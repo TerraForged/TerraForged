@@ -1,3 +1,3 @@
 # TerraForged
 
-![](terraforged.png)
+![](TerraForgedCore/src/resources/terraforged.png)
