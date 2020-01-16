@@ -1,0 +1,13 @@
+allprojects {
+    apply plugin: "java"
+    group = "com.terraforged"
+    version = "${mod_version}${getBuildNumber()}"
+}
+
+static def getBuildNumber() {
+    def buildNumber = System.getenv("BUILD_NUMBER")
+    if (buildNumber == null) {
+        return ""
+    }
+    return "-${buildNumber}"
+}
