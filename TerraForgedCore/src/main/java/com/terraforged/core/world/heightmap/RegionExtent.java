@@ -38,14 +38,6 @@ public interface RegionExtent extends Extent {
     }
 
     @Override
-    default Cell<Terrain> getCell(int x, int z) {
-        int regionX = chunkToRegion(Size.blockToChunk(x));
-        int regionZ = chunkToRegion(Size.blockToChunk(z));
-        Region region = getRegion(regionX, regionZ);
-        return region.getCell(x, z);
-    }
-
-    @Override
     default void visit(int minX, int minZ, int maxX, int maxZ, Cell.Visitor<Terrain> visitor) {
         int minRegionX = chunkToRegion(Size.blockToChunk(minX));
         int minRegionZ = chunkToRegion(Size.blockToChunk(minZ));

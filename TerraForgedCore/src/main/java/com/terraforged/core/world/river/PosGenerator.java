@@ -67,8 +67,8 @@ public class PosGenerator {
             int pz = z + dz;
             int wx = (int) domain.getX(px, pz);
             int wz = (int) domain.getY(px, pz);
-            float value1 = heightmap.getValue(lookup, px, pz);
-            float value2 = heightmap.getValue(lookup, wx, wz);
+            float value1 = getHeight(px, pz);
+            float value2 = getHeight(wx, wz);
             RiverNode.Type type1 = RiverNode.getType(value1);
             RiverNode.Type type2 = RiverNode.getType(value2);
             if (type1 == type2 && type1 != RiverNode.Type.NONE) {
@@ -91,8 +91,8 @@ public class PosGenerator {
             }
             int wx = (int) domain.getX(px, pz);
             int wz = (int) domain.getY(px, pz);
-            float value1 = heightmap.getValue(lookup, px, pz);
-            float value2 = heightmap.getValue(lookup, wx, wz);
+            float value1 = getHeight(px, pz);
+            float value2 = getHeight(wx, wz);
             RiverNode.Type type1 = RiverNode.getType(value1);
             RiverNode.Type type2 = RiverNode.getType(value2);
             if (type1 == type2 && type1 == point.type.opposite()) {
@@ -112,8 +112,8 @@ public class PosGenerator {
             int pz = z + dz;
             int wx = (int) domain.getX(px, pz);
             int wz = (int) domain.getY(px, pz);
-            float value1 = heightmap.getValue(lookup, px, pz);
-            float value2 = heightmap.getValue(lookup, wx, wz);
+            float value1 = getHeight(px, pz);
+            float value2 = getHeight(wx, wz);
             RiverNode.Type type1 = RiverNode.getType(value1);
             RiverNode.Type type2 = RiverNode.getType(value2);
             if (type1 == type2 && type1 == match) {
@@ -130,13 +130,18 @@ public class PosGenerator {
             int pz = z + dz;
             int wx = (int) domain.getX(px, pz);
             int wz = (int) domain.getY(px, pz);
-            float value1 = heightmap.getValue(lookup, px, pz);
-            float value2 = heightmap.getValue(lookup, wx, wz);
+            float value1 = getHeight(px, pz);
+            float value2 = getHeight(wx, wz);
             if (value1 > minHeight && value2 > minHeight) {
                 return new RiverNode(px, pz, RiverNode.Type.START);
             }
         }
         return null;
+    }
+
+    private float getHeight(int x, int z) {
+        heightmap.visit(lookup, x, z);
+        return lookup.value;
     }
 
     private static int index(int x, int z) {

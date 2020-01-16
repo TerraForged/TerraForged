@@ -16,7 +16,7 @@ public class ContinentMultiBlender extends MultiBlender {
     }
 
     @Override
-    public float getValue(Cell<Terrain> cell, float x, float z) {
+    public float getSelect(Cell<Terrain> cell, float x, float z) {
         return cell.continentEdge;
     }
 }

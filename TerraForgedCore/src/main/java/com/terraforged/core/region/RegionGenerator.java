@@ -84,13 +84,13 @@ public class RegionGenerator implements RegionExtent {
             try (ThreadPool.Batcher batcher = threadPool.batcher(region.getChunkCount())) {
                 region.generateZoom(generator.getHeightmap(), centerX, centerZ, zoom, batcher);
             }
+            region.check();
             postProcess(region, generator, centerX, centerZ, zoom, filter);
             return region;
         }
     }
 
-    private void postProcess(Region region, WorldGenerator generator, float centerX, float centerZ, float zoom,
-                             boolean filter) {
+    private void postProcess(Region region, WorldGenerator generator, float centerX, float centerZ, float zoom, boolean filter) {
         Filterable<Terrain> filterable = region.filterable();
         if (filter) {
             generator.getFilters().setRegion(region.getRegionX(), region.getRegionZ());

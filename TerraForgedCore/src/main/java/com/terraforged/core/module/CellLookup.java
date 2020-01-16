@@ -1,21 +1,29 @@
 package com.terraforged.core.module;
 
-import me.dags.noise.Module;
+import com.terraforged.core.cell.Cell;
+import com.terraforged.core.cell.Populator;
+import com.terraforged.core.world.heightmap.Heightmap;
+import com.terraforged.core.world.terrain.Terrain;
 
-public class CellLookup implements Module {
+public class CellLookup implements Populator {
 
     private final int scale;
-    private final Module module;
+    private final Heightmap heightmap;
 
-    public CellLookup(Module module, int scale) {
-        this.module = module;
+    public CellLookup(Heightmap heightmap, int scale) {
+        this.heightmap = heightmap;
         this.scale = scale;
     }
 
     @Override
-    public float getValue(float x, float y) {
+    public void apply(Cell<Terrain> cell, float x, float y) {
         float px = x * scale;
         float pz = y * scale;
-        return module.getValue(px, pz);
+        heightmap.getValue(px, pz);
+    }
+
+    @Override
+    public void tag(Cell<Terrain> cell, float x, float y) {
+
     }
 }

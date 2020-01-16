@@ -5,7 +5,6 @@ import com.terraforged.core.world.terrain.Terrain;
 
 public interface ChunkReader extends ChunkHolder {
 
-    @Override
     Cell<Terrain> getCell(int dx, int dz);
 
     @Override

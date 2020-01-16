@@ -19,7 +19,7 @@ public class Size {
     }
 
     public int indexOf(int x, int z) {
-        return z * total + x;
+        return (z * total) + x;
     }
 
     public static int chunkToBlock(int i) {

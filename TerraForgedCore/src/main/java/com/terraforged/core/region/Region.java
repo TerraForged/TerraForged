@@ -77,7 +77,6 @@ public class Region implements Extent {
         return new FilterRegion();
     }
 
-    @Override
     public Cell<Terrain> getCell(int blockX, int blockZ) {
         int relBlockX = blockSize.border + blockSize.mask(blockX);
         int relBlockZ = blockSize.border + blockSize.mask(blockZ);
@@ -127,6 +126,26 @@ public class Region implements Extent {
                 GenChunk chunk = computeChunk(index, cx, cz);
                 Runnable task = new ChunkZoomTask(chunk, heightmap, translateX, translateZ, zoom);
                 batcher.submit(task);
+            }
+        }
+    }
+
+    public void check() {
+        for (int dz = 0; dz < chunkSize.total; dz++) {
+            for (int dx = 0; dx < chunkSize.total; dx++) {
+                int index = chunkSize.indexOf(dx, dz);
+                if (chunks[index] == null) {
+                    throw new NullPointerException("Null chunk " + dx + ":" + dz);
+                }
+            }
+        }
+
+        for (int dz = 0; dz < blockSize.total; dz++) {
+            for (int dx = 0; dx < blockSize.total; dx++) {
+                int index = blockSize.indexOf(dx, dz);
+                if (blocks[index] == null) {
+                    throw new NullPointerException("Null block " + dx + ":" + dz);
+                }
             }
         }
     }
@@ -233,14 +252,18 @@ public class Region implements Extent {
         private final int chunkZ;
         private final int blockX;
         private final int blockZ;
-        private final int relBlockX;
-        private final int relBlockZ;
+        private final int regionBlockX;
+        private final int regionBlockZ;
 
-        private GenChunk(int relChunkX, int relChunkZ) {
-            this.relBlockX = relChunkX << 4;
-            this.relBlockZ = relChunkZ << 4;
-            this.chunkX = Region.this.chunkX + relChunkX;
-            this.chunkZ = Region.this.chunkZ + relChunkZ;
+        // the coordinate of the chunk within this region (relative to 0,0)
+        private GenChunk(int regionChunkX, int regionChunkZ) {
+            // the block coordinate of this chunk within this region (relative 0,0)
+            this.regionBlockX = regionChunkX << 4;
+            this.regionBlockZ = regionChunkZ << 4;
+            // the real coordinate of this chunk within the world
+            this.chunkX = Region.this.chunkX + regionChunkX;
+            this.chunkZ = Region.this.chunkZ + regionChunkZ;
+            // the real block coordinate of this chunk within the world
             this.blockX = chunkX << 4;
             this.blockZ = chunkZ << 4;
         }
@@ -267,16 +290,16 @@ public class Region implements Extent {
 
         @Override
         public Cell<Terrain> getCell(int blockX, int blockZ) {
-            int relX = relBlockX + (blockX & 15);
-            int relZ = relBlockZ + (blockZ & 15);
+            int relX = regionBlockX + (blockX & 15);
+            int relZ = regionBlockZ + (blockZ & 15);
             int index = blockSize.indexOf(relX, relZ);
             return blocks[index];
         }
 
         @Override
         public Cell<Terrain> genCell(int blockX, int blockZ) {
-            int relX = relBlockX + (blockX & 15);
-            int relZ = relBlockZ + (blockZ & 15);
+            int relX = regionBlockX + (blockX & 15);
+            int relZ = regionBlockZ + (blockZ & 15);
             int index = blockSize.indexOf(relX, relZ);
             return computeCell(index);
         }

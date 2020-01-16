@@ -52,11 +52,14 @@ public class VoronoiContinentModule implements Populator {
 
     @Override
     public float getValue(float x, float y) {
-        Cell<Terrain> cell = new Cell<>();
-        apply(cell, x, y);
-        return cell.continentEdge;
+        if (true) {
+            throw new RuntimeException("no pls!");
+        } else {
+            Cell<Terrain> cell = new Cell<>();
+            apply(cell, x, y);
+            return cell.continentEdge;
+        }
     }
-
 
     @Override
     public void apply(Cell<Terrain> cell, final float x, final float y) {

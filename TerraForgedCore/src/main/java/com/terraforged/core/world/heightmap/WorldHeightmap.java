@@ -1,9 +1,5 @@
 package com.terraforged.core.world.heightmap;
 
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.func.EdgeFunc;
-import me.dags.noise.func.Interpolation;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
 import com.terraforged.core.module.Blender;
@@ -23,6 +19,10 @@ import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.TerrainPopulator;
 import com.terraforged.core.world.terrain.Terrains;
 import com.terraforged.core.world.terrain.provider.TerrainProvider;
+import me.dags.noise.Module;
+import me.dags.noise.Source;
+import me.dags.noise.func.EdgeFunc;
+import me.dags.noise.func.Interpolation;
 
 public class WorldHeightmap implements Heightmap {
 
@@ -144,8 +144,10 @@ public class WorldHeightmap implements Heightmap {
         this.riverManager = new RiverManager(this, context);
     }
 
-    public RiverManager getRiverManager() {
-        return riverManager;
+    @Override
+    public void visit(Cell<Terrain> cell, float x, float z) {
+        continent.apply(cell, x, z);
+        root.apply(cell, x, z);
     }
 
     @Override

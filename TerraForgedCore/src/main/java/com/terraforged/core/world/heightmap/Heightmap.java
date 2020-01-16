@@ -1,26 +1,18 @@
 package com.terraforged.core.world.heightmap;
 
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.cell.Populator;
 import com.terraforged.core.cell.Extent;
+import com.terraforged.core.cell.Populator;
 import com.terraforged.core.region.Size;
 import com.terraforged.core.util.concurrent.ObjectPool;
 import com.terraforged.core.world.climate.Climate;
-import com.terraforged.core.world.river.RiverManager;
 import com.terraforged.core.world.terrain.Terrain;
-
-import java.rmi.UnexpectedException;
 
 public interface Heightmap extends Populator, Extent {
 
     Climate getClimate();
 
-    RiverManager getRiverManager();
-
-    @Override
-    default Cell<Terrain> getCell(int x, int z) {
-        throw new RuntimeException("Don't use this pls");
-    }
+    void visit(Cell<Terrain> cell, float x, float z);
 
     @Override
     default void visit(int minX, int minZ, int maxX, int maxZ, Cell.Visitor<Terrain> visitor) {

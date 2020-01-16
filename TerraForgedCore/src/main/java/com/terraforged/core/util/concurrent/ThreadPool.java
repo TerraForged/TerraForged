@@ -66,7 +66,6 @@ public class ThreadPool {
                 for (Future<?> future : tasks) {
                     if (!future.isDone()) {
                         hasMore = true;
-                        break;
                     }
                 }
             }
