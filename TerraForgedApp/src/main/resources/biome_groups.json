@@ -1,0 +1,168 @@
+{
+  "TROPICAL_RAINFOREST": [
+    "biomesoplenty:overgrown_cliffs",
+    "biomesoplenty:tropical_rainforest",
+    "minecraft:bamboo_jungle",
+    "minecraft:bamboo_jungle_hills",
+    "minecraft:jungle",
+    "minecraft:jungle_hills",
+    "minecraft:modified_jungle"
+  ],
+  "SAVANNA": [
+    "biomesoplenty:brushland",
+    "biomesoplenty:scrubland",
+    "biomesoplenty:xeric_shrubland",
+    "minecraft:savanna",
+    "minecraft:savanna_plateau",
+    "minecraft:shattered_savanna",
+    "minecraft:shattered_savanna_plateau",
+    "terraforged:savanna_scrub",
+    "terraforged:shattered_savanna_scrub"
+  ],
+  "DESERT": [
+    "biomesoplenty:oasis",
+    "biomesoplenty:outback",
+    "biomesoplenty:wasteland",
+    "minecraft:badlands",
+    "minecraft:badlands_plateau",
+    "minecraft:desert",
+    "minecraft:desert_hills",
+    "minecraft:desert_lakes",
+    "minecraft:eroded_badlands",
+    "minecraft:modified_badlands_plateau",
+    "minecraft:modified_wooded_badlands_plateau",
+    "minecraft:wooded_badlands_plateau"
+  ],
+  "TEMPERATE_RAINFOREST": [
+    "biomesoplenty:rainforest",
+    "biomesoplenty:temperate_rainforest",
+    "biomesoplenty:temperate_rainforest_hills",
+    "minecraft:plains"
+  ],
+  "TEMPERATE_FOREST": [
+    "biomesoplenty:cherry_blossom_grove",
+    "biomesoplenty:grove",
+    "biomesoplenty:mystic_grove",
+    "biomesoplenty:orchard",
+    "biomesoplenty:pumpkin_patch",
+    "biomesoplenty:redwood_forest",
+    "biomesoplenty:redwood_forest_edge",
+    "biomesoplenty:seasonal_forest",
+    "biomesoplenty:silkglade",
+    "biomesoplenty:temperate_rainforest",
+    "biomesoplenty:temperate_rainforest_hills",
+    "biomesoplenty:woodland",
+    "minecraft:birch_forest",
+    "minecraft:birch_forest_hills",
+    "minecraft:dark_forest",
+    "minecraft:flower_forest",
+    "minecraft:forest",
+    "minecraft:plains",
+    "minecraft:tall_birch_forest",
+    "minecraft:wooded_hills"
+  ],
+  "GRASSLAND": [
+    "biomesoplenty:bayou",
+    "biomesoplenty:bog",
+    "biomesoplenty:chaparral",
+    "biomesoplenty:floodplain",
+    "biomesoplenty:grassland",
+    "biomesoplenty:highland_moor",
+    "biomesoplenty:lavender_field",
+    "biomesoplenty:lush_grassland",
+    "biomesoplenty:lush_swamp",
+    "biomesoplenty:mangrove",
+    "biomesoplenty:marsh",
+    "biomesoplenty:mire",
+    "biomesoplenty:pasture",
+    "biomesoplenty:prairie",
+    "biomesoplenty:shrubland",
+    "biomesoplenty:steppe",
+    "biomesoplenty:wetland",
+    "minecraft:plains",
+    "minecraft:sunflower_plains",
+    "minecraft:swamp"
+  ],
+  "COLD_STEPPE": [
+    "terraforged:cold_steppe"
+  ],
+  "STEPPE": [
+    "biomesoplenty:steppe",
+    "terraforged:steppe"
+  ],
+  "TAIGA": [
+    "biomesoplenty:boreal_forest",
+    "biomesoplenty:coniferous_forest",
+    "biomesoplenty:dead_forest",
+    "biomesoplenty:fir_clearing",
+    "biomesoplenty:flower_meadow",
+    "biomesoplenty:maple_woods",
+    "biomesoplenty:meadow",
+    "biomesoplenty:ominous_woods",
+    "biomesoplenty:shield",
+    "biomesoplenty:tundra",
+    "minecraft:giant_spruce_taiga",
+    "minecraft:giant_tree_taiga",
+    "minecraft:giant_tree_taiga_hills",
+    "minecraft:taiga",
+    "minecraft:taiga_hills",
+    "terraforged:taiga_scrub"
+  ],
+  "TUNDRA": [
+    "biomesoplenty:alps",
+    "biomesoplenty:alps_foothills",
+    "biomesoplenty:snowy_coniferous_forest",
+    "biomesoplenty:snowy_fir_clearing",
+    "biomesoplenty:snowy_forest",
+    "minecraft:ice_spikes",
+    "minecraft:snowy_taiga",
+    "minecraft:snowy_taiga_hills",
+    "minecraft:snowy_tundra",
+    "terraforged:snowy_taiga_scrub"
+  ],
+  "ALPINE": [
+    "biomesoplenty:highland",
+    "minecraft:gravelly_mountains",
+    "minecraft:modified_gravelly_mountains",
+    "minecraft:mountains",
+    "minecraft:snowy_mountains",
+    "minecraft:snowy_taiga_mountains",
+    "minecraft:taiga_mountains",
+    "minecraft:wooded_mountains"
+  ],
+  "rivers": {
+    "COLD": [
+      "minecraft:frozen_river"
+    ],
+    "MEDIUM": [
+      "minecraft:river"
+    ],
+    "WARM": []
+  },
+  "oceans": {
+    "COLD": [
+      "minecraft:cold_ocean",
+      "minecraft:frozen_ocean"
+    ],
+    "MEDIUM": [
+      "minecraft:ocean"
+    ],
+    "WARM": [
+      "minecraft:lukewarm_ocean",
+      "minecraft:warm_ocean"
+    ]
+  },
+  "deep_oceans": {
+    "COLD": [
+      "minecraft:deep_cold_ocean",
+      "minecraft:deep_frozen_ocean"
+    ],
+    "MEDIUM": [
+      "minecraft:deep_ocean"
+    ],
+    "WARM": [
+      "minecraft:deep_lukewarm_ocean",
+      "minecraft:deep_warm_ocean"
+    ]
+  }
+}

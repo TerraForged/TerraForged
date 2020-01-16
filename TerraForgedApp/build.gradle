@@ -1,0 +1,18 @@
+plugins {
+    id "java"
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    compile "org.processing:core:3.3.7"
+    compile project(":TerraForgedCore")
+}
+
+jar {
+    manifest { attributes "Main-Class": "com.terraforged.app.Main" }
+}

@@ -1,2 +1,2 @@
 rootProject.name = "TerraForged"
-include "FeatureManager", "Noise2D"
+include ":Noise2D", ":FeatureManager", ":TerraForgedCore", ":TerraForgedApp"
