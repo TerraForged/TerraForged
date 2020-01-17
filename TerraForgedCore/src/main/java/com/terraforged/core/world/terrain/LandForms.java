@@ -35,7 +35,7 @@ public class LandForms {
 
     public LandForms(Levels levels) {
         terrainHorizontalScale = 1F;
-        terrainVerticalScale = 1F;
+        terrainVerticalScale = 0.9775F;
         groundLevel = levels.ground;
         seaLevel = levels.water;
     }
