@@ -46,7 +46,7 @@ public class Steepness implements Filter, Filter.Visitor {
             }
         }
         cell.steepness = Math.min(1, totalHeightDif * scaler);
-        if (cell.tag == terrains.coast && cell.steepness < 0.2F) {
+        if (cell.tag == terrains.coast && cell.steepness < 0.22F) {
             cell.tag = terrains.beach;
         }
     }

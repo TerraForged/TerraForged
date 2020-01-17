@@ -42,6 +42,10 @@ public enum BiomeType {
         return color;
     }
 
+    public boolean isExtreme() {
+        return this == TUNDRA || this == DESERT;
+    }
+
     public static BiomeType get(float temperature, float moisture) {
         return getCurve(temperature, moisture);
     }

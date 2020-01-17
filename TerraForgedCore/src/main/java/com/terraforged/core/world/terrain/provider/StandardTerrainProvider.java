@@ -42,12 +42,12 @@ public class StandardTerrainProvider implements TerrainProvider {
         registerMixable(context.terrain.hills, landForms.hills1(context.seed));
         registerMixable(context.terrain.hills, landForms.hills2(context.seed));
         registerMixable(context.terrain.dales, landForms.dales(context.seed));
-        registerMixable(context.terrain.badlands, landForms.badlands2(context.seed));
+        registerMixable(context.terrain.badlands, landForms.badlands(context.seed));
         registerMixable(context.terrain.plateau, landForms.plateau(context.seed));
         registerMixable(context.terrain.torridonian, landForms.torridonian(context.seed));
 
         registerUnMixable(new VolcanoPopulator(context.seed, config, context.levels, context.terrain));
-        registerUnMixable(context.terrain.badlands, landForms.badlands2(context.seed));
+        registerUnMixable(context.terrain.badlands, landForms.badlands(context.seed));
         registerUnMixable(context.terrain.mountains, landForms.mountains2(context.seed));
         registerUnMixable(context.terrain.mountains, landForms.mountains3(context.seed));
     }

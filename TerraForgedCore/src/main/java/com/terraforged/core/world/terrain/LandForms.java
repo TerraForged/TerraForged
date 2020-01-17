@@ -12,7 +12,7 @@ public class LandForms {
     private static final double PLAINS_V = 0.24;
 
     public static final int PLATEAU_H = 500;
-    public static final double PLATEAU_V = 0.45;
+    public static final double PLATEAU_V = 0.475;
 
     public static final int LOESS_H0 = 100;
     public static final int LOESS_H1 = 200;
@@ -35,7 +35,7 @@ public class LandForms {
 
     public LandForms(Levels levels) {
         terrainHorizontalScale = 1F;
-        terrainVerticalScale = 0.975F;
+        terrainVerticalScale = 1F;
         groundLevel = levels.ground;
         seaLevel = levels.water;
     }
@@ -118,16 +118,6 @@ public class LandForms {
                 .bias(groundLevel);
     }
 
-    public Module badlands(Seed seed) {
-        Module ridge = Source.build(seed.next(), LOESS_H0, 4).ridge().scale(0.25);
-        Module ridge2 = Source.build(seed.next(), LOESS_H1, 3).gain(1.5).ridge().scale(0.75);
-        Module mask = Source.perlin(seed.next(), LOESS_H1 * 2, 2).clamp(0.2, 0.9).map(0, 1);
-        return ridge.add(ridge2).mult(mask)
-                .warp(seed.next(), 360, 3, 200)
-                .scale(LOESS_V * terrainVerticalScale)
-                .bias(groundLevel);
-    }
-
     public Module hills1(Seed seed) {
         return Source.perlin(seed.next(), 200, 3)
                 .mult(Source.billow(seed.next(), 400, 3).alpha(0.5))
@@ -159,7 +149,7 @@ public class LandForms {
         Module hills = combined
                 .pow(1.125)
                 .warp(seed.next(), 300, 1, 100);
-        return hills.scale(0.225).bias(groundLevel);
+        return hills.scale(0.24).bias(groundLevel);
     }
 
     public Module mountains(Seed seed) {
@@ -203,7 +193,7 @@ public class LandForms {
         return terraced.scale(scale).bias(groundLevel);
     }
 
-    public Module badlands2(Seed seed) {
+    public Module badlands(Seed seed) {
         Module mask = Source.perlin(seed.next(), 800, 1).clamp(0.35, 0.65).map(0, 1);
         Module hills = Source.ridge(seed.next(), 500, 4)
                 .warp(seed.next(), 400, 2, 100)

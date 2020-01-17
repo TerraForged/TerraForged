@@ -39,7 +39,7 @@ public class SwampPools implements Decorator {
             return;
         }
 
-        if (cell.value <= levels.water) {
+        if (cell.value <= minY) {
             return;
         }
 
