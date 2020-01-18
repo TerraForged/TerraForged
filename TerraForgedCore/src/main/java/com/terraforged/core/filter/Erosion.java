@@ -41,6 +41,8 @@ public class Erosion implements Filter {
         }
 
         applyMain(map, seedX, seedZ, iterations, random);
+
+        applyNeighbours(map, seedX, seedZ, iterations, random);
     }
 
     private int nextCoord(Filterable<?> map, Random random) {
