@@ -2,7 +2,9 @@ package com.terraforged.core.filter;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.settings.Settings;
+import com.terraforged.core.util.PosIterator;
 import com.terraforged.core.world.heightmap.Levels;
+import me.dags.noise.util.NoiseUtil;
 
 import java.util.Random;
 
@@ -19,12 +21,12 @@ public class Erosion implements Filter {
     private int maxDropletLifetime = 30;
     private float initialWaterVolume = 1;
     private float initialSpeed = 1;
-    private final Random random = new Random();
     private final TerrainPos gradient = new TerrainPos();
     private int[][] erosionBrushIndices = new int[0][];
     private float[][] erosionBrushWeights = new float[0][];
 
     private final Modifier modifier;
+    private final Random random = new Random();
 
     public Erosion(Settings settings, Levels levels) {
         erodeSpeed = settings.filters.erosion.erosionRate;
@@ -33,18 +35,64 @@ public class Erosion implements Filter {
     }
 
     @Override
-    public void setSeed(long seed) {
-        random.setSeed(seed);
+    public void apply(Filterable<?> map, int seedX, int seedZ, int iterations) {
+        if (erosionBrushIndices.length != map.getRawSize()) {
+            init(map.getRawSize(), erosionRadius);
+        }
+
+        applyMain(map, seedX, seedZ, iterations, random);
     }
 
-    @Override
-    public void apply(Filterable<?> cellMap) {
-        int size = cellMap.getRawWidth();
-        Cell<?>[] cells = cellMap.getBacking();
+    private int nextCoord(Filterable<?> map, Random random) {
+        return random.nextInt(map.getRawSize() - 1);
+    }
 
-        // Create water droplet at random point on map
-        float posX = random.nextInt(size - 1);
-        float posY = random.nextInt(size - 1);
+    private void applyMain(Filterable<?> map, int seedX, int seedZ, int iterations, Random random) {
+        random.setSeed(NoiseUtil.seed(seedX, seedZ));
+        while (iterations-- > 0) {
+            int posX = nextCoord(map, random);
+            int posZ = nextCoord(map, random);
+            try {
+                apply(map.getBacking(), posX, posZ, map.getRawSize());
+            } catch (Throwable t) {
+                System.out.println(posX + ":" + posZ + "(" + map.getRawSize() + ")");
+                throw t;
+            }
+        }
+    }
+
+    private void applyNeighbours(Filterable<?> map, int centerX, int centerZ, int iterations, Random random) {
+        PosIterator regions = PosIterator.area(-1, -1, 3, 3);
+        while (regions.next()) {
+            int dx = regions.x();
+            int dz = regions.z();
+            if (dx == 0 && dz == 0) {
+                continue;
+            }
+            int rx = centerX + dx;
+            int rz = centerZ + dz;
+            random.setSeed(NoiseUtil.seed(rx, rz));
+            applyNeighbour(map, dx, dz, iterations, random);
+        }
+    }
+
+    private void applyNeighbour(Filterable<?> map, int deltaX, int deltaZ, int iterations, Random random) {
+        int max = map.getRawSize() - 1;
+        int offsetX = deltaX * map.getRawSize();
+        int offsetZ = deltaZ * map.getRawSize();
+        while (iterations-- > 0) {
+            int posX = nextCoord(map, random);
+            int posZ = nextCoord(map, random);
+
+            int relX = posX + offsetX;
+            int relZ = posZ + offsetZ;
+            if (relX >= 0 && relX < max && relZ >= 0 && relZ < max) {
+                apply(map.getBacking(), relX, relZ, map.getRawSize());
+            }
+        }
+    }
+
+    private void apply(Cell<?>[] cells, float posX, float posY, int size) {
         float dirX = 0;
         float dirY = 0;
         float speed = initialSpeed;
@@ -132,17 +180,6 @@ public class Erosion implements Filter {
         }
     }
 
-    @Override
-    public void apply(Filterable<?> map, int iterations) {
-        if (erosionBrushIndices.length != map.getRawWidth()) {
-            init(map.getRawWidth(), erosionRadius);
-        }
-
-        while (iterations-- > 0) {
-            apply(map);
-        }
-    }
-
     private void init(int size, int radius) {
         erosionBrushIndices = new int[size * size][];
         erosionBrushWeights = new float[size * size][];
@@ -191,13 +228,13 @@ public class Erosion implements Filter {
         }
     }
 
-    private void deposit(Cell cell, float amount) {
+    private void deposit(Cell<?> cell, float amount) {
         float change = modifier.modify(cell, amount);
         cell.value += change;
         cell.sediment += change;
     }
 
-    private void erode(Cell cell, float amount) {
+    private void erode(Cell<?> cell, float amount) {
         float change = modifier.modify(cell, amount);
         cell.value -= change;
         cell.erosion -= change;
@@ -208,7 +245,7 @@ public class Erosion implements Filter {
         private float gradientX;
         private float gradientY;
 
-        private TerrainPos update(Cell[] nodes, int mapSize, float posX, float posY) {
+        private TerrainPos update(Cell<?>[] nodes, int mapSize, float posX, float posY) {
             int coordX = (int) posX;
             int coordY = (int) posY;
 

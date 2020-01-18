@@ -1,12 +1,10 @@
 package com.terraforged.core.region;
 
-import com.terraforged.core.filter.Filterable;
 import com.terraforged.core.util.concurrent.ObjectPool;
 import com.terraforged.core.util.concurrent.ThreadPool;
 import com.terraforged.core.world.WorldGenerator;
 import com.terraforged.core.world.WorldGeneratorFactory;
 import com.terraforged.core.world.heightmap.RegionExtent;
-import com.terraforged.core.world.terrain.Terrain;
 
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
@@ -69,11 +67,7 @@ public class RegionGenerator implements RegionExtent {
     }
 
     private void postProcess(Region region, WorldGenerator generator) {
-        Filterable<Terrain> filterable = region.filterable();
-        generator.getFilters().setRegion(region.getRegionX(), region.getRegionZ());
-        generator.getFilters().getErosion().apply(filterable, generator.getFilters().getSettings().erosion.iterations);
-        generator.getFilters().getSmoothing().apply(filterable, generator.getFilters().getSettings().smoothing.iterations);
-        generator.getFilters().getSteepness().apply(filterable);
+        generator.getFilters().apply(region);
         region.decorate(generator.getDecorators().getDecorators());
     }
 
@@ -91,15 +85,9 @@ public class RegionGenerator implements RegionExtent {
     }
 
     private void postProcess(Region region, WorldGenerator generator, float centerX, float centerZ, float zoom, boolean filter) {
-        Filterable<Terrain> filterable = region.filterable();
         if (filter) {
-            generator.getFilters().setRegion(region.getRegionX(), region.getRegionZ());
-            generator.getFilters().getErosion().apply(filterable, generator.getFilters().getSettings().erosion.iterations);
-            generator.getFilters().getSmoothing().apply(filterable, generator.getFilters().getSettings().smoothing.iterations);
+            generator.getFilters().apply(region);
         }
-
-        generator.getFilters().getSteepness().apply(filterable);
-
 //        region.decorateZoom(generator.getDecorators().getDecorators(), centerX, centerZ, zoom);
     }
 

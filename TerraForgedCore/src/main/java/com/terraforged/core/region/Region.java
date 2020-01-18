@@ -308,12 +308,7 @@ public class Region implements Extent {
     private class FilterRegion implements Filterable<Terrain> {
 
         @Override
-        public int getRawWidth() {
-            return blockSize.total;
-        }
-
-        @Override
-        public int getRawHeight() {
+        public int getRawSize() {
             return blockSize.total;
         }
 

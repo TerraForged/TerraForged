@@ -20,7 +20,7 @@ public class Steepness implements Filter, Filter.Visitor {
     }
 
     @Override
-    public void apply(Filterable<?> cellMap) {
+    public void apply(Filterable<?> cellMap, int seedX, int seedZ, int iterations) {
         iterate(cellMap, this);
     }
 

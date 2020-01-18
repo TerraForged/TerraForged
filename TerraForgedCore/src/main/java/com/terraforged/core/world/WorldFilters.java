@@ -1,10 +1,12 @@
 package com.terraforged.core.world;
 
-import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.filter.Erosion;
+import com.terraforged.core.filter.Filterable;
 import com.terraforged.core.filter.Smoothing;
 import com.terraforged.core.filter.Steepness;
+import com.terraforged.core.region.Region;
 import com.terraforged.core.settings.FilterSettings;
+import com.terraforged.core.world.terrain.Terrain;
 
 public class WorldFilters {
 
@@ -21,26 +23,10 @@ public class WorldFilters {
         this.steepness = new Steepness(1, 10F, context.terrain);
     }
 
-    public void setRegion(int regionX, int regionZ) {
-        long seed = NoiseUtil.seed(regionX, regionZ);
-        getErosion().setSeed(seed);
-        getSmoothing().setSeed(seed);
-        getSteepness().setSeed(seed);
-    }
-
-    public FilterSettings getSettings() {
-        return settings;
-    }
-
-    public Erosion getErosion() {
-        return erosion;
-    }
-
-    public Smoothing getSmoothing() {
-        return smoothing;
-    }
-
-    public Steepness getSteepness() {
-        return steepness;
+    public void apply(Region region) {
+        Filterable<Terrain> map = region.filterable();
+        erosion.apply(map, region.getRegionX(), region.getRegionZ(), settings.erosion.iterations);
+        smoothing.apply(map, region.getRegionX(), region.getRegionZ(), settings.smoothing.iterations);
+        steepness.apply(map, region.getRegionX(), region.getRegionZ(), 1);
     }
 }
