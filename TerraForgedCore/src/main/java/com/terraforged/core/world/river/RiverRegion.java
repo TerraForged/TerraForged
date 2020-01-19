@@ -25,7 +25,6 @@ public class RiverRegion {
 //    private static final float LAKE_MIN_SIZE = 50;
 //    private static final float LAKE_MAX_SIZE = 100;
 
-    private final int seed;
     private final Domain domain;
     private final Terrains terrains;
     private final LakeConfig lake;
@@ -37,7 +36,7 @@ public class RiverRegion {
     private final List<Lake> lakes = new LinkedList<>();
 
     public RiverRegion(int regionX, int regionZ, WorldHeightmap heightmap, GeneratorContext context, RiverConfig primary, RiverConfig secondary, RiverConfig tertiary, LakeConfig lake) {
-        this.seed = new Random(NoiseUtil.seed(regionX, regionZ)).nextInt();
+        int seed = new Random(NoiseUtil.seed(regionX, regionZ)).nextInt();
         this.lake = lake;
         this.primary = primary;
         this.secondary = secondary;
@@ -70,7 +69,7 @@ public class RiverRegion {
         List<River> rivers = new LinkedList<>();
 
         // generates main rivers until either 10 attempts have passed or 2 rivers generate
-        for (int i = 0; rivers.size() < 1 && i < 20; i++) {
+        for (int i = 0; rivers.size() < 2 && i < 50; i++) {
             generateRiver(x, z, pos, primary, random, rivers);
         }
 
