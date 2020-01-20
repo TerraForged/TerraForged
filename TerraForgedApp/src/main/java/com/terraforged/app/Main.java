@@ -146,9 +146,9 @@ public class Main extends Applet {
                 {"Zoom: ", String.format("%.2f", controller.zoomLevel())},
                 {"Area: ", String.format("%sx%s [%sx%s]", blocks, blocks, resolution, resolution)},
                 {"Center: ", String.format("x=%.0f, y=%s, z=%.0f", offsetX, cache.getCenterHeight(), offsetZ)},
-                {"Terrain: ", String.format("%s:%s", cache.getCenterTerrain().getName(),
-                        cache.getCenterBiomeType().name())},
-                {"Biome: ", String.format("%s", biomeProvider.getBiome(cache.getCenterCell()).name)},
+                {"Terrain: ", cache.getCenterTerrain().getName()},
+                {"BiomeType:", cache.getCenterBiomeType().name()},
+//                {"Biome: ", String.format("%s", biomeProvider.getBiome(cache.getCenterCell()).name)},
                 {"Overlay: ", colorModeName()},
         };
 
