@@ -59,9 +59,6 @@ public class Climate {
         biomeNoise.apply(cell, x, z, mask);
 
         modifyTemp(cell, x, z);
-        cell.biomeTemperature = cell.temperature;
-
-        BiomeType.apply(cell);
     }
 
     private void modifyTemp(Cell<Terrain> cell, float x, float z) {
