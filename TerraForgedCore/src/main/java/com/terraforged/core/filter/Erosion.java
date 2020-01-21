@@ -43,11 +43,11 @@ public class Erosion implements Filter {
 
         applyMain(map, seedX, seedZ, iterations, random);
 
-        applyNeighbours(map, seedX, seedZ, iterations, random);
+//        applyNeighbours(map, seedX, seedZ, iterations, random);
     }
 
     private int nextCoord(Size size, Random random) {
-        return size.border + random.nextInt(size.size - 1);
+        return random.nextInt(size.total - 1);
     }
 
     private void applyMain(Filterable<?> map, int seedX, int seedZ, int iterations, Random random) {
@@ -56,44 +56,6 @@ public class Erosion implements Filter {
             int posX = nextCoord(map.getSize(), random);
             int posZ = nextCoord(map.getSize(), random);
             apply(map.getBacking(), posX, posZ, map.getSize().total);
-        }
-    }
-
-    private void applyNeighbours(Filterable<?> map, int centerX, int centerZ, int iterations, Random random) {
-        PosIterator regions = PosIterator.area(-1, -1, 3, 3);
-        while (regions.next()) {
-            int dx = regions.x();
-            int dz = regions.z();
-            if (dx == 0 && dz == 0) {
-                continue;
-            }
-            int rx = centerX + dx;
-            int rz = centerZ + dz;
-            random.setSeed(NoiseUtil.seed(rx, rz));
-            applyNeighbour(map, dx, dz, iterations, random);
-        }
-    }
-
-    private void applyNeighbour(Filterable<?> map, int deltaX, int deltaZ, int iterations, Random random) {
-        int min = -map.getSize().border;
-        int max = map.getSize().size + map.getSize().border - 1;
-        int neighbourOffsetX = deltaX * map.getSize().size;
-        int neighbourOffsetZ = deltaZ * map.getSize().size;
-        while (iterations-- > 0) {
-            int posX = nextCoord(map.getSize(), random);
-            int posZ = nextCoord(map.getSize(), random);
-            int relX = posX + neighbourOffsetX;
-            int relZ = posZ + neighbourOffsetZ;
-
-            // is inside the border box
-            if (relX > min && relZ > min && relX < max && relZ < max) {
-                // shouldn't happen
-                if (relX > 0 && relZ > 0 && relX < map.getSize().size && relZ < map.getSize().size) {
-                    System.out.println("err?");
-                    continue;
-                }
-                apply(map.getBacking(), relX, relZ, map.getSize().total);
-            }
         }
     }
 

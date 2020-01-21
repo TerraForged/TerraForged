@@ -32,7 +32,7 @@ public class Cache {
         this.renderer = RegionGenerator.builder()
                 .factory(new WorldGeneratorFactory(context))
                 .pool(ThreadPool.getCommon())
-                .size(3, 0)
+                .size(3, 2)
                 .build();
     }
 
