@@ -27,8 +27,8 @@ public class Smoothing implements Filter {
     }
 
     private void apply(Filterable<?> cellMap) {
-        int maxZ = cellMap.getRawSize() - radius;
-        int maxX = cellMap.getRawSize() - radius;
+        int maxZ = cellMap.getSize().total - radius;
+        int maxX = cellMap.getSize().total - radius;
         for (int z = radius; z < maxZ; z++) {
             for (int x = radius; x < maxX; x++) {
                 Cell<?> cell = cellMap.getCellRaw(x, z);

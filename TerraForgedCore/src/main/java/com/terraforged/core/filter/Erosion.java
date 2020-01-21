@@ -1,6 +1,7 @@
 package com.terraforged.core.filter;
 
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.region.Size;
 import com.terraforged.core.settings.Settings;
 import com.terraforged.core.util.PosIterator;
 import com.terraforged.core.world.heightmap.Levels;
@@ -36,8 +37,8 @@ public class Erosion implements Filter {
 
     @Override
     public void apply(Filterable<?> map, int seedX, int seedZ, int iterations) {
-        if (erosionBrushIndices.length != map.getRawSize()) {
-            init(map.getRawSize(), erosionRadius);
+        if (erosionBrushIndices.length != map.getSize().total) {
+            init(map.getSize().total, erosionRadius);
         }
 
         applyMain(map, seedX, seedZ, iterations, random);
@@ -45,21 +46,16 @@ public class Erosion implements Filter {
         applyNeighbours(map, seedX, seedZ, iterations, random);
     }
 
-    private int nextCoord(Filterable<?> map, Random random) {
-        return random.nextInt(map.getRawSize() - 1);
+    private int nextCoord(Size size, Random random) {
+        return size.border + random.nextInt(size.size - 1);
     }
 
     private void applyMain(Filterable<?> map, int seedX, int seedZ, int iterations, Random random) {
         random.setSeed(NoiseUtil.seed(seedX, seedZ));
         while (iterations-- > 0) {
-            int posX = nextCoord(map, random);
-            int posZ = nextCoord(map, random);
-            try {
-                apply(map.getBacking(), posX, posZ, map.getRawSize());
-            } catch (Throwable t) {
-                System.out.println(posX + ":" + posZ + "(" + map.getRawSize() + ")");
-                throw t;
-            }
+            int posX = nextCoord(map.getSize(), random);
+            int posZ = nextCoord(map.getSize(), random);
+            apply(map.getBacking(), posX, posZ, map.getSize().total);
         }
     }
 
@@ -79,17 +75,24 @@ public class Erosion implements Filter {
     }
 
     private void applyNeighbour(Filterable<?> map, int deltaX, int deltaZ, int iterations, Random random) {
-        int max = map.getRawSize() - 1;
-        int offsetX = deltaX * map.getRawSize();
-        int offsetZ = deltaZ * map.getRawSize();
+        int min = -map.getSize().border;
+        int max = map.getSize().size + map.getSize().border - 1;
+        int neighbourOffsetX = deltaX * map.getSize().size;
+        int neighbourOffsetZ = deltaZ * map.getSize().size;
         while (iterations-- > 0) {
-            int posX = nextCoord(map, random);
-            int posZ = nextCoord(map, random);
+            int posX = nextCoord(map.getSize(), random);
+            int posZ = nextCoord(map.getSize(), random);
+            int relX = posX + neighbourOffsetX;
+            int relZ = posZ + neighbourOffsetZ;
 
-            int relX = posX + offsetX;
-            int relZ = posZ + offsetZ;
-            if (relX >= 0 && relX < max && relZ >= 0 && relZ < max) {
-                apply(map.getBacking(), relX, relZ, map.getRawSize());
+            // is inside the border box
+            if (relX > min && relZ > min && relX < max && relZ < max) {
+                // shouldn't happen
+                if (relX > 0 && relZ > 0 && relX < map.getSize().size && relZ < map.getSize().size) {
+                    System.out.println("err?");
+                    continue;
+                }
+                apply(map.getBacking(), relX, relZ, map.getSize().total);
             }
         }
     }

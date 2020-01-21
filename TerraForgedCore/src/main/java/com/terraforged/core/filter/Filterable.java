@@ -2,10 +2,11 @@ package com.terraforged.core.filter;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Tag;
+import com.terraforged.core.region.Size;
 
 public interface Filterable<T extends Tag> {
 
-    int getRawSize();
+    Size getSize();
 
     Cell<T>[] getBacking();
 
