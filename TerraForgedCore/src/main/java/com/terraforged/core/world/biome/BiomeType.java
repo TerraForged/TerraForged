@@ -1,7 +1,7 @@
 package com.terraforged.core.world.biome;
 
-import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.cell.Cell;
+import me.dags.noise.util.NoiseUtil;
 
 import java.awt.*;
 
