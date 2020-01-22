@@ -93,7 +93,7 @@ public class WorldHeightmap implements Heightmap {
         // the voronoi controlled terrain regions
         Populator terrainRegions = new Selector(regionShape, terrainProvider.getPopulators());
         // the terrain type at region edges
-        Populator terrainRegionBorders = new TerrainPopulator(terrainProvider.getLandforms().steppe(seed), context.terrain.steppe);
+        Populator terrainRegionBorders = new TerrainPopulator(terrainProvider.getLandforms().plains(seed), context.terrain.steppe);
 
         // transitions between the unique terrain regions and the common border terrain
         Populator terrain = new Lerp(
