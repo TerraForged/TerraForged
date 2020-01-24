@@ -106,4 +106,12 @@ public class ThreadPool {
             return instance;
         }
     }
+
+    public static void shutdownCurrent() {
+        synchronized (lock) {
+            instance.shutdown();
+            // replace with the common pool
+            instance = new ThreadPool();
+        }
+    }
 }
