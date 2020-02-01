@@ -16,7 +16,7 @@ public class Smoothing implements Filter {
         this.radius = NoiseUtil.round(settings.filters.smoothing.smoothingRadius + 0.5F);
         this.rad2 = settings.filters.smoothing.smoothingRadius * settings.filters.smoothing.smoothingRadius;
         this.strength = settings.filters.smoothing.smoothingRate;
-        this.modifier = Modifier.range(levels.ground(10), levels.ground(150)).invert();
+        this.modifier = Modifier.range(levels.ground(1), levels.ground(120)).invert();
     }
 
     @Override
@@ -57,7 +57,6 @@ public class Smoothing implements Filter {
 
                 if (weights > 0) {
                     float dif = cell.value - (total / weights);
-//                    cell.value -= dif * strength;
                     cell.value -= modifier.modify(cell, dif * strength);
                 }
             }
