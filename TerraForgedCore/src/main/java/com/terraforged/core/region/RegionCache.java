@@ -21,7 +21,7 @@ public class RegionCache implements RegionExtent {
     public RegionCache(boolean queueNeighbours, RegionGenerator renderer) {
         this.renderer = renderer;
         this.queuing = queueNeighbours;
-        this.cache = new com.terraforged.core.util.Cache<>(30, 30, TimeUnit.SECONDS);
+        this.cache = new com.terraforged.core.util.Cache<>(180, 60, TimeUnit.SECONDS);
     }
 
     @Override
