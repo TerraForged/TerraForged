@@ -29,14 +29,14 @@ public class VolcanoPopulator extends TerrainPopulator {
         float midpoint = 0.3F;
         float range = 0.3F;
 
-        Module heightNoise = Source.perlin(seed.next(), 2, 1).map(0.45, 0.6);
+        Module heightNoise = Source.perlin(seed.next(), 2, 1).map(0.45, 0.65);
 
         this.height = Source.cellNoise(region.seed, region.scale, heightNoise)
                 .warp(region.warpX, region.warpZ, region.warpStrength);
 
         this.cone = Source.cellEdge(region.seed, region.scale, EdgeFunc.DISTANCE_2_DIV).invert()
                 .warp(region.warpX, region.warpZ, region.warpStrength)
-                .powCurve(10)
+                .powCurve(11)
                 .clamp(0.475, 1)
                 .map(0, 1)
                 .grad(0, 0.5, 0.5)
@@ -47,7 +47,7 @@ public class VolcanoPopulator extends TerrainPopulator {
                 .warp(seed.next(), 30, 1, 30)
                 .scale(0.1);
 
-        this.inversionPoint = 0.93F;
+        this.inversionPoint = 0.94F;
         this.blendLower = midpoint - (range / 2F);
         this.blendUpper = blendLower + range;
         this.blendRange = blendUpper - blendLower;
