@@ -58,13 +58,13 @@ public abstract class Renderer {
             if (cell.tag == applet.getCache().getTerrain().coast) {
                 hue = 15;
             }
-            float modifier = cell.mask;
+            float modifier = cell.mask(0.4F, 0.5F, 0F, 1F);
             float modAlpha = 0.1F;
             float mod = (1 - modAlpha) + (modifier * modAlpha);
             float sat = 70;
             float bri = 70;
             applet.fill(hue, 65, 70);
-            return height * el;
+            return cell.regionEdge * el;
         } else if(applet.controller.getColorMode() == Applet.EROSION) {
             float change = cell.sediment + cell.erosion;
             float value = Math.abs(cell.sediment * 250);

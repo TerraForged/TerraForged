@@ -88,7 +88,7 @@ public class RegionGenerator implements RegionExtent {
         if (filter) {
             generator.getFilters().apply(region);
         }
-//        region.decorateZoom(generator.getDecorators().getDecorators(), centerX, centerZ, zoom);
+        region.decorateZoom(generator.getDecorators().getDecorators(), centerX, centerZ, zoom);
     }
 
     public static Builder builder() {

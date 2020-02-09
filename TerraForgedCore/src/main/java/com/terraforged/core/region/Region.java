@@ -156,7 +156,9 @@ public class Region implements Extent {
                 int index = blockSize.indexOf(dx, dz);
                 GenCell cell = blocks[index];
                 for (Decorator decorator : decorators) {
-                    decorator.apply(cell, getBlockX() + dx, getBlockZ() + dz);
+                    if (decorator.apply(cell, getBlockX() + dx, getBlockZ() + dz)) {
+                        break;
+                    }
                 }
             }
         }

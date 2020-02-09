@@ -1,13 +1,14 @@
-package com.terraforged.core.module;
+package com.terraforged.core.world.continent;
 
-import me.dags.noise.func.Interpolation;
-import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
+import com.terraforged.core.module.MultiBlender;
 import com.terraforged.core.world.climate.Climate;
 import com.terraforged.core.world.terrain.Terrain;
+import me.dags.noise.func.Interpolation;
+import me.dags.noise.util.NoiseUtil;
 
-public class MultiBlender extends Select implements Populator {
+public class ContinentLerper3 implements Populator {
 
     private final Climate climate;
     private final Populator lower;
@@ -21,8 +22,7 @@ public class MultiBlender extends Select implements Populator {
     private final float lowerRange;
     private final float upperRange;
 
-    public MultiBlender(Climate climate, Populator control, Populator lower, Populator middle, Populator upper, float min, float mid, float max) {
-        super(control);
+    public ContinentLerper3(Climate climate, Populator lower, Populator middle, Populator upper, float min, float mid, float max) {
         this.climate = climate;
         this.lower = lower;
         this.upper = upper;
@@ -38,7 +38,7 @@ public class MultiBlender extends Select implements Populator {
 
     @Override
     public void apply(Cell<Terrain> cell, float x, float y) {
-        float select = getSelect(cell, x, y);
+        float select = cell.continentEdge;
         if (select < blendLower) {
             lower.apply(cell, x, y);
             return;
@@ -73,7 +73,7 @@ public class MultiBlender extends Select implements Populator {
 
     @Override
     public void tag(Cell<Terrain> cell, float x, float y) {
-        float select = getSelect(cell, x, y);
+        float select = cell.continentEdge;
         if (select < blendLower) {
             lower.tag(cell, x, y);
             return;
@@ -86,7 +86,6 @@ public class MultiBlender extends Select implements Populator {
 
         if (select < midpoint) {
             lower.tag(cell, x, y);
-//            upper.tag(cell, x, y);
             if (cell.value > cell.tag.getMax(climate.getRand().getValue(x, y))) {
                 upper.tag(cell, x, y);
             }

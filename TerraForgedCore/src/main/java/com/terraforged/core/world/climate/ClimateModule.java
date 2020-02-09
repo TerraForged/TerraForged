@@ -104,10 +104,10 @@ public class ClimateModule {
         }
 
         if (mask) {
-            cell.biomeMask = edgeValue(edgeDistance, edgeDistance2);
+            cell.biomeEdge = edgeValue(edgeDistance, edgeDistance2);
         } else {
             cell.biome = cellValue(seed, cellX, cellY);
-            cell.biomeMask = edgeValue(edgeDistance, edgeDistance2);
+            cell.biomeEdge = edgeValue(edgeDistance, edgeDistance2);
             cell.biomeMoisture = moisture.getValue(cellX + vec2f.x, cellY + vec2f.y);
             cell.biomeTemperature = temperature.getValue(cellX + vec2f.x, cellY + vec2f.y);
             cell.moisture = moisture.getValue(x, y);

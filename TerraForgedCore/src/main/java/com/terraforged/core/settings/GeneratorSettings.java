@@ -80,11 +80,11 @@ public class GeneratorSettings {
 
         @Range(min = 1, max = 200)
         @Comment("Controls the scale of shape distortion for biomes")
-        public int biomeWarpScale = 30;
+        public int biomeWarpScale = 35;
 
         @Range(min = 1, max = 200)
         @Comment("Controls the strength of shape distortion for biomes")
-        public int biomeWarpStrength = 30;
+        public int biomeWarpStrength = 70;
     }
 
     @Serializable
@@ -95,11 +95,11 @@ public class GeneratorSettings {
 
         @Range(min = 1, max = 100)
         @Comment("Controls the scale of the noise")
-        public int scale = 4;
+        public int scale = 8;
 
         @Range(min = 1, max = 5)
         @Comment("Controls the number of noise octaves")
-        public int octaves = 1;
+        public int octaves = 2;
 
         @Range(min = 0F, max = 5.5F)
         @Comment("Controls the gain subsequent noise octaves")
@@ -107,11 +107,11 @@ public class GeneratorSettings {
 
         @Range(min = 0F, max = 10.5F)
         @Comment("Controls the lacunarity of subsequent noise octaves")
-        public float lacunarity = 2F;
+        public float lacunarity = 2.5F;
 
         @Range(min = 1, max = 100)
         @Comment("Controls the strength of the noise")
-        public int strength = 12;
+        public int strength = 24;
 
         public Module build(int seed) {
             return Source.build(seed, scale, octaves).gain(gain).lacunarity(lacunarity).build(type).bias(-0.5);

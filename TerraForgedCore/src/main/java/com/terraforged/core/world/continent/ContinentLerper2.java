@@ -1,13 +1,12 @@
-package com.terraforged.core.module;
+package com.terraforged.core.world.continent;
 
-import me.dags.noise.Module;
-import me.dags.noise.func.Interpolation;
-import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
 import com.terraforged.core.world.terrain.Terrain;
+import me.dags.noise.func.Interpolation;
+import me.dags.noise.util.NoiseUtil;
 
-public class Blender extends Select implements Populator {
+public class ContinentLerper2 implements Populator {
 
     private final Populator lower;
     private final Populator upper;
@@ -18,19 +17,7 @@ public class Blender extends Select implements Populator {
     private final float midpoint;
     private final float tagThreshold;
 
-    public Blender(Module control, Populator lower, Populator upper, float min, float max, float split) {
-        super(control);
-        this.lower = lower;
-        this.upper = upper;
-        this.blendLower = min;
-        this.blendUpper = max;
-        this.blendRange = blendUpper - blendLower;
-        this.midpoint = blendLower + (blendRange * split);
-        this.tagThreshold = midpoint;
-    }
-
-    public Blender(Populator control, Populator lower, Populator upper, float min, float max, float split, float tagThreshold) {
-        super(control);
+    public ContinentLerper2(Populator lower, Populator upper, float min, float max, float split, float tagThreshold) {
         this.lower = lower;
         this.upper = upper;
         this.blendLower = min;
@@ -42,7 +29,7 @@ public class Blender extends Select implements Populator {
 
     @Override
     public void apply(Cell<Terrain> cell, float x, float y) {
-        float select = getSelect(cell, x, y);
+        float select = cell.continentEdge;
 
         if (select < blendLower) {
             lower.apply(cell, x, y);
@@ -71,7 +58,7 @@ public class Blender extends Select implements Populator {
 
     @Override
     public void tag(Cell<Terrain> cell, float x, float y) {
-        float select = getSelect(cell, x, y);
+        float select = cell.continentEdge;
         if (select < blendLower) {
             lower.tag(cell, x, y);
             return;

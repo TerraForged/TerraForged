@@ -1,23 +1,17 @@
-package com.terraforged.core.world.continent;
+package com.terraforged.core.world.terrain.region;
 
-import me.dags.noise.Module;
+import com.terraforged.core.cell.Cell;
+import com.terraforged.core.cell.Populator;
+import com.terraforged.core.world.heightmap.RegionConfig;
+import com.terraforged.core.world.terrain.Terrain;
 import me.dags.noise.Source;
 import me.dags.noise.domain.Domain;
 import me.dags.noise.func.DistanceFunc;
 import me.dags.noise.func.EdgeFunc;
 import me.dags.noise.util.NoiseUtil;
 import me.dags.noise.util.Vec2f;
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.cell.Populator;
-import com.terraforged.core.settings.GeneratorSettings;
-import com.terraforged.core.util.Seed;
-import com.terraforged.core.world.terrain.Terrain;
 
-public class VoronoiContinentModule implements Populator {
-
-    private static final float edgeClampMin = 0.05F;
-    private static final float edgeClampMax = 0.50F;
-    private static final float edgeClampRange = edgeClampMax - edgeClampMin;
+public class RegionModule implements Populator {
 
     private final int seed;
     private final float frequency;
@@ -25,44 +19,19 @@ public class VoronoiContinentModule implements Populator {
     private final float edgeMin;
     private final float edgeMax;
     private final float edgeRange;
-
     private final Domain warp;
-    private final Module shape;
 
-    public VoronoiContinentModule(Seed seed, GeneratorSettings settings) {
-        int tectonicScale = settings.land.continentScale * 4;
-        int continentScale = settings.land.continentScale / 2;
-        double oceans = Math.min(Math.max(settings.world.oceanSize, 0.01), 0.99);
-        double shapeMin = 0.15 + (oceans * 0.35);
-        this.seed = seed.next();
-
-        this.frequency = 1F / tectonicScale;
-        this.edgeMin = edgeClampMin;
-        this.edgeMax = (float) oceans;
-        this.edgeRange = edgeMax - edgeMin;
-
-        this.warp = Domain.warp(Source.SIMPLEX, seed.next(), continentScale, 3, continentScale);
-
-        this.shape = Source.perlin(seed.next(), settings.land.continentScale, 2)
-                .clamp(shapeMin, 0.7)
-                .map(0, 1)
-                .warp(Source.SIMPLEX, seed.next(), continentScale / 2, 1, continentScale / 4D)
-                .warp(seed.next(), 50, 1, 20D);
+    public RegionModule(RegionConfig regionConfig) {
+        seed = regionConfig.seed;
+        edgeMin = 0F;
+        edgeMax = 0.5F;
+        edgeRange = edgeMax - edgeMin;
+        frequency = 1F / regionConfig.scale;
+        warp = Domain.warp(regionConfig.warpX, regionConfig.warpZ, Source.constant(regionConfig.warpStrength));
     }
 
     @Override
-    public float getValue(float x, float y) {
-        if (true) {
-            throw new RuntimeException("no pls!");
-        } else {
-            Cell<Terrain> cell = new Cell<>();
-            apply(cell, x, y);
-            return cell.continentEdge;
-        }
-    }
-
-    @Override
-    public void apply(Cell<Terrain> cell, final float x, final float y) {
+    public void apply(Cell<Terrain> cell, float x, float y) {
         float ox = warp.getOffsetX(x, y);
         float oz = warp.getOffsetY(x, y);
 
@@ -108,12 +77,8 @@ public class VoronoiContinentModule implements Populator {
             }
         }
 
-
-        float shapeNoise = shape.getValue(x, y);
-        float continentNoise = edgeValue(edgeDistance, edgeDistance2);
-
-        cell.continent = cellValue(seed, cellX, cellY);
-        cell.continentEdge = shapeNoise * continentNoise;
+        cell.region = cellValue(seed, cellX, cellY);
+        cell.regionEdge = edgeValue(edgeDistance, edgeDistance2);
     }
 
     @Override
@@ -130,12 +95,16 @@ public class VoronoiContinentModule implements Populator {
         EdgeFunc edge = EdgeFunc.DISTANCE_2_DIV;
         float value = edge.apply(distance, distance2);
         float edgeValue = 1 - NoiseUtil.map(value, edge.min(), edge.max(), edge.range());
+
+        edgeValue = NoiseUtil.pow(edgeValue, 1.5F);
+
         if (edgeValue < edgeMin) {
             return 0F;
         }
         if (edgeValue > edgeMax) {
             return 1F;
         }
+
         return (edgeValue - edgeMin) / edgeRange;
     }
 }

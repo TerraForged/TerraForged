@@ -1,5 +1,6 @@
 package com.terraforged.core.world.river;
 
+import com.terraforged.core.world.heightmap.Heightmap;
 import me.dags.noise.domain.Domain;
 import me.dags.noise.util.NoiseUtil;
 import me.dags.noise.util.Vec2f;
@@ -7,7 +8,6 @@ import me.dags.noise.util.Vec2i;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.util.concurrent.ObjectPool;
 import com.terraforged.core.world.GeneratorContext;
-import com.terraforged.core.world.heightmap.WorldHeightmap;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.Terrains;
 
@@ -35,7 +35,7 @@ public class RiverRegion {
     private final List<River> rivers;
     private final List<Lake> lakes = new LinkedList<>();
 
-    public RiverRegion(int regionX, int regionZ, WorldHeightmap heightmap, GeneratorContext context, RiverConfig primary, RiverConfig secondary, RiverConfig tertiary, LakeConfig lake) {
+    public RiverRegion(int regionX, int regionZ, Heightmap heightmap, GeneratorContext context, RiverConfig primary, RiverConfig secondary, RiverConfig tertiary, LakeConfig lake) {
         int seed = new Random(NoiseUtil.seed(regionX, regionZ)).nextInt();
         this.lake = lake;
         this.primary = primary;

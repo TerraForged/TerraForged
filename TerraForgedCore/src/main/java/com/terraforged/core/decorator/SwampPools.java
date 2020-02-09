@@ -30,21 +30,21 @@ public class SwampPools implements Decorator {
     }
 
     @Override
-    public void apply(Cell<Terrain> cell, float x, float y) {
+    public boolean apply(Cell<Terrain> cell, float x, float y) {
         if (cell.tag == terrains.ocean) {
-            return;
+            return false;
         }
 
         if (cell.moisture < 0.7 || cell.temperature < 0.3) {
-            return;
+            return false;
         }
 
         if (cell.value <= minY) {
-            return;
+            return false;
         }
 
         if (cell.value > blendY) {
-            return;
+            return false;
         }
 
         float alpha = module.getValue(x, y);
@@ -55,5 +55,6 @@ public class SwampPools implements Decorator {
         }
 
         cell.value = NoiseUtil.lerp(cell.value, minY, alpha);
+        return true;
     }
 }

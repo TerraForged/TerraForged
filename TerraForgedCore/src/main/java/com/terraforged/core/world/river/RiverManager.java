@@ -1,10 +1,10 @@
 package com.terraforged.core.world.river;
 
+import com.terraforged.core.world.heightmap.Heightmap;
 import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.util.Cache;
 import com.terraforged.core.world.GeneratorContext;
-import com.terraforged.core.world.heightmap.WorldHeightmap;
 import com.terraforged.core.world.terrain.Terrain;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,11 +18,11 @@ public class RiverManager {
     private final RiverConfig primary;
     private final RiverConfig secondary;
     private final RiverConfig tertiary;
-    private final WorldHeightmap heightmap;
+    private final Heightmap heightmap;
     private final GeneratorContext context;
     private final Cache<Long, RiverRegion> cache = new Cache<>(60, 60, TimeUnit.SECONDS, () -> new ConcurrentHashMap<>());
 
-    public RiverManager(WorldHeightmap heightmap, GeneratorContext context) {
+    public RiverManager(Heightmap heightmap, GeneratorContext context) {
         this.heightmap = heightmap;
         this.context = context;
         this.primary = RiverConfig.builder(context.levels)

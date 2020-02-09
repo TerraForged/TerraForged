@@ -12,6 +12,7 @@ public class DesertStacks implements Decorator {
 
     private final float minY;
     private final float maxY;
+    private final Levels levels;
     private final Module module;
 
     public DesertStacks(Seed seed, Levels levels) {
@@ -35,21 +36,24 @@ public class DesertStacks implements Decorator {
 
         this.minY = levels.water(0);
         this.maxY = levels.water(50);
+        this.levels = levels;
         this.module = stack.scale(scale).mult(mask);
     }
 
     @Override
-    public void apply(Cell<Terrain> cell, float x, float y) {
+    public boolean apply(Cell<Terrain> cell, float x, float y) {
         if (BiomeType.DESERT != cell.biomeType) {
-            return;
+            return false;
         }
 
         if (cell.value <= minY || cell.value > maxY) {
-            return;
+            return false;
         }
 
         float value = module.getValue(x, y);
-        value *= cell.biomeMask;
+        value *= cell.biomeEdge;
         cell.value += value;
+
+        return value > levels.unit;
     }
 }

@@ -18,9 +18,13 @@ public class Cell<T extends Tag> {
 
     public float continent;
     public float continentEdge;
+    public float region;
+    public float regionEdge;
+    public float biome;
+    public float biomeEdge = 1F;
+    public float riverMask = 1F;
 
     public float value;
-    public float biome;
     public float biomeMoisture;
     public float biomeTemperature;
     public float moisture;
@@ -28,49 +32,53 @@ public class Cell<T extends Tag> {
     public float steepness;
     public float erosion;
     public float sediment;
-
-    public float mask = 1F;
-    public float biomeMask = 1F;
     public float biomeTypeMask = 1F;
-    public float regionMask = 1F;
-    public float riverMask = 1F;
     public BiomeType biomeType = BiomeType.GRASSLAND;
 
     public T tag = null;
 
     public void copy(Cell<T> other) {
+        value = other.value;
+
         continent = other.continent;
         continentEdge = other.continentEdge;
 
-        value = other.value;
-        biome = other.biome;
+        region = other.region;
+        regionEdge = other.regionEdge;
 
-        biomeMask = other.biomeMask;
+        biome = other.biome;
+        biomeEdge = other.biomeEdge;
+
         riverMask = other.riverMask;
-        biomeMoisture = other.biomeMoisture;
-        biomeTemperature = other.biomeTemperature;
-        mask = other.mask;
-        regionMask = other.regionMask;
+
         moisture = other.moisture;
         temperature = other.temperature;
+        biomeMoisture = other.biomeMoisture;
+        biomeTemperature = other.biomeTemperature;
+
         steepness = other.steepness;
         erosion = other.erosion;
         sediment = other.sediment;
         biomeType = other.biomeType;
         biomeTypeMask = other.biomeTypeMask;
+
         tag = other.tag;
     }
 
-    public float combinedMask(float clamp) {
-        return NoiseUtil.map(biomeMask * regionMask, 0, clamp, clamp);
+    public float continentMask(float min, float max) {
+        return NoiseUtil.map(continentEdge, min, max, max - min);
     }
 
-    public float biomeMask(float clamp) {
-        return NoiseUtil.map(biomeMask, 0, clamp, clamp);
+    public float regionMask(float min, float max) {
+        return NoiseUtil.map(regionEdge, min, max, max - min);
     }
 
-    public float regionMask(float clamp) {
-        return NoiseUtil.map(regionMask, 0, clamp, clamp);
+    public float biomeMask(float min, float max) {
+        return NoiseUtil.map(biomeEdge, min, max, max - min);
+    }
+
+    public float mask(float cmin, float cmax, float rmin, float rmax) {
+        return riverMask * continentMask(cmin, cmax) * regionMask(rmin, rmax);
     }
 
     public boolean isAbsent() {

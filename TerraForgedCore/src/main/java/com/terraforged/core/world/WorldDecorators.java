@@ -1,6 +1,7 @@
 package com.terraforged.core.world;
 
 import com.terraforged.core.decorator.Decorator;
+import com.terraforged.core.decorator.DesertDunes;
 import com.terraforged.core.decorator.DesertStacks;
 import com.terraforged.core.decorator.SwampPools;
 

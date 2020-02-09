@@ -1,9 +1,9 @@
 package com.terraforged.core.world.river;
 
+import com.terraforged.core.world.heightmap.Heightmap;
 import me.dags.noise.domain.Domain;
 import me.dags.noise.util.Vec2i;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.world.heightmap.WorldHeightmap;
 import com.terraforged.core.world.terrain.Terrain;
 
 import java.util.Random;
@@ -21,13 +21,13 @@ public class PosGenerator {
     private final int padding;
     private final Domain domain;
     private final Cell<Terrain> lookup;
-    private final WorldHeightmap heightmap;
+    private final Heightmap heightmap;
 
     private int i;
     private int dx;
     private int dz;
 
-    public PosGenerator(WorldHeightmap heightmap, Domain domain, Cell<Terrain> lookup, int size, int padding) {
+    public PosGenerator(Heightmap heightmap, Domain domain, Cell<Terrain> lookup, int size, int padding) {
         this.domain = domain;
         this.lookup = lookup;
         this.padding = padding;

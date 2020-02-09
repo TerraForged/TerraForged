@@ -36,7 +36,7 @@ public class VolcanoPopulator extends TerrainPopulator {
 
         this.cone = Source.cellEdge(region.seed, region.scale, EdgeFunc.DISTANCE_2_DIV).invert()
                 .warp(region.warpX, region.warpZ, region.warpStrength)
-                .powCurve(14)
+                .powCurve(10)
                 .clamp(0.475, 1)
                 .map(0, 1)
                 .grad(0, 0.5, 0.5)
@@ -47,7 +47,7 @@ public class VolcanoPopulator extends TerrainPopulator {
                 .warp(seed.next(), 30, 1, 30)
                 .scale(0.1);
 
-        this.inversionPoint = 0.95F;
+        this.inversionPoint = 0.93F;
         this.blendLower = midpoint - (range / 2F);
         this.blendUpper = blendLower + range;
         this.blendRange = blendUpper - blendLower;

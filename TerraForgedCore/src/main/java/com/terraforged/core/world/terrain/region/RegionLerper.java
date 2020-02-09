@@ -1,28 +1,23 @@
-package com.terraforged.core.module;
+package com.terraforged.core.world.terrain.region;
 
-import me.dags.noise.Module;
-import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
 import com.terraforged.core.world.terrain.Terrain;
+import me.dags.noise.util.NoiseUtil;
 
-public class Lerp implements Populator {
+public class RegionLerper implements Populator {
 
-    private final Module control;
     private final Populator lower;
     private final Populator upper;
 
-    public Lerp(Module control, Populator lower, Populator upper) {
-        this.control = control;
+    public RegionLerper(Populator lower, Populator upper) {
         this.lower = lower;
         this.upper = upper;
     }
 
     @Override
     public void apply(Cell<Terrain> cell, float x, float y) {
-        float alpha = control.getValue(x, y);
-        cell.regionMask = alpha;
-
+        float alpha = cell.regionEdge;
         if (alpha == 0) {
             lower.apply(cell, x, y);
             return;
@@ -44,8 +39,7 @@ public class Lerp implements Populator {
 
     @Override
     public void tag(Cell<Terrain> cell, float x, float y) {
-        float alpha = control.getValue(x, y);
-        if (alpha == 0) {
+        if (cell.regionEdge == 0) {
             lower.tag(cell, x, y);
             return;
         }

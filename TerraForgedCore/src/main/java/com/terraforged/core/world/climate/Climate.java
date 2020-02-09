@@ -2,8 +2,6 @@ package com.terraforged.core.world.climate;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.GeneratorContext;
-import com.terraforged.core.world.biome.BiomeType;
-import com.terraforged.core.world.heightmap.WorldHeightmap;
 import com.terraforged.core.world.terrain.Terrain;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
@@ -26,7 +24,7 @@ public class Climate {
 
     private final ClimateModule biomeNoise;
 
-    public Climate(GeneratorContext context, WorldHeightmap heightmap) {
+    public Climate(GeneratorContext context) {
         this.biomeNoise = new ClimateModule(context.seed, context.settings.generator);
 
         this.treeLine = Source.perlin(context.seed.next(), context.settings.generator.biome.biomeSize * 2, 1)

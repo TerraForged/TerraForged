@@ -7,6 +7,8 @@ public class Levels {
 
     public final int worldHeight;
 
+    public final float unit;
+
     // y index of the top-most water block
     public final int waterY;
     private final int groundY;
@@ -23,6 +25,7 @@ public class Levels {
 
     public Levels(GeneratorSettings settings) {
         worldHeight = Math.max(1, settings.world.worldHeight);
+        unit = NoiseUtil.div(1, worldHeight);
 
         waterLevel = settings.world.seaLevel;
         groundLevel = waterLevel + 1;
