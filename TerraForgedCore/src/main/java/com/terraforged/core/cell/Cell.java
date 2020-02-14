@@ -1,9 +1,9 @@
 package com.terraforged.core.cell;
 
-import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.util.concurrent.ObjectPool;
 import com.terraforged.core.world.biome.BiomeType;
 import com.terraforged.core.world.terrain.Terrain;
+import me.dags.noise.util.NoiseUtil;
 
 public class Cell<T extends Tag> {
 

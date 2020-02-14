@@ -167,15 +167,30 @@ public class Region implements Extent {
     public void decorateZoom(Collection<Decorator> decorators, float offsetX, float offsetZ, float zoom) {
         float translateX = offsetX - ((blockSize.total * zoom) / 2F);
         float translateZ = offsetZ - ((blockSize.total * zoom) / 2F);
-        for (int dz = 0; dz < blockSize.total; dz++) {
-            for (int dx = 0; dx < blockSize.total; dx++) {
-                int index = blockSize.indexOf(dx, dz);
-                GenCell cell = blocks[index];
-                for (Decorator decorator : decorators) {
-                    decorator.apply(cell, getBlockX() + translateX + dx, getBlockZ() + translateZ + dz);
-                }
+        for (int cz = 0; cz < chunkSize.total; cz++) {
+            for (int cx = 0; cx < chunkSize.total; cx++) {
+                int index = chunkSize.indexOf(cx, cz);
+                GenChunk chunk = computeChunk(index, cx, cz);
+                chunk.iterate((cell, dx, dz) -> {
+                    float x = ((chunk.getBlockX() + dx) * zoom) + translateX;
+                    float z = ((chunk.getBlockZ() + dz) * zoom) + translateZ;
+                    for (Decorator decorator : decorators) {
+                        decorator.apply(cell, x, z);
+                    }
+                });
             }
         }
+
+
+//        for (int dz = 0; dz < blockSize.total; dz++) {
+//            for (int dx = 0; dx < blockSize.total; dx++) {
+//                int index = blockSize.indexOf(dx, dz);
+//                GenCell cell = blocks[index];
+//                for (Decorator decorator : decorators) {
+//                    decorator.apply(cell, getBlockX() + translateX + dx, getBlockZ() + translateZ + dz);
+//                }
+//            }
+//        }
     }
 
     public void iterate(Consumer<ChunkReader> consumer) {

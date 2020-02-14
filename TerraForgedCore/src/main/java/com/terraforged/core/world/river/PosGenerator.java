@@ -1,10 +1,10 @@
 package com.terraforged.core.world.river;
 
+import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.heightmap.Heightmap;
+import com.terraforged.core.world.terrain.Terrain;
 import me.dags.noise.domain.Domain;
 import me.dags.noise.util.Vec2i;
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.world.terrain.Terrain;
 
 import java.util.Random;
 

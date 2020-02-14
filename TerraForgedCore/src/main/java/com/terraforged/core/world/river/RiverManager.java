@@ -1,11 +1,11 @@
 package com.terraforged.core.world.river;
 
-import com.terraforged.core.world.heightmap.Heightmap;
-import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.util.Cache;
 import com.terraforged.core.world.GeneratorContext;
+import com.terraforged.core.world.heightmap.Heightmap;
 import com.terraforged.core.world.terrain.Terrain;
+import me.dags.noise.util.NoiseUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;

@@ -1,10 +1,10 @@
 package com.terraforged.core.util;
 
-import me.dags.noise.Module;
-import me.dags.noise.Source;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.heightmap.Levels;
 import com.terraforged.core.world.terrain.Terrain;
+import me.dags.noise.Module;
+import me.dags.noise.Source;
 
 import java.util.function.BiPredicate;
 

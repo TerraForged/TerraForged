@@ -1,9 +1,9 @@
 package com.terraforged.core.world.geology;
 
+import com.terraforged.core.util.Seed;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.util.NoiseUtil;
-import com.terraforged.core.util.Seed;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

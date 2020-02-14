@@ -2,7 +2,11 @@ package com.terraforged.core.util.grid;
 
 import me.dags.noise.util.NoiseUtil;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class FixedList<T> implements Iterable<T> {
 

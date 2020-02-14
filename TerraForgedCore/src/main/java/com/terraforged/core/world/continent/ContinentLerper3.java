@@ -2,7 +2,6 @@ package com.terraforged.core.world.continent;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
-import com.terraforged.core.module.MultiBlender;
 import com.terraforged.core.world.climate.Climate;
 import com.terraforged.core.world.terrain.Terrain;
 import me.dags.noise.func.Interpolation;

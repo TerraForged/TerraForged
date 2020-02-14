@@ -3,7 +3,6 @@ package com.terraforged.core.filter;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.Size;
 import com.terraforged.core.settings.Settings;
-import com.terraforged.core.util.PosIterator;
 import com.terraforged.core.world.heightmap.Levels;
 import me.dags.noise.util.NoiseUtil;
 

@@ -1,8 +1,8 @@
 package com.terraforged.core.module;
 
-import me.dags.noise.Module;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.terrain.Terrain;
+import me.dags.noise.Module;
 
 public class Select {
 

@@ -1,7 +1,7 @@
 package com.terraforged.core.world.heightmap;
 
-import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.settings.GeneratorSettings;
+import me.dags.noise.util.NoiseUtil;
 
 public class Levels {
 

@@ -1,13 +1,13 @@
 package com.terraforged.core.world.river;
 
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.source.Line;
-import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.TerrainPopulator;
 import com.terraforged.core.world.terrain.Terrains;
+import me.dags.noise.Module;
+import me.dags.noise.Source;
+import me.dags.noise.source.Line;
+import me.dags.noise.util.NoiseUtil;
 
 public class River extends TerrainPopulator {
 

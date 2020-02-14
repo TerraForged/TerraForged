@@ -57,6 +57,10 @@ public class RegionSelector implements Populator {
             }
         }
 
+        if (result.isEmpty()) {
+            return modules.toArray(new Populator[0]);
+        }
+
         return result.toArray(new Populator[0]);
     }
 }

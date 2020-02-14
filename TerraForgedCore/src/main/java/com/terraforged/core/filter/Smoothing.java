@@ -1,9 +1,9 @@
 package com.terraforged.core.filter;
 
-import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.settings.Settings;
 import com.terraforged.core.world.heightmap.Levels;
+import me.dags.noise.util.NoiseUtil;
 
 public class Smoothing implements Filter {
 

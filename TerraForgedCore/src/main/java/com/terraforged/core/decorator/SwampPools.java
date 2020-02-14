@@ -1,13 +1,13 @@
 package com.terraforged.core.decorator;
 
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.util.Seed;
 import com.terraforged.core.world.heightmap.Levels;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.Terrains;
+import me.dags.noise.Module;
+import me.dags.noise.Source;
+import me.dags.noise.util.NoiseUtil;
 
 public class SwampPools implements Decorator {
 

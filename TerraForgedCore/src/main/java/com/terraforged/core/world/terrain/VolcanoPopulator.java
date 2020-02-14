@@ -1,12 +1,12 @@
 package com.terraforged.core.world.terrain;
 
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.func.EdgeFunc;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.util.Seed;
 import com.terraforged.core.world.heightmap.Levels;
 import com.terraforged.core.world.heightmap.RegionConfig;
+import me.dags.noise.Module;
+import me.dags.noise.Source;
+import me.dags.noise.func.EdgeFunc;
 
 public class VolcanoPopulator extends TerrainPopulator {
 

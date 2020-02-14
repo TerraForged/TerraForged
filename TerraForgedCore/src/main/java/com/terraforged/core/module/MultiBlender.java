@@ -1,11 +1,11 @@
 package com.terraforged.core.module;
 
-import me.dags.noise.func.Interpolation;
-import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
 import com.terraforged.core.world.climate.Climate;
 import com.terraforged.core.world.terrain.Terrain;
+import me.dags.noise.func.Interpolation;
+import me.dags.noise.util.NoiseUtil;
 
 public class MultiBlender extends Select implements Populator {
 

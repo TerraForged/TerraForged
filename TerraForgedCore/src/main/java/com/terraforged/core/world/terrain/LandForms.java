@@ -1,10 +1,11 @@
 package com.terraforged.core.world.terrain;
 
+import com.terraforged.core.settings.TerrainSettings;
+import com.terraforged.core.util.Seed;
+import com.terraforged.core.world.heightmap.Levels;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.func.EdgeFunc;
-import com.terraforged.core.util.Seed;
-import com.terraforged.core.world.heightmap.Levels;
 
 public class LandForms {
 
@@ -13,10 +14,6 @@ public class LandForms {
 
     public static final int PLATEAU_H = 500;
     public static final double PLATEAU_V = 0.475;
-
-    public static final int LOESS_H0 = 100;
-    public static final int LOESS_H1 = 200;
-    public static final double LOESS_V = 0.5;
 
     private static final int HILLS_H = 500;
     private static final double HILLS1_V = 0.6;
@@ -28,12 +25,14 @@ public class LandForms {
     private static final int MOUNTAINS2_H = 400;
     private static final double MOUNTAINS2_V = 0.645;
 
+    private final TerrainSettings settings;
     private final float terrainHorizontalScale;
     private final float terrainVerticalScale;
     private final float groundLevel;
     private final float seaLevel;
 
-    public LandForms(Levels levels) {
+    public LandForms(TerrainSettings settings, Levels levels) {
+        this.settings = settings;
         terrainHorizontalScale = 1.025F;
         terrainVerticalScale = 1F;
         groundLevel = levels.ground;
@@ -57,24 +56,23 @@ public class LandForms {
     }
 
     public Module steppe(Seed seed) {
-        int scaleH = Math.round(PLAINS_H * terrainHorizontalScale);
+        int scaleH = Math.round(PLAINS_H * terrainHorizontalScale * settings.steppe.horizontalScale);
 
         double erosionAmount = 0.45;
 
         Module erosion = Source.build(seed.next(), scaleH * 2, 3).lacunarity(3.75).perlin().alpha(erosionAmount);
         Module warpX = Source.build(seed.next(), scaleH / 4, 3).lacunarity(3).perlin();
         Module warpY = Source.build(seed.next(), scaleH / 4, 3).lacunarity(3).perlin();
-
-        return Source.perlin(seed.next(), scaleH, 1)
+        Module module = Source.perlin(seed.next(), scaleH, 1)
                 .mult(erosion)
                 .warp(warpX, warpY, Source.constant(scaleH / 4F))
-                .warp(seed.next(), 256, 1, 200)
-                .scale(0.125 * terrainVerticalScale)
-                .bias(groundLevel);
+                .warp(seed.next(), 256, 1, 200);
+
+        return settings.steppe.apply(groundLevel, 0.125 * terrainVerticalScale, module);
     }
 
     public Module plains(Seed seed) {
-        int scaleH = Math.round(PLAINS_H * terrainHorizontalScale);
+        int scaleH = Math.round(PLAINS_H * terrainHorizontalScale * settings.plains.horizontalScale);
 
         double erosionAmount = 0.45;
 
@@ -82,12 +80,12 @@ public class LandForms {
         Module warpX = Source.build(seed.next(), scaleH / 4, 3).lacunarity(3.5).perlin();
         Module warpY = Source.build(seed.next(), scaleH / 4, 3).lacunarity(3.5).perlin();
 
-        return Source.perlin(seed.next(), scaleH, 1)
+        Module module = Source.perlin(seed.next(), scaleH, 1)
                 .mult(erosion)
                 .warp(warpX, warpY, Source.constant(scaleH / 4F))
-                .warp(seed.next(), 256, 1, 256)
-                .scale(PLAINS_V * terrainVerticalScale)
-                .bias(groundLevel);
+                .warp(seed.next(), 256, 1, 256);
+
+        return settings.plains.apply(groundLevel, PLAINS_V * terrainVerticalScale, module);
     }
 
     public Module plateau(Seed seed) {
@@ -104,37 +102,32 @@ public class LandForms {
         Module surface = Source.perlin(seed.next(), 20, 3).scale(0.05)
                 .warp(seed.next(), 40, 2, 20);
 
-        return valley
-                .mult(Source.cubic(seed.next(), 500, 1).scale(0.6).bias(0.3))
-                .add(top)
-                .terrace(
-                        Source.perlin(seed.next(), 20, 1).scale(0.3).bias(0.2),
-                        Source.perlin(seed.next(), 20, 2).scale(0.1).bias(0.2),
-                        4,
-                        0.4
-                )
-                .add(surface)
-                .scale(PLATEAU_V * terrainVerticalScale)
-                .bias(groundLevel);
+        return settings.plateau.apply(groundLevel, PLATEAU_V * terrainVerticalScale,
+                valley
+                        .mult(Source.cubic(seed.next(), 500, 1).scale(0.6).bias(0.3))
+                        .add(top)
+                        .terrace(
+                                Source.perlin(seed.next(), 20, 1).scale(0.3).bias(0.2),
+                                Source.perlin(seed.next(), 20, 2).scale(0.1).bias(0.2),
+                                4,
+                                0.4
+                        )
+                        .add(surface));
     }
 
     public Module hills1(Seed seed) {
-        return Source.perlin(seed.next(), 200, 3)
+        return settings.hills.apply(groundLevel, HILLS1_V * terrainVerticalScale, Source.perlin(seed.next(), 200, 3)
                 .mult(Source.billow(seed.next(), 400, 3).alpha(0.5))
                 .warp(seed.next(), 30, 3, 20)
-                .warp(seed.next(), 400, 3, 200)
-                .scale(HILLS1_V * terrainVerticalScale)
-                .bias(groundLevel);
+                .warp(seed.next(), 400, 3, 200));
     }
 
     public Module hills2(Seed seed) {
-        return Source.cubic(seed.next(), 128, 2)
+        return settings.hills.apply(groundLevel, HILLS2_V * terrainVerticalScale, Source.cubic(seed.next(), 128, 2)
                 .mult(Source.perlin(seed.next(), 32, 4).alpha(0.075))
                 .warp(seed.next(), 30, 3, 20)
                 .warp(seed.next(), 400, 3, 200)
-                .mult(Source.ridge(seed.next(), 512, 2).alpha(0.8))
-                .scale(HILLS2_V * terrainVerticalScale)
-                .bias(groundLevel);
+                .mult(Source.ridge(seed.next(), 512, 2).alpha(0.8)));
     }
 
     public Module dales(Seed seed) {
@@ -149,16 +142,18 @@ public class LandForms {
         Module hills = combined
                 .pow(1.125)
                 .warp(seed.next(), 300, 1, 100);
-        return hills.scale(0.24).bias(groundLevel);
+
+        return settings.dales.apply(groundLevel, 0.4, hills);
     }
 
     public Module mountains(Seed seed) {
-        int scaleH = Math.round(MOUNTAINS_H * terrainHorizontalScale);
-        return Source.build(seed.next(), scaleH, 4).gain(1.15).lacunarity(2.35).ridge()
+        int scaleH = Math.round(MOUNTAINS_H * terrainHorizontalScale * settings.mountains.horizontalScale);
+
+        Module module = Source.build(seed.next(), scaleH, 4).gain(1.15).lacunarity(2.35).ridge()
                 .mult(Source.perlin(seed.next(), 24, 4).alpha(0.075))
-                .warp(seed.next(), 350, 1, 150)
-                .scale(MOUNTAINS_V * terrainVerticalScale)
-                .bias(groundLevel);
+                .warp(seed.next(), 350, 1, 150);
+
+        return settings.mountains.apply(groundLevel, MOUNTAINS_V * terrainVerticalScale, module);
     }
 
     public Module mountains2(Seed seed) {
@@ -168,7 +163,7 @@ public class LandForms {
         Module blur = Source.perlin(seed.next(), 10, 1).alpha(0.025);
         Module surface = Source.ridge(seed.next(), 125, 4).alpha(0.37);
         Module mountains = cell.clamp(0, 1).mult(blur).mult(surface).pow(1.1);
-        return mountains.scale(scale).bias(groundLevel);
+        return settings.mountains.apply(groundLevel, scale, mountains);
     }
 
     public Module mountains3(Seed seed) {
@@ -190,7 +185,7 @@ public class LandForms {
                 1
         );
 
-        return terraced.scale(scale).bias(groundLevel);
+        return settings.mountains.apply(groundLevel, scale, terraced);
     }
 
     public Module badlands(Seed seed) {
@@ -213,7 +208,7 @@ public class LandForms {
                 .add(mod2)
                 .scale(alpha);
 
-        return shape.mult(detail.alpha(0.5)).scale(0.7).bias(groundLevel);
+        return settings.badlands.apply(groundLevel, 0.7, shape.mult(detail.alpha(0.5)));
     }
 
     public Module torridonian(Seed seed) {
@@ -239,6 +234,6 @@ public class LandForms {
                         1
                 ).boost();
 
-        return test.scale(0.5).bias(groundLevel);
+        return settings.torridonian.apply(groundLevel, 0.5, test);
     }
 }

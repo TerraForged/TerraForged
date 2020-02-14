@@ -1,10 +1,10 @@
 package com.terraforged.core.world.terrain.provider;
 
-import me.dags.noise.Module;
 import com.terraforged.core.cell.Populator;
 import com.terraforged.core.world.terrain.LandForms;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.TerrainPopulator;
+import me.dags.noise.Module;
 
 import java.util.List;
 

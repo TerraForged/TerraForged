@@ -1,15 +1,15 @@
 package com.terraforged.core.world.river;
 
+import com.terraforged.core.cell.Cell;
+import com.terraforged.core.util.concurrent.ObjectPool;
+import com.terraforged.core.world.GeneratorContext;
 import com.terraforged.core.world.heightmap.Heightmap;
+import com.terraforged.core.world.terrain.Terrain;
+import com.terraforged.core.world.terrain.Terrains;
 import me.dags.noise.domain.Domain;
 import me.dags.noise.util.NoiseUtil;
 import me.dags.noise.util.Vec2f;
 import me.dags.noise.util.Vec2i;
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.util.concurrent.ObjectPool;
-import com.terraforged.core.world.GeneratorContext;
-import com.terraforged.core.world.terrain.Terrain;
-import com.terraforged.core.world.terrain.Terrains;
 
 import java.util.Collections;
 import java.util.LinkedList;

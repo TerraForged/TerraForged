@@ -1,10 +1,10 @@
 package com.terraforged.core.region;
 
-import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.util.Cache;
 import com.terraforged.core.util.FutureValue;
 import com.terraforged.core.world.heightmap.RegionExtent;
+import me.dags.noise.util.NoiseUtil;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;

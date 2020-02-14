@@ -64,7 +64,7 @@ public abstract class Renderer {
             float sat = 70;
             float bri = 70;
             applet.fill(hue, 65, 70);
-            return cell.regionEdge * el;
+            return height * el;
         } else if(applet.controller.getColorMode() == Applet.EROSION) {
             float change = cell.sediment + cell.erosion;
             float value = Math.abs(cell.sediment * 250);

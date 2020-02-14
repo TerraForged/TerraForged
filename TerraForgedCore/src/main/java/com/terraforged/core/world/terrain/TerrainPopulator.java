@@ -1,10 +1,10 @@
 package com.terraforged.core.world.terrain;
 
-import me.dags.noise.Module;
-import me.dags.noise.Source;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
 import com.terraforged.core.util.Seed;
+import me.dags.noise.Module;
+import me.dags.noise.Source;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;

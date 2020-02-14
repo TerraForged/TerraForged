@@ -1,10 +1,10 @@
 package com.terraforged.core.settings;
 
-import me.dags.noise.Module;
-import me.dags.noise.Source;
 import com.terraforged.core.util.serialization.annotation.Comment;
 import com.terraforged.core.util.serialization.annotation.Range;
 import com.terraforged.core.util.serialization.annotation.Serializable;
+import me.dags.noise.Module;
+import me.dags.noise.Source;
 
 @Serializable
 public class GeneratorSettings {

@@ -1,7 +1,5 @@
 package com.terraforged.core.world.terrain.provider;
 
-import me.dags.noise.Module;
-import me.dags.noise.Source;
 import com.terraforged.core.cell.Populator;
 import com.terraforged.core.util.Seed;
 import com.terraforged.core.world.GeneratorContext;
@@ -10,6 +8,8 @@ import com.terraforged.core.world.terrain.LandForms;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.TerrainPopulator;
 import com.terraforged.core.world.terrain.VolcanoPopulator;
+import me.dags.noise.Module;
+import me.dags.noise.Source;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +31,7 @@ public class StandardTerrainProvider implements TerrainProvider {
     public StandardTerrainProvider(GeneratorContext context, RegionConfig config, Populator defaultPopulator) {
         this.config = config;
         this.context = context;
-        this.landForms = new LandForms(context.levels);
+        this.landForms = new LandForms(context.settings.terrain, context.levels);
         this.defaultPopulator = defaultPopulator;
         init();
     }

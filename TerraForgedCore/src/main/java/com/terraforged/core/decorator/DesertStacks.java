@@ -1,12 +1,12 @@
 package com.terraforged.core.decorator;
 
-import me.dags.noise.Module;
-import me.dags.noise.Source;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.util.Seed;
 import com.terraforged.core.world.biome.BiomeType;
 import com.terraforged.core.world.heightmap.Levels;
 import com.terraforged.core.world.terrain.Terrain;
+import me.dags.noise.Module;
+import me.dags.noise.Source;
 
 public class DesertStacks implements Decorator {
 
@@ -24,7 +24,7 @@ public class DesertStacks implements Decorator {
         Module top = Source.perlin(seed.next(), 4, 1).alpha(0.25);
 
         Module scale = Source.perlin(seed.next(), 400, 1)
-                .clamp(20F / 255F, 25F / 255F);
+                .clamp(levels.scale(20), levels.scale(35));
 
         Module stack = (x, y) -> {
             float value = shape.getValue(x, y);

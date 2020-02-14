@@ -1,5 +1,10 @@
 package com.terraforged.core.world.continent;
 
+import com.terraforged.core.cell.Cell;
+import com.terraforged.core.cell.Populator;
+import com.terraforged.core.settings.GeneratorSettings;
+import com.terraforged.core.util.Seed;
+import com.terraforged.core.world.terrain.Terrain;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.domain.Domain;
@@ -7,11 +12,6 @@ import me.dags.noise.func.DistanceFunc;
 import me.dags.noise.func.EdgeFunc;
 import me.dags.noise.util.NoiseUtil;
 import me.dags.noise.util.Vec2f;
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.cell.Populator;
-import com.terraforged.core.settings.GeneratorSettings;
-import com.terraforged.core.util.Seed;
-import com.terraforged.core.world.terrain.Terrain;
 
 public class ContinentModule implements Populator {
 

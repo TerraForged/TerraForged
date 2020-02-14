@@ -1,12 +1,12 @@
 package com.terraforged.core.world.river;
 
-import me.dags.noise.Source;
-import me.dags.noise.util.NoiseUtil;
-import me.dags.noise.util.Vec2f;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.TerrainPopulator;
 import com.terraforged.core.world.terrain.Terrains;
+import me.dags.noise.Source;
+import me.dags.noise.util.NoiseUtil;
+import me.dags.noise.util.Vec2f;
 
 public class Lake extends TerrainPopulator {
 
