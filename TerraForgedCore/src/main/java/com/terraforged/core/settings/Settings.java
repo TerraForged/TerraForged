@@ -7,6 +7,8 @@ public class Settings {
 
     public GeneratorSettings generator = new GeneratorSettings();
 
+    public RiverSettings rivers = new RiverSettings();
+
     public FilterSettings filters = new FilterSettings();
 
     public TerrainSettings terrain = new TerrainSettings();

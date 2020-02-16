@@ -26,31 +26,31 @@ public class RiverManager {
         this.heightmap = heightmap;
         this.context = context;
         this.primary = RiverConfig.builder(context.levels)
-                .bankHeight(context.settings.generator.primaryRivers.minBankHeight, context.settings.generator.primaryRivers.maxBankHeight)
-                .bankWidth(context.settings.generator.primaryRivers.bankWidth)
-                .bedWidth(context.settings.generator.primaryRivers.bedWidth)
-                .bedDepth(context.settings.generator.primaryRivers.bedDepth)
-                .fade(context.settings.generator.primaryRivers.fade)
+                .bankHeight(context.settings.rivers.primaryRivers.minBankHeight, context.settings.rivers.primaryRivers.maxBankHeight)
+                .bankWidth(context.settings.rivers.primaryRivers.bankWidth)
+                .bedWidth(context.settings.rivers.primaryRivers.bedWidth)
+                .bedDepth(context.settings.rivers.primaryRivers.bedDepth)
+                .fade(context.settings.rivers.primaryRivers.fade)
                 .length(2500)
                 .main(true)
                 .build();
         this.secondary = RiverConfig.builder(context.levels)
-                .bankHeight(context.settings.generator.secondaryRiver.minBankHeight, context.settings.generator.secondaryRiver.maxBankHeight)
-                .bankWidth(context.settings.generator.secondaryRiver.bankWidth)
-                .bedWidth(context.settings.generator.secondaryRiver.bedWidth)
-                .bedDepth(context.settings.generator.secondaryRiver.bedDepth)
-                .fade(context.settings.generator.secondaryRiver.fade)
+                .bankHeight(context.settings.rivers.secondaryRiver.minBankHeight, context.settings.rivers.secondaryRiver.maxBankHeight)
+                .bankWidth(context.settings.rivers.secondaryRiver.bankWidth)
+                .bedWidth(context.settings.rivers.secondaryRiver.bedWidth)
+                .bedDepth(context.settings.rivers.secondaryRiver.bedDepth)
+                .fade(context.settings.rivers.secondaryRiver.fade)
                 .length(1000)
                 .build();
         this.tertiary = RiverConfig.builder(context.levels)
-                .bankHeight(context.settings.generator.tertiaryRivers.minBankHeight, context.settings.generator.tertiaryRivers.maxBankHeight)
-                .bankWidth(context.settings.generator.tertiaryRivers.bankWidth)
-                .bedWidth(context.settings.generator.tertiaryRivers.bedWidth)
-                .bedDepth(context.settings.generator.tertiaryRivers.bedDepth)
-                .fade(context.settings.generator.tertiaryRivers.fade)
+                .bankHeight(context.settings.rivers.tertiaryRivers.minBankHeight, context.settings.rivers.tertiaryRivers.maxBankHeight)
+                .bankWidth(context.settings.rivers.tertiaryRivers.bankWidth)
+                .bedWidth(context.settings.rivers.tertiaryRivers.bedWidth)
+                .bedDepth(context.settings.rivers.tertiaryRivers.bedDepth)
+                .fade(context.settings.rivers.tertiaryRivers.fade)
                 .length(500)
                 .build();
-        this.lakes = LakeConfig.of(context.settings.generator.lake, context.levels);
+        this.lakes = LakeConfig.of(context.settings.rivers.lake, context.levels);
     }
 
     public void apply(Cell<Terrain> cell, float x, float z) {

@@ -1,6 +1,6 @@
 package com.terraforged.core.world.river;
 
-import com.terraforged.core.settings.GeneratorSettings;
+import com.terraforged.core.settings.RiverSettings;
 import com.terraforged.core.world.heightmap.Levels;
 
 public class LakeConfig {
@@ -25,7 +25,7 @@ public class LakeConfig {
         distanceMax = builder.distanceMax;
     }
 
-    public static LakeConfig of(GeneratorSettings.Lake settings, Levels levels) {
+    public static LakeConfig of(RiverSettings.Lake settings, Levels levels) {
         Builder builder = new Builder();
         builder.chance = settings.chance;
         builder.sizeMin = settings.sizeMin;
