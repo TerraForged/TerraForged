@@ -10,7 +10,7 @@ import java.util.concurrent.Future;
 
 public class ThreadPool {
 
-    public static final int DEFAULT_POOL_SIZE = Math.max(4, Runtime.getRuntime().availableProcessors() - 1);
+    public static final int DEFAULT_POOL_SIZE = Math.max(2, (Runtime.getRuntime().availableProcessors() / 2) + 1);
 
     private static final Object lock = new Object();
 
