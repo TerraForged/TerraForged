@@ -2,12 +2,12 @@ package com.terraforged.core.region;
 
 import com.terraforged.core.util.concurrent.ObjectPool;
 import com.terraforged.core.util.concurrent.ThreadPool;
+import com.terraforged.core.util.concurrent.batcher.Batcher;
 import com.terraforged.core.world.WorldGenerator;
 import com.terraforged.core.world.WorldGeneratorFactory;
 import com.terraforged.core.world.heightmap.RegionExtent;
 
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 public class RegionGenerator implements RegionExtent {
 
@@ -42,23 +42,23 @@ public class RegionGenerator implements RegionExtent {
     }
 
     @Override
-    public Future<Region> getRegionAsync(int regionX, int regionZ) {
+    public CompletableFuture<Region> getRegionAsync(int regionX, int regionZ) {
         return generate(regionX, regionZ);
     }
 
-    public Future<Region> generate(int regionX, int regionZ) {
-        return ForkJoinPool.commonPool().submit(() -> generateRegion(regionX, regionZ));
+    public CompletableFuture<Region> generate(int regionX, int regionZ) {
+        return CompletableFuture.supplyAsync(() -> generateRegion(regionX, regionZ));
     }
 
-    public Future<Region> generate(float centerX, float centerZ, float zoom, boolean filter) {
-        return ForkJoinPool.commonPool().submit(() -> generateRegion(centerX, centerZ, zoom, filter));
+    public CompletableFuture<Region> generate(float centerX, float centerZ, float zoom, boolean filter) {
+        return CompletableFuture.supplyAsync(() -> generateRegion(centerX, centerZ, zoom, filter));
     }
 
     public Region generateRegion(int regionX, int regionZ) {
         try (ObjectPool.Item<WorldGenerator> item = genPool.get()) {
             WorldGenerator generator = item.getValue();
             Region region = new Region(regionX, regionZ, factor, border);
-            try (ThreadPool.Batcher batcher = threadPool.batcher(region.getChunkCount())) {
+            try (Batcher batcher = threadPool.batcher(region.getChunkCount())) {
                 region.generate(generator.getHeightmap(), batcher);
             }
             postProcess(region, generator);
@@ -75,7 +75,7 @@ public class RegionGenerator implements RegionExtent {
         try (ObjectPool.Item<WorldGenerator> item = genPool.get()) {
             WorldGenerator generator = item.getValue();
             Region region = new Region(0, 0, factor, border);
-            try (ThreadPool.Batcher batcher = threadPool.batcher(region.getChunkCount())) {
+            try (Batcher batcher = threadPool.batcher(region.getChunkCount())) {
                 region.generateZoom(generator.getHeightmap(), centerX, centerZ, zoom, batcher);
             }
             region.check();

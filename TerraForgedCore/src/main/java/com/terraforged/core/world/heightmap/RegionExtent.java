@@ -9,8 +9,7 @@ import com.terraforged.core.world.terrain.Terrain;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 public interface RegionExtent extends Extent {
 
@@ -18,7 +17,7 @@ public interface RegionExtent extends Extent {
 
     Region getRegion(int regionX, int regionZ);
 
-    Future<Region> getRegionAsync(int regionX, int regionZ);
+    CompletableFuture<Region> getRegionAsync(int regionX, int regionZ);
 
     default ChunkReader getChunk(int chunkX, int chunkZ) {
         int regionX = chunkToRegion(chunkX);
@@ -27,8 +26,8 @@ public interface RegionExtent extends Extent {
         return region.getChunk(chunkX, chunkZ);
     }
 
-    default List<Future<Region>> getRegions(int minRegionX, int minRegionZ, int maxRegionX, int maxRegionZ) {
-        List<Future<Region>> regions = new LinkedList<>();
+    default List<CompletableFuture<Region>> getRegions(int minRegionX, int minRegionZ, int maxRegionX, int maxRegionZ) {
+        List<CompletableFuture<Region>> regions = new LinkedList<>();
         for (int rz = minRegionZ; rz <= maxRegionZ; rz++) {
             for (int rx = minRegionX; rx <= maxRegionX; rx++) {
                 regions.add(getRegionAsync(rx, rz));
@@ -43,18 +42,14 @@ public interface RegionExtent extends Extent {
         int minRegionZ = chunkToRegion(Size.blockToChunk(minZ));
         int maxRegionX = chunkToRegion(Size.blockToChunk(maxX));
         int maxRegionZ = chunkToRegion(Size.blockToChunk(maxZ));
-        List<Future<Region>> regions = getRegions(minRegionX, minRegionZ, maxRegionX, maxRegionZ);
+        List<CompletableFuture<Region>> regions = getRegions(minRegionX, minRegionZ, maxRegionX, maxRegionZ);
         while (!regions.isEmpty()) {
             regions.removeIf(future -> {
                 if (!future.isDone()) {
                     return false;
                 }
-                try {
-                    Region region = future.get();
-                    region.visit(minX, minZ, maxX, maxZ, visitor);
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
+                Region region = future.join();
+                region.visit(minX, minZ, maxX, maxZ, visitor);
                 return true;
             });
         }

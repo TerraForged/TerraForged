@@ -2,26 +2,24 @@ package com.terraforged.core.region;
 
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.util.Cache;
-import com.terraforged.core.util.FutureValue;
 import com.terraforged.core.world.heightmap.RegionExtent;
 import me.dags.noise.util.NoiseUtil;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class RegionCache implements RegionExtent {
 
     private final boolean queuing;
     private final RegionGenerator renderer;
-    private final Cache<Long, Future<Region>> cache;
+    private final Cache<Long, CompletableFuture<Region>> cache;
 
     private Region cachedRegion = null;
 
     public RegionCache(boolean queueNeighbours, RegionGenerator renderer) {
         this.renderer = renderer;
         this.queuing = queueNeighbours;
-        this.cache = new com.terraforged.core.util.Cache<>(180, 60, TimeUnit.SECONDS);
+        this.cache = new Cache<>(180, 60, TimeUnit.SECONDS);
     }
 
     @Override
@@ -30,9 +28,9 @@ public class RegionCache implements RegionExtent {
     }
 
     @Override
-    public Future<Region> getRegionAsync(int regionX, int regionZ) {
+    public CompletableFuture<Region> getRegionAsync(int regionX, int regionZ) {
         long id = NoiseUtil.seed(regionX, regionZ);
-        Future<Region> future = cache.get(id);
+        CompletableFuture<Region> future = cache.get(id);
         if (future == null) {
             future = renderer.getRegionAsync(regionX, regionZ);
             cache.put(id, future);
@@ -55,17 +53,13 @@ public class RegionCache implements RegionExtent {
         }
 
         long id = NoiseUtil.seed(regionX, regionZ);
-        Future<Region> futureRegion = cache.get(id);
+        CompletableFuture<Region> futureRegion = cache.get(id);
 
         if (futureRegion == null) {
             cachedRegion = renderer.generateRegion(regionX, regionZ);
-            cache.put(id, new FutureValue<>(cachedRegion));
+            cache.put(id, CompletableFuture.completedFuture(cachedRegion));
         } else {
-            try {
-                cachedRegion = futureRegion.get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
+            cachedRegion = futureRegion.join();
         }
 
         if (queuing) {

@@ -1,7 +1,9 @@
 package com.terraforged.core.util.concurrent;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.terraforged.core.util.concurrent.batcher.AsyncBatcher;
+import com.terraforged.core.util.concurrent.batcher.Batcher;
+import com.terraforged.core.util.concurrent.batcher.SyncBatcher;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -10,27 +12,27 @@ import java.util.concurrent.Future;
 
 public class ThreadPool {
 
-    public static final int DEFAULT_POOL_SIZE = Math.max(2, (Runtime.getRuntime().availableProcessors() / 2) + 1);
+    public static final int DEFAULT_POOL_SIZE = defaultPoolSize();
 
     private static final Object lock = new Object();
 
     private static ThreadPool instance = new ThreadPool();
 
-    private final int size;
+    private final int poolSize;
     private final ExecutorService service;
 
     private ThreadPool() {
         this.service = ForkJoinPool.commonPool();
-        this.size = -1;
+        this.poolSize = -1;
     }
 
     public ThreadPool(int size) {
         this.service = Executors.newFixedThreadPool(size);
-        this.size = size;
+        this.poolSize = size;
     }
 
     public void shutdown() {
-        if (size > 0) {
+        if (poolSize > 0) {
             service.shutdown();
         }
     }
@@ -44,47 +46,15 @@ public class ThreadPool {
     }
 
     public Batcher batcher(int size) {
-        return new Batcher(size);
-    }
-
-    public class Batcher implements AutoCloseable {
-
-        private final List<Future<?>> tasks;
-
-        public Batcher(int size) {
-            tasks = new ArrayList<>(size);
+        if (this.poolSize != -1 && this.poolSize < 3) {
+            return new SyncBatcher();
         }
-
-        public void submit(Runnable task) {
-            tasks.add(ThreadPool.this.submit(task));
-        }
-
-        public void submit(Callable<?> task) {
-            tasks.add(ThreadPool.this.submit(task));
-        }
-
-        public void await() {
-            boolean hasMore = true;
-            while (hasMore) {
-                hasMore = false;
-                for (Future<?> future : tasks) {
-                    if (!future.isDone()) {
-                        hasMore = true;
-                    }
-                }
-            }
-            tasks.clear();
-        }
-
-        @Override
-        public void close() {
-            await();
-        }
+        return new AsyncBatcher(service, size);
     }
 
     public static ThreadPool getFixed(int size) {
         synchronized (lock) {
-            if (instance.size != size) {
+            if (instance.poolSize != size) {
                 instance.shutdown();
                 instance = new ThreadPool(size);
             }
@@ -94,7 +64,7 @@ public class ThreadPool {
 
     public static ThreadPool getFixed() {
         synchronized (lock) {
-            if (instance.size == -1) {
+            if (instance.poolSize == -1) {
                 instance = new ThreadPool(ThreadPool.DEFAULT_POOL_SIZE);
             }
             return instance;
@@ -103,7 +73,7 @@ public class ThreadPool {
 
     public static ThreadPool getCommon() {
         synchronized (lock) {
-            if (instance.size != -1) {
+            if (instance.poolSize != -1) {
                 instance.shutdown();
                 instance = new ThreadPool();
             }
@@ -117,5 +87,10 @@ public class ThreadPool {
             // replace with the common pool
             instance = new ThreadPool();
         }
+    }
+
+    private static int defaultPoolSize() {
+        int threads = Runtime.getRuntime().availableProcessors();
+        return Math.max(1, (threads / 3) * 2);
     }
 }

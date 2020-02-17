@@ -8,7 +8,7 @@ import com.terraforged.core.region.chunk.ChunkGenTask;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.region.chunk.ChunkWriter;
 import com.terraforged.core.region.chunk.ChunkZoomTask;
-import com.terraforged.core.util.concurrent.ThreadPool;
+import com.terraforged.core.util.concurrent.batcher.Batcher;
 import com.terraforged.core.world.heightmap.Heightmap;
 import com.terraforged.core.world.terrain.Terrain;
 
@@ -106,7 +106,7 @@ public class Region implements Extent {
         }
     }
 
-    public void generate(Heightmap heightmap, ThreadPool.Batcher batcher) {
+    public void generate(Heightmap heightmap, Batcher batcher) {
         for (int cz = 0; cz < chunkSize.total; cz++) {
             for (int cx = 0; cx < chunkSize.total; cx++) {
                 int index = chunkSize.indexOf(cx, cz);
@@ -117,7 +117,7 @@ public class Region implements Extent {
         }
     }
 
-    public void generateZoom(Heightmap heightmap, float offsetX, float offsetZ, float zoom, ThreadPool.Batcher batcher) {
+    public void generateZoom(Heightmap heightmap, float offsetX, float offsetZ, float zoom, Batcher batcher) {
         float translateX = offsetX - ((blockSize.total * zoom) / 2F);
         float translateZ = offsetZ - ((blockSize.total * zoom) / 2F);
         for (int cz = 0; cz < chunkSize.total; cz++) {
