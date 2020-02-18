@@ -1,7 +1,7 @@
 package com.terraforged.app.mesh;
 
-import com.terraforged.app.renderer.Renderer;
 import com.terraforged.app.Applet;
+import com.terraforged.app.renderer.Renderer;
 
 public class TestRenderer extends Renderer {
 

@@ -1,11 +1,11 @@
 package com.terraforged.app;
 
 import com.terraforged.app.biome.BiomeProvider;
-import me.dags.noise.util.NoiseUtil;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.biome.BiomeData;
 import com.terraforged.core.world.biome.BiomeType;
 import com.terraforged.core.world.terrain.Terrain;
+import me.dags.noise.util.NoiseUtil;
 
 import java.awt.*;
 import java.util.Random;

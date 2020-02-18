@@ -19,11 +19,8 @@ import java.util.Random;
 public class RiverRegion {
 
     public static final int SCALE = 12;
-//    private static final float LAKE_CHANCE = 0.05F;
-//    private static final float LAKE_MIN_DIST = 0.025F;
-//    private static final float LAKE_MAX_DIST = 0.05F;
-//    private static final float LAKE_MIN_SIZE = 50;
-//    private static final float LAKE_MAX_SIZE = 100;
+    private static final double MIN_FORK_ANGLE = 20D;
+    private static final double MAX_FORK_ANGLE = 60D;
 
     private final Domain domain;
     private final Terrains terrains;
@@ -42,7 +39,8 @@ public class RiverRegion {
         this.secondary = secondary;
         this.tertiary = tertiary;
         this.terrains = context.terrain;
-        this.domain = Domain.warp(seed, 400, 1, 400).add(Domain.warp(seed + 1, 50, 1, 25));
+        this.domain = Domain.warp(seed, 400, 1, 400)
+                .add(Domain.warp(seed + 1, 80, 1, 35));;
         try (ObjectPool.Item<Cell<Terrain>> cell = Cell.pooled()) {
             PosGenerator pos = new PosGenerator(heightmap, domain, cell.getValue(),1 << SCALE, River.VALLEY_WIDTH);
             this.rivers = generate(regionX, regionZ, pos);
@@ -68,23 +66,21 @@ public class RiverRegion {
         Random random = new Random(regionSeed);
         List<River> rivers = new LinkedList<>();
 
-        // generates main rivers until either 10 attempts have passed or 2 rivers generate
-        for (int i = 0; rivers.size() < 2 && i < 50; i++) {
+        for (int i = 0; rivers.size() < 4 && i < 50; i++) {
             generateRiver(x, z, pos, primary, random, rivers);
         }
 
-        for (int i = 0; rivers.size() < 10 && i < 15; i++) {
+        for (int i = 0; rivers.size() < 10 && i < 50; i++) {
             generateRiver(x, z, pos, secondary, random, rivers);
         }
 
-        for (int i = 0; rivers.size() < 10 && i < 15; i++) {
-            generateConnectingRiver(x, z, pos, tertiary, random, rivers);
+        for (int i = 0; rivers.size() < 20 && i < 50; i++) {
+            generateRiverFork(x, z, pos, tertiary, random, rivers);
         }
 
-        for (int i = 0; rivers.size() < 20 && i < 40; i++) {
+        for (int i = 0; rivers.size() < 30 && i < 50; i++) {
             generateRiver(x, z, pos, tertiary, random, rivers);
         }
-
 
         Collections.reverse(rivers);
 
@@ -124,7 +120,7 @@ public class RiverRegion {
      * Attempts to generate an inland position (p1), finds the nearest river (AB) to it, and tries to connect
      * a line from p1 to some position along AB
      */
-    private boolean generateConnectingRiver(int x, int z, PosGenerator pos, RiverConfig config, Random random, List<River> rivers) {
+    private boolean generateRiverFork(int x, int z, PosGenerator pos, RiverConfig config, Random random, List<River> rivers) {
         // generate a river start node
         RiverNode p1 = pos.nextType(x, z, random, 50, RiverNode.Type.START);
         if (p1 == null) {
@@ -147,25 +143,37 @@ public class RiverRegion {
             return false;
         }
 
-        // p1 is too close to start of the closest river
-        if (startDist2 < 640000) {
+        // connection should occur no less than 20% along the river length and no greater than 40%
+        float distance = 0.3F + (random.nextFloat() * 0.3F);
+        Vec2i fork = closest.bounds.pos(distance).toInt();
+
+        // connection should not occur in the ocean
+        float height = pos.getHeight(fork.x, fork.y);
+        RiverNode.Type type = RiverNode.getType(height);
+        if (type == RiverNode.Type.END) {
             return false;
         }
 
-        // p1 should be closer to the main river start than it's end, otherwise we're likely to get forks
-        // in the wrong direction (ie one river splitting into two, rather two rivers joining)
-        float endDist2 = dist2(p1.x, p1.z, closest.bounds.x2(), closest.bounds.y2());
-        if (endDist2 < startDist2) {
+        // calc angle between vector a (AB) & b (CB)
+        // A - existing river's start
+        // B - connection point
+        // C - new river's start
+        int ax = fork.x - closest.bounds.x1();
+        int az = fork.y - closest.bounds.y1();
+        int bx = fork.x - p1.x;
+        int bz = fork.y - p1.z;
+
+        // radians = arccos(AB.BC / |AB||BC|)
+        int dotAB = ax * bx + az * bz;
+        double lenA = Math.sqrt(ax * ax + az * az);
+        double lenB = Math.sqrt(bx * bx + bz * bz);
+        double radians = Math.acos(dotAB / (lenA * lenB));
+        double angle = Math.toDegrees(radians);
+        if (angle < MIN_FORK_ANGLE || angle > MAX_FORK_ANGLE) {
             return false;
         }
 
-        // pick a point some random distance along the main river, between 30%-70% along the main river length
-        // 0.4 offset should ensure the main river has become sufficiently wide for it not to look weird having
-        // a second river connect to it
-        float dist = 0.4F + (random.nextFloat() * 0.3F);
-        Vec2i p2 = closest.bounds.pos(dist).toInt();
-        RiverBounds bounds = new RiverBounds(p1.x, p1.z, p2.x, p2.y, 300);
-
+        RiverBounds bounds = new RiverBounds(p1.x, p1.z, fork.x, fork.y, 300);
         // check that the new river does not clash/overlap any other nearby rivers
         for (River river : rivers) {
             if (river == closest) {

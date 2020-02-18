@@ -1,7 +1,7 @@
 package com.terraforged.app.mesh;
 
-import com.terraforged.app.renderer.Renderer;
 import com.terraforged.app.Applet;
+import com.terraforged.app.renderer.Renderer;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.terrain.Terrain;
 import processing.core.PApplet;

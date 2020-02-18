@@ -153,7 +153,7 @@ public class Controller {
             case 'v':
                 try {
                     Object data = Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
-                    newSeed = Integer.parseInt(data.toString());
+                    newSeed = (int) Long.parseLong(data.toString());
                 } catch (Throwable t) {
                     t.printStackTrace();
                 }

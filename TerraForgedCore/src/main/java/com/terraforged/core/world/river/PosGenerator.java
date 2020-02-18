@@ -139,7 +139,7 @@ public class PosGenerator {
         return null;
     }
 
-    private float getHeight(int x, int z) {
+    public float getHeight(int x, int z) {
         heightmap.visit(lookup, x, z);
         return lookup.value;
     }
