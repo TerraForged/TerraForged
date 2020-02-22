@@ -6,6 +6,7 @@ import com.terraforged.core.world.heightmap.RegionExtent;
 import me.dags.noise.util.NoiseUtil;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class RegionCache implements RegionExtent {
@@ -19,7 +20,7 @@ public class RegionCache implements RegionExtent {
     public RegionCache(boolean queueNeighbours, RegionGenerator renderer) {
         this.renderer = renderer;
         this.queuing = queueNeighbours;
-        this.cache = new Cache<>(180, 60, TimeUnit.SECONDS);
+        this.cache = new Cache<>(180, 60, TimeUnit.SECONDS, () -> new ConcurrentHashMap<>());
     }
 
     @Override
