@@ -14,7 +14,7 @@ public class FilterSettings {
     @Serializable
     public static class Erosion {
 
-        @Range(min = 0, max = 30000)
+        @Range(min = 1000, max = 30000)
         @Comment("Controls the number of erosion iterations")
         public int iterations = 15000;
 
