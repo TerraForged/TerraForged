@@ -10,11 +10,12 @@ public class Deserializer {
     public void deserialize(Reader reader, Object object) throws Throwable {
         Class<?> type = object.getClass();
         for (String name : reader.getKeys()) {
-            if (name.charAt(0) == '_') {
+            if (name.charAt(0) == '#') {
                 continue;
             }
+
             Reader child = reader.getChild(name);
-            Field field = type.getField(getName(name));
+            Field field = type.getField(name);
             if (Serializer.isSerializable(field)) {
                 field.setAccessible(true);
                 fromValue(child, object, field);
@@ -32,7 +33,7 @@ public class Deserializer {
             return;
         }
         if (field.getType() == boolean.class) {
-            field.set(object, reader.getBool("value"));
+            field.set(object, reader.getString("value").equals("true"));
             return;
         }
         if (field.getType() == String.class) {
@@ -41,7 +42,7 @@ public class Deserializer {
         }
         if (field.getType().isEnum()) {
             String name = reader.getString("value");
-            for (Enum e : field.getType().asSubclass(Enum.class).getEnumConstants()) {
+            for (Enum<?> e : field.getType().asSubclass(Enum.class).getEnumConstants()) {
                 if (e.name().equals(name)) {
                     field.set(object, e);
                     return;
@@ -74,11 +75,12 @@ public class Deserializer {
         StringBuilder sb = new StringBuilder(name.length());
         for (int i = 0; i < name.length(); i++) {
             char c = name.charAt(i);
-            if (c == '_' && i + 1 < name.length()) {
-                sb.append(Character.toUpperCase(name.charAt(++i)));
-            } else {
-                sb.append(c);
+            if (i == 0) {
+                c = Character.toLowerCase(c);
+            } else if (c == ' ' && i + 1 < name.length()) {
+                c = Character.toUpperCase(name.charAt(++i));
             }
+            sb.append(c);
         }
         return sb.toString();
     }

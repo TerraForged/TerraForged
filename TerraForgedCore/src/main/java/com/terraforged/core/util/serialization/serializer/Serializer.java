@@ -35,7 +35,7 @@ public class Serializer {
 
     private void write(Object object, Field field, int order, Writer writer) throws IllegalAccessException {
         if (field.getType() == int.class) {
-            writer.name(getName(field));
+            writer.name(field.getName());
             writer.beginObject();
             writer.name("value").value((int) field.get(object));
             writeMeta(field, order, writer);
@@ -43,7 +43,7 @@ public class Serializer {
             return;
         }
         if (field.getType() == float.class) {
-            writer.name(getName(field));
+            writer.name(field.getName());
             writer.beginObject();
             writer.name("value").value((float) field.get(object));
             writeMeta(field, order, writer);
@@ -51,24 +51,31 @@ public class Serializer {
             return;
         }
         if (field.getType() == String.class) {
-            writer.name(getName(field));
+            writer.name(field.getName());
             writer.beginObject();
             writer.name("value").value((String) field.get(object));
             writeMeta(field, order, writer);
             writer.endObject();
             return;
         }
-        if (field.getType().isEnum()) {
-            writer.name(getName(field));
+        if (field.getType() == boolean.class) {
+            writer.name(field.getName());
             writer.beginObject();
-            writer.name("value").value(((Enum) field.get(object)).name());
+            writer.name("value").value("" + (field.get(object)));
+            writeMeta(field, order, writer);
+            writer.endObject();
+        }
+        if (field.getType().isEnum()) {
+            writer.name(field.getName());
+            writer.beginObject();
+            writer.name("value").value(((Enum<?>) field.get(object)).name());
             writeMeta(field, order, writer);
             writer.endObject();
             return;
         }
         if (field.getType().isArray()) {
             if (field.getType().getComponentType().isAnnotationPresent(Serializable.class)) {
-                writer.name(getName(field));
+                writer.name(field.getName());
                 writer.beginObject();
                 writer.name("value");
                 serialize(field.get(object), writer);
@@ -78,7 +85,7 @@ public class Serializer {
             return;
         }
         if (field.getType().isAnnotationPresent(Serializable.class)) {
-            writer.name(getName(field));
+            writer.name(field.getName());
             writer.beginObject();
             writer.name("value");
             serialize(field.get(object), writer);
@@ -88,23 +95,23 @@ public class Serializer {
     }
 
     private void writeMeta(Field field, int order, Writer writer) {
-        writer.name("_name").value(getName(field));
-        writer.name("_order").value(order);
+        writer.name("#display").value(getName(field));
+        writer.name("#order").value(order);
 
         Range range = field.getAnnotation(Range.class);
         if (range != null) {
             if (field.getType() == int.class) {
-                writer.name("_min").value((int) range.min());
-                writer.name("_max").value((int) range.max());
+                writer.name("#min").value((int) range.min());
+                writer.name("#max").value((int) range.max());
             } else {
-                writer.name("_min").value(range.min());
-                writer.name("_max").value(range.max());
+                writer.name("#min").value(range.min());
+                writer.name("#max").value(range.max());
             }
         }
 
         Comment comment = field.getAnnotation(Comment.class);
         if (comment != null) {
-            writer.name("_comment");
+            writer.name("#comment");
             writer.beginArray();
             for (String line : comment.value()) {
                 writer.value(line);
@@ -112,10 +119,18 @@ public class Serializer {
             writer.endArray();
         }
 
-        if (field.getType().isEnum()) {
-            writer.name("_options");
+        if (field.getType() == boolean.class) {
+            writer.name("#options");
             writer.beginArray();
-            for (Enum o : field.getType().asSubclass(Enum.class).getEnumConstants()) {
+            writer.value("true");
+            writer.value("false");
+            writer.endArray();
+        }
+
+        if (field.getType().isEnum()) {
+            writer.name("#options");
+            writer.beginArray();
+            for (Enum<?> o : field.getType().asSubclass(Enum.class).getEnumConstants()) {
                 writer.value(o.name());
             }
             writer.endArray();
@@ -127,11 +142,13 @@ public class Serializer {
         StringBuilder sb = new StringBuilder(name.length() * 2);
         for (int i = 0; i < name.length(); i++) {
             char c = name.charAt(i);
-            if (Character.isUpperCase(c)) {
-                sb.append('_').append(Character.toLowerCase(c));
-            } else {
-                sb.append(c);
+            if (i == 0) {
+                c = Character.toUpperCase(c);
+            } else if (Character.isUpperCase(c)) {
+                sb.append(' ');
             }
+
+            sb.append(c);
         }
         return sb.toString();
     }
