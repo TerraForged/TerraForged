@@ -1,0 +1,33 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven { url "https://files.minecraftforge.net/maven" }
+    }
+    dependencies {
+        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "3.+", changing: true
+    }
+}
+
+apply plugin: "net.minecraftforge.gradle"
+apply plugin: "eclipse"
+apply plugin: "maven"
+
+version = "${version}-mc${mc_version}"
+archivesBaseName = "TerraForgedAPI"
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
+    compile project(":Noise2D")
+    compile project(":FeatureManager")
+    compile project(":TerraForgedCore")
+}
+
+minecraft {
+    mappings channel: mcp_channel, version: mcp_version
+}

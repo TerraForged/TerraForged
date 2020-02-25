@@ -68,6 +68,9 @@ public abstract class Renderer {
             return height * el;
         } else if (applet.controller.getColorMode() == Applet.BIOME_TYPE) {
             Color c = cell.biomeType.getColor();
+            if (cell.riverMask < 0.2) {
+                c = Color.white;
+            }
             float[] hsb = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null);
             float bri = 90 + cell.biomeTypeMask * 10;
             applet.fill(hsb[0] * 100, hsb[1] * 100, hsb[2] * bri);
