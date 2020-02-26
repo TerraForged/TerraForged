@@ -29,7 +29,6 @@ import com.terraforged.core.cell.Populator;
 import com.terraforged.core.world.terrain.LandForms;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.TerrainPopulator;
-import com.terraforged.core.world.terrain.Terrains;
 import me.dags.noise.Module;
 
 import java.util.List;
@@ -38,8 +37,6 @@ import java.util.List;
  * Provides the heightmap generator with terrain specific noise generation modules (TerrainPopulators)
  */
 public interface TerrainProvider {
-
-    Terrains getTerrain();
 
     LandForms getLandforms();
 

@@ -32,7 +32,6 @@ import com.terraforged.core.world.heightmap.RegionConfig;
 import com.terraforged.core.world.terrain.LandForms;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.TerrainPopulator;
-import com.terraforged.core.world.terrain.Terrains;
 import com.terraforged.core.world.terrain.VolcanoPopulator;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
@@ -76,11 +75,6 @@ public class StandardTerrainProvider implements TerrainProvider {
         registerUnMixable(context.terrain.badlands, landForms.badlands(context.seed));
         registerUnMixable(context.terrain.mountains, landForms.mountains2(context.seed));
         registerUnMixable(context.terrain.mountains, landForms.mountains3(context.seed));
-    }
-
-    @Override
-    public Terrains getTerrain() {
-        return context.terrain;
     }
 
     @Override

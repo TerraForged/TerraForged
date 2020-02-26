@@ -25,73 +25,97 @@
 
 package com.terraforged.api.event;
 
+import com.terraforged.api.biome.modifier.ModifierManager;
 import com.terraforged.api.chunk.column.DecoratorManager;
 import com.terraforged.api.chunk.surface.SurfaceManager;
 import com.terraforged.api.material.geology.GeologyManager;
 import com.terraforged.api.material.layer.LayerManager;
+import com.terraforged.core.world.GeneratorContext;
 import com.terraforged.core.world.terrain.provider.TerrainProvider;
 import com.terraforged.feature.modifier.FeatureModifiers;
 import net.minecraftforge.eventbus.api.Event;
 
-public abstract class TerraEvent<T> extends Event {
+public abstract class SetupEvent<T> extends Event {
 
     private final T manager;
+    private final GeneratorContext context;
 
-    public TerraEvent(T manager) {
+    public SetupEvent(T manager, GeneratorContext context) {
         this.manager = manager;
+        this.context = context;
     }
 
+    /**
+     * Returns the Manager/Service being setup
+     */
     public T getManager() {
         return manager;
     }
 
     /**
+     * Returns the generator setup context
+     */
+    public GeneratorContext getContext() {
+        return context;
+    }
+
+    /**
      * Can be used to register custom biome Surface decorators
      */
-    public static class Surface extends TerraEvent<SurfaceManager> {
+    public static class Surface extends SetupEvent<SurfaceManager> {
 
-        public Surface(SurfaceManager manager) {
-            super(manager);
+        public Surface(SurfaceManager manager, GeneratorContext context) {
+            super(manager, context);
         }
     }
 
     /**
      * Register additional layer blocks (such as Snow Layers)
      */
-    public static class Layers extends TerraEvent<LayerManager> {
+    public static class Layers extends SetupEvent<LayerManager> {
 
-        public Layers(LayerManager manager) {
-            super(manager);
+        public Layers(LayerManager manager, GeneratorContext context) {
+            super(manager, context);
         }
     }
 
     /**
      * Register custom Strata and Geologies
      */
-    public static class Geology extends TerraEvent<GeologyManager> {
+    public static class Geology extends SetupEvent<GeologyManager> {
 
-        public Geology(GeologyManager manager) {
-            super(manager);
+        public Geology(GeologyManager manager, GeneratorContext context) {
+            super(manager, context);
+        }
+    }
+
+    /**
+     * Register custom BiomeModifiers
+     */
+    public static class BiomeModifier extends SetupEvent<ModifierManager> {
+
+        public BiomeModifier(ModifierManager manager, GeneratorContext context) {
+            super(manager, context);
         }
     }
 
     /**
      * Register custom FeatureModifiers
      */
-    public static class Features extends TerraEvent<FeatureModifiers> {
+    public static class Features extends SetupEvent<FeatureModifiers> {
 
-        public Features(FeatureModifiers manager) {
-            super(manager);
+        public Features(FeatureModifiers manager, GeneratorContext context) {
+            super(manager, context);
         }
     }
 
     /**
      * Register custom Terrain Populators
      */
-    public static class Terrain extends TerraEvent<TerrainProvider> {
+    public static class Terrain extends SetupEvent<TerrainProvider> {
 
-        public Terrain(TerrainProvider provider) {
-            super(provider);
+        public Terrain(TerrainProvider provider, GeneratorContext context) {
+            super(provider, context);
         }
     }
 
@@ -100,10 +124,10 @@ public abstract class TerraEvent<T> extends Event {
      *  - base decorators process chunk columns early in the generation process (before biome surfaces etc)
      *  - feature decorators process chunk columns late in the generation process (after all features have been placed)
      */
-    public static class Decorators extends TerraEvent<DecoratorManager> {
+    public static class Decorators extends SetupEvent<DecoratorManager> {
 
-        public Decorators(DecoratorManager manager) {
-            super(manager);
+        public Decorators(DecoratorManager manager, GeneratorContext context) {
+            super(manager, context);
         }
     }
 }

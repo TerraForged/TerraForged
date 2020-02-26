@@ -1,5 +1,5 @@
 /*
- *   
+ *
  * MIT License
  *
  * Copyright (c) 2020 TerraForged
@@ -25,7 +25,7 @@
 
 package com.terraforged.api.biome.modifier;
 
-public interface BiomeModifierRegistrar {
+public interface ModifierManager {
 
-
+    void register(BiomeModifier modifier);
 }

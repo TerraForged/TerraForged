@@ -35,8 +35,6 @@ import net.minecraft.world.chunk.IChunk;
 public interface ColumnDecorator {
 
     FastSource variance = (FastSource) Source.perlin(0, 100, 1);
-    ThreadLocal<BlockPos.Mutable> pos = ThreadLocal.withInitial(BlockPos.Mutable::new);
-    ThreadLocal<BlockPos.Mutable> pos1 = ThreadLocal.withInitial(BlockPos.Mutable::new);
 
     void decorate(IChunk chunk, ProcessorContext context, int x, int y, int z);
 
@@ -44,9 +42,15 @@ public interface ColumnDecorator {
         decorate(buffer.getDelegate(), context, x, y, z);
     }
 
+    default void setState(IChunk chunk, int x, int y, int z, BlockState state, boolean moving) {
+        chunk.setBlockState(new BlockPos(x, y, z), state, moving);
+    }
+
     default void fillDown(IChunk chunk, int x, int z, int from, int to, BlockState state) {
-        for (int dy = from; dy > to; dy--) {
-            chunk.setBlockState(pos.get().setPos(x, dy, z), state, false);
+        try (BlockPos.PooledMutable pos = pos()) {
+            for (int dy = from; dy > to; dy--) {
+                chunk.setBlockState(pos.setPos(x, dy, z), state, false);
+            }
         }
     }
 
@@ -56,5 +60,9 @@ public interface ColumnDecorator {
 
     static float getNoise(float x, float z, int seed, int scale, int bias) {
         return getNoise(x, z, seed, scale / 255F, bias / 255F);
+    }
+
+    static BlockPos.PooledMutable pos() {
+        return BlockPos.PooledMutable.retain();
     }
 }

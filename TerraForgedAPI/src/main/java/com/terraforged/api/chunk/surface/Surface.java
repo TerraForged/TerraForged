@@ -33,18 +33,18 @@ import net.minecraft.world.chunk.IChunk;
 
 public interface Surface {
 
-    BlockPos.Mutable pos = new BlockPos.Mutable();
-
     void buildSurface(int x, int z, int height, SurfaceContext ctx);
 
     default void fill(int x, int z, int start, int end, IChunk chunk, BlockState state) {
-        if (start < end) {
-            for (int y = start; y < end; y++) {
-                chunk.setBlockState(pos.setPos(x, y, z), state, false);
-            }
-        } else if (start > end) {
-            for (int y = start; y > end; y--) {
-                chunk.setBlockState(pos.setPos(x, y, z), state, false);
+        try (BlockPos.PooledMutable pos = BlockPos.PooledMutable.retain()) {
+            if (start < end) {
+                for (int y = start; y < end; y++) {
+                    chunk.setBlockState(pos.setPos(x, y, z), state, false);
+                }
+            } else if (start > end) {
+                for (int y = start; y > end; y--) {
+                    chunk.setBlockState(pos.setPos(x, y, z), state, false);
+                }
             }
         }
     }
