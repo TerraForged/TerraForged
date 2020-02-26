@@ -31,3 +31,11 @@ dependencies {
 minecraft {
     mappings channel: mcp_channel, version: mcp_version
 }
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "http://localhost:8087/repository/maven/")
+        }
+    }
+}
