@@ -36,22 +36,22 @@ import java.util.List;
 
 public class Strata<T> {
 
-    private final float[] depthBuffer;
     private final Module heightMod;
     private final List<Stratum<T>> strata;
 
     private Strata(Module heightMod, List<Stratum<T>> strata) {
         this.strata = strata;
         this.heightMod = heightMod;
-        this.depthBuffer = new float[strata.size()];
     }
 
     public boolean downwards(final int x, final int y, final int z, Stratum.Visitor<T> visitor) {
+        DepthBuffer depthBuffer = new DepthBuffer(strata, x, z);
+
         int py = y;
         T last = null;
-        float sum = getDepth(x, z);
+        float sum = depthBuffer.sum;
         for (int i = 0; i < strata.size(); i++) {
-            float depth = depthBuffer[i] / sum;
+            float depth = depthBuffer.buffer[i] / sum;
             int height = NoiseUtil.round(depth * y);
             T value = strata.get(i).getValue();
             last = value;
@@ -77,10 +77,11 @@ public class Strata<T> {
     }
 
     public boolean upwards(int x, int y, int z, Stratum.Visitor<T> visitor) {
+        DepthBuffer depthBuffer = new DepthBuffer(strata, x, z);
         int py = 0;
-        float sum = getDepth(x, z);
+        float sum = depthBuffer.sum;
         for (int i = strata.size() - 1; i > 0; i--) {
-            float depth = depthBuffer[i] / sum;
+            float depth = depthBuffer.buffer[i] / sum;
             int height = NoiseUtil.round(depth * y);
             T value = strata.get(i).getValue();
             for (int dy = 0; dy < height; dy++) {
@@ -100,14 +101,21 @@ public class Strata<T> {
         return (int) (64 * heightMod.getValue(x, z));
     }
 
-    private float getDepth(int x, int z) {
-        float sum = 0F;
-        for (int i = 0; i < strata.size(); i++) {
-            float depth = strata.get(i).getDepth(x, z);
-            sum += depth;
-            depthBuffer[i] = depth;
+    private static class DepthBuffer {
+
+        private final float sum;
+        private final float[] buffer;
+
+        private <T> DepthBuffer(List<Stratum<T>> strata, int x, int z) {
+            buffer = new float[strata.size()];
+            float sum = 0F;
+            for (int i = 0; i < strata.size(); i++) {
+                float depth = strata.get(i).getDepth(x, z);
+                sum += depth;
+                buffer[i] = depth;
+            }
+            this.sum = sum;
         }
-        return sum;
     }
 
     public static <T> Builder<T> builder(int seed, me.dags.noise.source.Builder noise) {

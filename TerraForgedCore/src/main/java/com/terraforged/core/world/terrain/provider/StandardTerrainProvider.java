@@ -108,6 +108,10 @@ public class StandardTerrainProvider implements TerrainProvider {
         return result;
     }
 
+    protected GeneratorContext getContext() {
+        return context;
+    }
+
     private TerrainPopulator combine(TerrainPopulator tp1, TerrainPopulator tp2) {
         return combine(tp1, tp2, context.seed, config.scale / 2);
     }
