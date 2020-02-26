@@ -31,7 +31,5 @@ import net.minecraft.world.chunk.IChunk;
 
 public interface ChunkAccess extends IChunk {
 
-    default BlockState getState(BlockPos pos) {
-        return getBlockState(pos);
-    }
+    BlockState getState(BlockPos pos);
 }

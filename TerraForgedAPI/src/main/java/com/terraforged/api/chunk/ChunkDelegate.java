@@ -74,6 +74,11 @@ public class ChunkDelegate implements ChunkAccess {
     }
 
     @Override
+    public BlockState getState(BlockPos pos) {
+        return chunk.getBlockState(pos);
+    }
+
+    @Override
     @Nullable
     public BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving) {
         return chunk.setBlockState(pos, state, isMoving);

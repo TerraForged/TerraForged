@@ -25,7 +25,7 @@ expansive and inspiring worlds to build and explore in!
 _Probably! (to some degree) - TerraForged is designed to work with many of the same world-gen systems
 that the majority of block & biome providing mods use. Certain biomes' terrain may not always look
 exactly as their author designed but should otherwise be compatible. Feel free to report any other
-compatibility issues on the issue tracker_
+compatibility issues on the issue tracker._
 
 2. "How can I use this on my server?"  
 _When Forge supports it, you can simply set level-type=terraforged in your server.properties file. In
