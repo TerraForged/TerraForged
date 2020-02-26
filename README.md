@@ -32,7 +32,7 @@ _When Forge supports it, you can simply set level-type=terraforged in your serve
 the meantime, you will need to create the world in single player and then copy that to your server
 directory. (In both cases, TerraForged must be installed on the client and the server)._
 
-3. "Will I need a super-computer to run this?!"
+3. "Will I need a super-computer to run this?!"  
 _No, not really - while this world generator will be a bit slower than vanilla's (on account of it
 doing more work to make things look nice), it would only be apparent when first generating a chunk - 
 they might load in slower when moving to new parts of the world, but game performance should
