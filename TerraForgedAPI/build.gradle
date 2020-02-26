@@ -33,6 +33,7 @@ minecraft {
 }
 
 task deobfApiJar(type: Jar) {
+    classifier = "deobf"
     duplicatesStrategy = "EXCLUDE"
     from("$buildDir/classes/java/main")
     from(fileTree(project(":Noise2D").buildDir.getPath() + "/classes/java/main"))
@@ -41,15 +42,10 @@ task deobfApiJar(type: Jar) {
 }
 
 jar {
-    enabled(false)
-}
-
-install {
     dependsOn(deobfApiJar)
 }
 
 uploadArchives {
-    dependsOn(deobfApiJar)
     repositories {
         mavenDeployer {
             repository(url: "https://io.terraforged.com/repository/maven/") {
