@@ -32,7 +32,24 @@ minecraft {
     mappings channel: mcp_channel, version: mcp_version
 }
 
+task deobfApiJar(type: Jar) {
+    duplicatesStrategy = "EXCLUDE"
+    from("$buildDir/classes/java/main")
+    from(fileTree(project(":Noise2D").buildDir.getPath() + "/classes/java/main"))
+    from(fileTree(project(":FeatureManager").buildDir.getPath() + "/classes/java/main"))
+    from(fileTree(project(":TerraForgedCore").buildDir.getPath() + "/classes/java/main"))
+}
+
+jar {
+    enabled(false)
+}
+
+install {
+    dependsOn(deobfApiJar)
+}
+
 uploadArchives {
+    dependsOn(deobfApiJar)
     repositories {
         mavenDeployer {
             repository(url: "https://io.terraforged.com/repository/maven/") {
