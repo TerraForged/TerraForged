@@ -41,7 +41,6 @@ import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.palette.UpgradeData;
-import net.minecraft.world.IBlockReader;
 import net.minecraft.world.ITickList;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.BiomeContainer;
@@ -57,296 +56,273 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class ChunkDelegate implements ChunkAccess {
+public interface ChunkDelegate extends IChunk {
 
-    private final IChunk chunk;
+    IChunk getDelegate();
 
-    public ChunkDelegate(IChunk chunk) {
-        this.chunk = chunk;
-    }
-
-    public IChunk getChunk() {
-        return chunk;
+    @Override
+    @Nullable
+    default BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving) {
+        return getDelegate().setBlockState(pos, state, isMoving);
     }
 
     @Override
-    public BlockState getState(BlockPos pos) {
-        return chunk.getBlockState(pos);
+    default void addTileEntity(BlockPos pos, TileEntity tileEntityIn) {
+        getDelegate().addTileEntity(pos, tileEntityIn);
+    }
+
+    @Override
+    default void addEntity(Entity entityIn) {
+        getDelegate().addEntity(entityIn);
     }
 
     @Override
     @Nullable
-    public BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving) {
-        return chunk.setBlockState(pos, state, isMoving);
+    default ChunkSection getLastExtendedBlockStorage() {
+        return getDelegate().getLastExtendedBlockStorage();
     }
 
     @Override
-    public void addTileEntity(BlockPos pos, TileEntity tileEntityIn) {
-        chunk.addTileEntity(pos, tileEntityIn);
+    default int getTopFilledSegment() {
+        return getDelegate().getTopFilledSegment();
     }
 
     @Override
-    public void addEntity(Entity entityIn) {
-        chunk.addEntity(entityIn);
+    default Set<BlockPos> getTileEntitiesPos() {
+        return getDelegate().getTileEntitiesPos();
     }
 
     @Override
-    @Nullable
-    public ChunkSection getLastExtendedBlockStorage() {
-        return chunk.getLastExtendedBlockStorage();
+    default ChunkSection[] getSections() {
+        return getDelegate().getSections();
     }
 
     @Override
-    public int getTopFilledSegment() {
-        return chunk.getTopFilledSegment();
+    default Collection<Map.Entry<Heightmap.Type, Heightmap>> getHeightmaps() {
+        return getDelegate().getHeightmaps();
     }
 
     @Override
-    public Set<BlockPos> getTileEntitiesPos() {
-        return chunk.getTileEntitiesPos();
+    default void setHeightmap(Heightmap.Type type, long[] data) {
+        getDelegate().setHeightmap(type, data);
     }
 
     @Override
-    public ChunkSection[] getSections() {
-        return chunk.getSections();
+    default Heightmap getHeightmap(Heightmap.Type type) {
+        return getDelegate().getHeightmap(type);
     }
 
     @Override
-    public Collection<Map.Entry<Heightmap.Type, Heightmap>> getHeightmaps() {
-        return chunk.getHeightmaps();
+    default int getTopBlockY(Heightmap.Type heightmapType, int x, int z) {
+        return getDelegate().getTopBlockY(heightmapType, x, z);
     }
 
     @Override
-    public void setHeightmap(Heightmap.Type type, long[] data) {
-        chunk.setHeightmap(type, data);
+    default ChunkPos getPos() {
+        return getDelegate().getPos();
     }
 
     @Override
-    public Heightmap getHeightmap(Heightmap.Type type) {
-        return chunk.getHeightmap(type);
+    default void setLastSaveTime(long saveTime) {
+        getDelegate().setLastSaveTime(saveTime);
     }
 
     @Override
-    public int getTopBlockY(Heightmap.Type heightmapType, int x, int z) {
-        return chunk.getTopBlockY(heightmapType, x, z);
+    default Map<String, StructureStart> getStructureStarts() {
+        return getDelegate().getStructureStarts();
     }
 
     @Override
-    public ChunkPos getPos() {
-        return chunk.getPos();
+    default void setStructureStarts(Map<String, StructureStart> structureStartsIn) {
+        getDelegate().setStructureStarts(structureStartsIn);
     }
 
     @Override
-    public void setLastSaveTime(long saveTime) {
-        chunk.setLastSaveTime(saveTime);
-    }
-
-    @Override
-    public Map<String, StructureStart> getStructureStarts() {
-        return chunk.getStructureStarts();
-    }
-
-    @Override
-    public void setStructureStarts(Map<String, StructureStart> structureStartsIn) {
-        chunk.setStructureStarts(structureStartsIn);
-    }
-
-    @Override
-    public boolean isEmptyBetween(int startY, int endY) {
-        return chunk.isEmptyBetween(startY, endY);
+    default boolean isEmptyBetween(int startY, int endY) {
+        return getDelegate().isEmptyBetween(startY, endY);
     }
 
     @Override
     @Nullable
-    public BiomeContainer getBiomes() {
-        return chunk.getBiomes();
+    default BiomeContainer getBiomes() {
+        return getDelegate().getBiomes();
     }
 
     @Override
-    public void setModified(boolean modified) {
-        chunk.setModified(modified);
+    default void setModified(boolean modified) {
+        getDelegate().setModified(modified);
     }
 
     @Override
-    public boolean isModified() {
-        return chunk.isModified();
+    default boolean isModified() {
+        return getDelegate().isModified();
     }
 
     @Override
-    public ChunkStatus getStatus() {
-        return chunk.getStatus();
+    default ChunkStatus getStatus() {
+        return getDelegate().getStatus();
     }
 
     @Override
-    public void removeTileEntity(BlockPos pos) {
-        chunk.removeTileEntity(pos);
+    default void removeTileEntity(BlockPos pos) {
+        getDelegate().removeTileEntity(pos);
     }
 
     @Override
-    public void markBlockForPostprocessing(BlockPos pos) {
-        chunk.markBlockForPostprocessing(pos);
+    default void markBlockForPostprocessing(BlockPos pos) {
+        getDelegate().markBlockForPostprocessing(pos);
     }
 
     @Override
-    public ShortList[] getPackedPositions() {
-        return chunk.getPackedPositions();
+    default ShortList[] getPackedPositions() {
+        return getDelegate().getPackedPositions();
     }
 
     @Override
-    public void func_201636_b(short packedPosition, int index) {
-        chunk.func_201636_b(packedPosition, index);
+    default void func_201636_b(short packedPosition, int index) {
+        getDelegate().func_201636_b(packedPosition, index);
     }
 
     @Override
-    public void addTileEntity(CompoundNBT nbt) {
-        chunk.addTileEntity(nbt);
-    }
-
-    @Override
-    @Nullable
-    public CompoundNBT getDeferredTileEntity(BlockPos pos) {
-        return chunk.getDeferredTileEntity(pos);
+    default void addTileEntity(CompoundNBT nbt) {
+        getDelegate().addTileEntity(nbt);
     }
 
     @Override
     @Nullable
-    public CompoundNBT getTileEntityNBT(BlockPos pos) {
-        return chunk.getTileEntityNBT(pos);
-    }
-
-    @Override
-    public Stream<BlockPos> getLightSources() {
-        return chunk.getLightSources();
-    }
-
-    @Override
-    public ITickList<Block> getBlocksToBeTicked() {
-        return chunk.getBlocksToBeTicked();
-    }
-
-    @Override
-    public ITickList<Fluid> getFluidsToBeTicked() {
-        return chunk.getFluidsToBeTicked();
-    }
-
-    @Override
-    public BitSet getCarvingMask(GenerationStage.Carving type) {
-        return chunk.getCarvingMask(type);
-    }
-
-    @Override
-    public UpgradeData getUpgradeData() {
-        return chunk.getUpgradeData();
-    }
-
-    @Override
-    public void setInhabitedTime(long newInhabitedTime) {
-        chunk.setInhabitedTime(newInhabitedTime);
-    }
-
-    @Override
-    public long getInhabitedTime() {
-        return chunk.getInhabitedTime();
-    }
-
-    public static ShortList getList(ShortList[] p_217308_0_, int p_217308_1_) {
-        return IChunk.getList(p_217308_0_, p_217308_1_);
-    }
-
-    @Override
-    public boolean hasLight() {
-        return chunk.hasLight();
-    }
-
-    @Override
-    public void setLight(boolean p_217305_1_) {
-        chunk.setLight(p_217305_1_);
+    default CompoundNBT getDeferredTileEntity(BlockPos pos) {
+        return getDelegate().getDeferredTileEntity(pos);
     }
 
     @Override
     @Nullable
-    public IWorld getWorldForge() {
-        return chunk.getWorldForge();
+    default CompoundNBT getTileEntityNBT(BlockPos pos) {
+        return getDelegate().getTileEntityNBT(pos);
+    }
+
+    @Override
+    default Stream<BlockPos> getLightSources() {
+        return getDelegate().getLightSources();
+    }
+
+    @Override
+    default ITickList<Block> getBlocksToBeTicked() {
+        return getDelegate().getBlocksToBeTicked();
+    }
+
+    @Override
+    default ITickList<Fluid> getFluidsToBeTicked() {
+        return getDelegate().getFluidsToBeTicked();
+    }
+
+    @Override
+    default BitSet getCarvingMask(GenerationStage.Carving type) {
+        return getDelegate().getCarvingMask(type);
+    }
+
+    @Override
+    default UpgradeData getUpgradeData() {
+        return getDelegate().getUpgradeData();
+    }
+
+    @Override
+    default void setInhabitedTime(long newInhabitedTime) {
+        getDelegate().setInhabitedTime(newInhabitedTime);
+    }
+
+    @Override
+    default long getInhabitedTime() {
+        return getDelegate().getInhabitedTime();
+    }
+
+    @Override
+    default boolean hasLight() {
+        return getDelegate().hasLight();
+    }
+
+    @Override
+    default void setLight(boolean p_217305_1_) {
+        getDelegate().setLight(p_217305_1_);
     }
 
     @Override
     @Nullable
-    public TileEntity getTileEntity(BlockPos pos) {
-        return chunk.getTileEntity(pos);
-    }
-
-    @Override
-    public BlockState getBlockState(BlockPos pos) {
-        return chunk.getBlockState(pos);
-    }
-
-    @Override
-    public IFluidState getFluidState(BlockPos pos) {
-        return chunk.getFluidState(pos);
-    }
-
-    @Override
-    public int getLightValue(BlockPos pos) {
-        return chunk.getLightValue(pos);
-    }
-
-    @Override
-    public int getMaxLightLevel() {
-        return chunk.getMaxLightLevel();
-    }
-
-    @Override
-    public int getHeight() {
-        return chunk.getHeight();
-    }
-
-    @Override
-    public BlockRayTraceResult rayTraceBlocks(RayTraceContext context) {
-        return chunk.rayTraceBlocks(context);
+    default IWorld getWorldForge() {
+        return getDelegate().getWorldForge();
     }
 
     @Override
     @Nullable
-    public BlockRayTraceResult rayTraceBlocks(Vec3d p_217296_1_, Vec3d p_217296_2_, BlockPos p_217296_3_, VoxelShape p_217296_4_, BlockState p_217296_5_) {
-        return chunk.rayTraceBlocks(p_217296_1_, p_217296_2_, p_217296_3_, p_217296_4_, p_217296_5_);
+    default TileEntity getTileEntity(BlockPos pos) {
+        return getDelegate().getTileEntity(pos);
     }
 
-    public static <T> T func_217300_a(RayTraceContext p_217300_0_, BiFunction<RayTraceContext, BlockPos, T> p_217300_1_, Function<RayTraceContext, T> p_217300_2_) {
-        return IBlockReader.func_217300_a(p_217300_0_, p_217300_1_, p_217300_2_);
+    @Override
+    default BlockState getBlockState(BlockPos pos) {
+        return getDelegate().getBlockState(pos);
+    }
+
+    @Override
+    default IFluidState getFluidState(BlockPos pos) {
+        return getDelegate().getFluidState(pos);
+    }
+
+    @Override
+    default int getLightValue(BlockPos pos) {
+        return getDelegate().getLightValue(pos);
+    }
+
+    @Override
+    default int getMaxLightLevel() {
+        return getDelegate().getMaxLightLevel();
+    }
+
+    @Override
+    default int getHeight() {
+        return getDelegate().getHeight();
+    }
+
+    @Override
+    default BlockRayTraceResult rayTraceBlocks(RayTraceContext context) {
+        return getDelegate().rayTraceBlocks(context);
     }
 
     @Override
     @Nullable
-    public StructureStart getStructureStart(String stucture) {
-        return chunk.getStructureStart(stucture);
+    default BlockRayTraceResult rayTraceBlocks(Vec3d p_217296_1_, Vec3d p_217296_2_, BlockPos p_217296_3_, VoxelShape p_217296_4_, BlockState p_217296_5_) {
+        return getDelegate().rayTraceBlocks(p_217296_1_, p_217296_2_, p_217296_3_, p_217296_4_, p_217296_5_);
     }
 
     @Override
-    public void putStructureStart(String structureIn, StructureStart structureStartIn) {
-        chunk.putStructureStart(structureIn, structureStartIn);
+    @Nullable
+    default StructureStart getStructureStart(String stucture) {
+        return getDelegate().getStructureStart(stucture);
     }
 
     @Override
-    public LongSet getStructureReferences(String structureIn) {
-        return chunk.getStructureReferences(structureIn);
+    default void putStructureStart(String structureIn, StructureStart structureStartIn) {
+        getDelegate().putStructureStart(structureIn, structureStartIn);
     }
 
     @Override
-    public void addStructureReference(String strucutre, long reference) {
-        chunk.addStructureReference(strucutre, reference);
+    default LongSet getStructureReferences(String structureIn) {
+        return getDelegate().getStructureReferences(structureIn);
     }
 
     @Override
-    public Map<String, LongSet> getStructureReferences() {
-        return chunk.getStructureReferences();
+    default void addStructureReference(String strucutre, long reference) {
+        getDelegate().addStructureReference(strucutre, reference);
     }
 
     @Override
-    public void setStructureReferences(Map<String, LongSet> p_201606_1_) {
-        chunk.setStructureReferences(p_201606_1_);
+    default Map<String, LongSet> getStructureReferences() {
+        return getDelegate().getStructureReferences();
+    }
+
+    @Override
+    default void setStructureReferences(Map<String, LongSet> p_201606_1_) {
+        getDelegate().setStructureReferences(p_201606_1_);
     }
 }

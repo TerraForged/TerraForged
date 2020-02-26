@@ -23,13 +23,52 @@
  * SOFTWARE.
  */
 
-package com.terraforged.api.chunk;
+package com.terraforged.api.chunk.surface;
 
+import com.terraforged.api.chunk.ChunkDelegate;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.IChunk;
 
-public interface ChunkAccess extends IChunk {
+import javax.annotation.Nullable;
 
-    BlockState getState(BlockPos pos);
+public class ChunkSurfaceBuffer implements ChunkDelegate {
+
+    private int surfaceTop;
+    private int surfaceBottom;
+    private final IChunk delegate;
+
+    public ChunkSurfaceBuffer(IChunk chunk) {
+        this.delegate = chunk;
+    }
+
+    @Override
+    public IChunk getDelegate() {
+        return delegate;
+    }
+
+    @Nullable
+    @Override
+    public BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving) {
+        if (pos.getY() > surfaceTop) {
+            surfaceTop = pos.getY();
+        }
+        if (pos.getY() < surfaceBottom) {
+            surfaceBottom = pos.getY();
+        }
+        return getDelegate().setBlockState(pos, state, isMoving);
+    }
+
+    public int getSurfaceTop() {
+        return surfaceTop;
+    }
+
+    public int getSurfaceBottom() {
+        return surfaceBottom;
+    }
+
+    public void setSurfaceLevel(int y) {
+        surfaceTop = y;
+        surfaceBottom = y;
+    }
 }

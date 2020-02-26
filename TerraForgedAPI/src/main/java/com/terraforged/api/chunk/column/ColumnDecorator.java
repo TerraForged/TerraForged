@@ -25,7 +25,7 @@
 
 package com.terraforged.api.chunk.column;
 
-import com.terraforged.api.chunk.ChunkSurfaceBuffer;
+import com.terraforged.api.chunk.surface.ChunkSurfaceBuffer;
 import me.dags.noise.Source;
 import me.dags.noise.source.FastSource;
 import net.minecraft.block.BlockState;
@@ -41,7 +41,7 @@ public interface ColumnDecorator {
     void decorate(IChunk chunk, ProcessorContext context, int x, int y, int z);
 
     default void decorate(ChunkSurfaceBuffer buffer, ProcessorContext context, int x, int y, int z) {
-        decorate(buffer.getChunk(), context, x, y, z);
+        decorate(buffer.getDelegate(), context, x, y, z);
     }
 
     default void fillDown(IChunk chunk, int x, int z, int from, int to, BlockState state) {
