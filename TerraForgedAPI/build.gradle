@@ -32,17 +32,21 @@ minecraft {
     mappings channel: mcp_channel, version: mcp_version
 }
 
-task deobfApiJar(type: Jar) {
+task deobfApiJar(type: Jar, dependsOn: classes) {
     classifier = "deobf"
     duplicatesStrategy = "EXCLUDE"
     from("$buildDir/classes/java/main")
-    from(fileTree(project(":Noise2D").buildDir.getPath() + "/classes/java/main"))
-    from(fileTree(project(":FeatureManager").buildDir.getPath() + "/classes/java/main"))
-    from(fileTree(project(":TerraForgedCore").buildDir.getPath() + "/classes/java/main"))
+    from(project(":Noise2D").buildDir.getPath() + "/classes/java/main")
+    from(project(":FeatureManager").buildDir.getPath() + "/classes/java/main")
+    from(project(":TerraForgedCore").buildDir.getPath() + "/classes/java/main")
 }
 
 jar {
     dependsOn(deobfApiJar)
+}
+
+artifacts{
+    archives deobfApiJar
 }
 
 uploadArchives {
