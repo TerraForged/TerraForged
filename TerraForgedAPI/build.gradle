@@ -35,7 +35,9 @@ minecraft {
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: "http://localhost:8087/repository/maven/")
+            repository(url: "https://io.terraforged.com/repository/maven/") {
+                authentication(userName: System.getenv("MAVEN_USER"), password: System.getenv("MAVEN_PASS"))
+            }
         }
     }
 }
