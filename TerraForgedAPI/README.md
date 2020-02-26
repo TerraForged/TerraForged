@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.terraforged:TerraForgedAPI:0.0.1-mc1.15.2"
+    implementation "com.terraforged:TerraForgedAPI:1.15.2-0.0.1"
 }
 ```
 
