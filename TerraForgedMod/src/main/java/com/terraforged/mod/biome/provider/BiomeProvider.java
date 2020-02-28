@@ -138,6 +138,10 @@ public class BiomeProvider extends AbstractBiomeProvider {
     public Biome getBiome(Cell<Terrain> cell, int x, int z) {
         if (cell.value <= context.levels.water) {
             if (cell.tag == context.terrain.river || cell.tag == context.terrain.riverBanks) {
+                Biome biome = getBiome(cell);
+                if (biome.getCategory() == Biome.Category.SWAMP) {
+                    return biome;
+                }
                 return biomeMap.getRiver(cell.temperature, cell.moisture, cell.biome);
             } else if (cell.tag == context.terrain.ocean) {
                 return biomeMap.getOcean(cell.temperature, cell.moisture, cell.biome);
