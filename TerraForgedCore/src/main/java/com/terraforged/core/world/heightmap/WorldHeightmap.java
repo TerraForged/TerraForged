@@ -160,7 +160,6 @@ public class WorldHeightmap implements Heightmap {
     public void visit(Cell<Terrain> cell, float x, float z) {
         continentModule.apply(cell, x, z);
         regionModule.apply(cell, x, z);
-
         root.apply(cell, x, z);
     }
 

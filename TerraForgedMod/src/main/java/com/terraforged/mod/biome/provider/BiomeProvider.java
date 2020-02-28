@@ -138,7 +138,7 @@ public class BiomeProvider extends AbstractBiomeProvider {
     public Biome getBiome(Cell<Terrain> cell, int x, int z) {
         if (cell.value <= context.levels.water) {
             if (cell.tag == context.terrain.river || cell.tag == context.terrain.riverBanks) {
-                return modifyBiome(biomeMap.getRiver(cell.temperature, cell.moisture, cell.biome), cell, x, z);
+                return biomeMap.getRiver(cell.temperature, cell.moisture, cell.biome);
             } else if (cell.tag == context.terrain.ocean) {
                 return biomeMap.getOcean(cell.temperature, cell.moisture, cell.biome);
             } else if (cell.tag == context.terrain.deepOcean) {
