@@ -5,8 +5,10 @@
 ![TerraForged Social](https://terraforged.com/curse/header.jpg)
 
 #### About:
-TerraForged is a new terrain generation mod for Minecraft (Java Edition), whose  aim is to create more  
-expansive and inspiring worlds to build and explore in!
+TerraForged is an ambitious new terrain generator mod for Minecraft (Java Edition) attempting to
+ create more immersive, inspiring worlds to explore and build in. Featuring an overhaul of the
+ vanilla generation system, custom terrain shapes, simulated erosion, better rivers, custom
+ decorations, tonnes of configuration options, and more!
 
 #### Website(s):
 [https://terraforged.com](https://terraforged.com)  

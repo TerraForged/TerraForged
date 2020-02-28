@@ -9,4 +9,7 @@ credits="dags"
 logoFile="terraforged.png"
 displayURL="https://terraforged.com"
 issueTrackerURL="https://github.com/TerraForged/TerraForged/issues"
-description="A 'terrain first' world generator"
+description='''
+Description:
+ A terrain generator attempting to create more immersive, inspiring worlds to explore and build in!
+'''

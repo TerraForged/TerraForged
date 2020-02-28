@@ -13,7 +13,7 @@ apply plugin: "net.minecraftforge.gradle"
 apply plugin: "maven-publish"
 apply plugin: "eclipse"
 
-version = "${mc_version}-${version}${getBuildNumber()}"
+version = "${mc_version}-${version}${getClassifier()}"
 archivesBaseName = "TerraForged"
 
 repositories {
@@ -98,10 +98,14 @@ publish {
     dependsOn("reobfJar")
 }
 
-static def getBuildNumber() {
-    def buildNumber = System.getenv("BUILD_NUMBER")
-    if (buildNumber == null) {
-        return ""
+static def getClassifier() {
+    def buildTag = System.getenv("GIT_TAG_NAME");
+    if (buildTag != null) {
+        return "-${buildTag}"
     }
-    return "-${buildNumber}"
+    def buildNumber = System.getenv("BUILD_NUMBER")
+    if (buildNumber != null) {
+        return "-${buildNumber}"
+    }
+    return ""
 }
