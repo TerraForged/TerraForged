@@ -25,7 +25,6 @@
 
 package com.terraforged.api.event;
 
-import com.terraforged.api.biome.BiomeRegistry;
 import com.terraforged.api.biome.modifier.ModifierManager;
 import com.terraforged.api.chunk.column.DecoratorManager;
 import com.terraforged.api.chunk.surface.SurfaceManager;
@@ -86,16 +85,6 @@ public abstract class SetupEvent<T> extends Event {
     public static class Geology extends SetupEvent<GeologyManager> {
 
         public Geology(GeologyManager manager, GeneratorContext context) {
-            super(manager, context);
-        }
-    }
-
-    /**
-     * Register custom Transient Biomes
-     */
-    public static class Biomes extends SetupEvent<BiomeRegistry> {
-
-        public Biomes(BiomeRegistry manager, GeneratorContext context) {
             super(manager, context);
         }
     }

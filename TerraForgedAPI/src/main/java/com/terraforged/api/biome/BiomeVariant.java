@@ -27,9 +27,9 @@ package com.terraforged.api.biome;
 
 import net.minecraft.world.biome.Biome;
 
-public abstract class TransientBiome extends Biome {
+public abstract class BiomeVariant extends Biome {
 
-    protected TransientBiome(Builder biomeBuilder) {
+    protected BiomeVariant(Builder biomeBuilder) {
         super(biomeBuilder);
     }
 
