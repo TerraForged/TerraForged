@@ -36,9 +36,9 @@ public interface ColumnDecorator {
 
     FastSource variance = (FastSource) Source.perlin(0, 100, 1);
 
-    void decorate(IChunk chunk, ProcessorContext context, int x, int y, int z);
+    void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z);
 
-    default void decorate(ChunkSurfaceBuffer buffer, ProcessorContext context, int x, int y, int z) {
+    default void decorate(ChunkSurfaceBuffer buffer, DecoratorContext context, int x, int y, int z) {
         decorate(buffer.getDelegate(), context, x, y, z);
     }
 
@@ -46,11 +46,9 @@ public interface ColumnDecorator {
         chunk.setBlockState(new BlockPos(x, y, z), state, moving);
     }
 
-    default void fillDown(IChunk chunk, int x, int z, int from, int to, BlockState state) {
-        try (BlockPos.PooledMutable pos = ColumnDecorator.pos(x, from, z)) {
-            for (int dy = from; dy > to; dy--) {
-                chunk.setBlockState(pos.setPos(x, dy, z), state, false);
-            }
+    default void fillDown(DecoratorContext context, IChunk chunk, int x, int z, int from, int to, BlockState state) {
+        for (int dy = from; dy > to; dy--) {
+            chunk.setBlockState(context.pos.setPos(x, dy, z), state, false);
         }
     }
 
@@ -60,9 +58,5 @@ public interface ColumnDecorator {
 
     static float getNoise(float x, float z, int seed, int scale, int bias) {
         return getNoise(x, z, seed, scale / 255F, bias / 255F);
-    }
-
-    static BlockPos.PooledMutable pos(int x, int y, int z) {
-        return BlockPos.PooledMutable.retain(x, y, z);
     }
 }

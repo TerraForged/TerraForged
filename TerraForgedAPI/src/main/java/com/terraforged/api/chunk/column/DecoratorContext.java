@@ -31,19 +31,21 @@ import com.terraforged.core.world.climate.Climate;
 import com.terraforged.core.world.heightmap.Levels;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.Terrains;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunk;
 
-public class ProcessorContext extends ChunkContext {
+public class DecoratorContext extends ChunkContext {
 
     public final Levels levels;
     public final Climate climate;
     public final Terrains terrains;
+    public final BlockPos.Mutable pos = new BlockPos.Mutable();
 
     public Biome biome;
     public Cell<Terrain> cell;
 
-    public ProcessorContext(IChunk chunk, Levels levels, Terrains terrain, Climate climate) {
+    public DecoratorContext(IChunk chunk, Levels levels, Terrains terrain, Climate climate) {
         super(chunk);
         this.levels = levels;
         this.climate = climate;

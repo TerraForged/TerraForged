@@ -25,7 +25,7 @@
 
 package com.terraforged.api.chunk.surface;
 
-import com.terraforged.api.chunk.column.ProcessorContext;
+import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.core.world.climate.Climate;
 import com.terraforged.core.world.heightmap.Levels;
 import com.terraforged.core.world.terrain.Terrains;
@@ -33,7 +33,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.GenerationSettings;
 
-public class SurfaceContext extends ProcessorContext {
+public class SurfaceContext extends DecoratorContext {
 
     public final BlockState solid;
     public final BlockState fluid;
