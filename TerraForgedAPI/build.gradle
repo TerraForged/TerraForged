@@ -13,7 +13,7 @@ apply plugin: "net.minecraftforge.gradle"
 apply plugin: "maven-publish"
 apply plugin: "eclipse"
 
-version = "${mc_version}-${version}"
+version = "${mc_version}-${mod_version}"
 archivesBaseName = "TerraForgedAPI"
 
 repositories {

@@ -13,7 +13,7 @@ apply plugin: "net.minecraftforge.gradle"
 apply plugin: "maven-publish"
 apply plugin: "eclipse"
 
-version = "${mc_version}-${version}${getClassifier()}"
+version = "${mc_version}-${mod_version}${getClassifier()}"
 archivesBaseName = "TerraForged"
 
 repositories {
@@ -84,7 +84,7 @@ processResources {
 
     filesMatching("**/mods.toml") {
         expand(
-                "version": version,
+                "version": "${mod_version}${getClassifier()}",
                 "mc_version": mc_version
         )
     }
@@ -99,9 +99,8 @@ publish {
 }
 
 static def getClassifier() {
-    def buildTag = System.getenv("GIT_TAG_NAME");
-    if (buildTag != null) {
-        return "-${buildTag}"
+    if (System.getenv("GIT_TAG_NAME") != null) {
+        return ""
     }
     def buildNumber = System.getenv("BUILD_NUMBER")
     if (buildNumber != null) {
