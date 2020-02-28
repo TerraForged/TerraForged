@@ -47,7 +47,7 @@ public interface ColumnDecorator {
     }
 
     default void fillDown(IChunk chunk, int x, int z, int from, int to, BlockState state) {
-        try (BlockPos.PooledMutable pos = pos()) {
+        try (BlockPos.PooledMutable pos = ColumnDecorator.pos(x, from, z)) {
             for (int dy = from; dy > to; dy--) {
                 chunk.setBlockState(pos.setPos(x, dy, z), state, false);
             }
@@ -62,7 +62,7 @@ public interface ColumnDecorator {
         return getNoise(x, z, seed, scale / 255F, bias / 255F);
     }
 
-    static BlockPos.PooledMutable pos() {
-        return BlockPos.PooledMutable.retain();
+    static BlockPos.PooledMutable pos(int x, int y, int z) {
+        return BlockPos.PooledMutable.retain(x, y, z);
     }
 }

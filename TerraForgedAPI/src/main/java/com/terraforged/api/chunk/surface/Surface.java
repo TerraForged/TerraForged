@@ -26,6 +26,7 @@
 package com.terraforged.api.chunk.surface;
 
 
+import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.surface.builder.Combiner;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
@@ -36,7 +37,7 @@ public interface Surface {
     void buildSurface(int x, int z, int height, SurfaceContext ctx);
 
     default void fill(int x, int z, int start, int end, IChunk chunk, BlockState state) {
-        try (BlockPos.PooledMutable pos = BlockPos.PooledMutable.retain()) {
+        try (BlockPos.PooledMutable pos = ColumnDecorator.pos(x, start, z)) {
             if (start < end) {
                 for (int y = start; y < end; y++) {
                     chunk.setBlockState(pos.setPos(x, y, z), state, false);

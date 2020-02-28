@@ -45,11 +45,11 @@ public class FilterSettings {
 
         @Range(min = 0F, max = 1F)
         @Comment("Controls how quickly material dissolves (during erosion)")
-        public float erosionRate = 0.4F;
+        public float erosionRate = 0.45F;
 
         @Range(min = 0F, max = 1F)
         @Comment("Controls how quickly material is deposited (during erosion)")
-        public float depositeRate = 0.4F;
+        public float depositeRate = 0.35F;
     }
 
     @Serializable
