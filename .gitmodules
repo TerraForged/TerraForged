@@ -4,6 +4,3 @@
 [submodule "Noise2D"]
 	path = Noise2D
 	url = https://github.com/TerraForged/Noise2D.git
-[submodule "TerraForgedMod"]
-	path = TerraForgedMod
-	url = https://github.com/dags-/TerraForgedMod.git
