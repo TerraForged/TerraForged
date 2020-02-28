@@ -1,0 +1,12 @@
+modLoader="javafml"
+loaderVersion="[31,)"
+[[mods]]
+modId="terraforged"
+displayName="TerraForged"
+version="${version}"
+authors="dags"
+credits="dags"
+logoFile="terraforged.png"
+displayURL="https://terraforged.com"
+issueTrackerURL="https://github.com/TerraForged/TerraForged/issues"
+description="A 'terrain first' world generator"

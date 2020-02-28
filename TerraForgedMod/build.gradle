@@ -1,0 +1,107 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven { url "https://files.minecraftforge.net/maven" }
+    }
+    dependencies {
+        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "3.+", changing: true
+    }
+}
+
+apply plugin: "net.minecraftforge.gradle"
+apply plugin: "maven-publish"
+apply plugin: "eclipse"
+
+version = "${mc_version}-${version}${getBuildNumber()}"
+archivesBaseName = "TerraForged"
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
+    compile project(":Noise2D")
+    compile (project(":TerraForgedCore")) {
+        transitive false
+    }
+    compile (project(":FeatureManager")) {
+        transitive false
+    }
+    compile (project(":TerraForgedAPI")) {
+        transitive false
+    }
+}
+
+minecraft {
+    mappings channel: mcp_channel, version: mcp_version
+    runs {
+        client {
+            workingDirectory project.file("run/client")
+            property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
+            property "forge.logging.console.level", "debug"
+            jvmArgs "-Xmx8G", "-Xms6G", "-Ddev"
+            mods {
+                terraforged {
+                    source sourceSets.main
+                }
+            }
+        }
+        server {
+            workingDirectory project.file("run/server")
+            property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
+            property "forge.logging.console.level", "debug"
+            jvmArgs "-Xmx8G", "-Xms6G", "-Ddev"
+            mods {
+                terraforged {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+task collectClasses(type: Copy) {
+    configurations.collectMany { it.allDependencies }.findAll{ it instanceof ProjectDependency }.each {
+        ProjectDependency project = (ProjectDependency) it
+        from("$project.dependencyProject.buildDir/classes/java/main")
+    }
+    into("build/classes/java/main")
+}
+
+task collectResources(type: Copy) {
+    configurations.collectMany { it.allDependencies }.findAll{ it instanceof ProjectDependency }.each {
+        ProjectDependency project = (ProjectDependency) it
+        from("$project.dependencyProject.buildDir/resources/main")
+    }
+    into("build/resources/main")
+}
+
+processResources {
+    dependsOn(collectResources)
+
+    filesMatching("**/mods.toml") {
+        expand(
+                "version": version,
+                "mc_version": mc_version
+        )
+    }
+}
+
+classes {
+    dependsOn(collectClasses)
+}
+
+publish {
+    dependsOn("reobfJar")
+}
+
+static def getBuildNumber() {
+    def buildNumber = System.getenv("BUILD_NUMBER")
+    if (buildNumber == null) {
+        return ""
+    }
+    return "-${buildNumber}"
+}

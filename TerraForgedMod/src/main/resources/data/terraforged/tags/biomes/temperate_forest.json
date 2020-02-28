@@ -1,0 +1,13 @@
+{
+  "replaceable": false,
+  "values": [
+    "minecraft:birch_forest",
+    "minecraft:birch_forest_hills",
+    "minecraft:dark_forest",
+    "minecraft:flower_forest",
+    "minecraft:forest",
+    "minecraft:plains",
+    "minecraft:tall_birch_forest",
+    "minecraft:wooded_hills"
+  ]
+}

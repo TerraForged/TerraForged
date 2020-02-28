@@ -1,0 +1,12 @@
+{
+  "replaceable": false,
+  "values": [
+    "minecraft:gravelly_mountains",
+    "minecraft:modified_gravelly_mountains",
+    "minecraft:mountains",
+    "minecraft:snowy_mountains",
+    "minecraft:snowy_taiga_mountains",
+    "minecraft:taiga_mountains",
+    "minecraft:wooded_mountains"
+  ]
+}

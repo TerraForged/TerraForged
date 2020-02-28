@@ -1,0 +1,10 @@
+{
+  "replaceable": false,
+  "values": [
+    "minecraft:ice_spikes",
+    "minecraft:snowy_taiga",
+    "minecraft:snowy_taiga_hills",
+    "minecraft:snowy_tundra",
+    "terraforged:snowy_taiga_scrub"
+  ]
+}

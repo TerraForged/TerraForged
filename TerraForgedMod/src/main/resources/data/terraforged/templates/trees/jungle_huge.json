@@ -1,0 +1,8 @@
+{
+  "type": "tree",
+  "base": 3,
+  "name": "terraforged:jungle_huge",
+  "paths": [
+    "terraforged:trees/jungle/huge"
+  ]
+}

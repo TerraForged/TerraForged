@@ -1,0 +1,14 @@
+{
+  "replaceable": false,
+  "values": [
+    "minecraft:badlands",
+    "minecraft:badlands_plateau",
+    "minecraft:desert",
+    "minecraft:desert_hills",
+    "minecraft:desert_lakes",
+    "minecraft:eroded_badlands",
+    "minecraft:modified_badlands_plateau",
+    "minecraft:modified_wooded_badlands_plateau",
+    "minecraft:wooded_badlands_plateau"
+  ]
+}

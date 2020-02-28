@@ -1,0 +1,8 @@
+{
+  "type": "tree",
+  "base": 3,
+  "name": "terraforged:dark_oak_large",
+  "paths": [
+    "terraforged:trees/dark_oak/large"
+  ]
+}
