@@ -31,7 +31,6 @@ import com.terraforged.core.world.heightmap.RegionExtent;
 import me.dags.noise.util.NoiseUtil;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class RegionCache implements RegionExtent {
@@ -39,13 +38,12 @@ public class RegionCache implements RegionExtent {
     private final boolean queuing;
     private final RegionGenerator renderer;
     private final Cache<Long, CompletableFuture<Region>> cache;
-
-    private Region cachedRegion = null;
+    private final ThreadLocal<Region> cachedRegion = new ThreadLocal<>();
 
     public RegionCache(boolean queueNeighbours, RegionGenerator renderer) {
         this.renderer = renderer;
         this.queuing = queueNeighbours;
-        this.cache = new Cache<>(180, 60, TimeUnit.SECONDS, () -> new ConcurrentHashMap<>());
+        this.cache = Cache.concurrent(180, 60, TimeUnit.SECONDS);
     }
 
     @Override
@@ -74,25 +72,28 @@ public class RegionCache implements RegionExtent {
 
     @Override
     public Region getRegion(int regionX, int regionZ) {
-        if (cachedRegion != null && regionX == cachedRegion.getRegionX() && regionZ == cachedRegion.getRegionZ()) {
-            return cachedRegion;
+        Region cached = cachedRegion.get();
+        if (cached != null && regionX == cached.getRegionX() && regionZ == cached.getRegionZ()) {
+            return cached;
         }
 
         long id = NoiseUtil.seed(regionX, regionZ);
         CompletableFuture<Region> futureRegion = cache.get(id);
 
         if (futureRegion == null) {
-            cachedRegion = renderer.generateRegion(regionX, regionZ);
-            cache.put(id, CompletableFuture.completedFuture(cachedRegion));
+            cached = renderer.generateRegion(regionX, regionZ);
+            cache.put(id, CompletableFuture.completedFuture(cached));
         } else {
-            cachedRegion = futureRegion.join();
+            cached = futureRegion.join();
         }
 
         if (queuing) {
             queueNeighbours(regionX, regionZ);
         }
 
-        return cachedRegion;
+        cachedRegion.set(cached);
+
+        return cached;
     }
 
     private void queueNeighbours(int regionX, int regionZ) {

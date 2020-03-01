@@ -27,6 +27,7 @@ package com.terraforged.core.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -93,5 +94,9 @@ public class Cache<K, V> {
             time = System.currentTimeMillis();
             return value;
         }
+    }
+
+    public static <K, V> Cache<K, V> concurrent(long lifespan, long interval, TimeUnit unit) {
+        return new Cache<>(lifespan, interval, unit, () -> new ConcurrentHashMap<>(100));
     }
 }
