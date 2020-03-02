@@ -10,6 +10,11 @@ TerraForged is an ambitious new terrain generator mod for Minecraft (Java Editio
  vanilla generation system, custom terrain shapes, simulated erosion, better rivers, custom
  decorations, tonnes of configuration options, and more!
 
+#### Installation:
+1. Install forge for the target version of Minecraft (ie 1.15.2)
+2. Add the TerraForged mod jar to your profile's mods folder
+3. Select the '`TerraForged`' world-type when creating a new world
+
 #### Website(s):
 [https://terraforged.com](https://terraforged.com)  
 [https://github.com/TerraForged](https://github.com/TerraForged)
