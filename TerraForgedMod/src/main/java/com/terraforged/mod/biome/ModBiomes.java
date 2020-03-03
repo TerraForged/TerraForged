@@ -27,6 +27,7 @@ package com.terraforged.mod.biome;
 
 import com.terraforged.api.biome.BiomeVariant;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -53,7 +54,11 @@ public class ModBiomes {
 
     @SubscribeEvent
     public static void register(RegistryEvent.Register<Biome> event) {
-        biomes.forEach(event.getRegistry()::register);
+        biomes.forEach(biome -> {
+            event.getRegistry().register(biome);
+            BiomeDictionary.makeBestGuess(biome);
+            BiomeDictionary.addTypes(biome, BiomeDictionary.Type.OVERWORLD);
+        });
         biomes.clear();
         biomes.trimToSize();
     }

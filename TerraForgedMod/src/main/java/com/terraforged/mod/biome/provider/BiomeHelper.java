@@ -25,7 +25,6 @@
 
 package com.terraforged.mod.biome.provider;
 
-import com.google.common.collect.Sets;
 import com.terraforged.core.settings.BiomeSettings;
 import com.terraforged.core.world.biome.BiomeData;
 import com.terraforged.core.world.biome.BiomeType;
@@ -54,20 +53,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class BiomeHelper {
-
-    private static final Set<Biome> IGNORE_BIOMES = Sets.newHashSet(
-            Biomes.THE_END,
-            Biomes.END_BARRENS,
-            Biomes.END_HIGHLANDS,
-            Biomes.END_MIDLANDS,
-            Biomes.SMALL_END_ISLANDS,
-            Biomes.NETHER,
-            Biomes.THE_VOID,
-            Biomes.JUNGLE_EDGE,
-            Biomes.MODIFIED_JUNGLE_EDGE,
-            Biomes.MOUNTAIN_EDGE,
-            Biomes.STONE_SHORE
-    );
 
     private static final Map<BiomeType, BiomePredicate> PREDICATES = new HashMap<BiomeType, BiomePredicate>() {{
         put(BiomeType.TROPICAL_RAINFOREST, BiomePredicate.TROPICAL_RAINFOREST);
@@ -227,7 +212,7 @@ public class BiomeHelper {
         if (biome.getCategory() == Biome.Category.NETHER) {
             return true;
         }
-        return IGNORE_BIOMES.contains(biome);
+        return !BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.OVERWORLD);
     }
 
     private static Vec2f getRange(Collection<Biome> biomes, Function<Biome, Float> getter) {

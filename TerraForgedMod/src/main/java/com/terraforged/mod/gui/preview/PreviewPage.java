@@ -68,7 +68,7 @@ public class PreviewPage extends BasePage {
         preview.setHeight(256);
 
         addElements(right.left, right.top, right, previewerSettings, right.scrollPane::addButton, this::update);
-        right.scrollPane.addButton(new TerraButton("Generate") {
+        right.scrollPane.addButton(new TerraButton("New Seed") {
             @Override
             public void onPress() {
                 preview.regenerate();

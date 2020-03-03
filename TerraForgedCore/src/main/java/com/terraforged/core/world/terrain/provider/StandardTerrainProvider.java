@@ -101,7 +101,7 @@ public class StandardTerrainProvider implements TerrainProvider {
 
     @Override
     public List<Populator> getPopulators() {
-        List<TerrainPopulator> mixed = combine(mixable, this::combine);
+        List<TerrainPopulator> mixed = combine(getMixable(mixable), this::combine);
         List<Populator> result = new ArrayList<>(mixed.size() + unmixable.size());
         result.addAll(mixed);
         result.addAll(unmixable);
@@ -117,14 +117,15 @@ public class StandardTerrainProvider implements TerrainProvider {
     }
 
     private static TerrainPopulator combine(TerrainPopulator tp1, TerrainPopulator tp2, Seed seed, int scale) {
-        Module combined = Source.perlin(seed.next(), scale, 1)
-                .warp(seed.next(), scale / 2, 2, scale / 2)
-                .blend(tp1.getSource(), tp2.getSource(), 0.5, 0.25);
+        float weight = Math.min(tp1.getType().getWeight(), tp2.getType().getWeight());
 
         String name = tp1.getType().getName() + "-" + tp2.getType().getName();
         int id = Terrain.ID_START + 1 + tp1.getType().getId() * tp2.getType().getId();
-        float weight = Math.min(tp1.getType().getWeight(), tp2.getType().getWeight());
+
         Terrain type = new Terrain(name, id, weight);
+        Module combined = Source.perlin(seed.next(), scale, 1)
+                .warp(seed.next(), scale / 2, 2, scale / 2D)
+                .blend(tp1.getSource(), tp2.getSource(), 0.5, 0.25);
 
         return new TerrainPopulator(combined, type);
     }
@@ -151,5 +152,15 @@ public class StandardTerrainProvider implements TerrainProvider {
         }
 
         return result;
+    }
+
+    private static List<TerrainPopulator> getMixable(List<TerrainPopulator> input) {
+        List<TerrainPopulator> output = new ArrayList<>(input.size());
+        for (TerrainPopulator populator : input) {
+            if (populator.getType().getWeight() > 0) {
+                output.add(populator);
+            }
+        }
+        return output;
     }
 }

@@ -85,7 +85,7 @@ public abstract class TerraSlider extends Slider implements Slider.ISlider, Elem
 
         public Float(String prefix, CompoundNBT value) {
             super(prefix, value, true);
-            precision = 4;
+            precision = 3;
             setValue(value.getFloat("value"));
             updateSlider();
         }
