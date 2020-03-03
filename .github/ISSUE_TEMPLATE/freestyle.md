@@ -2,7 +2,7 @@
 name: Freestyle
 about: '"This ain''t my first rodeo!"'
 title: ''
-labels: ''
+labels: review
 assignees: ''
 
 ---

@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest an idea or request a feature that you think would improve TerraForged
 title: ''
-labels: enhancement
+labels: enhancement, review
 assignees: ''
 
 ---

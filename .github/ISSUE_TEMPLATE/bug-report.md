@@ -2,7 +2,7 @@
 name: Bug report
 about: Help improve TerraForged by reporting bugs and inter-mod compatibility problems
 title: ''
-labels: ''
+labels: review
 assignees: ''
 
 ---
