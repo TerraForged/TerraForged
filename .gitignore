@@ -26,3 +26,8 @@ build/
 out/
 run/
 *.iml
+/.gradle/
+/Noise2D/out/
+/.idea/
+/Noise2D/out/production/resources/
+/Noise2D/out/production/resources/license.txt
