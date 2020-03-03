@@ -40,7 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-public class TreeBuffer extends WorldDelegate {
+public class TreeGrowBuffer extends WorldDelegate {
 
     private int topY = 0;
     private final BlockPos pos;
@@ -48,7 +48,7 @@ public class TreeBuffer extends WorldDelegate {
     private final MutableVec3i baseMax = new MutableVec3i(0);
     private final List<TemplateFeature.BlockInfo> changes = new LinkedList<>();
 
-    public TreeBuffer(IWorld delegate, BlockPos pos) {
+    public TreeGrowBuffer(IWorld delegate, BlockPos pos) {
         super(delegate);
         this.pos = pos;
     }
@@ -71,6 +71,9 @@ public class TreeBuffer extends WorldDelegate {
 
     @Override
     public boolean setBlockState(BlockPos pos, BlockState state, int i) {
+        if (pos.getY() < this.pos.getY()) {
+            return false;
+        }
         if (state.isSolid()) {
             recordPos(pos);
         }

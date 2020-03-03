@@ -25,7 +25,6 @@
 
 package com.terraforged.mod.chunk.fix;
 
-import com.terraforged.feature.util.WorldDelegate;
 import com.terraforged.mod.chunk.TerraContainer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
@@ -36,7 +35,9 @@ import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 
-public class RegionFix extends WorldDelegate {
+// fixes hard-coded water and world height values
+// overrides biome methods to use TerraForged's provider/manager
+public class RegionFix extends RegionDelegate {
 
     private final WorldGenRegion region;
     private final TerraContainer container;
@@ -44,7 +45,7 @@ public class RegionFix extends WorldDelegate {
     private final ChunkGenerator<?> generator;
 
     public RegionFix(WorldGenRegion region, TerraContainer container, ChunkGenerator<?> generator, BiomeManager biomeManager) {
-        super(region);
+        super(region.getWorld(), region);
         this.region = region;
         this.container = container;
         this.generator = generator;

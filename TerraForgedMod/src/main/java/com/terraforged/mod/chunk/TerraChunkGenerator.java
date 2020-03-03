@@ -187,7 +187,6 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
         Biome biome = container.getFeatureBiome();
         DecoratorContext context = getContext().decorator(chunk);
 
-        // overrides WorldGenRegion's getSeaLevel() to provide the actual sea level
         IWorld regionFix = new RegionFix(region, container, this, biomeManager);
         BlockPos pos = new BlockPos(context.blockX, 0, context.blockZ);
 

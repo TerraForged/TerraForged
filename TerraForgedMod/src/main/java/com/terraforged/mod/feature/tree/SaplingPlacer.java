@@ -60,7 +60,7 @@ public class SaplingPlacer {
             return false;
         }
 
-        TreeBuffer buffer = new TreeBuffer(event.getWorld(), event.getPos());
+        TreeGrowBuffer buffer = new TreeGrowBuffer(event.getWorld(), event.getPos());
         W world = feature.wrap(buffer);
 
         ChunkGenerator<?> generator = ((ServerChunkProvider) event.getWorld().getChunkProvider()).getChunkGenerator();
@@ -85,7 +85,7 @@ public class SaplingPlacer {
 
     private static boolean placeNormal(Feature<NoFeatureConfig> feature, SaplingGrowTreeEvent event, Vec3i[] dirs) {
         // apply the feature to a buffer
-        TreeBuffer buffer = new TreeBuffer(event.getWorld(), event.getPos());
+        TreeGrowBuffer buffer = new TreeGrowBuffer(event.getWorld(), event.getPos());
         buffer.placeFeature(feature, event.getPos(), event.getRand());
 
         // check that the tree can grow here
@@ -101,7 +101,7 @@ public class SaplingPlacer {
         return true;
     }
 
-    private static void applyBuffer(TreeBuffer buffer, IWorld world, BlockPos translation) {
+    private static void applyBuffer(TreeGrowBuffer buffer, IWorld world, BlockPos translation) {
         try (BlockPos.PooledMutable pos = BlockPos.PooledMutable.retain()) {
             for (TemplateFeature.BlockInfo block : buffer.getChanges()) {
                 int x = block.getPos().getX() + translation.getX();
@@ -110,11 +110,9 @@ public class SaplingPlacer {
 
                 pos.setPos(x, y, z);
 
-                if (pos.getY() > 90) {
-                    BlockState current = world.getBlockState(pos);
-                    if (current.isSolid()) {
-                        continue;
-                    }
+                BlockState current = world.getBlockState(pos);
+                if (current.isSolid()) {
+                    continue;
                 }
 
                 world.setBlockState(pos, block.getState(), 2);
