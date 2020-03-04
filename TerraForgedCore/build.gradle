@@ -1,3 +1,26 @@
+apply plugin: "maven-publish"
+
 dependencies {
     compile project(":Noise2D")
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+
+    if (System.getenv("MAVEN_USER") != null && System.getenv("MAVEN_PASS") != null) {
+        repositories {
+            maven {
+                credentials {
+                    username System.getenv("MAVEN_USER")
+                    password System.getenv("MAVEN_PASS")
+                }
+                name = "nexus"
+                url = "https://io.terraforged.com/repository/maven/"
+            }
+        }
+    }
 }
