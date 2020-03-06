@@ -27,7 +27,7 @@ package com.terraforged.mod.biome.provider;
 
 import com.google.common.collect.Sets;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.decorator.Decorator;
+import com.terraforged.core.world.decorator.Decorator;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.util.concurrent.ObjectPool;
 import com.terraforged.core.world.terrain.Terrain;

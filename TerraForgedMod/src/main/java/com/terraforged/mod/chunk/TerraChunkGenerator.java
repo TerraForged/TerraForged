@@ -32,7 +32,7 @@ import com.terraforged.api.chunk.surface.SurfaceContext;
 import com.terraforged.api.chunk.surface.SurfaceManager;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.decorator.Decorator;
+import com.terraforged.core.world.decorator.Decorator;
 import com.terraforged.core.region.RegionCache;
 import com.terraforged.core.region.RegionGenerator;
 import com.terraforged.core.region.Size;

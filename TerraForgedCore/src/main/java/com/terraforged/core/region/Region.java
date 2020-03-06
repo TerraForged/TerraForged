@@ -27,7 +27,7 @@ package com.terraforged.core.region;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Extent;
-import com.terraforged.core.decorator.Decorator;
+import com.terraforged.core.world.decorator.Decorator;
 import com.terraforged.core.filter.Filterable;
 import com.terraforged.core.region.chunk.ChunkGenTask;
 import com.terraforged.core.region.chunk.ChunkReader;

@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.decorator;
+package com.terraforged.core.world.decorator;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.terrain.Terrain;

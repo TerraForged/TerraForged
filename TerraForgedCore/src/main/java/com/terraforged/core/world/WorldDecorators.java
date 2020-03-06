@@ -25,9 +25,9 @@
 
 package com.terraforged.core.world;
 
-import com.terraforged.core.decorator.Decorator;
-import com.terraforged.core.decorator.DesertStacks;
-import com.terraforged.core.decorator.Wetlands;
+import com.terraforged.core.world.decorator.Decorator;
+import com.terraforged.core.world.decorator.DesertStacks;
+import com.terraforged.core.world.decorator.Wetlands;
 
 import java.util.ArrayList;
 import java.util.Collections;

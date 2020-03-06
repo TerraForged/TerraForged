@@ -23,62 +23,56 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.decorator;
+package com.terraforged.core.world.decorator;
 
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.util.Seed;
-import com.terraforged.core.world.biome.BiomeType;
+import com.terraforged.core.world.GeneratorContext;
 import com.terraforged.core.world.heightmap.Levels;
 import com.terraforged.core.world.terrain.Terrain;
+import com.terraforged.core.world.terrain.Terrains;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
+import me.dags.noise.func.CellFunc;
 
-public class DesertStacks implements Decorator {
+public class DesertDunes implements Decorator {
 
-    private final float minY;
-    private final float maxY;
-    private final Levels levels;
     private final Module module;
+    private final float climateMin;
+    private final float climateMax;
+    private final float climateRange;
 
-    public DesertStacks(Seed seed, Levels levels) {
-        Module mask = Source.perlin(seed.next(), 500, 1).clamp(0.7, 1).map(0, 1);
+    private final Levels levels;
+    private final Terrains terrains;
+    private final Terrain dunes = new Terrain("dunes", 100);
 
-        Module shape = Source.perlin(seed.next(), 25, 1).clamp(0.6, 1).map(0, 1)
-                .mult(Source.perlin(seed.next(), 8, 1).alpha(0.1));
-
-        Module top = Source.perlin(seed.next(), 4, 1).alpha(0.25);
-
-        Module scale = Source.perlin(seed.next(), 400, 1)
-                .clamp(levels.scale(20), levels.scale(35));
-
-        Module stack = (x, y) -> {
-            float value = shape.getValue(x, y);
-            if (value > 0.3) {
-                return top.getValue(x, y);
-            }
-            return value * 0.95F;
-        };
-
-        this.minY = levels.water(0);
-        this.maxY = levels.water(50);
-        this.levels = levels;
-        this.module = stack.scale(scale).mult(mask);
+    public DesertDunes(GeneratorContext context) {
+        this.climateMin = 0.6F;
+        this.climateMax = 0.85F;
+        this.climateRange = climateMax - climateMin;
+        this.levels = context.levels;
+        this.terrains = context.terrain;
+        this.module = Source.cell(context.seed.next(), 80, CellFunc.DISTANCE)
+                .warp(context.seed.next(), 70, 1, 70)
+                .scale(30 / 255D);
     }
 
     @Override
     public boolean apply(Cell<Terrain> cell, float x, float y) {
-        if (BiomeType.DESERT != cell.biomeType) {
+        float temp = cell.temperature;
+        float moisture = 1 - cell.moisture;
+        float climate = temp * moisture;
+        if (climate < climateMin) {
             return false;
         }
 
-        if (cell.value <= minY || cell.value > maxY) {
-            return false;
-        }
+        float duneHeight = module.getValue(x, y);
+        float climateMask = climate > climateMax ? 1F : (climate - climateMin) / climateRange;
+        float regionMask = cell.mask(0.4F, 0.5F, 0,0.8F);
 
-        float value = module.getValue(x, y);
-        value *= cell.biomeEdge;
-        cell.value += value;
+        float height = duneHeight * climateMask * regionMask;
+        cell.value += height;
+        cell.tag = dunes;
 
-        return value > levels.unit;
+        return height >= levels.unit;
     }
 }

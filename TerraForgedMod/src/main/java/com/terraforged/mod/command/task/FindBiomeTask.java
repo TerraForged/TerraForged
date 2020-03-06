@@ -26,7 +26,7 @@
 package com.terraforged.mod.command.task;
 
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.decorator.Decorator;
+import com.terraforged.core.world.decorator.Decorator;
 import com.terraforged.core.world.WorldGenerator;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.mod.biome.provider.BiomeProvider;
