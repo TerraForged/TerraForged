@@ -12,7 +12,7 @@ TerraForged is an ambitious new terrain generator mod for Minecraft (Java Editio
 
 #### Website(s):
 [https://terraforged.com](https://terraforged.com)  
-[https://github.com/TerraForged](https://github.com/TerraForged)
+[https://github.com/TerraForged](https://github.com/TerraForged)  
 [https://curseforge.com/../TerraForged](https://www.curseforge.com/minecraft/mc-mods/terraforged)
 
 #### Installation:
