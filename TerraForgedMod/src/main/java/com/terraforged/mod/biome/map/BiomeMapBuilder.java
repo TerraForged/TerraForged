@@ -44,6 +44,7 @@ import java.util.function.Function;
 public class BiomeMapBuilder implements BiomeMap.Builder {
 
     private final Map<Biome.TempCategory, List<Biome>> rivers = new HashMap<>();
+    private final Map<Biome.TempCategory, List<Biome>> wetlands = new HashMap<>();
     private final Map<Biome.TempCategory, List<Biome>> beaches = new HashMap<>();
     private final Map<Biome.TempCategory, List<Biome>> oceans = new HashMap<>();
     private final Map<Biome.TempCategory, List<Biome>> deepOceans = new HashMap<>();
@@ -88,6 +89,13 @@ public class BiomeMapBuilder implements BiomeMap.Builder {
     }
 
     @Override
+    public BiomeMapBuilder addWetland(Biome biome, int count) {
+        Biome.TempCategory category = BiomeHelper.getTempCategory(biome);
+        add(wetlands.computeIfAbsent(category, c -> new ArrayList<>()), biome, count);
+        return this;
+    }
+
+    @Override
     public BiomeMapBuilder addBiome(BiomeType type, Biome biome, int count) {
         add(map.computeIfAbsent(type, t -> new ArrayList<>()), biome, count);
         return this;
@@ -100,6 +108,10 @@ public class BiomeMapBuilder implements BiomeMap.Builder {
 
     Biome[][] rivers() {
         return collectTemps(rivers);
+    }
+
+    Biome[][] wetlands() {
+        return collectTemps(wetlands);
     }
 
     Biome[][] beaches() {

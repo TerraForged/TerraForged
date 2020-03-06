@@ -35,10 +35,10 @@ public class Test {
     public static boolean fixedBiome = true;
 
     public static Terrain getTerrainType(Terrains terrains) {
-        return terrains.steppe;
+        return terrains.dales;
     }
 
     public static Biome getBiome() {
-        return Biomes.DESERT;
+        return Biomes.PLAINS;
     }
 }

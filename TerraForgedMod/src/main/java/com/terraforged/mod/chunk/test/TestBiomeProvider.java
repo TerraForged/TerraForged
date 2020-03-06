@@ -27,7 +27,6 @@ package com.terraforged.mod.chunk.test;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.terrain.Terrain;
-import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.provider.BiomeProvider;
 import com.terraforged.mod.chunk.TerraContext;
 import net.minecraft.world.biome.Biome;
@@ -40,9 +39,6 @@ public class TestBiomeProvider extends BiomeProvider {
 
     @Override
     public Biome getBiome(Cell<Terrain> cell, int x, int z) {
-        if (cell.biome < 0.5F) {
-            return ModBiomes.TAIGA_SCRUB;
-        }
         return Test.getBiome();
     }
 }

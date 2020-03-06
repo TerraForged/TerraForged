@@ -60,7 +60,7 @@ public class BiomeHelper {
         put(BiomeType.DESERT, BiomePredicate.DESERT.or(BiomePredicate.MESA).not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN).not(BiomePredicate.WETLAND));
         put(BiomeType.TEMPERATE_RAINFOREST, BiomePredicate.TEMPERATE_RAINFOREST.not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN));
         put(BiomeType.TEMPERATE_FOREST, BiomePredicate.TEMPERATE_FOREST.not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN).not(BiomePredicate.WETLAND));
-        put(BiomeType.GRASSLAND, BiomePredicate.GRASSLAND.or(BiomePredicate.WETLAND).not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN));
+        put(BiomeType.GRASSLAND, BiomePredicate.GRASSLAND.not(BiomePredicate.WETLAND).not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN));
         put(BiomeType.COLD_STEPPE, BiomePredicate.COLD_STEPPE.not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN));
         put(BiomeType.STEPPE, BiomePredicate.STEPPE.not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN));
         put(BiomeType.TAIGA, BiomePredicate.TAIGA.not(BiomePredicate.TUNDRA).not(BiomePredicate.COLD_STEPPE).not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN));
@@ -104,6 +104,8 @@ public class BiomeHelper {
                 builder.addRiver(biome, weight);
             } else if (biome.getCategory() == Biome.Category.BEACH || biome == Biomes.STONE_SHORE) {
                 builder.addBeach(biome, weight);
+            } else if (biome.getCategory() == Biome.Category.SWAMP) {
+                builder.addWetland(biome, weight);
             } else {
                 Collection<BiomeType> types = getTypes(data, biome);
                 for (BiomeType type : types) {

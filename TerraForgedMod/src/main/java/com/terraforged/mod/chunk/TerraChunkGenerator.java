@@ -32,6 +32,7 @@ import com.terraforged.api.chunk.surface.SurfaceContext;
 import com.terraforged.api.chunk.surface.SurfaceManager;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.decorator.Decorator;
 import com.terraforged.core.region.RegionCache;
 import com.terraforged.core.region.RegionGenerator;
 import com.terraforged.core.region.Size;
@@ -69,7 +70,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeContainer;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -86,7 +86,7 @@ import net.minecraft.world.gen.feature.template.TemplateManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSettings> {
+public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSettings> implements ChunkProcessor {
 
     private final TerraContext context;
     private final BiomeProvider biomeProvider;
@@ -125,9 +125,23 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
     @Override
     public final void generateBiomes(IChunk chunk) {
         ChunkPos pos = chunk.getPos();
-        ChunkReader view = getChunkReader(pos.x, pos.z);
-        BiomeContainer container = getBiomeProvider().createBiomeContainer(view);
+        ChunkReader reader = getChunkReader(pos.x, pos.z);
+        TerraContainer container = getBiomeProvider().createBiomeContainer(reader);
         ((ChunkPrimer) chunk).func_225548_a_(container);
+        // apply chunk-local heightmap modifications
+        preProcess(pos, reader, container);
+    }
+
+    @Override
+    public final void preProcess(ChunkPos pos, ChunkReader chunk, TerraContainer container) {
+        chunk.iterate((cell, dx, dz) -> {
+            Biome biome = container.getBiome(dx, dz);
+            for (Decorator decorator : getBiomeProvider().getDecorators(biome)) {
+                if (decorator.apply(cell, pos.getXStart() + dx, pos.getZStart() + dz)) {
+                    return;
+                }
+            }
+        });
     }
 
     @Override
@@ -142,7 +156,6 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
             context.biome = container.getBiome(dx, dz);
             ChunkPopulator.INSTANCE.decorate(chunk, context, px, py, pz);
         });
-
         terrainHelper.flatten(world, chunk, context.blockX, context.blockZ);
     }
 
@@ -193,19 +206,25 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
         // place biome features
         featureManager.decorate(this, regionFix, chunk, biome, pos);
 
-        // run post processors
-        container.getChunkReader().iterate((cell, dx, dz) -> {
+        // run post processes on chunk
+        postProcess(container.getChunkReader(), container, context);
+
+        // bake biome array & discard gen data
+        ((ChunkPrimer) chunk).func_225548_a_(container.bakeBiomes());
+    }
+
+    @Override
+    public final void postProcess(ChunkReader chunk, TerraContainer container, DecoratorContext context) {
+        chunk.iterate((cell, dx, dz) -> {
             int px = context.blockX + dx;
             int pz = context.blockZ + dz;
-            int py = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, dx, dz);
+            int py = context.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, dx, dz);
             context.cell = cell;
             context.biome = container.getBiome(dx, dz);
             for (ColumnDecorator decorator : getPostProcessors()) {
-                decorator.decorate(chunk, context, px, py, pz);
+                decorator.decorate(context.chunk, context, px, py, pz);
             }
         });
-
-        ((ChunkPrimer) chunk).func_225548_a_(container.bakeBiomes());
     }
 
     @Override

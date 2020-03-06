@@ -26,7 +26,9 @@
 package com.terraforged.mod.biome.map;
 
 import com.google.gson.JsonElement;
+import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.biome.BiomeType;
+import com.terraforged.core.world.terrain.Terrain;
 import net.minecraft.world.biome.Biome;
 
 import java.util.List;
@@ -38,11 +40,17 @@ public interface BiomeMap {
 
     Biome getRiver(float temperature, float moisture, float shape);
 
+    Biome getWetland(float temperature, float moisture, float shape);
+
     Biome getOcean(float temperature, float moisture, float shape);
 
     Biome getDeepOcean(float temperature, float moisture, float shape);
 
     Biome getBiome(BiomeType type, float temperature, float moisture, float shape);
+
+    default Biome getBiome(Cell<Terrain> cell) {
+        return getBiome(cell.biomeType, cell.temperature, cell.moisture, cell.biome);
+    }
 
     List<Biome> getAllBiomes(BiomeType type);
 
@@ -56,11 +64,17 @@ public interface BiomeMap {
 
     JsonElement toJson();
 
+    static Biome getBiome(Biome biome) {
+        return biome.delegate.get();
+    }
+
     interface Builder {
 
         Builder addBeach(Biome biome, int count);
 
         Builder addRiver(Biome biome, int count);
+
+        Builder addWetland(Biome biome, int count);
 
         Builder addOcean(Biome biome, int count);
 

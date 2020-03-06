@@ -40,6 +40,7 @@ public class Terrains {
     public final Terrain lake;
     public final Terrain river;
     public final Terrain riverBanks;
+    public final Terrain wetlands;
     public final Terrain badlands;
     public final Terrain steppe;
     public final Terrain plains;
@@ -64,6 +65,7 @@ public class Terrains {
                 river = mutable.river,
                 torridonian = mutable.torridonian,
                 riverBanks = mutable.riverbanks,
+                wetlands = mutable.wetlands,
                 badlands = mutable.badlands,
                 plateau = mutable.plateau,
                 steppe = mutable.steppe,
@@ -102,6 +104,7 @@ public class Terrains {
         terrain.lake = Terrain.lake(settings);
         terrain.river = Terrain.river(settings);
         terrain.riverbanks = Terrain.riverBank(settings);
+        terrain.wetlands = Terrain.wetlands(settings);
         terrain.badlands = Terrain.badlands(settings);
         terrain.plateau = Terrain.plateau(settings);
         terrain.steppe = Terrain.steppe(settings);
@@ -123,6 +126,7 @@ public class Terrains {
         public Terrain lake = Terrain.NONE;
         public Terrain river = Terrain.NONE;
         public Terrain riverbanks = Terrain.NONE;
+        public Terrain wetlands = Terrain.NONE;
         public Terrain badlands = Terrain.NONE;
         public Terrain plateau = Terrain.NONE;
         public Terrain steppe = Terrain.NONE;

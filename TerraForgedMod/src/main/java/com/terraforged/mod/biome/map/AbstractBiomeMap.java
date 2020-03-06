@@ -38,39 +38,54 @@ import net.minecraft.world.biome.Biomes;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 public abstract class AbstractBiomeMap implements BiomeMap {
 
     private final Biome[][] beach;
     private final Biome[][] river;
+    private final Biome[][] wetland;
     private final Biome[][] ocean;
     private final Biome[][] deepOcean;
+
+    protected final DefaultBiome defaultLand = this::defaultBiome;
+    protected final DefaultBiome defaultBeach = this::defaultBeach;
+    protected final DefaultBiome defaultRiver = this::defaultRiver;
+    protected final DefaultBiome defaultWetland = this::defaultWetland;
+    protected final DefaultBiome defaultOcean = this::defaultOcean;
+    protected final DefaultBiome defaultDeepOcean = this::defaultDeepOcean;
 
     protected AbstractBiomeMap(BiomeMapBuilder builder) {
         river = builder.rivers();
         beach = builder.beaches();
         ocean = builder.oceans();
+        wetland = builder.wetlands();
         deepOcean = builder.deepOceans();
     }
 
     @Override
     public Biome getBeach(float temperature, float moisture, float shape) {
-        return get(beach, getCategory(temperature), shape, defaultBeach(temperature));
+        return get(beach, getCategory(temperature), shape, temperature, defaultBeach);
     }
 
     @Override
     public Biome getRiver(float temperature, float moisture, float shape) {
-        return get(river, getCategory(temperature), shape, defaultRiver(temperature));
+        return get(river, getCategory(temperature), shape, temperature, defaultRiver);
+    }
+
+    @Override
+    public Biome getWetland(float temperature, float moisture, float shape) {
+        return get(wetland, getCategory(temperature), shape, temperature, defaultWetland);
     }
 
     @Override
     public Biome getOcean(float temperature, float moisture, float shape) {
-        return get(ocean, getCategory(temperature), shape, defaultOcean(temperature));
+        return get(ocean, getCategory(temperature), shape, temperature, defaultOcean);
     }
 
     @Override
     public Biome getDeepOcean(float temperature, float moisture, float shape) {
-        return get(deepOcean, getCategory(temperature), shape, defaultDeepOcean(temperature));
+        return get(deepOcean, getCategory(temperature), shape, temperature, defaultDeepOcean);
     }
 
     @Override
@@ -92,7 +107,8 @@ public abstract class AbstractBiomeMap implements BiomeMap {
     public JsonObject toJson() {
         JsonObject root = new JsonObject();
         root.add("rivers", collect(river));
-        root.add("beaches", collect(river));
+        root.add("wetland", collect(wetland));
+        root.add("beaches", collect(beach));
         root.add("oceans", collect(ocean));
         root.add("deepOceans", collect(deepOcean));
         return root;
@@ -144,6 +160,13 @@ public abstract class AbstractBiomeMap implements BiomeMap {
         return Biomes.RIVER;
     }
 
+    protected Biome defaultWetland(float temperature) {
+        if (temperature < 0.15) {
+            return ModBiomes.TAIGA_SCRUB;
+        }
+        return ModBiomes.MARSHLAND;
+    }
+
     protected Biome defaultOcean(float temperature) {
         if (temperature < 0.3) {
             return Biomes.FROZEN_OCEAN;
@@ -164,7 +187,7 @@ public abstract class AbstractBiomeMap implements BiomeMap {
         return Biomes.DEEP_OCEAN;
     }
 
-    protected Biome defaultBiome(float temperature, float moisture) {
+    protected Biome defaultBiome(float temperature) {
         if (temperature < 0.3) {
             return ModBiomes.TAIGA_SCRUB;
         }
@@ -174,22 +197,22 @@ public abstract class AbstractBiomeMap implements BiomeMap {
         return Biomes.PLAINS;
     }
 
-    protected Biome get(Biome[][] group, Biome.TempCategory category, float shape, Biome def) {
-        return get(group, category.ordinal() - 1, shape, def);
+    protected Biome get(Biome[][] group, Biome.TempCategory category, float shape, float temp, DefaultBiome def) {
+        return get(group, category.ordinal() - 1, shape, temp, def);
     }
 
-    protected Biome get(Biome[][] group, BiomeType type, float shape, Biome def) {
-        return get(group, type.ordinal(), shape, def);
+    protected Biome get(Biome[][] group, BiomeType type, float shape, float temp, DefaultBiome def) {
+        return get(group, type.ordinal(), shape, temp, def);
     }
 
-    protected Biome get(Biome[][] group, int ordinal, float shape, Biome def) {
+    protected Biome get(Biome[][] group, int ordinal, float shape, float temp, DefaultBiome def) {
         if (ordinal >= group.length) {
-            return def;
+            return def.getDefaultBiome(temp);
         }
 
         Biome[] biomes = group[ordinal];
         if (biomes == null || biomes.length == 0) {
-            return def;
+            return def.getDefaultBiome(temp);
         }
 
         int index = NoiseUtil.round((biomes.length - 1) * shape);

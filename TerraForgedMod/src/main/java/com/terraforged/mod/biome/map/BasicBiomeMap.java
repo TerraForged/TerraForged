@@ -64,7 +64,7 @@ public class BasicBiomeMap extends AbstractBiomeMap {
 
     @Override
     public Biome getBiome(BiomeType type, float temperature, float moisture, float shape) {
-        return get(biomeTypes, type, shape, defaultBiome(temperature, moisture));
+        return get(biomeTypes, type, shape, temperature, defaultLand);
     }
 
     @Override

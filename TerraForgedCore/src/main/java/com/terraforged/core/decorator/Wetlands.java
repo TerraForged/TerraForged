@@ -34,52 +34,73 @@ import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.util.NoiseUtil;
 
-public class SwampPools implements Decorator {
+public class Wetlands implements Decorator {
 
     private final Module module;
-    private final Levels levels;
-    private final Terrains terrains;
-    private final float minY;
-    private final float maxY;
-    private final float blendY;
-    private final float blendRange;
+    private final float poolBase;
+    private final float bankHeight;
 
-    public SwampPools(Seed seed, Terrains terrains, Levels levels) {
-        this.levels = levels;
-        this.terrains = terrains;
-        this.minY = levels.water(-3);
-        this.maxY = levels.water(1);
-        this.blendY = levels.water(4);
-        this.blendRange = blendY - maxY;
-        this.module = Source.perlin(seed.next(), 14, 1).clamp(0.45, 0.8).map(0, 1);
+    private final Terrain wetlands;
+
+    public Wetlands(Seed seed, Terrains terrain, Levels levels) {
+        this.wetlands = terrain.wetlands;
+        this.poolBase = levels.water(-3);
+        this.bankHeight = levels.water(2);
+        this.module = Source.perlin(seed.next(), 12, 1).clamp(0.35, 0.65).map(0, 1);
     }
 
     @Override
     public boolean apply(Cell<Terrain> cell, float x, float y) {
-        if (cell.tag == terrains.ocean) {
+        if (cell.value < poolBase) {
             return false;
         }
 
-        if (cell.moisture < 0.7 || cell.temperature < 0.3) {
+        float tempAlpha = getAlpha(cell.temperature, 0.3F, 0.7F);
+        if (tempAlpha == 0) {
             return false;
         }
 
-        if (cell.value <= minY) {
+        float moistAlpha = getAlpha(cell.moisture, 0.7F, 1F);
+        if (moistAlpha == 0) {
             return false;
         }
 
-        if (cell.value > blendY) {
+        float riverAlpha = getAlpha(1 - cell.riverMask, 0.85F, 0.95F);
+        if (riverAlpha == 0) {
             return false;
         }
 
-        float alpha = module.getValue(x, y);
-        if (cell.value > maxY) {
-            float delta = blendY - cell.value;
-            float alpha2 = delta / blendRange;
-            alpha *= alpha2;
+        float alpha = tempAlpha * moistAlpha * riverAlpha;
+        float value1 = NoiseUtil.lerp(cell.value, bankHeight, alpha);
+        cell.value = Math.min(cell.value, value1);
+
+        float poolAlpha = getAlpha(alpha, 0.35F, 0.55F);
+        float shape = module.getValue(x, y);
+        float value2 = NoiseUtil.lerp(cell.value, poolBase, shape * poolAlpha);
+        cell.value = Math.min(cell.value, value2);
+
+        if (poolAlpha > 0.5) {
+            cell.tag = wetlands;
         }
 
-        cell.value = NoiseUtil.lerp(cell.value, minY, alpha);
         return true;
+    }
+
+    private static float getAlpha(float value, float min, float max) {
+        return getAlpha(value, min, max, false);
+    }
+
+    private static float getAlpha(float value, float min, float max, boolean inverse) {
+        if (value < min) {
+            return 0F;
+        }
+        if (value >= max) {
+            return 1F;
+        }
+        float alpha = (value - min) / (max - min);
+        if (inverse) {
+            return 1F - alpha;
+        }
+        return alpha;
     }
 }

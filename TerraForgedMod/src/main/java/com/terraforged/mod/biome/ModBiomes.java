@@ -46,6 +46,7 @@ public class ModBiomes {
     public static final Biome STEPPE = register(new Steppe());
     public static final Biome TAIGA_SCRUB = register(new TaigaScrub());
     public static final Biome WARM_BEACH = register(new WarmBeach());
+    public static final Biome MARSHLAND = register(new Marshland());
 
     private static Biome register(BiomeVariant biome) {
         biomes.add(biome);

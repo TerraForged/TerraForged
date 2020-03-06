@@ -25,6 +25,7 @@
 
 package com.terraforged.mod.data;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.terraforged.core.world.biome.BiomeType;
@@ -33,7 +34,11 @@ import com.terraforged.mod.biome.provider.BiomeHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Set;
 
 public class WorldGenBiomes extends DataGen {
@@ -42,6 +47,12 @@ public class WorldGenBiomes extends DataGen {
         BiomeMap map = BiomeHelper.getDefaultBiomeMap();
         for (BiomeType type : BiomeType.values()) {
             genBiomes(dataDir, type, map);
+        }
+
+        try (Writer writer = new BufferedWriter(new FileWriter(new File("biome_map.json")))) {
+            new GsonBuilder().setPrettyPrinting().create().toJson(map.toJson(), writer);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

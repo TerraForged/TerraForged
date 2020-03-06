@@ -75,7 +75,6 @@ public class TestChunkGenerator extends TerraChunkGenerator {
         @Override
         public void apply(Cell<Terrain> cell, float x, float y) {
             super.apply(cell, x, y);
-
             populator.apply(cell, x, y);
         }
 

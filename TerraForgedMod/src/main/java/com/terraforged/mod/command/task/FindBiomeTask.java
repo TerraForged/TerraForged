@@ -26,6 +26,7 @@
 package com.terraforged.mod.command.task;
 
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.decorator.Decorator;
 import com.terraforged.core.world.WorldGenerator;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.mod.biome.provider.BiomeProvider;
@@ -58,9 +59,14 @@ public class FindBiomeTask extends FindTask {
     @Override
     protected boolean search(int x, int z) {
         generator.getHeightmap().apply(cell, x, z);
+        for (Decorator decorator : generator.getDecorators().getDecorators()) {
+            if (decorator.apply(cell, x, z)) {
+                break;
+            }
+        }
 
         if (biome.getCategory() != Biome.Category.BEACH && biome.getCategory() != Biome.Category.OCEAN) {
-            if (cell.continentEdge > 0.4 && cell.continentEdge < 0.5) {
+            if (cell.continentEdge > 0.4 && cell.continentEdge < 0.45) {
                 return false;
             }
         }

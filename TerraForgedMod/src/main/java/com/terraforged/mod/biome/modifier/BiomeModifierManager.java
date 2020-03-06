@@ -54,11 +54,6 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
                 context.factory.getClimate(),
                 context.levels
         ));
-        modifiers.add(new SwampModifier(
-                context.seed,
-                context.factory.getClimate(),
-                context.levels
-        ));
         Collections.sort(modifiers);
         this.biomeModifiers = modifiers;
     }

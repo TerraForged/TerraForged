@@ -27,7 +27,7 @@ package com.terraforged.core.world;
 
 import com.terraforged.core.decorator.Decorator;
 import com.terraforged.core.decorator.DesertStacks;
-import com.terraforged.core.decorator.SwampPools;
+import com.terraforged.core.decorator.Wetlands;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,7 +41,7 @@ public class WorldDecorators {
         context = context.copy();
         List<Decorator> list = new ArrayList<>();
         list.add(new DesertStacks(context.seed, context.levels));
-        list.add(new SwampPools(context.seed, context.terrain, context.levels));
+        list.add(new Wetlands(context.seed, context.terrain, context.levels));
         decorators = Collections.unmodifiableList(list);
     }
 

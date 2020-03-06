@@ -134,43 +134,47 @@ public class Terrain implements Tag {
         return new Terrain("river_banks", 4);
     }
 
+    public static Terrain wetlands(Settings settings) {
+        return new Terrain("wetlands", 5);
+    }
+
     public static Terrain steppe(Settings settings) {
-        return new Terrain("steppe", 5, settings.terrain.steppe.weight);
+        return new Terrain("steppe", 6, settings.terrain.steppe.weight);
     }
 
     public static Terrain plains(Settings settings) {
-        return new Terrain("plains", 5, settings.terrain.plains.weight);
+        return new Terrain("plains", 7, settings.terrain.plains.weight);
     }
 
     public static Terrain plateau(Settings settings) {
-        return new Terrain("plateau", 6, settings.terrain.plateau.weight);
+        return new Terrain("plateau", 8, settings.terrain.plateau.weight);
     }
 
     public static Terrain badlands(Settings settings) {
-        return new Terrain("badlands", 7, settings.terrain.badlands.weight);
+        return new Terrain("badlands", 9, settings.terrain.badlands.weight);
     }
 
     public static Terrain hills(Settings settings) {
-        return new Terrain("hills", 8, settings.terrain.hills.weight);
+        return new Terrain("hills", 10, settings.terrain.hills.weight);
     }
 
     public static Terrain dales(Settings settings) {
-        return new Terrain("dales", 9, settings.terrain.dales.weight);
+        return new Terrain("dales", 11, settings.terrain.dales.weight);
     }
 
     public static Terrain torridonian(Settings settings) {
-        return new Terrain("torridonian_fells", 10, settings.terrain.torridonian.weight);
+        return new Terrain("torridonian_fells", 12, settings.terrain.torridonian.weight);
     }
 
     public static Terrain mountains(Settings settings) {
-        return new Terrain("mountains", 11, settings.terrain.mountains.weight);
+        return new Terrain("mountains", 13, settings.terrain.mountains.weight);
     }
 
     public static Terrain volcano(Settings settings) {
-        return new Terrain("volcano", 12, settings.terrain.volcano.weight);
+        return new Terrain("volcano", 14, settings.terrain.volcano.weight);
     }
 
     public static Terrain volcanoPipe(Settings settings) {
-        return new Terrain("volcano_pipe", 13, settings.terrain.volcano.weight);
+        return new Terrain("volcano_pipe", 15, settings.terrain.volcano.weight);
     }
 }

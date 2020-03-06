@@ -61,7 +61,7 @@ public class ClimateModule {
         int warpScale = settings.biome.biomeWarpScale;
 
         this.seed = seed.next();
-        this.edgeClamp = 0.85F;
+        this.edgeClamp = 1F;
         this.edgeScale = 1 / edgeClamp;
         this.biomeFreq = 1F / biomeSize;
         this.warpStrength = settings.biome.biomeWarpStrength;

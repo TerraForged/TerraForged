@@ -27,6 +27,7 @@ package com.terraforged.mod.biome.provider;
 
 import com.google.common.collect.Sets;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.decorator.Decorator;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.util.concurrent.ObjectPool;
 import com.terraforged.core.world.terrain.Terrain;
@@ -40,8 +41,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.structure.Structure;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -50,24 +54,12 @@ public class BiomeProvider extends AbstractBiomeProvider {
     private final BiomeMap biomeMap;
     private final TerraContext context;
     private final BiomeModifierManager modifierManager;
+    private final Map<Biome, List<Decorator>> decorators = new HashMap<>();
 
     public BiomeProvider(TerraContext context) {
         this.context = context;
         this.biomeMap = BiomeHelper.getDefaultBiomeMap();
         this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomeMap), context.copy());
-    }
-
-    public BiomeModifierManager getModifierManager() {
-        return modifierManager;
-    }
-
-    public TerraContainer createBiomeContainer(ChunkReader chunkReader) {
-        TerraContainer.Builder builder = TerraContainer.builder();
-        chunkReader.iterate((cell, dx, dz) -> {
-            Biome biome = getBiome(cell, chunkReader.getBlockX() + dx, chunkReader.getBlockZ() + dz);
-            builder.fill(dx, dz, biome);
-        });
-        return builder.build(chunkReader);
     }
 
     @Override
@@ -135,29 +127,51 @@ public class BiomeProvider extends AbstractBiomeProvider {
         return this.topBlocksCache;
     }
 
+    public BiomeModifierManager getModifierManager() {
+        return modifierManager;
+    }
+
+    public List<Decorator> getDecorators(Biome biome) {
+        return decorators.getOrDefault(biome, Collections.emptyList());
+    }
+
+    public TerraContainer createBiomeContainer(ChunkReader chunkReader) {
+        TerraContainer.Builder builder = TerraContainer.builder();
+        chunkReader.iterate((cell, dx, dz) -> {
+            Biome biome = getBiome(cell, chunkReader.getBlockX() + dx, chunkReader.getBlockZ() + dz);
+            builder.fill(dx, dz, biome);
+        });
+        return builder.build(chunkReader);
+    }
+
     public Biome getBiome(Cell<Terrain> cell, int x, int z) {
-        if (cell.value <= context.levels.water) {
-            if (cell.tag == context.terrain.river || cell.tag == context.terrain.riverBanks) {
-                Biome biome = getBiome(cell);
-                if (biome.getCategory() == Biome.Category.SWAMP) {
-                    return biome;
-                }
-                return biomeMap.getRiver(cell.temperature, cell.moisture, cell.biome);
-            } else if (cell.tag == context.terrain.ocean) {
-                return biomeMap.getOcean(cell.temperature, cell.moisture, cell.biome);
-            } else if (cell.tag == context.terrain.deepOcean) {
-                return biomeMap.getDeepOcean(cell.temperature, cell.moisture, cell.biome);
-            }
+        if (cell.tag == context.terrain.wetlands) {
+            return biomeMap.getWetland(cell.temperature, cell.moisture, cell.biome);
         }
-        return modifyBiome(getBiome(cell), cell, x, z);
+
+        if (cell.value > context.levels.water) {
+            return getModifierManager().modify(biomeMap.getBiome(cell), cell, x, z);
+        }
+
+        if (cell.tag == context.terrain.river || cell.tag == context.terrain.riverBanks) {
+            Biome biome = biomeMap.getBiome(cell);
+            if (overridesRiver(biome)) {
+                return biome;
+            }
+
+            return biomeMap.getRiver(cell.temperature, cell.moisture, cell.biome);
+        }
+
+        if (cell.tag == context.terrain.ocean) {
+            return biomeMap.getOcean(cell.temperature, cell.moisture, cell.biome);
+        }
+
+        return biomeMap.getDeepOcean(cell.temperature, cell.moisture, cell.biome);
     }
 
-    public Biome getBiome(Cell<Terrain> cell) {
-        return biomeMap.getBiome(cell.biomeType, cell.temperature, cell.moisture, cell.biome);
-    }
-
-    public Biome modifyBiome(Biome biome, Cell<Terrain> cell, int x, int z) {
-        return modifierManager.modify(biome, cell, x, z);
+    private static boolean overridesRiver(Biome biome) {
+        return biome.getCategory() == Biome.Category.SWAMP
+                || biome.getCategory() == Biome.Category.JUNGLE;
     }
 
     private static class SearchContext {
