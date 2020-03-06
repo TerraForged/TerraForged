@@ -58,8 +58,8 @@ public class LandForms {
 
     public LandForms(TerrainSettings settings, Levels levels) {
         this.settings = settings;
-        terrainHorizontalScale = 1.025F;
-        terrainVerticalScale = 1F;
+        terrainHorizontalScale = settings.globalHorizontalScale;
+        terrainVerticalScale = settings.globalVerticalScale;
         groundLevel = levels.ground;
         seaLevel = levels.water;
     }

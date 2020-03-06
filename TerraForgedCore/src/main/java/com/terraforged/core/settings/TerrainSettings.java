@@ -33,6 +33,14 @@ import me.dags.noise.Module;
 @Serializable
 public class TerrainSettings {
 
+    @Range(min = 0, max = 1)
+    @Comment("Globally controls the vertical scaling of terrain")
+    public float globalVerticalScale = 0.985F;
+
+    @Range(min = 0, max = 5)
+    @Comment("Globally controls the horizontal scaling of terrain")
+    public float globalHorizontalScale = 1.0F;
+
     public Terrain steppe = new Terrain(5F, 1F, 1F);
     public Terrain plains = new Terrain(5F, 1F, 1F);
     public Terrain hills = new Terrain(2F, 1F, 1F);
