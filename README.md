@@ -13,6 +13,7 @@ TerraForged is an ambitious new terrain generator mod for Minecraft (Java Editio
 #### Website(s):
 [https://terraforged.com](https://terraforged.com)  
 [https://github.com/TerraForged](https://github.com/TerraForged)
+[https://curseforge.com/../TerraForged](https://www.curseforge.com/minecraft/mc-mods/terraforged)
 
 #### Installation:
 1. Install forge for the target version of Minecraft (ie 1.15.2)
@@ -41,9 +42,9 @@ directory. (In both cases, TerraForged must be installed on the client and the s
 
 3) "Will I need a super-computer to run this?!"  
 _No, not really - while this world generator will be a bit slower than vanilla's (on account of it  
-doing more work to make things look nice), it would only be apparent when first generating a chunk  
-- they might load in slower when moving to new parts of the world, but game performance should  
-otherwise be normal. A 4-core CPU should be able to handle this just fine._  
+doing more work to make things look nice), it would only be apparent when first generating a chunk -  
+they might load in slower when moving to new parts of the world, but game performance should  
+otherwise be normal. A 4-core CPU should be able to handle this just fine._
 
 4) "Can this be ported Fabric/Bukkit/Spigot/Sponge?"  
 _If someone would like to take this task on, yes - a large part of the TerraForged codebase is already  
@@ -56,4 +57,4 @@ _Not by myself, no - My aim is to keep current with Forge. I'm simply not prolif
 write and maintain for multiple versions (hats off to those who do!). Again though, others are welcome  
 to back-port it, if inclined to do so._
 
-[View questions on github](https://github.com/TerraForged/TerraForged/issues?q=label:question)
+[View more questions on Github](https://github.com/TerraForged/TerraForged/issues?q=label:question)
