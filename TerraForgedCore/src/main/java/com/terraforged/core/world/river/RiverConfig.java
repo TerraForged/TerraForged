@@ -26,6 +26,7 @@
 package com.terraforged.core.world.river;
 
 import com.terraforged.core.world.heightmap.Levels;
+import me.dags.noise.util.NoiseUtil;
 
 public class RiverConfig {
 
@@ -47,6 +48,35 @@ public class RiverConfig {
         maxBankHeight = builder.levels.water(builder.maxBankHeight);
         length2 = builder.length * builder.length;
         fade = builder.fade;
+    }
+
+    private RiverConfig(boolean main, int bedWidth, int bankWidth, float bedHeight, float minBankHeight, float maxBankHeight, int length2, double fade) {
+        this.main = main;
+        this.bedWidth = bedWidth;
+        this.bankWidth = bankWidth;
+        this.bedHeight = bedHeight;
+        this.minBankHeight = minBankHeight;
+        this.maxBankHeight = maxBankHeight;
+        this.length2 = length2;
+        this.fade = fade;
+    }
+
+    public RiverConfig createFork(float connectWidth) {
+        if (bankWidth < connectWidth) {
+            return this;
+        }
+
+        float scale = bankWidth / connectWidth;
+        return new RiverConfig(
+                false,
+                NoiseUtil.round(bedWidth / scale),
+                NoiseUtil.round(bankWidth / scale),
+                bedHeight,
+                minBankHeight,
+                maxBankHeight,
+                length2,
+                fade
+        );
     }
 
     public static Builder builder(Levels levels) {

@@ -95,15 +95,15 @@ public class RiverRegion {
             generateRiver(x, z, pos, primary, random, rivers);
         }
 
-        for (int i = 0; rivers.size() < 10 && i < 50; i++) {
+        for (int i = 0; rivers.size() < 15 && i < 100; i++) {
             generateRiver(x, z, pos, secondary, random, rivers);
         }
 
-        for (int i = 0; rivers.size() < 20 && i < 50; i++) {
+        for (int i = 0; rivers.size() < 25 && i < 75; i++) {
             generateRiverFork(x, z, pos, tertiary, random, rivers);
         }
 
-        for (int i = 0; rivers.size() < 30 && i < 50; i++) {
+        for (int i = 0; rivers.size() < 40 && i < 50; i++) {
             generateRiver(x, z, pos, tertiary, random, rivers);
         }
 
@@ -211,7 +211,11 @@ public class RiverRegion {
 
         generateLake(bounds, random);
 
-        return rivers.add(new River(bounds, config, terrains, config.fade, 0, true));
+        // scale the connecting river's width down so that it's narrower than the one it's connecting to
+        float forkWidth = closest.config.bankWidth * distance * 0.6F;
+        RiverConfig forkConfig = config.createFork(forkWidth);
+        
+        return rivers.add(new River(bounds, forkConfig, terrains, forkConfig.fade, 0, true));
     }
 
     private void generateLake(RiverBounds bounds, Random random) {

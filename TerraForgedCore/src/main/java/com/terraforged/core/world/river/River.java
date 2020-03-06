@@ -54,6 +54,7 @@ public class River extends TerrainPopulator {
     private final Line bed;
     private final Line banks;
     private final Line valley;
+    public final RiverConfig config;
     public final RiverBounds bounds;
 
     private final Terrains terrains;
@@ -72,6 +73,7 @@ public class River extends TerrainPopulator {
         Module bankWidth = Source.constant(config.bankWidth * config.bankWidth);
         Module valleyWidth = Source.constant(VALLEY_WIDTH * VALLEY_WIDTH);
         this.bounds = bounds;
+        this.config = config;
         this.main = config.main;
         this.terrains = terrains;
         this.connecting = connecting;
