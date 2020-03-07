@@ -27,9 +27,9 @@ package com.terraforged.mod.biome.provider;
 
 import com.google.common.collect.Sets;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.world.decorator.Decorator;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.util.concurrent.ObjectPool;
+import com.terraforged.core.world.decorator.Decorator;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.modifier.BiomeModifierManager;
@@ -139,7 +139,7 @@ public class BiomeProvider extends AbstractBiomeProvider {
         TerraContainer.Builder builder = TerraContainer.builder();
         chunkReader.iterate((cell, dx, dz) -> {
             Biome biome = getBiome(cell, chunkReader.getBlockX() + dx, chunkReader.getBlockZ() + dz);
-            builder.fill(dx, dz, biome);
+            builder.set(dx, dz, biome);
         });
         return builder.build(chunkReader);
     }

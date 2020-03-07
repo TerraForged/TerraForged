@@ -25,12 +25,10 @@
 
 package com.terraforged.mod.chunk;
 
-import com.terraforged.api.biome.BiomeVariant;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.util.PosIterator;
 import com.terraforged.core.world.terrain.Terrain;
-import com.terraforged.mod.util.Environment;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeContainer;
@@ -75,14 +73,6 @@ public class TerraContainer extends BiomeContainer {
     }
 
     public BiomeContainer bakeBiomes() {
-        if (Environment.isDev()) {
-            for (int i = 0; i < biomes.length; i++) {
-                Biome biome = biomes[i];
-                if (biome instanceof BiomeVariant) {
-                    biomes[i] = ((BiomeVariant) biome).getBase();
-                }
-            }
-        }
         return new BiomeContainer(biomes);
     }
 
@@ -112,19 +102,23 @@ public class TerraContainer extends BiomeContainer {
         private final Biome[] biomes = new Biome[SIZE];
         private final Biome[] surfaceBiomeCache = new Biome[256];
 
-        public void set(int x, int y, int z, Biome biome) {
-            biomes[indexOf(x, y, z)] = biome;
-
+        public void set(int x, int z, Biome biome) {
             surfaceBiomeCache[indexOf(x, z)] = biome;
         }
 
-        public void fill(int x, int z, Biome biome) {
-            for (int y = 0; y < 256; y += 4) {
-                set(x, y, z, biome);
-            }
-        }
-
         public TerraContainer build(ChunkReader chunkReader) {
+            // biome storage format is 1 biome pos == 4x4x4 blocks, stored in an 4x64x4 (xyz) array
+            // sample the 1:1 surfaceBiomeCache every 4 blocks with a 2 block offset (roughly center of the 4x4 area)
+            for (int dy = 0; dy < 64; dy++) {
+                for (int dz = 0; dz < 4; dz++) {
+                    for (int dx = 0; dx < 4; dx++) {
+                        int x = 2 + (dx * 4);
+                        int z = 2 + (dz * 4);
+                        int index = indexOf(dx, dy, dz);
+                        biomes[index] = surfaceBiomeCache[indexOf(x, z)];
+                    }
+                }
+            }
             return new TerraContainer(this, chunkReader);
         }
     }
