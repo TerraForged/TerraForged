@@ -49,7 +49,6 @@ import com.terraforged.feature.predicate.MinHeight;
 import com.terraforged.feature.template.type.FeatureTypes;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.BiomeProvider;
-import com.terraforged.mod.biome.provider.TerraBiomeManager;
 import com.terraforged.mod.chunk.fix.ChunkCarverFix;
 import com.terraforged.mod.chunk.fix.RegionFix;
 import com.terraforged.mod.decorator.ChunkPopulator;
@@ -92,7 +91,6 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
     private final BiomeProvider biomeProvider;
     private final TerrainHelper terrainHelper;
 
-    private final BiomeManager biomeManager;
     private final GeoManager geologyManager;
     private final FeatureManager featureManager;
     private final SurfaceManager surfaceManager;
@@ -110,7 +108,6 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
         this.baseDecorators = createBaseDecorators(context);
         this.postProcessors = createFeatureDecorators(context);
         this.terrainHelper = new TerrainHelper((int) world.getSeed(), 0.8F);
-        this.biomeManager = new TerraBiomeManager(biomeProvider, context.world.getSeed());
         this.featureManager = createFeatureManager(context);
         this.regionCache = createRegionCache(context);
         SetupHooks.setup(getLayerManager(), context.copy());
@@ -119,7 +116,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
 
     @Override
     public void generateStructures(BiomeManager unused, IChunk chunk, ChunkGenerator<?> generator, TemplateManager templates) {
-        super.generateStructures(biomeManager, chunk, this, templates);
+        super.generateStructures(unused, chunk, this, templates);
     }
 
     @Override
@@ -188,7 +185,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
     public final void func_225550_a_(BiomeManager biomeManager, IChunk chunk, GenerationStage.Carving carving) {
         // World carvers have hardcoded 'carvable' blocks which can be problematic with modded blocks
         // AirCarverFix shims the actual blockstates to an equivalent carvable type
-        super.func_225550_a_(this.biomeManager, new ChunkCarverFix(chunk, context.materials), carving);
+        super.func_225550_a_(biomeManager, new ChunkCarverFix(chunk, context.materials), carving);
     }
 
     @Override
@@ -200,7 +197,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
         Biome biome = container.getFeatureBiome();
         DecoratorContext context = getContext().decorator(chunk);
 
-        IWorld regionFix = new RegionFix(region, container, this, biomeManager);
+        IWorld regionFix = new RegionFix(region, this);
         BlockPos pos = new BlockPos(context.blockX, 0, context.blockZ);
 
         // place biome features

@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
 
 import java.util.List;
 import java.util.Random;
@@ -43,11 +44,6 @@ public abstract class AbstractBiomeProvider extends net.minecraft.world.biome.pr
     }
 
     @Override
-    public final Biome getNoiseBiome(int x, int y, int z) {
-        return getBiome(x, y, z);
-    }
-
-    @Override
     public final Set<Biome> func_225530_a_(int x, int y, int z, int size) {
         return getBiomesInSquare(x, y, z, size);
     }
@@ -56,8 +52,6 @@ public abstract class AbstractBiomeProvider extends net.minecraft.world.biome.pr
     public final BlockPos func_225531_a_(int centerX, int centerY, int centerZ, int range, List<Biome> biomes, Random random) {
         return findBiomePosition(centerX, centerY, centerZ, range, biomes, random);
     }
-
-    public abstract Biome getBiome(int x, int y, int z);
 
     public abstract Set<Biome> getBiomesInSquare(int x, int y, int z, int size);
 

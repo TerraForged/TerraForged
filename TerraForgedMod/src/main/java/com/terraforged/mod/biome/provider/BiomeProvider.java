@@ -28,7 +28,6 @@ package com.terraforged.mod.biome.provider;
 import com.google.common.collect.Sets;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.chunk.ChunkReader;
-import com.terraforged.core.util.concurrent.ObjectPool;
 import com.terraforged.core.world.decorator.Decorator;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.mod.biome.map.BiomeMap;
@@ -63,11 +62,13 @@ public class BiomeProvider extends AbstractBiomeProvider {
     }
 
     @Override
-    public Biome getBiome(int x, int y, int z) {
-        try (ObjectPool.Item<Cell<Terrain>> item = Cell.pooled()) {
-            context.heightmap.apply(item.getValue(), x, z);
-            return getBiome(item.getValue(), x, z);
-        }
+    public Biome getNoiseBiome(int x, int y, int z) {
+        // I don't know why +24, just seems to provide slightly more accurate results
+        x = (x << 2) + 24;
+        z = (z << 2) + 24;
+        Cell<Terrain> cell = new Cell<>();
+        context.heightmap.apply(cell, x, z);
+        return getBiome(cell, x, z);
     }
 
     @Override

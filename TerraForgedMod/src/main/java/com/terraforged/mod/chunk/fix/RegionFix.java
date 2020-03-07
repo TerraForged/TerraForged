@@ -25,31 +25,17 @@
 
 package com.terraforged.mod.chunk.fix;
 
-import com.terraforged.mod.chunk.TerraContainer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeContainer;
-import net.minecraft.world.biome.BiomeManager;
-import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 
 // fixes hard-coded water and world height values
-// overrides biome methods to use TerraForged's provider/manager
 public class RegionFix extends RegionDelegate {
 
-    private final WorldGenRegion region;
-    private final TerraContainer container;
-    private final BiomeManager biomeManager;
     private final ChunkGenerator<?> generator;
 
-    public RegionFix(WorldGenRegion region, TerraContainer container, ChunkGenerator<?> generator, BiomeManager biomeManager) {
+    public RegionFix(WorldGenRegion region, ChunkGenerator<?> generator) {
         super(region.getWorld(), region);
-        this.region = region;
-        this.container = container;
         this.generator = generator;
-        this.biomeManager = biomeManager;
     }
 
     @Override
@@ -60,51 +46,5 @@ public class RegionFix extends RegionDelegate {
     @Override
     public int getMaxHeight() {
         return generator.getMaxHeight();
-    }
-
-    @Override
-    public BiomeManager func_225523_d_() {
-        return biomeManager;
-    }
-
-    @Override
-    public Biome getNoiseBiome(int x, int y, int z) {
-        return getBiome(x, y, z);
-    }
-
-    @Override
-    public Biome getNoiseBiomeRaw(int x, int y, int z) {
-        return getBiome(x, y, z);
-    }
-
-    @Override
-    public Biome getBiome(BlockPos pos) {
-        return getBiome(pos.getX(), pos.getY(), pos.getZ());
-    }
-
-    private Biome getBiome(int x, int y, int z) {
-        int chunkX = x >> 4;
-        int chunkZ = z >> 4;
-        if (chunkX == region.getMainChunkX() && chunkZ == region.getMainChunkZ()) {
-            return container.getBiome(x, z);
-        }
-
-        TerraContainer container = getBiomes(chunkX, chunkZ);
-        if (container == null) {
-            return generator.getBiomeProvider().getNoiseBiome(x, y, z);
-        }
-
-        return container.getBiome(x, z);
-    }
-
-    private TerraContainer getBiomes(int chunkX, int chunkZ) {
-        IChunk chunk = getChunk(chunkX, chunkZ, ChunkStatus.BIOMES, false);
-        if (chunk != null) {
-            BiomeContainer container = chunk.getBiomes();
-            if (container instanceof TerraContainer) {
-                return (TerraContainer) container;
-            }
-        }
-        return null;
     }
 }
