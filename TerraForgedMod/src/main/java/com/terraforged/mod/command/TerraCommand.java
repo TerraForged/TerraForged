@@ -41,12 +41,11 @@ import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.command.arg.BiomeArgType;
 import com.terraforged.mod.command.arg.TerrainArgType;
-import com.terraforged.mod.command.task.FindBiomeTask;
-import com.terraforged.mod.command.task.FindBothTask;
-import com.terraforged.mod.command.task.FindTask;
-import com.terraforged.mod.command.task.FindTerrainTask;
+import com.terraforged.mod.command.search.BiomeSearchTask;
+import com.terraforged.mod.command.search.BothSearchTask;
+import com.terraforged.mod.command.search.Search;
+import com.terraforged.mod.command.search.TerrainSearchTask;
 import com.terraforged.mod.data.DataGen;
-import me.dags.noise.util.Vec2i;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.player.PlayerEntity;
@@ -59,6 +58,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -69,6 +69,7 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TerraCommand {
@@ -144,8 +145,8 @@ public class TerraCommand {
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
         WorldGenerator worldGenerator = terraContext.factory.get();
-        FindTask task = new FindTerrainTask(pos, target, worldGenerator);
-        doSearch(server, playerID, task);
+        Search search = new TerrainSearchTask(pos, worldGenerator, target);
+        doSearch(server, playerID, search);
         context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
 
         return Command.SINGLE_SUCCESS;
@@ -162,10 +163,9 @@ public class TerraCommand {
         BlockPos pos = context.getSource().asPlayer().getPosition();
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
-        WorldGenerator worldGenerator = terraContext.factory.get();
-        BiomeProvider biomeProvider = getBiomeProvider(context);
-        FindTask task = new FindBiomeTask(pos, biome, worldGenerator, biomeProvider);
-        doSearch(server, playerID, task);
+        IWorldReader reader = context.getSource().asPlayer().getServerWorld();
+        Search search = new BiomeSearchTask(pos, reader, biome);
+        doSearch(server, playerID, search);
         context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
 
         return Command.SINGLE_SUCCESS;
@@ -182,25 +182,27 @@ public class TerraCommand {
         Terrain target = getTerrainInstance(terrain, terraContext.terrain);
         Biome biome = BiomeArgType.getBiome(context, "biome");
         BlockPos pos = context.getSource().asPlayer().getPosition();
+        IWorldReader world = context.getSource().asPlayer().getServerWorld();
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
         WorldGenerator worldGenerator = terraContext.factory.get();
-        BiomeProvider biomeProvider = getBiomeProvider(context);
-        FindTask task = new FindBothTask(pos, target, biome, worldGenerator, biomeProvider);
-        doSearch(server, playerID, task);
+        Search biomeSearch = new BiomeSearchTask(pos, world, biome);
+        Search terrainSearch = new TerrainSearchTask(pos, worldGenerator, target);
+        Search search = new BothSearchTask(pos, biomeSearch, terrainSearch);
+        doSearch(server, playerID, search);
         context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
 
         return Command.SINGLE_SUCCESS;
     }
 
-    private static void doSearch(MinecraftServer server, UUID userId, FindTask task) {
-        CompletableFuture.supplyAsync(task).thenAccept(pos -> server.deferTask(() -> {
+    private static void doSearch(MinecraftServer server, UUID userId, Supplier<BlockPos> supplier) {
+        CompletableFuture.supplyAsync(supplier).thenAccept(pos -> server.deferTask(() -> {
             PlayerEntity player = server.getPlayerList().getPlayerByUUID(userId);
             if (player == null) {
                 return;
             }
 
-            if (pos.x == 0 && pos.y == 0) {
+            if (pos.getX() == 0 && pos.getZ() == 0) {
                 player.sendMessage(new StringTextComponent("Location not found :["));
                 return;
             }
@@ -245,11 +247,11 @@ public class TerraCommand {
         );
     }
 
-    private static ITextComponent createTeleportMessage(Vec2i pos) {
+    private static ITextComponent createTeleportMessage(BlockPos pos) {
         return TextComponentUtils.wrapInSquareBrackets(new TranslationTextComponent(
-                "chat.coordinates", pos.x, "~", pos.y
+                "chat.coordinates", pos.getX(), "~", pos.getZ()
         )).applyTextStyle((style) -> style.setColor(TextFormatting.GREEN)
-                .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + pos.x + " ~ " + pos.y))
+                .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + pos.getX() + " ~ " + pos.getZ()))
                 .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("chat.coordinates.tooltip")))
         );
     }

@@ -29,7 +29,6 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
 
 import java.util.List;
 import java.util.Random;
