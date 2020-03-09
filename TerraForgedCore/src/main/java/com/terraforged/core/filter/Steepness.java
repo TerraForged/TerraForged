@@ -56,8 +56,8 @@ public class Steepness implements Filter, Filter.Visitor {
     @Override
     public void visit(Filterable<?> cellMap, Cell cell, int cx, int cz) {
         float totalHeightDif = 0F;
-        for (int dz = -radius; dz <= radius; dz++) {
-            for (int dx = -radius; dx <= radius; dx++) {
+        for (int dz = -1; dz <= 2; dz++) {
+            for (int dx = -1; dx <= 2; dx++) {
                 if (dx == 0 && dz == 0) {
                     continue;
                 }

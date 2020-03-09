@@ -108,16 +108,14 @@ public class TerraCommand {
     }
 
     private static int query(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        TerraContext terraContext = getContext(context).orElseThrow(() -> createException(
+        getContext(context).orElseThrow(() -> createException(
                 "Invalid world type",
                 "This command can only be run in a TerraForged world!"
         ));
 
         BlockPos pos = context.getSource().asPlayer().getPosition();
-        WorldGenerator worldGenerator = terraContext.factory.get();
         BiomeProvider biomeProvider = getBiomeProvider(context);
-        Cell<Terrain> cell = new Cell<>();
-        worldGenerator.getHeightmap().apply(cell, pos.getX(), pos.getZ());
+        Cell<Terrain> cell = biomeProvider.lookupPos(pos.getX(), pos.getZ());
         Biome biome = biomeProvider.getBiome(cell, pos.getX(), pos.getZ());
         context.getSource().sendFeedback(
                 new StringTextComponent("Terrain=" + cell.tag.getName() + ", Biome=" + biome.getRegistryName()),

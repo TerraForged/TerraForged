@@ -27,18 +27,18 @@ package com.terraforged.mod.chunk.test;
 
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.Terrains;
+import com.terraforged.mod.biome.ModBiomes;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
 
 public class Test {
 
     public static boolean fixedBiome = true;
 
     public static Terrain getTerrainType(Terrains terrains) {
-        return terrains.dales;
+        return terrains.mountains;
     }
 
     public static Biome getBiome() {
-        return Biomes.PLAINS;
+        return ModBiomes.TAIGA_SCRUB;
     }
 }

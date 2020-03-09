@@ -64,11 +64,15 @@ public class BiomeProvider extends AbstractBiomeProvider {
         this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomeMap), context.copy());
     }
 
+    public Cell<Terrain> lookupPos(int x, int z) {
+        return worldLookup.getCell(x, z);
+    }
+
     @Override
     public Biome getNoiseBiome(int x, int y, int z) {
         x = (x << 2);
         z = (z << 2);
-        return getBiome(worldLookup.getCell(x, z), x, z);
+        return getBiome(lookupPos(x, z), x, z);
     }
 
     @Override
