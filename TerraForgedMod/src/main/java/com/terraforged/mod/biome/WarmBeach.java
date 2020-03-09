@@ -41,8 +41,8 @@ public class WarmBeach extends BiomeVariant {
 
     public WarmBeach() {
         super((new Biome.Builder()).surfaceBuilder(SurfaceBuilder.DEFAULT, SurfaceBuilder.SAND_CONFIG).precipitation(Biome.RainType.RAIN).category(Category.BEACH).depth(-0.5F).scale(0.1F).temperature(1.5F).downfall(0.5F).waterColor(4445678).waterFogColor(270131).parent((String)null));
-        this.addStructure(Feature.MINESHAFT.func_225566_b_(new MineshaftConfig(0.004D, MineshaftStructure.Type.NORMAL)));
-        this.addStructure(Feature.BURIED_TREASURE.func_225566_b_(new BuriedTreasureConfig(0.01F)));
+        this.addStructure(Feature.MINESHAFT.withConfiguration(new MineshaftConfig(0.004D, MineshaftStructure.Type.NORMAL)));
+        this.addStructure(Feature.BURIED_TREASURE.withConfiguration(new BuriedTreasureConfig(0.01F)));
         DefaultBiomeFeatures.addCarvers(this);
         DefaultBiomeFeatures.addStructures(this);
         DefaultBiomeFeatures.addMonsterRooms(this);

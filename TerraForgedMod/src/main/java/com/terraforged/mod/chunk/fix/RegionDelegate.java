@@ -110,8 +110,8 @@ public class RegionDelegate extends WorldGenRegion {
     }
 
     @Override
-    public BiomeManager func_225523_d_() {
-        return region.func_225523_d_();
+    public BiomeManager getBiomeManager() {
+        return region.getBiomeManager();
     }
 
     @Override

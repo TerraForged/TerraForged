@@ -33,6 +33,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeContainer;
 
+// holds a 1:1 map of biomes in the chunk
+// also holds the chunk's view on the heightmap for convenience
 public class TerraContainer extends BiomeContainer {
 
     private static final int BITS_WIDTH = (int) Math.round(Math.log(16.0D) / Math.log(2.0D)) - 2;
