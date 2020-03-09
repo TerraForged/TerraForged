@@ -62,8 +62,12 @@ public class WorldGeneratorFactory implements Supplier<WorldGenerator> {
         return decorators;
     }
 
+    public WorldFilters getFilters() {
+        return new WorldFilters(context);
+    }
+
     @Override
     public WorldGenerator get() {
-        return new WorldGenerator(heightmap, decorators, new WorldFilters(context));
+        return new WorldGenerator(heightmap, decorators, getFilters());
     }
 }

@@ -1,5 +1,5 @@
 /*
- *   
+ *
  * MIT License
  *
  * Copyright (c) 2020 TerraForged
@@ -35,7 +35,11 @@ public class Steepness implements Filter, Filter.Visitor {
     private final Terrains terrains;
 
     public Steepness(Terrains terrains) {
-        this(1, 16F, terrains);
+        this(2, 16F, terrains);
+    }
+
+    public Steepness(float scaler, Terrains terrains) {
+        this(2, scaler, terrains);
     }
 
     public Steepness(int radius, float scaler, Terrains terrains) {
@@ -52,8 +56,8 @@ public class Steepness implements Filter, Filter.Visitor {
     @Override
     public void visit(Filterable<?> cellMap, Cell cell, int cx, int cz) {
         float totalHeightDif = 0F;
-        for (int dz = -1; dz <= 2; dz++) {
-            for (int dx = -1; dx <= 2; dx++) {
+        for (int dz = -radius; dz <= radius; dz++) {
+            for (int dx = -radius; dx <= radius; dx++) {
                 if (dx == 0 && dz == 0) {
                     continue;
                 }

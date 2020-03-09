@@ -29,6 +29,7 @@ import com.google.common.collect.Sets;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.world.decorator.Decorator;
+import com.terraforged.core.world.heightmap.WorldLookup;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.modifier.BiomeModifierManager;
@@ -52,23 +53,22 @@ public class BiomeProvider extends AbstractBiomeProvider {
 
     private final BiomeMap biomeMap;
     private final TerraContext context;
+    private final WorldLookup worldLookup;
     private final BiomeModifierManager modifierManager;
     private final Map<Biome, List<Decorator>> decorators = new HashMap<>();
 
     public BiomeProvider(TerraContext context) {
         this.context = context;
         this.biomeMap = BiomeHelper.getDefaultBiomeMap();
+        this.worldLookup = new WorldLookup(context.factory, context);
         this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomeMap), context.copy());
     }
 
     @Override
     public Biome getNoiseBiome(int x, int y, int z) {
-        // I don't know why +24, just seems to provide slightly more accurate results
-        x = (x << 2) + 24;
-        z = (z << 2) + 24;
-        Cell<Terrain> cell = new Cell<>();
-        context.heightmap.apply(cell, x, z);
-        return getBiome(cell, x, z);
+        x = (x << 2);
+        z = (z << 2);
+        return getBiome(worldLookup.getCell(x, z), x, z);
     }
 
     @Override
@@ -171,8 +171,7 @@ public class BiomeProvider extends AbstractBiomeProvider {
     }
 
     private static boolean overridesRiver(Biome biome) {
-        return biome.getCategory() == Biome.Category.SWAMP
-                || biome.getCategory() == Biome.Category.JUNGLE;
+        return biome.getCategory() == Biome.Category.SWAMP || biome.getCategory() == Biome.Category.JUNGLE;
     }
 
     private static class SearchContext {

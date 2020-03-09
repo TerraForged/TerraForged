@@ -143,8 +143,8 @@ public class Region implements Extent {
     }
 
     public void generateZoom(Heightmap heightmap, float offsetX, float offsetZ, float zoom, Batcher batcher) {
-        float translateX = offsetX - ((blockSize.total * zoom) / 2F);
-        float translateZ = offsetZ - ((blockSize.total * zoom) / 2F);
+        float translateX = offsetX - ((blockSize.size * zoom) / 2F);
+        float translateZ = offsetZ - ((blockSize.size * zoom) / 2F);
         for (int cz = 0; cz < chunkSize.total; cz++) {
             for (int cx = 0; cx < chunkSize.total; cx++) {
                 int index = chunkSize.indexOf(cx, cz);
@@ -190,8 +190,8 @@ public class Region implements Extent {
     }
 
     public void decorateZoom(Collection<Decorator> decorators, float offsetX, float offsetZ, float zoom) {
-        float translateX = offsetX - ((blockSize.total * zoom) / 2F);
-        float translateZ = offsetZ - ((blockSize.total * zoom) / 2F);
+        float translateX = offsetX - ((blockSize.size * zoom) / 2F);
+        float translateZ = offsetZ - ((blockSize.size * zoom) / 2F);
         for (int cz = 0; cz < chunkSize.total; cz++) {
             for (int cx = 0; cx < chunkSize.total; cx++) {
                 int index = chunkSize.indexOf(cx, cz);
@@ -205,17 +205,6 @@ public class Region implements Extent {
                 });
             }
         }
-
-
-//        for (int dz = 0; dz < blockSize.total; dz++) {
-//            for (int dx = 0; dx < blockSize.total; dx++) {
-//                int index = blockSize.indexOf(dx, dz);
-//                GenCell cell = blocks[index];
-//                for (Decorator decorator : decorators) {
-//                    decorator.apply(cell, getBlockX() + translateX + dx, getBlockZ() + translateZ + dz);
-//                }
-//            }
-//        }
     }
 
     public void iterate(Consumer<ChunkReader> consumer) {
@@ -303,8 +292,8 @@ public class Region implements Extent {
             this.regionBlockX = regionChunkX << 4;
             this.regionBlockZ = regionChunkZ << 4;
             // the real coordinate of this chunk within the world
-            this.chunkX = Region.this.chunkX + regionChunkX;
-            this.chunkZ = Region.this.chunkZ + regionChunkZ;
+            this.chunkX = Region.this.chunkX + regionChunkX - chunkSize.border;
+            this.chunkZ = Region.this.chunkZ + regionChunkZ - chunkSize.border;
             // the real block coordinate of this chunk within the world
             this.blockX = chunkX << 4;
             this.blockZ = chunkZ << 4;

@@ -49,6 +49,7 @@ import com.terraforged.mod.data.DataGen;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -60,6 +61,7 @@ import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -92,6 +94,8 @@ public class TerraCommand {
                 .then(Commands.literal("data")
                         .then(Commands.literal("dump")
                                 .executes(TerraCommand::dump)))
+                .then(Commands.literal("debug")
+                        .executes(TerraCommand::debugBiome))
                 .then(Commands.literal("locate")
                         .then(Commands.argument("biome", BiomeArgType.biome())
                                 .executes(TerraCommand::findBiome)
@@ -129,6 +133,26 @@ public class TerraCommand {
                 true
         );
         DataGen.dumpData();
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int debugBiome(CommandContext<CommandSource> context) throws CommandSyntaxException {
+        ServerPlayerEntity player = context.getSource().asPlayer();
+        BlockPos position = player.getPosition();
+        int x = position.getX();
+        int y = position.getY();
+        int z = position.getZ();
+
+        long seed = player.getServerWorld().getSeed();
+        Biome actual = player.getServerWorld().getBiome(position);
+        Biome biome2 = ColumnFuzzedBiomeMagnifier.INSTANCE.getBiome(seed, x, 0, z, player.getServerWorld().getWorldServer().getChunkProvider().generator.getBiomeProvider());
+
+        context.getSource().sendFeedback(new StringTextComponent(
+                        "Actual Biome = " + actual.getRegistryName()
+                        + "\nLookup Biome = " + biome2.getRegistryName()),
+                false
+        );
+
         return Command.SINGLE_SUCCESS;
     }
 

@@ -114,8 +114,8 @@ public class TerraContainer extends BiomeContainer {
             for (int dy = 0; dy < 64; dy++) {
                 for (int dz = 0; dz < 4; dz++) {
                     for (int dx = 0; dx < 4; dx++) {
-                        int x = 2 + (dx * 4);
-                        int z = 2 + (dz * 4);
+                        int x = dx * 4;
+                        int z = dz * 4;
                         int index = indexOf(dx, dy, dz);
                         biomes[index] = surfaceBiomeCache[indexOf(x, z)];
                     }
