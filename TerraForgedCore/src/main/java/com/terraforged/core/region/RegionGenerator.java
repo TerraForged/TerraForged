@@ -25,6 +25,7 @@
 
 package com.terraforged.core.region;
 
+import com.terraforged.core.region.legacy.LegacyRegion;
 import com.terraforged.core.util.concurrent.ObjectPool;
 import com.terraforged.core.util.concurrent.ThreadPool;
 import com.terraforged.core.util.concurrent.batcher.Batcher;
@@ -38,6 +39,7 @@ public class RegionGenerator implements RegionExtent {
 
     private final int factor;
     private final int border;
+    private final RegionFactory regions;
     private final ThreadPool threadPool;
     private final ObjectPool<WorldGenerator> genPool;
 
@@ -45,6 +47,7 @@ public class RegionGenerator implements RegionExtent {
         this.factor = builder.factor;
         this.border = builder.border;
         this.threadPool = builder.threadPool;
+        this.regions = builder.regionFactory;
         this.genPool = new ObjectPool<>(50, builder.factory);
     }
 
@@ -82,7 +85,7 @@ public class RegionGenerator implements RegionExtent {
     public Region generateRegion(int regionX, int regionZ) {
         try (ObjectPool.Item<WorldGenerator> item = genPool.get()) {
             WorldGenerator generator = item.getValue();
-            Region region = new Region(regionX, regionZ, factor, border);
+            Region region = regions.create(regionX, regionZ, factor, border);
             try (Batcher batcher = threadPool.batcher(region.getChunkCount())) {
                 region.generate(generator.getHeightmap(), batcher);
             }
@@ -99,7 +102,7 @@ public class RegionGenerator implements RegionExtent {
     public Region generateRegion(float centerX, float centerZ, float zoom, boolean filter) {
         try (ObjectPool.Item<WorldGenerator> item = genPool.get()) {
             WorldGenerator generator = item.getValue();
-            Region region = new Region(0, 0, factor, border);
+            Region region = regions.create(0, 0, factor, border);
             try (Batcher batcher = threadPool.batcher(region.getChunkCount())) {
                 region.generateZoom(generator.getHeightmap(), centerX, centerZ, zoom, batcher);
             }
@@ -126,6 +129,7 @@ public class RegionGenerator implements RegionExtent {
         private int border = 0;
         private ThreadPool threadPool;
         private WorldGeneratorFactory factory;
+        private RegionFactory regionFactory = Region::new;
 
         public Builder size(int factor, int border) {
             return factor(factor).border(border);
@@ -143,6 +147,18 @@ public class RegionGenerator implements RegionExtent {
 
         public Builder pool(ThreadPool threadPool) {
             this.threadPool = threadPool;
+            return this;
+        }
+
+        public Builder regions(RegionFactory factory) {
+            this.regionFactory = factory;
+            return this;
+        }
+
+        public Builder legacy(boolean legacy) {
+            if (legacy) {
+                return regions(LegacyRegion::new);
+            }
             return this;
         }
 

@@ -25,7 +25,6 @@
 
 package com.terraforged.mod;
 
-import com.google.gson.Gson;
 import com.terraforged.core.world.terrain.Terrains;
 import com.terraforged.mod.biome.provider.BiomeProvider;
 import com.terraforged.mod.chunk.ChunkGeneratorFactory;
@@ -34,11 +33,11 @@ import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.TerraGenSettings;
 import com.terraforged.mod.chunk.test.TestChunkGenerator;
 import com.terraforged.mod.gui.SettingsScreen;
+import com.terraforged.mod.settings.SettingsHelper;
 import com.terraforged.mod.settings.TerraSettings;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -49,22 +48,15 @@ import net.minecraft.world.gen.OverworldGenSettings;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.Reader;
 import java.util.HashSet;
 import java.util.Set;
 
 public class TerraWorld extends WorldType {
-
-    public static final String SETTINGS_FILE_NAME = "terraforged-generator.json";
+    public static final int VERSION = 1;
 
     private static final Set<WorldType> types = new HashSet<>();
     public static final TerraWorld TERRA = new TerraWorld("terraforged", TerraChunkGenerator::new);
     public static final TerraWorld TEST = new TerraWorld("terratest", TestChunkGenerator::new);
-
-    private static boolean dedicated = false;
 
     private final ChunkGeneratorFactory<?> factory;
 
@@ -93,13 +85,13 @@ public class TerraWorld extends WorldType {
 
         Log.debug("Creating {} generator", world.getDimension().getType());
 
-        TerraSettings settings = getSettings(world);
-        settings.generator.seed = world.getSeed();
+        int version = SettingsHelper.getVersion(world.getWorldInfo());
+        TerraSettings settings = SettingsHelper.getSettings(world);
+        SettingsHelper.syncSettings(world.getWorldInfo(), settings, version);
 
         Terrains terrains = Terrains.create(settings);
 
         OverworldGenSettings genSettings = new TerraGenSettings(settings.structures);
-
         OverworldBiomeProviderSettings biomeSettings = new OverworldBiomeProviderSettings(world.getWorldInfo());
         biomeSettings.setGeneratorSettings(genSettings);
         world.getWorldInfo().setGeneratorOptions(NBTHelper.serializeCompact(settings));
@@ -120,32 +112,8 @@ public class TerraWorld extends WorldType {
         return factory;
     }
 
-    private static TerraSettings getSettings(IWorld world) {
-        if (dedicated) {
-            try (Reader reader = new BufferedReader(new FileReader(new File("config", SETTINGS_FILE_NAME)))) {
-                Log.info("Loading generator settings from json");
-                return new Gson().fromJson(reader, TerraSettings.class);
-            } catch (Throwable ignored) {
-                return getSettings(world.getWorldInfo().getGeneratorOptions());
-            }
-        }
-        return getSettings(world.getWorldInfo().getGeneratorOptions());
-    }
-
-    private static TerraSettings getSettings(CompoundNBT root) {
-        TerraSettings settings = new TerraSettings();
-        if (!root.isEmpty()) {
-            NBTHelper.deserialize(root, settings);
-        }
-        return settings;
-    }
-
     public static void init() {
         Log.info("Registered world type(s)");
-    }
-
-    public static void setDedicatedServer() {
-        dedicated = true;
     }
 
     public static boolean isTerraWorld(IWorld world) {

@@ -28,7 +28,6 @@ package com.terraforged.mod.gui;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.terraforged.core.settings.Settings;
-import com.terraforged.mod.TerraWorld;
 import com.terraforged.mod.gui.element.TerraLabel;
 import com.terraforged.mod.gui.page.FeaturePage;
 import com.terraforged.mod.gui.page.FilterPage;
@@ -38,6 +37,7 @@ import com.terraforged.mod.gui.page.RiverPage;
 import com.terraforged.mod.gui.page.StructurePage;
 import com.terraforged.mod.gui.page.TerrainPage;
 import com.terraforged.mod.gui.preview.PreviewPage;
+import com.terraforged.mod.settings.SettingsHelper;
 import com.terraforged.mod.settings.TerraSettings;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.client.Minecraft;
@@ -246,7 +246,7 @@ public class SettingsScreen extends OverlayScreen {
         CompoundNBT tag = NBTHelper.serializeCompact(settings);
         JsonElement json = NBTHelper.toJson(tag);
         File config = new File(Minecraft.getInstance().gameDir, "config");
-        File file = new File(config, TerraWorld.SETTINGS_FILE_NAME);
+        File file = new File(config, SettingsHelper.SETTINGS_FILE_NAME);
         try (Writer writer = new BufferedWriter(new FileWriter(file))) {
             new GsonBuilder().setPrettyPrinting().create().toJson(json, writer);
             Util.getOSType().openURI(file.getParentFile().toURI());

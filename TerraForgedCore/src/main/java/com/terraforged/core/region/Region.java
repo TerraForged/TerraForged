@@ -48,6 +48,7 @@ public class Region implements Extent {
     private final int chunkZ;
     private final int blockX;
     private final int blockZ;
+    private final int border;
     private final Size blockSize;
     private final Size chunkSize;
     private final GenCell[] blocks;
@@ -60,6 +61,7 @@ public class Region implements Extent {
         this.chunkZ = regionZ << size;
         this.blockX = Size.chunkToBlock(chunkX);
         this.blockZ = Size.chunkToBlock(chunkZ);
+        this.border = borderChunks;
         this.chunkSize = Size.chunks(size, borderChunks);
         this.blockSize = Size.blocks(size, borderChunks);
         this.blocks = new GenCell[blockSize.total * blockSize.total];
@@ -80,6 +82,10 @@ public class Region implements Extent {
 
     public int getBlockZ() {
         return blockZ;
+    }
+
+    public int getOffsetChunks() {
+        return border;
     }
 
     public int getChunkCount() {
@@ -292,8 +298,8 @@ public class Region implements Extent {
             this.regionBlockX = regionChunkX << 4;
             this.regionBlockZ = regionChunkZ << 4;
             // the real coordinate of this chunk within the world
-            this.chunkX = Region.this.chunkX + regionChunkX - chunkSize.border;
-            this.chunkZ = Region.this.chunkZ + regionChunkZ - chunkSize.border;
+            this.chunkX = Region.this.chunkX + regionChunkX - getOffsetChunks();
+            this.chunkZ = Region.this.chunkZ + regionChunkZ - getOffsetChunks();
             // the real block coordinate of this chunk within the world
             this.blockX = chunkX << 4;
             this.blockZ = chunkZ << 4;

@@ -368,6 +368,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
 
     protected RegionCache createRegionCache(TerraContext context) {
         return RegionGenerator.builder()
+                .legacy(context.terraSettings.version == 0)
                 .pool(ThreadPool.getFixed())
                 .factory(context.factory)
                 .size(3, 2)

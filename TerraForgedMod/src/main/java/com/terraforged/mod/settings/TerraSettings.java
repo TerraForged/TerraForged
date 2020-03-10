@@ -31,6 +31,8 @@ import com.terraforged.core.util.serialization.annotation.Serializable;
 @Serializable
 public class TerraSettings extends Settings {
 
+    public int version = 1;
+
     public FeatureSettings features = new FeatureSettings();
 
     public StructureSettings structures = new StructureSettings();

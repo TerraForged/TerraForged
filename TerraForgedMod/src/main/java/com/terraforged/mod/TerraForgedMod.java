@@ -30,6 +30,7 @@ import com.terraforged.core.util.concurrent.ThreadPool;
 import com.terraforged.feature.FeatureManager;
 import com.terraforged.mod.data.DataGen;
 import com.terraforged.mod.feature.tree.SaplingManager;
+import com.terraforged.mod.settings.SettingsHelper;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraftforge.common.MinecraftForge;
@@ -67,7 +68,7 @@ public class TerraForgedMod {
     @SubscribeEvent
     public static void server(FMLDedicatedServerSetupEvent event) {
         Log.info("Setting dedicated server");
-        TerraWorld.setDedicatedServer();
+        SettingsHelper.setDedicatedServer();
     }
 
     @SubscribeEvent
