@@ -1,0 +1,84 @@
+buildscript {
+    repositories {
+        maven { url "https://maven.fabricmc.net/" }
+        jcenter()
+    }
+    dependencies {
+        classpath "net.fabricmc:fabric-loom:0.2.7-SNAPSHOT"
+    }
+}
+
+apply plugin: "fabric-loom"
+apply plugin: "maven-publish"
+apply plugin: "eclipse"
+
+version = "${mc_version}-${mod_version}${getClassifier()}"
+archivesBaseName = "TerraForged"
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${mc_version}"
+    mappings "net.fabricmc:yarn:${mc_version}+build.${yarn_build}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+    compile project(":Noise2D")
+    compile (project(":TerraForgedCore")) {
+        transitive false
+    }
+    compile (project(":FeatureManager-fabric")) {
+        transitive false
+    }
+    compile (project(":TerraForgedAPI-fabric")) {
+        transitive false
+    }
+}
+
+task collectClasses(type: Copy) {
+    configurations.collectMany { it.allDependencies }.findAll{ it instanceof ProjectDependency }.each {
+        ProjectDependency project = (ProjectDependency) it
+        from("$project.dependencyProject.buildDir/classes/java/main")
+    }
+    into("build/classes/java/main")
+}
+
+task collectResources(type: Copy) {
+    configurations.collectMany { it.allDependencies }.findAll{ it instanceof ProjectDependency }.each {
+        ProjectDependency project = (ProjectDependency) it
+        from("$project.dependencyProject.buildDir/resources/main")
+    }
+    into("build/resources/main")
+}
+
+processResources {
+    dependsOn(collectResources)
+
+    filesMatching("**/fabric.mod.json") {
+        expand(
+                "version": "${mod_version}${getClassifier()}",
+                "mc_version": mc_version
+        )
+    }
+}
+
+classes {
+    dependsOn(collectClasses)
+}
+
+publish {
+    dependsOn remapJar
+}
+
+static def getClassifier() {
+    if (System.getenv("GIT_TAG_NAME") != null) {
+        return ""
+    }
+    def buildNumber = System.getenv("BUILD_NUMBER")
+    if (buildNumber != null) {
+        return "-${buildNumber}"
+    }
+    return ""
+}

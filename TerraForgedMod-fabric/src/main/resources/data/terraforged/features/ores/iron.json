@@ -1,0 +1,32 @@
+{
+  "match": [
+    [
+      "minecraft:ore",
+      "minecraft:iron_ore"
+    ]
+  ],
+  "replace": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "minecraft:ore",
+        "config": {
+          "size": 9,
+          "target": "natural_stone",
+          "state": {
+            "Name": "minecraft:iron_ore"
+          }
+        }
+      },
+      "decorator": {
+        "name": "minecraft:count_range",
+        "config": {
+          "count": 20,
+          "bottom_offset": 0,
+          "top_offset": 0,
+          "maximum": 112
+        }
+      }
+    }
+  }
+}

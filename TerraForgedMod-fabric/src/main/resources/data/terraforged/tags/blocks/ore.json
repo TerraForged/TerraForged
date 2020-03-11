@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:lapis_ore",
+    "minecraft:diamond_ore",
+    "minecraft:coal_ore",
+    "minecraft:emerald_ore",
+    "minecraft:gold_ore",
+    "minecraft:redstone_ore",
+    "minecraft:iron_ore"
+  ]
+}

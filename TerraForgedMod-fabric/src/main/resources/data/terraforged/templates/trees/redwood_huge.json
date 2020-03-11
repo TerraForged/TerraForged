@@ -1,0 +1,21 @@
+{
+  "type": "tree",
+  "base": 3,
+  "name": "terraforged:redwood_huge",
+  "paths": [
+    "terraforged:trees/redwood/huge"
+  ],
+  "decorators": {
+    "minecraft:alter_ground": {
+      "provider": {
+        "type": "minecraft:simple_state_provider",
+        "state": {
+          "Name": "minecraft:podzol",
+          "Properties": {
+            "snowy": "false"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+    "schemaVersion": 1,
+    "id": "terraforged",
+    "version": "${version}",
+
+    "name": "TerraForged",
+    "description": "A terrain generator attempting to create more immersive, inspiring worlds to explore and build in!",
+    "authors": [
+        "dags"
+    ],
+    "contact": {
+        "homepage": "https://terraforged.com",
+        "issues": "https://github.com/TerraForged/TerraForged/issues",
+        "sources": "https://github.com/TerraForged/TerraForged"
+    },
+
+    "license": "MIT",
+    "icon": "terraforged.png",
+
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "com.terraforged.mod.TerraForgedMod"
+        ],
+        "server": [
+            "com.terraforged.mod.TerraForgedMod::server"
+        ]
+    },
+    "mixins": [
+        "modid.mixins.json"
+    ],
+
+    "depends": {
+        "fabricloader": ">=0.7.4",
+        "fabric": "*",
+        "minecraft": "1.15.x"
+    }
+}

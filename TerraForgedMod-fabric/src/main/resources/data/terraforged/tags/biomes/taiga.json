@@ -1,0 +1,11 @@
+{
+  "replaceable": false,
+  "values": [
+    "minecraft:giant_spruce_taiga",
+    "minecraft:giant_tree_taiga",
+    "minecraft:giant_tree_taiga_hills",
+    "minecraft:taiga",
+    "minecraft:taiga_hills",
+    "terraforged:taiga_scrub"
+  ]
+}

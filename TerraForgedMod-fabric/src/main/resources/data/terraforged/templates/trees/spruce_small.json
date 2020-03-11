@@ -1,0 +1,9 @@
+{
+  "type": "tree",
+  "base": 3,
+  "name": "terraforged:spruce_small",
+  "paths": [
+    "terraforged:trees/spruce/small",
+    "terraforged:trees/spruce/bush"
+  ]
+}

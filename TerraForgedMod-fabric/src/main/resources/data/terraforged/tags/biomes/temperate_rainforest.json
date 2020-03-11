@@ -1,0 +1,10 @@
+{
+  "replaceable": false,
+  "values": [
+    "minecraft:dark_forest",
+    "minecraft:flower_forest",
+    "minecraft:forest",
+    "minecraft:plains",
+    "minecraft:wooded_hills"
+  ]
+}

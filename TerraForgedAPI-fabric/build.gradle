@@ -1,0 +1,59 @@
+buildscript {
+    repositories {
+        maven { url "https://maven.fabricmc.net/" }
+        jcenter()
+    }
+    dependencies {
+        classpath "net.fabricmc:fabric-loom:0.2.7-SNAPSHOT"
+    }
+}
+
+apply plugin: "fabric-loom"
+apply plugin: "maven-publish"
+apply plugin: "eclipse"
+
+version = "${mc_version}-${mod_version}"
+archivesBaseName = "TerraForgedAPI-fabric"
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${mc_version}"
+    mappings "net.fabricmc:yarn:${mc_version}+build.${yarn_build}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+    compile project(":Noise2D")
+    compile project(":FeatureManager-fabric")
+    compile project(":TerraForgedCore")
+}
+
+jar {
+    from("$buildDir/classes/java/main")
+    from(project(":Noise2D").buildDir.getPath() + "/classes/java/main")
+    from(project(":FeatureManager-fabric").buildDir.getPath() + "/classes/java/main")
+    from(project(":TerraForgedCore").buildDir.getPath() + "/classes/java/main")
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+
+    if (System.getenv("MAVEN_USER") != null && System.getenv("MAVEN_PASS") != null) {
+        repositories {
+            maven {
+                credentials {
+                    username System.getenv("MAVEN_USER")
+                    password System.getenv("MAVEN_PASS")
+                }
+                name = "nexus"
+                url = "https://io.terraforged.com/repository/maven/"
+            }
+        }
+    }
+}

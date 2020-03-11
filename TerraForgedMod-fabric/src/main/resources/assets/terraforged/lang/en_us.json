@@ -1,0 +1,12 @@
+{
+  "generator.terraforged": "TerraForged",
+  "generator.terratest": "TerraTest",
+  "biome.terraforged.cold_steppe": "Cold Steppe",
+  "biome.terraforged.marshland": "Marshland",
+  "biome.terraforged.savanna_scrub": "Savanna Scrub",
+  "biome.terraforged.shattered_savanna_scrub": "Shattered Savanna Scrub",
+  "biome.terraforged.snowy_taiga_scrub": "Snowy Taiga Scrub",
+  "biome.terraforged.steppe": "Steppe",
+  "biome.terraforged.taiga_scrub": "Taiga Scrub",
+  "biome.terraforged.warm_beach": "Warm Beach"
+}
