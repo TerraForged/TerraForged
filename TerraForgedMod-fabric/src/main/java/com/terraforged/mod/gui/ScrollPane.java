@@ -26,33 +26,31 @@
 package com.terraforged.mod.gui;
 
 import com.terraforged.mod.gui.element.Element;
-import com.terraforged.mod.gui.preview.Preview;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.list.AbstractOptionList;
+import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.client.gui.widget.ElementListWidget;
 
 import java.util.Collections;
 import java.util.List;
 
-public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements OverlayRenderer {
+public class ScrollPane extends ElementListWidget<ScrollPane.Entry> implements OverlayRenderer {
 
     private boolean hovered = false;
 
     public ScrollPane(int slotHeightIn) {
-        super(Minecraft.getInstance(), 0, 0, 0, 0, slotHeightIn);
+        super(MinecraftClient.getInstance(), 0, 0, 0, 0, slotHeightIn);
     }
 
-    public void addButton(Widget button) {
+    public void addButton(AbstractButtonWidget button) {
         super.addEntry(new Entry(button));
     }
 
     @Override
     public void renderOverlays(Screen screen, int x, int y) {
         for (Entry entry : this.children()) {
-            if (entry.isMouseOver(x, y) && entry.option.isMouseOver(x, y)) {
-                Widget button = entry.option;
+            if (/*entry.isMouseOver(x, y) && todo lost*/ entry.option.isMouseOver(x, y)) {
+                AbstractButtonWidget button = entry.option;
                 if (button instanceof Element) {
                     screen.renderTooltip(((Element) button).getTooltip(), x, y);
                     return;
@@ -74,7 +72,7 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
 
     @Override
     protected int getScrollbarPosition() {
-        return getRight();
+        return getMaxPosition(); // todo old getRight
     }
 
     @Override
@@ -82,16 +80,16 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
         return hovered && super.mouseScrolled(x, y, direction);
     }
 
-    public class Entry extends AbstractOptionList.Entry<Entry> {
+    public class Entry extends ElementListWidget.Entry<Entry> {
 
-        public final Widget option;
+        public final AbstractButtonWidget option;
 
-        public Entry(Widget option) {
+        public Entry(AbstractButtonWidget option) {
             this.option = option;
         }
 
         @Override
-        public List<? extends IGuiEventListener> children() {
+        public List<? extends net.minecraft.client.gui.Element> children() {
             return Collections.singletonList(option);
         }
 
@@ -113,10 +111,10 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
             option.y = top;
             option.visible = true;
             option.setWidth(optionWidth);
-            option.setHeight(height);
-            if (option instanceof Preview) {
-                option.setHeight(option.getWidth());
-            }
+            // option.height = height; todo maybe use accessor
+            //if (option instanceof Preview) {
+            //    option.setHeight(option.getWidth());
+            //}
             option.render(mouseX, mouseY, partialTicks);
         }
     }

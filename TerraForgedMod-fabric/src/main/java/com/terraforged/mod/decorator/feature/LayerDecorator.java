@@ -34,7 +34,7 @@ import com.terraforged.core.world.heightmap.Levels;
 import com.terraforged.mod.material.MaterialHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.chunk.Chunk;
 
 public class LayerDecorator implements ColumnDecorator {
 
@@ -45,8 +45,8 @@ public class LayerDecorator implements ColumnDecorator {
     }
 
     @Override
-    public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        context.pos.setPos(x, y + 1, z);
+    public void decorate(Chunk chunk, DecoratorContext context, int x, int y, int z) {
+        context.pos.set(x, y + 1, z);
 
         // if block is already a layer-type then simply set the layer property
         BlockState state = chunk.getBlockState(context.pos);
@@ -63,16 +63,16 @@ public class LayerDecorator implements ColumnDecorator {
         // block is non-solid (grass/flower etc)
         if (!state.getMaterial().blocksMovement()) {
             // block below is solid
-            if (chunk.getBlockState(context.pos.setPos(x, y, z)).getMaterial().blocksMovement()) {
+            if (chunk.getBlockState(context.pos.set(x, y, z)).getMaterial().blocksMovement()) {
                 // block above is air
-                if (MaterialHelper.isAir(chunk.getBlockState(context.pos.setPos(x, y + 2, z)).getBlock())) {
+                if (MaterialHelper.isAir(chunk.getBlockState(context.pos.set(x, y + 2, z)).getBlock())) {
 //                    setLayer(chunk, pos.setPos(x, y + 1, z), context.cell, context.levels, 0.25F);
                 }
             }
         }
     }
 
-    private void setLayer(IChunk chunk, BlockPos pos, LayerMaterial material, Cell<?> cell, Levels levels, float min) {
+    private void setLayer(Chunk chunk, BlockPos pos, LayerMaterial material, Cell<?> cell, Levels levels, float min) {
         float height = cell.value * levels.worldHeight;
         float depth = material.getDepth(height);
         if (depth > min) {

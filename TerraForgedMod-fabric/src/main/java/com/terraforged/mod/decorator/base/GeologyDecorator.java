@@ -29,7 +29,7 @@ import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.chunk.surface.ChunkSurfaceBuffer;
 import com.terraforged.mod.material.geology.GeoManager;
-import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.chunk.Chunk;
 
 public class GeologyDecorator implements ColumnDecorator {
 
@@ -40,7 +40,7 @@ public class GeologyDecorator implements ColumnDecorator {
     }
 
     @Override
-    public void decorate(IChunk chunk, DecoratorContext context, int x, int dy, int z) {
+    public void decorate(Chunk chunk, DecoratorContext context, int x, int dy, int z) {
 
     }
 
@@ -48,7 +48,7 @@ public class GeologyDecorator implements ColumnDecorator {
     public void decorate(ChunkSurfaceBuffer buffer, DecoratorContext context, int x, int y, int z) {
         int top = buffer.getSurfaceBottom();
         geology.getGeology(context.biome).getStrata(x, z).downwards(x, top, z, (py, state) -> {
-            context.pos.setPos(x, py, z);
+            context.pos.set(x, py, z);
             buffer.getDelegate().setBlockState(context.pos, state, false);
             return true;
         });

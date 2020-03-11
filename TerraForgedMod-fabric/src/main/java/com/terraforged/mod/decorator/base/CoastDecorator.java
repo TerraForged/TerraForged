@@ -32,7 +32,7 @@ import com.terraforged.core.util.VariablePredicate;
 import com.terraforged.core.world.terrain.Terrains;
 import com.terraforged.mod.chunk.TerraContext;
 import net.minecraft.block.BlockState;
-import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.chunk.Chunk;
 
 public class CoastDecorator implements ColumnDecorator {
 
@@ -58,7 +58,7 @@ public class CoastDecorator implements ColumnDecorator {
     }
 
     @Override
-    public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
+    public void decorate(Chunk chunk, DecoratorContext context, int x, int y, int z) {
         if (context.cell.tag != terrains.beach) {
             return;
         }

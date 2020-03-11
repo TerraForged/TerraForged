@@ -28,9 +28,9 @@ package com.terraforged.mod.feature.predicate;
 import com.terraforged.core.world.climate.Climate;
 import com.terraforged.feature.predicate.FeaturePredicate;
 import com.terraforged.mod.chunk.TerraContext;
+import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.chunk.Chunk;
 
 public class TreeLine implements FeaturePredicate {
 
@@ -43,11 +43,11 @@ public class TreeLine implements FeaturePredicate {
     }
 
     @Override
-    public boolean test(IChunk chunk, Biome biome) {
-        int x = chunk.getPos().getXStart() + 8;
-        int z = chunk.getPos().getZStart() + 8;
+    public boolean test(Chunk chunk, Biome biome) {
+        int x = chunk.getPos().getStartX() + 8;
+        int z = chunk.getPos().getStartZ() + 8;
         int treeline = getTreeline(x, z);
-        int y = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, 8, 8);
+        int y = chunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE_WG, 8, 8);
         return y < treeline;
     }
 

@@ -27,10 +27,10 @@ package com.terraforged.mod.feature.tree;
 
 import com.google.gson.reflect.TypeToken;
 import com.mojang.datafixers.types.DynamicOps;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,11 +40,11 @@ import java.util.Map;
 
 public class SaplingConfig {
 
-    private static final TypeToken<Feature<NoFeatureConfig>> TOKEN = new TypeToken<Feature<NoFeatureConfig>>() {
+    private static final TypeToken<Feature<DefaultFeatureConfig>> TOKEN = new TypeToken<Feature<DefaultFeatureConfig>>() {
     };
 
-    private final Map<ResourceLocation, Integer> normal;
-    private final Map<ResourceLocation, Integer> giant;
+    private final Map<Identifier, Integer> normal;
+    private final Map<Identifier, Integer> giant;
 
     public SaplingConfig() {
         normal = new HashMap<>();
@@ -56,29 +56,29 @@ public class SaplingConfig {
         this.giant = getSection("giant", config, ops);
     }
 
-    public SaplingConfig addNormal(ResourceLocation name, int weight) {
+    public SaplingConfig addNormal(Identifier name, int weight) {
         normal.put(name, weight);
         return this;
     }
 
     public SaplingConfig addNormal(String name, int weight) {
-        normal.put(new ResourceLocation(name), weight);
+        normal.put(new Identifier(name), weight);
         return this;
     }
 
-    public SaplingConfig addGiant(ResourceLocation name, int weight) {
+    public SaplingConfig addGiant(Identifier name, int weight) {
         giant.put(name, weight);
         return this;
     }
 
     public SaplingConfig addGiant(String name, int weight) {
-        giant.put(new ResourceLocation(name), weight);
+        giant.put(new Identifier(name), weight);
         return this;
     }
 
-    private <T> Map<ResourceLocation, Integer> getSection(String key, T config, DynamicOps<T> ops) {
+    private <T> Map<Identifier, Integer> getSection(String key, T config, DynamicOps<T> ops) {
         return ops.get(config, key).flatMap(ops::getMapValues).map(map -> {
-            Map<ResourceLocation, Integer> backing = new HashMap<>();
+            Map<Identifier, Integer> backing = new HashMap<>();
 
             for (Map.Entry<T, T> entry : map.entrySet()) {
                 String name = ops.getStringValue(entry.getKey()).orElse("");
@@ -87,7 +87,7 @@ public class SaplingConfig {
                     continue;
                 }
 
-                ResourceLocation loc = new ResourceLocation(name);
+                Identifier loc = new Identifier(name);
                 backing.put(loc, weight);
             }
 
@@ -95,25 +95,25 @@ public class SaplingConfig {
         }).orElse(Collections.emptyMap());
     }
 
-    public List<Feature<NoFeatureConfig>> getNormal() {
+    public List<Feature<DefaultFeatureConfig>> getNormal() {
         return build(normal);
     }
 
-    public List<Feature<NoFeatureConfig>> getGiant() {
+    public List<Feature<DefaultFeatureConfig>> getGiant() {
         return build(giant);
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Feature<NoFeatureConfig>> build(Map<ResourceLocation, Integer> map) {
-        List<Feature<NoFeatureConfig>> list = new LinkedList<>();
-        for (Map.Entry<ResourceLocation, Integer> entry : map.entrySet()) {
-            Feature<?> feature = ForgeRegistries.FEATURES.getValue(entry.getKey());
+    public static List<Feature<DefaultFeatureConfig>> build(Map<Identifier, Integer> map) {
+        List<Feature<DefaultFeatureConfig>> list = new LinkedList<>();
+        for (Map.Entry<Identifier, Integer> entry : map.entrySet()) {
+            Feature<?> feature = Registry.FEATURE.get(entry.getKey());
             if (feature == null) {
                 continue;
             }
 
             if (TOKEN.getRawType().isAssignableFrom(feature.getClass())) {
-                Feature<NoFeatureConfig> noConfFeature = (Feature<NoFeatureConfig>) feature;
+                Feature<DefaultFeatureConfig> noConfFeature = (Feature<DefaultFeatureConfig>) feature;
                 list.add(noConfFeature);
             }
         }

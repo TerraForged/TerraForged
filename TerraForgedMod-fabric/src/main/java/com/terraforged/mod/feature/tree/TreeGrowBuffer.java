@@ -28,13 +28,13 @@ package com.terraforged.mod.feature.tree;
 import com.terraforged.feature.template.feature.TemplateFeature;
 import com.terraforged.feature.util.WorldDelegate;
 import net.minecraft.block.BlockState;
+import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.IFeatureConfig;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
-import net.minecraft.world.server.ServerChunkProvider;
+import net.minecraft.world.gen.feature.FeatureConfig;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -74,21 +74,21 @@ public class TreeGrowBuffer extends WorldDelegate {
         if (pos.getY() < this.pos.getY()) {
             return false;
         }
-        if (state.isSolid()) {
+        if (state.isOpaque()) {
             recordPos(pos);
         }
         changes.add(new TemplateFeature.BlockInfo(pos, state));
         return true;
     }
 
-    public void placeFeature(Feature<NoFeatureConfig> feature, BlockPos pos, Random random) {
-        placeFeature(feature, pos, random, NoFeatureConfig.NO_FEATURE_CONFIG);
+    public void placeFeature(Feature<DefaultFeatureConfig> feature, BlockPos pos, Random random) {
+        placeFeature(feature, pos, random, DefaultFeatureConfig.DEFAULT);
     }
 
-    public <T extends IFeatureConfig> void placeFeature(Feature<T> feature, BlockPos pos, Random random, T config) {
-        if (getChunkProvider() instanceof ServerChunkProvider) {
-            ServerChunkProvider chunkProvider = (ServerChunkProvider) getChunkProvider();
-            feature.place(this, chunkProvider.getChunkGenerator(), random, pos, config);
+    public <T extends FeatureConfig> void placeFeature(Feature<T> feature, BlockPos pos, Random random, T config) {
+        if (getChunkManager() instanceof ServerChunkManager) {
+            ServerChunkManager chunkProvider = (ServerChunkManager) getChunkManager();
+            feature.generate(this, chunkProvider.getChunkGenerator(), random, pos, config);
         }
     }
 

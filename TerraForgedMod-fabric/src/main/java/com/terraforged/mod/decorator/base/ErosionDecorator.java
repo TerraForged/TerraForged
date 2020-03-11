@@ -33,10 +33,10 @@ import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.material.Materials;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.gen.surfacebuilders.ISurfaceBuilderConfig;
+import net.minecraft.block.Material;
+import net.minecraft.world.Heightmap;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.gen.surfacebuilder.SurfaceConfig;
 
 public class ErosionDecorator implements ColumnDecorator {
 
@@ -74,7 +74,7 @@ public class ErosionDecorator implements ColumnDecorator {
     }
 
     @Override
-    public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
+    public void decorate(Chunk chunk, DecoratorContext context, int x, int y, int z) {
         if (context.cell.value < minY || context.cell.tag == terrain.river || context.cell.tag == terrain.riverBanks) {
             return;
         }
@@ -83,14 +83,14 @@ public class ErosionDecorator implements ColumnDecorator {
             return;
         }
 
-        int topY = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
+        int topY = chunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE_WG, x, z);
         if (topY - 1 > y) {
             y = topY;
         }
 
-        ISurfaceBuilderConfig config = context.biome.getSurfaceBuilderConfig();
-        BlockState top = config.getTop();
-        BlockState middle = config.getUnder();
+        SurfaceConfig config = context.biome.getSurfaceConfig();
+        BlockState top = config.getTopMaterial();
+        BlockState middle = config.getUnderMaterial();
 
         if (materials.isErodible(top.getBlock())) {
             BlockState material = getMaterial(x, z, context, top, middle);
@@ -106,7 +106,7 @@ public class ErosionDecorator implements ColumnDecorator {
         }
     }
 
-    protected void erodeRock(DecoratorContext context, IChunk chunk, int dx, int y, int dz) {
+    protected void erodeRock(DecoratorContext context, Chunk chunk, int dx, int y, int dz) {
         int depth = 32;
         BlockState material = Blocks.GRAVEL.getDefaultState();
         // find the uppermost layer of rock & record it's depth
@@ -127,7 +127,7 @@ public class ErosionDecorator implements ColumnDecorator {
         }
     }
 
-    protected void placeScree(IChunk chunk, DecoratorContext context, int x, int y, int z) {
+    protected void placeScree(Chunk chunk, DecoratorContext context, int x, int y, int z) {
         float steepness = context.cell.steepness + context.climate.getRand().getValue(x, z, seed2) * SLOPE_MODIFIER;
         if (steepness < SCREE_STEEPNESS) {
             return;
@@ -164,7 +164,7 @@ public class ErosionDecorator implements ColumnDecorator {
     }
 
     private static BlockState rock(BlockState state) {
-        if (state.getMaterial() == Material.ROCK) {
+        if (state.getMaterial() == Material.STONE) {
             return state;
         }
         return States.STONE.get();
@@ -174,7 +174,7 @@ public class ErosionDecorator implements ColumnDecorator {
         if (state.getMaterial() == Material.ORGANIC) {
             return States.DIRT.get();
         }
-        if (state.getMaterial() == Material.ROCK) {
+        if (state.getMaterial() == Material.STONE) {
             return States.GRAVEL.get();
         }
         if (state.getMaterial() == Material.EARTH) {

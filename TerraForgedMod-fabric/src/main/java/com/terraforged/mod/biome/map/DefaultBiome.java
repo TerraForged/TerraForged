@@ -7,6 +7,6 @@ public interface DefaultBiome {
     Biome getBiome(float temperature);
 
     default Biome getDefaultBiome(float temperature) {
-        return getBiome(temperature).delegate.get();
+        return getBiome(temperature);//.delegate.get(); todo no forge whack
     }
 }

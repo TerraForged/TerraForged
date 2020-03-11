@@ -28,12 +28,12 @@ package com.terraforged.mod.gui.page;
 import com.terraforged.mod.gui.OverlayScreen;
 import com.terraforged.mod.settings.TerraSettings;
 import com.terraforged.mod.util.nbt.NBTHelper;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 public class FeaturePage extends BasePage {
 
     private final TerraSettings settings;
-    private final CompoundNBT featureSettings;
+    private final CompoundTag featureSettings;
 
     public FeaturePage(TerraSettings settings) {
         this.settings = settings;

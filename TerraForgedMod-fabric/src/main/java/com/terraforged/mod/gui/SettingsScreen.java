@@ -40,11 +40,11 @@ import com.terraforged.mod.gui.preview.PreviewPage;
 import com.terraforged.mod.settings.SettingsHelper;
 import com.terraforged.mod.settings.TerraSettings;
 import com.terraforged.mod.util.nbt.NBTHelper;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.CreateWorldScreen;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.client.gui.screen.world.CreateWorldScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Util;
 
 import java.io.BufferedWriter;
@@ -55,7 +55,8 @@ import java.io.Writer;
 
 public class SettingsScreen extends OverlayScreen {
 
-    private static final Button.IPressable NO_ACTION = b -> {};
+    private static final ButtonWidget.PressAction NO_ACTION = b -> {
+    };
 
     private final Page[] pages;
     private final CreateWorldScreen parent;
@@ -65,7 +66,7 @@ public class SettingsScreen extends OverlayScreen {
     private int pageIndex = 0;
 
     public SettingsScreen(CreateWorldScreen parent) {
-        NBTHelper.deserialize(parent.chunkProviderSettingsJson, settings);
+        NBTHelper.deserialize(parent.generatorOptionsTag, settings);
         this.parent = parent;
         this.pages = new Page[]{
                 new GeneratorPage(settings, preview),
@@ -105,21 +106,21 @@ public class SettingsScreen extends OverlayScreen {
         }
 
         // -52
-        addButton(new Button(buttonsCenter - buttonWidth - buttonPad, buttonsRow, buttonWidth, buttonHeight, "Cancel"
+        addButton(new ButtonWidget(buttonsCenter - buttonWidth - buttonPad, buttonsRow, buttonWidth, buttonHeight, "Cancel"
                 , b -> onClose()));
 
         // +2
-        addButton(new Button(buttonsCenter + buttonPad, buttonsRow, buttonWidth, buttonHeight, "Done", b -> {
+        addButton(new ButtonWidget(buttonsCenter + buttonPad, buttonsRow, buttonWidth, buttonHeight, "Done", b -> {
             for (Page page : pages) {
                 page.save();
             }
-            parent.chunkProviderSettingsJson = NBTHelper.serializeCompact(settings);
+            parent.generatorOptionsTag = NBTHelper.serializeCompact(settings);
             onClose();
         }));
 
 
         // -106
-        addButton(new Button(buttonsCenter - (buttonWidth * 2 + (buttonPad * 3)), buttonsRow, buttonWidth,
+        addButton(new ButtonWidget(buttonsCenter - (buttonWidth * 2 + (buttonPad * 3)), buttonsRow, buttonWidth,
                 buttonHeight, "<<", NO_ACTION) {
             @Override
             public void render(int mouseX, int mouseY, float partialTicks) {
@@ -142,7 +143,7 @@ public class SettingsScreen extends OverlayScreen {
         });
 
         // +56
-        addButton(new Button(buttonsCenter + buttonWidth + (buttonPad * 3), buttonsRow, buttonWidth, buttonHeight,
+        addButton(new ButtonWidget(buttonsCenter + buttonWidth + (buttonPad * 3), buttonsRow, buttonWidth, buttonHeight,
                 ">>", NO_ACTION) {
             @Override
             public void render(int mouseX, int mouseY, float partialTicks) {
@@ -164,7 +165,7 @@ public class SettingsScreen extends OverlayScreen {
             }
         });
 
-        addButton(new Button(width - buttonWidth - 15, buttonsRow, buttonWidth, buttonHeight, "Export", NO_ACTION) {
+        addButton(new ButtonWidget(width - buttonWidth - 15, buttonsRow, buttonWidth, buttonHeight, "Export", NO_ACTION) {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 super.onClick(mouseX, mouseY);
@@ -236,20 +237,20 @@ public class SettingsScreen extends OverlayScreen {
             page.close();
         }
         preview.close();
-        Minecraft.getInstance().displayGuiScreen(parent);
+        MinecraftClient.getInstance().openScreen(parent);
     }
 
     private void export(Settings settings) {
         for (Page page : pages) {
             page.save();
         }
-        CompoundNBT tag = NBTHelper.serializeCompact(settings);
+        CompoundTag tag = NBTHelper.serializeCompact(settings);
         JsonElement json = NBTHelper.toJson(tag);
-        File config = new File(Minecraft.getInstance().gameDir, "config");
+        File config = new File(MinecraftClient.getInstance().runDirectory, "config");
         File file = new File(config, SettingsHelper.SETTINGS_FILE_NAME);
         try (Writer writer = new BufferedWriter(new FileWriter(file))) {
             new GsonBuilder().setPrettyPrinting().create().toJson(json, writer);
-            Util.getOSType().openURI(file.getParentFile().toURI());
+            Util.getOperatingSystem().open(file.getParentFile().toURI());
         } catch (IOException e) {
             e.printStackTrace();
         }

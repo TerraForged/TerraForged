@@ -28,14 +28,14 @@ package com.terraforged.mod.decorator;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.material.state.States;
-import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.chunk.Chunk;
 
 public class ChunkPopulator implements ColumnDecorator {
 
     public static final ChunkPopulator INSTANCE = new ChunkPopulator();
 
     @Override
-    public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
+    public void decorate(Chunk chunk, DecoratorContext context, int x, int y, int z) {
         if (context.cell.tag == context.terrains.volcanoPipe && context.cell.riverMask > 0.25F) {
             int lavaStart = Math.max(context.levels.waterY + 10, y - 30);
             int lavaEnd = Math.max(5, context.levels.waterY - 10);

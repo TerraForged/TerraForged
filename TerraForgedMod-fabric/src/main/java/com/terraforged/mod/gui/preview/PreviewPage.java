@@ -30,7 +30,7 @@ import com.terraforged.mod.gui.OverlayScreen;
 import com.terraforged.mod.gui.element.TerraButton;
 import com.terraforged.mod.gui.page.BasePage;
 import com.terraforged.mod.util.nbt.NBTHelper;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.function.Consumer;
 
@@ -38,7 +38,7 @@ public class PreviewPage extends BasePage {
 
     private final Preview preview = new Preview();
     private final Settings settings = new Settings();
-    private final CompoundNBT previewerSettings = NBTHelper.serialize(new PreviewSettings());
+    private final CompoundTag previewerSettings = NBTHelper.serialize(new PreviewSettings());
 
     public PreviewPage() {
 
@@ -65,7 +65,7 @@ public class PreviewPage extends BasePage {
         preview.x = 0;
         preview.y = 0;
         preview.setWidth(256);
-        preview.setHeight(256);
+        // preview.setHeight(256); todo cannot set height
 
         addElements(right.left, right.top, right, previewerSettings, right.scrollPane::addButton, this::update);
         right.scrollPane.addButton(new TerraButton("New Seed") {

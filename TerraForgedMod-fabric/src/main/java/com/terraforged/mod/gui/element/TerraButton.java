@@ -25,9 +25,9 @@
 
 package com.terraforged.mod.gui.element;
 
-import net.minecraftforge.fml.client.gui.widget.ExtendedButton;
+import net.minecraft.client.gui.widget.ButtonWidget;
 
-public class TerraButton extends ExtendedButton implements Element {
+public class TerraButton extends ButtonWidget implements Element {
 
     public TerraButton(String displayString) {
         super(0, 0, 200, 20, displayString, b -> {});

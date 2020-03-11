@@ -29,28 +29,29 @@ import com.mojang.datafixers.types.DynamicOps;
 import com.terraforged.mod.Log;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class SaplingManager {
 
-    private static final Map<ResourceLocation, SaplingFeature> saplings = new HashMap<>();
+    private static final Map<Identifier, SaplingFeature> saplings = new HashMap<>();
 
-    public static SaplingFeature getSapling(ResourceLocation name) {
+    public static SaplingFeature getSapling(Identifier name) {
         return saplings.get(name);
     }
 
     public static void register(Block block, SaplingConfig config) {
-        register(block.getRegistryName(), config);
+        register(Registry.BLOCK.getId(block), config);
     }
 
-    public static <T> void register(ResourceLocation location, T config, DynamicOps<T> ops) {
+    public static <T> void register(Identifier location, T config, DynamicOps<T> ops) {
         register(location, new SaplingConfig(config, ops));
     }
 
-    public static void register(ResourceLocation location, SaplingConfig config) {
+    public static void register(Identifier location, SaplingConfig config) {
         saplings.put(location, new SaplingFeature(config));
     }
 

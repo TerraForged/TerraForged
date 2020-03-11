@@ -35,33 +35,23 @@ import com.terraforged.mod.feature.tree.SaplingManager;
 import com.terraforged.mod.settings.SettingsHelper;
 import com.terraforged.mod.util.Environment;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.server.ServerStartCallback;
 import net.fabricmc.fabric.api.event.server.ServerStopCallback;
 import net.fabricmc.fabric.api.registry.CommandRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 
 /**
  * Author <dags@dags.me>
  */
 public class TerraForgedMod implements ModInitializer {
 
-    @Override 
+    @Override
     public void onInitialize() {
         Log.info("Common setup");
         ServerStopCallback.EVENT.register(TerraForgedMod::onShutdown);
         MaterialTags.init();
-        TerraWorld.init();
+        //        TerraWorld.init();
         SaplingManager.init();
         if (Environment.isDev()) {
             DataGen.dumpData();
@@ -69,13 +59,14 @@ public class TerraForgedMod implements ModInitializer {
         FeatureManager.registerTemplates();
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new BiomeTagManager());
         CommandRegistry.INSTANCE.register(false, TerraCommand::register);
+        // TODO register and fix sapling listener
     }
 
     public static void server() {
         Log.info("Setting dedicated server");
         SettingsHelper.setDedicatedServer();
     }
-    
+
     private static void onShutdown(MinecraftServer server) {
         ThreadPool.shutdownCurrent();
     }

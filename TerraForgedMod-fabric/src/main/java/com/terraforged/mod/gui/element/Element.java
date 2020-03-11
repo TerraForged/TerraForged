@@ -25,10 +25,10 @@
 
 package com.terraforged.mod.gui.element;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraftforge.common.util.Constants;
+import net.fabricmc.fabric.api.util.NbtType;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,11 +47,11 @@ public interface Element {
         return ID_COUNTER.getAndAdd(1);
     }
 
-    static List<String> readTooltip(CompoundNBT value) {
+    static List<String> readTooltip(CompoundTag value) {
         if (value.contains("#comment")) {
-            ListNBT comment = value.getList("#comment", Constants.NBT.TAG_STRING);
+            ListTag comment = value.getList("#comment", NbtType.STRING);
             return comment.stream()
-                    .map(INBT::getString)
+                    .map(Tag::asString)
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();

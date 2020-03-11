@@ -25,25 +25,26 @@
 
 package com.terraforged.mod.gui.element;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraftforge.common.util.Constants;
+import net.fabricmc.fabric.api.util.NbtType;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 
 public class Toggle extends TerraButton {
 
     private final String prefix;
-    private final CompoundNBT value;
-    private final ListNBT options;
+    private final CompoundTag value;
+    private final ListTag options;
 
     private int index;
-    private Runnable callback = () -> {};
+    private Runnable callback = () -> {
+    };
 
-    public Toggle(String prefix, CompoundNBT value) {
+    public Toggle(String prefix, CompoundTag value) {
         super(value.getString("value"));
         this.value = value;
         this.prefix = prefix;
-        this.options = value.getList("#options", Constants.NBT.TAG_STRING);
+        this.options = value.getList("#options", NbtType.STRING);
         for (int i = 0; i < options.size(); i++) {
             String s = options.getString(i);
             if (s.equals(value.getString("value"))) {
@@ -63,7 +64,7 @@ public class Toggle extends TerraButton {
     public boolean mouseClicked(double mx, double my, int button) {
         if (super.isValidClickButton(button)) {
             int direction = button == 0 ? 1 : -1;
-            this.playDownSound(Minecraft.getInstance().getSoundHandler());
+            this.playDownSound(MinecraftClient.getInstance().getSoundManager());
             this.onClick(mx, my, direction);
             return true;
         }

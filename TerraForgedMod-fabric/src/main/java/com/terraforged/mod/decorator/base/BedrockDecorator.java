@@ -28,7 +28,7 @@ package com.terraforged.mod.decorator.base;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.material.state.States;
-import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.chunk.Chunk;
 
 import java.util.Random;
 
@@ -37,7 +37,7 @@ public class BedrockDecorator implements ColumnDecorator {
     private final Random random = new Random();
 
     @Override
-    public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
+    public void decorate(Chunk chunk, DecoratorContext context, int x, int y, int z) {
         fillDown(context, chunk, x, z, 1 + random.nextInt(4), -1, States.BEDROCK.get());
     }
 }

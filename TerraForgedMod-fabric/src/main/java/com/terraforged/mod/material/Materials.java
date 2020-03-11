@@ -30,8 +30,8 @@ import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.api.material.state.States;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.tags.Tag;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.tag.Tag;
+import net.minecraft.util.registry.Registry;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -51,7 +51,7 @@ public class Materials {
 
     public Materials() {
         Predicate<Block> filter = getTagFilter();
-        for (Block block : ForgeRegistries.BLOCKS) {
+        for (Block block : Registry.BLOCK) {
             if (filter.test(block)) {
                 continue;
             }
@@ -142,22 +142,22 @@ public class Materials {
     }
 
     private static Set<Block> create(Tag<Block> tag) {
-        return new HashSet<>(tag.getAllElements());
+        return new HashSet<>(tag.values());
     }
 
     private static Predicate<Block> getTagFilter() {
         Set<String> namespaces = new HashSet<>();
-        collectNamespace(namespaces, MaterialTags.WG_ROCK.getAllElements());
-        collectNamespace(namespaces, MaterialTags.WG_EARTH.getAllElements());
-        collectNamespace(namespaces, MaterialTags.WG_EARTH.getAllElements());
-        collectNamespace(namespaces, MaterialTags.WG_SEDIMENT.getAllElements());
-        collectNamespace(namespaces, MaterialTags.WG_ORE.getAllElements());
-        return b -> namespaces.contains(MaterialHelper.getNamespace(b));
+        collectNamespace(namespaces, MaterialTags.WG_ROCK.values());
+        collectNamespace(namespaces, MaterialTags.WG_EARTH.values());
+        collectNamespace(namespaces, MaterialTags.WG_EARTH.values());
+        collectNamespace(namespaces, MaterialTags.WG_SEDIMENT.values());
+        collectNamespace(namespaces, MaterialTags.WG_ORE.values());
+        return b -> namespaces.contains(MaterialHelper.getNamespace(Registry.BLOCK, b));
     }
 
     private static void collectNamespace(Set<String> set, Collection<Block> blocks) {
         for (Block block : blocks) {
-            set.add(MaterialHelper.getNamespace(block));
+            set.add(MaterialHelper.getNamespace(Registry.BLOCK, block));
         }
     }
 }

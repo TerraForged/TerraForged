@@ -30,23 +30,23 @@ import com.terraforged.mod.gui.OverlayScreen;
 import com.terraforged.mod.gui.ScrollPane;
 import com.terraforged.mod.gui.element.TerraButton;
 import com.terraforged.mod.gui.element.TerraLabel;
-import com.terraforged.mod.gui.element.TerraSlider;
 import com.terraforged.mod.gui.element.Toggle;
 import com.terraforged.mod.util.nbt.NBTHelper;
-import net.minecraft.client.gui.IGuiEventListener;
+import net.fabricmc.fabric.api.util.NbtType;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public abstract class Page implements IGuiEventListener, OverlayRenderer {
+public abstract class Page implements Element, OverlayRenderer {
 
-    protected static final Runnable NO_CALLBACK = () -> {};
+    protected static final Runnable NO_CALLBACK = () -> {
+    };
 
     private static final int SLIDER_HEIGHT = 20;
     private static final int SLIDER_PAD = 2;
@@ -126,50 +126,51 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
         init(parent);
     }
 
-    public void addElements(int x, int y, Column column, CompoundNBT settings, Consumer<Widget> consumer, Runnable callback) {
+    public void addElements(int x, int y, Column column, CompoundTag settings, Consumer<AbstractButtonWidget> consumer, Runnable callback) {
         addElements(x, y, column, settings, false, consumer, callback);
     }
 
-    public void addElements(int x, int y, Column column, CompoundNBT settings, boolean deep, Consumer<Widget> consumer, Runnable callback) {
+    public void addElements(int x, int y, Column column, CompoundTag settings, boolean deep, Consumer<AbstractButtonWidget> consumer,
+            Runnable callback) {
         AtomicInteger top = new AtomicInteger(y);
 
         NBTHelper.stream(settings).forEach(value -> {
             String name = value.getString("#display");
-            Widget button = createButton(name, value, callback);
+            AbstractButtonWidget button = createButton(name, value, callback);
             if (button != null) {
                 button.setWidth(column.width);
-                button.setHeight(SLIDER_HEIGHT);
+                // button.setHeight(SLIDER_HEIGHT); todo mixin
                 button.x = x;
                 button.y = top.getAndAdd(SLIDER_HEIGHT + SLIDER_PAD);
                 consumer.accept(button);
             } else if (deep) {
-                INBT child = value.get("value");
-                if (child == null || child.getId() != Constants.NBT.TAG_COMPOUND) {
+                Tag child = value.get("value");
+                if (child == null || child.getType() != NbtType.COMPOUND) {
                     return;
                 }
                 TerraLabel label = new TerraLabel(name);
                 label.x = x;
                 label.y = top.getAndAdd(SLIDER_HEIGHT + SLIDER_PAD);
                 consumer.accept(label);
-                addElements(x, label.y, column, (CompoundNBT) child, consumer, callback);
+                addElements(x, label.y, column, (CompoundTag) child, consumer, callback);
             }
         });
     }
 
-    public Widget createButton(String name, CompoundNBT value, Runnable callback) {
-        INBT tag = value.get("value");
+    public AbstractButtonWidget createButton(String name, CompoundTag value, Runnable callback) {
+        Tag tag = value.get("value");
         if (tag == null) {
             return null;
         }
 
-        byte type = tag.getId();
-        if (type == Constants.NBT.TAG_INT) {
-            return new TerraSlider.Int(name + ": ", value).callback(callback);
-        } else if (type == Constants.NBT.TAG_FLOAT) {
-            return new TerraSlider.Float(name + ": ", value).callback(callback);
-        } else if (type == Constants.NBT.TAG_STRING && value.contains("#options")) {
+        byte type = tag.getType();
+        if (type == NbtType.INT) {
+            return new TerraButton(name);// todo slider return new TerraSlider.Int(name + ": ", value).callback(callback);
+        } else if (type == NbtType.FLOAT) {
+            return new TerraButton(name);// todo slider return new TerraSlider.Float(name + ": ", value).callback(callback);
+        } else if (type == NbtType.STRING && value.contains("#options")) {
             return new Toggle(name + ": ", value).callback(callback);
-        } else if (type == Constants.NBT.TAG_STRING) {
+        } else if (type == NbtType.STRING) {
             return new TerraButton(name);
         } else {
             return null;

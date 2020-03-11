@@ -28,7 +28,7 @@ package com.terraforged.api.chunk.surface.builder;
 import com.terraforged.api.chunk.surface.Surface;
 import com.terraforged.api.chunk.surface.SurfaceContext;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
+import net.minecraft.world.gen.surfacebuilder.ConfiguredSurfaceBuilder;
 
 import java.util.function.Function;
 
@@ -48,9 +48,9 @@ public class Delegate implements Surface {
 
     @Override
     public void buildSurface(int x, int z, int height, SurfaceContext context) {
-        surfaceBuilder.setSeed(context.seed);
+        surfaceBuilder.initSeed(context.seed);
 
-        surfaceBuilder.buildSurface(
+        surfaceBuilder.generate(
                 context.random,
                 context.chunk,
                 context.biome,

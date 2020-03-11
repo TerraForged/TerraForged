@@ -29,13 +29,13 @@ import com.terraforged.core.settings.Settings;
 import com.terraforged.mod.gui.OverlayScreen;
 import com.terraforged.mod.gui.preview.PreviewPage;
 import com.terraforged.mod.util.nbt.NBTHelper;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 public class TerrainPage extends BasePage {
 
     private final Settings settings;
     private final PreviewPage preview;
-    private final CompoundNBT terrainSettings;
+    private final CompoundTag terrainSettings;
 
     public TerrainPage(Settings settings, PreviewPage preview) {
         this.settings = settings;

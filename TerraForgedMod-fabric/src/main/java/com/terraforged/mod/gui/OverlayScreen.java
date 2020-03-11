@@ -27,23 +27,23 @@ package com.terraforged.mod.gui;
 
 import com.terraforged.mod.gui.element.CheckBox;
 import com.terraforged.mod.gui.element.Element;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.text.TranslatableText;
 
 public class OverlayScreen extends Screen implements OverlayRenderer {
 
     public boolean showTooltips = false;
 
     public OverlayScreen() {
-        super(new TranslationTextComponent(""));
-        super.minecraft = Minecraft.getInstance();
-        super.font = minecraft.fontRenderer;
+        super(new TranslatableText(""));
+        super.minecraft = MinecraftClient.getInstance();
+        super.font = minecraft.textRenderer;
     }
 
     @Override
-    public <T extends Widget> T addButton(T buttonIn) {
+    public <T extends AbstractButtonWidget> T addButton(T buttonIn) {
         return super.addButton(buttonIn);
     }
 
@@ -57,7 +57,7 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
 
     @Override
     public void renderOverlays(Screen screen, int mouseX, int mouseY) {
-        for (Widget button : buttons) {
+        for (AbstractButtonWidget button : buttons) {
             if (button.isMouseOver(mouseX, mouseY)) {
                 if (button instanceof Element) {
                     screen.renderTooltip(((Element) button).getTooltip(), mouseX, mouseY);

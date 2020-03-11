@@ -36,7 +36,7 @@ import me.dags.noise.Source;
 import me.dags.noise.util.NoiseUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
+import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
 
 public class FrozenOcean implements Surface {
 

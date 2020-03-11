@@ -38,20 +38,20 @@ import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.Terrains;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import me.dags.noise.util.NoiseUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.texture.NativeImage;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.nbt.CompoundTag;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class Preview extends Button {
+public class Preview extends ButtonWidget {
 
     private static final int FACTOR = 4;
     private static final int BLOCK_SIZE = 256;//Size.chunkToBlock(1 << FACTOR);
@@ -61,7 +61,7 @@ public class Preview extends Button {
     private final int offsetZ;
     private final Random random = new Random(System.currentTimeMillis());
     private final PreviewSettings previewSettings = new PreviewSettings();
-    private final DynamicTexture texture = new DynamicTexture(new NativeImage(BLOCK_SIZE, BLOCK_SIZE, true));
+    private final NativeImageBackedTexture texture = new NativeImageBackedTexture(new NativeImage(BLOCK_SIZE, BLOCK_SIZE, true));
 
     private int seed;
     private long lastUpdate = 0L;
@@ -73,7 +73,8 @@ public class Preview extends Button {
     private String[] values = {"", "", ""};
 
     public Preview() {
-        super(0, 0, 0, 0, "", b -> {});
+        super(0, 0, 0, 0, "", b -> {
+        });
         this.seed = random.nextInt();
         this.offsetX = random.nextInt(50000) - 25000;
         this.offsetZ = random.nextInt(50000) - 25000;
@@ -87,6 +88,7 @@ public class Preview extends Button {
         texture.close();
     }
 
+
     @Override
     public void render(int mx, int my, float partialTicks) {
         preRender();
@@ -94,17 +96,18 @@ public class Preview extends Button {
         texture.bindTexture();
         RenderSystem.enableBlend();
         RenderSystem.enableRescaleNormal();
-        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE,
+                GlStateManager.DstFactor.ZERO);
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
 
-        AbstractGui.blit(x, y, 0, 0, width, height, width, height);
+        DrawableHelper.blit(x, y, 0, 0, width, height, width, height);
         RenderSystem.disableRescaleNormal();
 
         updateLegend(mx, my);
         renderLegend(labels, values, x + 1, y + height + 2, 15, 0xFFFFFF);
     }
 
-    public void update(Settings settings, CompoundNBT prevSettings) {
+    public void update(Settings settings, CompoundTag prevSettings) {
         long time = System.currentTimeMillis();
         if (time - lastUpdate < 50) {
             return;
@@ -133,7 +136,7 @@ public class Preview extends Button {
     }
 
     private void render(Region region) {
-        NativeImage image = texture.getTextureData();
+        NativeImage image = texture.getImage();
         if (image == null) {
             return;
         }
@@ -146,17 +149,17 @@ public class Preview extends Button {
         int width = region.getBlockSize().size;
         region.iterate((cell, x, z) -> {
             if (x < stroke || z < stroke || x >= width - stroke || z >= width - stroke) {
-                image.setPixelRGBA(x, z, Color.black.getRGB());
+                image.setPixelRgba(x, z, Color.black.getRGB());
             } else {
                 Color color = renderer.color(cell, context);
-                image.setPixelRGBA(x, z, RenderMode.rgba(color));
+                image.setPixelRgba(x, z, RenderMode.rgba(color));
             }
         });
 
-        texture.updateDynamicTexture();
+        texture.upload();
     }
 
-    private Future<Region> generate(Settings settings, CompoundNBT prevSettings) {
+    private Future<Region> generate(Settings settings, CompoundTag prevSettings) {
         NBTHelper.deserialize(prevSettings, previewSettings);
         settings.generator.seed = seed;
         this.settings = settings;
@@ -172,7 +175,7 @@ public class Preview extends Button {
         return renderer.generate(offsetX, offsetZ, 101 - previewSettings.zoom, false);
     }
 
-    private void updateLegend(int mx ,int my) {
+    private void updateLegend(int mx, int my) {
         if (region != null) {
             int zoom = (101 - previewSettings.zoom);
             int width = Math.max(1, region.getBlockSize().size * zoom);
@@ -192,7 +195,7 @@ public class Preview extends Button {
     }
 
     private float getLegendScale() {
-        int index = Minecraft.getInstance().gameSettings.guiScale - 1;
+        int index = MinecraftClient.getInstance().options.guiScale - 1;
         if (index < 0 || index >= LEGEND_SCALES.length) {
             // index=-1 == GuiScale(AUTO) which is the same as GuiScale(4)
             // values above 4 don't exist but who knows what mods might try set it to
@@ -210,7 +213,7 @@ public class Preview extends Button {
         RenderSystem.translatef(left, top, 0);
         RenderSystem.scalef(scale, scale, 1);
 
-        FontRenderer renderer = Minecraft.getInstance().fontRenderer;
+        TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
         int spacing = 0;
         for (String s : labels) {
             spacing = Math.max(spacing, renderer.getStringWidth(s));
@@ -221,7 +224,7 @@ public class Preview extends Button {
             String label = labels[i];
             String value = values[i];
 
-            while (left + spacing + Minecraft.getInstance().fontRenderer.getStringWidth(value) > maxX) {
+            while (left + spacing + MinecraftClient.getInstance().textRenderer.getStringWidth(value) > maxX) {
                 value = value.substring(0, value.length() - 1);
             }
 

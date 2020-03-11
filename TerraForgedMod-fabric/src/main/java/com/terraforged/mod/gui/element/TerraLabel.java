@@ -25,28 +25,27 @@
 
 package com.terraforged.mod.gui.element;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 
 public class TerraLabel extends TerraButton {
 
-//    private final GuiLabel label;
+    //    private final GuiLabel label;
 
     public TerraLabel(String text) {
         super(text);
         visible = true;
-//        label = new GuiLabel(
-//                Collections.singletonList(text),
-//                0xFFFFFF,
-//                Minecraft.getInstance().fontRenderer
-//        );
-//        label.visible = true;
+        //        label = new GuiLabel(
+        //                Collections.singletonList(text),
+        //                0xFFFFFF,
+        //                Minecraft.getInstance().fontRenderer
+        //        );
+        //        label.visible = true;
     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        Minecraft minecraft = Minecraft.getInstance();
-        FontRenderer fontrenderer = minecraft.fontRenderer;
-        fontrenderer.drawStringWithShadow(getMessage(), x, y + (height - 8) / 2, 0xFFFFFF);
+        TextRenderer fontrenderer = MinecraftClient.getInstance().textRenderer;
+        fontrenderer.drawWithShadow(getMessage(), x, y + (height - 8) / 2, 0xFFFFFF);
     }
 }

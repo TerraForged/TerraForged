@@ -35,7 +35,7 @@ import com.terraforged.mod.chunk.TerraContext;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import net.minecraft.block.BlockState;
-import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.chunk.Chunk;
 
 public class RiverDecorator implements ColumnDecorator {
 
@@ -61,23 +61,23 @@ public class RiverDecorator implements ColumnDecorator {
     }
 
     @Override
-    public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
+    public void decorate(Chunk chunk, DecoratorContext context, int x, int y, int z) {
         if (context.cell.tag == river) {
-            chunk.setBlockState(context.pos.setPos(x, y, z), dirt, false);
+            chunk.setBlockState(context.pos.set(x, y, z), dirt, false);
             return;
         }
         if (context.cell.tag == riverBank) {
             float value = noise1.getValue(x, z) * 5;
             if (y + value >= levels.waterY) {
                 if (context.cell.steepness > 0.5) {
-                    chunk.setBlockState(context.pos.setPos(x, y, z), gravel, false);
+                    chunk.setBlockState(context.pos.set(x, y, z), gravel, false);
                 } else if (context.cell.steepness < 0.3) {
-                    chunk.setBlockState(context.pos.setPos(x, y, z), sand, false);
+                    chunk.setBlockState(context.pos.set(x, y, z), sand, false);
                 } else {
-                    chunk.setBlockState(context.pos.setPos(x, y, z), dirt, false);
+                    chunk.setBlockState(context.pos.set(x, y, z), dirt, false);
                 }
             } else {
-                chunk.setBlockState(context.pos.setPos(x, y, z), dirt, false);
+                chunk.setBlockState(context.pos.set(x, y, z), dirt, false);
             }
         }
     }

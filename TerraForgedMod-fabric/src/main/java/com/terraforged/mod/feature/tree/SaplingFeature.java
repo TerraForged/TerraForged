@@ -26,7 +26,7 @@
 package com.terraforged.mod.feature.tree;
 
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,22 +34,22 @@ import java.util.Random;
 
 public class SaplingFeature {
 
-    private final List<Feature<NoFeatureConfig>> normal;
-    private final List<Feature<NoFeatureConfig>> giant;
+    private final List<Feature<DefaultFeatureConfig>> normal;
+    private final List<Feature<DefaultFeatureConfig>> giant;
 
     public SaplingFeature(SaplingConfig config) {
         this.normal = new ArrayList<>(config.getNormal());
         this.giant = new ArrayList<>(config.getGiant());
     }
 
-    public Feature<NoFeatureConfig> nextNormal(Random random) {
+    public Feature<DefaultFeatureConfig> nextNormal(Random random) {
         if (normal.isEmpty()) {
             return null;
         }
         return normal.get(random.nextInt(normal.size()));
     }
 
-    public Feature<NoFeatureConfig> nextGiant(Random random) {
+    public Feature<DefaultFeatureConfig> nextGiant(Random random) {
         if (giant.isEmpty()) {
             return null;
         }

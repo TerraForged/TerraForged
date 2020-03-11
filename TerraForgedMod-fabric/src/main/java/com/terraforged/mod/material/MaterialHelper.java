@@ -32,15 +32,14 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ConcretePowderBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.block.Material;
+import net.minecraft.tag.BlockTags;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.DecoratedFeatureConfig;
 import net.minecraft.world.gen.feature.OreFeatureConfig;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.util.Set;
 
@@ -73,14 +72,11 @@ public class MaterialHelper {
     }
 
     public static boolean isStone(Block block) {
-        return Tags.Blocks.STONE.contains(block)
-                && !isBlacklisted(block)
-                && !("" + block.getRegistryName()).contains("polished_");
+        return block == Blocks.STONE || block == Blocks.ANDESITE || block == Blocks.GRANITE || block == Blocks.DIORITE;
     }
 
     public static boolean isDirt(Block block) {
-        return Tags.Blocks.DIRT.contains(block)
-                && !isBlacklisted(block);
+        return block == Blocks.DIRT || block == Blocks.COARSE_DIRT || block == Blocks.FARMLAND || isGrass(block);
     }
 
     public static boolean isClay(Block block) {
@@ -101,24 +97,19 @@ public class MaterialHelper {
     }
 
     public static boolean isGravel(Block block) {
-        return getName(block).contains("gravel");
+        return String.valueOf(Registry.BLOCK.getId(block)).contains("gravel");
     }
 
     public static boolean isOre(Block block) {
-        return Tags.Blocks.ORES.contains(block)
-                && !isBlacklisted(block);
+        return block == Blocks.COAL_ORE || block == Blocks.DIAMOND_ORE || block == Blocks.EMERALD_ORE || block == Blocks.GOLD_ORE || block == Blocks.IRON_ORE || block == Blocks.LAPIS_ORE || block == Blocks.NETHER_QUARTZ_ORE || block == Blocks.REDSTONE_ORE;
     }
 
     public static boolean isBlacklisted(Block block) {
         return BLACKLIST.contains(block);
     }
 
-    public static String getName(IForgeRegistryEntry<?> entry) {
-        return "" + entry.getRegistryName();
-    }
-
-    public static String getNamespace(IForgeRegistryEntry<?> entry) {
-        ResourceLocation name = entry.getRegistryName();
+    public static <T> String getNamespace(Registry<T> registry, T entry) {
+        Identifier name = registry.getId(entry);
         if (name == null) {
             return "unknown";
         }
@@ -128,14 +119,14 @@ public class MaterialHelper {
     public static float getHardness(BlockState state) {
         try (ObjectPool.Item<DummyBlockReader> reader = DummyBlockReader.pooled()) {
             reader.getValue().set(state);
-            return state.getBlockHardness(reader.getValue(), BlockPos.ZERO);
+            return state.getHardness(reader.getValue(), BlockPos.ORIGIN);
         }
     }
 
     public static boolean isCube(BlockState state) {
         try (ObjectPool.Item<DummyBlockReader> reader = DummyBlockReader.pooled()) {
             reader.getValue().set(state);
-            return state.isNormalCube(reader.getValue(), BlockPos.ZERO);
+            return state.isSimpleFullBlock(reader.getValue(), BlockPos.ORIGIN);
         }
     }
 

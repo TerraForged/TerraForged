@@ -81,7 +81,7 @@ public class DesertDunes implements Surface {
         float depth = material.getDepth(duneHeight);
         int levels = material.getLevel(depth);
         BlockState top = material.getState(levels);
-        ctx.chunk.setBlockState(pos.setPos(x, duneTop, z), top, false);
+        ctx.chunk.setBlockState(pos.set(x, duneTop, z), top, false);
     }
 
     public static Surface create(TerraContext context, BiomeProvider provider) {
