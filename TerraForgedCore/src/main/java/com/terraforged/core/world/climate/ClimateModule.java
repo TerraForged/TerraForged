@@ -60,7 +60,7 @@ public class ClimateModule {
 
         float biomeFreq = 1F / biomeSize;
         int moistureSize = moistScaler * biomeSize;
-        int temperatureSize = tempScaler * tempScaler;
+        int temperatureSize = tempScaler * biomeSize;
         int moistScale = NoiseUtil.round(moistureSize * biomeFreq);
         int tempScale = NoiseUtil.round(temperatureSize * biomeFreq);
         int warpScale = settings.biome.biomeWarpScale;
