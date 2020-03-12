@@ -32,7 +32,16 @@ minecraft {
     mappings channel: mcp_channel, version: mcp_version
 }
 
+task sourceJar(type: Jar) {
+    classifier = "sources"
+    from("$projectDir/src/main/java")
+    from(project(":Noise2D").projectDir.getPath() + "/src/main/java")
+    from(project(":FeatureManager").projectDir.getPath() + "/src/main/java")
+    from(project(":TerraForgedCore").projectDir.getPath() + "/src/main/java")
+}
+
 jar {
+    dependsOn(sourceJar)
     from("$buildDir/classes/java/main")
     from(project(":Noise2D").buildDir.getPath() + "/classes/java/main")
     from(project(":FeatureManager").buildDir.getPath() + "/classes/java/main")
@@ -43,6 +52,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             artifact jar
+            artifact sourceJar
         }
     }
 
