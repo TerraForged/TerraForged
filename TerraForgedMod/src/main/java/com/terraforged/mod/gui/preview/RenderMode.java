@@ -65,9 +65,9 @@ public enum RenderMode {
                 float[] hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), new float[3]);
                 return Color.getHSBColor(hsb[0], hsb[1], (hsb[2] * scale) + bias);
             case MOISTURE:
-                return Color.getHSBColor(step(1 - cell.moisture, 8) * 0.65F, saturation, brightness);
+                return Color.getHSBColor(step(cell.moisture, 8) * 0.65F, saturation, brightness);
             case TEMPERATURE:
-                return Color.getHSBColor(step(cell.temperature, 8) * 0.65F, saturation, brightness);
+                return Color.getHSBColor(step(1 - cell.temperature, 8) * 0.65F, saturation, brightness);
             default:
                 return Color.black;
         }

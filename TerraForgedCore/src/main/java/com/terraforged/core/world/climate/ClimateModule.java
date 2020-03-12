@@ -53,9 +53,14 @@ public class ClimateModule {
 
     public ClimateModule(Seed seed, GeneratorSettings settings) {
         int biomeSize = settings.biome.biomeSize;
+
+        // todo - better solution (reduces the amount that temp/moist grows with biome size)
+        int tempScaler = biomeSize > 500 ? 8 : 10;
+        int moistScaler = biomeSize > 500 ? 20 : 40;
+
         float biomeFreq = 1F / biomeSize;
-        int moistureSize = 40 * biomeSize;
-        int temperatureSize = 10 * biomeSize;
+        int moistureSize = moistScaler * biomeSize;
+        int temperatureSize = tempScaler * tempScaler;
         int moistScale = NoiseUtil.round(moistureSize * biomeFreq);
         int tempScale = NoiseUtil.round(temperatureSize * biomeFreq);
         int warpScale = settings.biome.biomeWarpScale;
