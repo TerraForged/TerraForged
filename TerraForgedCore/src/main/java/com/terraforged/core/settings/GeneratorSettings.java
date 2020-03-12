@@ -72,7 +72,7 @@ public class GeneratorSettings {
     @Serializable
     public static class Land {
 
-        @Range(min = 500, max = 10000)
+        @Range(min = 100, max = 10000)
         @Comment("Controls the size of continents")
         public int continentScale = 4000;
 
@@ -80,7 +80,7 @@ public class GeneratorSettings {
         @Comment("Controls the size of mountain ranges")
         public int mountainScale = 950;
 
-        @Range(min = 125, max = 2500)
+        @Range(min = 125, max = 5000)
         @Comment("Controls the size of terrain regions")
         public int regionSize = 1000;
     }
@@ -88,15 +88,15 @@ public class GeneratorSettings {
     @Serializable
     public static class Biome {
 
-        @Range(min = 50, max = 500)
+        @Range(min = 50, max = 1000)
         @Comment("Controls the size of individual biomes")
         public int biomeSize = 200;
 
-        @Range(min = 1, max = 200)
+        @Range(min = 1, max = 500)
         @Comment("Controls the scale of shape distortion for biomes")
         public int biomeWarpScale = 35;
 
-        @Range(min = 1, max = 200)
+        @Range(min = 1, max = 500)
         @Comment("Controls the strength of shape distortion for biomes")
         public int biomeWarpStrength = 70;
     }
@@ -107,7 +107,7 @@ public class GeneratorSettings {
         @Comment("The noise type")
         public Source type = Source.PERLIN;
 
-        @Range(min = 1, max = 100)
+        @Range(min = 1, max = 500)
         @Comment("Controls the scale of the noise")
         public int scale = 8;
 
@@ -123,7 +123,7 @@ public class GeneratorSettings {
         @Comment("Controls the lacunarity of subsequent noise octaves")
         public float lacunarity = 2.5F;
 
-        @Range(min = 1, max = 100)
+        @Range(min = 1, max = 500)
         @Comment("Controls the strength of the noise")
         public int strength = 24;
 

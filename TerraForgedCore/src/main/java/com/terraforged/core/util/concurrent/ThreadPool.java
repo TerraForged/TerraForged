@@ -30,12 +30,13 @@ import com.terraforged.core.util.concurrent.batcher.Batcher;
 import com.terraforged.core.util.concurrent.batcher.SyncBatcher;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 
-public class ThreadPool {
+public class ThreadPool implements Executor {
 
     public static final int DEFAULT_POOL_SIZE = defaultPoolSize();
 
@@ -60,6 +61,11 @@ public class ThreadPool {
         if (poolSize > 0) {
             service.shutdown();
         }
+    }
+
+    @Override
+    public void execute(Runnable command) {
+        service.execute(command);
     }
 
     public <T> Future<?> submit(Runnable runnable) {
@@ -116,6 +122,6 @@ public class ThreadPool {
 
     private static int defaultPoolSize() {
         int threads = Runtime.getRuntime().availableProcessors();
-        return Math.max(1, (threads / 3) * 2);
+        return Math.max(2, (int) ((threads / 3F) * 2));
     }
 }

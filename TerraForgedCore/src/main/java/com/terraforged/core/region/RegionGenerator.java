@@ -75,11 +75,11 @@ public class RegionGenerator implements RegionExtent {
     }
 
     public CompletableFuture<Region> generate(int regionX, int regionZ) {
-        return CompletableFuture.supplyAsync(() -> generateRegion(regionX, regionZ));
+        return CompletableFuture.supplyAsync(() -> generateRegion(regionX, regionZ), threadPool);
     }
 
     public CompletableFuture<Region> generate(float centerX, float centerZ, float zoom, boolean filter) {
-        return CompletableFuture.supplyAsync(() -> generateRegion(centerX, centerZ, zoom, filter));
+        return CompletableFuture.supplyAsync(() -> generateRegion(centerX, centerZ, zoom, filter), threadPool);
     }
 
     public Region generateRegion(int regionX, int regionZ) {

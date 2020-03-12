@@ -25,28 +25,26 @@
 
 package com.terraforged.mod.material;
 
-import com.terraforged.api.material.MaterialTags;
+import com.terraforged.api.material.WGTags;
 import com.terraforged.api.material.layer.LayerManager;
-import com.terraforged.api.material.state.States;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.tags.Tag;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 
+@Deprecated
 public class Materials {
 
-    private final Set<Block> stone = create(MaterialTags.WG_ROCK);
-    private final Set<Block> dirt = create(MaterialTags.WG_EARTH);
-    private final Set<Block> clay = create(MaterialTags.WG_CLAY);
-    private final Set<Block> sediment = create(MaterialTags.WG_SEDIMENT);
-    private final Set<Block> ore = create(MaterialTags.WG_ORE);
-    private final Set<Block> erodible = create(MaterialTags.WG_ERODIBLE);
+    private final Set<Block> stone = create(WGTags.STONE);
+    private final Set<Block> dirt = create(WGTags.DIRT);
+    private final Set<Block> clay = create(WGTags.CLAY);
+    private final Set<Block> sediment = create(WGTags.SEDIMENT);
+    private final Set<Block> erodible = create(WGTags.ERODIBLE);
     private final LayerManager layerManager = new LayerManager();
 
     public Materials() {
@@ -68,8 +66,6 @@ public class Materials {
                 clay.add(block);
             } else if (MaterialHelper.isSediment(block)) {
                 sediment.add(block);
-            } else if (MaterialHelper.isOre(block)) {
-                ore.add(block);
             }
         }
 
@@ -98,47 +94,8 @@ public class Materials {
         return sediment.contains(block);
     }
 
-    public boolean isOre(Block block) {
-        return ore.contains(block);
-    }
-
     public boolean isErodible(Block block) {
         return erodible.contains(block);
-    }
-
-    public Collection<Block> getStone() {
-        if (stone.isEmpty()) {
-            return Collections.singleton(States.STONE.getBlock());
-        }
-        return Collections.unmodifiableSet(stone);
-    }
-
-    public Collection<Block> getDirt() {
-        if (dirt.isEmpty()) {
-            return Collections.singleton(States.DIRT.getBlock());
-        }
-        return Collections.unmodifiableSet(dirt);
-    }
-
-    public Collection<Block> getClay() {
-        if (clay.isEmpty()) {
-            return Collections.singleton(States.STONE.getBlock());
-        }
-        return Collections.unmodifiableSet(clay);
-    }
-
-    public Collection<Block> getSediment() {
-        if (sediment.isEmpty()) {
-            return Collections.singleton(States.CLAY.getBlock());
-        }
-        return Collections.unmodifiableSet(sediment);
-    }
-
-    public Collection<Block> getOre() {
-        if (ore.isEmpty()) {
-            return Collections.singleton(States.STONE.getBlock());
-        }
-        return Collections.unmodifiableSet(ore);
     }
 
     private static Set<Block> create(Tag<Block> tag) {
@@ -147,11 +104,10 @@ public class Materials {
 
     private static Predicate<Block> getTagFilter() {
         Set<String> namespaces = new HashSet<>();
-        collectNamespace(namespaces, MaterialTags.WG_ROCK.getAllElements());
-        collectNamespace(namespaces, MaterialTags.WG_EARTH.getAllElements());
-        collectNamespace(namespaces, MaterialTags.WG_EARTH.getAllElements());
-        collectNamespace(namespaces, MaterialTags.WG_SEDIMENT.getAllElements());
-        collectNamespace(namespaces, MaterialTags.WG_ORE.getAllElements());
+        collectNamespace(namespaces, WGTags.STONE.getAllElements());
+        collectNamespace(namespaces, WGTags.DIRT.getAllElements());
+        collectNamespace(namespaces, WGTags.DIRT.getAllElements());
+        collectNamespace(namespaces, WGTags.SEDIMENT.getAllElements());
         return b -> namespaces.contains(MaterialHelper.getNamespace(b));
     }
 

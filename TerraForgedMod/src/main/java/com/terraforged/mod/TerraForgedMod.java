@@ -25,7 +25,7 @@
 
 package com.terraforged.mod;
 
-import com.terraforged.api.material.MaterialTags;
+import com.terraforged.api.material.WGTags;
 import com.terraforged.core.util.concurrent.ThreadPool;
 import com.terraforged.feature.FeatureManager;
 import com.terraforged.mod.data.DataGen;
@@ -53,7 +53,7 @@ public class TerraForgedMod {
     public static void setup(FMLCommonSetupEvent event) {
         Log.info("Common setup");
         MinecraftForge.EVENT_BUS.addListener(TerraForgedMod::onShutdown);
-        MaterialTags.init();
+        WGTags.init();
         TerraWorld.init();
         SaplingManager.init();
     }

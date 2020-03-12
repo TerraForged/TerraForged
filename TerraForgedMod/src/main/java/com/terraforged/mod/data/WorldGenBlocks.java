@@ -27,7 +27,7 @@ package com.terraforged.mod.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.terraforged.mod.material.Materials;
+import com.terraforged.api.material.WGTags;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 
@@ -38,12 +38,10 @@ public class WorldGenBlocks extends DataGen {
 
     public static void genBlockTags(File dataDir) {
         if (dataDir.exists() || dataDir.mkdirs()) {
-            Materials materials = new Materials();
-            printMaterials(dataDir, "stone", materials.getStone());
-            printMaterials(dataDir, "dirt", materials.getDirt());
-            printMaterials(dataDir, "clay", materials.getClay());
-            printMaterials(dataDir, "sediment",materials.getSediment());
-            printMaterials(dataDir, "ore", materials.getOre());
+            printMaterials(dataDir, "stone", WGTags.STONE.getAllElements());
+            printMaterials(dataDir, "dirt", WGTags.DIRT.getAllElements());
+            printMaterials(dataDir, "clay", WGTags.CLAY.getAllElements());
+            printMaterials(dataDir, "sediment", WGTags.SEDIMENT.getAllElements());
         }
     }
 

@@ -30,20 +30,19 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 
-public class MaterialTags {
+public class WGTags {
 
-    public static final Tag<Block> WG_ROCK = tag("rock");
-    public static final Tag<Block> WG_EARTH = tag("earth");
-    public static final Tag<Block> WG_CLAY = tag("clay");
-    public static final Tag<Block> WG_SEDIMENT = tag("sediment");
-    public static final Tag<Block> WG_ORE = tag("ore");
-    public static final Tag<Block> WG_ERODIBLE = tag("erodible");
+    public static final Tag<Block> STONE = tag("wg_stone");
+    public static final Tag<Block> DIRT = tag("wg_dirt");
+    public static final Tag<Block> CLAY = tag("wg_clay");
+    public static final Tag<Block> SEDIMENT = tag("wg_sediment");
+    public static final Tag<Block> ERODIBLE = tag("wg_erodible");
 
     public static void init() {
 
     }
 
     private static Tag<Block> tag(String name) {
-        return new BlockTags.Wrapper(new ResourceLocation("terraforged", name));
+        return new BlockTags.Wrapper(new ResourceLocation("forge", name));
     }
 }

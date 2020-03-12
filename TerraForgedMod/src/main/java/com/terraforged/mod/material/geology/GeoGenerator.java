@@ -25,6 +25,7 @@
 
 package com.terraforged.mod.material.geology;
 
+import com.terraforged.api.material.WGTags;
 import com.terraforged.api.material.geology.StrataConfig;
 import com.terraforged.api.material.geology.StrataGenerator;
 import com.terraforged.core.world.geology.Strata;
@@ -49,10 +50,10 @@ public class GeoGenerator implements StrataGenerator {
 
     public GeoGenerator(Materials materials) {
         types.add(Source.PERLIN);
-        rock = new ArrayList<>(materials.getStone());
-        soil = new ArrayList<>(materials.getDirt());
-        clay = new ArrayList<>(materials.getClay());
-        sediment = new ArrayList<>(materials.getSediment());
+        rock = new ArrayList<>(WGTags.STONE.getAllElements());
+        soil = new ArrayList<>(WGTags.DIRT.getAllElements());
+        clay = new ArrayList<>(WGTags.CLAY.getAllElements());
+        sediment = new ArrayList<>(WGTags.SEDIMENT.getAllElements());
     }
 
     @Override
