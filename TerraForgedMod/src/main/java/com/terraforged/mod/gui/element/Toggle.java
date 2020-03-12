@@ -30,11 +30,14 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.common.util.Constants;
 
+import java.util.List;
+
 public class Toggle extends TerraButton {
 
     private final String prefix;
     private final CompoundNBT value;
     private final ListNBT options;
+    private final List<String> tooltip;
 
     private int index;
     private Runnable callback = () -> {};
@@ -43,6 +46,7 @@ public class Toggle extends TerraButton {
         super(value.getString("value"));
         this.value = value;
         this.prefix = prefix;
+        this.tooltip = Element.readTooltip(value);
         this.options = value.getList("#options", Constants.NBT.TAG_STRING);
         for (int i = 0; i < options.size(); i++) {
             String s = options.getString(i);
@@ -57,6 +61,11 @@ public class Toggle extends TerraButton {
     public Toggle callback(Runnable runnable) {
         this.callback = runnable;
         return this;
+    }
+
+    @Override
+    public List<String> getTooltip() {
+        return tooltip;
     }
 
     @Override
