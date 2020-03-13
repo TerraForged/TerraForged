@@ -26,6 +26,8 @@
 package com.terraforged.mod.feature.tree;
 
 import com.terraforged.mod.TerraWorld;
+import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TerraContext;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SaplingBlock;
@@ -34,8 +36,10 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
+import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.world.SaplingGrowTreeEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -54,7 +58,16 @@ public class SaplingListener {
 
     @SubscribeEvent
     public static void onTreeGrow(SaplingGrowTreeEvent event) {
+        // ignore if client
+        if (event.getWorld().isRemote()) {
+            return;
+        }
+        // ignore other world types
         if (!TerraWorld.isTerraWorld(event.getWorld())) {
+            return;
+        }
+        // has user disabled custom trees?
+        if (!areCustomTreesEnabled(event.getWorld())) {
             return;
         }
 
@@ -128,14 +141,15 @@ public class SaplingListener {
         return NONE;
     }
 
-    private static boolean isTerraWorld(IWorld world) {
-        if (world instanceof World) {
-            return isTerraWorld(((World) world).getWorldType());
+    private static boolean areCustomTreesEnabled(IWorld world) {
+        if (world instanceof ServerWorld) {
+            ServerWorld serverWorld = (ServerWorld) world;
+            ChunkGenerator<?> generator = serverWorld.getChunkProvider().generator;
+            if (generator instanceof TerraChunkGenerator) {
+                TerraContext context = ((TerraChunkGenerator) generator).getContext();
+                return context.terraSettings.features.customBiomeFeatures;
+            }
         }
         return false;
-    }
-
-    private static boolean isTerraWorld(WorldType type) {
-        return type.getName().equals("terraforged");
     }
 }
