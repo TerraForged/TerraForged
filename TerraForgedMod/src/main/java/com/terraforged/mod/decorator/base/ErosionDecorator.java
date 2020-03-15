@@ -111,7 +111,7 @@ public class ErosionDecorator implements ColumnDecorator {
         BlockState material = Blocks.GRAVEL.getDefaultState();
         // find the uppermost layer of rock & record it's depth
         for (int dy = 3; dy < 32; dy++) {
-            context.pos.setY(y - dy);
+            context.pos.setPos(dx, y - dy, dz);
             BlockState state = chunk.getBlockState(context.pos);
             if (materials.isStone(state.getBlock())) {
                 material = state;
@@ -122,7 +122,7 @@ public class ErosionDecorator implements ColumnDecorator {
 
         // fill downwards to the first rock layer
         for (int dy = 0; dy < depth; dy++) {
-            context.pos.setY(y - dy);
+            context.pos.setPos(dx, y - dy, dz);
             chunk.setBlockState(context.pos, material, false);
         }
     }

@@ -27,8 +27,8 @@ package com.terraforged.mod.chunk.test;
 
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.Terrains;
-import com.terraforged.mod.biome.ModBiomes;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
 
 public class Test {
 
@@ -39,6 +39,6 @@ public class Test {
     }
 
     public static Biome getBiome() {
-        return ModBiomes.TAIGA_SCRUB;
+        return Biomes.PLAINS;
     }
 }

@@ -55,7 +55,7 @@ public class TestChunkGenerator extends TerraChunkGenerator {
                 .pool(ThreadPool.getFixed())
                 .size(3, 2)
                 .build()
-                .toCache(true);
+                .toCache(false);
     }
 
     @Override

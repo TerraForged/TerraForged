@@ -75,7 +75,7 @@ public class SnowEroder extends ErosionDecorator {
             if (snowErosion(x, z, steepness, height)) {
                 Predicate<BlockState> predicate = Heightmap.Type.MOTION_BLOCKING.getHeightLimitPredicate();
                 for (int dy = 2; dy > 0; dy--) {
-                    context.pos.setY(y + dy);
+                    context.pos.setPos(x, y + dy, z);
                     BlockState state = chunk.getBlockState(context.pos);
                     if (!predicate.test(state) || state.getBlock() == Blocks.SNOW) {
                         chunk.setBlockState(context.pos, Blocks.AIR.getDefaultState(), false);
