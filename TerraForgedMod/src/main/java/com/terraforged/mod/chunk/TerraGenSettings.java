@@ -34,6 +34,7 @@ public class TerraGenSettings extends OverworldGenSettings {
         super.villageDistance *= settings.villageDistance;
         super.mansionDistance *= settings.mansionDistance;
         super.strongholdDistance *= settings.strongholdDistance;
+        super.strongholdSpread *= settings.strongholdSpread;
         super.biomeFeatureDistance *= settings.biomeStructureDistance;
         super.oceanMonumentSpacing *= settings.oceanMonumentSpacing;
         super.oceanMonumentSeparation *= settings.oceanMonumentSeparation;

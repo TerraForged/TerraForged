@@ -25,7 +25,11 @@ public class WorldLookup {
 
     public Cell<Terrain> getCell(int x, int z) {
         Cell<Terrain> cell = new Cell<>();
+        applyCell(cell, x, z);
+        return cell;
+    }
 
+    public void applyCell(Cell<Terrain> cell, int x, int z) {
         heightmap.apply(cell, x, z);
 
         // approximation - actual beaches depend on steepness but that's too expensive to calculate
@@ -38,7 +42,5 @@ public class WorldLookup {
                 break;
             }
         }
-
-        return cell;
     }
 }

@@ -76,38 +76,55 @@ public class BiomeProvider extends AbstractBiomeProvider {
     }
 
     @Override
-    public Set<Biome> getBiomesInSquare(int centerX, int centerY, int centerZ, int sideLength) {
-        int minX = centerX - (sideLength >> 2);
-        int minZ = centerZ - (sideLength >> 2);
-        int maxX = centerX + (sideLength >> 2);
-        int maxZ = centerZ + (sideLength >> 2);
-        Set<Biome> biomes = Sets.newHashSet();
-        context.heightmap.visit(minX, minZ, maxX, maxZ, (cell, x, z) -> {
-            Biome biome = getBiome(cell, minX + x, minZ + z);
-            biomes.add(biome);
-        });
-        return biomes;
+    public Set<Biome> getBiomesInSquare(int centerX, int centerY, int centerZ, int radius) {
+        int minX = centerX - radius >> 2;
+        int minZ = centerZ - radius >> 2;
+        int maxX = centerX + radius >> 2;
+        int maxZ = centerZ + radius >> 2;
+        int rangeX = maxX - minX + 1;
+        int rangeZ = maxZ - minZ + 1;
+        Set<Biome> set = Sets.newHashSet();
+        Cell<Terrain> cell = new Cell<>();
+        for(int dz = 0; dz < rangeZ; ++dz) {
+            for(int dx = 0; dx < rangeX; ++dx) {
+                int x = (minX + dx) << 2;
+                int z = (minZ + dz) << 2;
+                worldLookup.applyCell(cell, x, z);
+                Biome biome = getBiome(cell, x, z);
+                set.add(biome);
+            }
+        }
+
+        return set;
     }
 
     @Override
     public BlockPos findBiomePosition(int centerX, int centerY, int centerZ, int range, List<Biome> biomes, Random random) {
-        int minX = centerX - (range >> 2);
-        int minZ = centerZ - (range >> 2);
-        int maxX = centerX + (range >> 2);
-        int maxZ = centerZ + (range >> 2);
-        Set<Biome> matchBiomes = new HashSet<>(biomes);
-        SearchContext search = new SearchContext();
-        context.heightmap.visit(minX, minZ, maxX, maxZ, (cell, x, z) -> {
-            Biome biome = getBiome(cell, minX + x, minZ + z);
-            if (matchBiomes.contains(biome)) {
-                if (search.first || random.nextInt(search.count + 1) == 0) {
-                    search.first = false;
-                    search.pos.setPos(minX + x, 0, minZ + z);
+        int minX = centerX - range >> 2;
+        int minZ = centerZ - range >> 2;
+        int maxX = centerX + range >> 2;
+        int maxZ = centerZ + range >> 2;
+        int rangeX = maxX - minX + 1;
+        int rangeZ = maxZ - minZ + 1;
+        int y = centerY >> 2;
+        BlockPos blockpos = null;
+        int attempts = 0;
+
+        Cell<Terrain> cell = new Cell<>();
+        for(int dz = 0; dz < rangeZ; ++dz) {
+            for(int dx = 0; dx < rangeX; ++dx) {
+                int x = (minX + dx) << 2;
+                int z = (minZ + dz) << 2;
+                worldLookup.applyCell(cell, x, z);
+                if (biomes.contains(getBiome(cell, x, z))) {
+                    if (blockpos == null || random.nextInt(attempts + 1) == 0) {
+                        blockpos = new BlockPos(x, y, z);
+                    }
+                    ++attempts;
                 }
-                ++search.count;
             }
-        });
-        return search.pos;
+        }
+        return blockpos;
     }
 
     @Override

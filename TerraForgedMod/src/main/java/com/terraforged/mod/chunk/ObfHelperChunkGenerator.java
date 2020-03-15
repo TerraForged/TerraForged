@@ -25,6 +25,7 @@
 
 package com.terraforged.mod.chunk;
 
+import com.terraforged.mod.chunk.fix.SpawnFix;
 import com.terraforged.mod.util.annotation.Name;
 import com.terraforged.mod.util.annotation.Ref;
 import net.minecraft.entity.EntityClassification;
@@ -107,20 +108,24 @@ public abstract class ObfHelperChunkGenerator<T extends GenerationSettings> exte
     }
 
     @Override
-    public final void spawnMobs(ServerWorld worldIn, boolean spawnHostileMobs, boolean spawnPeacefulMobs) {
-        phantomSpawner.tick(worldIn, spawnHostileMobs, spawnPeacefulMobs);
-        patrolSpawner.tick(worldIn, spawnHostileMobs, spawnPeacefulMobs);
-        catSpawner.tick(worldIn, spawnHostileMobs, spawnPeacefulMobs);
+    public final void spawnMobs(WorldGenRegion region) {
+        // vanilla does NOT check the mobSpawning gamerule before calling this
+        if (SpawnFix.canSpawnMobs()) {
+            int chunkX = region.getMainChunkX();
+            int chunkZ = region.getMainChunkZ();
+            Biome biome = region.getChunk(chunkX, chunkZ).getBiomes().getNoiseBiome(0, 0, 0);
+            SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
+            sharedseedrandom.setDecorationSeed(region.getSeed(), chunkX << 4, chunkZ << 4);
+            WorldEntitySpawner.performWorldGenSpawning(region, biome, chunkX, chunkZ, sharedseedrandom);
+        }
     }
 
     @Override
-    public final void spawnMobs(WorldGenRegion region) {
-        int chunkX = region.getMainChunkX();
-        int chunkZ = region.getMainChunkZ();
-        Biome biome = region.getChunk(chunkX, chunkZ).getBiomes().getNoiseBiome(0, 0, 0);
-        SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
-        sharedseedrandom.setDecorationSeed(region.getSeed(), chunkX << 4, chunkZ << 4);
-        WorldEntitySpawner.performWorldGenSpawning(region, biome, chunkX, chunkZ, sharedseedrandom);
+    public final void spawnMobs(ServerWorld worldIn, boolean spawnHostileMobs, boolean spawnPeacefulMobs) {
+        // vanilla does check the mobSpawning gamerule before calling this
+        phantomSpawner.tick(worldIn, spawnHostileMobs, spawnPeacefulMobs);
+        patrolSpawner.tick(worldIn, spawnHostileMobs, spawnPeacefulMobs);
+        catSpawner.tick(worldIn, spawnHostileMobs, spawnPeacefulMobs);
     }
 
     @Override
