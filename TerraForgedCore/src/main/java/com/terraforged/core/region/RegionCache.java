@@ -43,7 +43,6 @@ public class RegionCache implements RegionExtent {
     public RegionCache(boolean queueNeighbours, RegionGenerator renderer) {
         this.renderer = renderer;
         this.queuing = queueNeighbours;
-
         this.cache = Cache.concurrent(180, 60, TimeUnit.SECONDS);
     }
 

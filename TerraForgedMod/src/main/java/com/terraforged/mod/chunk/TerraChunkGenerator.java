@@ -373,7 +373,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
                 .factory(context.factory)
                 .size(3, 2)
                 .build()
-                .toCache();
+                .toCache(false);
     }
 
     public ChunkReader getChunkReader(int chunkX, int chunkZ) {
