@@ -32,6 +32,7 @@ import com.terraforged.mod.data.DataGen;
 import com.terraforged.mod.feature.tree.SaplingManager;
 import com.terraforged.mod.settings.SettingsHelper;
 import com.terraforged.mod.util.Environment;
+import net.minecraft.server.dedicated.ServerProperties;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -78,5 +79,25 @@ public class TerraForgedMod {
 
     private static void onShutdown(FMLServerStoppingEvent event) {
         ThreadPool.shutdownCurrent();
+    }
+
+
+    @SubscribeEvent
+    public void dedicatedServerSetup(FMLDedicatedServerSetupEvent event)
+    {
+        ServerProperties serverProperties = event.getServerSupplier().get().getServerProperties();
+
+        if(serverProperties != null)
+        {
+            //get entry if it exists or null if it doesn't
+            String entryValue = serverProperties.serverProperties.getProperty("use-modded-worldtype");
+
+            if(entryValue != null && entryValue.equals("terraforged"))
+            {
+                //make server use our worldtype
+                serverProperties.worldType = TerraWorld.TERRA;
+            }
+        }
+        //In server.properties use this line: `use-modded-worldtype=terraforged`
     }
 }
