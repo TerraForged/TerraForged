@@ -66,7 +66,9 @@ public class TerraForgedMod {
         }
     }
 
+    //
     @SubscribeEvent
+    //FoundSpore: Possibly useless event with the other method `serverSetup` replacing this.
     public static void server(FMLDedicatedServerSetupEvent event) {
         Log.info("Setting dedicated server");
         SettingsHelper.setDedicatedServer();
@@ -80,13 +82,10 @@ public class TerraForgedMod {
     private static void onShutdown(FMLServerStoppingEvent event) {
         ThreadPool.shutdownCurrent();
     }
-
-
     @SubscribeEvent
-    public void dedicatedServerSetup(FMLDedicatedServerSetupEvent event)
+    public static void serverSetup(FMLDedicatedServerSetupEvent event)
     {
         ServerProperties serverProperties = event.getServerSupplier().get().getServerProperties();
-
         if(serverProperties != null)
         {
             //get entry if it exists or null if it doesn't
@@ -96,6 +95,7 @@ public class TerraForgedMod {
             {
                 //make server use our worldtype
                 serverProperties.worldType = TerraWorld.TERRA;
+                Log.info("TerraForged world type set for server!");
             }
         }
         //In server.properties use this line: `use-modded-worldtype=terraforged`
