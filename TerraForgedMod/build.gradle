@@ -42,7 +42,7 @@ minecraft {
             workingDirectory project.file("run/client")
             property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
             property "forge.logging.console.level", "debug"
-            jvmArgs "-Xmx8G", "-Xms6G", "-Ddev"
+            jvmArgs "-Xmx8G", "-Xms6G", "-Ddev", "-DvanillaBiomes"
             mods {
                 terraforged {
                     source sourceSets.main

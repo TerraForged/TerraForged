@@ -33,7 +33,7 @@ public class CheckBox extends TerraButton implements Element {
         super(displayString);
         this.visible = true;
         this.width = 70;
-        this.height = 16;
+        this.height = 20;
         checked = isChecked;
     }
 

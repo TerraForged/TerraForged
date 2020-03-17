@@ -65,6 +65,7 @@ import com.terraforged.mod.feature.TerrainHelper;
 import com.terraforged.mod.feature.predicate.TreeLine;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.material.geology.GeoManager;
+import com.terraforged.mod.util.Environment;
 import com.terraforged.mod.util.setup.SetupHooks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -208,7 +209,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
         postProcess(container.getChunkReader(), container, context);
 
         // bake biome array & discard gen data
-        ((ChunkPrimer) chunk).func_225548_a_(container.bakeBiomes(false));
+        ((ChunkPrimer) chunk).func_225548_a_(container.bakeBiomes(Environment.isVanillaBiomes()));
     }
 
     @Override

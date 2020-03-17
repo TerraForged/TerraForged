@@ -25,13 +25,13 @@
 
 package com.terraforged.mod.gui.element;
 
-import net.minecraftforge.fml.client.gui.widget.ExtendedButton;
+import net.minecraft.client.gui.widget.button.Button;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class TerraButton extends ExtendedButton implements Element {
+public class TerraButton extends Button implements Element {
 
     private final List<String> tooltip;
 

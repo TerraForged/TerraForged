@@ -195,7 +195,7 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
             this.bottom = height - hpad;
             this.width = width;
             this.height = height;
-            this.scrollPane = new ScrollPane(22);
+            this.scrollPane = new ScrollPane(25);
             this.scrollPane.updateSize(width, height, 30, height - 30);
             this.scrollPane.setLeftPos(this.left);
         }

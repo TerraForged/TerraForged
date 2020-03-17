@@ -113,7 +113,7 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
             option.y = top;
             option.visible = true;
             option.setWidth(optionWidth);
-            option.setHeight(height);
+            option.setHeight(height - 1);
             if (option instanceof Preview) {
                 option.setHeight(option.getWidth());
             }

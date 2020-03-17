@@ -78,8 +78,8 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
 
             @Override
             public void render(int mouseX, int mouseY, float partial) {
-                this.x = OverlayScreen.this.width - width - 12;
-                this.y = 8;
+                this.x = OverlayScreen.this.width - width - 13;
+                this.y = 6;
                 super.render(mouseX, mouseY, partial);
             }
         });
