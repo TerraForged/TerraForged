@@ -31,6 +31,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeEffects;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
@@ -40,7 +41,7 @@ public class ColdSteppe extends BiomeVariant {
     public ColdSteppe() {
         super((new Settings()).configureSurfaceBuilder(SurfaceBuilder.GIANT_TREE_TAIGA, SurfaceBuilder.GRASS_CONFIG)
                 .precipitation(Precipitation.SNOW).category(Biome.Category.TAIGA).depth(0.2F).scale(0.25F).temperature(0.2F).downfall(0.1F)
-                .waterColor(4159204).waterFogColor(329011).parent(null));
+                .effects(new BiomeEffects.Builder().waterColor(4159204).waterFogColor(329011).fogColor(12638463).build()).parent(null));
         DefaultBiomeFeatures.addLandCarvers(this);
         DefaultBiomeFeatures.addDefaultStructures(this);
         //        DefaultBiomeFeatures.addLakes(this);

@@ -334,12 +334,7 @@ public class RegionDelegate extends ChunkRegion {
     public PlayerEntity getClosestPlayer(double x, double y, double z, double distance, boolean creativePlayers) {
         return region.getClosestPlayer(x, y, z, distance, creativePlayers);
     }
-
-    @Override
-    public PlayerEntity getClosestPlayer(double x, double y, double z) {
-        return region.getClosestPlayer(x, y, z);
-    }
-
+    
     @Override
     public boolean isPlayerInRange(double x, double y, double z, double distance) {
         return region.isPlayerInRange(x, y, z, distance);

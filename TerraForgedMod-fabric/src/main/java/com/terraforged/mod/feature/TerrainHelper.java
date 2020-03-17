@@ -76,7 +76,7 @@ public class TerrainHelper {
                 StructureStart structurestart = neighbourChunk.getStructureStart(name);
                 if (structurestart != null && structurestart.isInExistingChunk()) {
                     for (StructurePiece structurepiece : structurestart.getChildren()) {
-                        if (structurepiece.method_16654(pos, 12) && structurepiece instanceof PoolStructurePiece) {
+                        if (structurepiece.intersectsChunk(pos, 12) && structurepiece instanceof PoolStructurePiece) {
                             PoolStructurePiece piece = (PoolStructurePiece) structurepiece;
                             StructurePool.Projection placement = piece.getPoolElement().getProjection();
                             if (placement == StructurePool.Projection.RIGID) {

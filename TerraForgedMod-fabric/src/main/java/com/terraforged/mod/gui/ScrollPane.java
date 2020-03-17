@@ -71,7 +71,7 @@ public class ScrollPane extends ElementListWidget<ScrollPane.Entry> implements O
     }
 
     @Override
-    protected int getScrollbarPosition() {
+    protected int getScrollbarPositionX() {
         return getMaxPosition(); // todo old getRight
     }
 

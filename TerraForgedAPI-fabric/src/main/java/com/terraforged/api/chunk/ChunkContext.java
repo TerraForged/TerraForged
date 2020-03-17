@@ -43,6 +43,6 @@ public class ChunkContext {
         this.chunkZ = chunk.getPos().z;
         this.blockX = chunkX << 4;
         this.blockZ = chunkZ << 4;
-        this.random.setSeed(chunkX, chunkZ);
+        this.random.setTerrainSeed(chunkX, chunkZ);
     }
 }

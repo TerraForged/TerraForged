@@ -31,6 +31,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeEffects;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
@@ -39,7 +40,8 @@ public class Steppe extends BiomeVariant {
 
     protected Steppe() {
         super((new Settings()).configureSurfaceBuilder(SurfaceBuilder.GIANT_TREE_TAIGA, SurfaceBuilder.GRASS_CONFIG).precipitation(Precipitation.SNOW)
-                .category(Category.SAVANNA).depth(0.2F).scale(0.2F).temperature(0.7F).downfall(0.1F).waterColor(4159204).waterFogColor(329011)
+                .category(Category.SAVANNA).depth(0.2F).scale(0.2F).temperature(0.7F).downfall(0.1F)
+                .effects(new BiomeEffects.Builder().fogColor(12638463).waterColor(4159204).waterFogColor(329011).build())
                 .parent(null));
         DefaultBiomeFeatures.addLandCarvers(this);
         DefaultBiomeFeatures.addDefaultStructures(this);

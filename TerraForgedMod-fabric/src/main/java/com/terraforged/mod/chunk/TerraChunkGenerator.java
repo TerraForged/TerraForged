@@ -124,7 +124,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<ChunkGeneratorC
         ChunkPos pos = chunk.getPos();
         ChunkReader reader = getChunkReader(pos.x, pos.z);
         TerraBiomeArray container = getBiomeSource().createBiomeContainer(reader);
-        ((ProtoChunk) chunk).method_22405(container);
+        ((ProtoChunk) chunk).setBiomes(container);
         // apply chunk-local heightmap modifications
         preProcess(pos, reader, container);
     }
@@ -205,7 +205,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<ChunkGeneratorC
         postProcess(container.getChunkReader(), container, context);
 
         // bake biome array & discard gen data
-        ((ProtoChunk) chunk).method_22405(container.bakeBiomes());
+        ((ProtoChunk) chunk).setBiomes(container.bakeBiomes());
     }
 
     @Override
@@ -292,7 +292,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<ChunkGeneratorC
         ChunkReader view = getChunkReader(chunk.getPos().x, chunk.getPos().z);
         TerraBiomeArray container = getBiomeSource().createBiomeContainer(view);
         if (chunk instanceof ProtoChunk) {
-            ((ProtoChunk) chunk).method_22405(container);
+            ((ProtoChunk) chunk).setBiomes(container);
         }
 
         return container;

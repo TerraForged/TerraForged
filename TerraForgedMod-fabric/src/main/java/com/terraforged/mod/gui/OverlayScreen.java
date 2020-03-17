@@ -38,8 +38,8 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
 
     public OverlayScreen() {
         super(new TranslatableText(""));
-        super.minecraft = MinecraftClient.getInstance();
-        super.font = minecraft.textRenderer;
+        super.client = MinecraftClient.getInstance();
+        super.textRenderer = client.textRenderer;
     }
 
     @Override

@@ -104,7 +104,7 @@ public class TerraCommand {
                 "This command can only be run in a TerraForged world!"
         ));
 
-        BlockPos pos = context.getSource().getPlayer().getBlockPos();
+        BlockPos pos = context.getSource().getPlayer().getSenseCenterPos();
         BiomeProvider biomeProvider = getBiomeProvider(context);
         Cell<Terrain> cell = biomeProvider.lookupPos(pos.getX(), pos.getZ());
         Biome biome = biomeProvider.getBiome(cell, pos.getX(), pos.getZ());
@@ -127,7 +127,7 @@ public class TerraCommand {
 
     private static int debugBiome(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayer();
-        BlockPos position = player.getBlockPos();
+        BlockPos position = player.getSenseCenterPos();
         int x = position.getX();
         int y = position.getY();
         int z = position.getZ();
@@ -155,7 +155,7 @@ public class TerraCommand {
 
         Terrain terrain = TerrainArgType.getTerrain(context, "terrain");
         Terrain target = getTerrainInstance(terrain, terraContext.terrain);
-        BlockPos pos = context.getSource().getPlayer().getBlockPos();
+        BlockPos pos = context.getSource().getPlayer().getSenseCenterPos();
         UUID playerID = context.getSource().getPlayer().getUuid();
         MinecraftServer server = context.getSource().getMinecraftServer();
         WorldGenerator worldGenerator = terraContext.factory.get();
@@ -174,7 +174,7 @@ public class TerraCommand {
         ));
 
         Biome biome = BiomeArgType.getBiome(context, "biome");
-        BlockPos pos = context.getSource().getPlayer().getBlockPos();
+        BlockPos pos = context.getSource().getPlayer().getSenseCenterPos();
         UUID playerID = context.getSource().getPlayer().getUuid();
         MinecraftServer server = context.getSource().getMinecraftServer();
         ServerWorld reader = context.getSource().getPlayer().getServerWorld();
@@ -195,7 +195,7 @@ public class TerraCommand {
         Terrain terrain = TerrainArgType.getTerrain(context, "terrain");
         Terrain target = getTerrainInstance(terrain, terraContext.terrain);
         Biome biome = BiomeArgType.getBiome(context, "biome");
-        BlockPos pos = context.getSource().getPlayer().getBlockPos();
+        BlockPos pos = context.getSource().getPlayer().getSenseCenterPos();
         ServerWorld world = context.getSource().getPlayer().getServerWorld();
         UUID playerID = context.getSource().getPlayer().getUuid();
         MinecraftServer server = context.getSource().getMinecraftServer();

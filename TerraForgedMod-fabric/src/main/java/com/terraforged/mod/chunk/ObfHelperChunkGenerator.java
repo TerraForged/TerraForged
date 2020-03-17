@@ -47,6 +47,7 @@ import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.Feature;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 public abstract class ObfHelperChunkGenerator<T extends ChunkGeneratorConfig> extends ChunkGenerator<T> {
 
@@ -59,7 +60,7 @@ public abstract class ObfHelperChunkGenerator<T extends ChunkGeneratorConfig> ex
     public ObfHelperChunkGenerator(IWorld world, BiomeSource biomeSource, T settings) {
         super(world, biomeSource, settings);
         ChunkRandom random = new ChunkRandom(world.getSeed());
-        this.surfaceNoise = new OctavePerlinNoiseSampler(random, 3, 0);
+        this.surfaceNoise = new OctavePerlinNoiseSampler(random, IntStream.rangeClosed(-3, 0));
     }
 
     @Override
@@ -98,7 +99,7 @@ public abstract class ObfHelperChunkGenerator<T extends ChunkGeneratorConfig> ex
         int chunkZ = region.getCenterChunkZ();
         Biome biome = region.getChunk(chunkX, chunkZ).getBiomeArray().getBiomeForNoiseGen(0, 0, 0);
         ChunkRandom random = new ChunkRandom();
-        random.setSeed(region.getSeed(), chunkX << 4, chunkZ << 4);
+        random.setPopulationSeed(region.getSeed(), chunkX << 4, chunkZ << 4);
         SpawnHelper.populateEntities(region, biome, chunkX, chunkZ, random);
     }
 

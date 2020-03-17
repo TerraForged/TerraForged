@@ -29,6 +29,7 @@ import com.terraforged.api.biome.BiomeVariant;
 import net.minecraft.entity.EntityCategory;
 import net.minecraft.entity.EntityType;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeEffects;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
@@ -37,7 +38,8 @@ public class SnowyTaigaScrub extends BiomeVariant {
 
     public SnowyTaigaScrub() {
         super(new Settings().configureSurfaceBuilder(SurfaceBuilder.DEFAULT, SurfaceBuilder.GRASS_CONFIG).precipitation(Precipitation.SNOW)
-                .category(Category.TAIGA).depth(0.2F).scale(0.2F).temperature(-0.5F).downfall(0.4F).waterColor(4020182).waterFogColor(329011)
+                .category(Category.TAIGA).depth(0.2F).scale(0.2F).temperature(-0.5F).downfall(0.4F)
+                .effects(new BiomeEffects.Builder().fogColor(12638463).waterColor(4020182).waterFogColor(329011).build())
                 .parent(null));
         DefaultBiomeFeatures.addLandCarvers(this);
         DefaultBiomeFeatures.addDefaultStructures(this);

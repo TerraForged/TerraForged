@@ -12,7 +12,7 @@ apply plugin: "fabric-loom"
 apply plugin: "maven-publish"
 apply plugin: "eclipse"
 
-version = "${mc_version}-${mod_version}${getClassifier()}"
+version = "${fabric_mc_version}-${mod_version}${getClassifier()}"
 archivesBaseName = "TerraForged"
 
 repositories {
@@ -21,8 +21,8 @@ repositories {
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${mc_version}"
-    mappings "net.fabricmc:yarn:${mc_version}+build.${yarn_build}:v2"
+    minecraft "com.mojang:minecraft:${fabric_mc_version}"
+    mappings "net.fabricmc:yarn:${fabric_mc_version}+build.${yarn_build}:v2"
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
     compile project(":Noise2D")

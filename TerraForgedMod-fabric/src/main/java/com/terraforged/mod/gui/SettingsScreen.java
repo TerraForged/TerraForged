@@ -27,6 +27,7 @@ package com.terraforged.mod.gui;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.mojang.datafixers.Dynamic;
 import com.terraforged.core.settings.Settings;
 import com.terraforged.mod.gui.element.TerraLabel;
 import com.terraforged.mod.gui.page.FeaturePage;
@@ -44,8 +45,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.datafixer.NbtOps;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Util;
+import net.minecraft.world.level.LevelGeneratorOptions;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -66,7 +69,8 @@ public class SettingsScreen extends OverlayScreen {
     private int pageIndex = 0;
 
     public SettingsScreen(CreateWorldScreen parent) {
-        NBTHelper.deserialize(parent.generatorOptionsTag, settings);
+        // todo enhance this!
+        NBTHelper.deserialize((CompoundTag) parent.generatorOptions.getDynamic().convert(NbtOps.INSTANCE).getValue(), settings);
         this.parent = parent;
         this.pages = new Page[]{
                 new GeneratorPage(settings, preview),
@@ -114,7 +118,8 @@ public class SettingsScreen extends OverlayScreen {
             for (Page page : pages) {
                 page.save();
             }
-            parent.generatorOptionsTag = NBTHelper.serializeCompact(settings);
+            LevelGeneratorOptions oldOptions = parent.generatorOptions;
+            parent.generatorOptions = new LevelGeneratorOptions(oldOptions.getType(), new Dynamic<>(NbtOps.INSTANCE, NBTHelper.serializeCompact(settings)), oldOptions::createChunkGenerator);
             onClose();
         }));
 

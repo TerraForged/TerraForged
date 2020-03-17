@@ -29,6 +29,7 @@ import com.terraforged.api.biome.BiomeVariant;
 import net.minecraft.entity.EntityCategory;
 import net.minecraft.entity.EntityType;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeEffects;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.gen.feature.BuriedTreasureFeatureConfig;
@@ -41,7 +42,8 @@ public class WarmBeach extends BiomeVariant {
 
     public WarmBeach() {
         super((new Settings()).configureSurfaceBuilder(SurfaceBuilder.DEFAULT, SurfaceBuilder.SAND_CONFIG).precipitation(Precipitation.RAIN)
-                .category(Category.BEACH).depth(-0.5F).scale(0.1F).temperature(1.5F).downfall(0.5F).waterColor(4445678).waterFogColor(270131)
+                .category(Category.BEACH).depth(-0.5F).scale(0.1F).temperature(1.5F).downfall(0.5F)
+                .effects(new BiomeEffects.Builder().fogColor(12638463).waterColor(4445678).waterFogColor(270131).build())
                 .parent(null));
         this.addStructureFeature(Feature.MINESHAFT.configure(new MineshaftFeatureConfig(0.004D, MineshaftFeature.Type.NORMAL)));
         this.addStructureFeature(Feature.BURIED_TREASURE.configure(new BuriedTreasureFeatureConfig(0.01F)));

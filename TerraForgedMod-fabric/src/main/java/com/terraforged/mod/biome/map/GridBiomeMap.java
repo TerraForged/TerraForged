@@ -53,7 +53,7 @@ public class GridBiomeMap extends AbstractBiomeMap {
     public Biome getBiome(BiomeType type, float temperature, float moisture, float shape) {
         BiomeGroup group = biomeTypes[type.ordinal()];
         if (group == null) {
-            return Biomes.NETHER;
+            return Biomes.NETHER_WASTES;
         }
         return group.biomes.get(moisture, temperature, shape);
     }

@@ -33,6 +33,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeEffects;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.chunk.Chunk;
@@ -46,8 +47,9 @@ public class SavannaScrub extends BiomeVariant {
 
     public SavannaScrub() {
         super((new Settings()).configureSurfaceBuilder(new Builder(), SurfaceBuilder.GRASS_CONFIG).precipitation(Precipitation.NONE)
-                .category(Biome.Category.SAVANNA).depth(0.125F).scale(0.05F).temperature(1.2F).downfall(0.0F).waterColor(4159204)
-                .waterFogColor(329011).parent(null));
+                .category(Biome.Category.SAVANNA).depth(0.125F).scale(0.05F).temperature(1.2F).downfall(0.0F)
+                .effects(new BiomeEffects.Builder().fogColor(12638463).waterColor(4159204).waterFogColor(329011).build())
+                .parent(null));
         DefaultBiomeFeatures.addLandCarvers(this);
         DefaultBiomeFeatures.addDefaultStructures(this);
         //        DefaultBiomeFeatures.addLakes(this);

@@ -29,6 +29,7 @@ import com.terraforged.api.biome.BiomeVariant;
 import net.minecraft.entity.EntityCategory;
 import net.minecraft.entity.EntityType;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeEffects;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.gen.GenerationStep;
@@ -42,7 +43,7 @@ public class Marshland extends BiomeVariant {
 
     public Marshland() {
         super((new Settings()).configureSurfaceBuilder(SurfaceBuilder.SWAMP, SurfaceBuilder.GRASS_CONFIG).precipitation(Precipitation.RAIN)
-                .category(Category.SWAMP).depth(0.2F).scale(0.2F).temperature(0.8F).downfall(0.4F).waterColor(6388580).waterFogColor(2302743)
+                .category(Category.SWAMP).depth(0.2F).scale(0.2F).temperature(0.8F).downfall(0.4F).effects(new BiomeEffects.Builder().waterColor(6388580).waterFogColor(2302743).fogColor(12638463).build())
                 .parent(null));
         DefaultBiomeFeatures.addLandCarvers(this);
         DefaultBiomeFeatures.addDefaultStructures(this);
