@@ -38,25 +38,25 @@ public class StructureSettings {
 
     @Range(min = 1, max = 10)
     @Comment("Controls the distance between mansions")
-    public int mansionDistance = 2;
+    public int mansionDistance = 3;
 
     @Range(min = 1, max = 10)
     @Comment("Controls the distance between strongholds")
-    public int strongholdDistance = 2;
+    public int strongholdDistance = 3;
 
     @Range(min = 1, max = 10)
     @Comment("Controls the distance between strongholds")
-    public int strongholdSpread = 2;
+    public int strongholdSpread = 3;
 
     @Range(min = 1, max = 10)
     @Comment("Controls the distance between biome structures")
-    public int biomeStructureDistance = 2;
+    public int biomeStructureDistance = 4;
 
     @Range(min = 1, max = 10)
     @Comment("Controls the distance between ocean monuments")
-    public int oceanMonumentSpacing = 2;
+    public int oceanMonumentSpacing = 3;
 
     @Range(min = 1, max = 10)
     @Comment("Controls the separation between ocean monuments")
-    public int oceanMonumentSeparation = 2;
+    public int oceanMonumentSeparation = 3;
 }

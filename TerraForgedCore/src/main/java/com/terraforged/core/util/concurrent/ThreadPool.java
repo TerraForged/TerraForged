@@ -1,5 +1,5 @@
 /*
- *   
+ *
  * MIT License
  *
  * Copyright (c) 2020 TerraForged
@@ -27,14 +27,15 @@ package com.terraforged.core.util.concurrent;
 
 import com.terraforged.core.util.concurrent.batcher.AsyncBatcher;
 import com.terraforged.core.util.concurrent.batcher.Batcher;
-import com.terraforged.core.util.concurrent.batcher.SyncBatcher;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class ThreadPool implements Executor {
 
@@ -42,7 +43,7 @@ public class ThreadPool implements Executor {
 
     private static final Object lock = new Object();
 
-    private static ThreadPool instance = new ThreadPool();
+    private static ThreadPool instance = new ThreadPool(defaultPoolSize());
 
     private final int poolSize;
     private final ExecutorService service;
@@ -53,8 +54,8 @@ public class ThreadPool implements Executor {
     }
 
     public ThreadPool(int size) {
-        this.service = Executors.newFixedThreadPool(size);
         this.poolSize = size;
+        this.service = ThreadPool.createService(size);
     }
 
     public void shutdown() {
@@ -77,9 +78,6 @@ public class ThreadPool implements Executor {
     }
 
     public Batcher batcher(int size) {
-        if (this.poolSize != -1 && this.poolSize < 3) {
-            return new SyncBatcher();
-        }
         return new AsyncBatcher(service, size);
     }
 
@@ -122,6 +120,19 @@ public class ThreadPool implements Executor {
 
     private static int defaultPoolSize() {
         int threads = Runtime.getRuntime().availableProcessors();
-        return Math.max(2, (int) ((threads / 3F) * 2));
+        return Math.max(2, (int) (threads / 3F) * 2);
+    }
+
+    private static ExecutorService createService(int size) {
+        ThreadPoolExecutor service = new ThreadPoolExecutor(
+                size,
+                size,
+                30,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(),
+                new ThreadPoolFactory()
+        );
+        service.allowCoreThreadTimeOut(true);
+        return service;
     }
 }

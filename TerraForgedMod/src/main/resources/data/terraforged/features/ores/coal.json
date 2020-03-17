@@ -11,7 +11,7 @@
       "feature": {
         "name": "minecraft:ore",
         "config": {
-          "size": 20,
+          "size": 16,
           "target": "natural_stone",
           "state": {
             "Name": "minecraft:coal_ore"
@@ -21,10 +21,10 @@
       "decorator": {
         "name": "minecraft:count_range",
         "config": {
-          "count": 24,
+          "count": 18,
           "bottom_offset": 0,
           "top_offset": 0,
-          "maximum": 154
+          "maximum": 140
         }
       }
     }

@@ -11,7 +11,7 @@
       "feature": {
         "name": "minecraft:ore",
         "config": {
-          "size": 10,
+          "size": 8,
           "target": "natural_stone",
           "state": {
             "Name": "minecraft:redstone_ore",
@@ -24,10 +24,10 @@
       "decorator": {
         "name": "minecraft:count_range",
         "config": {
-          "count": 10,
+          "count": 8,
           "bottom_offset": 0,
           "top_offset": 0,
-          "maximum": 19
+          "maximum": 18
         }
       }
     }

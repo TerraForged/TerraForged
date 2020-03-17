@@ -11,7 +11,7 @@
       "feature": {
         "name": "minecraft:ore",
         "config": {
-          "size": 8,
+          "size": 7,
           "target": "natural_stone",
           "state": {
             "Name": "minecraft:lapis_ore"
@@ -22,8 +22,8 @@
         "name": "minecraft:count_depth_average",
         "config": {
           "count": 1,
-          "baseline": 19,
-          "spread": 19
+          "baseline": 18,
+          "spread": 18
         }
       }
     }

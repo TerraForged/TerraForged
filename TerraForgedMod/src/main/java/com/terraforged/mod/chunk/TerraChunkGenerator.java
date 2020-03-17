@@ -43,9 +43,9 @@ import com.terraforged.feature.matcher.dynamic.DynamicMatcher;
 import com.terraforged.feature.matcher.feature.FeatureMatcher;
 import com.terraforged.feature.modifier.FeatureModifierLoader;
 import com.terraforged.feature.modifier.FeatureModifiers;
-import com.terraforged.feature.predicate.BiomePredicate;
 import com.terraforged.feature.predicate.DeepWater;
 import com.terraforged.feature.predicate.FeaturePredicate;
+import com.terraforged.feature.predicate.MinDepth;
 import com.terraforged.feature.predicate.MinHeight;
 import com.terraforged.feature.template.type.FeatureTypes;
 import com.terraforged.mod.Log;
@@ -312,7 +312,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
         modifiers.getPredicates().add(FeatureMatcher.of(Feature.SPRING_FEATURE), FeaturePredicate.DENY);
 
         // limit to deep oceans
-        modifiers.getPredicates().add(FeatureMatcher.of(Feature.SHIPWRECK), BiomePredicate.oceans());
+        modifiers.getPredicates().add(FeatureMatcher.of(Feature.SHIPWRECK), MinDepth.DEPTH55);
         modifiers.getPredicates().add(FeatureMatcher.of(Feature.OCEAN_RUIN), DeepWater.INSTANCE);
         modifiers.getPredicates().add(FeatureMatcher.of(Feature.OCEAN_MONUMENT), DeepWater.INSTANCE);
 

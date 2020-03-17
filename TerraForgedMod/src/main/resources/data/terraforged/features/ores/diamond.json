@@ -11,7 +11,7 @@
       "feature": {
         "name": "minecraft:ore",
         "config": {
-          "size": 10,
+          "size": 8,
           "target": "natural_stone",
           "state": {
             "Name": "minecraft:diamond_ore"
@@ -24,7 +24,7 @@
           "count": 1,
           "bottom_offset": 0,
           "top_offset": 0,
-          "maximum": 19
+          "maximum": 18
         }
       }
     }

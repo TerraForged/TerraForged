@@ -1,6 +1,7 @@
 {
   "biomes": [
-    "minecraft:birch_forest*"
+    "minecraft:birch*",
+    "minecraft:tall_birch*"
   ],
   "match": [
     [
