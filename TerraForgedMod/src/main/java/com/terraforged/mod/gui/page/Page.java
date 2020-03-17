@@ -64,6 +64,8 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
         this.columns = new Column[columnSizes.length];
     }
 
+    public abstract void callback(Runnable runnable);
+
     public abstract void save();
 
     public abstract void init(OverlayScreen parent);

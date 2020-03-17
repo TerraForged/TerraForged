@@ -47,6 +47,12 @@ public class NBTHelper {
         return output.getValue();
     }
 
+    public static CompoundNBT fromJson(JsonElement json) {
+        Dynamic<JsonElement> input = new Dynamic<>(JsonOps.INSTANCE, json);
+        Dynamic<INBT> output = input.convert(NBTDynamicOps.INSTANCE);
+        return (CompoundNBT) output.getValue();
+    }
+
     public static Stream<CompoundNBT> stream(CompoundNBT tag) {
         return tag.keySet().stream()
                 .map(tag::getCompound)

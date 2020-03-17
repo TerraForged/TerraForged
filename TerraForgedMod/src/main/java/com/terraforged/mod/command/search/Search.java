@@ -75,8 +75,6 @@ public abstract class Search implements Supplier<BlockPos> {
             z += dz;
         }
 
-        System.out.println("LAST POS: " + pos);
-
         return BlockPos.ZERO;
     }
 

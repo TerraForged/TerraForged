@@ -53,6 +53,6 @@ public class FeaturePage extends BasePage {
     @Override
     public void init(OverlayScreen parent) {
         Column left = getColumn(0);
-        addElements(left.left, left.top, left, featureSettings, false, left.scrollPane::addButton, NO_CALLBACK);
+        addElements(left.left, left.top, left, featureSettings, false, left.scrollPane::addButton, this::update);
     }
 }

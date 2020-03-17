@@ -25,15 +25,36 @@
 
 package com.terraforged.mod.feature;
 
+import com.terraforged.feature.matcher.BiomeFeatureMatcher;
+import com.terraforged.feature.matcher.biome.BiomeMatcher;
 import com.terraforged.feature.matcher.feature.FeatureMatcher;
+import com.terraforged.mod.feature.feature.DiskFeature;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.feature.Feature;
 
 public class Matchers {
 
-    public static final FeatureMatcher STONE_BLOBS = FeatureMatcher.builder()
-            .or("minecraft:ore").and("minecraft:dirt")
-            .or("minecraft:ore").and("minecraft:gravel")
-            .or("minecraft:ore").and("minecraft:granite")
-            .or("minecraft:ore").and("minecraft:diorite")
-            .or("minecraft:ore").and("minecraft:andesite")
-            .build();
+    public static FeatureMatcher stoneBlobs() {
+        return FeatureMatcher.builder()
+                .or("minecraft:ore").and("minecraft:dirt")
+                .or("minecraft:ore").and("minecraft:gravel")
+                .or("minecraft:ore").and("minecraft:granite")
+                .or("minecraft:ore").and("minecraft:diorite")
+                .or("minecraft:ore").and("minecraft:andesite")
+                .build();
+    }
+
+    public static BiomeFeatureMatcher sedimentDisks() {
+        return new BiomeFeatureMatcher(
+                BiomeMatcher.of(Biome.Category.RIVER, Biome.Category.SWAMP),
+                FeatureMatcher.builder()
+                        .or(Feature.DISK).and("minecraft:sand")
+                        .or(Feature.DISK).and("minecraft:gravel")
+                        .or(Feature.DISK).and("minecraft:dirt")
+                        .or(DiskFeature.INSTANCE).and("minecraft:sand")
+                        .or(DiskFeature.INSTANCE).and("minecraft:gravel")
+                        .or(DiskFeature.INSTANCE).and("minecraft:dirt")
+                        .build()
+        );
+    }
 }

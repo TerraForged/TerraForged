@@ -29,8 +29,8 @@ import com.terraforged.api.material.WGTags;
 import com.terraforged.core.util.concurrent.ThreadPool;
 import com.terraforged.feature.FeatureManager;
 import com.terraforged.mod.data.DataGen;
+import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.mod.feature.tree.SaplingManager;
-import com.terraforged.mod.settings.SettingsHelper;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraftforge.common.MinecraftForge;
@@ -38,7 +38,6 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 
@@ -66,14 +65,9 @@ public class TerraForgedMod {
     }
 
     @SubscribeEvent
-    public static void server(FMLDedicatedServerSetupEvent event) {
-        Log.info("Setting dedicated server");
-        SettingsHelper.setDedicatedServer();
-    }
-
-    @SubscribeEvent
     public static void registerFeatures(RegistryEvent.Register<Feature<?>> event) {
         FeatureManager.registerTemplates(event);
+        event.getRegistry().register(DiskFeature.INSTANCE);
     }
 
     private static void onShutdown(FMLServerStoppingEvent event) {

@@ -25,9 +25,7 @@
 
 package com.terraforged.mod.gui;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.terraforged.core.settings.Settings;
+import com.terraforged.mod.gui.element.TerraButton;
 import com.terraforged.mod.gui.element.TerraLabel;
 import com.terraforged.mod.gui.page.FeaturePage;
 import com.terraforged.mod.gui.page.FilterPage;
@@ -44,14 +42,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Util;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
 
 public class SettingsScreen extends OverlayScreen {
 
@@ -63,9 +53,10 @@ public class SettingsScreen extends OverlayScreen {
     private final TerraSettings settings = new TerraSettings();
 
     private int pageIndex = 0;
+    private boolean hasChanged = false;
 
     public SettingsScreen(CreateWorldScreen parent) {
-        NBTHelper.deserialize(parent.chunkProviderSettingsJson, settings);
+        SettingsHelper.applyDefaults(parent.chunkProviderSettingsJson, settings);
         this.parent = parent;
         this.pages = new Page[]{
                 new GeneratorPage(settings, preview),
@@ -90,6 +81,7 @@ public class SettingsScreen extends OverlayScreen {
 
         if (pageIndex < pages.length) {
             Page page = pages[pageIndex];
+            page.callback(() -> this.hasChanged = true);
             TerraLabel title = new TerraLabel(page.getTitle());
             title.visible = true;
             title.x = 16;
@@ -119,8 +111,7 @@ public class SettingsScreen extends OverlayScreen {
 
 
         // -106
-        addButton(new Button(buttonsCenter - (buttonWidth * 2 + (buttonPad * 3)), buttonsRow, buttonWidth,
-                buttonHeight, "<<", NO_ACTION) {
+        addButton(new Button(buttonsCenter - (buttonWidth * 2 + (buttonPad * 3)), buttonsRow, buttonWidth, buttonHeight, "<<", NO_ACTION) {
             @Override
             public void render(int mouseX, int mouseY, float partialTicks) {
                 super.active = hasPrevious();
@@ -135,15 +126,10 @@ public class SettingsScreen extends OverlayScreen {
                     init();
                 }
             }
-
-            private boolean hasPrevious() {
-                return pageIndex > 0;
-            }
         });
 
         // +56
-        addButton(new Button(buttonsCenter + buttonWidth + (buttonPad * 3), buttonsRow, buttonWidth, buttonHeight,
-                ">>", NO_ACTION) {
+        addButton(new Button(buttonsCenter + buttonWidth + (buttonPad * 3), buttonsRow, buttonWidth, buttonHeight, ">>", NO_ACTION) {
             @Override
             public void render(int mouseX, int mouseY, float partialTicks) {
                 super.active = hasNext();
@@ -158,19 +144,45 @@ public class SettingsScreen extends OverlayScreen {
                     init();
                 }
             }
-
-            private boolean hasNext() {
-                return pageIndex + 1 < pages.length;
-            }
         });
 
-        addButton(new Button(width - buttonWidth - 15, buttonsRow, buttonWidth, buttonHeight, "Export", NO_ACTION) {
+        addButton(new TerraButton("Set Defaults", "Use the current settings as the defaults", "CTRL + click to clear them") {
+
+            private boolean ctrl = false;
+
+            @Override
+            public void render(int mouseX, int mouseY, float partialTicks) {
+                if (Screen.hasControlDown()) {
+                    if (!ctrl) {
+                        ctrl = true;
+                        setMessage("Clear Defaults");
+                    }
+                    super.active = true;
+                } else {
+                    if (ctrl) {
+                        ctrl = false;
+                        setMessage("Set Defaults");
+                    }
+                    super.active = hasChanged;
+                }
+                super.render(mouseX, mouseY, partialTicks);
+            }
+
             @Override
             public void onClick(double mouseX, double mouseY) {
                 super.onClick(mouseX, mouseY);
-                export(settings);
+                if (Screen.hasControlDown()) {
+                    SettingsHelper.clearDefaults();
+                    hasChanged = true;
+                } else {
+                    for (Page page : pages) {
+                        page.save();
+                    }
+                    hasChanged = false;
+                    SettingsHelper.exportDefaults(settings);
+                }
             }
-        });
+        }.init(width - buttonWidth - 55, buttonsRow, 90, buttonHeight));
 
         super.init();
     }
@@ -239,19 +251,11 @@ public class SettingsScreen extends OverlayScreen {
         Minecraft.getInstance().displayGuiScreen(parent);
     }
 
-    private void export(Settings settings) {
-        for (Page page : pages) {
-            page.save();
-        }
-        CompoundNBT tag = NBTHelper.serializeCompact(settings);
-        JsonElement json = NBTHelper.toJson(tag);
-        File config = new File(Minecraft.getInstance().gameDir, "config");
-        File file = new File(config, SettingsHelper.SETTINGS_FILE_NAME);
-        try (Writer writer = new BufferedWriter(new FileWriter(file))) {
-            new GsonBuilder().setPrettyPrinting().create().toJson(json, writer);
-            Util.getOSType().openURI(file.getParentFile().toURI());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private boolean hasNext() {
+        return pageIndex + 1 < pages.length;
+    }
+
+    private boolean hasPrevious() {
+        return pageIndex > 0;
     }
 }

@@ -27,7 +27,17 @@ package com.terraforged.mod.gui.page;
 
 public abstract class BasePage extends Page {
 
+    private Runnable changeListener = () -> {};
+
     public BasePage() {
         super(4, 0, 0.7F, 0.3F);
+    }
+
+    public void callback(Runnable runnable) {
+        changeListener = runnable;
+    }
+
+    protected void update() {
+        changeListener.run();
     }
 }

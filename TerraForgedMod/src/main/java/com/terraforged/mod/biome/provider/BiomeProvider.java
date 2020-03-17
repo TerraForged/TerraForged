@@ -174,12 +174,11 @@ public class BiomeProvider extends AbstractBiomeProvider {
             return getModifierManager().modify(biomeMap.getBiome(cell), cell, x, z);
         }
 
-        if (cell.tag == context.terrain.river || cell.tag == context.terrain.riverBanks) {
+        if (cell.tag == context.terrain.river || cell.tag == context.terrain.riverBanks || cell.tag == context.terrain.lake) {
             Biome biome = biomeMap.getBiome(cell);
             if (overridesRiver(biome)) {
                 return biome;
             }
-
             return biomeMap.getRiver(cell.temperature, cell.moisture, cell.biome);
         }
 

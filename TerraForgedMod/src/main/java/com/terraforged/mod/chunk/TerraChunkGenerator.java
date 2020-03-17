@@ -43,6 +43,7 @@ import com.terraforged.feature.matcher.dynamic.DynamicMatcher;
 import com.terraforged.feature.matcher.feature.FeatureMatcher;
 import com.terraforged.feature.modifier.FeatureModifierLoader;
 import com.terraforged.feature.modifier.FeatureModifiers;
+import com.terraforged.feature.predicate.BiomePredicate;
 import com.terraforged.feature.predicate.DeepWater;
 import com.terraforged.feature.predicate.FeaturePredicate;
 import com.terraforged.feature.predicate.MinHeight;
@@ -305,13 +306,13 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
         }
 
         // block ugly features
-        modifiers.getPredicates().add(Matchers.STONE_BLOBS, FeaturePredicate.DENY);
-        modifiers.getPredicates().add(FeatureMatcher.of(Feature.DISK), FeaturePredicate.DENY);
+        modifiers.getPredicates().add(Matchers.stoneBlobs(), FeaturePredicate.DENY);
+        modifiers.getPredicates().add(Matchers.sedimentDisks(), FeaturePredicate.DENY);
         modifiers.getPredicates().add(FeatureMatcher.of(Feature.LAKE), FeaturePredicate.DENY);
         modifiers.getPredicates().add(FeatureMatcher.of(Feature.SPRING_FEATURE), FeaturePredicate.DENY);
 
         // limit to deep oceans
-        modifiers.getPredicates().add(FeatureMatcher.of(Feature.SHIPWRECK), DeepWater.INSTANCE);
+        modifiers.getPredicates().add(FeatureMatcher.of(Feature.SHIPWRECK), BiomePredicate.oceans());
         modifiers.getPredicates().add(FeatureMatcher.of(Feature.OCEAN_RUIN), DeepWater.INSTANCE);
         modifiers.getPredicates().add(FeatureMatcher.of(Feature.OCEAN_MONUMENT), DeepWater.INSTANCE);
 

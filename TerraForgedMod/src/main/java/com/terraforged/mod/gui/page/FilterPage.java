@@ -59,7 +59,9 @@ public class FilterPage extends BasePage {
         addElements(0, 0, column, filterSettings, true, column.scrollPane::addButton, this::update);
     }
 
-    private void update() {
+    @Override
+    protected void update() {
+        super.update();
         preview.apply(settings -> NBTHelper.deserialize(filterSettings, settings.filters));
     }
 }

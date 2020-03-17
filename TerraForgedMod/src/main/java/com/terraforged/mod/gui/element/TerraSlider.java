@@ -61,8 +61,10 @@ public abstract class TerraSlider extends Slider implements Slider.ISlider, Elem
 
     @Override
     public void onRelease(double mouseX, double mouseY) {
+        if (dragging) {
+            callback.run();
+        }
         super.onRelease(mouseX, mouseY);
-        callback.run();
     }
 
     protected abstract void onChange(Slider slider, CompoundNBT value);

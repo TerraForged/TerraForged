@@ -27,9 +27,59 @@ package com.terraforged.mod.gui.element;
 
 import net.minecraftforge.fml.client.gui.widget.ExtendedButton;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class TerraButton extends ExtendedButton implements Element {
+
+    private final List<String> tooltip;
 
     public TerraButton(String displayString) {
         super(0, 0, 200, 20, displayString, b -> {});
+        this.tooltip = Collections.emptyList();
+    }
+
+    public TerraButton(String displayString, String... tooltip) {
+        super(0, 0, 200, 20, displayString, b -> {});
+        this.tooltip = Arrays.asList(tooltip);
+    }
+
+    public TerraButton init(int x, int y, int width, int height) {
+        this.x = x;
+        this.y = y;
+        setWidth(width);
+        setHeight(height);
+        return this;
+    }
+
+    @Override
+    public List<String> getTooltip() {
+        return tooltip;
+    }
+
+    public static TerraButton create(String title, int x, int y, int width, int height, String tooltip, Runnable action) {
+        TerraButton button = new TerraButton(title) {
+
+            private final List<String> tooltips = Collections.singletonList(tooltip);
+
+            @Override
+            public List<String> getTooltip() {
+                return tooltips;
+            }
+
+            @Override
+            public void onClick(double mouseX, double mouseY) {
+                super.onClick(mouseX, mouseY);
+                action.run();
+            }
+        };
+
+        button.x = x;
+        button.y = y;
+        button.setWidth(width);
+        button.setHeight(height);
+
+        return button;
     }
 }

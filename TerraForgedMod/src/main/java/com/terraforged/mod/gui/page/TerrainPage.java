@@ -60,7 +60,8 @@ public class TerrainPage extends BasePage {
         addElements(0, 0, center, terrainSettings, true, center.scrollPane::addButton, this::update);
     }
 
-    private void update() {
+    protected void update() {
+        super.update();
         preview.apply(settings -> NBTHelper.deserialize(terrainSettings, settings.terrain));
     }
 }

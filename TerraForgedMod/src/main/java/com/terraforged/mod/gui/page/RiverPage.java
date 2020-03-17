@@ -60,7 +60,8 @@ public class RiverPage extends BasePage {
         addElements(0, 0, center, riverSettings, true, center.scrollPane::addButton, this::update);
     }
 
-    private void update() {
+    protected void update() {
+        super.update();
         preview.apply(settings -> NBTHelper.deserialize(riverSettings, settings.rivers));
     }
 }

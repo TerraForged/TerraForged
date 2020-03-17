@@ -59,7 +59,8 @@ public class GeneratorPage extends BasePage {
         addElements(left.left, left.top, left, generatorSettings, true, left.scrollPane::addButton, this::update);
     }
 
-    private void update() {
+    protected void update() {
+        super.update();
         preview.apply(settings -> NBTHelper.deserialize(generatorSettings, settings.generator));
     }
 }

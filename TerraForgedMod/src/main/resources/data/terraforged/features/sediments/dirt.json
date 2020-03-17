@@ -1,0 +1,40 @@
+{
+  "match": [
+    [
+      "minecraft:disk",
+      "minecraft:dirt"
+    ]
+  ],
+  "replace": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "terraforged:disk",
+        "config": {
+          "state": {
+            "Name": "minecraft:sand"
+          },
+          "radius": 7,
+          "y_size": 2,
+          "targets": [
+            {
+              "Name": "minecraft:dirt"
+            },
+            {
+              "Name": "minecraft:grass_block",
+              "Properties": {
+                "snowy": "false"
+              }
+            }
+          ]
+        }
+      },
+      "decorator": {
+        "name": "minecraft:count_top_solid",
+        "config": {
+          "count": 3
+        }
+      }
+    }
+  }
+}

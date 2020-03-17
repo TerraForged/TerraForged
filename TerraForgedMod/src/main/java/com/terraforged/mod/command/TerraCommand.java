@@ -78,7 +78,7 @@ public class TerraCommand {
 
     @SubscribeEvent
     public static void start(FMLServerStartingEvent event) {
-        Log.info("Registering find command!");
+        Log.info("Registering /terra command");
         register(event.getCommandDispatcher());
     }
 
