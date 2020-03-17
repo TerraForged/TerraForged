@@ -12,7 +12,7 @@ _Please take a look through the [existing issues](https://github.com/TerraForged
 **Description**
 Please describe the problem clearly and concisely
 
-**How to reproduce (get your mind out of the gutter! -_-)**
+**How to reproduce**
 - Describe your setup if using anything other than the Mojang launcher or standard forge server
 - List any third-party mods (& their version number) that may be relevant to the issue
 - Provide a simple step-by-step guide to recreate the problem
