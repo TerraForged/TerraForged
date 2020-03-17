@@ -208,7 +208,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
         postProcess(container.getChunkReader(), container, context);
 
         // bake biome array & discard gen data
-        ((ChunkPrimer) chunk).func_225548_a_(container.bakeBiomes());
+        ((ChunkPrimer) chunk).func_225548_a_(container.bakeBiomes(false));
     }
 
     @Override

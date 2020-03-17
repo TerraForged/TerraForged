@@ -25,6 +25,7 @@
 
 package com.terraforged.mod.chunk;
 
+import com.terraforged.api.biome.BiomeVariant;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.util.PosIterator;
@@ -74,7 +75,18 @@ public class TerraContainer extends BiomeContainer {
         return getBiome(8, 8);
     }
 
-    public BiomeContainer bakeBiomes() {
+    public BiomeContainer bakeBiomes(boolean convertToVanilla) {
+        if (convertToVanilla) {
+            Biome[] biomeArray = new Biome[biomes.length];
+            for (int i = 0; i < biomes.length; i++) {
+                Biome biome = biomes[i];
+                if (biome instanceof BiomeVariant) {
+                    biome = ((BiomeVariant) biome).getBase();
+                }
+                biomeArray[i] = biome;
+            }
+            return new BiomeContainer(biomeArray);
+        }
         return new BiomeContainer(biomes);
     }
 

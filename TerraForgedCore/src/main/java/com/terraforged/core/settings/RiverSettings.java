@@ -35,6 +35,10 @@ public class RiverSettings {
     /**
      * RIVER PROPERTIES
      */
+    @Range(min = 0.0F, max = 5F)
+    @Comment("Controls how frequently rivers generate")
+    public float riverFrequency = 1;
+
     public River primaryRivers = new River(5, 2, 8, 25, 8, 0.75F);
 
     public River secondaryRiver = new River(4, 1, 6, 15, 5, 0.75F);

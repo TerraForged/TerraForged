@@ -40,6 +40,7 @@ import java.util.Random;
  */
 public class PosGenerator {
 
+    private final int size;
     private final int quadSize;
     private final Vec2i[] quads = new Vec2i[4];
 
@@ -57,6 +58,7 @@ public class PosGenerator {
         this.lookup = lookup;
         this.padding = padding;
         this.heightmap = heightmap;
+        this.size = size;
         this.quadSize = (size - (padding * 2)) / 4;
         int x1 = 0;
         int y1 = 0;
@@ -111,6 +113,49 @@ public class PosGenerator {
             nextPos(random);
             int px = x + dx;
             int pz = z + dz;
+            if (dist2(px, pz, point.x, point.z) < mindDist2) {
+                continue;
+            }
+            int wx = (int) domain.getX(px, pz);
+            int wz = (int) domain.getY(px, pz);
+            float value1 = getHeight(px, pz);
+            float value2 = getHeight(wx, wz);
+            RiverNode.Type type1 = RiverNode.getType(value1);
+            RiverNode.Type type2 = RiverNode.getType(value2);
+            if (type1 == type2 && type1 == point.type.opposite()) {
+                if (type1 == RiverNode.Type.END) {
+                    return new RiverNode(wx, wz, type1);
+                }
+                return new RiverNode(px, pz, type1);
+            }
+        }
+        return null;
+    }
+
+    public RiverNode nextRelaxed(int x, int z, Random random, int attempts) {
+        for (int i = 0; i < attempts; i++) {
+            int px = x + random.nextInt(size);
+            int pz = z + random.nextInt(size);
+            int wx = (int) domain.getX(px, pz);
+            int wz = (int) domain.getY(px, pz);
+            float value1 = getHeight(px, pz);
+            float value2 = getHeight(wx, wz);
+            RiverNode.Type type1 = RiverNode.getType(value1);
+            RiverNode.Type type2 = RiverNode.getType(value2);
+            if (type1 == type2 && type1 != RiverNode.Type.NONE) {
+                if (type1 == RiverNode.Type.END) {
+                    return new RiverNode(wx, wz, type1);
+                }
+                return new RiverNode(px, pz, type1);
+            }
+        }
+        return null;
+    }
+
+    public RiverNode nextFromRelaxed(int x, int z, Random random, int attempts, RiverNode point, int mindDist2) {
+        for (int i = 0; i < attempts; i++) {
+            int px = x + random.nextInt(size);
+            int pz = z + random.nextInt(size);
             if (dist2(px, pz, point.x, point.z) < mindDist2) {
                 continue;
             }

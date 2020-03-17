@@ -57,15 +57,39 @@ public class RiverRegion {
     private final List<River> rivers;
     private final List<Lake> lakes = new LinkedList<>();
 
-    public RiverRegion(int regionX, int regionZ, Heightmap heightmap, GeneratorContext context, RiverConfig primary, RiverConfig secondary, RiverConfig tertiary, LakeConfig lake) {
+    private final int primaryLimit;
+    private final int secondaryLimit;
+    private final int secondaryRelaxedLimit;
+    private final int forkLimit;
+    private final int tertiaryLimit;
+    private final int primaryAttempts;
+    private final int secondaryAttempts;
+    private final int secondaryRelaxedAttempts;
+    private final int forkAttempts;
+    private final int tertiaryAttempts;
+
+    public RiverRegion(int regionX, int regionZ, Heightmap heightmap, GeneratorContext context, RiverContext riverContext) {
         int seed = new Random(NoiseUtil.seed(regionX, regionZ)).nextInt();
-        this.lake = lake;
-        this.primary = primary;
-        this.secondary = secondary;
-        this.tertiary = tertiary;
+        this.lake = riverContext.lakes;
+        this.primary = riverContext.primary;
+        this.secondary = riverContext.secondary;
+        this.tertiary = riverContext.tertiary;
         this.terrains = context.terrain;
         this.domain = Domain.warp(seed, 400, 1, 400)
-                .add(Domain.warp(seed + 1, 80, 1, 35));;
+                .add(Domain.warp(seed + 1, 80, 1, 35));
+
+        this.primaryLimit = NoiseUtil.round(10 * riverContext.frequency);
+        this.secondaryLimit = NoiseUtil.round(20 * riverContext.frequency);
+        this.secondaryRelaxedLimit = NoiseUtil.round(30 * riverContext.frequency);
+        this.forkLimit = NoiseUtil.round(40 * riverContext.frequency);
+        this.tertiaryLimit = NoiseUtil.round(50 * riverContext.frequency);
+
+        this.primaryAttempts = NoiseUtil.round(100 * riverContext.frequency);
+        this.secondaryAttempts = NoiseUtil.round(100 * riverContext.frequency);
+        this.secondaryRelaxedAttempts = NoiseUtil.round(50 * riverContext.frequency);
+        this.forkAttempts = NoiseUtil.round(75 * riverContext.frequency);
+        this.tertiaryAttempts = NoiseUtil.round(50 * riverContext.frequency);
+
         try (ObjectPool.Item<Cell<Terrain>> cell = Cell.pooled()) {
             PosGenerator pos = new PosGenerator(heightmap, domain, cell.getValue(),1 << SCALE, River.VALLEY_WIDTH);
             this.rivers = generate(regionX, regionZ, pos);
@@ -91,19 +115,23 @@ public class RiverRegion {
         Random random = new Random(regionSeed);
         List<River> rivers = new LinkedList<>();
 
-        for (int i = 0; rivers.size() < 4 && i < 50; i++) {
+        for (int i = 0; rivers.size() < primaryLimit && i < primaryAttempts; i++) {
             generateRiver(x, z, pos, primary, random, rivers);
         }
 
-        for (int i = 0; rivers.size() < 15 && i < 100; i++) {
+        for (int i = 0; rivers.size() < secondaryLimit && i < secondaryAttempts; i++) {
             generateRiver(x, z, pos, secondary, random, rivers);
         }
 
-        for (int i = 0; rivers.size() < 25 && i < 75; i++) {
+        for (int i = 0; rivers.size() < secondaryRelaxedLimit && i < secondaryRelaxedAttempts; i++) {
+            generateRiverRelaxed(x, z, pos, secondary, random, rivers);
+        }
+
+        for (int i = 0; rivers.size() < forkLimit && i < forkAttempts; i++) {
             generateRiverFork(x, z, pos, tertiary, random, rivers);
         }
 
-        for (int i = 0; rivers.size() < 40 && i < 50; i++) {
+        for (int i = 0; rivers.size() < tertiaryLimit && i < tertiaryAttempts; i++) {
             generateRiver(x, z, pos, tertiary, random, rivers);
         }
 
@@ -216,6 +244,32 @@ public class RiverRegion {
         RiverConfig forkConfig = config.createFork(forkWidth);
         
         return rivers.add(new River(bounds, forkConfig, terrains, forkConfig.fade, 0, true));
+    }
+
+    private boolean generateRiverRelaxed(int x, int z, PosGenerator pos, RiverConfig config, Random random, List<River> rivers) {
+        // generate either a river start or end node
+        RiverNode p1 = pos.nextRelaxed(x, z, random, 50);
+        if (p1 == null) {
+            return false;
+        }
+
+        // generate a node with a min distance from p1 and that has the opposite node type to p1
+        RiverNode p2 = pos.nextFromRelaxed(x, z, random,50, p1, config.length2);
+        if (p2 == null) {
+            return false;
+        }
+
+        // avoid collisions with existing rivers
+        RiverBounds bounds = RiverBounds.fromNodes(p1, p2);
+        for (River river : rivers) {
+            if (bounds.overlaps(river.bounds)) {
+                return false;
+            }
+        }
+
+        generateLake(bounds, random);
+
+        return rivers.add(new River(bounds, config, terrains, config.fade, 0));
     }
 
     private void generateLake(RiverBounds bounds, Random random) {

@@ -39,18 +39,13 @@ public class RiverManager {
 
     private static final int QUAD_SIZE = (1 << RiverRegion.SCALE) / 2;
 
-    private final LakeConfig lakes;
-    private final RiverConfig primary;
-    private final RiverConfig secondary;
-    private final RiverConfig tertiary;
     private final Heightmap heightmap;
     private final GeneratorContext context;
+    private final RiverContext riverContext;
     private final Cache<Long, RiverRegion> cache = new Cache<>(60, 60, TimeUnit.SECONDS, () -> new ConcurrentHashMap<>());
 
     public RiverManager(Heightmap heightmap, GeneratorContext context) {
-        this.heightmap = heightmap;
-        this.context = context;
-        this.primary = RiverConfig.builder(context.levels)
+        RiverConfig primary = RiverConfig.builder(context.levels)
                 .bankHeight(context.settings.rivers.primaryRivers.minBankHeight, context.settings.rivers.primaryRivers.maxBankHeight)
                 .bankWidth(context.settings.rivers.primaryRivers.bankWidth)
                 .bedWidth(context.settings.rivers.primaryRivers.bedWidth)
@@ -59,7 +54,7 @@ public class RiverManager {
                 .length(2500)
                 .main(true)
                 .build();
-        this.secondary = RiverConfig.builder(context.levels)
+        RiverConfig secondary = RiverConfig.builder(context.levels)
                 .bankHeight(context.settings.rivers.secondaryRiver.minBankHeight, context.settings.rivers.secondaryRiver.maxBankHeight)
                 .bankWidth(context.settings.rivers.secondaryRiver.bankWidth)
                 .bedWidth(context.settings.rivers.secondaryRiver.bedWidth)
@@ -67,7 +62,7 @@ public class RiverManager {
                 .fade(context.settings.rivers.secondaryRiver.fade)
                 .length(1000)
                 .build();
-        this.tertiary = RiverConfig.builder(context.levels)
+        RiverConfig tertiary = RiverConfig.builder(context.levels)
                 .bankHeight(context.settings.rivers.tertiaryRivers.minBankHeight, context.settings.rivers.tertiaryRivers.maxBankHeight)
                 .bankWidth(context.settings.rivers.tertiaryRivers.bankWidth)
                 .bedWidth(context.settings.rivers.tertiaryRivers.bedWidth)
@@ -75,7 +70,11 @@ public class RiverManager {
                 .fade(context.settings.rivers.tertiaryRivers.fade)
                 .length(500)
                 .build();
-        this.lakes = LakeConfig.of(context.settings.rivers.lake, context.levels);
+        LakeConfig lakes = LakeConfig.of(context.settings.rivers.lake, context.levels);
+
+        this.heightmap = heightmap;
+        this.context = context;
+        this.riverContext = new RiverContext(context.settings.rivers.riverFrequency, primary, secondary, tertiary, lakes);
     }
 
     public void apply(Cell<Terrain> cell, float x, float z) {
@@ -103,7 +102,7 @@ public class RiverManager {
         long id = NoiseUtil.seed(rx, rz);
         RiverRegion region = cache.get(id);
         if (region == null) {
-            region = new RiverRegion(rx, rz, heightmap, context, primary, secondary, tertiary, lakes);
+            region = new RiverRegion(rx, rz, heightmap, context, riverContext);
             cache.put(id, region);
         }
         return region;
