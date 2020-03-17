@@ -11,7 +11,7 @@
       "feature": {
         "name": "minecraft:ore",
         "config": {
-          "size": 9,
+          "size": 11,
           "target": "natural_stone",
           "state": {
             "Name": "minecraft:iron_ore"
@@ -21,10 +21,10 @@
       "decorator": {
         "name": "minecraft:count_range",
         "config": {
-          "count": 20,
+          "count": 24,
           "bottom_offset": 0,
           "top_offset": 0,
-          "maximum": 112
+          "maximum": 90
         }
       }
     }

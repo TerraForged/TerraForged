@@ -18,7 +18,7 @@
       "feature": {
         "name": "minecraft:ore",
         "config": {
-          "size": 9,
+          "size": 11,
           "target": "natural_stone",
           "state": {
             "Name": "minecraft:gold_ore"
@@ -28,10 +28,10 @@
       "decorator": {
         "name": "minecraft:count_range",
         "config": {
-          "count": 20,
-          "bottom_offset": 64,
-          "top_offset": 64,
-          "maximum": 112
+          "count": 24,
+          "bottom_offset": 38,
+          "top_offset": 38,
+          "maximum": 96
         }
       }
     }

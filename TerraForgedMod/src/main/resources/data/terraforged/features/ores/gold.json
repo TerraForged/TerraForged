@@ -11,7 +11,7 @@
       "feature": {
         "name": "minecraft:ore",
         "config": {
-          "size": 9,
+          "size": 11,
           "target": "natural_stone",
           "state": {
             "Name": "minecraft:gold_ore"
@@ -24,7 +24,7 @@
           "count": 2,
           "bottom_offset": 0,
           "top_offset": 0,
-          "maximum": 80
+          "maximum": 38
         }
       }
     }
