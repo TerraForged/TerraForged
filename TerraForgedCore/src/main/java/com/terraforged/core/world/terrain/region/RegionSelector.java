@@ -63,17 +63,29 @@ public class RegionSelector implements Populator {
         float smallest = Float.MAX_VALUE;
         for (Populator p : modules) {
             if (p instanceof TerrainPopulator) {
-                smallest = Math.min(smallest, ((TerrainPopulator) p).getType().getWeight());
+                TerrainPopulator tp = (TerrainPopulator) p;
+                if (tp.getType().getWeight() == 0F) {
+                    continue;
+                }
+                smallest = Math.min(smallest, tp.getType().getWeight());
             } else {
                 smallest = Math.min(smallest, 1);
             }
+        }
+
+        if (smallest == Float.MAX_VALUE) {
+            return modules.toArray(new Populator[0]);
         }
 
         List<Populator> result = new LinkedList<>();
         for (Populator p : modules) {
             int count;
             if (p instanceof TerrainPopulator) {
-                count = Math.round(((TerrainPopulator) p).getType().getWeight() / smallest);
+                TerrainPopulator tp = (TerrainPopulator) p;
+                if (tp.getType().getWeight() == 0F) {
+                    continue;
+                }
+                count = Math.round(tp.getType().getWeight() / smallest);
             } else {
                 count = Math.round(1 / smallest);
             }
