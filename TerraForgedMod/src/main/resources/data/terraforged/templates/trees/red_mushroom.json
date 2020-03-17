@@ -1,0 +1,8 @@
+{
+  "type": "tree",
+  "base": 0,
+  "name": "terraforged:red_mushroom",
+  "paths": [
+    "terraforged:mushrooms/red"
+  ]
+}
