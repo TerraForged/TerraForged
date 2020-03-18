@@ -26,12 +26,12 @@
 package com.terraforged.core.region;
 
 import com.terraforged.core.region.legacy.LegacyRegion;
-import com.terraforged.core.util.concurrent.ObjectPool;
 import com.terraforged.core.util.concurrent.ThreadPool;
-import com.terraforged.core.util.concurrent.batcher.Batcher;
+import com.terraforged.core.util.concurrent.cache.CacheEntry;
 import com.terraforged.core.world.WorldGenerator;
 import com.terraforged.core.world.WorldGeneratorFactory;
 import com.terraforged.core.world.heightmap.RegionExtent;
+import com.terraforged.core.world.river.RiverRegionList;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -41,14 +41,14 @@ public class RegionGenerator implements RegionExtent {
     private final int border;
     private final RegionFactory regions;
     private final ThreadPool threadPool;
-    private final ObjectPool<WorldGenerator> genPool;
+    private final ThreadLocal<WorldGenerator> genPool;
 
     private RegionGenerator(Builder builder) {
         this.factor = builder.factor;
         this.border = builder.border;
         this.threadPool = builder.threadPool;
         this.regions = builder.regionFactory;
-        this.genPool = new ObjectPool<>(50, builder.factory);
+        this.genPool = ThreadLocal.withInitial(builder.factory);
     }
 
     public RegionCache toCache() {
@@ -75,23 +75,25 @@ public class RegionGenerator implements RegionExtent {
     }
 
     public CompletableFuture<Region> generate(int regionX, int regionZ) {
-        return CompletableFuture.supplyAsync(() -> generateRegion(regionX, regionZ));
+        return CompletableFuture.supplyAsync(() -> generateRegion(regionX, regionZ), threadPool);
     }
 
     public CompletableFuture<Region> generate(float centerX, float centerZ, float zoom, boolean filter) {
-        return CompletableFuture.supplyAsync(() -> generateRegion(centerX, centerZ, zoom, filter));
+        return CompletableFuture.supplyAsync(() -> generateRegion(centerX, centerZ, zoom, filter), threadPool);
+    }
+
+    public CacheEntry<Region> generateCached(int regionX, int regionZ) {
+        return CacheEntry.supplyAsync(() -> generateRegion(regionX, regionZ), threadPool);
     }
 
     public Region generateRegion(int regionX, int regionZ) {
-        try (ObjectPool.Item<WorldGenerator> item = genPool.get()) {
-            WorldGenerator generator = item.getValue();
-            Region region = regions.create(regionX, regionZ, factor, border);
-            try (Batcher batcher = threadPool.batcher(region.getChunkCount())) {
-                region.generate(generator.getHeightmap(), batcher);
-            }
-            postProcess(region, generator);
-            return region;
-        }
+        WorldGenerator generator = genPool.get();
+        Region region = regions.create(regionX, regionZ, factor, border);
+        RiverRegionList rivers = generator.getHeightmap().getRiverManager().getRivers(region);
+        region.generateBase(generator.getHeightmap());
+        region.generateRivers(generator.getHeightmap(), rivers);
+        postProcess(region, generator);
+        return region;
     }
 
     private void postProcess(Region region, WorldGenerator generator) {
@@ -100,16 +102,19 @@ public class RegionGenerator implements RegionExtent {
     }
 
     public Region generateRegion(float centerX, float centerZ, float zoom, boolean filter) {
-        try (ObjectPool.Item<WorldGenerator> item = genPool.get()) {
-            WorldGenerator generator = item.getValue();
-            Region region = regions.create(0, 0, factor, border);
-            try (Batcher batcher = threadPool.batcher(region.getChunkCount())) {
-                region.generateZoom(generator.getHeightmap(), centerX, centerZ, zoom, batcher);
-            }
-            region.check();
-            postProcess(region, generator, centerX, centerZ, zoom, filter);
-            return region;
-        }
+        WorldGenerator generator = genPool.get();
+        Region region = regions.create(0, 0, factor, border);
+        float translateX = centerX - ((region.getBlockSize().size * zoom) / 2F);
+        float translateZ = centerZ - ((region.getBlockSize().size * zoom) / 2F);
+        region.generate(chunk -> {
+            chunk.generate((cell, dx, dz) -> {
+                float x = ((chunk.getBlockX() + dx) * zoom) + translateX;
+                float z = ((chunk.getBlockZ() + dz) * zoom) + translateZ;
+                generator.getHeightmap().apply(cell, x, z);
+            });
+        });
+        postProcess(region, generator, centerX, centerZ, zoom, filter);
+        return region;
     }
 
     private void postProcess(Region region, WorldGenerator generator, float centerX, float centerZ, float zoom, boolean filter) {

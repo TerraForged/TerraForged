@@ -26,6 +26,7 @@
 package com.terraforged.mod.chunk;
 
 import com.terraforged.api.chunk.column.DecoratorContext;
+import com.terraforged.api.chunk.surface.ChunkSurfaceBuffer;
 import com.terraforged.api.chunk.surface.SurfaceContext;
 import com.terraforged.core.world.GeneratorContext;
 import com.terraforged.core.world.WorldGeneratorFactory;
@@ -62,7 +63,7 @@ public class TerraContext extends GeneratorContext {
         return new DecoratorContext(chunk, levels, terrain, factory.getClimate());
     }
 
-    public SurfaceContext surface(IChunk chunk, GenerationSettings settings) {
-        return new SurfaceContext(chunk, levels, terrain, factory.getClimate(), settings, world.getSeed());
+    public SurfaceContext surface(ChunkSurfaceBuffer buffer, GenerationSettings settings) {
+        return new SurfaceContext(buffer, levels, terrain, factory.getClimate(), settings, world.getSeed());
     }
 }

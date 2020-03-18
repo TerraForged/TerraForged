@@ -30,24 +30,25 @@ import com.terraforged.core.world.climate.Climate;
 import com.terraforged.core.world.heightmap.Levels;
 import com.terraforged.core.world.terrain.Terrains;
 import net.minecraft.block.BlockState;
-import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.GenerationSettings;
 
 public class SurfaceContext extends DecoratorContext {
 
+    public final long seed;
+    public final int seaLevel;
     public final BlockState solid;
     public final BlockState fluid;
-    public final int seaLevel;
-    public final long seed;
+    public final ChunkSurfaceBuffer buffer;
     public final CachedSurface cached = new CachedSurface();
 
     public double noise;
 
-    public SurfaceContext(IChunk chunk, Levels levels, Terrains terrain, Climate climate, GenerationSettings settings, long seed) {
-        super(chunk, levels, terrain, climate);
+    public SurfaceContext(ChunkSurfaceBuffer buffer, Levels levels, Terrains terrain, Climate climate, GenerationSettings settings, long seed) {
+        super(buffer, levels, terrain, climate);
         this.solid = settings.getDefaultBlock();
         this.fluid = settings.getDefaultFluid();
-        this.seed = seed;
+        this.buffer = buffer;
         this.seaLevel = levels.waterLevel;
+        this.seed = seed;
     }
 }

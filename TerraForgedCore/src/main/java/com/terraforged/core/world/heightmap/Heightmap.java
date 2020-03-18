@@ -31,13 +31,23 @@ import com.terraforged.core.cell.Populator;
 import com.terraforged.core.region.Size;
 import com.terraforged.core.util.concurrent.ObjectPool;
 import com.terraforged.core.world.climate.Climate;
+import com.terraforged.core.world.river.RiverManager;
+import com.terraforged.core.world.river.RiverRegionList;
 import com.terraforged.core.world.terrain.Terrain;
 
 public interface Heightmap extends Populator, Extent {
 
     Climate getClimate();
 
+    RiverManager getRiverManager();
+
     void visit(Cell<Terrain> cell, float x, float z);
+
+    void applyBase(Cell<Terrain> cell, float x, float z);
+
+    void applyRivers(Cell<Terrain> cell, float x, float z, RiverRegionList rivers);
+
+    void applyClimate(Cell<Terrain> cell, float x, float z);
 
     @Override
     default void visit(int minX, int minZ, int maxX, int maxZ, Cell.Visitor<Terrain> visitor) {

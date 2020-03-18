@@ -118,6 +118,11 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
 
     @Override
     public void generateStructures(BiomeManager unused, IChunk chunk, ChunkGenerator<?> generator, TemplateManager templates) {
+        ChunkPos pos = chunk.getPos();
+        int regionX = regionCache.chunkToRegion(pos.x);
+        int regionZ = regionCache.chunkToRegion(pos.z);
+        // start generating the heightmap as early as possible
+        regionCache.queueRegion(regionX, regionZ);
         super.generateStructures(unused, chunk, this, templates);
     }
 
@@ -145,40 +150,41 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
 
     @Override
     public final void generateBase(IWorld world, IChunk chunk) {
-        DecoratorContext context = new DecoratorContext(chunk, getContext().levels, getContext().terrain, getContext().factory.getClimate());
         TerraContainer container = getBiomeContainer(chunk);
-        container.getChunkReader().iterate((cell, dx, dz) -> {
-            int px = context.blockX + dx;
-            int pz = context.blockZ + dz;
+        DecoratorContext context = new DecoratorContext(FastChunk.wrap(chunk), getContext().levels, getContext().terrain, getContext().factory.getClimate());
+        container.getChunkReader().iterate(context, (cell, dx, dz, ctx) -> {
+            int px = ctx.blockX + dx;
+            int pz = ctx.blockZ + dz;
             int py = (int) (cell.value * getMaxHeight());
-            context.cell = cell;
-            context.biome = container.getBiome(dx, dz);
-            ChunkPopulator.INSTANCE.decorate(chunk, context, px, py, pz);
+            ctx.cell = cell;
+            ctx.biome = container.getBiome(dx, dz);
+            ChunkPopulator.INSTANCE.decorate(ctx.chunk, ctx, px, py, pz);
         });
         terrainHelper.flatten(world, chunk, context.blockX, context.blockZ);
     }
 
     @Override
     public final void generateSurface(WorldGenRegion world, IChunk chunk) {
-        ChunkSurfaceBuffer buffer = new ChunkSurfaceBuffer(chunk);
-        SurfaceContext context = getContext().surface(buffer, getSettings());
         TerraContainer container = getBiomeContainer(chunk);
-        container.getChunkReader().iterate((cell, dx, dz) -> {
-            int px = context.blockX + dx;
-            int pz = context.blockZ + dz;
-            int top = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, dx, dz) + 1;
+        ChunkSurfaceBuffer buffer = new ChunkSurfaceBuffer(FastChunk.wrap(chunk));
+        SurfaceContext context = getContext().surface(buffer, getSettings());
 
-            buffer.setSurfaceLevel(top);
+        container.getChunkReader().iterate(context, (cell, dx, dz, ctx) -> {
+            int px = ctx.blockX + dx;
+            int pz = ctx.blockZ + dz;
+            int top = ctx.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, dx, dz) + 1;
 
-            context.cell = cell;
-            context.biome = container.getBiome(dx, dz);
-            context.noise = getSurfaceNoise(px, pz) * 15D;
+            ctx.buffer.setSurfaceLevel(top);
 
-            getSurfaceManager().getSurface(context).buildSurface(px, pz, top, context);
+            ctx.cell = cell;
+            ctx.biome = container.getBiome(dx, dz);
+            ctx.noise = getSurfaceNoise(px, pz) * 15D;
+
+            getSurfaceManager().getSurface(ctx).buildSurface(px, pz, top, ctx);
 
             int py = (int) (cell.value * getMaxHeight());
             for (ColumnDecorator processor : getBaseDecorators()) {
-                processor.decorate(buffer, context, px, py, pz);
+                processor.decorate(ctx.buffer, ctx, px, py, pz);
             }
         });
     }
@@ -214,14 +220,14 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
 
     @Override
     public final void postProcess(ChunkReader chunk, TerraContainer container, DecoratorContext context) {
-        chunk.iterate((cell, dx, dz) -> {
-            int px = context.blockX + dx;
-            int pz = context.blockZ + dz;
-            int py = context.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, dx, dz);
-            context.cell = cell;
-            context.biome = container.getBiome(dx, dz);
+        chunk.iterate(context, (cell, dx, dz, ctx) -> {
+            int px = ctx.blockX + dx;
+            int pz = ctx.blockZ + dz;
+            int py = ctx.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, dx, dz);
+            ctx.cell = cell;
+            ctx.biome = container.getBiome(dx, dz);
             for (ColumnDecorator decorator : getPostProcessors()) {
-                decorator.decorate(context.chunk, context, px, py, pz);
+                decorator.decorate(ctx.chunk, ctx, px, py, pz);
             }
         });
     }
@@ -292,6 +298,8 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
         TerraContainer container = getBiomeProvider().createBiomeContainer(view);
         if (chunk instanceof ChunkPrimer) {
             ((ChunkPrimer) chunk).func_225548_a_(container);
+        } else if (chunk instanceof FastChunk) {
+            ((FastChunk) chunk).setBiomes(container);
         }
 
         return container;
@@ -306,8 +314,12 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
             modifiers = new FeatureModifiers();
         }
 
+        if (context.terraSettings.features.strataDecorator) {
+            // block stone blobs if strata enabled
+            modifiers.getPredicates().add(Matchers.stoneBlobs(), FeaturePredicate.DENY);
+        }
+
         // block ugly features
-        modifiers.getPredicates().add(Matchers.stoneBlobs(), FeaturePredicate.DENY);
         modifiers.getPredicates().add(Matchers.sedimentDisks(), FeaturePredicate.DENY);
         modifiers.getPredicates().add(FeatureMatcher.of(Feature.LAKE), FeaturePredicate.DENY);
         modifiers.getPredicates().add(FeatureMatcher.of(Feature.SPRING_FEATURE), FeaturePredicate.DENY);

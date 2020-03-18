@@ -26,13 +26,15 @@
 package com.terraforged.core.world.river;
 
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.util.Cache;
+import com.terraforged.core.region.Region;
+import com.terraforged.core.util.concurrent.cache.Cache;
+import com.terraforged.core.util.concurrent.cache.CacheEntry;
 import com.terraforged.core.world.GeneratorContext;
 import com.terraforged.core.world.heightmap.Heightmap;
 import com.terraforged.core.world.terrain.Terrain;
 import me.dags.noise.util.NoiseUtil;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
 public class RiverManager {
@@ -42,7 +44,7 @@ public class RiverManager {
     private final Heightmap heightmap;
     private final GeneratorContext context;
     private final RiverContext riverContext;
-    private final Cache<Long, RiverRegion> cache = new Cache<>(60, 60, TimeUnit.SECONDS, () -> new ConcurrentHashMap<>());
+    private final Cache<Long, CacheEntry<RiverRegion>> cache = new Cache<>(120, 60, TimeUnit.SECONDS);
 
     public RiverManager(Heightmap heightmap, GeneratorContext context) {
         RiverConfig primary = RiverConfig.builder(context.levels)
@@ -77,6 +79,35 @@ public class RiverManager {
         this.riverContext = new RiverContext(context.settings.rivers.riverFrequency, primary, secondary, tertiary, lakes);
     }
 
+    public RiverRegionList getRivers(Region region) {
+        return getRivers(region.getBlockX(), region.getBlockZ());
+    }
+
+    public RiverRegionList getRivers(int blockX, int blockZ) {
+        int rx = RiverRegion.blockToRegion(blockX);
+        int rz = RiverRegion.blockToRegion(blockZ);
+
+        // check which quarter of the region pos (x,y) is in & get the neighbouring regions' relative coords
+        int qx = blockX < RiverRegion.regionToBlock(rx) + QUAD_SIZE ? -1 : 1;
+        int qz = blockZ < RiverRegion.regionToBlock(rz) + QUAD_SIZE ? -1 : 1;
+
+        // relative positions of neighbouring regions
+        int minX = Math.min(0, qx);
+        int minZ = Math.min(0, qz);
+        int maxX = Math.max(0, qx);
+        int maxZ = Math.max(0, qz);
+
+        RiverRegionList list = new RiverRegionList();
+        for (int dz = minZ; dz <= maxZ; dz++) {
+            for (int dx = minX; dx <= maxX; dx++) {
+                CacheEntry<RiverRegion> entry = getRegion(rx + dx, rz + dz);
+                list.add(entry);
+            }
+        }
+
+        return list;
+    }
+
     public void apply(Cell<Terrain> cell, float x, float z) {
         int rx = RiverRegion.blockToRegion((int) x);
         int rz = RiverRegion.blockToRegion((int) z);
@@ -91,20 +122,32 @@ public class RiverManager {
         int maxX = Math.max(0, qx);
         int maxZ = Math.max(0, qz);
 
+        // queue up the 4 nearest reiver regions
+        int index = 0;
+        CacheEntry<RiverRegion>[] entries = new CacheEntry[4];
         for (int dz = minZ; dz <= maxZ; dz++) {
             for (int dx = minX; dx <= maxX; dx++) {
-                getRegion(rx + dx, rz + dz).apply(cell, x, z);
+                entries[index++] = getRegion(rx + dx, rz + dz);
+            }
+        }
+
+        int count = 0;
+        while (count < index) {
+            for (CacheEntry<RiverRegion> entry : entries) {
+                if (entry.isDone()) {
+                    count++;
+                    entry.get().apply(cell, x, z);
+                }
             }
         }
     }
 
-    private RiverRegion getRegion(int rx, int rz) {
+    private CacheEntry<RiverRegion> getRegion(int rx, int rz) {
         long id = NoiseUtil.seed(rx, rz);
-        RiverRegion region = cache.get(id);
-        if (region == null) {
-            region = new RiverRegion(rx, rz, heightmap, context, riverContext);
-            cache.put(id, region);
-        }
-        return region;
+        return cache.computeIfAbsent(id, l -> generateRegion(rx, rz));
+    }
+
+    private CacheEntry<RiverRegion> generateRegion(int rx, int rz) {
+        return CacheEntry.supplyAsync(() -> new RiverRegion(rx, rz, heightmap, context, riverContext), ForkJoinPool.commonPool());
     }
 }

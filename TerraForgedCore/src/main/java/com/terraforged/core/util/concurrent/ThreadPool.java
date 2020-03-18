@@ -55,7 +55,7 @@ public class ThreadPool implements Executor {
 
     public ThreadPool(int size) {
         this.poolSize = size;
-        this.service = ThreadPool.createService(size);
+        this.service = ThreadPool.createService(size, "TerraForged");
     }
 
     public void shutdown() {
@@ -79,6 +79,12 @@ public class ThreadPool implements Executor {
 
     public Batcher batcher(int size) {
         return new AsyncBatcher(service, size);
+    }
+
+    public static ThreadPool getCurrent() {
+        synchronized (lock) {
+            return instance;
+        }
     }
 
     public static ThreadPool getFixed(int size) {
@@ -120,17 +126,17 @@ public class ThreadPool implements Executor {
 
     private static int defaultPoolSize() {
         int threads = Runtime.getRuntime().availableProcessors();
-        return Math.max(2, (int) (threads / 3F) * 2);
+        return Math.max(1, (int) ((threads / 3F) * 2F));
     }
 
-    private static ExecutorService createService(int size) {
+    public static ExecutorService createService(int size, String name) {
         ThreadPoolExecutor service = new ThreadPoolExecutor(
                 size,
                 size,
                 30,
                 TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(),
-                new ThreadPoolFactory()
+                new WorkerFactory(name)
         );
         service.allowCoreThreadTimeOut(true);
         return service;

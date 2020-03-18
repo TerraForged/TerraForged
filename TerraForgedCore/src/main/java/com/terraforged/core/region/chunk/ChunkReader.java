@@ -65,4 +65,12 @@ public interface ChunkReader extends ChunkHolder {
             }
         }
     }
+
+    default <C> void iterate(C context, Cell.ContextVisitor<C, Terrain> visitor) {
+        for (int dz = 0; dz < 16; dz++) {
+            for (int dx = 0; dx < 16; dx++) {
+                visitor.visit(getCell(dx, dz), dx, dz, context);
+            }
+        }
+    }
 }

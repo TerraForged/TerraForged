@@ -124,6 +124,11 @@ public class Cell<T extends Tag> {
         void visit(Cell<T> cell, int dx, int dz);
     }
 
+    public interface ContextVisitor<C, T extends Tag> {
+
+        void visit(Cell<T> cell, int dx, int dz, C ctx);
+    }
+
     public interface ZoomVisitor<T extends Tag> {
 
         void visit(Cell<T> cell, float x, float z);

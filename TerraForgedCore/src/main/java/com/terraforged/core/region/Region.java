@@ -27,14 +27,15 @@ package com.terraforged.core.region;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Extent;
-import com.terraforged.core.world.decorator.Decorator;
 import com.terraforged.core.filter.Filterable;
 import com.terraforged.core.region.chunk.ChunkGenTask;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.region.chunk.ChunkWriter;
 import com.terraforged.core.region.chunk.ChunkZoomTask;
 import com.terraforged.core.util.concurrent.batcher.Batcher;
+import com.terraforged.core.world.decorator.Decorator;
 import com.terraforged.core.world.heightmap.Heightmap;
+import com.terraforged.core.world.river.RiverRegionList;
 import com.terraforged.core.world.terrain.Terrain;
 
 import java.util.Collection;
@@ -133,6 +134,41 @@ public class Region implements Extent {
                 int index = chunkSize.indexOf(cx, cz);
                 GenChunk chunk = computeChunk(index, cx, cz);
                 consumer.accept(chunk);
+            }
+        }
+    }
+
+    public void generateBase(Heightmap heightmap) {
+        for (int cz = 0; cz < chunkSize.total; cz++) {
+            for (int cx = 0; cx < chunkSize.total; cx++) {
+                int index = chunkSize.indexOf(cx, cz);
+                GenChunk chunk = computeChunk(index, cx, cz);
+                for (int dz = 0; dz < 16; dz++) {
+                    for (int dx = 0; dx < 16; dx++) {
+                        float x = chunk.getBlockX() + dx;
+                        float z = chunk.getBlockZ() + dz;
+                        Cell<Terrain> cell = chunk.genCell(dx, dz);
+                        heightmap.applyBase(cell, x, z);
+                    }
+                }
+            }
+        }
+    }
+
+    public void generateRivers(Heightmap heightmap, RiverRegionList rivers) {
+        for (int cz = 0; cz < chunkSize.total; cz++) {
+            for (int cx = 0; cx < chunkSize.total; cx++) {
+                int index = chunkSize.indexOf(cx, cz);
+                GenChunk chunk = computeChunk(index, cx, cz);
+                for (int dz = 0; dz < 16; dz++) {
+                    for (int dx = 0; dx < 16; dx++) {
+                        float x = chunk.getBlockX() + dx;
+                        float z = chunk.getBlockZ() + dz;
+                        Cell<Terrain> cell = chunk.genCell(dx, dz);
+                        heightmap.applyRivers(cell, x, z, rivers);
+                        heightmap.applyClimate(cell, x, z);
+                    }
+                }
             }
         }
     }

@@ -27,6 +27,7 @@ package com.terraforged.core.world.river;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.util.concurrent.ObjectPool;
+import com.terraforged.core.util.concurrent.cache.ExpiringEntry;
 import com.terraforged.core.world.GeneratorContext;
 import com.terraforged.core.world.heightmap.Heightmap;
 import com.terraforged.core.world.terrain.Terrain;
@@ -40,12 +41,14 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-public class RiverRegion {
+public class RiverRegion implements ExpiringEntry {
 
     public static final int SCALE = 12;
     private static final double MIN_FORK_ANGLE = 20D;
     private static final double MAX_FORK_ANGLE = 60D;
+    private static final long EXPIRE_TIME = TimeUnit.SECONDS.toMillis(60);
 
     private final Domain domain;
     private final Terrains terrains;
@@ -67,6 +70,8 @@ public class RiverRegion {
     private final int secondaryRelaxedAttempts;
     private final int forkAttempts;
     private final int tertiaryAttempts;
+
+    private final long timestamp = System.currentTimeMillis() + EXPIRE_TIME;
 
     public RiverRegion(int regionX, int regionZ, Heightmap heightmap, GeneratorContext context, RiverContext riverContext) {
         int seed = new Random(NoiseUtil.seed(regionX, regionZ)).nextInt();
@@ -94,6 +99,11 @@ public class RiverRegion {
             PosGenerator pos = new PosGenerator(heightmap, domain, cell.getValue(),1 << SCALE, River.VALLEY_WIDTH);
             this.rivers = generate(regionX, regionZ, pos);
         }
+    }
+
+    @Override
+    public long getTimestamp() {
+        return timestamp;
     }
 
     public void apply(Cell<Terrain> cell, float x, float z) {

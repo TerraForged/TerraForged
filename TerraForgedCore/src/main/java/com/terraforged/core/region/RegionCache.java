@@ -26,7 +26,8 @@
 package com.terraforged.core.region;
 
 import com.terraforged.core.region.chunk.ChunkReader;
-import com.terraforged.core.util.Cache;
+import com.terraforged.core.util.concurrent.cache.Cache;
+import com.terraforged.core.util.concurrent.cache.CacheEntry;
 import com.terraforged.core.world.heightmap.RegionExtent;
 import me.dags.noise.util.NoiseUtil;
 
@@ -37,13 +38,12 @@ public class RegionCache implements RegionExtent {
 
     private final boolean queuing;
     private final RegionGenerator renderer;
-    private final Cache<Long, CompletableFuture<Region>> cache;
-    private final ThreadLocal<Region> cachedRegion = new ThreadLocal<>();
+    private final Cache<Long, CacheEntry<Region>> cache;
 
     public RegionCache(boolean queueNeighbours, RegionGenerator renderer) {
         this.renderer = renderer;
         this.queuing = queueNeighbours;
-        this.cache = Cache.concurrent(180, 60, TimeUnit.SECONDS);
+        this.cache = new Cache<>(80, 60, TimeUnit.SECONDS);
     }
 
     @Override
@@ -53,13 +53,7 @@ public class RegionCache implements RegionExtent {
 
     @Override
     public CompletableFuture<Region> getRegionAsync(int regionX, int regionZ) {
-        long id = NoiseUtil.seed(regionX, regionZ);
-        CompletableFuture<Region> future = cache.get(id);
-        if (future == null) {
-            future = renderer.getRegionAsync(regionX, regionZ);
-            cache.put(id, future);
-        }
-        return future;
+        return renderer.generate(regionX, regionZ);
     }
 
     @Override
@@ -72,28 +66,18 @@ public class RegionCache implements RegionExtent {
 
     @Override
     public Region getRegion(int regionX, int regionZ) {
-        Region cached = cachedRegion.get();
-        if (cached != null && regionX == cached.getRegionX() && regionZ == cached.getRegionZ()) {
-            return cached;
-        }
-
-        long id = NoiseUtil.seed(regionX, regionZ);
-        CompletableFuture<Region> futureRegion = cache.get(id);
-
-        if (futureRegion == null) {
-            cached = renderer.generateRegion(regionX, regionZ);
-            cache.put(id, CompletableFuture.completedFuture(cached));
-        } else {
-            cached = futureRegion.join();
-        }
+        Region region = queueRegion(regionX, regionZ).get();
 
         if (queuing) {
             queueNeighbours(regionX, regionZ);
         }
 
-        cachedRegion.set(cached);
+        return region;
+    }
 
-        return cached;
+    public CacheEntry<Region> queueRegion(int regionX, int regionZ) {
+        long id = NoiseUtil.seed(regionX, regionZ);
+        return cache.computeIfAbsent(id, l -> renderer.generateCached(regionX, regionZ));
     }
 
     private void queueNeighbours(int regionX, int regionZ) {
@@ -102,7 +86,7 @@ public class RegionCache implements RegionExtent {
                 if (x == 0 && z == 0) {
                     continue;
                 }
-                getRegionAsync(regionX + x, regionZ + z);
+                queueRegion(regionX + x, regionZ + z);
             }
         }
     }
