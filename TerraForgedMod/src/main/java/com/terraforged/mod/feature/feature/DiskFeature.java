@@ -30,11 +30,12 @@ public class DiskFeature extends Feature<SphereReplaceConfig> {
             return false;
         } else {
             int i = 0;
-            float radius2 = (config.radius * config.radius)  * 0.65F;
+            int radius = 4 + rand.nextInt(config.radius - 2);
+            float radius2 = (radius * radius)  * 0.65F;
             BlockPos.Mutable blockPos = new BlockPos.Mutable();
 
-            for(int x = pos.getX() - config.radius; x <= pos.getX() + config.radius; ++x) {
-                for(int z = pos.getZ() - config.radius; z <= pos.getZ() + config.radius; ++z) {
+            for(int x = pos.getX() - radius; x <= pos.getX() + radius; ++x) {
+                for(int z = pos.getZ() - radius; z <= pos.getZ() + radius; ++z) {
                     int dx = x - pos.getX();
                     int dz = z - pos.getZ();
                     float rad2 = domain.getValue(x, z) * radius2;

@@ -49,10 +49,8 @@ public class Matchers {
                 BiomeMatcher.of(Biome.Category.RIVER, Biome.Category.SWAMP),
                 FeatureMatcher.builder()
                         .or(Feature.DISK).and("minecraft:sand")
-                        .or(Feature.DISK).and("minecraft:gravel")
                         .or(Feature.DISK).and("minecraft:dirt")
                         .or(DiskFeature.INSTANCE).and("minecraft:sand")
-                        .or(DiskFeature.INSTANCE).and("minecraft:gravel")
                         .or(DiskFeature.INSTANCE).and("minecraft:dirt")
                         .build()
         );
