@@ -50,7 +50,7 @@ public class Climate {
     private final ClimateModule biomeNoise;
 
     public Climate(GeneratorContext context) {
-        this.biomeNoise = new ClimateModule(context.seed, context.settings.generator);
+        this.biomeNoise = new ClimateModule(context.seed, context.settings);
 
         this.treeLine = Source.perlin(context.seed.next(), context.settings.generator.biome.biomeSize * 2, 1)
                 .scale(0.1).bias(0.4);

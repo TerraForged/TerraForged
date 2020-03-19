@@ -26,7 +26,7 @@
 package com.terraforged.core.world.climate;
 
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.settings.GeneratorSettings;
+import com.terraforged.core.settings.Settings;
 import com.terraforged.core.util.Seed;
 import com.terraforged.core.world.biome.BiomeType;
 import com.terraforged.core.world.terrain.Terrain;
@@ -51,8 +51,8 @@ public class ClimateModule {
     private final Module moisture;
     private final Module temperature;
 
-    public ClimateModule(Seed seed, GeneratorSettings settings) {
-        int biomeSize = settings.biome.biomeSize;
+    public ClimateModule(Seed seed, Settings settings) {
+        int biomeSize = settings.generator.biome.biomeSize;
 
         // todo - better solution (reduces the amount that temp/moist grows with biome size)
         int tempScaler = biomeSize > 500 ? 8 : 10;
@@ -63,23 +63,25 @@ public class ClimateModule {
         int temperatureSize = tempScaler * biomeSize;
         int moistScale = NoiseUtil.round(moistureSize * biomeFreq);
         int tempScale = NoiseUtil.round(temperatureSize * biomeFreq);
-        int warpScale = settings.biome.biomeWarpScale;
+        int warpScale = settings.generator.biome.biomeWarpScale;
 
         this.seed = seed.next();
         this.edgeClamp = 1F;
         this.edgeScale = 1 / edgeClamp;
         this.biomeFreq = 1F / biomeSize;
-        this.warpStrength = settings.biome.biomeWarpStrength;
+        this.warpStrength = settings.generator.biome.biomeWarpStrength;
         this.warpX = Source.perlin(seed.next(), warpScale, 2).bias(-0.5);
         this.warpZ = Source.perlin(seed.next(), warpScale, 2).bias(-0.5);
 
-        this.moisture = Source.simplex(seed.next(), moistScale, 2)
-                .clamp(0.15, 0.85).map(0, 1)
+        Module moisture = Source.simplex(seed.next(), moistScale, 2).clamp(0.15, 0.85).map(0, 1);
+        this.moisture = settings.climate.moisture.clamp(moisture)
                 .warp(seed.next(), moistScale / 2, 1, moistScale / 4D)
                 .warp(seed.next(), moistScale / 6, 2, moistScale / 12D);
 
-        Module temperature = Source.sin(tempScale, Source.constant(0.9)).clamp(0.05, 0.95).map(0, 1);
-        this.temperature = new Compressor(temperature, 0.1F, 0.2F)
+        Module temperature = Source.sin(tempScale, Source.constant(0.9))
+                .clamp(0.05, 0.95).map(0, 1);
+
+        this.temperature = new Compressor(settings.climate.temperature.clamp(temperature), 0.1F, 0.2F)
                 .warp(seed.next(), tempScale * 4, 2, tempScale * 4)
                 .warp(seed.next(), tempScale, 1, tempScale)
                 .warp(seed.next(), tempScale / 8, 1, tempScale / 8D);

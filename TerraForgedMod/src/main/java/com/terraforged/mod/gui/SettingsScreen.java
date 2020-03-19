@@ -27,6 +27,7 @@ package com.terraforged.mod.gui;
 
 import com.terraforged.mod.gui.element.TerraButton;
 import com.terraforged.mod.gui.element.TerraLabel;
+import com.terraforged.mod.gui.page.ClimatePage;
 import com.terraforged.mod.gui.page.FeaturePage;
 import com.terraforged.mod.gui.page.FilterPage;
 import com.terraforged.mod.gui.page.GeneratorPage;
@@ -60,6 +61,7 @@ public class SettingsScreen extends OverlayScreen {
         this.parent = parent;
         this.pages = new Page[]{
                 new GeneratorPage(settings, preview),
+                new ClimatePage(settings, preview),
                 new TerrainPage(settings, preview),
                 new RiverPage(settings, preview),
                 new FilterPage(settings, preview),

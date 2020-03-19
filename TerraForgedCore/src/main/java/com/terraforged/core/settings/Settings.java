@@ -32,6 +32,8 @@ public class Settings {
 
     public GeneratorSettings generator = new GeneratorSettings();
 
+    public ClimateSettings climate = new ClimateSettings();
+
     public RiverSettings rivers = new RiverSettings();
 
     public FilterSettings filters = new FilterSettings();
