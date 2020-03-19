@@ -62,6 +62,13 @@ public class Levels {
         water = NoiseUtil.div(waterY, worldHeight);
     }
 
+    public int scale(float value) {
+        if (value >= 1F) {
+            return worldHeight - 1;
+        }
+        return (int) (value * worldHeight);
+    }
+
     public float scale(int level) {
         return NoiseUtil.div(level, worldHeight);
     }

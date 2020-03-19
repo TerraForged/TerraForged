@@ -155,7 +155,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
         container.getChunkReader().iterate(context, (cell, dx, dz, ctx) -> {
             int px = ctx.blockX + dx;
             int pz = ctx.blockZ + dz;
-            int py = (int) (cell.value * getMaxHeight());
+            int py = ctx.levels.scale(cell.value);
             ctx.cell = cell;
             ctx.biome = container.getBiome(dx, dz);
             ChunkPopulator.INSTANCE.decorate(ctx.chunk, ctx, px, py, pz);
@@ -182,7 +182,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
 
             getSurfaceManager().getSurface(ctx).buildSurface(px, pz, top, ctx);
 
-            int py = (int) (cell.value * getMaxHeight());
+            int py = ctx.levels.scale(cell.value);
             for (ColumnDecorator processor : getBaseDecorators()) {
                 processor.decorate(ctx.buffer, ctx, px, py, pz);
             }
@@ -238,7 +238,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
         int chunkZ = Size.blockToChunk(z);
         ChunkReader chunk = getChunkReader(chunkX, chunkZ);
         Cell<?> cell = chunk.getCell(x, z);
-        return (int) (cell.value * getMaxHeight());
+        return context.levels.scale(cell.value);
     }
 
     @Override

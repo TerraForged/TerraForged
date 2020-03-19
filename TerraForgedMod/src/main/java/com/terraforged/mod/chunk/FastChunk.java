@@ -37,22 +37,25 @@ public class FastChunk implements ChunkDelegate {
 
     @Override
     public BlockState setBlockState(BlockPos pos, BlockState state, boolean falling) {
-        ChunkSection section = primer.getSection(pos.getY() >> 4);
-        section.lock();
-        int dx = pos.getX() & 15;
-        int dy = pos.getY() & 15;
-        int dz = pos.getZ() & 15;
-        BlockState replaced = section.setBlockState(dx, dy, dz, state, false);
-        if (state.getBlock() != Blocks.AIR) {
-            mutable.setPos(blockX + dx, pos.getY(), blockZ + dz);
-            if (state.getLightValue(primer, mutable) != 0) {
-                primer.addLightPosition(mutable);
+        if (pos.getY() >= 0 && pos.getY() < 256) {
+            ChunkSection section = primer.getSection(pos.getY() >> 4);
+            section.lock();
+            int dx = pos.getX() & 15;
+            int dy = pos.getY() & 15;
+            int dz = pos.getZ() & 15;
+            BlockState replaced = section.setBlockState(dx, dy, dz, state, false);
+            if (state.getBlock() != Blocks.AIR) {
+                mutable.setPos(blockX + dx, pos.getY(), blockZ + dz);
+                if (state.getLightValue(primer, mutable) != 0) {
+                    primer.addLightPosition(mutable);
+                }
+                worldSurface.update(dx, pos.getY(), dz, state);
+                oceanSurface.update(dx, pos.getY(), dz, state);
             }
-            worldSurface.update(dx, pos.getY(), dz, state);
-            oceanSurface.update(dx, pos.getY(), dz, state);
+            section.unlock();
+            return replaced;
         }
-        section.unlock();
-        return replaced;
+        return Blocks.AIR.getDefaultState();
     }
 
     public void setBiomes(BiomeContainer biomes) {

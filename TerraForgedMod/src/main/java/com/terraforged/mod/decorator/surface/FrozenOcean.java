@@ -28,12 +28,10 @@ package com.terraforged.mod.decorator.surface;
 import com.terraforged.api.chunk.surface.Surface;
 import com.terraforged.api.chunk.surface.SurfaceContext;
 import com.terraforged.api.material.state.States;
-import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.heightmap.Levels;
 import com.terraforged.mod.chunk.TerraContext;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
-import me.dags.noise.util.NoiseUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
@@ -94,7 +92,7 @@ public class FrozenOcean implements Surface {
         }
 
         // set ocean floor to gravel
-        int floorBed = (int) (ctx.cell.value * ctx.levels.worldHeight);
+        int floorBed = ctx.levels.scale(ctx.cell.value);
         int floorDepth = (int) (seaFloor.getValue(x, z) * levels.worldHeight);
         for (int dy = 0; dy < floorDepth; dy++) {
             pos.setY(floorBed - dy);
@@ -107,9 +105,5 @@ public class FrozenOcean implements Surface {
             return States.SNOW_BLOCK.get();
         }
         return States.PACKED_ICE.get();
-    }
-
-    private static float getMask(Cell<?> cell) {
-        return NoiseUtil.map(cell.biomeTypeMask * cell.riverMask, 0F, 0.3F, 0.3F);
     }
 }
