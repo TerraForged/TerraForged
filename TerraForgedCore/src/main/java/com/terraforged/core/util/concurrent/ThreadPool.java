@@ -42,6 +42,7 @@ public class ThreadPool implements Executor {
     public static final int DEFAULT_POOL_SIZE = defaultPoolSize();
 
     private static final Object lock = new Object();
+    private static final ForkJoinPool defaultPool = ThreadPool.createPool(2, "TFCore");
 
     private static ThreadPool instance = new ThreadPool(defaultPoolSize());
 
@@ -49,13 +50,18 @@ public class ThreadPool implements Executor {
     private final ExecutorService service;
 
     private ThreadPool() {
-        this.service = ForkJoinPool.commonPool();
+        this.service = defaultPool;
         this.poolSize = -1;
     }
 
     public ThreadPool(int size) {
         this.poolSize = size;
-        this.service = ThreadPool.createService(size, "TerraForged");
+        this.service = ThreadPool.createExecutor(size, "TerraForged");
+    }
+
+    private ThreadPool(ForkJoinPool pool) {
+        this.service = pool;
+        this.poolSize = pool.getPoolSize();
     }
 
     public void shutdown() {
@@ -116,6 +122,10 @@ public class ThreadPool implements Executor {
         }
     }
 
+    public static ForkJoinPool getDefaultPool() {
+        return defaultPool;
+    }
+
     public static void shutdownCurrent() {
         synchronized (lock) {
             instance.shutdown();
@@ -129,7 +139,7 @@ public class ThreadPool implements Executor {
         return Math.max(1, (int) ((threads / 3F) * 2F));
     }
 
-    public static ExecutorService createService(int size, String name) {
+    public static ExecutorService createExecutor(int size, String name) {
         ThreadPoolExecutor service = new ThreadPoolExecutor(
                 size,
                 size,
@@ -140,5 +150,9 @@ public class ThreadPool implements Executor {
         );
         service.allowCoreThreadTimeOut(true);
         return service;
+    }
+
+    public static ForkJoinPool createPool(int size, String name) {
+        return new ForkJoinPool(size, new WorkerFactory.ForkJoin(name), null, true);
     }
 }

@@ -1,9 +1,9 @@
 package com.terraforged.core.util.concurrent.cache;
 
+import com.terraforged.core.util.concurrent.ThreadPool;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -12,7 +12,6 @@ public class Cache<K, V extends ExpiringEntry> implements Runnable {
 
     private final long expireMS;
     private final long intervalMS;
-    private final Executor executor;
     private final Map<K, V> map = new ConcurrentHashMap<>();
 
     private volatile long timestamp = 0L;
@@ -20,7 +19,6 @@ public class Cache<K, V extends ExpiringEntry> implements Runnable {
     public Cache(long expireTime, long interval, TimeUnit unit) {
         this.expireMS = unit.toMillis(expireTime);
         this.intervalMS = unit.toMillis(interval);
-        this.executor = ForkJoinPool.commonPool();
     }
 
     public V computeIfAbsent(K k, Supplier<V> supplier) {
@@ -37,7 +35,7 @@ public class Cache<K, V extends ExpiringEntry> implements Runnable {
         long now = System.currentTimeMillis();
         if (now - timestamp > intervalMS) {
             timestamp = now;
-            executor.execute(this);
+            ThreadPool.getDefaultPool().execute(this);
         }
     }
 

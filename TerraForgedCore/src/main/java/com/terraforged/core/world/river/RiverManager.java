@@ -27,6 +27,7 @@ package com.terraforged.core.world.river;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.Region;
+import com.terraforged.core.util.concurrent.ThreadPool;
 import com.terraforged.core.util.concurrent.cache.Cache;
 import com.terraforged.core.util.concurrent.cache.CacheEntry;
 import com.terraforged.core.world.GeneratorContext;
@@ -34,7 +35,6 @@ import com.terraforged.core.world.heightmap.Heightmap;
 import com.terraforged.core.world.terrain.Terrain;
 import me.dags.noise.util.NoiseUtil;
 
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
 public class RiverManager {
@@ -148,6 +148,6 @@ public class RiverManager {
     }
 
     private CacheEntry<RiverRegion> generateRegion(int rx, int rz) {
-        return CacheEntry.supplyAsync(() -> new RiverRegion(rx, rz, heightmap, context, riverContext), ForkJoinPool.commonPool());
+        return CacheEntry.supplyAsync(() -> new RiverRegion(rx, rz, heightmap, context, riverContext), ThreadPool.getDefaultPool());
     }
 }
