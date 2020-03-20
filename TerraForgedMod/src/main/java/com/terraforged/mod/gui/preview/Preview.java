@@ -165,7 +165,7 @@ public class Preview extends Button {
 
         RegionGenerator renderer = RegionGenerator.builder()
                 .factory(new WorldGeneratorFactory(context))
-                .pool(ThreadPool.getCommon())
+                .pool(ThreadPool.getPool())
                 .size(FACTOR, 0)
                 .build();
 

@@ -33,41 +33,19 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class ThreadPool implements Executor {
 
-    public static final int DEFAULT_POOL_SIZE = defaultPoolSize();
+    private static final ThreadPool instance = new ThreadPool("TerraForged", defaultPoolSize());
 
-    private static final Object lock = new Object();
-    private static final ForkJoinPool defaultPool = ThreadPool.createPool(2, "TFCore");
-
-    private static ThreadPool instance = new ThreadPool(defaultPoolSize());
-
-    private final int poolSize;
     private final ExecutorService service;
 
-    private ThreadPool() {
-        this.service = defaultPool;
-        this.poolSize = -1;
-    }
-
-    public ThreadPool(int size) {
-        this.poolSize = size;
-        this.service = ThreadPool.createExecutor(size, "TerraForged");
-    }
-
-    private ThreadPool(ForkJoinPool pool) {
-        this.service = pool;
-        this.poolSize = pool.getPoolSize();
+    private ThreadPool(String name, int size) {
+        this.service = ThreadPool.createPool(size, name);
     }
 
     public void shutdown() {
-        if (poolSize > 0) {
-            service.shutdown();
-        }
+        service.shutdown();
     }
 
     @Override
@@ -87,69 +65,21 @@ public class ThreadPool implements Executor {
         return new AsyncBatcher(service, size);
     }
 
-    public static ThreadPool getCurrent() {
-        synchronized (lock) {
-            return instance;
-        }
+    public static ThreadPool getPool() {
+        return instance;
     }
 
-    public static ThreadPool getFixed(int size) {
-        synchronized (lock) {
-            if (instance.poolSize != size) {
-                instance.shutdown();
-                instance = new ThreadPool(size);
-            }
-            return instance;
-        }
-    }
-
-    public static ThreadPool getFixed() {
-        synchronized (lock) {
-            if (instance.poolSize == -1) {
-                instance = new ThreadPool(ThreadPool.DEFAULT_POOL_SIZE);
-            }
-            return instance;
-        }
-    }
-
-    public static ThreadPool getCommon() {
-        synchronized (lock) {
-            if (instance.poolSize != -1) {
-                instance.shutdown();
-                instance = new ThreadPool();
-            }
-            return instance;
-        }
-    }
-
-    public static ForkJoinPool getDefaultPool() {
-        return defaultPool;
+    public static ThreadPool create(int size) {
+        return new ThreadPool("Pool", Math.max(1, size));
     }
 
     public static void shutdownCurrent() {
-        synchronized (lock) {
-            instance.shutdown();
-            // replace with the common pool
-            instance = new ThreadPool();
-        }
+        instance.shutdown();
     }
 
     private static int defaultPoolSize() {
         int threads = Runtime.getRuntime().availableProcessors();
         return Math.max(1, (int) ((threads / 3F) * 2F));
-    }
-
-    public static ExecutorService createExecutor(int size, String name) {
-        ThreadPoolExecutor service = new ThreadPoolExecutor(
-                size,
-                size,
-                30,
-                TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(),
-                new WorkerFactory(name)
-        );
-        service.allowCoreThreadTimeOut(true);
-        return service;
     }
 
     public static ForkJoinPool createPool(int size, String name) {

@@ -56,7 +56,7 @@ public class Cache {
         this.context = new GeneratorContext(terrain, settings);
         this.renderer = RegionGenerator.builder()
                 .factory(new WorldGeneratorFactory(context))
-                .pool(ThreadPool.getCommon())
+                .pool(ThreadPool.getPool())
                 .size(3, 2)
                 .build();
     }

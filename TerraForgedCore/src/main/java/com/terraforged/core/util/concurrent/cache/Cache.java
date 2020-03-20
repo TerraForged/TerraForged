@@ -4,7 +4,6 @@ import com.terraforged.core.util.concurrent.ThreadPool;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
-import java.util.function.Supplier;
 
 public class Cache<V extends ExpiringEntry> implements Runnable {
 
@@ -20,8 +19,8 @@ public class Cache<V extends ExpiringEntry> implements Runnable {
         this.map = new SynchronizedLongMap<>(100);
     }
 
-    public V computeIfAbsent(long key, Supplier<V> supplier) {
-        return computeIfAbsent(key, o -> supplier.get());
+    public void remove(long key) {
+        map.remove(key);
     }
 
     public V computeIfAbsent(long key, LongFunction<V> func) {
@@ -34,7 +33,7 @@ public class Cache<V extends ExpiringEntry> implements Runnable {
         long now = System.currentTimeMillis();
         if (now - timestamp > intervalMS) {
             timestamp = now;
-            ThreadPool.getDefaultPool().execute(this);
+            ThreadPool.getPool().execute(this);
         }
     }
 

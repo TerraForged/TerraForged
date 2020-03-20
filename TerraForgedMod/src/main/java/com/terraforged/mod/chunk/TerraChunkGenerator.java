@@ -216,6 +216,9 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
 
         // bake biome array & discard gen data
         ((ChunkPrimer) chunk).func_225548_a_(container.bakeBiomes(Environment.isVanillaBiomes()));
+
+        // marks the heightmap data for this chunk for removal
+        container.getChunkReader().dispose();
     }
 
     @Override
@@ -383,7 +386,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
     protected RegionCache createRegionCache(TerraContext context) {
         return RegionGenerator.builder()
                 .legacy(context.terraSettings.version == 0)
-                .pool(ThreadPool.getFixed())
+                .pool(ThreadPool.getPool())
                 .factory(context.factory)
                 .size(3, 2)
                 .build()

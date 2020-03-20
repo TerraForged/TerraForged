@@ -55,7 +55,7 @@ public class FastChunk implements ChunkDelegate {
             section.unlock();
             return replaced;
         }
-        return Blocks.AIR.getDefaultState();
+        return Blocks.VOID_AIR.getDefaultState();
     }
 
     public void setBiomes(BiomeContainer biomes) {

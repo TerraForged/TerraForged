@@ -52,7 +52,7 @@ public class TestChunkGenerator extends TerraChunkGenerator {
     protected RegionCache createRegionCache(TerraContext context) {
         return RegionGenerator.builder()
                 .factory(new WorldGeneratorFactory(context, new TestHeightMap(context)))
-                .pool(ThreadPool.getFixed())
+                .pool(ThreadPool.getPool())
                 .size(3, 2)
                 .build()
                 .toCache(false);

@@ -26,8 +26,9 @@
 package com.terraforged.core.region.chunk;
 
 import com.terraforged.core.cell.Extent;
+import com.terraforged.core.util.concurrent.Disposable;
 
-public interface ChunkHolder extends Extent {
+public interface ChunkHolder extends Extent, Disposable {
 
     int getChunkX();
 

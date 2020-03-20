@@ -1,6 +1,7 @@
 package com.terraforged.core.region.legacy;
 
 import com.terraforged.core.region.Region;
+import com.terraforged.core.util.concurrent.Disposable;
 
 /**
  * This is here to provide compatibility for versions 0.0.2 and below which contained a
@@ -9,8 +10,8 @@ import com.terraforged.core.region.Region;
  */
 public class LegacyRegion extends Region {
 
-    public LegacyRegion(int regionX, int regionZ, int size, int borderChunks) {
-        super(regionX, regionZ, size, borderChunks);
+    public LegacyRegion(int regionX, int regionZ, int size, int borderChunks, Disposable.Listener<Region> listener) {
+        super(regionX, regionZ, size, borderChunks, listener);
     }
 
     /**

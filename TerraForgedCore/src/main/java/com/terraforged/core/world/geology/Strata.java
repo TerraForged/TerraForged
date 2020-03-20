@@ -44,14 +44,19 @@ public class Strata<T> {
         this.heightMod = heightMod;
     }
 
-    public boolean downwards(final int x, final int y, final int z, Stratum.Visitor<T> visitor) {
-        DepthBuffer depthBuffer = new DepthBuffer(strata, x, z);
+    public boolean downwards(final int x, final int y, final int z, final Stratum.Visitor<T> visitor) {
+        DepthBuffer buffer = new DepthBuffer();
+        initBuffer(buffer, x, z);
+        return downwards(x, y, z, buffer, visitor);
+    }
+
+    public boolean downwards(final int x, final int y, final int z, final DepthBuffer buffer, Stratum.Visitor<T> visitor) {
+        initBuffer(buffer, x, z);
 
         int py = y;
         T last = null;
-        float sum = depthBuffer.sum;
         for (int i = 0; i < strata.size(); i++) {
-            float depth = depthBuffer.buffer[i] / sum;
+            float depth = buffer.get(i);
             int height = NoiseUtil.round(depth * y);
             T value = strata.get(i).getValue();
             last = value;
@@ -76,45 +81,15 @@ public class Strata<T> {
         return true;
     }
 
-    public boolean upwards(int x, int y, int z, Stratum.Visitor<T> visitor) {
-        DepthBuffer depthBuffer = new DepthBuffer(strata, x, z);
-        int py = 0;
-        float sum = depthBuffer.sum;
-        for (int i = strata.size() - 1; i > 0; i--) {
-            float depth = depthBuffer.buffer[i] / sum;
-            int height = NoiseUtil.round(depth * y);
-            T value = strata.get(i).getValue();
-            for (int dy = 0; dy < height; dy++) {
-                boolean cont = visitor.visit(py, value);
-                if (!cont) {
-                    return false;
-                }
-                if (++py > y) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     private int getYOffset(int x, int z) {
         return (int) (64 * heightMod.getValue(x, z));
     }
 
-    private static class DepthBuffer {
-
-        private final float sum;
-        private final float[] buffer;
-
-        private <T> DepthBuffer(List<Stratum<T>> strata, int x, int z) {
-            buffer = new float[strata.size()];
-            float sum = 0F;
-            for (int i = 0; i < strata.size(); i++) {
-                float depth = strata.get(i).getDepth(x, z);
-                sum += depth;
-                buffer[i] = depth;
-            }
-            this.sum = sum;
+    private void initBuffer(DepthBuffer buffer,  int x, int z) {
+        buffer.init(strata.size());
+        for (int i = 0; i < strata.size(); i++) {
+            float depth = strata.get(i).getDepth(x, z);
+            buffer.set(i, depth);
         }
     }
 

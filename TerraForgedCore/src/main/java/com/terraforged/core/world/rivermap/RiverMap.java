@@ -151,6 +151,6 @@ public class RiverMap {
     }
 
     private CacheEntry<RiverRegion> generateRegion(int rx, int rz) {
-        return CacheEntry.supplyAsync(() -> new RiverRegion(rx, rz, heightmap, context, riverMapConfig), ThreadPool.getDefaultPool());
+        return CacheEntry.supplyAsync(() -> new RiverRegion(rx, rz, heightmap, context, riverMapConfig), ThreadPool.getPool());
     }
 }

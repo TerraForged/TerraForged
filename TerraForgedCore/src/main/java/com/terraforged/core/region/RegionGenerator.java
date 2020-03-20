@@ -26,6 +26,7 @@
 package com.terraforged.core.region;
 
 import com.terraforged.core.region.legacy.LegacyRegion;
+import com.terraforged.core.util.concurrent.Disposable;
 import com.terraforged.core.util.concurrent.ThreadPool;
 import com.terraforged.core.util.concurrent.cache.CacheEntry;
 import com.terraforged.core.world.WorldGenerator;
@@ -42,6 +43,7 @@ public class RegionGenerator implements RegionExtent {
     private final RegionFactory regions;
     private final ThreadPool threadPool;
     private final ThreadLocal<WorldGenerator> genPool;
+    private final Disposable.Listener<Region> disposalListener;
 
     private RegionGenerator(Builder builder) {
         this.factor = builder.factor;
@@ -49,6 +51,16 @@ public class RegionGenerator implements RegionExtent {
         this.threadPool = builder.threadPool;
         this.regions = builder.regionFactory;
         this.genPool = ThreadLocal.withInitial(builder.factory);
+        this.disposalListener = region -> {};
+    }
+
+    protected RegionGenerator(RegionGenerator from, Disposable.Listener<Region> listener) {
+        this.factor = from.factor;
+        this.border = from.border;
+        this.threadPool = from.threadPool;
+        this.regions = from.regions;
+        this.genPool = from.genPool;
+        this.disposalListener = listener;
     }
 
     public RegionCache toCache() {
@@ -88,7 +100,7 @@ public class RegionGenerator implements RegionExtent {
 
     public Region generateRegion(int regionX, int regionZ) {
         WorldGenerator generator = genPool.get();
-        Region region = regions.create(regionX, regionZ, factor, border);
+        Region region = regions.create(regionX, regionZ, factor, border, disposalListener);
         RiverRegionList rivers = generator.getHeightmap().getRiverMap().getRivers(region);
         region.generateBase(generator.getHeightmap());
         region.generateRivers(generator.getHeightmap(), rivers);
@@ -103,7 +115,7 @@ public class RegionGenerator implements RegionExtent {
 
     public Region generateRegion(float centerX, float centerZ, float zoom, boolean filter) {
         WorldGenerator generator = genPool.get();
-        Region region = regions.create(0, 0, factor, border);
+        Region region = regions.create(0, 0, factor, border, disposalListener);
         region.generateZoom(generator.getHeightmap(), centerX, centerZ, zoom);
         postProcess(region, generator, centerX, centerZ, zoom, filter);
         return region;

@@ -30,15 +30,18 @@ import com.terraforged.core.cell.Extent;
 import com.terraforged.core.filter.Filterable;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.region.chunk.ChunkWriter;
+import com.terraforged.core.util.concurrent.Disposable;
 import com.terraforged.core.world.decorator.Decorator;
 import com.terraforged.core.world.heightmap.Heightmap;
 import com.terraforged.core.world.rivermap.RiverRegionList;
 import com.terraforged.core.world.terrain.Terrain;
+import me.dags.noise.util.NoiseUtil;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-public class Region implements Extent {
+public class Region implements Extent, Disposable {
 
     private final int regionX;
     private final int regionZ;
@@ -51,8 +54,15 @@ public class Region implements Extent {
     private final Size chunkSize;
     private final GenCell[] blocks;
     private final GenChunk[] chunks;
+    private final int disposableChunks;
+    private final Disposable.Listener<Region> disposalListener;
+    private final AtomicInteger disposedChunks = new AtomicInteger();
 
     public Region(int regionX, int regionZ, int size, int borderChunks) {
+        this(regionX, regionZ, size, borderChunks, region -> {});
+    }
+
+    public Region(int regionX, int regionZ, int size, int borderChunks, Disposable.Listener<Region> disposalListener) {
         this.regionX = regionX;
         this.regionZ = regionZ;
         this.chunkX = regionX << size;
@@ -62,8 +72,23 @@ public class Region implements Extent {
         this.border = borderChunks;
         this.chunkSize = Size.chunks(size, borderChunks);
         this.blockSize = Size.blocks(size, borderChunks);
+        this.disposalListener = disposalListener;
+        this.disposableChunks = chunkSize.size * chunkSize.size;
         this.blocks = new GenCell[blockSize.total * blockSize.total];
         this.chunks = new GenChunk[chunkSize.total * chunkSize.total];
+    }
+
+    @Override
+    public void dispose() {
+        int disposed = disposedChunks.incrementAndGet();
+        if (disposed < disposableChunks) {
+            return;
+        }
+        disposalListener.onDispose(this);
+    }
+
+    public long getRegionId() {
+        return NoiseUtil.seed(getRegionX(), getRegionZ());
     }
 
     public int getRegionX() {
@@ -331,6 +356,11 @@ public class Region implements Extent {
         @Override
         public int getBlockZ() {
             return blockZ;
+        }
+
+        @Override
+        public void dispose() {
+            Region.this.dispose();
         }
 
         @Override

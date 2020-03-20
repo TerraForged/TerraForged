@@ -28,6 +28,7 @@ package com.terraforged.api.chunk.column;
 import com.terraforged.api.chunk.ChunkContext;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.climate.Climate;
+import com.terraforged.core.world.geology.DepthBuffer;
 import com.terraforged.core.world.heightmap.Levels;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.Terrains;
@@ -40,6 +41,7 @@ public class DecoratorContext extends ChunkContext {
     public final Levels levels;
     public final Climate climate;
     public final Terrains terrains;
+    public final DepthBuffer depthBuffer = new DepthBuffer();
     public final BlockPos.Mutable pos = new BlockPos.Mutable();
 
     public Biome biome;

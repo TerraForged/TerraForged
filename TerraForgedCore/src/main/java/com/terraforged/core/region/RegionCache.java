@@ -26,6 +26,7 @@
 package com.terraforged.core.region;
 
 import com.terraforged.core.region.chunk.ChunkReader;
+import com.terraforged.core.util.concurrent.Disposable;
 import com.terraforged.core.util.concurrent.cache.Cache;
 import com.terraforged.core.util.concurrent.cache.CacheEntry;
 import com.terraforged.core.world.heightmap.RegionExtent;
@@ -34,32 +35,37 @@ import me.dags.noise.util.NoiseUtil;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-public class RegionCache implements RegionExtent {
+public class RegionCache implements RegionExtent, Disposable.Listener<Region> {
 
     private final boolean queuing;
-    private final RegionGenerator renderer;
+    private final RegionGenerator generator;
     private final Cache<CacheEntry<Region>> cache;
 
-    public RegionCache(boolean queueNeighbours, RegionGenerator renderer) {
-        this.renderer = renderer;
+    public RegionCache(boolean queueNeighbours, RegionGenerator generator) {
         this.queuing = queueNeighbours;
-        this.cache = new Cache<>(80, 60, TimeUnit.SECONDS);
+        this.generator = new RegionGenerator(generator, this);
+        this.cache = new Cache<>(60, 30, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void onDispose(Region region) {
+        cache.remove(region.getRegionId());
     }
 
     @Override
     public int chunkToRegion(int coord) {
-        return renderer.chunkToRegion(coord);
+        return generator.chunkToRegion(coord);
     }
 
     @Override
     public CompletableFuture<Region> getRegionAsync(int regionX, int regionZ) {
-        return renderer.generate(regionX, regionZ);
+        return generator.generate(regionX, regionZ);
     }
 
     @Override
     public ChunkReader getChunk(int chunkX, int chunkZ) {
-        int regionX = renderer.chunkToRegion(chunkX);
-        int regionZ = renderer.chunkToRegion(chunkZ);
+        int regionX = generator.chunkToRegion(chunkX);
+        int regionZ = generator.chunkToRegion(chunkZ);
         Region region = getRegion(regionX, regionZ);
         return region.getChunk(chunkX, chunkZ);
     }
@@ -77,7 +83,7 @@ public class RegionCache implements RegionExtent {
 
     public CacheEntry<Region> queueRegion(int regionX, int regionZ) {
         long id = NoiseUtil.seed(regionX, regionZ);
-        return cache.computeIfAbsent(id, l -> renderer.generateCached(regionX, regionZ));
+        return cache.computeIfAbsent(id, l -> generator.generateCached(regionX, regionZ));
     }
 
     private void queueNeighbours(int regionX, int regionZ) {
