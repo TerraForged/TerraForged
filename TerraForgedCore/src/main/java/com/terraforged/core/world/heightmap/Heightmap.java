@@ -31,15 +31,15 @@ import com.terraforged.core.cell.Populator;
 import com.terraforged.core.region.Size;
 import com.terraforged.core.util.concurrent.ObjectPool;
 import com.terraforged.core.world.climate.Climate;
-import com.terraforged.core.world.river.RiverManager;
-import com.terraforged.core.world.river.RiverRegionList;
+import com.terraforged.core.world.rivermap.RiverMap;
+import com.terraforged.core.world.rivermap.RiverRegionList;
 import com.terraforged.core.world.terrain.Terrain;
 
 public interface Heightmap extends Populator, Extent {
 
     Climate getClimate();
 
-    RiverManager getRiverManager();
+    RiverMap getRiverMap();
 
     void visit(Cell<Terrain> cell, float x, float z);
 

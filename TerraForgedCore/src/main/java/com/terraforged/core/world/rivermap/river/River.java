@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.world.river;
+package com.terraforged.core.world.rivermap.river;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.terrain.Terrain;

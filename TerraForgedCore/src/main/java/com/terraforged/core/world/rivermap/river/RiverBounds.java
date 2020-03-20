@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.world.river;
+package com.terraforged.core.world.rivermap.river;
 
 import me.dags.noise.util.Vec2f;
 

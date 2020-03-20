@@ -28,14 +28,11 @@ package com.terraforged.core.region;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Extent;
 import com.terraforged.core.filter.Filterable;
-import com.terraforged.core.region.chunk.ChunkGenTask;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.region.chunk.ChunkWriter;
-import com.terraforged.core.region.chunk.ChunkZoomTask;
-import com.terraforged.core.util.concurrent.batcher.Batcher;
 import com.terraforged.core.world.decorator.Decorator;
 import com.terraforged.core.world.heightmap.Heightmap;
-import com.terraforged.core.world.river.RiverRegionList;
+import com.terraforged.core.world.rivermap.RiverRegionList;
 import com.terraforged.core.world.terrain.Terrain;
 
 import java.util.Collection;
@@ -173,45 +170,20 @@ public class Region implements Extent {
         }
     }
 
-    public void generate(Heightmap heightmap, Batcher batcher) {
-        for (int cz = 0; cz < chunkSize.total; cz++) {
-            for (int cx = 0; cx < chunkSize.total; cx++) {
-                int index = chunkSize.indexOf(cx, cz);
-                GenChunk chunk = computeChunk(index, cx, cz);
-                Runnable task = new ChunkGenTask(chunk, heightmap);
-                batcher.submit(task);
-            }
-        }
-    }
-
-    public void generateZoom(Heightmap heightmap, float offsetX, float offsetZ, float zoom, Batcher batcher) {
+    public void generateZoom(Heightmap heightmap, float offsetX, float offsetZ, float zoom) {
         float translateX = offsetX - ((blockSize.size * zoom) / 2F);
         float translateZ = offsetZ - ((blockSize.size * zoom) / 2F);
         for (int cz = 0; cz < chunkSize.total; cz++) {
             for (int cx = 0; cx < chunkSize.total; cx++) {
                 int index = chunkSize.indexOf(cx, cz);
                 GenChunk chunk = computeChunk(index, cx, cz);
-                Runnable task = new ChunkZoomTask(chunk, heightmap, translateX, translateZ, zoom);
-                batcher.submit(task);
-            }
-        }
-    }
-
-    public void check() {
-        for (int dz = 0; dz < chunkSize.total; dz++) {
-            for (int dx = 0; dx < chunkSize.total; dx++) {
-                int index = chunkSize.indexOf(dx, dz);
-                if (chunks[index] == null) {
-                    throw new NullPointerException("Null chunk " + dx + ":" + dz);
-                }
-            }
-        }
-
-        for (int dz = 0; dz < blockSize.total; dz++) {
-            for (int dx = 0; dx < blockSize.total; dx++) {
-                int index = blockSize.indexOf(dx, dz);
-                if (blocks[index] == null) {
-                    throw new NullPointerException("Null block " + dx + ":" + dz);
+                for (int dz = 0; dz < 16; dz++) {
+                    for (int dx = 0; dx < 16; dx++) {
+                        float x = ((chunk.getBlockX() + dx) * zoom) + translateX;
+                        float z = ((chunk.getBlockZ() + dz) * zoom) + translateZ;
+                        Cell<Terrain> cell = chunk.genCell(dx, dz);
+                        heightmap.apply(cell, x, z);
+                    }
                 }
             }
         }

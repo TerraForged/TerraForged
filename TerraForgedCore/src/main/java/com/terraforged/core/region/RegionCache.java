@@ -38,7 +38,7 @@ public class RegionCache implements RegionExtent {
 
     private final boolean queuing;
     private final RegionGenerator renderer;
-    private final Cache<Long, CacheEntry<Region>> cache;
+    private final Cache<CacheEntry<Region>> cache;
 
     public RegionCache(boolean queueNeighbours, RegionGenerator renderer) {
         this.renderer = renderer;

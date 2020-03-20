@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.world.river;
+package com.terraforged.core.world.rivermap;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.Region;
@@ -32,21 +32,24 @@ import com.terraforged.core.util.concurrent.cache.Cache;
 import com.terraforged.core.util.concurrent.cache.CacheEntry;
 import com.terraforged.core.world.GeneratorContext;
 import com.terraforged.core.world.heightmap.Heightmap;
+import com.terraforged.core.world.rivermap.lake.LakeConfig;
+import com.terraforged.core.world.rivermap.river.RiverConfig;
+import com.terraforged.core.world.rivermap.river.RiverRegion;
 import com.terraforged.core.world.terrain.Terrain;
 import me.dags.noise.util.NoiseUtil;
 
 import java.util.concurrent.TimeUnit;
 
-public class RiverManager {
+public class RiverMap {
 
     private static final int QUAD_SIZE = (1 << RiverRegion.SCALE) / 2;
 
     private final Heightmap heightmap;
     private final GeneratorContext context;
-    private final RiverContext riverContext;
-    private final Cache<Long, CacheEntry<RiverRegion>> cache = new Cache<>(120, 60, TimeUnit.SECONDS);
+    private final RiverMapConfig riverMapConfig;
+    private final Cache<CacheEntry<RiverRegion>> cache;
 
-    public RiverManager(Heightmap heightmap, GeneratorContext context) {
+    public RiverMap(Heightmap heightmap, GeneratorContext context) {
         RiverConfig primary = RiverConfig.builder(context.levels)
                 .bankHeight(context.settings.rivers.primaryRivers.minBankHeight, context.settings.rivers.primaryRivers.maxBankHeight)
                 .bankWidth(context.settings.rivers.primaryRivers.bankWidth)
@@ -76,7 +79,8 @@ public class RiverManager {
 
         this.heightmap = heightmap;
         this.context = context;
-        this.riverContext = new RiverContext(context.settings.rivers.riverFrequency, primary, secondary, tertiary, lakes);
+        this.riverMapConfig = new RiverMapConfig(context.settings.rivers.riverFrequency, primary, secondary, tertiary, lakes);
+        this.cache = new Cache<>(120, 60, TimeUnit.SECONDS);
     }
 
     public RiverRegionList getRivers(Region region) {
@@ -100,8 +104,7 @@ public class RiverManager {
         RiverRegionList list = new RiverRegionList();
         for (int dz = minZ; dz <= maxZ; dz++) {
             for (int dx = minX; dx <= maxX; dx++) {
-                CacheEntry<RiverRegion> entry = getRegion(rx + dx, rz + dz);
-                list.add(entry);
+                list.add(getRegion(rx + dx, rz + dz));
             }
         }
 
@@ -148,6 +151,6 @@ public class RiverManager {
     }
 
     private CacheEntry<RiverRegion> generateRegion(int rx, int rz) {
-        return CacheEntry.supplyAsync(() -> new RiverRegion(rx, rz, heightmap, context, riverContext), ThreadPool.getDefaultPool());
+        return CacheEntry.supplyAsync(() -> new RiverRegion(rx, rz, heightmap, context, riverMapConfig), ThreadPool.getDefaultPool());
     }
 }

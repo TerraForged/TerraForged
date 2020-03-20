@@ -31,7 +31,7 @@ import com.terraforged.core.util.concurrent.cache.CacheEntry;
 import com.terraforged.core.world.WorldGenerator;
 import com.terraforged.core.world.WorldGeneratorFactory;
 import com.terraforged.core.world.heightmap.RegionExtent;
-import com.terraforged.core.world.river.RiverRegionList;
+import com.terraforged.core.world.rivermap.RiverRegionList;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -89,7 +89,7 @@ public class RegionGenerator implements RegionExtent {
     public Region generateRegion(int regionX, int regionZ) {
         WorldGenerator generator = genPool.get();
         Region region = regions.create(regionX, regionZ, factor, border);
-        RiverRegionList rivers = generator.getHeightmap().getRiverManager().getRivers(region);
+        RiverRegionList rivers = generator.getHeightmap().getRiverMap().getRivers(region);
         region.generateBase(generator.getHeightmap());
         region.generateRivers(generator.getHeightmap(), rivers);
         postProcess(region, generator);
@@ -104,15 +104,7 @@ public class RegionGenerator implements RegionExtent {
     public Region generateRegion(float centerX, float centerZ, float zoom, boolean filter) {
         WorldGenerator generator = genPool.get();
         Region region = regions.create(0, 0, factor, border);
-        float translateX = centerX - ((region.getBlockSize().size * zoom) / 2F);
-        float translateZ = centerZ - ((region.getBlockSize().size * zoom) / 2F);
-        region.generate(chunk -> {
-            chunk.generate((cell, dx, dz) -> {
-                float x = ((chunk.getBlockX() + dx) * zoom) + translateX;
-                float z = ((chunk.getBlockZ() + dz) * zoom) + translateZ;
-                generator.getHeightmap().apply(cell, x, z);
-            });
-        });
+        region.generateZoom(generator.getHeightmap(), centerX, centerZ, zoom);
         postProcess(region, generator, centerX, centerZ, zoom, filter);
         return region;
     }

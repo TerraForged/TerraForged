@@ -25,6 +25,7 @@
 
 package com.terraforged.mod.feature;
 
+import com.terraforged.api.material.state.States;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
@@ -89,7 +90,7 @@ public class TerrainHelper {
         }
     }
 
-    // try to fill in type air beneath village pieces with the biomes default filler block
+    // lowers or raises the terrain matcher the base height of each structure piece
     private void buildBases(IChunk chunk, ObjectList<AbstractVillagePiece> pieces, int chunkStartX, int chunkStartZ) {
         BlockPos.Mutable pos = new BlockPos.Mutable();
         MutableBoundingBox chunkBounds = new MutableBoundingBox(chunkStartX, chunkStartZ, chunkStartX + 15, chunkStartZ + 15);
@@ -110,6 +111,9 @@ public class TerrainHelper {
             int endX = Math.min(chunkStartX + 15, expanded.maxX);
             int endZ = Math.min(chunkStartZ + 15, expanded.maxZ);
 
+            // y position of the structure piece
+            int level = pieceBounds.minY + piece.getGroundLevelDelta();
+
             // iterate the intersecting area
             for (int z = startZ; z <= endZ; z++) {
                 for (int x = startX; x <= endX; x++) {
@@ -117,38 +121,54 @@ public class TerrainHelper {
                     int dx = x & 15;
                     int dz = z & 15;
 
-                    // the paste position of the village piece
-                    BlockPos position = piece.getPos();
-
-                    int offset = piece.getGroundLevelDelta();
-                    int level = position.getY() + (offset - 1);
-                    int surface = chunk.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, dx, dz) - 1;
-                    int height = level - surface;
-                    if (height <= 0) {
+                    int surface = chunk.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, dx, dz);
+                    if (surface == level) {
                         continue;
                     }
 
-                    float radius2 = Math.max(1, borderRadius * borderRadius * noise.getValue(x, z));
-                    float alpha = getAlpha(pieceBounds, radius2, x, z);
-                    if (alpha == 0F) {
-                        continue;
-                    }
-
-                    if (alpha < 1F) {
-                        alpha = alpha * alpha;
-                        height = NoiseUtil.round(alpha * height);
-                    }
-
-                    BlockState state = Blocks.STONE.getDefaultState();
-                    for (int dy = surface + height; dy >= surface; dy--) {
-                        pos.setPos(dx, dy, dz);
-                        if (chunk.getBlockState(pos).isSolid()) {
-                            break;
-                        }
-                        chunk.setBlockState(pos.setPos(dx, dy, dz), state, false);
+                    if (surface > level) {
+                        // world-surface is higher than the piece's base .: flatten terrain
+                        flatten(chunk, pieceBounds, pos.setPos(x, surface, z), dx, dz, level, surface, borderRadius);
+                    } else {
+                        // piece is higher than world-surface .: raise ground to form a base
+                        raise(chunk, pieceBounds, pos.setPos(x, surface, z), dx, dz, level, surface, borderRadius);
                     }
                 }
             }
+        }
+    }
+
+    private void flatten(IChunk chunk, MutableBoundingBox bounds, BlockPos.Mutable pos, int dx, int dz, int level, int surface, int borderRadius) {
+        // only flatten terrain within the footprint of the structure piece
+        if (pos.getX() >= bounds.minX && pos.getX() <= bounds.maxX && pos.getZ() >= bounds.minZ && pos.getZ() <= bounds.maxZ) {
+            for (int dy = level + 1; dy <= surface; dy++) {
+                chunk.setBlockState(pos.setPos(dx, dy, dz), Blocks.AIR.getDefaultState(), false);
+            }
+        }
+    }
+
+    private void raise(IChunk chunk, MutableBoundingBox bounds, BlockPos.Mutable pos, int dx, int dz, int level, int surface, int borderRadius) {
+        float radius2 = Math.max(1, borderRadius * borderRadius * noise.getValue(pos.getX(), pos.getZ()));
+        float alpha = getAlpha(bounds, radius2, pos.getX(), pos.getZ());
+        if (alpha == 0F) {
+            // outside of the raise-able radius
+            return;
+        }
+
+        int heightDelta = level - surface - 1;
+        if (alpha < 1F) {
+            // sharper fall-off
+            alpha = alpha * alpha;
+            heightDelta = NoiseUtil.round(alpha * heightDelta);
+        }
+
+        BlockState state = States.STONE.getDefaultState();
+        for (int dy = surface + heightDelta; dy >= surface; dy--) {
+            pos.setPos(dx, dy, dz);
+            if (chunk.getBlockState(pos).isSolid()) {
+                return;
+            }
+            chunk.setBlockState(pos.setPos(dx, dy, dz), state, false);
         }
     }
 

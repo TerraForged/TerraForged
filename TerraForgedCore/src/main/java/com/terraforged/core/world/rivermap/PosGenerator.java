@@ -23,10 +23,11 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.world.river;
+package com.terraforged.core.world.rivermap;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.heightmap.Heightmap;
+import com.terraforged.core.world.rivermap.river.RiverNode;
 import com.terraforged.core.world.terrain.Terrain;
 import me.dags.noise.domain.Domain;
 import me.dags.noise.util.Vec2i;

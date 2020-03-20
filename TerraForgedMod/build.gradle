@@ -24,15 +24,9 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
     compile project(":Noise2D")
-    compile (project(":TerraForgedCore")) {
-        transitive false
-    }
-    compile (project(":FeatureManager")) {
-        transitive false
-    }
-    compile (project(":TerraForgedAPI")) {
-        transitive false
-    }
+    compile (project(":TerraForgedCore")) { transitive false }
+    compile (project(":FeatureManager")) { transitive false }
+    compile (project(":TerraForgedAPI")) { transitive false }
 }
 
 minecraft {
@@ -81,7 +75,6 @@ task collectResources(type: Copy) {
 
 processResources {
     dependsOn(collectResources)
-
     filesMatching("**/mods.toml") {
         expand(
                 "version": "${mod_version}${getClassifier()}",

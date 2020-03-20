@@ -1,6 +1,9 @@
-package com.terraforged.core.world.river;
+package com.terraforged.core.world.rivermap;
 
-public class RiverContext {
+import com.terraforged.core.world.rivermap.lake.LakeConfig;
+import com.terraforged.core.world.rivermap.river.RiverConfig;
+
+public class RiverMapConfig {
 
     public final float frequency;
     public final RiverConfig primary;
@@ -8,7 +11,7 @@ public class RiverContext {
     public final RiverConfig tertiary;
     public final LakeConfig lakes;
 
-    public RiverContext(float frequency, RiverConfig primary, RiverConfig secondary, RiverConfig tertiary, LakeConfig lakes) {
+    public RiverMapConfig(float frequency, RiverConfig primary, RiverConfig secondary, RiverConfig tertiary, LakeConfig lakes) {
         this.frequency = frequency;
         this.primary = primary;
         this.secondary = secondary;

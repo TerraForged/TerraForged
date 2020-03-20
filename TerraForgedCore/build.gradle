@@ -1,7 +1,12 @@
 apply plugin: "maven-publish"
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile project(":Noise2D")
+    compile "it.unimi.dsi:fastutil:8.2.1"
 }
 
 publishing {

@@ -23,13 +23,17 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.world.river;
+package com.terraforged.core.world.rivermap.river;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.util.concurrent.ObjectPool;
 import com.terraforged.core.util.concurrent.cache.ExpiringEntry;
 import com.terraforged.core.world.GeneratorContext;
 import com.terraforged.core.world.heightmap.Heightmap;
+import com.terraforged.core.world.rivermap.PosGenerator;
+import com.terraforged.core.world.rivermap.RiverMapConfig;
+import com.terraforged.core.world.rivermap.lake.Lake;
+import com.terraforged.core.world.rivermap.lake.LakeConfig;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.Terrains;
 import me.dags.noise.domain.Domain;
@@ -73,27 +77,27 @@ public class RiverRegion implements ExpiringEntry {
 
     private final long timestamp = System.currentTimeMillis() + EXPIRE_TIME;
 
-    public RiverRegion(int regionX, int regionZ, Heightmap heightmap, GeneratorContext context, RiverContext riverContext) {
+    public RiverRegion(int regionX, int regionZ, Heightmap heightmap, GeneratorContext context, RiverMapConfig riverMapConfig) {
         int seed = new Random(NoiseUtil.seed(regionX, regionZ)).nextInt();
-        this.lake = riverContext.lakes;
-        this.primary = riverContext.primary;
-        this.secondary = riverContext.secondary;
-        this.tertiary = riverContext.tertiary;
+        this.lake = riverMapConfig.lakes;
+        this.primary = riverMapConfig.primary;
+        this.secondary = riverMapConfig.secondary;
+        this.tertiary = riverMapConfig.tertiary;
         this.terrains = context.terrain;
         this.domain = Domain.warp(seed, 400, 1, 400)
                 .add(Domain.warp(seed + 1, 80, 1, 35));
 
-        this.primaryLimit = NoiseUtil.round(10 * riverContext.frequency);
-        this.secondaryLimit = NoiseUtil.round(20 * riverContext.frequency);
-        this.secondaryRelaxedLimit = NoiseUtil.round(30 * riverContext.frequency);
-        this.forkLimit = NoiseUtil.round(40 * riverContext.frequency);
-        this.tertiaryLimit = NoiseUtil.round(50 * riverContext.frequency);
+        this.primaryLimit = NoiseUtil.round(10 * riverMapConfig.frequency);
+        this.secondaryLimit = NoiseUtil.round(20 * riverMapConfig.frequency);
+        this.secondaryRelaxedLimit = NoiseUtil.round(30 * riverMapConfig.frequency);
+        this.forkLimit = NoiseUtil.round(40 * riverMapConfig.frequency);
+        this.tertiaryLimit = NoiseUtil.round(50 * riverMapConfig.frequency);
 
-        this.primaryAttempts = NoiseUtil.round(100 * riverContext.frequency);
-        this.secondaryAttempts = NoiseUtil.round(100 * riverContext.frequency);
-        this.secondaryRelaxedAttempts = NoiseUtil.round(50 * riverContext.frequency);
-        this.forkAttempts = NoiseUtil.round(75 * riverContext.frequency);
-        this.tertiaryAttempts = NoiseUtil.round(50 * riverContext.frequency);
+        this.primaryAttempts = NoiseUtil.round(100 * riverMapConfig.frequency);
+        this.secondaryAttempts = NoiseUtil.round(100 * riverMapConfig.frequency);
+        this.secondaryRelaxedAttempts = NoiseUtil.round(50 * riverMapConfig.frequency);
+        this.forkAttempts = NoiseUtil.round(75 * riverMapConfig.frequency);
+        this.tertiaryAttempts = NoiseUtil.round(50 * riverMapConfig.frequency);
 
         try (ObjectPool.Item<Cell<Terrain>> cell = Cell.pooled()) {
             PosGenerator pos = new PosGenerator(heightmap, domain, cell.getValue(),1 << SCALE, River.VALLEY_WIDTH);

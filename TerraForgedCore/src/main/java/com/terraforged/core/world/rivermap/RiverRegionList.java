@@ -1,7 +1,8 @@
-package com.terraforged.core.world.river;
+package com.terraforged.core.world.rivermap;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.util.concurrent.cache.CacheEntry;
+import com.terraforged.core.world.rivermap.river.RiverRegion;
 import com.terraforged.core.world.terrain.Terrain;
 
 public class RiverRegionList {
@@ -10,7 +11,10 @@ public class RiverRegionList {
     private final CacheEntry<RiverRegion>[] regions = new CacheEntry[4];
 
     protected void add(CacheEntry<RiverRegion> entry) {
-        regions[index++] = entry;
+        if (index < regions.length) {
+            regions[index] = entry;
+            index++;
+        }
     }
 
     public void apply(Cell<Terrain> cell, float x, float z) {

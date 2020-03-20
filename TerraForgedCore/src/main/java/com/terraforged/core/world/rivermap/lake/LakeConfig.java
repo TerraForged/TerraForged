@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.world.river;
+package com.terraforged.core.world.rivermap.lake;
 
 import com.terraforged.core.settings.RiverSettings;
 import com.terraforged.core.world.heightmap.Levels;

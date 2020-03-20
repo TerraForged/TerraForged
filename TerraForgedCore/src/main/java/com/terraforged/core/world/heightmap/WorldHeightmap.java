@@ -36,8 +36,8 @@ import com.terraforged.core.world.climate.Climate;
 import com.terraforged.core.world.continent.ContinentLerper2;
 import com.terraforged.core.world.continent.ContinentLerper3;
 import com.terraforged.core.world.continent.ContinentModule;
-import com.terraforged.core.world.river.RiverManager;
-import com.terraforged.core.world.river.RiverRegionList;
+import com.terraforged.core.world.rivermap.RiverMap;
+import com.terraforged.core.world.rivermap.RiverRegionList;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.TerrainPopulator;
 import com.terraforged.core.world.terrain.Terrains;
@@ -67,7 +67,7 @@ public class WorldHeightmap implements Heightmap {
 
     private final Climate climate;
     private final Populator root;
-    private final RiverManager riverManager;
+    private final RiverMap riverMap;
     private final TerrainProvider terrainProvider;
 
     public WorldHeightmap(GeneratorContext context) {
@@ -154,7 +154,7 @@ public class WorldHeightmap implements Heightmap {
                 COAST_VALUE - 0.05F
         );
 
-        riverManager = new RiverManager(this, context);
+        riverMap = new RiverMap(this, context);
     }
 
     @Override
@@ -167,7 +167,7 @@ public class WorldHeightmap implements Heightmap {
     @Override
     public void apply(Cell<Terrain> cell, float x, float z) {
         applyBase(cell, x, z);
-        applyRivers(cell, x, z, riverManager.getRivers((int) x, (int) z));
+        applyRivers(cell, x, z, riverMap.getRivers((int) x, (int) z));
         applyClimate(cell, x, z);
     }
 
@@ -219,8 +219,8 @@ public class WorldHeightmap implements Heightmap {
     }
 
     @Override
-    public RiverManager getRiverManager() {
-        return riverManager;
+    public RiverMap getRiverMap() {
+        return riverMap;
     }
 
     public Populator getPopulator(Terrain terrain) {
