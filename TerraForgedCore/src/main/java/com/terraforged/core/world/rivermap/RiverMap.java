@@ -48,6 +48,7 @@ public class RiverMap {
     private final GeneratorContext context;
     private final RiverMapConfig riverMapConfig;
     private final Cache<CacheEntry<RiverRegion>> cache;
+    private final ThreadPool threadPool = ThreadPool.getPool();
 
     public RiverMap(Heightmap heightmap, GeneratorContext context) {
         RiverConfig primary = RiverConfig.builder(context.levels)
@@ -151,6 +152,6 @@ public class RiverMap {
     }
 
     private CacheEntry<RiverRegion> generateRegion(int rx, int rz) {
-        return CacheEntry.supplyAsync(() -> new RiverRegion(rx, rz, heightmap, context, riverMapConfig), ThreadPool.getPool());
+        return CacheEntry.supplyAsync(() -> new RiverRegion(rx, rz, heightmap, context, riverMapConfig), threadPool);
     }
 }

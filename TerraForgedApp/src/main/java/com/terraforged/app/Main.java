@@ -91,7 +91,7 @@ public class Main extends Applet {
                 if (cell.tag == getCache().getTerrain().volcano) {
                     return 0F;
                 }
-                return 20 + (cell.tag.getId() / (float) Terrain.MAX_ID.get()) * 80;
+                return 20 + (cell.tag.getHue() * 80);
             case ELEVATION:
                 float value = (cell.value - 0.245F) / 0.65F;
                 return (1 - value) * 30;

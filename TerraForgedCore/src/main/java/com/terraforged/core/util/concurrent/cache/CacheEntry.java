@@ -1,17 +1,17 @@
 package com.terraforged.core.util.concurrent.cache;
 
-import java.util.concurrent.Executor;
-import java.util.function.Supplier;
+import com.terraforged.core.util.concurrent.ThreadPool;
 
-public class CacheEntry<T> implements Runnable, ExpiringEntry {
+import java.util.concurrent.Callable;
+import java.util.concurrent.ForkJoinTask;
 
-    private volatile T result;
+public class CacheEntry<T> implements ExpiringEntry {
+
     private volatile long timestamp;
+    private final ForkJoinTask<T> task;
 
-    private final Supplier<T> supplier;
-
-    private CacheEntry(Supplier<T> supplier) {
-        this.supplier = supplier;
+    public CacheEntry(ForkJoinTask<T> task) {
+        this.task = task;
         this.timestamp = System.currentTimeMillis();
     }
 
@@ -20,33 +20,15 @@ public class CacheEntry<T> implements Runnable, ExpiringEntry {
         return timestamp;
     }
 
-    @Override
-    public void run() {
-        this.result = supplier.get();
-        this.timestamp = System.currentTimeMillis();
-    }
-
     public boolean isDone() {
-        return result != null;
+        return task.isDone();
     }
 
     public T get() {
-        T value = result;
-        if (value == null) {
-            value = getNow();
-        }
-        return value;
+        return task.join();
     }
 
-    private T getNow() {
-        T result = supplier.get();
-        this.result = result;
-        return result;
-    }
-
-    public static <T> CacheEntry<T> supplyAsync(Supplier<T> supplier, Executor executor) {
-        CacheEntry<T> entry = new CacheEntry<>(supplier);
-        executor.execute(entry);
-        return entry;
+    public static <T> CacheEntry<T> supplyAsync(Callable<T> callable, ThreadPool executor) {
+        return new CacheEntry<>(executor.submit(callable));
     }
 }

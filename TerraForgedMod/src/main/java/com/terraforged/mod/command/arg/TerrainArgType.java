@@ -32,20 +32,17 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import com.terraforged.core.settings.Settings;
 import com.terraforged.core.world.terrain.Terrain;
-import com.terraforged.core.world.terrain.Terrains;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.text.StringTextComponent;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class TerrainArgType implements ArgumentType<Terrain> {
 
-    private final List<Terrain> terrains = getTerrains();
+    private final List<Terrain> terrains = Terrain.getRegistered();
 
     @Override
     public Terrain parse(StringReader reader) throws CommandSyntaxException {
@@ -78,40 +75,5 @@ public class TerrainArgType implements ArgumentType<Terrain> {
                 new SimpleCommandExceptionType(new StringTextComponent(type)),
                 new StringTextComponent(String.format(message, args))
         );
-    }
-
-    private static List<Terrain> getTerrains() {
-        Terrains terrains = Terrains.create(new Settings());
-        List<Terrain> result = new ArrayList<>();
-
-        for (int i = 0; i < terrains.index.size(); i++) {
-            Terrain terrain = terrains.index.get(i);
-            result.add(terrain);
-            if (dontMix(terrain, terrains)) {
-                continue;
-            }
-            for (int j = i + 1; j < terrains.index.size(); j++) {
-                Terrain other = terrains.index.get(j);
-                if (dontMix(other, terrains)) {
-                    continue;
-                }
-                Terrain mix = new Terrain(terrain.getName() + "-" + other.getName(), -1);
-                result.add(mix);
-            }
-        }
-
-        return result;
-    }
-
-    private static boolean dontMix(Terrain terrain, Terrains terrains) {
-        return terrain == terrains.ocean
-                || terrain == terrains.deepOcean
-                || terrain == terrains.river
-                || terrain == terrains.riverBanks
-                || terrain == terrains.beach
-                || terrain == terrains.coast
-                || terrain == terrains.volcano
-                || terrain == terrains.volcanoPipe
-                || terrain == terrains.lake;
     }
 }

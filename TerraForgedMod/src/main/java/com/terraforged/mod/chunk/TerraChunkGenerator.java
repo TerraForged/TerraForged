@@ -187,6 +187,8 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
                 processor.decorate(ctx.buffer, ctx, px, py, pz);
             }
         });
+
+        FastChunk.updateWGHeightmaps(chunk, context.pos);
     }
 
     @Override

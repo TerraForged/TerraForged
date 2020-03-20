@@ -26,6 +26,7 @@
 package com.terraforged.core.util.serialization.serializer;
 
 import com.terraforged.core.util.serialization.annotation.Comment;
+import com.terraforged.core.util.serialization.annotation.Name;
 import com.terraforged.core.util.serialization.annotation.Range;
 import com.terraforged.core.util.serialization.annotation.Serializable;
 
@@ -163,7 +164,9 @@ public class Serializer {
     }
 
     private static String getName(Field field) {
-        String name = field.getName();
+        Name nameMeta = field.getAnnotation(Name.class);
+
+        String name = nameMeta == null ? field.getName() : nameMeta.value();
         StringBuilder sb = new StringBuilder(name.length() * 2);
         for (int i = 0; i < name.length(); i++) {
             char c = name.charAt(i);

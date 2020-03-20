@@ -10,6 +10,7 @@ public class Cache<V extends ExpiringEntry> implements Runnable {
     private final long expireMS;
     private final long intervalMS;
     private final SynchronizedLongMap<V> map;
+    private final ThreadPool threadPool = ThreadPool.getPool();
 
     private volatile long timestamp = 0L;
 
@@ -33,7 +34,7 @@ public class Cache<V extends ExpiringEntry> implements Runnable {
         long now = System.currentTimeMillis();
         if (now - timestamp > intervalMS) {
             timestamp = now;
-            ThreadPool.getPool().execute(this);
+            threadPool.submit(this);
         }
     }
 

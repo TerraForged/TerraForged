@@ -29,17 +29,25 @@ import com.terraforged.core.cell.Tag;
 import com.terraforged.core.settings.Settings;
 import com.terraforged.core.world.heightmap.Levels;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Terrain implements Tag {
 
-    public static final int ID_START = 9;
-    public static final AtomicInteger MAX_ID = new AtomicInteger(0);
+    private static final AtomicInteger MAX_ID = new AtomicInteger(0);
+    private static final Map<String, Terrain> register = Collections.synchronizedMap(new HashMap<>());
+
+    public static final int ID_START = 10;
     public static final Terrain NONE = new Terrain("none", -1);
 
     private final String name;
     private final int id;
-    private float weight;
+    private final float weight;
 
     public Terrain(String name, int id) {
         this(name, id, 1F);
@@ -49,6 +57,7 @@ public class Terrain implements Tag {
         this.name = name;
         this.id = id;
         this.weight = (float) weight;
+        register.put(name, this);
         MAX_ID.set(Math.max(MAX_ID.get(), id));
     }
 
@@ -67,6 +76,10 @@ public class Terrain implements Tag {
 
     public float getWeight() {
         return weight;
+    }
+
+    public float getHue() {
+        return id / (float) MAX_ID.get();
     }
 
     @Override
@@ -176,5 +189,13 @@ public class Terrain implements Tag {
 
     public static Terrain volcanoPipe(Settings settings) {
         return new Terrain("volcano_pipe", 15, settings.terrain.volcano.weight);
+    }
+
+    public static Optional<Terrain> get(String name) {
+        return Optional.ofNullable(register.get(name));
+    }
+
+    public static List<Terrain> getRegistered() {
+        return new ArrayList<>(register.values());
     }
 }

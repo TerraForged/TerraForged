@@ -26,6 +26,7 @@
 package com.terraforged.core.settings;
 
 import com.terraforged.core.util.serialization.annotation.Comment;
+import com.terraforged.core.util.serialization.annotation.Name;
 import com.terraforged.core.util.serialization.annotation.Range;
 import com.terraforged.core.util.serialization.annotation.Serializable;
 import me.dags.noise.Module;
@@ -77,6 +78,7 @@ public class GeneratorSettings {
         public int continentScale = 4000;
 
         @Range(min = 250, max = 5000)
+        @Name("Mountain Range Scale")
         @Comment("Controls the size of mountain ranges")
         public int mountainScale = 950;
 
