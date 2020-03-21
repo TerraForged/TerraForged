@@ -27,6 +27,7 @@ package com.terraforged.core.util.concurrent;
 
 import com.terraforged.core.util.concurrent.batcher.AsyncBatcher;
 import com.terraforged.core.util.concurrent.batcher.Batcher;
+import com.terraforged.core.util.concurrent.batcher.SyncBatcher;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
@@ -35,13 +36,12 @@ import java.util.concurrent.ForkJoinTask;
 
 public class ThreadPool implements Executor {
 
-    private static final ThreadPool instance = new ThreadPool("TF", defaultPoolSize());
-    private static final Object lock = new Object();
+    private static final ThreadPool instance = create("TF", defaultPoolSize());
 
     private final ForkJoinPool service;
 
-    private ThreadPool(String name, int size) {
-        this.service = ThreadPool.createPool(size, name);
+    private ThreadPool(ForkJoinPool service) {
+        this.service = service;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class ThreadPool implements Executor {
         service.submit(command);
     }
 
-    public <T> ForkJoinTask<?> submit(Runnable runnable) {
+    public ForkJoinTask<?> submit(Runnable runnable) {
         return service.submit(runnable);
     }
 
@@ -65,8 +65,15 @@ public class ThreadPool implements Executor {
         return instance;
     }
 
-    public static ThreadPool create(int size) {
-        return new ThreadPool("Pool", Math.max(1, size));
+    public static ThreadPool create(String name, int size) {
+        if (size < 2) {
+            return new SingleThreadExecutor();
+        }
+        return new ThreadPool(createPool(name, size));
+    }
+
+    public static ForkJoinPool createPool(String name, int size) {
+        return new ForkJoinPool(size, new WorkerFactory.ForkJoin(name), null, true);
     }
 
     private static int defaultPoolSize() {
@@ -74,8 +81,34 @@ public class ThreadPool implements Executor {
         return Math.max(1, (int) ((threads / 3F) * 2F));
     }
 
-    public static ForkJoinPool createPool(int size, String name) {
+    private static class SingleThreadExecutor extends ThreadPool {
 
-        return new ForkJoinPool(size, new WorkerFactory.ForkJoin(name), null, true);
+        private SingleThreadExecutor() {
+            super(null);
+        }
+
+        @Override
+        public void execute(Runnable command) {
+            command.run();
+        }
+
+        @Override
+        public ForkJoinTask<?> submit(Runnable runnable) {
+            ForkJoinTask<?> task = ForkJoinTask.adapt(runnable);
+            task.invoke();
+            return task;
+        }
+
+        @Override
+        public <T> ForkJoinTask<T> submit(Callable<T> callable) {
+            ForkJoinTask<T> task = ForkJoinTask.adapt(callable);
+            task.invoke();
+            return task;
+        }
+
+        @Override
+        public Batcher batcher(int size) {
+            return new SyncBatcher();
+        }
     }
 }
