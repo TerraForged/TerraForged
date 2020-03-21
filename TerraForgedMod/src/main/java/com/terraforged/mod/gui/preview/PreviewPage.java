@@ -68,8 +68,8 @@ public class PreviewPage extends BasePage {
         Column right = getColumn(1);
         preview.x = 0;
         preview.y = 0;
-        preview.setWidth(256);
-        preview.setHeight(256);
+        preview.setWidth(Preview.WIDTH);
+        preview.setHeight(Preview.HEIGHT);
 
         addElements(right.left, right.top, right, previewerSettings, right.scrollPane::addButton, this::update);
         right.scrollPane.addButton(new TerraButton("New Seed") {
@@ -84,7 +84,7 @@ public class PreviewPage extends BasePage {
 
         // used to pad the scroll-pane out so that the preview legend scrolls on larger gui scales
         TerraButton spacer = createSpacer();
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 7; i++) {
             right.scrollPane.addButton(spacer);
         }
 

@@ -47,7 +47,7 @@ public enum RenderMode {
         }
 
         float bands = 10F;
-        float alpha = 0.15F;
+        float alpha = 0.2F;
         float elevation = (cell.value - baseHeight) / (1F - baseHeight);
 
         int band = NoiseUtil.round(elevation * bands);
