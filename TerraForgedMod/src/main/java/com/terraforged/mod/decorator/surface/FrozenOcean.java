@@ -28,10 +28,12 @@ package com.terraforged.mod.decorator.surface;
 import com.terraforged.api.chunk.surface.Surface;
 import com.terraforged.api.chunk.surface.SurfaceContext;
 import com.terraforged.api.material.state.States;
+import com.terraforged.core.cell.Cell;
 import com.terraforged.core.world.heightmap.Levels;
 import com.terraforged.mod.chunk.TerraContext;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
+import me.dags.noise.util.NoiseUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
@@ -44,6 +46,9 @@ public class FrozenOcean implements Surface {
     private final Module bergTop;
     private final Module seaFloor;
     private final Levels levels;
+
+    private final float minDepth;
+    private final float depthRange;
 
     public FrozenOcean(TerraContext context, int height, int depth) {
         Levels levels = context.levels;
@@ -74,14 +79,19 @@ public class FrozenOcean implements Surface {
         this.seaFloor = Source.perlin(context.seed.next(), 50, 1)
                 .scale(levels.scale(3))
                 .bias(levels.scale(1));
+
+        this.minDepth = levels.water(-3);
+        this.depthRange = levels.scale(7);
     }
 
     @Override
     public void buildSurface(int x, int z, int height, SurfaceContext ctx) {
+        float alpha = alpha(ctx.cell);
+
         int center = levels.waterLevel - 5;
-        int top = center + (int) (up.getValue(x, z) * levels.worldHeight);
-        int topDepth = (int) (bergTop.getValue(x, z) * levels.worldHeight);
-        int bottom = center - (int) (down.getValue(x, z) * levels.worldHeight);
+        int top = center + (int) (up.getValue(x, z) * levels.worldHeight * alpha);
+        int topDepth = (int) (bergTop.getValue(x, z) * levels.worldHeight * alpha);
+        int bottom = center - (int) (down.getValue(x, z) * levels.worldHeight * alpha);
 
         // set iceberg materials
         BlockPos.Mutable pos = new BlockPos.Mutable(x, height, z);
@@ -105,5 +115,21 @@ public class FrozenOcean implements Surface {
             return States.SNOW_BLOCK.get();
         }
         return States.PACKED_ICE.get();
+    }
+
+    private float alpha(Cell<?> cell) {
+        if (cell.value > minDepth) {
+            return 0;
+        }
+
+        float alpha = 1F;
+        float delta = minDepth - cell.value;
+        if (delta < depthRange) {
+            alpha -= ((depthRange - delta) / depthRange);
+        }
+
+        alpha *= NoiseUtil.map(cell.riverMask, 0.3F, 1F, 0.7F);
+
+        return NoiseUtil.clamp(alpha, 0, 1);
     }
 }
