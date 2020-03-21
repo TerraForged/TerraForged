@@ -75,8 +75,8 @@ public class Preview extends Button {
     public Preview(int seed) {
         super(0, 0, 0, 0, "", b -> {});
         this.seed = seed == -1 ? random.nextInt() : seed;
-        this.offsetX = 0;//random.nextInt(50000) - 25000;
-        this.offsetZ = 0;//random.nextInt(50000) - 25000;
+        this.offsetX = 0;
+        this.offsetZ = 0;
     }
 
     public int getSeed() {
