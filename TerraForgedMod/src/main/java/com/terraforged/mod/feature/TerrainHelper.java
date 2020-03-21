@@ -26,6 +26,8 @@
 package com.terraforged.mod.feature;
 
 import com.terraforged.api.material.state.States;
+import com.terraforged.core.cell.Cell;
+import com.terraforged.core.region.chunk.ChunkReader;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
@@ -57,10 +59,10 @@ public class TerrainHelper {
         this.radius = radius;
     }
 
-    public void flatten(IWorld world, IChunk chunk, int chunkStartX, int chunkStartZ) {
+    public void flatten(IWorld world, IChunk chunk, ChunkReader reader, int chunkStartX, int chunkStartZ) {
         ObjectList<AbstractVillagePiece> pieces = new ObjectArrayList<>(10);
         collectPieces(world, chunk, pieces);
-        buildBases(chunk, pieces, chunkStartX, chunkStartZ);
+        buildBases(chunk, reader, pieces, chunkStartX, chunkStartZ);
     }
 
     // see NoiseChunkGenerator
@@ -91,12 +93,11 @@ public class TerrainHelper {
     }
 
     // lowers or raises the terrain matcher the base height of each structure piece
-    private void buildBases(IChunk chunk, ObjectList<AbstractVillagePiece> pieces, int chunkStartX, int chunkStartZ) {
+    private void buildBases(IChunk chunk, ChunkReader reader,ObjectList<AbstractVillagePiece> pieces, int chunkStartX, int chunkStartZ) {
         BlockPos.Mutable pos = new BlockPos.Mutable();
         MutableBoundingBox chunkBounds = new MutableBoundingBox(chunkStartX, chunkStartZ, chunkStartX + 15, chunkStartZ + 15);
         for (AbstractVillagePiece piece : pieces) {
             MutableBoundingBox pieceBounds = piece.getBoundingBox();
-
             int length = Math.min(pieceBounds.maxX - pieceBounds.minX, pieceBounds.maxZ - pieceBounds.minZ);
             int borderRadius = Math.max(5, NoiseUtil.round(length * radius));
             MutableBoundingBox expanded = expand(pieceBounds, borderRadius);
@@ -127,8 +128,7 @@ public class TerrainHelper {
                     }
 
                     if (surface > level) {
-                        // world-surface is higher than the piece's base .: flatten terrain
-                        flatten(chunk, pieceBounds, pos.setPos(x, surface, z), dx, dz, level, surface, borderRadius);
+                        flatten(chunk, reader, pieceBounds, pos.setPos(x, surface, z), dx, dz, level, surface, borderRadius);
                     } else {
                         // piece is higher than world-surface .: raise ground to form a base
                         raise(chunk, pieceBounds, pos.setPos(x, surface, z), dx, dz, level, surface, borderRadius);
@@ -138,9 +138,12 @@ public class TerrainHelper {
         }
     }
 
-    private void flatten(IChunk chunk, MutableBoundingBox bounds, BlockPos.Mutable pos, int dx, int dz, int level, int surface, int borderRadius) {
-        // only flatten terrain within the footprint of the structure piece
+    private void flatten(IChunk chunk, ChunkReader reader, MutableBoundingBox bounds, BlockPos.Mutable pos, int dx, int dz, int level, int surface, int borderRadius) {
         if (pos.getX() >= bounds.minX && pos.getX() <= bounds.maxX && pos.getZ() >= bounds.minZ && pos.getZ() <= bounds.maxZ) {
+            Cell<?> cell = reader.getCell(dx, dz);
+            cell.steepness = 0F;
+            cell.sediment = 0F;
+            cell.erosion = 0F;
             for (int dy = level + 1; dy <= surface; dy++) {
                 chunk.setBlockState(pos.setPos(dx, dy, dz), Blocks.AIR.getDefaultState(), false);
             }

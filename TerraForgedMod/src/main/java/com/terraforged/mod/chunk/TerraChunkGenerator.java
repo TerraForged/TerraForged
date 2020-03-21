@@ -160,7 +160,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
             ctx.biome = container.getBiome(dx, dz);
             ChunkPopulator.INSTANCE.decorate(ctx.chunk, ctx, px, py, pz);
         });
-        terrainHelper.flatten(world, chunk, context.blockX, context.blockZ);
+        terrainHelper.flatten(world, chunk, container.getChunkReader(), context.blockX, context.blockZ);
     }
 
     @Override

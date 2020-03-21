@@ -84,7 +84,7 @@ public class ErosionDecorator implements ColumnDecorator {
         }
 
         int topY = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
-        if (topY - 1 > y) {
+        if (topY < y) {
             y = topY;
         }
 
