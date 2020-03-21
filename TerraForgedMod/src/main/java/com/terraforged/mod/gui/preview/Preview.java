@@ -72,11 +72,15 @@ public class Preview extends Button {
     private String[] labels = {"Area: ", "Terrain: ", "Biome: "};
     private String[] values = {"", "", ""};
 
-    public Preview() {
+    public Preview(int seed) {
         super(0, 0, 0, 0, "", b -> {});
-        this.seed = random.nextInt();
-        this.offsetX = random.nextInt(50000) - 25000;
-        this.offsetZ = random.nextInt(50000) - 25000;
+        this.seed = seed == -1 ? random.nextInt() : seed;
+        this.offsetX = 0;//random.nextInt(50000) - 25000;
+        this.offsetZ = 0;//random.nextInt(50000) - 25000;
+    }
+
+    public int getSeed() {
+        return seed;
     }
 
     public void regenerate() {

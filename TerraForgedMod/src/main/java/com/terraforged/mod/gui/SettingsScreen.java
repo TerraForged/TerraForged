@@ -40,17 +40,20 @@ import com.terraforged.mod.settings.SettingsHelper;
 import com.terraforged.mod.settings.TerraSettings;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.resources.I18n;
 
 public class SettingsScreen extends OverlayScreen {
 
     private static final Button.IPressable NO_ACTION = b -> {};
 
     private final Page[] pages;
+    private final PreviewPage preview;
     private final CreateWorldScreen parent;
-    private final PreviewPage preview = new PreviewPage();
     private final TerraSettings settings = new TerraSettings();
 
     private int pageIndex = 0;
@@ -59,6 +62,7 @@ public class SettingsScreen extends OverlayScreen {
     public SettingsScreen(CreateWorldScreen parent) {
         SettingsHelper.applyDefaults(parent.chunkProviderSettingsJson, settings);
         this.parent = parent;
+        this.preview = new PreviewPage(getSeed(parent));
         this.pages = new Page[]{
                 new GeneratorPage(settings, preview),
                 new ClimatePage(settings, preview),
@@ -108,6 +112,7 @@ public class SettingsScreen extends OverlayScreen {
                 page.save();
             }
             parent.chunkProviderSettingsJson = NBTHelper.serializeCompact(settings);
+            SettingsScreen.setSeed(parent, preview.getSeed());
             onClose();
         }));
 
@@ -259,5 +264,38 @@ public class SettingsScreen extends OverlayScreen {
 
     private boolean hasPrevious() {
         return pageIndex > 0;
+    }
+
+    private static int getSeed(CreateWorldScreen screen) {
+        TextFieldWidget field = getWidget(screen);
+        if (field != null && !field.getText().isEmpty()) {
+            try {
+                long seed = Long.parseLong(field.getText());
+                return (int) seed;
+            } catch (NumberFormatException var6) {
+                return field.getText().hashCode();
+            }
+        }
+        return -1;
+    }
+
+    private static void setSeed(CreateWorldScreen screen, int seed) {
+        TextFieldWidget field = getWidget(screen);
+        if (field != null) {
+            field.setText("" + seed);
+        }
+    }
+
+    private static TextFieldWidget getWidget(CreateWorldScreen screen) {
+        String message = I18n.format("selectWorld.enterSeed");
+        for (IGuiEventListener widget : screen.children()) {
+            if (widget instanceof TextFieldWidget) {
+                TextFieldWidget field = (TextFieldWidget) widget;
+                if (field.getMessage().equals(message)) {
+                    return field;
+                }
+            }
+        }
+        return null;
     }
 }

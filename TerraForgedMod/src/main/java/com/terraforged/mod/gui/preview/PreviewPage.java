@@ -36,12 +36,16 @@ import java.util.function.Consumer;
 
 public class PreviewPage extends BasePage {
 
-    private final Preview preview = new Preview();
+    private final Preview preview;
     private final Settings settings = new Settings();
     private final CompoundNBT previewerSettings = NBTHelper.serialize(new PreviewSettings());
 
-    public PreviewPage() {
+    public PreviewPage(int seed) {
+        preview = new Preview(seed);
+    }
 
+    public int getSeed() {
+        return preview.getSeed();
     }
 
     public void apply(Consumer<Settings> consumer) {
