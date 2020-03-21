@@ -81,7 +81,7 @@ public class RiverMap {
         this.heightmap = heightmap;
         this.context = context;
         this.riverMapConfig = new RiverMapConfig(context.settings.rivers.riverFrequency, primary, secondary, tertiary, lakes);
-        this.cache = new Cache<>(120, 60, TimeUnit.SECONDS);
+        this.cache = new Cache<>(3, 1, TimeUnit.MINUTES);
     }
 
     public RiverRegionList getRivers(Region region) {
