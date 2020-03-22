@@ -26,7 +26,6 @@
 package com.terraforged.mod.feature;
 
 import com.terraforged.api.material.state.States;
-import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.chunk.ChunkReader;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -140,10 +139,6 @@ public class TerrainHelper {
 
     private void flatten(IChunk chunk, ChunkReader reader, MutableBoundingBox bounds, BlockPos.Mutable pos, int dx, int dz, int level, int surface, int borderRadius) {
         if (pos.getX() >= bounds.minX && pos.getX() <= bounds.maxX && pos.getZ() >= bounds.minZ && pos.getZ() <= bounds.maxZ) {
-            Cell<?> cell = reader.getCell(dx, dz);
-            cell.steepness = 0F;
-            cell.sediment = 0F;
-            cell.erosion = 0F;
             for (int dy = level + 1; dy <= surface; dy++) {
                 chunk.setBlockState(pos.setPos(dx, dy, dz), Blocks.AIR.getDefaultState(), false);
             }

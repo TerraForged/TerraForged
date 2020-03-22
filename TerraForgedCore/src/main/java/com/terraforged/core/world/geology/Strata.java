@@ -56,7 +56,7 @@ public class Strata<T> {
         int py = y;
         T last = null;
         for (int i = 0; i < strata.size(); i++) {
-            float depth = buffer.get(i);
+            float depth = buffer.getDepth(i);
             int height = NoiseUtil.round(depth * y);
             T value = strata.get(i).getValue();
             last = value;
