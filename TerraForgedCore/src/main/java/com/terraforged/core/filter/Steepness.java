@@ -26,26 +26,23 @@
 package com.terraforged.core.filter;
 
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.world.heightmap.Levels;
 import com.terraforged.core.world.terrain.Terrains;
 
 public class Steepness implements Filter, Filter.Visitor {
 
     private final int radius;
     private final float scaler;
+    private final float waterLevel;
+    private final float maxBeachLevel;
     private final Terrains terrains;
 
-    public Steepness(Terrains terrains) {
-        this(2, 16F, terrains);
-    }
-
-    public Steepness(float scaler, Terrains terrains) {
-        this(2, scaler, terrains);
-    }
-
-    public Steepness(int radius, float scaler, Terrains terrains) {
+    public Steepness(int radius, float scaler, Terrains terrains, Levels levels) {
         this.radius = radius;
         this.scaler = scaler;
         this.terrains = terrains;
+        this.waterLevel = levels.water;
+        this.maxBeachLevel = levels.water(6);
     }
 
     @Override
@@ -69,13 +66,13 @@ public class Steepness implements Filter, Filter.Visitor {
                     continue;
                 }
 
-                float height = Math.max(neighbour.value, 62 / 256F);
+                float height = Math.max(neighbour.value, waterLevel);
 
                 totalHeightDif += (Math.abs(cell.value - height) / radius);
             }
         }
         cell.steepness = Math.min(1, totalHeightDif * scaler);
-        if (cell.tag == terrains.coast && cell.steepness < 0.22F) {
+        if (cell.tag == terrains.coast && cell.steepness < 0.225F && cell.value < maxBeachLevel) {
             cell.tag = terrains.beach;
         }
     }

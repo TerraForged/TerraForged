@@ -45,7 +45,7 @@ public class WorldFilters {
         this.settings = context.settings.filters;
         this.erosion = new Erosion(context.settings, context.levels);
         this.smoothing = new Smoothing(context.settings, context.levels);
-        this.steepness = new Steepness(1, 10F, context.terrain);
+        this.steepness = new Steepness(1, 10F, context.terrain, context.levels);
     }
 
     public void apply(Region region) {

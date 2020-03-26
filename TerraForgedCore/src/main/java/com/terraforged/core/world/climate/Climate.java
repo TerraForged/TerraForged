@@ -53,7 +53,9 @@ public class Climate {
         this.biomeNoise = new ClimateModule(context.seed, context.settings);
 
         this.treeLine = Source.perlin(context.seed.next(), context.settings.generator.biome.biomeSize * 2, 1)
-                .scale(0.1).bias(0.4);
+                .scale(context.levels.scale(25)) // 30 units worth of variance
+                .bias(context.levels.ground(40)) // start at-least 30 units above ground level
+                .clamp(0, 1);
 
         this.rand = new Rand(Source.builder().seed(context.seed.next()));
         this.offsetX = context.settings.generator.biomeEdgeNoise.build(context.seed.next());
