@@ -1,11 +1,11 @@
 {
   "biomes": [
-    "minecraft:jungle",
-    "minecraft:bamboo_jungle"
+    "minecraft:jungle_hills",
+    "minecraft:bamboo_jungle_hills"
   ],
   "match": [
     [
-      "minecraft:mega_jungle_tree"
+      "minecraft:fancy_tree"
     ]
   ],
   "replace": {
@@ -18,17 +18,17 @@
             {
               "name": "terraforged:jungle_small",
               "config": {},
-              "chance": 0.2
+              "chance": 0.4
             },
             {
               "name": "terraforged:jungle_large",
               "config": {},
-              "chance": 0.3
+              "chance": 0.2
             },
             {
               "name": "terraforged:jungle_huge",
               "config": {},
-              "chance": 0.4
+              "chance": 0.05
             },
             {
               "name": "minecraft:jungle_ground_bush",
@@ -55,7 +55,7 @@
                 "decorators": [],
                 "base_height": 4
               },
-              "chance": 0.5
+              "chance": 0.3
             }
           ],
           "default": {
@@ -67,7 +67,7 @@
       "decorator": {
         "name": "minecraft:count_extra_heightmap",
         "config": {
-          "count": 15,
+          "count": 6,
           "extra_chance": 0.25,
           "extra_count": 1
         }

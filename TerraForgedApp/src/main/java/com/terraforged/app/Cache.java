@@ -27,7 +27,7 @@ package com.terraforged.app;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.Region;
-import com.terraforged.core.region.RegionGenerator;
+import com.terraforged.core.region.gen.RegionGenerator;
 import com.terraforged.core.settings.Settings;
 import com.terraforged.core.util.concurrent.ThreadPool;
 import com.terraforged.core.world.GeneratorContext;

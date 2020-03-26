@@ -83,10 +83,7 @@ public class ErosionDecorator implements ColumnDecorator {
             return;
         }
 
-        int topY = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
-        if (topY < y) {
-            y = topY;
-        }
+        y = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
 
         ISurfaceBuilderConfig config = context.biome.getSurfaceBuilderConfig();
         BlockState top = config.getTop();

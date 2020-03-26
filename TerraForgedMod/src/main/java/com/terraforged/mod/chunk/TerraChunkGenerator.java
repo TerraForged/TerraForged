@@ -32,10 +32,10 @@ import com.terraforged.api.chunk.surface.SurfaceContext;
 import com.terraforged.api.chunk.surface.SurfaceManager;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.region.RegionCache;
-import com.terraforged.core.region.RegionGenerator;
 import com.terraforged.core.region.Size;
 import com.terraforged.core.region.chunk.ChunkReader;
+import com.terraforged.core.region.gen.RegionCache;
+import com.terraforged.core.region.gen.RegionGenerator;
 import com.terraforged.core.util.concurrent.ThreadPool;
 import com.terraforged.core.world.decorator.Decorator;
 import com.terraforged.feature.FeatureManager;
@@ -390,7 +390,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
                 .legacy(context.terraSettings.version == 0)
                 .pool(ThreadPool.getPool())
                 .factory(context.factory)
-                .size(3, 2)
+                .size(4, 2)
                 .build()
                 .toCache(false);
     }

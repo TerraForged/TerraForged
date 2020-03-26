@@ -23,8 +23,9 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.region;
+package com.terraforged.core.region.gen;
 
+import com.terraforged.core.region.Region;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.util.concurrent.Disposable;
 import com.terraforged.core.util.concurrent.cache.Cache;

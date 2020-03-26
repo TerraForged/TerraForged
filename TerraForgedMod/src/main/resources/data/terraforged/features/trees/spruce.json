@@ -2,10 +2,7 @@
   "biomes": [
     "minecraft:snowy_taiga",
     "minecraft:snowy_taiga_hills",
-    "minecraft:snowy_taiga_mountains",
-    "minecraft:snowy_taiga_scrub",
-    "minecraft:snowy_tundra",
-    "minecraft:wooded_mountains"
+    "minecraft:snowy_taiga_mountains"
   ],
   "match": [
     [

@@ -1,8 +1,7 @@
 {
   "biomes": [
-    "minecraft:taiga",
-    "minecraft:taiga_hills",
-    "minecraft:taiga_mountains"
+    "minecraft:snowy_tundra",
+    "minecraft:wooded_mountains"
   ],
   "match": [
     [
@@ -33,8 +32,8 @@
       "decorator": {
         "name": "minecraft:count_extra_heightmap",
         "config": {
-          "count": 8,
-          "extra_chance": 0.1,
+          "count": 0,
+          "extra_chance": 0.02,
           "extra_count": 1
         }
       }

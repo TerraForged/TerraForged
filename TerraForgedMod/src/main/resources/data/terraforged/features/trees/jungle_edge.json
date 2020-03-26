@@ -1,14 +1,10 @@
 {
   "biomes": [
-    "minecraft:taiga",
-    "minecraft:taiga_hills",
-    "minecraft:taiga_mountains"
+    "minecraft:jungle_edge"
   ],
   "match": [
     [
-      "minecraft:normal_tree",
-      "minecraft:spruce_log",
-      "minecraft:spruce_leaves"
+      "minecraft:fancy_tree"
     ]
   ],
   "replace": {
@@ -19,13 +15,18 @@
         "config": {
           "features": [
             {
-              "name": "terraforged:pine",
+              "name": "terraforged:jungle_small",
+              "config": {},
+              "chance": 0.2
+            },
+            {
+              "name": "terraforged:jungle_large",
               "config": {},
               "chance": 0.3
             }
           ],
           "default": {
-            "name": "terraforged:pine",
+            "name": "terraforged:jungle_small",
             "config": {}
           }
         }
@@ -33,8 +34,8 @@
       "decorator": {
         "name": "minecraft:count_extra_heightmap",
         "config": {
-          "count": 8,
-          "extra_chance": 0.1,
+          "count": 3,
+          "extra_chance": 0.25,
           "extra_count": 1
         }
       }

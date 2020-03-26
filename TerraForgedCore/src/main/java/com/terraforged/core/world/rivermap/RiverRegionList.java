@@ -5,6 +5,8 @@ import com.terraforged.core.util.concurrent.cache.CacheEntry;
 import com.terraforged.core.world.rivermap.river.RiverRegion;
 import com.terraforged.core.world.terrain.Terrain;
 
+import java.util.Arrays;
+
 public class RiverRegionList {
 
     private int index = 0;
@@ -17,15 +19,17 @@ public class RiverRegionList {
         }
     }
 
+    protected void reset() {
+        index = 0;
+    }
+
+    public void clear() {
+        Arrays.fill(regions, null);
+    }
+
     public void apply(Cell<Terrain> cell, float x, float z) {
-        int complete = 0;
-        while (complete < regions.length) {
-            for (CacheEntry<RiverRegion> entry : regions) {
-                if (entry.isDone()) {
-                    complete++;
-                    entry.get().apply(cell, x, z);
-                }
-            }
+        for (CacheEntry<RiverRegion> entry : regions) {
+            entry.get().apply(cell, x, z);
         }
     }
 }

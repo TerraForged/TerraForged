@@ -27,8 +27,8 @@ package com.terraforged.mod.chunk.test;
 
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
-import com.terraforged.core.region.RegionCache;
-import com.terraforged.core.region.RegionGenerator;
+import com.terraforged.core.region.gen.RegionCache;
+import com.terraforged.core.region.gen.RegionGenerator;
 import com.terraforged.core.util.concurrent.ThreadPool;
 import com.terraforged.core.world.GeneratorContext;
 import com.terraforged.core.world.WorldGeneratorFactory;

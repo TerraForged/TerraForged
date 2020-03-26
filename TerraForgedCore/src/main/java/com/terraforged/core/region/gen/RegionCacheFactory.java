@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.core.region;
+package com.terraforged.core.region.gen;
 
 import com.terraforged.core.world.WorldGeneratorFactory;
 

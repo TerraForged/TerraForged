@@ -85,10 +85,22 @@ public class RiverMap {
     }
 
     public RiverRegionList getRivers(Region region) {
-        return getRivers(region.getBlockX(), region.getBlockZ());
+        RiverRegionList rivers = new RiverRegionList();
+        getRivers(region.getBlockX(), region.getBlockZ(), rivers);
+        return rivers;
     }
 
     public RiverRegionList getRivers(int blockX, int blockZ) {
+        RiverRegionList rivers = new RiverRegionList();
+        getRivers(blockX, blockZ, rivers);
+        return rivers;
+    }
+
+    public void getRivers(Region region, RiverRegionList rivers) {
+        getRivers(region.getBlockX(), region.getBlockZ(), rivers);
+    }
+
+    public void getRivers(int blockX, int blockZ, RiverRegionList rivers) {
         int rx = RiverRegion.blockToRegion(blockX);
         int rz = RiverRegion.blockToRegion(blockZ);
 
@@ -102,48 +114,18 @@ public class RiverMap {
         int maxX = Math.max(0, qx);
         int maxZ = Math.max(0, qz);
 
-        RiverRegionList list = new RiverRegionList();
+        rivers.reset();
         for (int dz = minZ; dz <= maxZ; dz++) {
             for (int dx = minX; dx <= maxX; dx++) {
-                list.add(getRegion(rx + dx, rz + dz));
+                rivers.add(getRegion(rx + dx, rz + dz));
             }
         }
-
-        return list;
     }
 
     public void apply(Cell<Terrain> cell, float x, float z) {
-        int rx = RiverRegion.blockToRegion((int) x);
-        int rz = RiverRegion.blockToRegion((int) z);
-
-        // check which quarter of the region pos (x,y) is in & get the neighbouring regions' relative coords
-        int qx = x < RiverRegion.regionToBlock(rx) + QUAD_SIZE ? -1 : 1;
-        int qz = z < RiverRegion.regionToBlock(rz) + QUAD_SIZE ? -1 : 1;
-
-        // relative positions of neighbouring regions
-        int minX = Math.min(0, qx);
-        int minZ = Math.min(0, qz);
-        int maxX = Math.max(0, qx);
-        int maxZ = Math.max(0, qz);
-
-        // queue up the 4 nearest reiver regions
-        int index = 0;
-        CacheEntry<RiverRegion>[] entries = new CacheEntry[4];
-        for (int dz = minZ; dz <= maxZ; dz++) {
-            for (int dx = minX; dx <= maxX; dx++) {
-                entries[index++] = getRegion(rx + dx, rz + dz);
-            }
-        }
-
-        int count = 0;
-        while (count < index) {
-            for (CacheEntry<RiverRegion> entry : entries) {
-                if (entry.isDone()) {
-                    count++;
-                    entry.get().apply(cell, x, z);
-                }
-            }
-        }
+        RiverRegionList rivers = new RiverRegionList();
+        getRivers((int) x, (int) z, rivers);
+        rivers.apply(cell, x, z);
     }
 
     private CacheEntry<RiverRegion> getRegion(int rx, int rz) {
