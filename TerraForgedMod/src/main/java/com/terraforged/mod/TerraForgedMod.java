@@ -31,7 +31,9 @@ import com.terraforged.mod.data.DataGen;
 import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.mod.feature.tree.SaplingManager;
 import com.terraforged.mod.util.Environment;
+import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.feature.Feature;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -51,6 +53,10 @@ public class TerraForgedMod {
         WGTags.init();
         TerraWorld.init();
         SaplingManager.init();
+
+        // temp fix
+        BiomeDictionary.addTypes(Biomes.BAMBOO_JUNGLE, BiomeDictionary.Type.OVERWORLD);
+        BiomeDictionary.addTypes(Biomes.BAMBOO_JUNGLE_HILLS, BiomeDictionary.Type.OVERWORLD);
     }
 
     @SubscribeEvent
