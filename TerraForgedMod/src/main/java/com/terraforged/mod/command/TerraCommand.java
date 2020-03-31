@@ -46,6 +46,7 @@ import com.terraforged.mod.command.search.BothSearchTask;
 import com.terraforged.mod.command.search.Search;
 import com.terraforged.mod.command.search.TerrainSearchTask;
 import com.terraforged.mod.data.DataGen;
+import com.terraforged.mod.settings.SettingsHelper;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.player.PlayerEntity;
@@ -94,6 +95,9 @@ public class TerraCommand {
                 .then(Commands.literal("data")
                         .then(Commands.literal("dump")
                                 .executes(TerraCommand::dump)))
+                .then(Commands.literal("defaults")
+                        .then(Commands.literal("set")
+                                .executes(TerraCommand::setDefaults)))
                 .then(Commands.literal("debug")
                         .executes(TerraCommand::debugBiome))
                 .then(Commands.literal("locate")
@@ -131,6 +135,20 @@ public class TerraCommand {
                 true
         );
         DataGen.dumpData();
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int setDefaults(CommandContext<CommandSource> context) throws CommandSyntaxException {
+        TerraContext terraContext = getContext(context).orElseThrow(() -> createException(
+                "Invalid world type",
+                "This command can only be run in a TerraForged world!"
+        ));
+
+        context.getSource().sendFeedback(
+                new StringTextComponent("Setting generator defaults"),
+                true
+        );
+        SettingsHelper.exportDefaults(terraContext.terraSettings);
         return Command.SINGLE_SUCCESS;
     }
 

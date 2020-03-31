@@ -54,7 +54,7 @@ public class RiverSettings {
         @Comment("Controls the depth of the river")
         public int bedDepth;
 
-        @Range(min = 1, max = 10)
+        @Range(min = 0, max = 10)
         @Comment("Controls the height of river banks")
         public int minBankHeight;
 

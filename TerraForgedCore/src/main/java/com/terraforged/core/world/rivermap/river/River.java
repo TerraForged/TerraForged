@@ -177,8 +177,9 @@ public class River extends TerrainPopulator {
     }
 
     private void carveBed(Cell<Terrain> cell, float bedAlpha, float bedHeight) {
-        // lerp the height down to  the riverbed height
-        cell.value = NoiseUtil.lerp(cell.value, bedHeight, bedAlpha);
+        if (cell.value > bedHeight) {
+            cell.value = NoiseUtil.lerp(cell.value, bedHeight, bedAlpha);
+        }
         tag(cell, terrains.river);
     }
 

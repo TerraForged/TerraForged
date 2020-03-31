@@ -125,7 +125,8 @@ public class StandardTerrainProvider implements TerrainProvider {
         Terrain type = new Terrain(name, id, weight);
         Module combined = Source.perlin(seed.next(), scale, 1)
                 .warp(seed.next(), scale / 2, 2, scale / 2D)
-                .blend(tp1.getSource(), tp2.getSource(), 0.5, 0.25);
+                .blend(tp1.getSource(), tp2.getSource(), 0.5, 0.25)
+                .clamp(0, 1);
 
         return new TerrainPopulator(combined, type);
     }

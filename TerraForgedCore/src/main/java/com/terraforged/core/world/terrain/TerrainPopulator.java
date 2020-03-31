@@ -36,7 +36,7 @@ public class TerrainPopulator implements Populator {
 
     public TerrainPopulator(Module source, Terrain type) {
         this.type = type;
-        this.source = source;
+        this.source = clamp(source);
     }
 
     public Module getSource() {
@@ -56,5 +56,12 @@ public class TerrainPopulator implements Populator {
     @Override
     public void tag(Cell<Terrain> cell, float x, float y) {
         cell.tag = type;
+    }
+
+    public static Module clamp(Module module) {
+        if (module.minValue() < 0 || module.maxValue() > 1) {
+            return module.clamp(0, 1);
+        }
+        return module;
     }
 }

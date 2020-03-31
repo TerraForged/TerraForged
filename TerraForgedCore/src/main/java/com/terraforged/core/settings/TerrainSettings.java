@@ -28,6 +28,7 @@ package com.terraforged.core.settings;
 import com.terraforged.core.util.serialization.annotation.Comment;
 import com.terraforged.core.util.serialization.annotation.Range;
 import com.terraforged.core.util.serialization.annotation.Serializable;
+import com.terraforged.core.world.terrain.TerrainPopulator;
 import me.dags.noise.Module;
 
 @Serializable
@@ -83,10 +84,8 @@ public class TerrainSettings {
         public Module apply(double bias, double scale, Module module) {
             double moduleBias = bias * baseScale;
             double moduleScale = scale * verticalScale;
-            if (moduleBias + moduleScale > 1) {
-                return module.scale(moduleScale).bias(moduleBias).clamp(0, 1);
-            }
-            return module.scale(moduleScale).bias(moduleBias);
+            Module outputModule = module.scale(moduleScale).bias(moduleBias);
+            return TerrainPopulator.clamp(outputModule);
         }
     }
 }
