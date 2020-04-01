@@ -49,6 +49,8 @@ import com.terraforged.mod.data.DataGen;
 import com.terraforged.mod.settings.SettingsHelper;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.arguments.ArgumentSerializer;
+import net.minecraft.command.arguments.ArgumentTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
@@ -77,8 +79,13 @@ import java.util.function.Supplier;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TerraCommand {
 
+    public static void init() {
+        ArgumentTypes.register("terraforged:biome", BiomeArgType.class, new ArgumentSerializer<>(BiomeArgType::new));
+        ArgumentTypes.register("terraforged:terrain", TerrainArgType.class, new ArgumentSerializer<>(TerrainArgType::new));
+    }
+
     @SubscribeEvent
-    public static void start(FMLServerStartingEvent event) {
+    public static void register(FMLServerStartingEvent event) {
         Log.info("Registering /terra command");
         register(event.getCommandDispatcher());
     }
@@ -165,7 +172,7 @@ public class TerraCommand {
 
         context.getSource().sendFeedback(new StringTextComponent(
                         "Actual Biome = " + actual.getRegistryName()
-                        + "\nLookup Biome = " + biome2.getRegistryName()),
+                                + "\nLookup Biome = " + biome2.getRegistryName()),
                 false
         );
 

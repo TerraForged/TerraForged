@@ -74,18 +74,20 @@ public class SettingsHelper {
     }
 
     public static TerraSettings getSettings(IWorld world) {
-        try (Reader reader = new BufferedReader(new FileReader(new File("config", SETTINGS_FILE_NAME)))) {
-            Log.info("Loading generator settings from json");
-            return new Gson().fromJson(reader, TerraSettings.class);
-        } catch (Throwable ignored) {
-            return getSettings(world.getWorldInfo());
-        }
-    }
-
-    public static TerraSettings getSettings(WorldInfo info) {
         TerraSettings settings = new TerraSettings();
-        if (!info.getGeneratorOptions().isEmpty()) {
-            NBTHelper.deserialize(info.getGeneratorOptions(), settings);
+        if (world.getWorldInfo().getGeneratorOptions().isEmpty()) {
+            File defaults = new File("config", SETTINGS_FILE_NAME);
+            if (defaults.exists()) {
+                try (Reader reader = new BufferedReader(new FileReader(defaults))) {
+                    Log.info("Loading generator settings from json");
+                    return new Gson().fromJson(reader, TerraSettings.class);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        } else {
+            Log.info("Loading generator settings from level.dat");
+            NBTHelper.deserialize(world.getWorldInfo().getGeneratorOptions(), settings);
         }
         return settings;
     }

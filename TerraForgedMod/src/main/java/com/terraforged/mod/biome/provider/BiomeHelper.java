@@ -87,23 +87,19 @@ public class BiomeHelper {
                 weight = 5;
             }
 
-            if (biome.getCategory() == Biome.Category.MUSHROOM) {
-                weight = 1;
-            }
-
             // don't use BiomeDictionary with transient biomes
             if (ForgeRegistries.BIOMES.containsKey(biome.getRegistryName())) {
                 if (BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.RARE)) {
-                    weight = 1;
+                    weight = 2;
                 }
             }
 
-            if (biome.getCategory() == Biome.Category.OCEAN) {
+            if (BiomePredicate.COAST.test(data)) {
+                builder.addBeach(biome, weight);
+            } else if (biome.getCategory() == Biome.Category.OCEAN) {
                 builder.addOcean(biome, weight);
             } else if (biome.getCategory() == Biome.Category.RIVER) {
                 builder.addRiver(biome, weight);
-            } else if (biome.getCategory() == Biome.Category.BEACH || biome == Biomes.STONE_SHORE) {
-                builder.addBeach(biome, weight);
             } else if (biome.getCategory() == Biome.Category.SWAMP) {
                 builder.addWetland(biome, weight);
             } else {

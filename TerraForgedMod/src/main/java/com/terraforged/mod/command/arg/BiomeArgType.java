@@ -52,7 +52,7 @@ public class BiomeArgType implements ArgumentType<Biome> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder suggestions) {
-        return ISuggestionProvider.func_212476_a(ForgeRegistries.BIOMES.getValues().stream().map(Biome::getRegistryName), suggestions);
+        return ISuggestionProvider.suggestIterable(ForgeRegistries.BIOMES.getKeys(), suggestions);
     }
 
     private static CommandSyntaxException createException(String type, String message, Object... args) {

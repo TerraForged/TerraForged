@@ -84,7 +84,7 @@ public interface BiomePredicate {
         return false;
     }
 
-    BiomePredicate COAST = type(Biome.Category.BEACH);
+    BiomePredicate COAST = type(Biome.Category.BEACH, Biome.Category.MUSHROOM).or(name("shore")).or(name("beach"));
     BiomePredicate WETLAND = type(Biome.Category.SWAMP);
     BiomePredicate DESERT = type(Biome.Category.DESERT).or(temp(0.9, 2).and(rain(-1, 0.2)));
     BiomePredicate SAVANNA = type(Biome.Category.SAVANNA).or(temp(0.8, 2).and(rain(-1, 0.4)));

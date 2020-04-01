@@ -35,6 +35,7 @@ import com.terraforged.mod.chunk.test.TestChunkGenerator;
 import com.terraforged.mod.gui.SettingsScreen;
 import com.terraforged.mod.settings.SettingsHelper;
 import com.terraforged.mod.settings.TerraSettings;
+import com.terraforged.mod.util.Environment;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
@@ -52,11 +53,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class TerraWorld extends WorldType {
-    public static final int VERSION = 1;
 
+    public static final int VERSION = 1;
     private static final Set<WorldType> types = new HashSet<>();
-    public static final TerraWorld TERRA = new TerraWorld("terraforged", TerraChunkGenerator::new);
-    public static final TerraWorld TEST = new TerraWorld("terratest", TestChunkGenerator::new);
 
     private final ChunkGeneratorFactory<?> factory;
 
@@ -113,7 +112,12 @@ public class TerraWorld extends WorldType {
     }
 
     public static void init() {
-        Log.info("Registered world type(s)");
+        Log.info("Registered world type");
+        new TerraWorld("terraforged", TerraChunkGenerator::new);
+        if (Environment.isDev()) {
+            Log.info("Registered developer world type");
+            new TerraWorld("terratest", TestChunkGenerator::new);
+        }
     }
 
     public static boolean isTerraWorld(IWorld world) {
