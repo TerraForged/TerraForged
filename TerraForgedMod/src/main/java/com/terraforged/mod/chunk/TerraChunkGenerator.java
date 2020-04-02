@@ -325,10 +325,14 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
             modifiers.getPredicates().add(Matchers.stoneBlobs(), FeaturePredicate.DENY);
         }
 
+        if (!context.terraSettings.features.vanillaWaterFeatures) {
+            // block lakes and springs if not enabled
+            modifiers.getPredicates().add(FeatureMatcher.of(Feature.LAKE), FeaturePredicate.DENY);
+            modifiers.getPredicates().add(FeatureMatcher.of(Feature.SPRING_FEATURE), FeaturePredicate.DENY);
+        }
+
         // block ugly features
         modifiers.getPredicates().add(Matchers.sedimentDisks(), FeaturePredicate.DENY);
-        modifiers.getPredicates().add(FeatureMatcher.of(Feature.LAKE), FeaturePredicate.DENY);
-        modifiers.getPredicates().add(FeatureMatcher.of(Feature.SPRING_FEATURE), FeaturePredicate.DENY);
 
         // limit to deep oceans
         modifiers.getPredicates().add(FeatureMatcher.of(Feature.SHIPWRECK), MinDepth.DEPTH55);

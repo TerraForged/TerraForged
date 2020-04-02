@@ -45,4 +45,7 @@ public class FeatureSettings {
 
     @Comment("Use custom biome features in place of vanilla ones (such as trees)")
     public boolean customBiomeFeatures = true;
+
+    @Comment("Controls whether vanilla lakes & springs should generate")
+    public boolean vanillaWaterFeatures = false;
 }
