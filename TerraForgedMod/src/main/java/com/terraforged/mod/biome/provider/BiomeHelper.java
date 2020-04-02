@@ -90,7 +90,7 @@ public class BiomeHelper {
             // don't use BiomeDictionary with transient biomes
             if (ForgeRegistries.BIOMES.containsKey(biome.getRegistryName())) {
                 if (BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.RARE)) {
-                    weight = 2;
+                    weight = 1;
                 }
             }
 

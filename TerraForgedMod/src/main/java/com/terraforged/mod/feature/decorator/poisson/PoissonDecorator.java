@@ -25,7 +25,7 @@ public abstract class PoissonDecorator extends Placement<PoissonConfig> {
 
     @Override
     public final <FC extends IFeatureConfig, F extends Feature<FC>> boolean place(IWorld world, ChunkGenerator<?> generator, Random random, BlockPos pos, PoissonConfig config, ConfiguredFeature<FC, F> feature) {
-        int radius = Math.max(2, Math.min(30, config.radius));
+        int radius = Math.max(1, Math.min(30, config.radius));
         Poisson poisson = getInstance(radius);
         PoissonVisitor visitor = new PoissonVisitor(this, feature, world, generator, random, pos);
         setVariance(world, visitor, config);
@@ -44,7 +44,7 @@ public abstract class PoissonDecorator extends Placement<PoissonConfig> {
 
     private Poisson getInstance(int radius) {
         synchronized (lock) {
-            if (instance == null) {
+            if (instance == null || instance.getRadius() != radius) {
                 instance = new Poisson(radius);
             }
             return instance;
@@ -52,13 +52,18 @@ public abstract class PoissonDecorator extends Placement<PoissonConfig> {
     }
 
     private void setVariance(IWorld world, PoissonContext context, PoissonConfig config) {
-        Module module = BiomeVariance.of(world);
-        if (module != Source.ONE) {
-            if (config.variance > 0) {
-                Module variance = Source.simplex((int) world.getSeed(), config.variance, 1).scale(1.5);
-                module = module.mult(variance);
-            }
-            context.density = module;
+        Module module = Source.ONE;
+
+        if (config.biomeFade > 0.075F) {
+            module = BiomeVariance.of(world, config.biomeFade);
         }
+
+        if (config.variance > 0) {
+            module = module.mult(Source.simplex(context.seed, config.variance, 1)
+                    .scale(config.max - config.min)
+                    .bias(config.min));
+        }
+
+        context.density = module;
     }
 }

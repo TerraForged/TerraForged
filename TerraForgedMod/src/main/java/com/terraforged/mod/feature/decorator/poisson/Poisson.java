@@ -1,6 +1,7 @@
 package com.terraforged.mod.feature.decorator.poisson;
 
 import com.terraforged.core.util.concurrent.ObjectPool;
+import me.dags.noise.Source;
 import me.dags.noise.util.NoiseUtil;
 import me.dags.noise.util.Vec2f;
 
@@ -17,6 +18,7 @@ public class Poisson {
 
     private final int radius;
     private final int radius2;
+    private final float halfRadius;
     private final int maxDistance;
     private final int regionSize;
     private final int gridSize;
@@ -27,12 +29,16 @@ public class Poisson {
         int size = 48;
         this.radius = radius;
         this.radius2 = radius * radius;
-        int halfRadius = radius / 2;
+        this.halfRadius = radius / 2F;
         this.maxDistance = radius * 2;
-        this.regionSize = size - halfRadius;
+        this.regionSize = size - radius;
         this.cellSize = radius / NoiseUtil.SQRT2;
         this.gridSize = (int) Math.ceil(regionSize / cellSize);
         this.pool = new ObjectPool<>(3, () -> new Vec2f[gridSize][gridSize]);
+    }
+
+    public int getRadius() {
+        return radius;
     }
 
     public void visit(int chunkX, int chunkZ, PoissonContext context, BiConsumer<Integer, Integer> consumer) {
@@ -57,8 +63,8 @@ public class Poisson {
         for (int i = 0; i < samples; i++) {
             float angle = context.random.nextFloat() * NoiseUtil.PI2;
             float distance = radius + (context.random.nextFloat() * maxDistance);
-            float x = px + NoiseUtil.sin(angle) * distance;
-            float z = pz + NoiseUtil.cos(angle) * distance;
+            float x = halfRadius + px + NoiseUtil.sin(angle) * distance;
+            float z = halfRadius + pz + NoiseUtil.cos(angle) * distance;
             if (valid(x, z, grid, context)) {
                 Vec2f vec = new Vec2f(x, z);
                 visit(vec, context, consumer);
@@ -122,7 +128,7 @@ public class Poisson {
 
     public static void main(String[] args) {
         int size = 512;
-        int radius = 10;
+        int radius = 6;
 
         int chunkSize = 16;
         int chunks = size / chunkSize;
@@ -130,13 +136,19 @@ public class Poisson {
         BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
         Poisson poisson = new Poisson(radius);
         PoissonContext context = new PoissonContext(213, new Random());
+        context.density = Source.simplex(213, 100, 1).scale(2).bias(0);
 
         long time = 0L;
         long count = 0L;
+
+        int chunkX = 342;
+        int chunkZ = 546;
         for (int cz = 0; cz < chunks; cz++) {
             for (int cx = 0; cx < chunks; cx++) {
                 long start = System.nanoTime();
-                poisson.visit(cx, cz, context, (x, z) -> {
+                poisson.visit(chunkX + cx, chunkZ + cz, context, (x, z) -> {
+                    x -= chunkX << 4;
+                    z -= chunkZ << 4;
                     if (x < 0 || x >= image.getWidth() || z < 0 || z >= image.getHeight()) {
                         return;
                     }
@@ -147,8 +159,8 @@ public class Poisson {
             }
         }
 
-        double avg = (double) time / count;
-        System.out.println(avg + "ns");
+        double avg = (double) (time / count) / 1000000;
+        System.out.println(avg + "ms");
 
         JFrame frame = new JFrame();
         frame.add(new JLabel(new ImageIcon(image)));

@@ -47,6 +47,8 @@ public class ModBiomes {
     public static final Biome TAIGA_SCRUB = register(new TaigaScrub());
     public static final Biome WARM_BEACH = register(new WarmBeach());
     public static final Biome MARSHLAND = register(new Marshland());
+//    public static final Biome FIR_FOREST = register(new FirForest());
+//    public static final Biome FLOWER_PLAINS = register(new FlowerPlains());
 
     private static Biome register(BiomeVariant biome) {
         biomes.add(biome);
@@ -59,6 +61,9 @@ public class ModBiomes {
             event.getRegistry().register(biome);
             BiomeDictionary.makeBestGuess(biome);
             BiomeDictionary.addTypes(biome, BiomeDictionary.Type.OVERWORLD);
+            if (BiomeDictionary.getTypes(biome.getBase()).contains(BiomeDictionary.Type.RARE)) {
+                BiomeDictionary.addTypes(biome, BiomeDictionary.Type.RARE);
+            }
         });
         biomes.clear();
         biomes.trimToSize();

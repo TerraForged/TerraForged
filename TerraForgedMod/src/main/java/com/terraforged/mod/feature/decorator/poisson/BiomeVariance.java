@@ -14,34 +14,38 @@ import net.minecraft.world.gen.WorldGenRegion;
 
 public class BiomeVariance implements Module {
 
-    private final ChunkReader chunk;
+    public static float MIN_FADE = 0.05F;
 
-    public BiomeVariance(ChunkReader chunk) {
+    private final ChunkReader chunk;
+    private final float fade;
+    private final float range;
+
+    public BiomeVariance(ChunkReader chunk, float fade) {
         this.chunk = chunk;
+        this.fade = fade;
+        this.range = fade - MIN_FADE;
     }
 
     @Override
     public float getValue(float x, float y) {
-        int dx = ((int) x) & 15;
-        int dz = ((int) y) & 15;
-        Cell<?> cell = chunk.getCell(dx, dz);
-        return NoiseUtil.map(1 - cell.biomeEdge, 0.05F, 0.25F, 0.2F);
+        Cell<?> cell = chunk.getCell((int) x, (int) y);
+        return NoiseUtil.map(1 - cell.biomeEdge, MIN_FADE, fade, range);
     }
 
-    public static Module of(IWorld world) {
+    public static Module of(IWorld world, float fade) {
         if (world instanceof RegionDelegate) {
             WorldGenRegion region = ((RegionDelegate) world).getRegion();
             IChunk chunk = region.getChunk(region.getMainChunkX(), region.getMainChunkZ());
-            return of(chunk);
+            return of(chunk, fade);
         }
         return Source.ONE;
     }
 
-    public static Module of(IChunk chunk) {
+    public static Module of(IChunk chunk, float fade) {
         BiomeContainer container = chunk.getBiomes();
         if (container instanceof TerraContainer) {
             ChunkReader reader = ((TerraContainer) container).getChunkReader();
-            return new BiomeVariance(reader);
+            return new BiomeVariance(reader, fade);
         }
         return Source.ONE;
     }

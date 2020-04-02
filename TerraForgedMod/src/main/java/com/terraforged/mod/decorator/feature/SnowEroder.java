@@ -32,6 +32,8 @@ import com.terraforged.mod.decorator.base.ErosionDecorator;
 import me.dags.noise.source.Rand;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.GrassBlock;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
 
@@ -78,7 +80,7 @@ public class SnowEroder extends ErosionDecorator {
                     context.pos.setPos(x, y + dy, z);
                     BlockState state = chunk.getBlockState(context.pos);
                     if (!predicate.test(state) || state.getBlock() == Blocks.SNOW) {
-                        chunk.setBlockState(context.pos, Blocks.AIR.getDefaultState(), false);
+                        erodeSnow(chunk, context.pos);
                     }
                 }
             }
@@ -89,5 +91,17 @@ public class SnowEroder extends ErosionDecorator {
         return steepness > ROCK_STEEPNESS
                 || (steepness > SNOW_ROCK_STEEPNESS && height > SNOW_ROCK_HEIGHT)
                 || super.erodeDirt(x, z, steepness, height);
+    }
+
+    private void erodeSnow(IChunk chunk, BlockPos.Mutable pos) {
+        chunk.setBlockState(pos, Blocks.AIR.getDefaultState(), false);
+
+        if (pos.getY() > 0) {
+            pos.setY(pos.getY() - 1);
+            BlockState below = chunk.getBlockState(pos);
+            if (below.has(GrassBlock.SNOWY)) {
+                chunk.setBlockState(pos, below.with(GrassBlock.SNOWY, false), false);
+            }
+        }
     }
 }
