@@ -33,29 +33,29 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
+import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.world.gen.feature.structure.MineshaftConfig;
+import net.minecraft.world.gen.feature.structure.MineshaftStructure;
+import net.minecraft.world.gen.feature.structure.VillageConfig;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
 
 public class Steppe extends BiomeVariant {
 
     protected Steppe() {
         super((new Biome.Builder()).surfaceBuilder(SurfaceBuilder.GIANT_TREE_TAIGA, SurfaceBuilder.GRASS_DIRT_GRAVEL_CONFIG).precipitation(RainType.SNOW).category(Category.SAVANNA).depth(0.2F).scale(0.2F).temperature(0.7F).downfall(0.1F).waterColor(4159204).waterFogColor(329011).parent((String) null));
+        this.addStructure(Feature.VILLAGE.withConfiguration(new VillageConfig("village/savanna/town_centers", 6)));
+        this.addStructure(Feature.PILLAGER_OUTPOST.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG));
+        this.addStructure(Feature.MINESHAFT.withConfiguration(new MineshaftConfig(0.004D, MineshaftStructure.Type.NORMAL)));
+        this.addStructure(Feature.STRONGHOLD.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG));
         DefaultBiomeFeatures.addCarvers(this);
         DefaultBiomeFeatures.addStructures(this);
-//        DefaultBiomeFeatures.addLakes(this);
         DefaultBiomeFeatures.addMonsterRooms(this);
-//        DefaultBiomeFeatures.addTaigaRocks(this);
-//        DefaultBiomeFeatures.addTaigaLargeFerns(this);
         DefaultBiomeFeatures.addStoneVariants(this);
         DefaultBiomeFeatures.addOres(this);
         DefaultBiomeFeatures.addSedimentDisks(this);
-        // extra grasses as no trees/ferns
         DefaultBiomeFeatures.addGrass(this);
         DefaultBiomeFeatures.addVeryDenseGrass(this);
-//        DefaultBiomeFeatures.func_222285_H(this);
-//        DefaultBiomeFeatures.addDefaultFlowers(this);
-//        DefaultBiomeFeatures.addMushrooms(this);
-//        DefaultBiomeFeatures.addReedsAndPumpkins(this);
-//        DefaultBiomeFeatures.addSprings(this);
         DefaultBiomeFeatures.addFreezeTopLayer(this);
         this.addSpawn(EntityClassification.CREATURE, new Biome.SpawnListEntry(EntityType.SHEEP, 12, 4, 4));
         this.addSpawn(EntityClassification.CREATURE, new Biome.SpawnListEntry(EntityType.PIG, 10, 4, 4));
