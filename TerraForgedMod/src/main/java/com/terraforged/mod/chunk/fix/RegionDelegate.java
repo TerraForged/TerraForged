@@ -62,6 +62,10 @@ public class RegionDelegate extends WorldGenRegion {
         this.region = region;
     }
 
+    public WorldGenRegion getRegion() {
+        return region;
+    }
+
     @Override
     public int getMainChunkX() {
         return region.getMainChunkX();

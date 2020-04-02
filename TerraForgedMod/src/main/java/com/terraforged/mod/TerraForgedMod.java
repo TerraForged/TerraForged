@@ -29,12 +29,14 @@ import com.terraforged.api.material.WGTags;
 import com.terraforged.feature.FeatureManager;
 import com.terraforged.mod.command.TerraCommand;
 import com.terraforged.mod.data.DataGen;
+import com.terraforged.mod.feature.decorator.poisson.PoissonAtSurface;
 import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.mod.feature.tree.SaplingManager;
 import com.terraforged.mod.util.DataPackFinder;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -74,8 +76,15 @@ public class TerraForgedMod {
 
     @SubscribeEvent
     public static void registerFeatures(RegistryEvent.Register<Feature<?>> event) {
+        Log.info("Registering features");
         FeatureManager.registerTemplates(event);
         event.getRegistry().register(DiskFeature.INSTANCE);
+    }
+
+    @SubscribeEvent
+    public static void registerDecorators(RegistryEvent.Register<Placement<?>> event) {
+        Log.info("Registering decorators");
+        event.getRegistry().register(new PoissonAtSurface());
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
