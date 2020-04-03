@@ -114,10 +114,10 @@ public class TerrainHelper {
                     int level = pieceBounds.minY + piece.getGroundLevelDelta();
                     if (level > y) {
                         y = raise(pieceBounds, pos.setPos(x, surface, z), level, y, borderRadius);
-                    } else if (level < surface && pieceBounds.getYSize() > 4) {
-                        if (highest == null) {
-                            highest = piece;
-                        } else if (highest.getBoundingBox().maxY < pieceBounds.maxY) {
+                    }
+
+                    if (x > pieceBounds.minX && x < pieceBounds.maxX && z > pieceBounds.minZ && z < pieceBounds.maxZ) {
+                        if (highest == null || pieceBounds.minY > highest.getBoundingBox().minY) {
                             highest = piece;
                         }
                     }
@@ -134,13 +134,11 @@ public class TerrainHelper {
                     }
                 }
 
-                if (highest != null && highest.getBoundingBox().minY < surface) {
+                if (highest != null) {
                     MutableBoundingBox bounds = highest.getBoundingBox();
-                    if (x > bounds.minX && x < bounds.maxX && z > bounds.minZ && z < bounds.maxZ) {
-                        for (int dy = bounds.minY + 1; dy <= surface; dy++) {
-                            pos.setPos(dx, dy, dz);
-                            chunk.setBlockState(pos, Blocks.AIR.getDefaultState(), false);
-                        }
+                    for (int dy = bounds.minY + highest.getGroundLevelDelta(); dy <= surface; dy++) {
+                        pos.setPos(dx, dy, dz);
+                        chunk.setBlockState(pos, Blocks.AIR.getDefaultState(), false);
                     }
                 }
             }
