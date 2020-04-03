@@ -1,11 +1,9 @@
 {
   "biomes": [
-    "minecraft:plains"
+    "minecraft:flower_forest"
   ],
   "match": [
     [
-      "minecraft:birch_log",
-      "minecraft:birch_leaves",
       "minecraft:oak_log",
       "minecraft:oak_leaves"
     ]
@@ -18,18 +16,28 @@
         "config": {
           "features": [
             {
-              "name": "terraforged:oak_huge",
+              "name": "terraforged:birch_forest",
               "config": {},
-              "chance": 0.1
+              "chance": 0.2
             },
             {
-              "name": "terraforged:oak_small",
+              "name": "terraforged:birch_large",
+              "config": {},
+              "chance": 0.2
+            },
+            {
+              "name": "terraforged:oak_forest",
+              "config": {},
+              "chance": 0.2
+            },
+            {
+              "name": "terraforged:oak_large",
               "config": {},
               "chance": 0.2
             }
           ],
           "default": {
-            "name": "terraforged:oak_small",
+            "name": "terraforged:birch_forest",
             "config": {}
           }
         }
@@ -37,9 +45,9 @@
       "decorator": {
         "name": "minecraft:count_extra_heightmap",
         "config": {
-          "count": 0,
-          "extra_chance": 0.02,
-          "extra_count": 1
+          "count": 2,
+          "extra_chance": 0.1,
+          "extra_count": 2
         }
       }
     }

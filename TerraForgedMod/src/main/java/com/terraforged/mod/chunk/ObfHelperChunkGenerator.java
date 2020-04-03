@@ -135,7 +135,7 @@ public abstract class ObfHelperChunkGenerator<T extends GenerationSettings> exte
         if (type == Heightmap.Type.OCEAN_FLOOR || type == Heightmap.Type.OCEAN_FLOOR_WG) {
             return level;
         }
-        return Math.max(getGroundHeight(), level);
+        return Math.max(getSeaLevel(), level);
     }
 
     public final double getSurfaceNoise(int x, int z) {

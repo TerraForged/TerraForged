@@ -32,6 +32,7 @@ import com.terraforged.mod.data.DataGen;
 import com.terraforged.mod.feature.decorator.poisson.PoissonAtSurface;
 import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.mod.feature.tree.SaplingManager;
+import com.terraforged.mod.settings.SettingsHelper;
 import com.terraforged.mod.util.DataPackFinder;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.world.biome.Biomes;
@@ -61,6 +62,7 @@ public class TerraForgedMod {
         TerraWorld.init();
         SaplingManager.init();
         TerraCommand.init();
+        SettingsHelper.moveSettings();
 
         // temp fix
         BiomeDictionary.addTypes(Biomes.BAMBOO_JUNGLE, BiomeDictionary.Type.OVERWORLD);

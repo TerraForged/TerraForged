@@ -62,7 +62,7 @@ public class SettingsScreen extends OverlayScreen {
     public SettingsScreen(CreateWorldScreen parent) {
         SettingsHelper.applyDefaults(parent.chunkProviderSettingsJson, settings);
         this.parent = parent;
-        this.preview = new PreviewPage(getSeed(parent));
+        this.preview = new PreviewPage(settings, getSeed(parent));
         this.pages = new Page[]{
                 new GeneratorPage(settings, preview),
                 new ClimatePage(settings, preview),

@@ -25,15 +25,11 @@
 
 package com.terraforged.mod.feature;
 
-import com.terraforged.api.material.state.States;
-import com.terraforged.core.region.chunk.ChunkReader;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
+import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import me.dags.noise.util.NoiseUtil;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -50,18 +46,16 @@ import net.minecraft.world.gen.feature.structure.StructureStart;
 
 public class TerrainHelper {
 
-    private final Module noise;
     private final float radius;
 
-    public TerrainHelper(int seed, float radius) {
-        this.noise = Source.perlin(++seed, 8, 1).alpha(0.75);
+    public TerrainHelper(float radius) {
         this.radius = radius;
     }
 
-    public void flatten(IWorld world, IChunk chunk, ChunkReader reader, int chunkStartX, int chunkStartZ) {
+    public void flatten(IWorld world, IChunk chunk) {
         ObjectList<AbstractVillagePiece> pieces = new ObjectArrayList<>(10);
         collectPieces(world, chunk, pieces);
-        buildBases(chunk, reader, pieces, chunkStartX, chunkStartZ);
+        buildBases(chunk, pieces);
     }
 
     // see NoiseChunkGenerator
@@ -92,82 +86,72 @@ public class TerrainHelper {
     }
 
     // lowers or raises the terrain matcher the base height of each structure piece
-    private void buildBases(IChunk chunk, ChunkReader reader,ObjectList<AbstractVillagePiece> pieces, int chunkStartX, int chunkStartZ) {
+    private void buildBases(IChunk chunk, ObjectList<AbstractVillagePiece> pieces) {
+        int chunkStartX = chunk.getPos().getXStart();
+        int chunkStartZ = chunk.getPos().getZStart();
         BlockPos.Mutable pos = new BlockPos.Mutable();
+        ObjectListIterator<AbstractVillagePiece> iterator = pieces.iterator();
         MutableBoundingBox chunkBounds = new MutableBoundingBox(chunkStartX, chunkStartZ, chunkStartX + 15, chunkStartZ + 15);
-        for (AbstractVillagePiece piece : pieces) {
-            MutableBoundingBox pieceBounds = piece.getBoundingBox();
-            int length = Math.min(pieceBounds.maxX - pieceBounds.minX, pieceBounds.maxZ - pieceBounds.minZ);
-            int borderRadius = Math.max(5, NoiseUtil.round(length * radius));
-            MutableBoundingBox expanded = expand(pieceBounds, borderRadius);
 
-            if (!expanded.intersectsWith(chunkBounds)) {
-                continue;
-            }
+        for (int dz = 0; dz < 16; dz++) {
+            for (int dx = 0; dx < 16; dx++) {
+                int x = chunkStartX + dx;
+                int z = chunkStartZ + dz;
+                int surface = chunk.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, dx, dz);
+                float y = surface;
 
-            // intersecting area between the generator bounds and the village piece bounds
-            int startX = Math.max(chunkStartX, expanded.minX);
-            int startZ = Math.max(chunkStartZ, expanded.minZ);
-            int endX = Math.min(chunkStartX + 15, expanded.maxX);
-            int endZ = Math.min(chunkStartZ + 15, expanded.maxZ);
-
-            // y position of the structure piece
-            int level = pieceBounds.minY + piece.getGroundLevelDelta();
-
-            // iterate the intersecting area
-            for (int z = startZ; z <= endZ; z++) {
-                for (int x = startX; x <= endX; x++) {
-                    // local generator coords
-                    int dx = x & 15;
-                    int dz = z & 15;
-
-                    int surface = chunk.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, dx, dz);
-                    if (surface == level) {
+                AbstractVillagePiece highest = null;
+                while (iterator.hasNext()) {
+                    AbstractVillagePiece piece = iterator.next();
+                    MutableBoundingBox pieceBounds = piece.getBoundingBox();
+                    int length = Math.min(pieceBounds.maxX - pieceBounds.minX, pieceBounds.maxZ - pieceBounds.minZ);
+                    int borderRadius = Math.min(5, Math.max(10, NoiseUtil.round(length * radius)));
+                    MutableBoundingBox expanded = expand(pieceBounds, borderRadius);
+                    if (!expanded.intersectsWith(chunkBounds)) {
                         continue;
                     }
 
-                    if (surface > level) {
-                        flatten(chunk, reader, pieceBounds, pos.setPos(x, surface, z), dx, dz, level, surface, borderRadius);
-                    } else {
-                        // piece is higher than world-surface .: raise ground to form a base
-                        raise(chunk, pieceBounds, pos.setPos(x, surface, z), dx, dz, level, surface, borderRadius);
+                    int level = pieceBounds.minY + piece.getGroundLevelDelta();
+                    if (level > y) {
+                        y = raise(pieceBounds, pos.setPos(x, surface, z), level, y, borderRadius);
+                    } else if (level < surface && pieceBounds.getYSize() > 4) {
+                        if (highest == null) {
+                            highest = piece;
+                        } else if (highest.getBoundingBox().maxY < pieceBounds.maxY) {
+                            highest = piece;
+                        }
+                    }
+                }
+
+                // reset iterator for next pass
+                iterator.back(pieces.size());
+
+                if (y > surface) {
+                    int delta = (int) y - surface;
+                    for (int dy = 0; dy < delta; dy++) {
+                        pos.setPos(dx, surface + dy, dz);
+                        chunk.setBlockState(pos, Blocks.STONE.getDefaultState(), false);
+                    }
+                }
+
+                if (highest != null && highest.getBoundingBox().minY < surface) {
+                    MutableBoundingBox bounds = highest.getBoundingBox();
+                    if (x > bounds.minX && x < bounds.maxX && z > bounds.minZ && z < bounds.maxZ) {
+                        for (int dy = bounds.minY + 1; dy <= surface; dy++) {
+                            pos.setPos(dx, dy, dz);
+                            chunk.setBlockState(pos, Blocks.AIR.getDefaultState(), false);
+                        }
                     }
                 }
             }
         }
     }
 
-    private void flatten(IChunk chunk, ChunkReader reader, MutableBoundingBox bounds, BlockPos.Mutable pos, int dx, int dz, int level, int surface, int borderRadius) {
-        if (pos.getX() >= bounds.minX && pos.getX() <= bounds.maxX && pos.getZ() >= bounds.minZ && pos.getZ() <= bounds.maxZ) {
-            for (int dy = level + 1; dy <= surface; dy++) {
-                chunk.setBlockState(pos.setPos(dx, dy, dz), Blocks.AIR.getDefaultState(), false);
-            }
-        }
-    }
-
-    private void raise(IChunk chunk, MutableBoundingBox bounds, BlockPos.Mutable pos, int dx, int dz, int level, int surface, int borderRadius) {
-        float radius2 = Math.max(1, borderRadius * borderRadius * noise.getValue(pos.getX(), pos.getZ()));
-        float alpha = getAlpha(bounds, radius2, pos.getX(), pos.getZ());
-        if (alpha == 0F) {
-            // outside of the raise-able radius
-            return;
-        }
-
-        int heightDelta = level - surface - 1;
-        if (alpha < 1F) {
-            // sharper fall-off
-            alpha = alpha * alpha;
-            heightDelta = NoiseUtil.round(alpha * heightDelta);
-        }
-
-        BlockState state = States.STONE.getDefaultState();
-        for (int dy = surface + heightDelta; dy >= surface; dy--) {
-            pos.setPos(dx, dy, dz);
-            if (chunk.getBlockState(pos).isSolid()) {
-                return;
-            }
-            chunk.setBlockState(pos.setPos(dx, dy, dz), state, false);
-        }
+    private float raise(MutableBoundingBox bounds, BlockPos.Mutable pos, float level, float surface, int borderRadius) {
+        float radius2 = Math.max(1, borderRadius * borderRadius);
+        float alpha = 1 - getDistAlpha(pos.getX(), pos.getZ(), bounds, radius2);
+        alpha = (float) Math.pow(alpha, 2F - alpha);
+        return NoiseUtil.lerp(surface, level, alpha);
     }
 
     private static MutableBoundingBox expand(MutableBoundingBox box, int radius) {
@@ -181,16 +165,16 @@ public class TerrainHelper {
         );
     }
 
-    private static float getAlpha(MutableBoundingBox box, float radius2, int x, int y) {
+    private static float getDistAlpha(int x, int z, MutableBoundingBox box, float radius2) {
         int dx = x < box.minX ? box.minX - x : x > box.maxX ? x - box.maxX : 0;
-        int dy = y < box.minZ ? box.minZ - y : y > box.maxZ ? y - box.maxZ : 0;
-        int d2 = dx * dx + dy * dy;
+        int dz = z < box.minZ ? box.minZ - z : z > box.maxZ ? z - box.maxZ : 0;
+        int d2 = dx * dx + dz * dz;
         if (d2 == 0) {
-            return 1F;
+            return 0;
         }
         if (d2 > radius2) {
-            return 0F;
+            return 1F;
         }
-        return 1 - (d2 / radius2);
+        return d2 / radius2;
     }
 }

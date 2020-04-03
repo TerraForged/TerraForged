@@ -109,7 +109,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
         this.geologyManager = SetupHooks.setup(createGeologyManager(context), context.copy());
         this.baseDecorators = createBaseDecorators(context);
         this.postProcessors = createFeatureDecorators(context);
-        this.terrainHelper = new TerrainHelper((int) world.getSeed(), 0.8F);
+        this.terrainHelper = new TerrainHelper(0.75F);
         this.featureManager = createFeatureManager(context);
         this.regionCache = createRegionCache(context);
         SetupHooks.setup(getLayerManager(), context.copy());
@@ -117,13 +117,13 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
     }
 
     @Override
-    public void generateStructures(BiomeManager unused, IChunk chunk, ChunkGenerator<?> generator, TemplateManager templates) {
+    public void generateStructures(BiomeManager biomes, IChunk chunk, ChunkGenerator<?> generator, TemplateManager templates) {
         ChunkPos pos = chunk.getPos();
         int regionX = regionCache.chunkToRegion(pos.x);
         int regionZ = regionCache.chunkToRegion(pos.z);
         // start generating the heightmap as early as possible
         regionCache.queueRegion(regionX, regionZ);
-        super.generateStructures(unused, chunk, this, templates);
+        super.generateStructures(biomes, chunk, this, templates);
     }
 
     @Override
@@ -160,7 +160,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
             ctx.biome = container.getBiome(dx, dz);
             ChunkPopulator.INSTANCE.decorate(ctx.chunk, ctx, px, py, pz);
         });
-        terrainHelper.flatten(world, chunk, container.getChunkReader(), context.blockX, context.blockZ);
+        terrainHelper.flatten(world, chunk);
     }
 
     @Override
