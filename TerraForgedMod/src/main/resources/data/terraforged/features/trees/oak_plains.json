@@ -4,8 +4,6 @@
   ],
   "match": [
     [
-      "minecraft:birch_log",
-      "minecraft:birch_leaves",
       "minecraft:oak_log",
       "minecraft:oak_leaves"
     ]
