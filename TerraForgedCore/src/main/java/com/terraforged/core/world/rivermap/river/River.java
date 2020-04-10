@@ -140,7 +140,7 @@ public class River extends TerrainPopulator {
             return;
         }
 
-        carveBed(cell, bedAlpha, bedHeight);
+        carveBed(cell, bedHeight);
     }
 
     private float getBankHeight(Cell<Terrain> cell, float x, float z) {
@@ -163,8 +163,9 @@ public class River extends TerrainPopulator {
         // lerp the position's height to the riverbank height
         if (cell.value > bankHeight) {
             cell.value = NoiseUtil.lerp(cell.value, bankHeight, valleyAlpha);
+            return true;
         }
-        return true;
+        return false;
     }
 
     private boolean carveBanks(Cell<Terrain> cell, float banksAlpha, float bedHeight) {
@@ -172,13 +173,14 @@ public class River extends TerrainPopulator {
         if (cell.value > bedHeight) {
             cell.value = NoiseUtil.lerp(cell.value, bedHeight, banksAlpha);
             tag(cell, terrains.riverBanks);
+            return true;
         }
-        return true;
+        return false;
     }
 
-    private void carveBed(Cell<Terrain> cell, float bedAlpha, float bedHeight) {
+    private void carveBed(Cell<Terrain> cell, float bedHeight) {
         if (cell.value > bedHeight) {
-            cell.value = NoiseUtil.lerp(cell.value, bedHeight, bedAlpha);
+            cell.value = bedHeight;
         }
         tag(cell, terrains.river);
     }

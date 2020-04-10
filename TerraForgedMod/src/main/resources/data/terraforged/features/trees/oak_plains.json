@@ -1,6 +1,7 @@
 {
   "biomes": [
-    "minecraft:plains"
+    "minecraft:plains",
+    "minecraft:river"
   ],
   "match": [
     [

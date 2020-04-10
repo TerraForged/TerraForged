@@ -39,11 +39,15 @@ public class Deserializer {
                 continue;
             }
 
-            Reader child = reader.getChild(name);
-            Field field = type.getField(name);
-            if (Serializer.isSerializable(field)) {
-                field.setAccessible(true);
-                fromValue(child, object, field);
+            try {
+                Reader child = reader.getChild(name);
+                Field field = type.getField(name);
+                if (Serializer.isSerializable(field)) {
+                    field.setAccessible(true);
+                    fromValue(child, object, field);
+                }
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
             }
         }
     }
