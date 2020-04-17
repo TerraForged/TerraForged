@@ -7,6 +7,7 @@ repositories {
 }
 
 dependencies {
+    compile "com.google.code.gson:gson:2.8.0"
     compile "org.processing:core:3.3.7"
     compile "it.unimi.dsi:fastutil:8.2.1"
     compile project(":TerraForgedCore")
