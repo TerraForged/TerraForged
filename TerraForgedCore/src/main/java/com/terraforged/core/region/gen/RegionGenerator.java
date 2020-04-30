@@ -97,8 +97,20 @@ public class RegionGenerator implements RegionExtent {
         return CompletableFuture.supplyAsync(() -> generateRegion(centerX, centerZ, zoom, filter), threadPool);
     }
 
-    public CacheEntry<Region> generateCached(int regionX, int regionZ) {
-        return CacheEntry.supplyAsync(() -> generateRegion(regionX, regionZ), threadPool);
+    public CacheEntry<Region> compute(int regionX, int regionZ) {
+        return CacheEntry.supply(new FutureRegion(regionX, regionZ, this));
+    }
+
+    public CacheEntry<Region> compute(float centerX, float centerZ, float zoom, boolean filter) {
+        return CacheEntry.supply(new FutureRegionZoom(centerX, centerZ, zoom, filter, this));
+    }
+
+    public CacheEntry<Region> queue(int regionX, int regionZ) {
+        return CacheEntry.supplyAsync(new FutureRegion(regionX, regionZ, this), threadPool);
+    }
+
+    public CacheEntry<Region> queue(float centerX, float centerZ, float zoom, boolean filter) {
+        return CacheEntry.supplyAsync(new FutureRegionZoom(centerX, centerZ, zoom, filter, this), threadPool);
     }
 
     public Region generateRegion(int regionX, int regionZ) {

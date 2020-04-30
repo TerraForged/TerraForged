@@ -73,7 +73,7 @@ public class RegionCache implements RegionExtent, Disposable.Listener<Region> {
 
     @Override
     public Region getRegion(int regionX, int regionZ) {
-        Region region = queueRegion(regionX, regionZ).get();
+        Region region = computeRegion(regionX, regionZ).get();
 
         if (queuing) {
             queueNeighbours(regionX, regionZ);
@@ -82,9 +82,14 @@ public class RegionCache implements RegionExtent, Disposable.Listener<Region> {
         return region;
     }
 
+    private CacheEntry<Region> computeRegion(int regionX, int regionZ) {
+        long id = NoiseUtil.seed(regionX, regionZ);
+        return cache.computeIfAbsent(id, l -> generator.compute(regionX, regionZ));
+    }
+
     public CacheEntry<Region> queueRegion(int regionX, int regionZ) {
         long id = NoiseUtil.seed(regionX, regionZ);
-        return cache.computeIfAbsent(id, l -> generator.generateCached(regionX, regionZ));
+        return cache.computeIfAbsent(id, l -> generator.queue(regionX, regionZ));
     }
 
     private void queueNeighbours(int regionX, int regionZ) {
