@@ -93,7 +93,8 @@ public class TerraCommand {
     }
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
-        dispatcher.register(command());
+        registerSimple(dispatcher);
+        registerLocate(dispatcher);
         PermissionAPI.registerNode(Permissions.QUERY, DefaultPermissionLevel.OP, "Allows use of the query command");
         PermissionAPI.registerNode(Permissions.DATA, DefaultPermissionLevel.OP, "Allows use of the data command");
         PermissionAPI.registerNode(Permissions.DEFAULTS, DefaultPermissionLevel.OP, "Allows use of the defaults command");
@@ -101,8 +102,8 @@ public class TerraCommand {
         PermissionAPI.registerNode(Permissions.LOCATE, DefaultPermissionLevel.OP, "Allows use of the locate command");
     }
 
-    private static LiteralArgumentBuilder<CommandSource> command() {
-        return Commands.literal("terra")
+    private static void registerSimple(CommandDispatcher<CommandSource> dispatcher) {
+        dispatcher.register(Commands.literal("terra")
                 .then(Commands.literal("query")
                         .requires(perm(Permissions.QUERY))
                         .executes(TerraCommand::query))
@@ -116,17 +117,35 @@ public class TerraCommand {
                                 .executes(TerraCommand::setDefaults)))
                 .then(Commands.literal("debug")
                         .requires(perm(Permissions.DEBUG))
-                        .executes(TerraCommand::debugBiome))
+                        .executes(TerraCommand::debugBiome)));
+    }
+
+    private static void registerLocate(CommandDispatcher<CommandSource> dispatcher) {
+        dispatcher.register(Commands.literal("terra")
                 .then(Commands.literal("locate")
                         .requires(perm(Permissions.LOCATE))
                         .then(Commands.argument("biome", BiomeArgType.biome())
-                                .executes(TerraCommand::findBiome)
-                                .then(Commands.argument("terrain", TerrainArgType.terrain())
-                                        .executes(TerraCommand::findTerrainAndBiome)))
+                                .executes(TerraCommand::findBiome))));
+
+        dispatcher.register(Commands.literal("terra")
+                .then(Commands.literal("locate")
+                        .requires(perm(Permissions.LOCATE))
                         .then(Commands.argument("terrain", TerrainArgType.terrain())
-                                .executes(TerraCommand::findTerrain)
+                                .executes(TerraCommand::findTerrain))));
+
+        dispatcher.register(Commands.literal("terra")
+                .then(Commands.literal("locate")
+                        .requires(perm(Permissions.LOCATE))
+                        .then(Commands.argument("biome", BiomeArgType.biome())
+                                .then(Commands.argument("terrain", TerrainArgType.terrain())
+                                        .executes(TerraCommand::findTerrainAndBiome)))));
+
+        dispatcher.register(Commands.literal("terra")
+                .then(Commands.literal("locate")
+                        .requires(perm(Permissions.LOCATE))
+                        .then(Commands.argument("terrain", TerrainArgType.terrain())
                                 .then(Commands.argument("biome", BiomeArgType.biome())
-                                        .executes(TerraCommand::findTerrainAndBiome))));
+                                        .executes(TerraCommand::findTerrainAndBiome)))));
     }
 
     private static int query(CommandContext<CommandSource> context) throws CommandSyntaxException {
@@ -205,7 +224,7 @@ public class TerraCommand {
         WorldGenerator worldGenerator = terraContext.factory.get();
         Search search = new TerrainSearchTask(pos, worldGenerator, target);
         doSearch(server, playerID, search);
-        context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
+        context.getSource().sendFeedback(new StringTextComponent("Locating terrain..."), false);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -224,7 +243,7 @@ public class TerraCommand {
         IWorldReader reader = context.getSource().asPlayer().getServerWorld();
         Search search = new BiomeSearchTask(pos, reader, biome);
         doSearch(server, playerID, search);
-        context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
+        context.getSource().sendFeedback(new StringTextComponent("Locating biome..."), false);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -248,7 +267,7 @@ public class TerraCommand {
         Search terrainSearch = new TerrainSearchTask(pos, worldGenerator, target);
         Search search = new BothSearchTask(pos, biomeSearch, terrainSearch);
         doSearch(server, playerID, search);
-        context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
+        context.getSource().sendFeedback(new StringTextComponent("Locating biome & terrain..."), false);
 
         return Command.SINGLE_SUCCESS;
     }

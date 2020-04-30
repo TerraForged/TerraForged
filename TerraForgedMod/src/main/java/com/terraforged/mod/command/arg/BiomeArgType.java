@@ -37,7 +37,6 @@ import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.IArgumentSerializer;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -48,9 +47,28 @@ public class BiomeArgType implements ArgumentType<Biome> {
 
     @Override
     public Biome parse(StringReader reader) throws CommandSyntaxException {
-        ResourceLocation resourcelocation = ResourceLocation.read(reader);
-        return Registry.BIOME.getValue(resourcelocation)
-                .orElseThrow(() -> createException("Invalid biome", "%s is not a valid biome", resourcelocation));
+        int cursor = reader.getCursor();
+        String raw = reader.getString().substring(cursor);
+
+        if (raw.indexOf(':') == -1) {
+            reader.setCursor(cursor);
+            throw createException("Invalid biome", "%s is not a valid biome", raw);
+        }
+
+        ResourceLocation resourcelocation = ResourceLocation.tryCreate(raw);
+        if (resourcelocation == null) {
+            reader.setCursor(cursor);
+            throw createException("Invalid biome", "%s is not a valid biome", raw);
+        }
+
+        if (!ForgeRegistries.BIOMES.containsKey(resourcelocation)) {
+            reader.setCursor(cursor);
+            throw createException("Invalid biome", "%s is not a valid biome", resourcelocation);
+        }
+
+        reader.setCursor(reader.getString().length());
+
+        return ForgeRegistries.BIOMES.getValue(resourcelocation);
     }
 
     @Override
