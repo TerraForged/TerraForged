@@ -27,7 +27,6 @@ package com.terraforged.mod.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
@@ -305,8 +304,15 @@ public class TerraCommand {
     // the terrain parsed from the command will not be the same instance as used in the
     // world generator, so find the matching instance by name
     private static Terrain getTerrainInstance(Terrain find, Terrains terrains) {
+        // search for exact match first
         for (Terrain t : terrains.index) {
             if (t.getName().equals(find.getName())) {
+                return t;
+            }
+        }
+        // find a mixed terrain as a fallback
+        for (Terrain t : terrains.index) {
+            if (t.getName().contains("-") && t.getName().contains(find.getName())) {
                 return t;
             }
         }

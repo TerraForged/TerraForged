@@ -33,27 +33,22 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.terraforged.core.settings.Settings;
 import com.terraforged.core.world.terrain.Terrain;
+import com.terraforged.core.world.terrain.Terrains;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.IArgumentSerializer;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.StringTextComponent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class TerrainArgType implements ArgumentType<Terrain> {
 
-    private final List<Terrain> terrains;
-
-    public TerrainArgType() {
-        this(Terrain.getRegistered());
-    }
-
-    public TerrainArgType(List<Terrain> terrains) {
-        this.terrains = terrains;
-    }
+    private final List<Terrain> terrains = createTerrainList();
 
     @Override
     public Terrain parse(StringReader reader) throws CommandSyntaxException {
@@ -86,6 +81,10 @@ public class TerrainArgType implements ArgumentType<Terrain> {
                 new SimpleCommandExceptionType(new StringTextComponent(type)),
                 new StringTextComponent(String.format(message, args))
         );
+    }
+
+    private static List<Terrain> createTerrainList() {
+        return Terrains.create(new Settings()).index;
     }
 
     public static class Serializer implements IArgumentSerializer<TerrainArgType> {
