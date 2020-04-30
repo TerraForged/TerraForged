@@ -25,6 +25,7 @@
 
 package com.terraforged.mod.command.arg;
 
+import com.google.gson.JsonObject;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -33,6 +34,8 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.ISuggestionProvider;
+import net.minecraft.command.arguments.IArgumentSerializer;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.StringTextComponent;
@@ -68,5 +71,23 @@ public class BiomeArgType implements ArgumentType<Biome> {
 
     public static <S> Biome getBiome(CommandContext<S> context, String name) {
         return context.getArgument(name, Biome.class);
+    }
+
+    public static class Serializer implements IArgumentSerializer<BiomeArgType> {
+
+        @Override
+        public void write(BiomeArgType type, PacketBuffer buffer) {
+
+        }
+
+        @Override
+        public BiomeArgType read(PacketBuffer buffer) {
+            return new BiomeArgType();
+        }
+
+        @Override
+        public void write(BiomeArgType type, JsonObject json) {
+
+        }
     }
 }

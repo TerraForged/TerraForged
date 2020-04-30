@@ -49,7 +49,6 @@ import com.terraforged.mod.data.DataGen;
 import com.terraforged.mod.settings.SettingsHelper;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.command.arguments.ArgumentSerializer;
 import net.minecraft.command.arguments.ArgumentTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -70,18 +69,21 @@ import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.server.permission.DefaultPermissionLevel;
+import net.minecraftforge.server.permission.PermissionAPI;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TerraCommand {
 
     public static void init() {
-        ArgumentTypes.register("terraforged:biome", BiomeArgType.class, new ArgumentSerializer<>(BiomeArgType::new));
-        ArgumentTypes.register("terraforged:terrain", TerrainArgType.class, new ArgumentSerializer<>(TerrainArgType::new));
+        ArgumentTypes.register("terraforged:biome", BiomeArgType.class, new BiomeArgType.Serializer());
+        ArgumentTypes.register("terraforged:terrain", TerrainArgType.class, new TerrainArgType.Serializer());
     }
 
     @SubscribeEvent
@@ -92,22 +94,31 @@ public class TerraCommand {
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(command());
+        PermissionAPI.registerNode(Permissions.QUERY, DefaultPermissionLevel.OP, "Allows use of the query command");
+        PermissionAPI.registerNode(Permissions.DATA, DefaultPermissionLevel.OP, "Allows use of the data command");
+        PermissionAPI.registerNode(Permissions.DEFAULTS, DefaultPermissionLevel.OP, "Allows use of the defaults command");
+        PermissionAPI.registerNode(Permissions.DEBUG, DefaultPermissionLevel.OP, "Allows use of the debug command");
+        PermissionAPI.registerNode(Permissions.LOCATE, DefaultPermissionLevel.OP, "Allows use of the locate command");
     }
 
     private static LiteralArgumentBuilder<CommandSource> command() {
         return Commands.literal("terra")
-                .requires(source -> source.hasPermissionLevel(2))
                 .then(Commands.literal("query")
+                        .requires(perm(Permissions.QUERY))
                         .executes(TerraCommand::query))
                 .then(Commands.literal("data")
+                        .requires(perm(Permissions.DATA))
                         .then(Commands.literal("dump")
                                 .executes(TerraCommand::dump)))
                 .then(Commands.literal("defaults")
+                        .requires(perm(Permissions.DEFAULTS))
                         .then(Commands.literal("set")
                                 .executes(TerraCommand::setDefaults)))
                 .then(Commands.literal("debug")
+                        .requires(perm(Permissions.DEBUG))
                         .executes(TerraCommand::debugBiome))
                 .then(Commands.literal("locate")
+                        .requires(perm(Permissions.LOCATE))
                         .then(Commands.argument("biome", BiomeArgType.biome())
                                 .executes(TerraCommand::findBiome)
                                 .then(Commands.argument("terrain", TerrainArgType.terrain())
@@ -281,6 +292,16 @@ public class TerraCommand {
             }
         }
         return find;
+    }
+
+    private static Predicate<CommandSource> perm(String node) {
+        return source -> {
+            try {
+                return PermissionAPI.hasPermission(source.asPlayer(), node);
+            } catch (Throwable t) {
+                return source.hasPermissionLevel(2);
+            }
+        };
     }
 
     private static BiomeProvider getBiomeProvider(CommandContext<CommandSource> context) {
