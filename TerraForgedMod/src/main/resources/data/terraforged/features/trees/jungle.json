@@ -1,6 +1,7 @@
 {
   "biomes": [
     "minecraft:jungle",
+    "minecraft:modified_jungle",
     "minecraft:bamboo_jungle"
   ],
   "match": [

@@ -1,7 +1,19 @@
 {
   "biomes": [
     "minecraft:plains",
-    "minecraft:river"
+    "minecraft:sunflower_plains",
+    "minecraft:river",
+    "minecraft:frozen_river",
+    "minecraft:ocean",
+    "minecraft:deep_ocean",
+    "minecraft:warm_ocean",
+    "minecraft:deep_warm_ocean",
+    "minecraft:lukewarm_ocean",
+    "minecraft:deep_lukewarm_ocean",
+    "minecraft:cold_ocean",
+    "minecraft:deep_cold_ocean",
+    "minecraft:frozen_ocean",
+    "minecraft:deep_frozen_ocean"
   ],
   "match": [
     [
