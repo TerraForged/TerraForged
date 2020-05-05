@@ -38,6 +38,14 @@ public abstract class Search implements Supplier<BlockPos> {
         return 16;
     }
 
+    protected BlockPos success(BlockPos.Mutable pos) {
+        return pos.toImmutable();
+    }
+
+    protected BlockPos fail(BlockPos pos) {
+        return pos;
+    }
+
     @Override
     public BlockPos get() {
         int radius = maxRadius;
@@ -60,7 +68,7 @@ public abstract class Search implements Supplier<BlockPos> {
                 pos.setPos(center.getX() + (x * getSpacing()), center.getY(), center.getZ() + (z * getSpacing()));
                 if (center.distanceSq(pos) >= minRadius2) {
                     if (test(pos)) {
-                        return pos.toImmutable();
+                        return success(pos);
                     }
                 }
             }
@@ -75,7 +83,7 @@ public abstract class Search implements Supplier<BlockPos> {
             z += dz;
         }
 
-        return BlockPos.ZERO;
+        return fail(BlockPos.ZERO);
     }
 
     public abstract boolean test(BlockPos pos);

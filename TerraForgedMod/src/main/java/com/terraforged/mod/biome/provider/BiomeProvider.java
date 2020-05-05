@@ -63,8 +63,20 @@ public class BiomeProvider extends AbstractBiomeProvider {
         this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomeMap), context.copy());
     }
 
+    public TerraContext getContext() {
+        return context;
+    }
+
+    public void lookupPos(int x, int z, Cell<Terrain> cell) {
+        worldLookup.applyCell(cell, x, z);
+    }
+
     public Cell<Terrain> lookupPos(int x, int z) {
         return worldLookup.getCell(x, z);
+    }
+
+    public boolean canSpawnAt(Cell<Terrain> cell) {
+        return cell.tag != context.terrain.ocean && cell.tag != context.terrain.deepOcean && cell.value > context.levels.ground;
     }
 
     @Override

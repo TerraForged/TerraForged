@@ -27,7 +27,6 @@ package com.terraforged.mod.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
@@ -49,7 +48,6 @@ import com.terraforged.mod.data.DataGen;
 import com.terraforged.mod.settings.SettingsHelper;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.command.arguments.ArgumentSerializer;
 import net.minecraft.command.arguments.ArgumentTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -70,18 +68,21 @@ import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.server.permission.DefaultPermissionLevel;
+import net.minecraftforge.server.permission.PermissionAPI;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TerraCommand {
 
     public static void init() {
-        ArgumentTypes.register("terraforged:biome", BiomeArgType.class, new ArgumentSerializer<>(BiomeArgType::new));
-        ArgumentTypes.register("terraforged:terrain", TerrainArgType.class, new ArgumentSerializer<>(TerrainArgType::new));
+        ArgumentTypes.register("terraforged:biome", BiomeArgType.class, new BiomeArgType.Serializer());
+        ArgumentTypes.register("terraforged:terrain", TerrainArgType.class, new TerrainArgType.Serializer());
     }
 
     @SubscribeEvent
@@ -91,31 +92,59 @@ public class TerraCommand {
     }
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
-        dispatcher.register(command());
+        registerSimple(dispatcher);
+        registerLocate(dispatcher);
+        PermissionAPI.registerNode(Permissions.QUERY, DefaultPermissionLevel.OP, "Allows use of the query command");
+        PermissionAPI.registerNode(Permissions.DATA, DefaultPermissionLevel.OP, "Allows use of the data command");
+        PermissionAPI.registerNode(Permissions.DEFAULTS, DefaultPermissionLevel.OP, "Allows use of the defaults command");
+        PermissionAPI.registerNode(Permissions.DEBUG, DefaultPermissionLevel.OP, "Allows use of the debug command");
+        PermissionAPI.registerNode(Permissions.LOCATE, DefaultPermissionLevel.OP, "Allows use of the locate command");
     }
 
-    private static LiteralArgumentBuilder<CommandSource> command() {
-        return Commands.literal("terra")
-                .requires(source -> source.hasPermissionLevel(2))
+    private static void registerSimple(CommandDispatcher<CommandSource> dispatcher) {
+        dispatcher.register(Commands.literal("terra")
                 .then(Commands.literal("query")
+                        .requires(perm(Permissions.QUERY))
                         .executes(TerraCommand::query))
                 .then(Commands.literal("data")
+                        .requires(perm(Permissions.DATA))
                         .then(Commands.literal("dump")
                                 .executes(TerraCommand::dump)))
                 .then(Commands.literal("defaults")
+                        .requires(perm(Permissions.DEFAULTS))
                         .then(Commands.literal("set")
                                 .executes(TerraCommand::setDefaults)))
                 .then(Commands.literal("debug")
-                        .executes(TerraCommand::debugBiome))
+                        .requires(perm(Permissions.DEBUG))
+                        .executes(TerraCommand::debugBiome)));
+    }
+
+    private static void registerLocate(CommandDispatcher<CommandSource> dispatcher) {
+        dispatcher.register(Commands.literal("terra")
                 .then(Commands.literal("locate")
+                        .requires(perm(Permissions.LOCATE))
                         .then(Commands.argument("biome", BiomeArgType.biome())
-                                .executes(TerraCommand::findBiome)
-                                .then(Commands.argument("terrain", TerrainArgType.terrain())
-                                        .executes(TerraCommand::findTerrainAndBiome)))
+                                .executes(TerraCommand::findBiome))));
+
+        dispatcher.register(Commands.literal("terra")
+                .then(Commands.literal("locate")
+                        .requires(perm(Permissions.LOCATE))
                         .then(Commands.argument("terrain", TerrainArgType.terrain())
-                                .executes(TerraCommand::findTerrain)
+                                .executes(TerraCommand::findTerrain))));
+
+        dispatcher.register(Commands.literal("terra")
+                .then(Commands.literal("locate")
+                        .requires(perm(Permissions.LOCATE))
+                        .then(Commands.argument("biome", BiomeArgType.biome())
+                                .then(Commands.argument("terrain", TerrainArgType.terrain())
+                                        .executes(TerraCommand::findTerrainAndBiome)))));
+
+        dispatcher.register(Commands.literal("terra")
+                .then(Commands.literal("locate")
+                        .requires(perm(Permissions.LOCATE))
+                        .then(Commands.argument("terrain", TerrainArgType.terrain())
                                 .then(Commands.argument("biome", BiomeArgType.biome())
-                                        .executes(TerraCommand::findTerrainAndBiome))));
+                                        .executes(TerraCommand::findTerrainAndBiome)))));
     }
 
     private static int query(CommandContext<CommandSource> context) throws CommandSyntaxException {
@@ -194,7 +223,7 @@ public class TerraCommand {
         WorldGenerator worldGenerator = terraContext.factory.get();
         Search search = new TerrainSearchTask(pos, worldGenerator, target);
         doSearch(server, playerID, search);
-        context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
+        context.getSource().sendFeedback(new StringTextComponent("Locating terrain..."), false);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -213,7 +242,7 @@ public class TerraCommand {
         IWorldReader reader = context.getSource().asPlayer().getServerWorld();
         Search search = new BiomeSearchTask(pos, reader, biome);
         doSearch(server, playerID, search);
-        context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
+        context.getSource().sendFeedback(new StringTextComponent("Locating biome..."), false);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -237,7 +266,7 @@ public class TerraCommand {
         Search terrainSearch = new TerrainSearchTask(pos, worldGenerator, target);
         Search search = new BothSearchTask(pos, biomeSearch, terrainSearch);
         doSearch(server, playerID, search);
-        context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
+        context.getSource().sendFeedback(new StringTextComponent("Locating biome & terrain..."), false);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -275,12 +304,29 @@ public class TerraCommand {
     // the terrain parsed from the command will not be the same instance as used in the
     // world generator, so find the matching instance by name
     private static Terrain getTerrainInstance(Terrain find, Terrains terrains) {
+        // search for exact match first
         for (Terrain t : terrains.index) {
             if (t.getName().equals(find.getName())) {
                 return t;
             }
         }
+        // find a mixed terrain as a fallback
+        for (Terrain t : terrains.index) {
+            if (t.getName().contains("-") && t.getName().contains(find.getName())) {
+                return t;
+            }
+        }
         return find;
+    }
+
+    private static Predicate<CommandSource> perm(String node) {
+        return source -> {
+            try {
+                return PermissionAPI.hasPermission(source.asPlayer(), node);
+            } catch (Throwable t) {
+                return source.hasPermissionLevel(2);
+            }
+        };
     }
 
     private static BiomeProvider getBiomeProvider(CommandContext<CommandSource> context) {

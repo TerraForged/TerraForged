@@ -1,6 +1,7 @@
 {
   "biomes": [
-    "minecraft:jungle_edge"
+    "minecraft:jungle_edge",
+    "minecraft:modified_jungle_edge"
   ],
   "match": [
     [

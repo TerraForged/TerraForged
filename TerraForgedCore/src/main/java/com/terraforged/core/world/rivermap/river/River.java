@@ -163,9 +163,8 @@ public class River extends TerrainPopulator {
         // lerp the position's height to the riverbank height
         if (cell.value > bankHeight) {
             cell.value = NoiseUtil.lerp(cell.value, bankHeight, valleyAlpha);
-            return true;
         }
-        return false;
+        return true;
     }
 
     private boolean carveBanks(Cell<Terrain> cell, float banksAlpha, float bedHeight) {

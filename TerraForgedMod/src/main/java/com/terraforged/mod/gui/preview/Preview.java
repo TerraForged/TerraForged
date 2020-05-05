@@ -32,6 +32,7 @@ import com.terraforged.core.region.Region;
 import com.terraforged.core.region.gen.RegionGenerator;
 import com.terraforged.core.settings.Settings;
 import com.terraforged.core.util.concurrent.ThreadPool;
+import com.terraforged.core.util.concurrent.cache.CacheEntry;
 import com.terraforged.core.world.GeneratorContext;
 import com.terraforged.core.world.WorldGeneratorFactory;
 import com.terraforged.core.world.terrain.Terrain;
@@ -48,8 +49,6 @@ import net.minecraft.nbt.CompoundNBT;
 
 import java.awt.*;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 public class Preview extends Button {
 
@@ -68,7 +67,7 @@ public class Preview extends Button {
     private int seed;
     private long lastUpdate = 0L;
     private Settings settings = new Settings();
-    private Future<Region> task = null;
+    private CacheEntry<Region> task = null;
     private Region region = null;
 
     private String[] labels = {"Area: ", "Terrain: ", "Biome: "};
@@ -131,10 +130,6 @@ public class Preview extends Button {
             try {
                 region = task.get();
                 render(region);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.getCause().printStackTrace();
             } finally {
                 task = null;
             }
@@ -195,7 +190,7 @@ public class Preview extends Button {
         texture.updateDynamicTexture();
     }
 
-    private Future<Region> generate(Settings settings, CompoundNBT prevSettings) {
+    private CacheEntry<Region> generate(Settings settings, CompoundNBT prevSettings) {
         NBTHelper.deserialize(prevSettings, previewSettings);
         settings.generator.seed = seed;
         this.settings = settings;
@@ -208,7 +203,7 @@ public class Preview extends Button {
                 .size(FACTOR, 0)
                 .build();
 
-        return renderer.generate(offsetX, offsetZ, 101 - previewSettings.zoom, true);
+        return renderer.queue(offsetX, offsetZ, 101 - previewSettings.zoom, true);
     }
 
     private void updateLegend(int mx ,int my) {

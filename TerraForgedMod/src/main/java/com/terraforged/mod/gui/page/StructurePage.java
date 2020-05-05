@@ -53,6 +53,6 @@ public class StructurePage extends BasePage {
     @Override
     public void init(OverlayScreen parent) {
         Column left = getColumn(0);
-        addElements(left.left, left.top, left, structureSettings, false, left.scrollPane::addButton, this::update);
+        addElements(left.left, left.top, left, structureSettings, true, left.scrollPane::addButton, this::update);
     }
 }

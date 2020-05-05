@@ -395,7 +395,7 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
                 .legacy(context.terraSettings.version == 0)
                 .pool(ThreadPool.getPool())
                 .factory(context.factory)
-                .size(4, 2)
+                .size(3, 2)
                 .build()
                 .toCache(false);
     }
