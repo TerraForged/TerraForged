@@ -1,0 +1,12 @@
+{
+	"generator.terraforged": "TerraForged",
+	"generator.terratest": "TerraTest",
+	"biome.terraforged.cold_steppe": "Kald Steppe",
+	"biome.terraforged.marshland": "Myr",
+	"biome.terraforged.savanna_scrub": "Savanne Kratt",
+	"biome.terraforged.shattered_savanna_scrub": "Frakturert Savanne Kratt",
+	"biome.terraforged.snowy_taiga_scrub": "Snørik Taiga Kratt",
+	"biome.terraforged.steppe": "Steppe",
+	"biome.terraforged.taiga_scrub": "Taiga Kratt",
+	"biome.terraforged.warm_beach": "Varm Strand"
+}
