@@ -28,16 +28,44 @@ package com.terraforged.mod.decorator.base;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.material.state.States;
+import com.terraforged.mod.chunk.TerraContext;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.IChunk;
+import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class BedrockDecorator implements ColumnDecorator {
 
-    private final Random random = new Random();
+    private final int minDepth;
+    private final int variance;
+    private final BlockState material;
+
+    public BedrockDecorator(TerraContext context) {
+        minDepth = context.terraSettings.dimensions.baseLayer.minDepth;
+        variance = context.terraSettings.dimensions.baseLayer.variance;
+        material = getState(context.terraSettings.dimensions.baseLayer.material);
+    }
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        fillDown(context, chunk, x, z, 1 + random.nextInt(4), -1, States.BEDROCK.get());
+        if (variance <= 0) {
+            fillDown(context, chunk, x, z, minDepth - 1, -1, material);
+        } else {
+            fillDown(context, chunk, x, z, minDepth + ThreadLocalRandom.current().nextInt(variance), -1, material);
+        }
+    }
+
+    private static BlockState getState(String name) {
+        ResourceLocation location = ResourceLocation.tryCreate(name);
+        if (location != null && ForgeRegistries.BLOCKS.containsKey(location)) {
+            Block block = ForgeRegistries.BLOCKS.getValue(location);
+            if (block != null) {
+                return block.getDefaultState();
+            }
+        }
+        return States.BEDROCK.get();
     }
 }

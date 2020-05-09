@@ -36,4 +36,6 @@ public class TerraSettings extends Settings {
     public FeatureSettings features = new FeatureSettings();
 
     public StructureSettings structures = new StructureSettings();
+
+    public DimesionSettings dimensions = new DimesionSettings();
 }

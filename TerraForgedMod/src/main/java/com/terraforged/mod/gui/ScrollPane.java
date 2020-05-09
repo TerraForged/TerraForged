@@ -106,6 +106,16 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
         }
 
         @Override
+        public boolean keyPressed(int i, int j, int k) {
+            return option.keyPressed(i, j, k);
+        }
+
+        @Override
+        public boolean charTyped(char c, int code) {
+            return option.charTyped(c, code);
+        }
+
+        @Override
         public void render(int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean wut, float partialTicks) {
             int optionWidth = Math.min(396, width);
             int padding = (width - optionWidth) / 2;

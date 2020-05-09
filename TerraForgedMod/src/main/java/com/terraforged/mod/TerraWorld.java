@@ -33,6 +33,7 @@ import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.TerraGenSettings;
 import com.terraforged.mod.chunk.test.TestChunkGenerator;
 import com.terraforged.mod.gui.SettingsScreen;
+import com.terraforged.mod.settings.DimesionSettings;
 import com.terraforged.mod.settings.SettingsHelper;
 import com.terraforged.mod.settings.TerraSettings;
 import com.terraforged.mod.util.Environment;
@@ -46,6 +47,7 @@ import net.minecraft.world.biome.provider.OverworldBiomeProviderSettings;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.OverworldGenSettings;
+import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -67,6 +69,44 @@ public class TerraWorld extends WorldType {
     }
 
     @Override
+    public ChunkGenerator<?> createChunkGenerator(World world) {
+        if (world.getDimension().getType() == DimensionType.OVERWORLD) {
+            WorldInfo info = world.getWorldInfo();
+            int version = SettingsHelper.getVersion(info);
+            TerraSettings settings = SettingsHelper.getSettings(info);
+            SettingsHelper.syncSettings(world.getWorldInfo(), settings, version);
+            settings.dimensions.dimensionGenerators.apply(world.getWorldInfo());
+
+            Terrains terrains = Terrains.create(settings);
+
+            OverworldGenSettings genSettings = new TerraGenSettings(settings.structures);
+            OverworldBiomeProviderSettings biomeSettings = new OverworldBiomeProviderSettings(world.getWorldInfo());
+            biomeSettings.setGeneratorSettings(genSettings);
+            world.getWorldInfo().setGeneratorOptions(NBTHelper.serializeCompact(settings));
+
+            TerraContext context = new TerraContext(world, terrains, settings);
+            BiomeProvider biomeProvider = new BiomeProvider(context);
+
+            Log.debug("Creating Terra {} generator", world.getDimension().getType().getRegistryName());
+            return factory.create(context, biomeProvider, genSettings);
+        }
+
+        if (world.getDimension().getType() == DimensionType.THE_NETHER) {
+            WorldType type = DimesionSettings.getWorldType(world.getWorldInfo(), DimensionType.THE_NETHER);
+            Log.debug("Creating {} {} generator", type.getName(), world.getDimension().getType().getRegistryName());
+            return type.createChunkGenerator(world);
+        }
+
+        if (world.getDimension().getType() == DimensionType.THE_END) {
+            WorldType type = DimesionSettings.getWorldType(world.getWorldInfo(), DimensionType.THE_END);
+            Log.debug("Creating {} {} generator", type.getName(), world.getDimension().getType().getRegistryName());
+            return type.createChunkGenerator(world);
+        }
+
+        return super.createChunkGenerator(world);
+    }
+
+    @Override
     public double getHorizon(World world) {
         return 0;
     }
@@ -77,38 +117,9 @@ public class TerraWorld extends WorldType {
     }
 
     @Override
-    public ChunkGenerator<?> createChunkGenerator(World world) {
-        if (world.getDimension().getType() != DimensionType.OVERWORLD) {
-            return world.getDimension().createChunkGenerator();
-        }
-
-        Log.debug("Creating {} generator", world.getDimension().getType());
-
-        int version = SettingsHelper.getVersion(world.getWorldInfo());
-        TerraSettings settings = SettingsHelper.getSettings(world);
-        SettingsHelper.syncSettings(world.getWorldInfo(), settings, version);
-
-        Terrains terrains = Terrains.create(settings);
-
-        OverworldGenSettings genSettings = new TerraGenSettings(settings.structures);
-        OverworldBiomeProviderSettings biomeSettings = new OverworldBiomeProviderSettings(world.getWorldInfo());
-        biomeSettings.setGeneratorSettings(genSettings);
-        world.getWorldInfo().setGeneratorOptions(NBTHelper.serializeCompact(settings));
-
-        TerraContext context = new TerraContext(world, terrains, settings);
-        BiomeProvider biomeProvider = new BiomeProvider(context);
-
-        return getGeneratorFactory().create(context, biomeProvider, genSettings);
-    }
-
-    @Override
     @OnlyIn(Dist.CLIENT)
     public void onCustomizeButton(Minecraft mc, CreateWorldScreen gui) {
         mc.displayGuiScreen(new SettingsScreen(gui));
-    }
-
-    public ChunkGeneratorFactory<?> getGeneratorFactory() {
-        return factory;
     }
 
     public static void init() {
@@ -120,9 +131,13 @@ public class TerraWorld extends WorldType {
         }
     }
 
+    public static boolean isTerraType(WorldType type) {
+        return types.contains(type);
+    }
+
     public static boolean isTerraWorld(IWorld world) {
         if (world instanceof World) {
-            return types.contains(((World) world).getWorldType());
+            return isTerraType(((World) world).getWorldType());
         }
         return false;
     }
