@@ -8,8 +8,9 @@ import com.terraforged.mod.Log;
 import com.terraforged.mod.TerraWorld;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -72,10 +73,6 @@ public class SettingsHelper {
         NBTHelper.deserialize(options, dest);
     }
 
-    public static TerraSettings getSettings(World world) {
-        return getSettings(world.getWorldInfo());
-    }
-
     public static TerraSettings getSettings(WorldInfo info) {
         TerraSettings settings = new TerraSettings();
         if (info.getGeneratorOptions().isEmpty()) {
@@ -103,7 +100,7 @@ public class SettingsHelper {
         info.setGeneratorOptions(options);
     }
 
-    public static void moveSettings() {
+    public static void initSettings() {
         if (SETTINGS_FILE.exists()) {
             return;
         }
@@ -120,6 +117,12 @@ public class SettingsHelper {
                     e.printStackTrace();
                 }
             }
+        } else {
+            DistExecutor.runWhenOn(Dist.DEDICATED_SERVER, () -> () -> exportDefaults(new TerraSettings()));
         }
+    }
+
+    private static void initServerSettings() {
+        DistExecutor.runWhenOn(Dist.DEDICATED_SERVER, () -> () -> exportDefaults(new TerraSettings()));
     }
 }
