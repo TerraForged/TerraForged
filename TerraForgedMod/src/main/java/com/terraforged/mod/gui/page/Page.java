@@ -28,10 +28,10 @@ package com.terraforged.mod.gui.page;
 import com.terraforged.mod.gui.OverlayRenderer;
 import com.terraforged.mod.gui.OverlayScreen;
 import com.terraforged.mod.gui.ScrollPane;
-import com.terraforged.mod.gui.element.TerraButton;
 import com.terraforged.mod.gui.element.TerraLabel;
 import com.terraforged.mod.gui.element.TerraSlider;
-import com.terraforged.mod.gui.element.Toggle;
+import com.terraforged.mod.gui.element.TerraTextInput;
+import com.terraforged.mod.gui.element.TerraToggle;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
@@ -144,6 +144,7 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
                 button.x = x;
                 button.y = top.getAndAdd(SLIDER_HEIGHT + SLIDER_PAD);
                 consumer.accept(button);
+                onAddWidget(button);
             } else if (deep) {
                 INBT child = value.get("value");
                 if (child == null || child.getId() != Constants.NBT.TAG_COMPOUND) {
@@ -170,12 +171,16 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
         } else if (type == Constants.NBT.TAG_FLOAT) {
             return new TerraSlider.Float(name + ": ", value).callback(callback);
         } else if (type == Constants.NBT.TAG_STRING && value.contains("#options")) {
-            return new Toggle(name + ": ", value).callback(callback);
+            return new TerraToggle(name + ": ", value).callback(callback);
         } else if (type == Constants.NBT.TAG_STRING) {
-            return new TerraButton(name);
+            return new TerraTextInput(name, value);
         } else {
             return null;
         }
+    }
+
+    public void onAddWidget(Widget widget) {
+
     }
 
     public static class Column {

@@ -92,7 +92,7 @@ public class PreviewPage extends BasePage {
         update();
     }
 
-    protected void update() {
+    public void update() {
         preview.update(settings, previewerSettings);
     }
 

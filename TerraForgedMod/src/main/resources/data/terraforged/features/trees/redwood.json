@@ -1,4 +1,7 @@
 {
+  "biomes": [
+    "minecraft:*"
+  ],
   "match": [
     [
       "minecraft:mega_spruce_tree"

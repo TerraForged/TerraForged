@@ -139,10 +139,10 @@ public class BiomeProvider extends AbstractBiomeProvider {
     }
 
     @Override
-    public boolean hasStructure(Structure<?> structureIn) {
-        return this.hasStructureCache.computeIfAbsent(structureIn, (p_205006_1_) -> {
-            for (Biome biome : defaultBiomes) {
-                if (biome.hasStructure(p_205006_1_)) {
+    public boolean hasStructure(Structure<?> structure) {
+        return this.hasStructureCache.computeIfAbsent(structure, (name) -> {
+            for (Biome biome : getAvailableBiomes()) {
+                if (biome.hasStructure(name)) {
                     return true;
                 }
             }
@@ -153,7 +153,7 @@ public class BiomeProvider extends AbstractBiomeProvider {
     @Override
     public Set<BlockState> getSurfaceBlocks() {
         if (this.topBlocksCache.isEmpty()) {
-            for (Biome biome : defaultBiomes) {
+            for (Biome biome : getAvailableBiomes()) {
                 this.topBlocksCache.add(biome.getSurfaceBuilderConfig().getTop());
             }
         }

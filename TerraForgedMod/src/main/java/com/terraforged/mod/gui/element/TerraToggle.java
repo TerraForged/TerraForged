@@ -32,7 +32,7 @@ import net.minecraftforge.common.util.Constants;
 
 import java.util.List;
 
-public class Toggle extends TerraButton {
+public class TerraToggle extends TerraButton {
 
     private final String prefix;
     private final CompoundNBT value;
@@ -42,7 +42,7 @@ public class Toggle extends TerraButton {
     private int index;
     private Runnable callback = () -> {};
 
-    public Toggle(String prefix, CompoundNBT value) {
+    public TerraToggle(String prefix, CompoundNBT value) {
         super(value.getString("value"));
         this.value = value;
         this.prefix = prefix;
@@ -58,7 +58,7 @@ public class Toggle extends TerraButton {
         setMessage(prefix + value.getString("value"));
     }
 
-    public Toggle callback(Runnable runnable) {
+    public TerraToggle callback(Runnable runnable) {
         this.callback = runnable;
         return this;
     }

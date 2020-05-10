@@ -25,10 +25,14 @@
 
 package com.terraforged.api.material;
 
+import com.terraforged.api.material.state.StateTagPredicate;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
+
+import java.util.function.Predicate;
 
 public class WGTags {
 
@@ -44,5 +48,9 @@ public class WGTags {
 
     private static Tag<Block> tag(String name) {
         return new BlockTags.Wrapper(new ResourceLocation("forge", name));
+    }
+
+    public static Predicate<BlockState> stone() {
+        return new StateTagPredicate(STONE);
     }
 }

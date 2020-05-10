@@ -28,6 +28,7 @@ package com.terraforged.mod.gui;
 import com.terraforged.mod.gui.element.TerraButton;
 import com.terraforged.mod.gui.element.TerraLabel;
 import com.terraforged.mod.gui.page.ClimatePage;
+import com.terraforged.mod.gui.page.DimensionsPage;
 import com.terraforged.mod.gui.page.FeaturePage;
 import com.terraforged.mod.gui.page.FilterPage;
 import com.terraforged.mod.gui.page.GeneratorPage;
@@ -70,7 +71,8 @@ public class SettingsScreen extends OverlayScreen {
                 new RiverPage(settings, preview),
                 new FilterPage(settings, preview),
                 new FeaturePage(settings),
-                new StructurePage(settings)
+                new StructurePage(settings),
+                new DimensionsPage(settings),
         };
     }
 
@@ -247,6 +249,13 @@ public class SettingsScreen extends OverlayScreen {
         boolean b = preview.action(pane -> pane.keyPressed(i, j, k));
         boolean c = super.keyPressed(i, j, k);
         return a || b || c;
+    }
+
+    @Override
+    public boolean charTyped(char c, int code) {
+        boolean a = pages[pageIndex].action(pane -> pane.charTyped(c, code));
+        boolean b = preview.action(pane -> pane.charTyped(c, code));
+        return a || b || super.charTyped(c, code);
     }
 
     @Override

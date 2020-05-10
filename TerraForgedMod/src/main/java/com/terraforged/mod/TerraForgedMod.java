@@ -37,6 +37,7 @@ import com.terraforged.mod.util.DataPackFinder;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.OreFeatureConfig;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
@@ -62,11 +63,14 @@ public class TerraForgedMod {
         TerraWorld.init();
         SaplingManager.init();
         TerraCommand.init();
-        SettingsHelper.moveSettings();
+        SettingsHelper.initSettings();
 
         // temp fix
         BiomeDictionary.addTypes(Biomes.BAMBOO_JUNGLE, BiomeDictionary.Type.OVERWORLD);
         BiomeDictionary.addTypes(Biomes.BAMBOO_JUNGLE_HILLS, BiomeDictionary.Type.OVERWORLD);
+
+        // allows ores to replace any world-gen stone type
+        OreFeatureConfig.FillerBlockType.create("WG_STONE", "wg_stone", WGTags.stone());
     }
 
     @SubscribeEvent

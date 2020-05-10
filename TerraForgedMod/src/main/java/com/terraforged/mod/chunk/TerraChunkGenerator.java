@@ -368,12 +368,13 @@ public class TerraChunkGenerator extends ObfHelperChunkGenerator<GenerationSetti
             Log.info(" - Geology decorator enabled");
             processors.add(new GeologyDecorator(geologyManager));
         }
+
         if (context.terraSettings.features.erosionDecorator) {
             Log.info(" - Erosion decorator enabled");
             processors.add(new ErosionDecorator(context));
         }
         processors.add(new CoastDecorator(context));
-        processors.add(new BedrockDecorator());
+        processors.add(new BedrockDecorator(context));
         return processors;
     }
 

@@ -8,8 +8,9 @@ import com.terraforged.mod.Log;
 import com.terraforged.mod.TerraWorld;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -72,9 +73,9 @@ public class SettingsHelper {
         NBTHelper.deserialize(options, dest);
     }
 
-    public static TerraSettings getSettings(IWorld world) {
+    public static TerraSettings getSettings(WorldInfo info) {
         TerraSettings settings = new TerraSettings();
-        if (world.getWorldInfo().getGeneratorOptions().isEmpty()) {
+        if (info.getGeneratorOptions().isEmpty()) {
             if (SETTINGS_FILE.exists()) {
                 try (Reader reader = new BufferedReader(new FileReader(SETTINGS_FILE))) {
                     Log.info("Loading generator settings from json");
@@ -87,7 +88,7 @@ public class SettingsHelper {
             }
         } else {
             Log.info("Loading generator settings from level.dat");
-            NBTHelper.deserialize(world.getWorldInfo().getGeneratorOptions(), settings);
+            NBTHelper.deserialize(info.getGeneratorOptions(), settings);
         }
         return settings;
     }
@@ -99,7 +100,7 @@ public class SettingsHelper {
         info.setGeneratorOptions(options);
     }
 
-    public static void moveSettings() {
+    public static void initSettings() {
         if (SETTINGS_FILE.exists()) {
             return;
         }
@@ -116,6 +117,12 @@ public class SettingsHelper {
                     e.printStackTrace();
                 }
             }
+        } else {
+            DistExecutor.runWhenOn(Dist.DEDICATED_SERVER, () -> () -> exportDefaults(new TerraSettings()));
         }
+    }
+
+    private static void initServerSettings() {
+        DistExecutor.runWhenOn(Dist.DEDICATED_SERVER, () -> () -> exportDefaults(new TerraSettings()));
     }
 }

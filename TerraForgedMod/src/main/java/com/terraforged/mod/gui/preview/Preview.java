@@ -35,6 +35,7 @@ import com.terraforged.core.util.concurrent.ThreadPool;
 import com.terraforged.core.util.concurrent.cache.CacheEntry;
 import com.terraforged.core.world.GeneratorContext;
 import com.terraforged.core.world.WorldGeneratorFactory;
+import com.terraforged.core.world.heightmap.Levels;
 import com.terraforged.core.world.terrain.Terrain;
 import com.terraforged.core.world.terrain.Terrains;
 import com.terraforged.mod.util.nbt.NBTHelper;
@@ -53,9 +54,9 @@ import java.util.Random;
 public class Preview extends Button {
 
     private static final int FACTOR = 4;
-    public static final int WIDTH = 256;//Size.chunkToBlock(1 << FACTOR);
+    public static final int WIDTH = 256;
     private static final int SLICE_HEIGHT = 64;
-    public static final int HEIGHT = WIDTH + SLICE_HEIGHT;//Size.chunkToBlock(1 << FACTOR);
+    public static final int HEIGHT = WIDTH + SLICE_HEIGHT;
     private static final float[] LEGEND_SCALES = {1, 0.9F, 0.75F, 0.6F};
 
     private final int offsetX;
@@ -64,14 +65,14 @@ public class Preview extends Button {
     private final PreviewSettings previewSettings = new PreviewSettings();
     private final DynamicTexture texture = new DynamicTexture(new NativeImage(WIDTH, HEIGHT, true));
 
+    private final String[] values = {"", "", ""};
+    private final String[] labels = {"Area: ", "Terrain: ", "Biome: "};
+
     private int seed;
     private long lastUpdate = 0L;
     private Settings settings = new Settings();
     private CacheEntry<Region> task = null;
     private Region region = null;
-
-    private String[] labels = {"Area: ", "Terrain: ", "Biome: "};
-    private String[] values = {"", "", ""};
 
     public Preview(int seed) {
         super(0, 0, 0, 0, "", b -> {});
@@ -109,6 +110,7 @@ public class Preview extends Button {
         RenderSystem.disableRescaleNormal();
 
         updateLegend(mx, my);
+
         renderLegend(labels, values, x, y + width, 10, 0xFFFFFF);
     }
 
@@ -130,6 +132,8 @@ public class Preview extends Button {
             try {
                 region = task.get();
                 render(region);
+            } catch (Throwable t) {
+                t.printStackTrace();
             } finally {
                 task = null;
             }
@@ -143,8 +147,7 @@ public class Preview extends Button {
         }
 
         RenderMode renderer = previewSettings.mode;
-        Terrains terrains = Terrains.create(settings);
-        GeneratorContext context = new GeneratorContext(terrains, settings);
+        Levels levels = new Levels(settings.generator);
 
         int stroke = 2;
         int width = region.getBlockSize().size;
@@ -164,8 +167,7 @@ public class Preview extends Button {
             if (x < stroke || z < stroke || x >= width - stroke || z >= width - stroke) {
                 image.setPixelRGBA(x, z, Color.BLACK.getRGB());
             } else {
-                Color color = renderer.color(cell, context);
-                image.setPixelRGBA(x, z, RenderMode.rgba(color));
+                image.setPixelRGBA(x, z, renderer.getColor(cell, levels));
             }
 
             if (z == half) {
@@ -203,19 +205,21 @@ public class Preview extends Button {
                 .size(FACTOR, 0)
                 .build();
 
-        return renderer.queue(offsetX, offsetZ, 101 - previewSettings.zoom, true);
+        return renderer.queue(offsetX, offsetZ, 101 - previewSettings.zoom, false);
     }
 
     private void updateLegend(int mx ,int my) {
         if (region != null) {
+            int left = this.x;
+            int top = this.y;
+            float size = this.width;
             int zoom = (101 - previewSettings.zoom);
             int width = Math.max(1, region.getBlockSize().size * zoom);
             int height = Math.max(1, region.getBlockSize().size * zoom);
             values[0] = width + "x" + height;
-
-            if (mx >= this.x && mx <= this.x + this.width && my >= this.y && my <= this.y + this.height) {
-                float fx = (mx - this.x) / (float) this.width;
-                float fz = (my - this.y) / (float) this.height;
+            if (mx >= left && mx <= left + size && my >= top && my <= top + size) {
+                float fx = (mx - left) / size;
+                float fz = (my - top) / size;
                 int ix = NoiseUtil.round(fx * region.getBlockSize().size);
                 int iz = NoiseUtil.round(fz * region.getBlockSize().size);
                 Cell<Terrain> cell = region.getCell(ix, iz);

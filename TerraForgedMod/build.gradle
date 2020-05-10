@@ -24,9 +24,9 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
     compile project(":Noise2D")
-    compile (project(":TerraForgedCore")) { transitive false }
-    compile (project(":FeatureManager")) { transitive false }
-    compile (project(":TerraForgedAPI")) { transitive false }
+    compile(project(":TerraForgedCore")) { transitive false }
+    compile(project(":FeatureManager")) { transitive false }
+    compile(project(":TerraForgedAPI")) { transitive false }
 }
 
 minecraft {
@@ -58,7 +58,7 @@ minecraft {
 }
 
 task collectClasses(type: Copy) {
-    configurations.collectMany { it.allDependencies }.findAll{ it instanceof ProjectDependency }.each {
+    configurations.collectMany { it.allDependencies }.findAll { it instanceof ProjectDependency }.each {
         ProjectDependency project = (ProjectDependency) it
         from("$project.dependencyProject.buildDir/classes/java/main")
     }
@@ -66,7 +66,7 @@ task collectClasses(type: Copy) {
 }
 
 task collectResources(type: Copy) {
-    configurations.collectMany { it.allDependencies }.findAll{ it instanceof ProjectDependency }.each {
+    configurations.collectMany { it.allDependencies }.findAll { it instanceof ProjectDependency }.each {
         ProjectDependency project = (ProjectDependency) it
         from("$project.dependencyProject.buildDir/resources/main")
     }

@@ -12,7 +12,7 @@
         "name": "minecraft:ore",
         "config": {
           "size": 7,
-          "target": "natural_stone",
+          "target": "wg_stone",
           "state": {
             "Name": "minecraft:lapis_ore"
           }
