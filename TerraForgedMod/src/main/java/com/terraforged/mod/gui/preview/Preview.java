@@ -54,9 +54,9 @@ import java.util.Random;
 public class Preview extends Button {
 
     private static final int FACTOR = 4;
-    public static final int WIDTH = 256;//Size.chunkToBlock(1 << FACTOR);
+    public static final int WIDTH = 256;
     private static final int SLICE_HEIGHT = 64;
-    public static final int HEIGHT = WIDTH + SLICE_HEIGHT;//Size.chunkToBlock(1 << FACTOR);
+    public static final int HEIGHT = WIDTH + SLICE_HEIGHT;
     private static final float[] LEGEND_SCALES = {1, 0.9F, 0.75F, 0.6F};
 
     private final int offsetX;
@@ -65,14 +65,14 @@ public class Preview extends Button {
     private final PreviewSettings previewSettings = new PreviewSettings();
     private final DynamicTexture texture = new DynamicTexture(new NativeImage(WIDTH, HEIGHT, true));
 
+    private final String[] values = {"", "", ""};
+    private final String[] labels = {"Area: ", "Terrain: ", "Biome: "};
+
     private int seed;
     private long lastUpdate = 0L;
     private Settings settings = new Settings();
     private CacheEntry<Region> task = null;
     private Region region = null;
-
-    private String[] labels = {"Area: ", "Terrain: ", "Biome: "};
-    private String[] values = {"", "", ""};
 
     public Preview(int seed) {
         super(0, 0, 0, 0, "", b -> {});
