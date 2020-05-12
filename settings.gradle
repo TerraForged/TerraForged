@@ -1,7 +1,4 @@
 rootProject.name = "TerraForged"
-include ":Noise2D"
 include ":TerraForgedMod"
 include ":TerraForgedAPI"
-include ":TerraForgedCore"
 include ":FeatureManager"
-include ":TerraForgedApp"

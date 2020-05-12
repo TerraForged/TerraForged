@@ -23,7 +23,6 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
-    compile project(":Noise2D")
     compile project(":FeatureManager")
     compile project(":TerraForgedCore")
 }
