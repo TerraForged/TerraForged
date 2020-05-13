@@ -161,6 +161,11 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
     }
 
     @Override
+    public Biome getBiome(BiomeManager manager, BlockPos pos) {
+        return super.getBiome(manager, pos);
+    }
+
+    @Override
     public final int func_222529_a(int x, int z, Heightmap.Type type) {
         int chunkX = Size.blockToChunk(x);
         int chunkZ = Size.blockToChunk(z);

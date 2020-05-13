@@ -17,7 +17,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.function.UnaryOperator;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-public class DataGenerator {
+public class LangGenerator {
 
     @SubscribeEvent
     public static void gather(GatherDataEvent event) {
