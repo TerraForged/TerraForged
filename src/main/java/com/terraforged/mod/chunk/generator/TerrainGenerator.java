@@ -1,4 +1,4 @@
-package com.terraforged.mod.chunk.component;
+package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;

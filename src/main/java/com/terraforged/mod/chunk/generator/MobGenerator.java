@@ -1,10 +1,10 @@
-package com.terraforged.mod.chunk.component;
+package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.mod.chunk.TerraChunkGenerator;
-import com.terraforged.mod.chunk.fix.SpawnFix;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.WorldGenRegion;
@@ -14,10 +14,17 @@ import net.minecraft.world.spawner.CatSpawner;
 import net.minecraft.world.spawner.PatrolSpawner;
 import net.minecraft.world.spawner.PhantomSpawner;
 import net.minecraft.world.spawner.WorldEntitySpawner;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
 
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class MobGenerator {
+
+    // may be accessed cross-thread
+    private static volatile boolean mobSpawning = true;
 
     private final CatSpawner catSpawner = new CatSpawner();
     private final PatrolSpawner patrolSpawner = new PatrolSpawner();
@@ -30,7 +37,7 @@ public class MobGenerator {
 
     public final void generateMobs(WorldGenRegion region) {
         // vanilla does NOT check the mobSpawning gamerule before calling this
-        if (SpawnFix.canSpawnMobs()) {
+        if (MobGenerator.mobSpawning) {
             int chunkX = region.getMainChunkX();
             int chunkZ = region.getMainChunkZ();
             Biome biome = region.getChunk(chunkX, chunkZ).getBiomes().getNoiseBiome(0, 0, 0);
@@ -65,5 +72,12 @@ public class MobGenerator {
             }
         }
         return world.getBiome(pos).getSpawns(type);
+    }
+
+    @SubscribeEvent
+    public static void tick(TickEvent.WorldTickEvent event) {
+        if (event.phase == TickEvent.Phase.START && event.side.isServer()) {
+            mobSpawning = event.world.getGameRules().get(GameRules.DO_MOB_SPAWNING).get();
+        }
     }
 }

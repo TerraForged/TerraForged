@@ -34,7 +34,7 @@ import net.minecraft.state.properties.BlockStateProperties;
 
 public class LayerMaterial {
 
-    private static final BlockState AIR = Blocks.AIR.getDefaultState();
+    public static final BlockState NONE = Blocks.AIR.getDefaultState();
 
     private final int min;
     private final int max;
@@ -64,7 +64,7 @@ public class LayerMaterial {
 
     public BlockState getState(int level) {
         if (level < min) {
-            return LayerMaterial.AIR;
+            return LayerMaterial.NONE;
         }
         if (level >= max) {
             return fullState;

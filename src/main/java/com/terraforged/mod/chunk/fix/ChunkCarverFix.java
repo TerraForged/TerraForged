@@ -27,7 +27,6 @@ package com.terraforged.mod.chunk.fix;
 
 import com.terraforged.api.chunk.ChunkDelegate;
 import com.terraforged.api.material.state.States;
-import com.terraforged.mod.material.MaterialHelper;
 import com.terraforged.mod.material.Materials;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
@@ -51,10 +50,10 @@ public class ChunkCarverFix implements ChunkDelegate {
     @Override
     public BlockState getBlockState(BlockPos pos) {
         BlockState state = getDelegate().getBlockState(pos);
-        if (MaterialHelper.isAir(state.getBlock())) {
+        if (materials.isAir(state.getBlock())) {
             return state;
         }
-        if (MaterialHelper.isGrass(state.getBlock())) {
+        if (materials.isGrass(state.getBlock())) {
             return States.GRASS_BLOCK.get();
         }
         if (materials.isStone(state.getBlock())) {

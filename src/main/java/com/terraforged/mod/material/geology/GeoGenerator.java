@@ -25,12 +25,10 @@
 
 package com.terraforged.mod.material.geology;
 
-import com.terraforged.api.material.WGTags;
 import com.terraforged.api.material.geology.StrataConfig;
 import com.terraforged.api.material.geology.StrataGenerator;
-import com.terraforged.world.geology.Strata;
-import com.terraforged.mod.material.MaterialHelper;
 import com.terraforged.mod.material.Materials;
+import com.terraforged.world.geology.Strata;
 import me.dags.noise.Source;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -50,10 +48,10 @@ public class GeoGenerator implements StrataGenerator {
 
     public GeoGenerator(Materials materials) {
         types.add(Source.PERLIN);
-        rock = new ArrayList<>(WGTags.STONE.getAllElements());
-        soil = new ArrayList<>(WGTags.DIRT.getAllElements());
-        clay = new ArrayList<>(WGTags.CLAY.getAllElements());
-        sediment = new ArrayList<>(WGTags.SEDIMENT.getAllElements());
+        rock = new ArrayList<>(materials.stone);
+        soil = new ArrayList<>(materials.dirt);
+        clay = new ArrayList<>(materials.clay);
+        sediment = new ArrayList<>(materials.sediment);
     }
 
     @Override
@@ -100,7 +98,7 @@ public class GeoGenerator implements StrataGenerator {
     }
 
     private List<Layer> sortHardness(List<Layer> layers) {
-        layers.sort(Comparator.comparing(s -> MaterialHelper.getHardness(s.state)));
+        layers.sort(Comparator.comparing(s -> Materials.getHardness(s.state)));
         return layers;
     }
 

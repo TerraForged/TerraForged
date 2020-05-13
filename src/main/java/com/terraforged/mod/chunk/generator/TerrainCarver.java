@@ -1,4 +1,4 @@
-package com.terraforged.mod.chunk.component;
+package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.fix.ChunkCarverFix;

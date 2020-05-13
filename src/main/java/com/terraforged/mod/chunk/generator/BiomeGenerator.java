@@ -1,4 +1,4 @@
-package com.terraforged.mod.chunk.component;
+package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.world.terrain.decorator.Decorator;

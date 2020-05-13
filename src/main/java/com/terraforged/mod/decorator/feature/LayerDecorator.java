@@ -31,7 +31,6 @@ import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.api.material.layer.LayerMaterial;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.mod.material.MaterialHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.IChunk;
@@ -50,13 +49,13 @@ public class LayerDecorator implements ColumnDecorator {
 
         // if block is already a layer-type then simply set the layer property
         BlockState state = chunk.getBlockState(context.pos);
-        LayerMaterial material = layerManager.getMaterial(state.getBlock());
-        if (material != null) {
-            setLayer(chunk, context.pos, material, context.cell, context.levels, 0F);
+        if (state.isAir(chunk, context.pos)) {
             return;
         }
 
-        if (MaterialHelper.isAir(state.getBlock())) {
+        LayerMaterial material = layerManager.getMaterial(state.getBlock());
+        if (material != null) {
+            setLayer(chunk, context.pos, material, context.cell, context.levels, 0F);
             return;
         }
 
@@ -65,7 +64,8 @@ public class LayerDecorator implements ColumnDecorator {
             // block below is solid
             if (chunk.getBlockState(context.pos.setPos(x, y, z)).getMaterial().blocksMovement()) {
                 // block above is air
-                if (MaterialHelper.isAir(chunk.getBlockState(context.pos.setPos(x, y + 2, z)).getBlock())) {
+                BlockState above = chunk.getBlockState(context.pos.setPos(x, y + 2, z));
+                if (above.isAir(chunk, context.pos)) {
 //                    setLayer(chunk, pos.setPos(x, y + 1, z), context.cell, context.levels, 0.25F);
                 }
             }
@@ -78,7 +78,7 @@ public class LayerDecorator implements ColumnDecorator {
         if (depth > min) {
             int level = material.getLevel(depth);
             BlockState layer = material.getState(level);
-            if (MaterialHelper.isAir(layer.getBlock())) {
+            if (layer == LayerMaterial.NONE) {
                 return;
             }
             chunk.setBlockState(pos, layer, false);

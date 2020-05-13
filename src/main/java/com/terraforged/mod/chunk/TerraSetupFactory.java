@@ -1,7 +1,20 @@
-package com.terraforged.mod.chunk.util;
+package com.terraforged.mod.chunk;
 
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.surface.SurfaceManager;
+import com.terraforged.mod.Log;
+import com.terraforged.mod.biome.ModBiomes;
+import com.terraforged.mod.biome.surface.IcebergsSurface;
+import com.terraforged.mod.biome.surface.SteppeSurface;
+import com.terraforged.mod.biome.surface.SwampSurface;
+import com.terraforged.mod.decorator.feature.LayerDecorator;
+import com.terraforged.mod.decorator.feature.SnowEroder;
+import com.terraforged.mod.decorator.terrain.BedrockDecorator;
+import com.terraforged.mod.decorator.terrain.CoastDecorator;
+import com.terraforged.mod.decorator.terrain.ErosionDecorator;
+import com.terraforged.mod.decorator.terrain.GeologyDecorator;
+import com.terraforged.mod.feature.BlockDataManager;
+import com.terraforged.mod.feature.Matchers;
 import com.terraforged.mod.feature.manager.FeatureManager;
 import com.terraforged.mod.feature.manager.data.DataManager;
 import com.terraforged.mod.feature.manager.matcher.biome.BiomeMatcher;
@@ -11,20 +24,6 @@ import com.terraforged.mod.feature.manager.predicate.DeepWater;
 import com.terraforged.mod.feature.manager.predicate.FeaturePredicate;
 import com.terraforged.mod.feature.manager.predicate.MinDepth;
 import com.terraforged.mod.feature.manager.predicate.MinHeight;
-import com.terraforged.mod.Log;
-import com.terraforged.mod.biome.ModBiomes;
-import com.terraforged.mod.biome.surface.IcebergsSurface;
-import com.terraforged.mod.biome.surface.SteppeSurface;
-import com.terraforged.mod.biome.surface.SwampSurface;
-import com.terraforged.mod.chunk.TerraContext;
-import com.terraforged.mod.decorator.terrain.BedrockDecorator;
-import com.terraforged.mod.decorator.terrain.CoastDecorator;
-import com.terraforged.mod.decorator.terrain.ErosionDecorator;
-import com.terraforged.mod.decorator.terrain.GeologyDecorator;
-import com.terraforged.mod.decorator.feature.LayerDecorator;
-import com.terraforged.mod.decorator.feature.SnowEroder;
-import com.terraforged.mod.feature.Matchers;
-import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.material.geology.GeoManager;
 import com.terraforged.mod.util.setup.SetupHooks;
 import net.minecraft.world.biome.Biome;
@@ -35,7 +34,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TerraHooks {
+public class TerraSetupFactory {
 
     public static DataManager createDataManager() {
         return FeatureManager.data(new File("config/terraforged/datapacks"));

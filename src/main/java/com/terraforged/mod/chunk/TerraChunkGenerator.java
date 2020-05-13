@@ -36,12 +36,11 @@ import com.terraforged.mod.feature.manager.FeatureManager;
 import com.terraforged.mod.feature.manager.data.DataManager;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.BiomeProvider;
-import com.terraforged.mod.chunk.component.BiomeGenerator;
-import com.terraforged.mod.chunk.component.MobGenerator;
-import com.terraforged.mod.chunk.component.StructureGenerator;
-import com.terraforged.mod.chunk.component.TerrainCarver;
-import com.terraforged.mod.chunk.component.TerrainGenerator;
-import com.terraforged.mod.chunk.util.TerraHooks;
+import com.terraforged.mod.chunk.generator.BiomeGenerator;
+import com.terraforged.mod.chunk.generator.MobGenerator;
+import com.terraforged.mod.chunk.generator.StructureGenerator;
+import com.terraforged.mod.chunk.generator.TerrainCarver;
+import com.terraforged.mod.chunk.generator.TerrainGenerator;
 import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.material.geology.GeoManager;
@@ -93,16 +92,16 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
         this.terrainGenerator = new TerrainGenerator(this);
         this.structureGenerator = new StructureGenerator(this);
 
-        this.surfaceManager = TerraHooks.createSurfaceManager(context);
-        this.geologyManager = TerraHooks.createGeologyManager(context);
-        this.baseDecorators = TerraHooks.createBaseDecorators(geologyManager, context);
-        this.postProcessors = TerraHooks.createFeatureDecorators(context);
+        this.surfaceManager = TerraSetupFactory.createSurfaceManager(context);
+        this.geologyManager = TerraSetupFactory.createGeologyManager(context);
+        this.baseDecorators = TerraSetupFactory.createBaseDecorators(geologyManager, context);
+        this.postProcessors = TerraSetupFactory.createFeatureDecorators(context);
         this.regionCache = context.cache;
 
-        try (DataManager data = TerraHooks.createDataManager()) {
+        try (DataManager data = TerraSetupFactory.createDataManager()) {
             FeatureManager.initData(data);
-            this.featureManager = TerraHooks.createFeatureManager(data, context);
-            this.blockDataManager = TerraHooks.createBlockDataManager(data, context);
+            this.featureManager = TerraSetupFactory.createFeatureManager(data, context);
+            this.blockDataManager = TerraSetupFactory.createBlockDataManager(data, context);
             FeatureManager.clearData();
         }
 
@@ -159,10 +158,6 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
     @Override
     public final List<Biome.SpawnListEntry> getPossibleCreatures(EntityClassification type, BlockPos pos) {
         return mobGenerator.getPossibleCreatures(world, type, pos);
-    }
-
-    public final Biome getBiome(BiomeManager biomes, BlockPos pos) {
-        return super.getBiome(biomes, pos);
     }
 
     @Override

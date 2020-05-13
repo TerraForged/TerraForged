@@ -26,10 +26,7 @@
 package com.terraforged.mod.biome.modifier;
 
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.Seed;
-import com.terraforged.world.climate.Climate;
-import com.terraforged.world.heightmap.Levels;
-import com.terraforged.mod.material.MaterialHelper;
+import com.terraforged.mod.chunk.TerraContext;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -42,10 +39,10 @@ public class SandBiomeModifier extends AbstractMaxHeightModifier {
 
     private final Set<Biome> biomes;
 
-    public SandBiomeModifier(Seed seed, Climate climate, Levels levels) {
-        super(seed, climate, 50, 2, levels.scale(8), levels.ground(5), levels.ground(25));
+    public SandBiomeModifier(TerraContext context) {
+        super(context.seed, context.factory.getClimate(), 50, 2, context.levels.scale(8), context.levels.ground(5), context.levels.ground(25));
         this.biomes = ForgeRegistries.BIOMES.getValues().stream()
-                .filter(biome -> MaterialHelper.isSand(biome.getSurfaceBuilderConfig().getTop().getBlock()))
+                .filter(biome -> context.materials.isSand(biome.getSurfaceBuilderConfig().getTop().getBlock()))
                 .collect(Collectors.toSet());
     }
 

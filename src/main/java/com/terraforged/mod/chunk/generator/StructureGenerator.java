@@ -1,4 +1,4 @@
-package com.terraforged.mod.chunk.component;
+package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import net.minecraft.network.DebugPacketSender;
@@ -9,7 +9,6 @@ import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;

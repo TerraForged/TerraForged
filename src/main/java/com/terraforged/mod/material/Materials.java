@@ -27,52 +27,31 @@ package com.terraforged.mod.material;
 
 import com.terraforged.api.material.WGTags;
 import com.terraforged.api.material.layer.LayerManager;
+import com.terraforged.api.material.state.States;
+import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.mod.util.DummyBlockReader;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectSets;
+import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ConcretePowderBlock;
+import net.minecraft.block.GrassBlock;
+import net.minecraft.block.MyceliumBlock;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.util.math.BlockPos;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Predicate;
 
-@Deprecated
 public class Materials {
 
-    private final Set<Block> stone = create(WGTags.STONE);
-    private final Set<Block> dirt = create(WGTags.DIRT);
-    private final Set<Block> clay = create(WGTags.CLAY);
-    private final Set<Block> sediment = create(WGTags.SEDIMENT);
-    private final Set<Block> erodible = create(WGTags.ERODIBLE);
-    private final LayerManager layerManager = new LayerManager();
-
-    public Materials() {
-        Predicate<Block> filter = getTagFilter();
-        for (Block block : ForgeRegistries.BLOCKS) {
-            if (filter.test(block)) {
-                continue;
-            }
-
-            if (!MaterialHelper.isCube(block.getDefaultState())) {
-                continue;
-            }
-
-            if (MaterialHelper.isStone(block)) {
-                stone.add(block);
-            } else if (MaterialHelper.isDirt(block)) {
-                dirt.add(block);
-            } else if (MaterialHelper.isClay(block)) {
-                clay.add(block);
-            } else if (MaterialHelper.isSediment(block)) {
-                sediment.add(block);
-            }
-        }
-
-        if (stone.isEmpty()) {
-            stone.add(Blocks.STONE);
-        }
-    }
+    public final LayerManager layerManager = new LayerManager();
+    public final Set<Block> stone = create(WGTags.STONE, States.STONE.getBlock());
+    public final Set<Block> dirt = create(WGTags.DIRT, States.DIRT.getBlock());
+    public final Set<Block> clay = create(WGTags.CLAY, States.CLAY.getBlock());
+    public final Set<Block> sediment = create(WGTags.SEDIMENT, States.GRAVEL.getBlock());
+    public final Set<Block> erodible = create(WGTags.ERODIBLE, null);
 
     public LayerManager getLayerManager() {
         return layerManager;
@@ -98,22 +77,30 @@ public class Materials {
         return erodible.contains(block);
     }
 
-    private static Set<Block> create(Tag<Block> tag) {
-        return new HashSet<>(tag.getAllElements());
+    public boolean isAir(Block block) {
+        return block instanceof AirBlock;
     }
 
-    private static Predicate<Block> getTagFilter() {
-        Set<String> namespaces = new HashSet<>();
-        collectNamespace(namespaces, WGTags.STONE.getAllElements());
-        collectNamespace(namespaces, WGTags.DIRT.getAllElements());
-        collectNamespace(namespaces, WGTags.DIRT.getAllElements());
-        collectNamespace(namespaces, WGTags.SEDIMENT.getAllElements());
-        return b -> namespaces.contains(MaterialHelper.getNamespace(b));
+    public boolean isGrass(Block block) {
+        return block instanceof GrassBlock || block instanceof MyceliumBlock;
     }
 
-    private static void collectNamespace(Set<String> set, Collection<Block> blocks) {
-        for (Block block : blocks) {
-            set.add(MaterialHelper.getNamespace(block));
+    public boolean isSand(Block block) {
+        return BlockTags.SAND.contains(block) && !(block instanceof ConcretePowderBlock);
+    }
+
+    private static Set<Block> create(Tag<Block> tag, Block def) {
+        ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(tag.getAllElements());
+        if (set.isEmpty() && def != null) {
+            set.add(def);
+        }
+        return ObjectSets.unmodifiable(set);
+    }
+
+    public static float getHardness(BlockState state) {
+        try (ObjectPool.Item<DummyBlockReader> reader = DummyBlockReader.pooled()) {
+            reader.getValue().set(state);
+            return state.getBlockHardness(reader.getValue(), BlockPos.ZERO);
         }
     }
 }

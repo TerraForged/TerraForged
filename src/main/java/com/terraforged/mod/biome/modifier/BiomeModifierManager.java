@@ -48,11 +48,7 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
         List<BiomeModifier> modifiers = new ArrayList<>();
         modifiers.add(new BeachModifier(biomes, context));
         modifiers.add(new DesertColorModifier(desertBiomes));
-        modifiers.add(new SandBiomeModifier(
-                context.seed,
-                context.factory.getClimate(),
-                context.levels
-        ));
+        modifiers.add(new SandBiomeModifier(context));
         Collections.sort(modifiers);
         this.biomeModifiers = modifiers;
     }
