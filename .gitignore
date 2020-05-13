@@ -26,7 +26,8 @@ build/
 out/
 run/
 *.iml
-/.gradle/
-/.idea/
+.gradle/
+.idea/
 **/build/
 **/out/
+generated/resources/.cache
