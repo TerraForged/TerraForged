@@ -1,3 +1,6 @@
 [submodule "FeatureManager"]
 	path = FeatureManager
 	url = https://github.com/TerraForged/FeatureManager.git
+[submodule "Engine"]
+	path = Engine
+	url = https://github.com/TerraForged/Engine.git
