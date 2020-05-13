@@ -1,4 +1,3 @@
 rootProject.name = "TerraForged"
-include ":TerraForgedMod"
-include ":TerraForgedAPI"
+include ":Engine"
 include ":FeatureManager"

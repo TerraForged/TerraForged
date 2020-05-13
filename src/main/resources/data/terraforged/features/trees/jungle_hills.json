@@ -1,0 +1,87 @@
+{
+  "biomes": [
+    "minecraft:jungle_hills",
+    "minecraft:bamboo_jungle_hills"
+  ],
+  "match": [
+    [
+      "minecraft:fancy_tree"
+    ]
+  ],
+  "replace": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "minecraft:random_selector",
+        "config": {
+          "features": [
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:jungle_small"
+              },
+              "chance": 0.3
+            },
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:jungle_large"
+              },
+              "chance": 0.4
+            },
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:jungle_huge"
+              },
+              "chance": 0.3
+            },
+            {
+              "name": "minecraft:jungle_ground_bush",
+              "config": {
+                "trunk_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:jungle_log",
+                    "Properties": {
+                      "axis": "y"
+                    }
+                  }
+                },
+                "leaves_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:oak_leaves",
+                    "Properties": {
+                      "distance": "7",
+                      "persistent": "false"
+                    }
+                  }
+                },
+                "decorators": [],
+                "base_height": 4
+              },
+              "chance": 0.2
+            }
+          ],
+          "default": {
+            "name": "terraforged:template",
+            "config": {
+              "template": "terraforged:jungle_small"
+            }
+          }
+        }
+      },
+      "decorator": {
+        "name": "terraforged:poisson_surface",
+        "config": {
+          "radius": 8,
+          "fade": 0.2,
+          "scale": 200,
+          "min": 0.35,
+          "max": 1.85
+        }
+      }
+    }
+  }
+}

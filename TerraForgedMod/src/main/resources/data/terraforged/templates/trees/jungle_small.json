@@ -1,8 +1,0 @@
-{
-  "type": "tree",
-  "base": 3,
-  "name": "terraforged:jungle_small",
-  "paths": [
-    "terraforged:trees/jungle/small"
-  ]
-}

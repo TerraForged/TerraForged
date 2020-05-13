@@ -1,0 +1,11 @@
+{
+  "type": "tree",
+  "name": "terraforged:dark_oak_large",
+  "paths": [
+    "terraforged:trees/dark_oak/large"
+  ],
+  "config": {
+    "extend_base": 3,
+    "check_bounds": true
+  }
+}

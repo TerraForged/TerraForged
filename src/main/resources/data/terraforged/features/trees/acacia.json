@@ -1,0 +1,48 @@
+{
+  "match": [
+    [
+      "minecraft:acacia_log",
+      "minecraft:acacia_leaves"
+    ]
+  ],
+  "replace": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "minecraft:random_selector",
+        "config": {
+          "features": [
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:acacia_large"
+              },
+              "chance": 0.4
+            },
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:acacia_small"
+              },
+              "chance": 0.15
+            }
+          ],
+          "default": {
+            "name": "terraforged:template",
+            "config": {
+              "template": "terraforged:acacia_large"
+            }
+          }
+        }
+      },
+      "decorator": {
+        "name": "minecraft:count_extra_heightmap",
+        "config": {
+          "count": 0,
+          "extra_chance": 0.2,
+          "extra_count": 1
+        }
+      }
+    }
+  }
+}

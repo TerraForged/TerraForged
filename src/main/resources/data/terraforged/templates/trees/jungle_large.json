@@ -1,0 +1,11 @@
+{
+  "type": "tree",
+  "name": "terraforged:jungle_large",
+  "paths": [
+    "terraforged:trees/jungle/large"
+  ],
+  "config": {
+    "extend_base": 3,
+    "check_bounds": true
+  }
+}

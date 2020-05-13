@@ -1,7 +1,113 @@
-allprojects {
-    apply plugin: "java"
-    group = "com.terraforged"
-    version = mod_version
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven { url "https://files.minecraftforge.net/maven" }
+    }
+    dependencies {
+        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "3.+", changing: true
+    }
 }
 
-jar.enabled(false)
+apply plugin: "net.minecraftforge.gradle"
+apply plugin: "maven-publish"
+apply plugin: "eclipse"
+
+version = "${mc_version}-${mod_version}${getClassifier()}"
+
+allprojects {
+    apply plugin: "java"
+}
+
+configurations {
+    lib
+    compile.extendsFrom lib
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { url "https://io.terraforged.com/repository/maven/" }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
+    lib (project(":FeatureManager")) { transitive false }
+    lib project(":Engine")
+}
+
+minecraft {
+    mappings channel: mcp_channel, version: mcp_version
+    runs {
+        client {
+            workingDirectory project.file("run/client")
+            property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
+            property "forge.logging.console.level", "debug"
+            jvmArgs "-Xmx8G", "-Xms6G", "-Ddev"
+            mods {
+                terraforged {
+                    source sourceSets.main
+                }
+            }
+        }
+        server {
+            workingDirectory project.file("run/server")
+            property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
+            property "forge.logging.console.level", "debug"
+            jvmArgs "-Xmx8G", "-Xms6G", "-Ddev"
+            mods {
+                terraforged {
+                    source sourceSets.main
+                }
+            }
+        }
+        data {
+            workingDirectory project.file("run/data")
+            property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
+            property "forge.logging.console.level", "debug"
+            property "fml.earlyprogresswindow", "false"
+            args "--mod", "terraforged", "--server", "--output", file("generated/resources/")
+            jvmArgs "-Xmx4G", "-Xms2G"
+            mods {
+                terraforged {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+sourceSets {
+    main.resources {
+        srcDirs += "generated/resources/"
+        exclude ".cache"
+    }
+}
+
+task collectLibs(type: Copy) {
+    dependsOn(dependsOn: subprojects.tasks["jar"])
+    from { configurations.lib.collect { it.isDirectory() ? it : zipTree(it) } }
+    into("build/classes/java/main")
+    duplicatesStrategy = "EXCLUDE"
+}
+
+processResources {
+    filesMatching("**/mods.toml") {
+        expand("version": "${mod_version}${getClassifier()}", "mc_version": mc_version)
+    }
+}
+
+classes {
+    dependsOn(collectLibs)
+}
+
+static def getClassifier() {
+    if (System.getenv("GIT_TAG_NAME") != null) {
+        return ""
+    }
+    def buildNumber = System.getenv("BUILD_NUMBER")
+    if (buildNumber != null) {
+        return "-${buildNumber}"
+    }
+    return ""
+}

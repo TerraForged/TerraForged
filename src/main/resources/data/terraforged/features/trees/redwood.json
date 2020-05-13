@@ -1,0 +1,59 @@
+{
+  "biomes": [
+    "minecraft:*"
+  ],
+  "match": [
+    [
+      "minecraft:mega_spruce_tree"
+    ]
+  ],
+  "replace": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "minecraft:random_selector",
+        "config": {
+          "features": [
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:redwood_huge"
+              },
+              "chance": 0.025641026
+            },
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:pine"
+              },
+              "chance": 0.15
+            },
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:redwood_large"
+              },
+              "chance": 0.33333334
+            }
+          ],
+          "default": {
+            "name": "terraforged:template",
+            "config": {
+              "template": "terraforged:redwood_large"
+            }
+          }
+        }
+      },
+      "decorator": {
+        "name": "terraforged:poisson_surface",
+        "config": {
+          "radius": 9,
+          "fade": 0.2,
+          "scale": 250,
+          "min": 0.15,
+          "max": 2.25
+        }
+      }
+    }
+  }
+}

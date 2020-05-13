@@ -1,9 +1,0 @@
-{
-  "type": "tree",
-  "base": 3,
-  "name": "terraforged:acacia_small",
-  "paths": [
-    "terraforged:trees/acacia/small",
-    "terraforged:trees/acacia/bush"
-  ]
-}

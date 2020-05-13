@@ -1,0 +1,12 @@
+{
+  "type": "tree",
+  "name": "terraforged:acacia_small",
+  "paths": [
+    "terraforged:trees/acacia/small",
+    "terraforged:trees/acacia/bush"
+  ],
+  "config": {
+    "extend_base": 3,
+    "check_bounds": true
+  }
+}

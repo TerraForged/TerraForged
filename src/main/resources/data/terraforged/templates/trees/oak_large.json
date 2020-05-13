@@ -1,0 +1,23 @@
+{
+  "type": "tree",
+  "name": "terraforged:oak_large",
+  "paths": [
+    "terraforged:trees/oak/large"
+  ],
+  "config": {
+    "extend_base": 3,
+    "check_bounds": true
+  },
+  "decorators": {
+    "default": {
+      "minecraft:beehive": {
+        "probability": 0.002
+      }
+    },
+    "minecraft:flower_forest": {
+      "minecraft:beehive": {
+        "probability": 0.02
+      }
+    }
+  }
+}
