@@ -33,6 +33,7 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.Size;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.region.gen.RegionCache;
+import com.terraforged.fm.structure.StructureManager;
 import com.terraforged.fm.FeatureManager;
 import com.terraforged.material.Materials;
 import com.terraforged.material.geology.GeoManager;
@@ -75,6 +76,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
 
     private final GeoManager geologyManager;
     private final FeatureManager featureManager;
+    private final StructureManager structureManager;
     private final SurfaceManager surfaceManager;
     private final BlockDataManager blockDataManager;
     private final List<ColumnDecorator> baseDecorators;
@@ -93,6 +95,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
         this.structureGenerator = new StructureGenerator(this);
 
         this.surfaceManager = TerraSetupFactory.createSurfaceManager(context);
+        this.structureManager = TerraSetupFactory.createStructureManager(context);
         this.geologyManager = TerraSetupFactory.createGeologyManager(context);
         this.baseDecorators = TerraSetupFactory.createBaseDecorators(geologyManager, context);
         this.postProcessors = TerraSetupFactory.createFeatureDecorators(context);
@@ -208,6 +211,10 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
 
     public final FeatureManager getFeatureManager() {
         return featureManager;
+    }
+
+    public final StructureManager getStructureManager() {
+        return structureManager;
     }
 
     public final GeoManager getGeologyManager() {

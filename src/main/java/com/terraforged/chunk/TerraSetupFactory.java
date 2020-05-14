@@ -4,11 +4,11 @@ import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.surface.SurfaceManager;
 import com.terraforged.biome.ModBiomes;
 import com.terraforged.biome.surface.IcebergsSurface;
-import com.terraforged.biome.surface.SteppeSurface;
 import com.terraforged.biome.surface.SwampSurface;
 import com.terraforged.decorator.feature.LayerDecorator;
 import com.terraforged.decorator.feature.SnowEroder;
 import com.terraforged.feature.Matchers;
+import com.terraforged.fm.structure.StructureManager;
 import com.terraforged.fm.FeatureManager;
 import com.terraforged.fm.matcher.biome.BiomeMatcher;
 import com.terraforged.fm.matcher.feature.FeatureMatcher;
@@ -29,6 +29,7 @@ import com.terraforged.util.setup.SetupHooks;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.structure.Structure;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -93,24 +94,24 @@ public class TerraSetupFactory {
 
         // block ugly features
         modifiers.getPredicates().add(Matchers.sedimentDisks(), FeaturePredicate.DENY);
-
-        // limit to deep oceans
-        modifiers.getPredicates().add(FeatureMatcher.of(Feature.SHIPWRECK), MinDepth.DEPTH55);
-        modifiers.getPredicates().add(FeatureMatcher.of(Feature.OCEAN_RUIN), DeepWater.INSTANCE);
-        modifiers.getPredicates().add(FeatureMatcher.of(Feature.OCEAN_MONUMENT), DeepWater.INSTANCE);
-
-        // prevent mineshafts above ground
-        modifiers.getPredicates().add(FeatureMatcher.of(Feature.MINESHAFT), MinHeight.HEIGHT80);
+        modifiers.getPredicates().add(FeatureMatcher.of(Feature.MINESHAFT), new MinHeight(context.levels.waterY + 20));
 
         return FeatureManager.create(context.world, SetupHooks.setup(modifiers, context.copy()));
     }
 
     public static SurfaceManager createSurfaceManager(TerraContext context) {
         SurfaceManager manager = new SurfaceManager();
-        manager.replace(Biomes.FROZEN_OCEAN.delegate.get(), new IcebergsSurface(context, 20, 15));
         manager.replace(Biomes.DEEP_FROZEN_OCEAN.delegate.get(), new IcebergsSurface(context, 30, 30));
+        manager.replace(Biomes.FROZEN_OCEAN.delegate.get(), new IcebergsSurface(context, 20, 15));
         manager.replace(Biomes.SWAMP.delegate.get(), new SwampSurface());
         manager.replace(ModBiomes.MARSHLAND, new SwampSurface());
+        return SetupHooks.setup(manager, context);
+    }
+
+    public static StructureManager createStructureManager(TerraContext context) {
+        StructureManager manager = new StructureManager();
+        manager.register(Structure.OCEAN_MONUMENT, DeepWater.INSTANCE);
+        manager.register(Structure.OCEAN_RUIN, DeepWater.INSTANCE);
         return SetupHooks.setup(manager, context);
     }
 

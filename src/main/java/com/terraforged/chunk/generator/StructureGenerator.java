@@ -1,6 +1,7 @@
 package com.terraforged.chunk.generator;
 
 import com.terraforged.chunk.TerraChunkGenerator;
+import com.terraforged.fm.predicate.FeaturePredicate;
 import net.minecraft.network.DebugPacketSender;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
@@ -10,7 +11,6 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureStart;
@@ -31,16 +31,21 @@ public class StructureGenerator {
         generator.queueChunk(chunkpos.x, chunkpos.z);
 
         BlockPos biomePos = new BlockPos(chunkpos.getXStart() + 9, 0, chunkpos.getZStart() + 9);
+        Biome biome = biomes.getBiome(biomePos);
 
         for (Structure<?> structure : Feature.STRUCTURES.values()) {
             if (generator.getBiomeProvider().hasStructure(structure)) {
+                FeaturePredicate predicate = generator.getStructureManager().getPredicate(structure);
+                if (!predicate.test(chunk, biome)) {
+                    continue;
+                }
+
                 StructureStart existingStart = chunk.getStructureStart(structure.getStructureName());
                 int refCount = existingStart != null ? existingStart.func_227457_j_() : 0;
 
                 SharedSeedRandom random = new SharedSeedRandom();
                 StructureStart start = StructureStart.DUMMY;
 
-                Biome biome = biomes.getBiome(biomePos);
                 if (structure.func_225558_a_(biomes, generator, random, chunkpos.x, chunkpos.z, biome)) {
                     StructureStart altStart = structure.getStartFactory().create(structure, chunkpos.x, chunkpos.z, MutableBoundingBox.getNewBoundingBox(), refCount, generator.getSeed());
                     altStart.init(generator, templates, chunkpos.x, chunkpos.z, biome);
