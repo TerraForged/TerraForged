@@ -59,7 +59,7 @@ public class TerrainGenerator {
         container.getChunkReader().iterate(context, (cell, dx, dz, ctx) -> {
             int px = ctx.blockX + dx;
             int pz = ctx.blockZ + dz;
-            int top = ctx.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, dx, dz) + 1;
+            int top = ctx.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, dx, dz);
 
             ctx.buffer.setSurfaceLevel(top);
 

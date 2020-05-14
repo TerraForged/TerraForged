@@ -73,6 +73,7 @@ public class TerraWorld extends WorldType {
         if (world.getDimension().getType() == DimensionType.OVERWORLD) {
             WorldInfo info = world.getWorldInfo();
             TerraSettings settings = SettingsHelper.getSettings(info);
+            settings.world.seed = world.getSeed();
             settings.dimensions.dimensions.apply(world.getWorldInfo());
 
             Terrains terrains = Terrains.create(settings);

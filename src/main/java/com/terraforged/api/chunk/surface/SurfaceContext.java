@@ -35,7 +35,6 @@ import net.minecraft.world.gen.GenerationSettings;
 public class SurfaceContext extends DecoratorContext {
 
     public final long seed;
-    public final int seaLevel;
     public final BlockState solid;
     public final BlockState fluid;
     public final ChunkSurfaceBuffer buffer;
@@ -48,7 +47,6 @@ public class SurfaceContext extends DecoratorContext {
         this.solid = settings.getDefaultBlock();
         this.fluid = settings.getDefaultFluid();
         this.buffer = buffer;
-        this.seaLevel = levels.waterLevel;
         this.seed = seed;
     }
 }

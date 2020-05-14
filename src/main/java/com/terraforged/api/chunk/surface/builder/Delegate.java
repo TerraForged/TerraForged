@@ -60,7 +60,7 @@ public class Delegate implements Surface {
                 context.noise,
                 context.solid,
                 context.fluid,
-                context.seaLevel,
+                context.levels.waterLevel,
                 context.seed
         );
     }

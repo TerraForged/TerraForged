@@ -22,13 +22,13 @@ public class SwampSurface implements Surface {
                     continue;
                 }
 
-                if (y == ctx.seaLevel && ctx.buffer.getBlockState(ctx.pos).getBlock() != ctx.fluid.getBlock()) {
+                if (y == ctx.levels.waterY && ctx.buffer.getBlockState(ctx.pos).getBlock() != ctx.fluid.getBlock()) {
                     ctx.buffer.setBlockState(ctx.pos, ctx.fluid, false);
                 }
                 break;
             }
         }
 
-        SurfaceBuilder.DEFAULT.buildSurface(ctx.random, ctx.buffer, ctx.biome, x, z, height, noise, ctx.solid, ctx.fluid, ctx.seaLevel, ctx.seed, config);
+        SurfaceBuilder.DEFAULT.buildSurface(ctx.random, ctx.buffer, ctx.biome, x, z, height, noise, ctx.solid, ctx.fluid, ctx.levels.waterLevel, ctx.seed, config);
     }
 }
