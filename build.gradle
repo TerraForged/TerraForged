@@ -91,6 +91,16 @@ task collectLibs(type: Copy) {
     duplicatesStrategy = "EXCLUDE"
 }
 
+task apiJar(type: Jar) {
+    from { zipTree(tasks.jar.archivePath) }
+    include "com/terraforged/fm/**"
+    include "com/terraforged/api/**"
+    include "com/terraforged/core/**"
+    include "com/terraforged/world/**"
+    include "me/dags/**"
+    classifier "api"
+}
+
 processResources {
     filesMatching("**/mods.toml") {
         expand("version": "${mod_version}${getClassifier()}", "mc_version": mc_version)
@@ -99,6 +109,10 @@ processResources {
 
 classes {
     dependsOn(collectLibs)
+}
+
+build {
+    finalizedBy(apiJar)
 }
 
 static def getClassifier() {

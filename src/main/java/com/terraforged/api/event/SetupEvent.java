@@ -32,7 +32,7 @@ import com.terraforged.api.material.geology.GeologyManager;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.terrain.provider.TerrainProvider;
-import com.terraforged.mod.feature.manager.modifier.FeatureModifiers;
+import com.terraforged.fm.modifier.FeatureModifiers;
 import net.minecraftforge.eventbus.api.Event;
 
 public abstract class SetupEvent<T> extends Event {
