@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.decorator.feature;
+package com.terraforged.chunk.column.post;
 
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;

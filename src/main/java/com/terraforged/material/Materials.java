@@ -28,7 +28,7 @@ package com.terraforged.material;
 import com.terraforged.api.material.WGTags;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.api.material.state.States;
-import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.util.DummyBlockReader;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
@@ -98,9 +98,9 @@ public class Materials {
     }
 
     public static float getHardness(BlockState state) {
-        try (ObjectPool.Item<DummyBlockReader> reader = DummyBlockReader.pooled()) {
-            reader.getValue().set(state);
-            return state.getBlockHardness(reader.getValue(), BlockPos.ZERO);
+        try (Resource<DummyBlockReader> reader = DummyBlockReader.pooled()) {
+            reader.get().set(state);
+            return state.getBlockHardness(reader.get(), BlockPos.ZERO);
         }
     }
 }

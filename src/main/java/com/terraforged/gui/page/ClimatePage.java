@@ -26,8 +26,8 @@
 package com.terraforged.gui.page;
 
 import com.terraforged.core.settings.Settings;
-import com.terraforged.gui.preview.PreviewPage;
 import com.terraforged.gui.OverlayScreen;
+import com.terraforged.gui.preview.PreviewPage;
 import com.terraforged.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
 

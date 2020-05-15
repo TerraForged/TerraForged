@@ -25,14 +25,14 @@
 
 package com.terraforged.gui.page;
 
-import com.terraforged.gui.element.TerraLabel;
-import com.terraforged.gui.element.TerraSlider;
-import com.terraforged.gui.element.TerraTextInput;
-import com.terraforged.gui.element.TerraToggle;
 import com.terraforged.gui.OverlayRenderer;
 import com.terraforged.gui.OverlayScreen;
 import com.terraforged.gui.ScrollPane;
 import com.terraforged.gui.element.Element;
+import com.terraforged.gui.element.TerraLabel;
+import com.terraforged.gui.element.TerraSlider;
+import com.terraforged.gui.element.TerraTextInput;
+import com.terraforged.gui.element.TerraToggle;
 import com.terraforged.util.nbt.NBTHelper;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;

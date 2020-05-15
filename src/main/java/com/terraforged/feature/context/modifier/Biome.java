@@ -6,8 +6,8 @@ import net.minecraft.util.math.BlockPos;
 
 public class Biome extends RangeContextModifier {
 
-    public Biome(float chance, float min, float max) {
-        super(min, max);
+    public Biome(float from, float to, boolean exclusive) {
+        super(from, to, exclusive);
     }
 
     @Override
@@ -21,9 +21,6 @@ public class Biome extends RangeContextModifier {
     }
 
     public static ContextModifier deserialize(Dynamic<?> dynamic) {
-        float chance = dynamic.get("chance").asFloat(0F);
-        float min = dynamic.get("min").asFloat(0F);
-        float max = dynamic.get("max").asFloat(1F);
-        return new Biome(chance, min, max);
+        return RangeContextModifier.deserialize(dynamic, Biome::new);
     }
 }

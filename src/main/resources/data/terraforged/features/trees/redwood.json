@@ -11,47 +11,88 @@
     "name": "minecraft:decorated",
     "config": {
       "feature": {
-        "name": "minecraft:random_selector",
+        "name": "terraforged:context_selector",
         "config": {
           "features": [
             {
-              "name": "terraforged:template",
-              "config": {
-                "template": "terraforged:redwood_huge"
+              "feature": {
+                "name": "terraforged:template",
+                "config": {
+                  "template": "terraforged:redwood_huge"
+                }
               },
-              "chance": 0.025641026
+              "context": {
+                "chance": 0.4,
+                "elevation": {
+                  "from": 0.15,
+                  "to": 0.0
+                },
+                "biome": {
+                  "from": 0.1,
+                  "to": 0.4
+                }
+              }
             },
             {
-              "name": "terraforged:template",
-              "config": {
-                "template": "terraforged:pine"
+              "feature": {
+                "name": "terraforged:template",
+                "config": {
+                  "template": "terraforged:redwood_large"
+                }
               },
-              "chance": 0.15
+              "context": {
+                "chance": 0.2,
+                "elevation": {
+                  "from": 0.25,
+                  "to": 0.0
+                }
+              },
+              "biome": {
+                "from": 0.0,
+                "to": 0.25
+              }
             },
             {
-              "name": "terraforged:template",
-              "config": {
-                "template": "terraforged:redwood_large"
+              "feature": {
+                "name": "terraforged:template",
+                "config": {
+                  "template": "terraforged:spruce_large"
+                }
               },
-              "chance": 0.33333334
+              "context": {
+                "chance": 0.4,
+                "elevation": {
+                  "from": 0.35,
+                  "to": 0.15
+                }
+              }
+            },
+            {
+              "feature": {
+                "name": "terraforged:template",
+                "config": {
+                  "template": "terraforged:spruce_small"
+                }
+              },
+              "context": {
+                "chance": 0.2,
+                "elevation": {
+                  "from": 0.50,
+                  "to": 0.2
+                }
+              }
             }
-          ],
-          "default": {
-            "name": "terraforged:template",
-            "config": {
-              "template": "terraforged:redwood_large"
-            }
-          }
+          ]
         }
       },
       "decorator": {
         "name": "terraforged:poisson_surface",
         "config": {
-          "radius": 9,
-          "fade": 0.2,
-          "scale": 250,
-          "min": 0.15,
-          "max": 2.25
+          "radius": 8,
+          "biome_fade": 0.2,
+          "density_noise_scale": 250,
+          "density_noise_min": 0.15,
+          "density_noise_max": 2.25
         }
       }
     }

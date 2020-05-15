@@ -23,22 +23,34 @@
  * SOFTWARE.
  */
 
-package com.terraforged.chunk.test;
+package com.terraforged.chunk.column;
 
-import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.Terrains;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
+import com.terraforged.api.chunk.column.ColumnDecorator;
+import com.terraforged.api.chunk.column.DecoratorContext;
+import com.terraforged.api.chunk.surface.ChunkSurfaceBuffer;
+import com.terraforged.material.geology.GeoManager;
+import net.minecraft.world.chunk.IChunk;
 
-public class Test {
+public class GeologyDecorator implements ColumnDecorator {
 
-    public static boolean fixedBiome = true;
+    private final GeoManager geology;
 
-    public static Terrain getTerrainType(Terrains terrains) {
-        return terrains.steppe;
+    public GeologyDecorator(GeoManager geology) {
+        this.geology = geology;
     }
 
-    public static Biome getBiome() {
-        return Biomes.PLAINS;
+    @Override
+    public void decorate(IChunk chunk, DecoratorContext context, int x, int dy, int z) {
+
+    }
+
+    @Override
+    public void decorate(ChunkSurfaceBuffer buffer, DecoratorContext context, int x, int y, int z) {
+        int top = buffer.getSurfaceBottom();
+        geology.getGeology(context.biome).getStrata(x, z).downwards(x, top, z, context.depthBuffer, (py, state) -> {
+            context.pos.setPos(x, py, z);
+            buffer.getDelegate().setBlockState(context.pos, state, false);
+            return true;
+        });
     }
 }

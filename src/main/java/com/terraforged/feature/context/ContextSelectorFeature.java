@@ -1,6 +1,6 @@
 package com.terraforged.feature.context;
 
-import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.Resource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -20,12 +20,12 @@ public class ContextSelectorFeature extends Feature<ContextSelectorConfig> {
 
     @Override
     public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random random, BlockPos pos, ContextSelectorConfig config) {
-        try (ObjectPool.Item<ChanceContext> item = ChanceContext.pooled(world)) {
+        try (Resource<ChanceContext> item = ChanceContext.pooled(world)) {
             if (item == null) {
                 return false;
             }
 
-            ChanceContext context = item.getValue();
+            ChanceContext context = item.get();
             context.setPos(pos);
             context.init(config.features.size());
             for (int i = 0; i < config.features.size(); i++) {

@@ -25,8 +25,8 @@
 
 package com.terraforged.biome.modifier;
 
-import com.terraforged.core.cell.Cell;
 import com.terraforged.chunk.TerraContext;
+import com.terraforged.core.cell.Cell;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -53,7 +53,7 @@ public class SandBiomeModifier extends AbstractMaxHeightModifier {
 
     @Override
     public boolean test(Biome biome) {
-        return biome.getCategory() == Biome.Category.DESERT || biomes.contains(biome);
+        return biome.getCategory() == Biome.Category.DESERT && biomes.contains(biome);
     }
 
     @Override

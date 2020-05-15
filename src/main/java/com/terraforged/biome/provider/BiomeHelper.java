@@ -25,12 +25,12 @@
 
 package com.terraforged.biome.provider;
 
-import com.terraforged.world.biome.BiomeData;
-import com.terraforged.world.biome.BiomeType;
 import com.terraforged.biome.ModBiomes;
 import com.terraforged.biome.map.BiomeMap;
 import com.terraforged.biome.map.BiomeMapBuilder;
 import com.terraforged.biome.map.BiomePredicate;
+import com.terraforged.world.biome.BiomeData;
+import com.terraforged.world.biome.BiomeType;
 import me.dags.noise.util.Vec2f;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;

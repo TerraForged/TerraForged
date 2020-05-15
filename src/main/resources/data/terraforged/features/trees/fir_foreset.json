@@ -25,10 +25,10 @@
                 }
               },
               "context": {
-                "chance": 0.2,
+                "chance": 0.1,
                 "elevation": {
-                  "min": 0.75,
-                  "max": 0.25
+                  "from": 0.55,
+                  "to": 0.2
                 }
               }
             },
@@ -40,10 +40,14 @@
                 }
               },
               "context": {
-                "chance": 0.2,
+                "chance": 0.25,
                 "elevation": {
-                  "min": 0.5,
-                  "max": 0.0
+                  "from": 0.3,
+                  "to": 0.0
+                },
+                "biome": {
+                  "from": 0,
+                  "to": 0.2
                 }
               }
             }
@@ -53,11 +57,11 @@
       "decorator": {
         "name": "terraforged:poisson_surface",
         "config": {
-          "radius": 6,
-          "fade": 0.3,
-          "scale": 200,
-          "min": 0,
-          "max": 2.5
+          "radius": 7,
+          "biome_fade": 0.3,
+          "density_noise_scale": 300,
+          "density_noise_min": 0,
+          "density_noise_max": 2.5
         }
       }
     }

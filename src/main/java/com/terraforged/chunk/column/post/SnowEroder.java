@@ -23,12 +23,12 @@
  * SOFTWARE.
  */
 
-package com.terraforged.decorator.feature;
+package com.terraforged.chunk.column.post;
 
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.chunk.TerraContext;
-import com.terraforged.decorator.terrain.ErosionDecorator;
+import com.terraforged.chunk.column.ErosionDecorator;
 import me.dags.noise.source.Rand;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

@@ -27,11 +27,11 @@ package com.terraforged.biome.modifier;
 
 import com.terraforged.api.biome.modifier.BiomeModifier;
 import com.terraforged.api.biome.modifier.ModifierManager;
+import com.terraforged.biome.map.BiomeMap;
 import com.terraforged.biome.provider.DesertBiomes;
+import com.terraforged.chunk.TerraContext;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.biome.BiomeType;
-import com.terraforged.biome.map.BiomeMap;
-import com.terraforged.chunk.TerraContext;
 import net.minecraft.world.biome.Biome;
 
 import java.util.ArrayList;

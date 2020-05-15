@@ -1,9 +1,9 @@
 package com.terraforged.settings;
 
+import com.terraforged.TerraWorld;
 import com.terraforged.core.serialization.annotation.Comment;
 import com.terraforged.core.serialization.annotation.Range;
 import com.terraforged.core.serialization.annotation.Serializable;
-import com.terraforged.TerraWorld;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.world.WorldType;

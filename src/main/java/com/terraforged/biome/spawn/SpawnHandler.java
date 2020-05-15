@@ -1,8 +1,8 @@
 package com.terraforged.biome.spawn;
 
+import com.terraforged.Log;
 import com.terraforged.biome.provider.BiomeProvider;
 import com.terraforged.world.continent.MutableVeci;
-import com.terraforged.Log;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Feature;

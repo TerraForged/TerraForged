@@ -23,49 +23,54 @@
  * SOFTWARE.
  */
 
-package com.terraforged.decorator.terrain;
+package com.terraforged.chunk.column;
 
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.material.state.States;
 import com.terraforged.chunk.TerraContext;
-import net.minecraft.block.Block;
+import com.terraforged.core.util.VariablePredicate;
+import com.terraforged.world.terrain.Terrains;
 import net.minecraft.block.BlockState;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.concurrent.ThreadLocalRandom;
+public class CoastDecorator implements ColumnDecorator {
 
-public class BedrockDecorator implements ColumnDecorator {
+    private final Terrains terrains;
+    private final BlockState sand;
+    private final BlockState gravel;
+    private final VariablePredicate height;
 
-    private final int minDepth;
-    private final int variance;
-    private final BlockState material;
-
-    public BedrockDecorator(TerraContext context) {
-        minDepth = context.terraSettings.dimensions.bedrockLayer.minDepth;
-        variance = context.terraSettings.dimensions.bedrockLayer.variance;
-        material = getState(context.terraSettings.dimensions.bedrockLayer.material);
+    public CoastDecorator(TerraContext context) {
+        int min = context.levels.waterLevel - 5;
+        int max = context.levels.waterLevel + 16;
+        sand = States.SAND.get();
+        gravel = States.GRAVEL.get();
+        terrains = context.terrain;
+        height = VariablePredicate.height(
+                context.seed,
+                context.levels,
+                min,
+                max,
+                75,
+                1
+        );
     }
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        if (variance <= 0) {
-            fillDown(context, chunk, x, z, minDepth - 1, -1, material);
-        } else {
-            fillDown(context, chunk, x, z, minDepth + ThreadLocalRandom.current().nextInt(variance), -1, material);
+        if (context.cell.terrainType != terrains.beach) {
+            return;
         }
-    }
 
-    private static BlockState getState(String name) {
-        ResourceLocation location = ResourceLocation.tryCreate(name);
-        if (location != null && ForgeRegistries.BLOCKS.containsKey(location)) {
-            Block block = ForgeRegistries.BLOCKS.getValue(location);
-            if (block != null) {
-                return block.getDefaultState();
-            }
+        if (!height.test(context.cell, x, z)) {
+            return;
         }
-        return States.BEDROCK.get();
+
+        if (context.cell.temperature < 0.3F) {
+            setState(chunk, x, y, z, gravel, false);
+        } else {
+            setState(chunk, x, y, z, sand, false);
+        }
     }
 }

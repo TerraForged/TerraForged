@@ -1,9 +1,6 @@
 package com.terraforged.feature.decorator.poisson;
 
 import com.terraforged.core.util.poisson.Poisson;
-import com.terraforged.core.util.poisson.PoissonContext;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -30,7 +27,7 @@ public abstract class PoissonDecorator extends Placement<PoissonConfig> {
         int radius = Math.max(1, Math.min(30, config.radius));
         Poisson poisson = getInstance(radius);
         PoissonVisitor visitor = new PoissonVisitor(this, feature, world, generator, random, pos);
-        setVariance(world, visitor, config);
+        config.apply(world, visitor);
         int chunkX = pos.getX() >> 4;
         int chunkZ = pos.getZ() >> 4;
         poisson.visit(chunkX, chunkZ, visitor, visitor);
@@ -51,21 +48,5 @@ public abstract class PoissonDecorator extends Placement<PoissonConfig> {
             }
             return instance;
         }
-    }
-
-    private void setVariance(IWorld world, PoissonContext context, PoissonConfig config) {
-        Module module = Source.ONE;
-
-        if (config.biomeFade > 0.075F) {
-            module = BiomeVariance.of(world, config.biomeFade);
-        }
-
-        if (config.variance > 0) {
-            module = module.mult(Source.simplex(context.seed, config.variance, 1)
-                    .scale(config.max - config.min)
-                    .bias(config.min));
-        }
-
-        context.density = module;
     }
 }

@@ -26,6 +26,7 @@
 package com.terraforged.util;
 
 import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.Resource;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.fluid.FluidState;
@@ -74,7 +75,7 @@ public class DummyBlockReader implements IBlockReader {
         return fluid;
     }
 
-    public static ObjectPool.Item<DummyBlockReader> pooled() {
+    public static Resource<DummyBlockReader> pooled() {
         return pool.get();
     }
 }

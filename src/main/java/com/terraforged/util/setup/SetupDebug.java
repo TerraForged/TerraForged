@@ -25,8 +25,8 @@
 
 package com.terraforged.util.setup;
 
-import com.terraforged.api.event.SetupEvent;
 import com.terraforged.Log;
+import com.terraforged.api.event.SetupEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 

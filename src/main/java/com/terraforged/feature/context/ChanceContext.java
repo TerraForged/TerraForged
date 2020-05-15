@@ -3,8 +3,9 @@ package com.terraforged.feature.context;
 import com.terraforged.chunk.fix.RegionDelegate;
 import com.terraforged.chunk.util.TerraContainer;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.Resource;
+import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.world.heightmap.Levels;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
@@ -46,8 +47,11 @@ public class ChanceContext {
     }
 
     int nextIndex(Random random) {
+        if (total == 0) {
+            return -1;
+        }
         float value = 0F;
-        float chance = random.nextFloat() * total;
+        float chance = total * random.nextFloat();
         for (int i = 0; i < length; i++) {
             value += buffer[i];
             if (value >= chance) {
@@ -57,7 +61,7 @@ public class ChanceContext {
         return -1;
     }
 
-    public static ObjectPool.Item<ChanceContext> pooled(IWorld world) {
+    public static Resource<ChanceContext> pooled(IWorld world) {
         if (world instanceof RegionDelegate) {
             Levels levels = new Levels(world.getMaxHeight(), world.getSeaLevel());
             WorldGenRegion region = ((RegionDelegate) world).getRegion();
@@ -67,12 +71,12 @@ public class ChanceContext {
         return null;
     }
 
-    public static ObjectPool.Item<ChanceContext> pooled(IChunk chunk, Levels levels) {
+    public static Resource<ChanceContext> pooled(IChunk chunk, Levels levels) {
         BiomeContainer container = chunk.getBiomes();
         if (container instanceof TerraContainer) {
             ChunkReader reader = ((TerraContainer) container).getChunkReader();
-            ObjectPool.Item<ChanceContext> item = pool.get();
-            ChanceContext context = item.getValue();
+            Resource<ChanceContext> item = pool.get();
+            ChanceContext context = item.get();
             context.chunk = chunk;
             context.levels = levels;
             context.reader = reader;

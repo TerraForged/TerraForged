@@ -25,8 +25,8 @@
 
 package com.terraforged.api.biome.modifier;
 
-import com.terraforged.core.cell.Cell;
 import com.terraforged.core.Seed;
+import com.terraforged.core.cell.Cell;
 import com.terraforged.world.climate.Climate;
 import me.dags.noise.Module;
 import me.dags.noise.Source;

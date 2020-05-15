@@ -28,12 +28,12 @@ package com.terraforged.gui.preview;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.cache.CacheEntry;
+import com.terraforged.core.concurrent.pool.ThreadPools;
 import com.terraforged.core.region.Region;
 import com.terraforged.core.region.Size;
 import com.terraforged.core.region.gen.RegionGenerator;
 import com.terraforged.core.settings.Settings;
-import com.terraforged.core.concurrent.ThreadPool;
-import com.terraforged.core.concurrent.cache.CacheEntry;
 import com.terraforged.util.nbt.NBTHelper;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.MutableVeci;
@@ -203,7 +203,7 @@ public class Preview extends Button {
         context.factory.getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ, center);
 
         RegionGenerator renderer = RegionGenerator.builder()
-                .pool(ThreadPool.getPool())
+                .pool(ThreadPools.getPool())
                 .size(FACTOR, 0)
                 .factory(context.factory)
                 .batch(6)

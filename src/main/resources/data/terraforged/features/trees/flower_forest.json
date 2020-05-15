@@ -58,10 +58,10 @@
         "name": "terraforged:poisson_surface",
         "config": {
           "radius": 15,
-          "fade": 0.3,
-          "scale": 500,
-          "min": 0.75,
-          "max": 2
+          "biome_fade": 0.3,
+          "density_noise_scale": 500,
+          "density_noise_min": 0.75,
+          "density_noise_max": 2
         }
       }
     }

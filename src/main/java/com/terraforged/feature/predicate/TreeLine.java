@@ -25,9 +25,9 @@
 
 package com.terraforged.feature.predicate;
 
+import com.terraforged.chunk.TerraContext;
 import com.terraforged.fm.predicate.FeaturePredicate;
 import com.terraforged.world.climate.Climate;
-import com.terraforged.chunk.TerraContext;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;

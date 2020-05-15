@@ -25,8 +25,8 @@
 
 package com.terraforged.settings;
 
-import com.terraforged.core.settings.Settings;
 import com.terraforged.core.serialization.annotation.Serializable;
+import com.terraforged.core.settings.Settings;
 
 @Serializable
 public class TerraSettings extends Settings {

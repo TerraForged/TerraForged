@@ -27,11 +27,11 @@ package com.terraforged.material.geology;
 
 import com.terraforged.api.material.geology.GeologyManager;
 import com.terraforged.api.material.geology.StrataConfig;
+import com.terraforged.chunk.TerraContext;
 import com.terraforged.core.Seed;
+import com.terraforged.material.Materials;
 import com.terraforged.world.geology.Geology;
 import com.terraforged.world.geology.Strata;
-import com.terraforged.chunk.TerraContext;
-import com.terraforged.material.Materials;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import net.minecraft.block.BlockState;

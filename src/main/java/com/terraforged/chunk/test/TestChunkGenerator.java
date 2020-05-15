@@ -25,13 +25,13 @@
 
 package com.terraforged.chunk.test;
 
+import com.terraforged.biome.provider.BiomeProvider;
+import com.terraforged.chunk.TerraChunkGenerator;
+import com.terraforged.chunk.TerraContext;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.cell.Populator;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.heightmap.WorldHeightmap;
-import com.terraforged.biome.provider.BiomeProvider;
-import com.terraforged.chunk.TerraChunkGenerator;
-import com.terraforged.chunk.TerraContext;
 import net.minecraft.world.gen.GenerationSettings;
 
 public class TestChunkGenerator extends TerraChunkGenerator {

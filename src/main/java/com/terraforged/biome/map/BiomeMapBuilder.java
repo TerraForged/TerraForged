@@ -27,9 +27,9 @@ package com.terraforged.biome.map;
 
 import com.terraforged.biome.provider.BiomeHelper;
 import com.terraforged.core.util.grid.FixedGrid;
+import com.terraforged.util.ListUtils;
 import com.terraforged.world.biome.BiomeData;
 import com.terraforged.world.biome.BiomeType;
-import com.terraforged.util.ListUtils;
 import net.minecraft.world.biome.Biome;
 
 import java.util.ArrayList;

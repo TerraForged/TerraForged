@@ -23,27 +23,49 @@
  * SOFTWARE.
  */
 
-package com.terraforged.decorator;
+package com.terraforged.chunk.column;
 
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.material.state.States;
+import com.terraforged.chunk.TerraContext;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.IChunk;
+import net.minecraftforge.registries.ForgeRegistries;
 
-public class ChunkPopulator implements ColumnDecorator {
+import java.util.concurrent.ThreadLocalRandom;
 
-    public static final ChunkPopulator INSTANCE = new ChunkPopulator();
+public class BedrockDecorator implements ColumnDecorator {
+
+    private final int minDepth;
+    private final int variance;
+    private final BlockState material;
+
+    public BedrockDecorator(TerraContext context) {
+        minDepth = context.terraSettings.dimensions.bedrockLayer.minDepth;
+        variance = context.terraSettings.dimensions.bedrockLayer.variance;
+        material = getState(context.terraSettings.dimensions.bedrockLayer.material);
+    }
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        if (context.cell.terrainType == context.terrains.volcanoPipe && context.cell.riverMask > 0.25F) {
-            int lavaStart = Math.max(context.levels.waterY + 10, y - 30);
-            int lavaEnd = Math.max(5, context.levels.waterY - 10);
-            fillDown(context, chunk, x, z, lavaStart, lavaEnd, States.LAVA.get());
-            y = lavaEnd;
-        } else if (y < context.levels.waterLevel) {
-            fillDown(context, chunk, x, z, context.levels.waterY, y, States.WATER.get());
+        if (variance <= 0) {
+            fillDown(context, chunk, x, z, minDepth - 1, -1, material);
+        } else {
+            fillDown(context, chunk, x, z, minDepth + ThreadLocalRandom.current().nextInt(variance), -1, material);
         }
-        fillDown(context, chunk, x, z, y, 0, States.STONE.get());
+    }
+
+    private static BlockState getState(String name) {
+        ResourceLocation location = ResourceLocation.tryCreate(name);
+        if (location != null && ForgeRegistries.BLOCKS.containsKey(location)) {
+            Block block = ForgeRegistries.BLOCKS.getValue(location);
+            if (block != null) {
+                return block.getDefaultState();
+            }
+        }
+        return States.BEDROCK.get();
     }
 }

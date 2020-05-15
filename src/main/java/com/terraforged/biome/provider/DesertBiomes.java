@@ -27,7 +27,7 @@ package com.terraforged.biome.provider;
 
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.api.material.layer.LayerMaterial;
-import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.material.Materials;
 import com.terraforged.util.DummyBlockReader;
 import com.terraforged.util.ListUtils;
@@ -60,10 +60,10 @@ public class DesertBiomes {
     public DesertBiomes(Materials materials, List<Biome> deserts) {
         List<Biome> white = new LinkedList<>();
         List<Biome> red = new LinkedList<>();
-        try (ObjectPool.Item<DummyBlockReader> reader = DummyBlockReader.pooled()) {
+        try (Resource<DummyBlockReader> reader = DummyBlockReader.pooled()) {
             for (Biome biome : deserts) {
                 BlockState top = biome.getSurfaceBuilderConfig().getTop();
-                MaterialColor color = top.getMaterialColor(reader.getValue().set(top), BlockPos.ZERO);
+                MaterialColor color = top.getMaterialColor(reader.get().set(top), BlockPos.ZERO);
                 int whiteDist2 = distance2(color, MaterialColor.SAND);
                 int redDist2 = distance2(color, MaterialColor.ADOBE);
                 if (whiteDist2 < redDist2) {

@@ -27,14 +27,14 @@ package com.terraforged.gui;
 
 import com.terraforged.gui.element.TerraLabel;
 import com.terraforged.gui.page.ClimatePage;
-import com.terraforged.gui.page.Page;
-import com.terraforged.gui.page.StructurePage;
-import com.terraforged.gui.page.TerrainPage;
-import com.terraforged.gui.preview.PreviewPage;
 import com.terraforged.gui.page.MiscPage;
+import com.terraforged.gui.page.Page;
 import com.terraforged.gui.page.PresetsPage;
 import com.terraforged.gui.page.RiverPage;
+import com.terraforged.gui.page.StructurePage;
+import com.terraforged.gui.page.TerrainPage;
 import com.terraforged.gui.page.WorldPage;
+import com.terraforged.gui.preview.PreviewPage;
 import com.terraforged.settings.SettingsHelper;
 import com.terraforged.settings.TerraSettings;
 import com.terraforged.util.nbt.NBTHelper;

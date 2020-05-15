@@ -25,8 +25,8 @@
 
 package com.terraforged.gui;
 
-import com.terraforged.gui.preview.Preview;
 import com.terraforged.gui.element.Element;
+import com.terraforged.gui.preview.Preview;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;

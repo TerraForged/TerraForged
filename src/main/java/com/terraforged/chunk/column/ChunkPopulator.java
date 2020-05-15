@@ -23,34 +23,27 @@
  * SOFTWARE.
  */
 
-package com.terraforged.decorator.terrain;
+package com.terraforged.chunk.column;
 
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
-import com.terraforged.api.chunk.surface.ChunkSurfaceBuffer;
-import com.terraforged.material.geology.GeoManager;
+import com.terraforged.api.material.state.States;
 import net.minecraft.world.chunk.IChunk;
 
-public class GeologyDecorator implements ColumnDecorator {
+public class ChunkPopulator implements ColumnDecorator {
 
-    private final GeoManager geology;
-
-    public GeologyDecorator(GeoManager geology) {
-        this.geology = geology;
-    }
+    public static final ChunkPopulator INSTANCE = new ChunkPopulator();
 
     @Override
-    public void decorate(IChunk chunk, DecoratorContext context, int x, int dy, int z) {
-
-    }
-
-    @Override
-    public void decorate(ChunkSurfaceBuffer buffer, DecoratorContext context, int x, int y, int z) {
-        int top = buffer.getSurfaceBottom();
-        geology.getGeology(context.biome).getStrata(x, z).downwards(x, top, z, context.depthBuffer, (py, state) -> {
-            context.pos.setPos(x, py, z);
-            buffer.getDelegate().setBlockState(context.pos, state, false);
-            return true;
-        });
+    public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
+        if (context.cell.terrainType == context.terrains.volcanoPipe && context.cell.riverMask > 0.25F) {
+            int lavaStart = Math.max(context.levels.waterY + 10, y - 30);
+            int lavaEnd = Math.max(5, context.levels.waterY - 10);
+            fillDown(context, chunk, x, z, lavaStart, lavaEnd, States.LAVA.get());
+            y = lavaEnd;
+        } else if (y < context.levels.waterLevel) {
+            fillDown(context, chunk, x, z, context.levels.waterY, y, States.WATER.get());
+        }
+        fillDown(context, chunk, x, z, y, 0, States.STONE.get());
     }
 }

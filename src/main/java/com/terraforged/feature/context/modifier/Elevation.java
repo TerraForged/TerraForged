@@ -6,8 +6,8 @@ import net.minecraft.util.math.BlockPos;
 
 public class Elevation extends RangeContextModifier {
 
-    public Elevation(float min, float max) {
-        super(min, max);
+    public Elevation(float from, float to, boolean exclusive) {
+        super(from, to, exclusive);
     }
 
     @Override
@@ -21,8 +21,6 @@ public class Elevation extends RangeContextModifier {
     }
 
     public static ContextModifier deserialize(Dynamic<?> dynamic) {
-        float min = dynamic.get("min").asFloat(0F);
-        float max = dynamic.get("max").asFloat(1F);
-        return new Elevation(min, max);
+        return RangeContextModifier.deserialize(dynamic, Elevation::new);
     }
 }
