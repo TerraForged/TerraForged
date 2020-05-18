@@ -30,7 +30,7 @@ import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.material.state.States;
 import com.terraforged.chunk.TerraContext;
 import com.terraforged.material.Materials;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
@@ -61,7 +61,7 @@ public class ErosionDecorator implements ColumnDecorator {
     private final int seed2;
     private final int seed3;
     private final float minY;
-    private final Terrains terrain;
+    private final TerrainTypes terrain;
     private final Materials materials;
 
     public ErosionDecorator(TerraContext context) {

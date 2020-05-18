@@ -28,7 +28,9 @@ package com.terraforged.biome.provider;
 import com.google.common.collect.Sets;
 import com.terraforged.biome.map.BiomeMap;
 import com.terraforged.biome.modifier.BiomeModifierManager;
+import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.TerraContext;
+import com.terraforged.chunk.util.FastChunk;
 import com.terraforged.chunk.util.TerraContainer;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.chunk.ChunkReader;
@@ -37,6 +39,8 @@ import com.terraforged.world.heightmap.WorldLookup;
 import com.terraforged.world.terrain.decorator.Decorator;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.chunk.IChunk;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -182,5 +186,21 @@ public class BiomeProvider extends AbstractBiomeProvider {
 
     private static boolean overridesRiver(Biome biome) {
         return biome.getCategory() == Biome.Category.SWAMP || biome.getCategory() == Biome.Category.JUNGLE;
+    }
+
+    public static TerraContainer getBiomeContainer(TerraChunkGenerator generator, IChunk chunk) {
+        if (chunk.getBiomes() instanceof TerraContainer) {
+            return (TerraContainer) chunk.getBiomes();
+        }
+
+        ChunkReader view = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z);
+        TerraContainer container = generator.getBiomeProvider().createBiomeContainer(view);
+        if (chunk instanceof ChunkPrimer) {
+            ((ChunkPrimer) chunk).func_225548_a_(container);
+        } else if (chunk instanceof FastChunk) {
+            ((FastChunk) chunk).setBiomes(container);
+        }
+
+        return container;
     }
 }

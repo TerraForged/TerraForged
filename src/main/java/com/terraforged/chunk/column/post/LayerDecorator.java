@@ -47,29 +47,21 @@ public class LayerDecorator implements ColumnDecorator {
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
         context.pos.setPos(x, y + 1, z);
 
-        // if block is already a layer-type then simply set the layer property
         BlockState state = chunk.getBlockState(context.pos);
         if (state.isAir(chunk, context.pos)) {
-            return;
+            context.pos.setPos(x, y, z);
+            state = chunk.getBlockState(context.pos);
+            if (state.isAir(chunk, context.pos)) {
+                return;
+            }
         }
 
         LayerMaterial material = layerManager.getMaterial(state.getBlock());
-        if (material != null) {
-            setLayer(chunk, context.pos, material, context.cell, context.levels, 0F);
+        if (material == null) {
             return;
         }
 
-        // block is non-solid (grass/flower etc)
-        if (!state.getMaterial().blocksMovement()) {
-            // block below is solid
-            if (chunk.getBlockState(context.pos.setPos(x, y, z)).getMaterial().blocksMovement()) {
-                // block above is air
-                BlockState above = chunk.getBlockState(context.pos.setPos(x, y + 2, z));
-                if (above.isAir(chunk, context.pos)) {
-//                    setLayer(chunk, pos.setPos(x, y + 1, z), context.cell, context.levels, 0.25F);
-                }
-            }
-        }
+        setLayer(chunk, context.pos, material, context.cell, context.levels, 0F);
     }
 
     private void setLayer(IChunk chunk, BlockPos pos, LayerMaterial material, Cell cell, Levels levels, float min) {

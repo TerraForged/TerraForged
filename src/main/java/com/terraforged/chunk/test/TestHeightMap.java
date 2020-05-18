@@ -3,11 +3,11 @@ package com.terraforged.chunk.test;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.heightmap.WorldHeightmap;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 
 public class TestHeightMap extends WorldHeightmap {
 
-    private final Terrains terrains;
+    private final TerrainTypes terrains;
 
     public TestHeightMap(GeneratorContext context) {
         super(context);

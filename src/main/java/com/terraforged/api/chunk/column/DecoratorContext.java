@@ -27,29 +27,42 @@ package com.terraforged.api.chunk.column;
 
 import com.terraforged.api.chunk.ChunkContext;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.world.climate.Climate;
 import com.terraforged.world.geology.DepthBuffer;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunk;
 
-public class DecoratorContext extends ChunkContext {
+public class DecoratorContext extends ChunkContext implements AutoCloseable {
 
     public final Levels levels;
     public final Climate climate;
-    public final Terrains terrains;
-    public final DepthBuffer depthBuffer = new DepthBuffer();
+    public final TerrainTypes terrains;
+    public final Resource<DepthBuffer> depthBuffer;
     public final BlockPos.Mutable pos = new BlockPos.Mutable();
 
     public Biome biome;
     public Cell cell;
 
-    public DecoratorContext(IChunk chunk, Levels levels, Terrains terrain, Climate climate) {
+    public DecoratorContext(IChunk chunk, Levels levels, TerrainTypes terrain, Climate climate) {
+        this(chunk, levels, terrain, climate, true);
+    }
+
+    public DecoratorContext(IChunk chunk, Levels levels, TerrainTypes terrain, Climate climate, boolean depthBuffer) {
         super(chunk);
         this.levels = levels;
         this.climate = climate;
         this.terrains = terrain;
+        this.depthBuffer = depthBuffer ? DepthBuffer.get() : null;
+    }
+
+    @Override
+    public void close() {
+        if (depthBuffer != null) {
+            depthBuffer.close();
+        }
     }
 }

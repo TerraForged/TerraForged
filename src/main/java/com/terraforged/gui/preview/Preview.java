@@ -38,7 +38,7 @@ import com.terraforged.util.nbt.NBTHelper;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.MutableVeci;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 import me.dags.noise.util.NoiseUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
@@ -197,7 +197,7 @@ public class Preview extends Button {
         settings.world.seed = seed;
         this.settings = settings;
 
-        GeneratorContext context = GeneratorContext.createNoCache(Terrains.create(settings), settings);
+        GeneratorContext context = GeneratorContext.createNoCache(TerrainTypes.create(settings), settings);
 
         MutableVeci center = new MutableVeci();
         context.factory.getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ, center);

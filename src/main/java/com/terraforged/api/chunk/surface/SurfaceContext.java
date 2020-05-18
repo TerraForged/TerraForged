@@ -28,11 +28,11 @@ package com.terraforged.api.chunk.surface;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.world.climate.Climate;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 import net.minecraft.block.BlockState;
 import net.minecraft.world.gen.GenerationSettings;
 
-public class SurfaceContext extends DecoratorContext {
+public class SurfaceContext extends DecoratorContext implements AutoCloseable {
 
     public final long seed;
     public final BlockState solid;
@@ -42,7 +42,7 @@ public class SurfaceContext extends DecoratorContext {
 
     public double noise;
 
-    public SurfaceContext(ChunkSurfaceBuffer buffer, Levels levels, Terrains terrain, Climate climate, GenerationSettings settings, long seed) {
+    public SurfaceContext(ChunkSurfaceBuffer buffer, Levels levels, TerrainTypes terrain, Climate climate, GenerationSettings settings, long seed) {
         super(buffer, levels, terrain, climate);
         this.solid = settings.getDefaultBlock();
         this.fluid = settings.getDefaultFluid();

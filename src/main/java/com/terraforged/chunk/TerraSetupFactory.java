@@ -4,6 +4,7 @@ import com.terraforged.Log;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.surface.SurfaceManager;
 import com.terraforged.biome.ModBiomes;
+import com.terraforged.biome.surface.BriceSurface;
 import com.terraforged.biome.surface.IcebergsSurface;
 import com.terraforged.biome.surface.SwampSurface;
 import com.terraforged.chunk.column.BedrockDecorator;
@@ -104,6 +105,7 @@ public class TerraSetupFactory {
         manager.replace(Biomes.FROZEN_OCEAN.delegate.get(), new IcebergsSurface(context, 20, 15));
         manager.replace(Biomes.SWAMP.delegate.get(), new SwampSurface());
         manager.replace(ModBiomes.MARSHLAND, new SwampSurface());
+        manager.extend(ModBiomes.BRICE, new BriceSurface(context.seed));
         return SetupHooks.setup(manager, context);
     }
 

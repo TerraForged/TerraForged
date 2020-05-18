@@ -33,7 +33,7 @@ import com.terraforged.biome.provider.DesertBiomes;
 import com.terraforged.chunk.TerraContext;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.func.CellFunc;
@@ -48,7 +48,7 @@ public class DunesSurface implements Surface {
     private final int maxHeight;
     private final Levels levels;
     private final Module module;
-    private final Terrains terrains;
+    private final TerrainTypes terrains;
     private final DesertBiomes deserts;
     private final BlockPos.Mutable pos = new BlockPos.Mutable();
 

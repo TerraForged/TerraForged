@@ -30,13 +30,13 @@ import com.terraforged.biome.map.BiomeMap;
 import com.terraforged.chunk.TerraContext;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 import net.minecraft.world.biome.Biome;
 
 public class BeachModifier implements BiomeModifier {
 
     private final Levels levels;
-    private final Terrains terrain;
+    private final TerrainTypes terrain;
     private final BiomeMap biomeMap;
 
     public BeachModifier(BiomeMap biomeMap, TerraContext context) {

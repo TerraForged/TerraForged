@@ -33,6 +33,7 @@ import com.terraforged.biome.provider.BiomeProvider;
 import com.terraforged.chunk.generator.BiomeGenerator;
 import com.terraforged.chunk.generator.MobGenerator;
 import com.terraforged.chunk.generator.StructureGenerator;
+import com.terraforged.chunk.generator.SurfaceGenerator;
 import com.terraforged.chunk.generator.TerrainCarver;
 import com.terraforged.chunk.generator.TerrainGenerator;
 import com.terraforged.core.cell.Cell;
@@ -72,6 +73,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
     private final BiomeGenerator biomeGenerator;
     private final TerrainCarver terrainCarver;
     private final TerrainGenerator terrainGenerator;
+    private final SurfaceGenerator surfaceGenerator;
     private final StructureGenerator structureGenerator;
 
     private final GeoManager geologyManager;
@@ -92,6 +94,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
         this.biomeGenerator = new BiomeGenerator(this);
         this.terrainCarver = new TerrainCarver(this);
         this.terrainGenerator = new TerrainGenerator(this);
+        this.surfaceGenerator = new SurfaceGenerator(this);
         this.structureGenerator = new StructureGenerator(this);
 
         this.surfaceManager = TerraSetupFactory.createSurfaceManager(context);
@@ -135,7 +138,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
 
     @Override
     public final void func_225551_a_(WorldGenRegion world, IChunk chunk) {
-        terrainGenerator.generateSurface(world, chunk);
+        surfaceGenerator.generateSurface(world, chunk);
     }
 
     @Override

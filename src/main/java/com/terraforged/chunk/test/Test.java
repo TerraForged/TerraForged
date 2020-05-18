@@ -26,19 +26,19 @@
 package com.terraforged.chunk.test;
 
 import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 
 public class Test {
 
-    public static boolean fixedBiome = true;
+    public static boolean fixedBiome = false;
 
-    public static Terrain getTerrainType(Terrains terrains) {
-        return terrains.steppe;
+    public static Terrain getTerrainType(TerrainTypes terrains) {
+        return terrains.badlands;
     }
 
     public static Biome getBiome() {
-        return Biomes.PLAINS;
+        return Biomes.BADLANDS;
     }
 }

@@ -37,7 +37,7 @@ import com.terraforged.settings.SettingsHelper;
 import com.terraforged.settings.TerraSettings;
 import com.terraforged.util.Environment;
 import com.terraforged.util.nbt.NBTHelper;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
 import net.minecraft.world.IWorld;
@@ -76,7 +76,7 @@ public class TerraWorld extends WorldType {
             settings.world.seed = world.getSeed();
             settings.dimensions.dimensions.apply(world.getWorldInfo());
 
-            Terrains terrains = Terrains.create(settings);
+            TerrainTypes terrains = TerrainTypes.create(settings);
 
             OverworldGenSettings genSettings = new TerraGenSettings(settings.structures);
             OverworldBiomeProviderSettings biomeSettings = new OverworldBiomeProviderSettings(world.getWorldInfo());
@@ -128,15 +128,6 @@ public class TerraWorld extends WorldType {
             Log.info("Registered developer world type");
             new TerraWorld("terratest", TestChunkGenerator::new);
         }
-    }
-
-    public static WorldType getFirst() {
-        for (WorldType worldType : WorldType.WORLD_TYPES) {
-            if (worldType instanceof TerraWorld) {
-                return worldType;
-            }
-        }
-        throw new RuntimeException();
     }
 
     public static void forEach(Consumer<WorldType> consumer) {
