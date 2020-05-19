@@ -27,6 +27,13 @@ package com.terraforged.util.setup;
 
 import com.terraforged.Log;
 import com.terraforged.api.event.SetupEvent;
+import com.terraforged.core.Seed;
+import com.terraforged.world.geology.Strata;
+import me.dags.noise.Source;
+import me.dags.noise.source.Builder;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -50,7 +57,24 @@ public class SetupDebug {
 
     @SubscribeEvent
     public static void geology(SetupEvent.Geology event) {
-        log(event);
+        Seed seed = event.getContext().seed;
+
+        // Noise parameters used to vary the depth of the strata bands
+        Builder noise = Source.build(seed.next(), 150, 1);
+
+        // Set each layer material & its relative depth (top to bottom)
+        Strata<BlockState> strata = Strata.<BlockState>builder(seed.next(), noise)
+                .add(Blocks.STONE.getDefaultState(), 0.5)
+                .add(Blocks.GRANITE.getDefaultState(), 0.3)
+                .add(Blocks.DIORITE.getDefaultState(), 0.2)
+                // Note - you can specify the noise type to be used for a layer using the Source enum (default is Perlin)
+                .add(Source.RIDGE, Blocks.STONE.getDefaultState(), 0.1)
+                .build();
+
+        // Register to a specific biome. This creates a new geology system specific to that biome. The boolean
+        // flag 'inheritGlobal' determines whether global strata layers should be copied to this new geology system.
+        // If set false then only the strata specifically registered to it will be used.
+        event.getManager().register(Biomes.OCEAN, strata, true);
     }
 
     @SubscribeEvent
