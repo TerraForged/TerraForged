@@ -25,6 +25,7 @@
 
 package com.terraforged.feature;
 
+import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
@@ -37,14 +38,21 @@ import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
-import net.minecraft.world.gen.feature.structure.AbstractVillagePiece;
-import net.minecraft.world.gen.feature.structure.Structure;
-import net.minecraft.world.gen.feature.structure.StructurePiece;
-import net.minecraft.world.gen.feature.structure.StructureStart;
+import net.minecraft.world.gen.feature.structure.*;
+
+import java.util.List;
+import java.util.Set;
 
 public class TerrainHelper {
+
+    private static final Set<IStructurePieceType> SURFACE_STRUCTURES = ImmutableSet.of(
+            IStructurePieceType.PCP, // outpost
+            IStructurePieceType.NVI, // village
+            IStructurePieceType.TEJP, // jungle temple
+            IStructurePieceType.IGLU, // igloo
+            IStructurePieceType.TEDP // desert pyramid
+    );
 
     private final float radius;
 
@@ -53,15 +61,15 @@ public class TerrainHelper {
     }
 
     public void flatten(IWorld world, IChunk chunk) {
-        ObjectList<AbstractVillagePiece> pieces = new ObjectArrayList<>(10);
+        ObjectList<StructurePiece> pieces = new ObjectArrayList<>(10);
         collectPieces(world, chunk, pieces);
         buildBases(chunk, pieces);
     }
 
     // see NoiseChunkGenerator
-    private void collectPieces(IWorld world, IChunk chunk, ObjectList<AbstractVillagePiece> pieces) {
+    private void collectPieces(IWorld world, IChunk chunk, ObjectList<StructurePiece> pieces) {
         ChunkPos pos = chunk.getPos();
-        for (Structure<?> structure : Feature.ILLAGER_STRUCTURES) {
+        for (Structure<?> structure : Structure.ILLAGER_STRUCTURES) {
             String name = structure.getStructureName();
             LongIterator structureIds = chunk.getStructureReferences(name).iterator();
 
@@ -72,12 +80,9 @@ public class TerrainHelper {
                 StructureStart structurestart = neighbourChunk.getStructureStart(name);
                 if (structurestart != null && structurestart.isValid()) {
                     for (StructurePiece structurepiece : structurestart.getComponents()) {
-                        if (structurepiece.func_214810_a(pos, 12) && structurepiece instanceof AbstractVillagePiece) {
-                            AbstractVillagePiece piece = (AbstractVillagePiece) structurepiece;
-                            JigsawPattern.PlacementBehaviour placement = piece.getJigsawPiece().getPlacementBehaviour();
-                            if (placement == JigsawPattern.PlacementBehaviour.RIGID) {
-                                pieces.add(piece);
-                            }
+                        // collect if piece is within radius of the chunk
+                        if (structurepiece.func_214810_a(pos, 12)) {
+                            collectPiece(structurepiece, pieces);
                         }
                     }
                 }
@@ -86,11 +91,11 @@ public class TerrainHelper {
     }
 
     // lowers or raises the terrain matcher the base height of each structure piece
-    private void buildBases(IChunk chunk, ObjectList<AbstractVillagePiece> pieces) {
+    private void buildBases(IChunk chunk, ObjectList<StructurePiece> pieces) {
         int chunkStartX = chunk.getPos().getXStart();
         int chunkStartZ = chunk.getPos().getZStart();
         BlockPos.Mutable pos = new BlockPos.Mutable();
-        ObjectListIterator<AbstractVillagePiece> iterator = pieces.iterator();
+        ObjectListIterator<StructurePiece> iterator = pieces.iterator();
         MutableBoundingBox chunkBounds = new MutableBoundingBox(chunkStartX, chunkStartZ, chunkStartX + 15, chunkStartZ + 15);
 
         for (int dz = 0; dz < 16; dz++) {
@@ -100,9 +105,10 @@ public class TerrainHelper {
                 int surface = chunk.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, dx, dz);
                 float y = surface;
 
-                AbstractVillagePiece highest = null;
+                int highestOffset = 0;
+                StructurePiece highest = null;
                 while (iterator.hasNext()) {
-                    AbstractVillagePiece piece = iterator.next();
+                    StructurePiece piece = iterator.next();
                     MutableBoundingBox pieceBounds = piece.getBoundingBox();
                     int length = Math.min(pieceBounds.maxX - pieceBounds.minX, pieceBounds.maxZ - pieceBounds.minZ);
                     int borderRadius = Math.min(5, Math.max(10, NoiseUtil.round(length * radius)));
@@ -111,7 +117,8 @@ public class TerrainHelper {
                         continue;
                     }
 
-                    int level = pieceBounds.minY + piece.getGroundLevelDelta();
+                    int offset = getGroundLevelDelta(piece);
+                    int level = pieceBounds.minY + offset;
                     if (level > y) {
                         y = raise(pieceBounds, pos.setPos(x, surface, z), level, y, borderRadius);
                     }
@@ -119,6 +126,7 @@ public class TerrainHelper {
                     if (x > pieceBounds.minX && x < pieceBounds.maxX && z > pieceBounds.minZ && z < pieceBounds.maxZ) {
                         if (highest == null || pieceBounds.minY > highest.getBoundingBox().minY) {
                             highest = piece;
+                            highestOffset = offset;
                         }
                     }
                 }
@@ -136,7 +144,7 @@ public class TerrainHelper {
 
                 if (highest != null) {
                     MutableBoundingBox bounds = highest.getBoundingBox();
-                    for (int dy = bounds.minY + highest.getGroundLevelDelta(); dy <= surface; dy++) {
+                    for (int dy = bounds.minY + highestOffset; dy <= surface; dy++) {
                         pos.setPos(dx, dy, dz);
                         chunk.setBlockState(pos, Blocks.AIR.getDefaultState(), false);
                     }
@@ -150,6 +158,25 @@ public class TerrainHelper {
         float alpha = 1 - getDistAlpha(pos.getX(), pos.getZ(), bounds, radius2);
         alpha = (float) Math.pow(alpha, 2F - alpha);
         return NoiseUtil.lerp(surface, level, alpha);
+    }
+
+    private static void collectPiece(StructurePiece structurepiece, List<StructurePiece> list) {
+        if (structurepiece instanceof AbstractVillagePiece) {
+            AbstractVillagePiece piece = (AbstractVillagePiece) structurepiece;
+            JigsawPattern.PlacementBehaviour placement = piece.getJigsawPiece().getPlacementBehaviour();
+            if (placement == JigsawPattern.PlacementBehaviour.RIGID) {
+                list.add(piece);
+            }
+        } else if (SURFACE_STRUCTURES.contains(structurepiece.getStructurePieceType())) {
+            list.add(structurepiece);
+        }
+    }
+
+    private static int getGroundLevelDelta(StructurePiece piece) {
+        if (piece instanceof AbstractVillagePiece) {
+            return ((AbstractVillagePiece) piece).getGroundLevelDelta();
+        }
+        return 0;
     }
 
     private static MutableBoundingBox expand(MutableBoundingBox box, int radius) {

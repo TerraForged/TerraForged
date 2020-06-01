@@ -46,7 +46,7 @@ import com.terraforged.data.DataGen;
 import com.terraforged.settings.SettingsHelper;
 import com.terraforged.world.WorldGenerator;
 import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.ArgumentSerializer;
@@ -129,7 +129,7 @@ public class TerraCommand {
         Cell cell = biomeProvider.lookupPos(pos.getX(), pos.getZ());
         Biome biome = biomeProvider.getBiome(cell, pos.getX(), pos.getZ());
         context.getSource().sendFeedback(
-                new StringTextComponent("Terrain=" + cell.terrainType.getName() + ", Biome=" + biome.getRegistryName()),
+                new StringTextComponent("Terrain=" + cell.terrain.getName() + ", Biome=" + biome.getRegistryName()),
                 false
         );
 
@@ -277,7 +277,7 @@ public class TerraCommand {
 
     // the terrain parsed from the command will not be the same instance as used in the
     // world generator, so find the matching instance by name
-    private static Terrain getTerrainInstance(Terrain find, TerrainTypes terrains) {
+    private static Terrain getTerrainInstance(Terrain find, Terrains terrains) {
         for (Terrain t : terrains.index) {
             if (t.getName().equals(find.getName())) {
                 return t;

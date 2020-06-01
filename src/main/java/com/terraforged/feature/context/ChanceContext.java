@@ -3,7 +3,7 @@ package com.terraforged.feature.context;
 import com.terraforged.chunk.fix.RegionDelegate;
 import com.terraforged.chunk.util.TerraContainer;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.pool.ObjectPool;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.world.heightmap.Levels;

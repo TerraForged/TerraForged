@@ -4,6 +4,7 @@ import com.terraforged.api.chunk.ChunkDelegate;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.palette.PalettedContainer;
 import net.minecraft.world.biome.BiomeContainer;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.ChunkSection;
@@ -61,6 +62,31 @@ public class FastChunk implements ChunkDelegate {
             return replaced;
         }
         return Blocks.VOID_AIR.getDefaultState();
+    }
+
+    public void fill(BlockState state) {
+        int surfaceMinY = 255;
+        for (int dz = 0; dz < 16; dz++) {
+            for (int dx = 0; dx < 16; dx++) {
+                int y = primer.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, dx, dz);
+                surfaceMinY = Math.min(surfaceMinY, y);
+            }
+        }
+
+        int topSection = (surfaceMinY >> 4);
+        for (int sectionIndex = 0; sectionIndex < topSection; sectionIndex++) {
+            ChunkSection section = primer.getSection(sectionIndex);
+            section.lock();
+            PalettedContainer<BlockState> container = section.getData();
+            for (int dy = 0; dy < 16; dy++) {
+                for (int dz = 0; dz < 16; dz++) {
+                    for (int dx = 0; dx < 16; dx++) {
+                        container.swap(dx, dy, dz, state);
+                    }
+                }
+            }
+            section.unlock();
+        }
     }
 
     public void setBiomes(BiomeContainer biomes) {

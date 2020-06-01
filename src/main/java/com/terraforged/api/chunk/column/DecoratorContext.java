@@ -31,7 +31,7 @@ import com.terraforged.core.concurrent.Resource;
 import com.terraforged.world.climate.Climate;
 import com.terraforged.world.geology.DepthBuffer;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunk;
@@ -40,18 +40,18 @@ public class DecoratorContext extends ChunkContext implements AutoCloseable {
 
     public final Levels levels;
     public final Climate climate;
-    public final TerrainTypes terrains;
+    public final Terrains terrains;
     public final Resource<DepthBuffer> depthBuffer;
     public final BlockPos.Mutable pos = new BlockPos.Mutable();
 
     public Biome biome;
     public Cell cell;
 
-    public DecoratorContext(IChunk chunk, Levels levels, TerrainTypes terrain, Climate climate) {
+    public DecoratorContext(IChunk chunk, Levels levels, Terrains terrain, Climate climate) {
         this(chunk, levels, terrain, climate, true);
     }
 
-    public DecoratorContext(IChunk chunk, Levels levels, TerrainTypes terrain, Climate climate, boolean depthBuffer) {
+    public DecoratorContext(IChunk chunk, Levels levels, Terrains terrain, Climate climate, boolean depthBuffer) {
         super(chunk);
         this.levels = levels;
         this.climate = climate;

@@ -32,6 +32,8 @@ import com.terraforged.biome.provider.DesertBiomes;
 import com.terraforged.chunk.TerraContext;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.biome.BiomeType;
+import com.terraforged.world.terrain.ITerrain;
+import com.terraforged.world.terrain.TerrainType;
 import net.minecraft.world.biome.Biome;
 
 import java.util.ArrayList;
@@ -53,14 +55,18 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
         this.biomeModifiers = modifiers;
     }
 
-    @Override
-    public void register(BiomeModifier modifier) {
-        biomeModifiers.add(modifier);
-        Collections.sort(biomeModifiers);
+    public boolean hasModifiers(ITerrain type) {
+        return type.isOverground();
     }
 
     public DesertBiomes getDesertBiomes() {
         return desertBiomes;
+    }
+
+    @Override
+    public void register(BiomeModifier modifier) {
+        biomeModifiers.add(modifier);
+        Collections.sort(biomeModifiers);
     }
 
     @Override

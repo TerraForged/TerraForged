@@ -26,15 +26,13 @@
 package com.terraforged.gui;
 
 import com.terraforged.gui.element.TerraLabel;
-import com.terraforged.gui.page.ClimatePage;
-import com.terraforged.gui.page.MiscPage;
 import com.terraforged.gui.page.Page;
 import com.terraforged.gui.page.PresetsPage;
-import com.terraforged.gui.page.RiverPage;
-import com.terraforged.gui.page.StructurePage;
-import com.terraforged.gui.page.TerrainPage;
+import com.terraforged.gui.page.SimplePage;
+import com.terraforged.gui.page.SimplePreviewPage;
 import com.terraforged.gui.page.WorldPage;
 import com.terraforged.gui.preview.PreviewPage;
+import com.terraforged.gui.preview.again.PreviewPage2;
 import com.terraforged.settings.SettingsHelper;
 import com.terraforged.settings.TerraSettings;
 import com.terraforged.util.nbt.NBTHelper;
@@ -51,7 +49,7 @@ public class SettingsScreen extends OverlayScreen {
     private static final Button.IPressable NO_ACTION = b -> {};
 
     private final Page[] pages;
-    private final PreviewPage preview;
+    private final PreviewPage2 preview;
     private final CreateWorldScreen parent;
     private final TerraSettings settings = new TerraSettings();
 
@@ -60,15 +58,16 @@ public class SettingsScreen extends OverlayScreen {
     public SettingsScreen(CreateWorldScreen parent) {
         SettingsHelper.applyDefaults(parent.chunkProviderSettingsJson, settings);
         this.parent = parent;
-        this.preview = new PreviewPage(settings, getSeed(parent));
+        this.preview = new PreviewPage2(settings, getSeed(parent));
         this.pages = new Page[]{
                 new PresetsPage(),
                 new WorldPage(settings, preview),
-                new ClimatePage(settings, preview),
-                new TerrainPage(settings, preview),
-                new RiverPage(settings, preview),
-                new StructurePage(settings),
-                new MiscPage(settings)
+                new SimplePreviewPage("Climate Settings", "climate", preview, settings, s -> s.climate),
+                new SimplePreviewPage("Terrain Settings", "terrain", preview, settings, s -> s.terrain),
+                new SimplePreviewPage("River Settings", "rivers", preview, settings, s -> s.rivers),
+                new SimplePreviewPage("Filter Settings", "filters", preview, settings, s -> s.filters),
+                new SimplePage("Structure Settings", "structures", settings, s -> s.structures),
+                new SimplePage("Feature Settings", "features", settings, s -> s.features)
         };
     }
 

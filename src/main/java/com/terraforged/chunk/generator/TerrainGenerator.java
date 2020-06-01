@@ -13,7 +13,7 @@ import com.terraforged.feature.TerrainHelper;
 import com.terraforged.util.Environment;
 import com.terraforged.world.climate.Climate;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
@@ -28,7 +28,7 @@ public class TerrainGenerator {
 
     private final Levels levels;
     private final Climate climate;
-    private final TerrainTypes terrain;
+    private final Terrains terrain;
     private final TerraChunkGenerator generator;
     private final TerrainHelper terrainHelper;
 

@@ -25,22 +25,23 @@
 
 package com.terraforged.gui.preview;
 
-import com.terraforged.core.settings.Settings;
 import com.terraforged.gui.OverlayScreen;
 import com.terraforged.gui.element.TerraButton;
 import com.terraforged.gui.page.BasePage;
+import com.terraforged.gui.page.UpdatablePage;
+import com.terraforged.settings.TerraSettings;
 import com.terraforged.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
 
 import java.util.function.Consumer;
 
-public class PreviewPage extends BasePage {
+public class PreviewPage extends UpdatablePage {
 
     private final Preview preview;
-    private final Settings settings;
+    private final TerraSettings settings;
     private final CompoundNBT previewerSettings = NBTHelper.serialize("preview", new PreviewSettings());
 
-    public PreviewPage(Settings settings, int seed) {
+    public PreviewPage(TerraSettings settings, int seed) {
         this.preview = new Preview(seed);
         this.settings = settings;
     }
@@ -49,7 +50,8 @@ public class PreviewPage extends BasePage {
         return preview.getSeed();
     }
 
-    public void apply(Consumer<Settings> consumer) {
+    @Override
+    public void apply(Consumer<TerraSettings> consumer) {
         consumer.accept(settings);
         preview.update(settings, previewerSettings);
     }
@@ -57,11 +59,6 @@ public class PreviewPage extends BasePage {
     @Override
     public void close() {
         preview.close();
-    }
-
-    @Override
-    public void save() {
-
     }
 
     @Override
@@ -92,6 +89,7 @@ public class PreviewPage extends BasePage {
         update();
     }
 
+    @Override
     public void update() {
         preview.update(settings, previewerSettings);
     }

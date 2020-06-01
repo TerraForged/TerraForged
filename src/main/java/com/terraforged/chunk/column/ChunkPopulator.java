@@ -36,7 +36,7 @@ public class ChunkPopulator implements ColumnDecorator {
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        if (context.cell.terrainType == context.terrains.volcanoPipe && context.cell.riverMask > 0.25F) {
+        if (context.cell.terrain == context.terrains.volcanoPipe && context.cell.riverMask > 0.25F) {
             int lavaStart = Math.max(context.levels.waterY + 10, y - 30);
             int lavaEnd = Math.max(5, context.levels.waterY - 10);
             fillDown(context, chunk, x, z, lavaStart, lavaEnd, States.LAVA.get());

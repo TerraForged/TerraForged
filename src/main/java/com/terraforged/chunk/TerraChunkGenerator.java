@@ -25,17 +25,11 @@
 
 package com.terraforged.chunk;
 
-import com.terraforged.Log;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.surface.SurfaceManager;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.biome.provider.BiomeProvider;
-import com.terraforged.chunk.generator.BiomeGenerator;
-import com.terraforged.chunk.generator.MobGenerator;
-import com.terraforged.chunk.generator.StructureGenerator;
-import com.terraforged.chunk.generator.SurfaceGenerator;
-import com.terraforged.chunk.generator.TerrainCarver;
-import com.terraforged.chunk.generator.TerrainGenerator;
+import com.terraforged.chunk.generator.*;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.Size;
 import com.terraforged.core.region.chunk.ChunkReader;
@@ -46,7 +40,6 @@ import com.terraforged.fm.data.DataManager;
 import com.terraforged.fm.structure.StructureManager;
 import com.terraforged.material.Materials;
 import com.terraforged.material.geology.GeoManager;
-import com.terraforged.util.Environment;
 import com.terraforged.util.setup.SetupHooks;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.math.BlockPos;
@@ -54,11 +47,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.gen.*;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 import net.minecraft.world.server.ServerWorld;
 
@@ -113,7 +102,6 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
 
         SetupHooks.setup(getLayerManager(), context.copy());
         SetupHooks.setup(baseDecorators, postProcessors, context.copy());
-        Log.info("Vanilla Biomes: {}", Environment.isVanillaBiomes());
     }
 
     @Override

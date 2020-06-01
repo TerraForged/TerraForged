@@ -52,6 +52,7 @@ import java.util.Set;
 public class BiomeProvider extends AbstractBiomeProvider {
 
     private final BiomeMap biomeMap;
+    private final BiomeAccess biomeAccess;
     private final TerraContext context;
     private final WorldLookup worldLookup;
     private final BiomeModifierManager modifierManager;
@@ -60,6 +61,7 @@ public class BiomeProvider extends AbstractBiomeProvider {
     public BiomeProvider(TerraContext context) {
         this.context = context;
         this.biomeMap = BiomeHelper.getDefaultBiomeMap();
+        this.biomeAccess = new BiomeAccess(context.levels);
         this.worldLookup = new WorldLookup(context.factory, context);
         this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomeMap), context.copy());
     }
@@ -153,39 +155,16 @@ public class BiomeProvider extends AbstractBiomeProvider {
     }
 
     public Biome getBiome(Cell cell, int x, int z) {
-        if (cell.terrainType.isWetland()) {
-            return biomeMap.getWetland(cell.temperature, cell.moisture, cell.biome);
+        BiomeAccessor accessor = biomeAccess.getAccessor(cell);
+        Biome biome = accessor.getBiome(biomeMap, cell);
+        if (modifierManager.hasModifiers(cell.terrain)) {
+            return modifierManager.modify(biome, cell, x, z);
         }
-
-        if (cell.value > context.levels.water) {
-            return getModifierManager().modify(biomeMap.getBiome(cell), cell, x, z);
-        }
-
-        if (cell.terrainType.isLake()) {
-            return biomeMap.getLake(cell.temperature, cell.moisture, cell.biome);
-        }
-
-        if (cell.terrainType.isRiver()) {
-            Biome biome = biomeMap.getBiome(cell);
-            if (overridesRiver(biome)) {
-                return biome;
-            }
-            return biomeMap.getRiver(cell.temperature, cell.moisture, cell.biome);
-        }
-
-        if (cell.terrainType.isShallowOcean()) {
-            return biomeMap.getOcean(cell.temperature, cell.moisture, cell.biome);
-        }
-
-        return biomeMap.getDeepOcean(cell.temperature, cell.moisture, cell.biome);
+        return biome;
     }
 
     public boolean canSpawnAt(Cell cell) {
-        return cell.terrainType != context.terrain.ocean && cell.terrainType != context.terrain.deepOcean;
-    }
-
-    private static boolean overridesRiver(Biome biome) {
-        return biome.getCategory() == Biome.Category.SWAMP || biome.getCategory() == Biome.Category.JUNGLE;
+        return cell.terrain != context.terrain.ocean && cell.terrain != context.terrain.deepOcean;
     }
 
     public static TerraContainer getBiomeContainer(TerraChunkGenerator generator, IChunk chunk) {

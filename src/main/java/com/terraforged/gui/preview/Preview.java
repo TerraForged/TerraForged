@@ -29,7 +29,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.cache.CacheEntry;
-import com.terraforged.core.concurrent.pool.ThreadPools;
+import com.terraforged.core.concurrent.thread.ThreadPools;
 import com.terraforged.core.region.Region;
 import com.terraforged.core.region.Size;
 import com.terraforged.core.region.gen.RegionGenerator;
@@ -38,7 +38,7 @@ import com.terraforged.util.nbt.NBTHelper;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.MutableVeci;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import me.dags.noise.util.NoiseUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
@@ -197,7 +197,7 @@ public class Preview extends Button {
         settings.world.seed = seed;
         this.settings = settings;
 
-        GeneratorContext context = GeneratorContext.createNoCache(TerrainTypes.create(settings), settings);
+        GeneratorContext context = GeneratorContext.createNoCache(Terrains.create(settings), settings);
 
         MutableVeci center = new MutableVeci();
         context.factory.getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ, center);
@@ -276,7 +276,7 @@ public class Preview extends Button {
     }
 
     private static String getTerrainName(Cell cell) {
-        String terrain = cell.terrainType.getName().toLowerCase();
+        String terrain = cell.terrain.getName().toLowerCase();
         if (terrain.contains("river")) {
             return "river";
         }
@@ -284,7 +284,7 @@ public class Preview extends Button {
     }
 
     private static String getBiomeName(Cell cell) {
-        String terrain = cell.terrainType.getName().toLowerCase();
+        String terrain = cell.terrain.getName().toLowerCase();
         if (terrain.contains("ocean")) {
             if (cell.temperature < 0.3) {
                 return "cold_ocean";

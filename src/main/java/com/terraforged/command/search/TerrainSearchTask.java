@@ -25,6 +25,6 @@ public class TerrainSearchTask extends Search {
     @Override
     public boolean test(BlockPos pos) {
         generator.getHeightmap().apply(cell, pos.getX(), pos.getZ());
-        return cell.terrainType == type;
+        return cell.terrain == type;
     }
 }

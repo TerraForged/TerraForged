@@ -30,13 +30,13 @@ import com.terraforged.biome.map.BiomeMap;
 import com.terraforged.chunk.TerraContext;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import net.minecraft.world.biome.Biome;
 
 public class BeachModifier implements BiomeModifier {
 
     private final Levels levels;
-    private final TerrainTypes terrain;
+    private final Terrains terrain;
     private final BiomeMap biomeMap;
 
     public BeachModifier(BiomeMap biomeMap, TerraContext context) {
@@ -57,10 +57,10 @@ public class BeachModifier implements BiomeModifier {
 
     @Override
     public Biome modify(Biome in, Cell cell, int x, int z) {
-        if (cell.terrainType == terrain.beach) {
+        if (cell.terrain == terrain.beach) {
             return biomeMap.getBeach(cell.temperature, cell.moisture, cell.biome);
         }
-        if (cell.terrainType == terrain.coast && cell.value <= levels.water) {
+        if (cell.terrain == terrain.coast && cell.value <= levels.water) {
             return biomeMap.getOcean(cell.temperature, cell.moisture, cell.biome);
         }
         return in;

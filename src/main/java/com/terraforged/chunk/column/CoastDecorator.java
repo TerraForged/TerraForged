@@ -30,13 +30,13 @@ import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.material.state.States;
 import com.terraforged.chunk.TerraContext;
 import com.terraforged.core.util.VariablePredicate;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import net.minecraft.block.BlockState;
 import net.minecraft.world.chunk.IChunk;
 
 public class CoastDecorator implements ColumnDecorator {
 
-    private final TerrainTypes terrains;
+    private final Terrains terrains;
     private final BlockState sand;
     private final BlockState gravel;
     private final VariablePredicate height;
@@ -59,7 +59,7 @@ public class CoastDecorator implements ColumnDecorator {
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        if (context.cell.terrainType != terrains.beach) {
+        if (context.cell.terrain != terrains.beach) {
             return;
         }
 

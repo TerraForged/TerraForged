@@ -14,31 +14,43 @@
     "name": "minecraft:decorated",
     "config": {
       "feature": {
-        "name": "minecraft:random_selector",
+        "name": "minecraft:decorated",
         "config": {
-          "features": [
-            {
-              "name": "terraforged:template",
-              "config": {
-                "template": "terraforged:pine"
-              },
-              "chance": 0.3
-            }
-          ],
-          "default": {
-            "name": "terraforged:template",
+          "feature": {
+            "name": "minecraft:random_selector",
             "config": {
-              "template": "terraforged:pine"
+              "features": [
+                {
+                  "name": "terraforged:template",
+                  "config": {
+                    "template": "terraforged:pine"
+                  },
+                  "chance": 0.3
+                }
+              ],
+              "default": {
+                "name": "terraforged:template",
+                "config": {
+                  "template": "terraforged:pine"
+                }
+              }
+            }
+          },
+          "decorator": {
+            "name": "terraforged:poisson_surface",
+            "config": {
+              "radius": 10,
+              "density_noise_scale": 120,
+              "density_noise_min": 0.5,
+              "density_noise_max": 1.5
             }
           }
         }
       },
       "decorator": {
-        "name": "minecraft:count_extra_heightmap",
+        "name": "minecraft:chance_passthrough",
         "config": {
-          "count": 0,
-          "extra_chance": 0.02,
-          "extra_count": 1
+          "chance": 0.02
         }
       }
     }

@@ -25,7 +25,7 @@
 
 package com.terraforged.util;
 
-import com.terraforged.core.concurrent.ObjectPool;
+import com.terraforged.core.concurrent.pool.ObjectPool;
 import com.terraforged.core.concurrent.Resource;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

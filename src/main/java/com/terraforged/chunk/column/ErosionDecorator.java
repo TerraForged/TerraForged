@@ -30,7 +30,7 @@ import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.material.state.States;
 import com.terraforged.chunk.TerraContext;
 import com.terraforged.material.Materials;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
@@ -61,7 +61,7 @@ public class ErosionDecorator implements ColumnDecorator {
     private final int seed2;
     private final int seed3;
     private final float minY;
-    private final TerrainTypes terrain;
+    private final Terrains terrain;
     private final Materials materials;
 
     public ErosionDecorator(TerraContext context) {
@@ -75,11 +75,11 @@ public class ErosionDecorator implements ColumnDecorator {
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        if (context.cell.value < minY || context.cell.terrainType == terrain.river || context.cell.terrainType == terrain.riverBanks) {
+        if (context.cell.value < minY || context.cell.terrain == terrain.river || context.cell.terrain == terrain.riverBanks) {
             return;
         }
 
-        if (context.cell.terrainType == terrain.volcanoPipe) {
+        if (context.cell.terrain == terrain.volcanoPipe) {
             return;
         }
 

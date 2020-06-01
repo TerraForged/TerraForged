@@ -42,11 +42,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class WorldPage extends BasePage {
 
     private final TerraSettings settings;
-    private final PreviewPage preview;
+    private final UpdatablePage preview;
     private final CompoundNBT worldSettings;
     private final CompoundNBT dimSettings;
 
-    public WorldPage(TerraSettings settings, PreviewPage preview) {
+    public WorldPage(TerraSettings settings, UpdatablePage preview) {
         this.settings = settings;
         this.preview = preview;
         this.worldSettings = NBTHelper.serialize("world", settings.world);

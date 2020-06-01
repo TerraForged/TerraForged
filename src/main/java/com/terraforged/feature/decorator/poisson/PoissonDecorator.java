@@ -23,7 +23,7 @@ public abstract class PoissonDecorator extends Placement<PoissonConfig> {
     }
 
     @Override
-    public final <FC extends IFeatureConfig, F extends Feature<FC>> boolean place(IWorld world, ChunkGenerator<?> generator, Random random, BlockPos pos, PoissonConfig config, ConfiguredFeature<FC, F> feature) {
+    public <FC extends IFeatureConfig, F extends Feature<FC>> boolean place(IWorld world, ChunkGenerator<?> generator, Random random, BlockPos pos, PoissonConfig config, ConfiguredFeature<FC, F> feature) {
         int radius = Math.max(1, Math.min(30, config.radius));
         Poisson poisson = getInstance(radius);
         PoissonVisitor visitor = new PoissonVisitor(this, feature, world, generator, random, pos);

@@ -28,7 +28,7 @@ package com.terraforged.chunk;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.chunk.surface.ChunkSurfaceBuffer;
 import com.terraforged.api.chunk.surface.SurfaceContext;
-import com.terraforged.core.concurrent.pool.ThreadPools;
+import com.terraforged.core.concurrent.thread.ThreadPools;
 import com.terraforged.core.region.gen.RegionCache;
 import com.terraforged.core.region.gen.RegionGenerator;
 import com.terraforged.material.Materials;
@@ -36,7 +36,7 @@ import com.terraforged.settings.TerraSettings;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.WorldGeneratorFactory;
 import com.terraforged.world.heightmap.Heightmap;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.GenerationSettings;
@@ -56,7 +56,7 @@ public class TerraContext extends GeneratorContext {
         this.heightmap = factory.getHeightmap();
     }
 
-    public TerraContext(IWorld world, TerrainTypes terrain, TerraSettings settings) {
+    public TerraContext(IWorld world, Terrains terrain, TerraSettings settings) {
         super(terrain, settings, TerraTerrainProvider::new, TerraContext::createCache);
         this.world = world;
         this.materials = new Materials();

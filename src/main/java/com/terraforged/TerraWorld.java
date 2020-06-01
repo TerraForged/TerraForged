@@ -37,7 +37,7 @@ import com.terraforged.settings.SettingsHelper;
 import com.terraforged.settings.TerraSettings;
 import com.terraforged.util.Environment;
 import com.terraforged.util.nbt.NBTHelper;
-import com.terraforged.world.terrain.TerrainTypes;
+import com.terraforged.world.terrain.Terrains;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
 import net.minecraft.world.IWorld;
@@ -76,7 +76,7 @@ public class TerraWorld extends WorldType {
             settings.world.seed = world.getSeed();
             settings.dimensions.dimensions.apply(world.getWorldInfo());
 
-            TerrainTypes terrains = TerrainTypes.create(settings);
+            Terrains terrains = Terrains.create(settings);
 
             OverworldGenSettings genSettings = new TerraGenSettings(settings.structures);
             OverworldBiomeProviderSettings biomeSettings = new OverworldBiomeProviderSettings(world.getWorldInfo());
