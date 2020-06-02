@@ -42,6 +42,7 @@ import com.terraforged.command.search.BothSearchTask;
 import com.terraforged.command.search.Search;
 import com.terraforged.command.search.TerrainSearchTask;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.data.DataGen;
 import com.terraforged.settings.SettingsHelper;
 import com.terraforged.world.WorldGenerator;
@@ -126,12 +127,13 @@ public class TerraCommand {
 
         BlockPos pos = context.getSource().asPlayer().getPosition();
         BiomeProvider biomeProvider = getBiomeProvider(context);
-        Cell cell = biomeProvider.lookupPos(pos.getX(), pos.getZ());
-        Biome biome = biomeProvider.getBiome(cell, pos.getX(), pos.getZ());
-        context.getSource().sendFeedback(
-                new StringTextComponent("Terrain=" + cell.terrain.getName() + ", Biome=" + biome.getRegistryName()),
-                false
-        );
+        try (Resource<Cell> cell = biomeProvider.lookupPos(pos.getX(), pos.getZ())) {
+            Biome biome = biomeProvider.getBiome(cell.get(), pos.getX(), pos.getZ());
+            context.getSource().sendFeedback(
+                    new StringTextComponent("Terrain=" + cell.get().terrain.getName() + ", Biome=" + biome.getRegistryName()),
+                    false
+            );
+        }
 
         return Command.SINGLE_SUCCESS;
     }

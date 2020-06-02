@@ -33,6 +33,7 @@ import com.terraforged.chunk.TerraContext;
 import com.terraforged.chunk.util.FastChunk;
 import com.terraforged.chunk.util.TerraContainer;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.util.setup.SetupHooks;
 import com.terraforged.world.heightmap.WorldLookup;
@@ -66,7 +67,7 @@ public class BiomeProvider extends AbstractBiomeProvider {
         this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomeMap), context.copy());
     }
 
-    public Cell lookupPos(int x, int z) {
+    public Resource<Cell> lookupPos(int x, int z) {
         return getWorldLookup().getCell(x, z);
     }
 
@@ -74,7 +75,9 @@ public class BiomeProvider extends AbstractBiomeProvider {
     public Biome getNoiseBiome(int x, int y, int z) {
         x = (x << 2);
         z = (z << 2);
-        return getBiome(lookupPos(x, z), x, z);
+        try (Resource<Cell> cell = lookupPos(x, z)) {
+            return getBiome(cell.get(), x, z);
+        }
     }
 
     @Override

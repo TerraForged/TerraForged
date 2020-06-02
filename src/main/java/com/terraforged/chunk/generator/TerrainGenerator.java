@@ -75,7 +75,6 @@ public class TerrainGenerator {
         // bake biome array & discard gen data
         ((ChunkPrimer) chunk).func_225548_a_(container.bakeBiomes(Environment.isVanillaBiomes()));
 
-        // marks the heightmap data for this chunk for removal
         container.getChunkReader().dispose();
     }
 
