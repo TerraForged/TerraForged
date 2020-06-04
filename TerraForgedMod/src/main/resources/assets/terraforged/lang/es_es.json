@@ -1,0 +1,12 @@
+{
+  "generator.terraforged": "TerraForged",
+  "generator.terratest": "TerraTest",
+  "biome.terraforged.cold_steppe": "Estepa fría",
+  "biome.terraforged.marshland": "Marisma",
+  "biome.terraforged.savanna_scrub": "Matorral de sabana",
+  "biome.terraforged.shattered_savanna_scrub": "Matorral de sabana abrupta",
+  "biome.terraforged.snowy_taiga_scrub": "Matorral de taiga nevada",
+  "biome.terraforged.steppe": "Estepa",
+  "biome.terraforged.taiga_scrub": "Matorral de taiga",
+  "biome.terraforged.warm_beach": "Playa cálida"
+}
