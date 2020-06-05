@@ -31,8 +31,7 @@ import com.terraforged.gui.page.PresetsPage;
 import com.terraforged.gui.page.SimplePage;
 import com.terraforged.gui.page.SimplePreviewPage;
 import com.terraforged.gui.page.WorldPage;
-import com.terraforged.gui.preview.PreviewPage;
-import com.terraforged.gui.preview.again.PreviewPage2;
+import com.terraforged.gui.preview2.PreviewPage;
 import com.terraforged.settings.SettingsHelper;
 import com.terraforged.settings.TerraSettings;
 import com.terraforged.util.nbt.NBTHelper;
@@ -49,7 +48,7 @@ public class SettingsScreen extends OverlayScreen {
     private static final Button.IPressable NO_ACTION = b -> {};
 
     private final Page[] pages;
-    private final PreviewPage2 preview;
+    private final PreviewPage preview;
     private final CreateWorldScreen parent;
     private final TerraSettings settings = new TerraSettings();
 
@@ -58,7 +57,7 @@ public class SettingsScreen extends OverlayScreen {
     public SettingsScreen(CreateWorldScreen parent) {
         SettingsHelper.applyDefaults(parent.chunkProviderSettingsJson, settings);
         this.parent = parent;
-        this.preview = new PreviewPage2(settings, getSeed(parent));
+        this.preview = new PreviewPage(settings, getSeed(parent));
         this.pages = new Page[]{
                 new PresetsPage(),
                 new WorldPage(settings, preview),

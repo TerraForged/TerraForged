@@ -1,45 +1,23 @@
-/*
- *
- * MIT License
- *
- * Copyright (c) 2020 TerraForged
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package com.terraforged.chunk.util;
 
 import com.terraforged.api.biome.BiomeVariant;
+import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.util.PosIterator;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeContainer;
+import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.chunk.IChunk;
 
-// holds a 1:1 map of biomes in the chunk
-// also holds the chunk's view on the heightmap for convenience
 public class TerraContainer extends BiomeContainer {
 
     private static final int BITS_WIDTH = (int) Math.round(Math.log(16.0D) / Math.log(2.0D)) - 2;
     private static final int ZOOM_VERT = (int) Math.round(Math.log(256.0D) / Math.log(2.0D)) - 2;
-    public static final int SIZE = 1 << BITS_WIDTH + BITS_WIDTH + ZOOM_VERT;
+    public static final int BIOMES_3D_SIZE = 1 << BITS_WIDTH + BITS_WIDTH + ZOOM_VERT;
+    public static final int BIOMES_2D_SIZE = 16 * 16;
     public static final int MASK_HORIZ = (1 << BITS_WIDTH) - 1;
     public static final int MASK_VERT = (1 << ZOOM_VERT) - 1;
 
@@ -47,23 +25,24 @@ public class TerraContainer extends BiomeContainer {
     private final Biome[] surface;
     private final ChunkReader chunkReader;
 
-    public TerraContainer(Builder builder, ChunkReader chunkReader) {
-        super(builder.biomes);
+    public TerraContainer(Biome[] biomes, Biome[] surface, ChunkReader chunkReader) {
+        super(biomes);
+        this.biomes = biomes;
+        this.surface = surface;
         this.chunkReader = chunkReader;
-        this.biomes = builder.biomes;
-        this.surface = builder.surfaceBiomeCache;
+    }
+
+    public ChunkReader getChunkReader() {
+        return chunkReader;
     }
 
     public Biome getBiome(int x, int z) {
-        return surface[indexOf(x, z)];
+        x &= 15;
+        z &= 15;
+        return surface[z * 16 + x];
     }
 
-    @Override
-    public Biome getNoiseBiome(int x, int y, int z) {
-        return super.getNoiseBiome(x, y, z);
-    }
-
-    public Biome getFeatureBiome() {
+    public Biome getFeatureBiome(ChunkReader chunkReader) {
         PosIterator iterator = PosIterator.area(0, 0, 16, 16);
         while (iterator.next()) {
             Cell cell = chunkReader.getCell(iterator.x(), iterator.z());
@@ -89,50 +68,47 @@ public class TerraContainer extends BiomeContainer {
         return new BiomeContainer(biomes);
     }
 
-    public ChunkReader getChunkReader() {
-        return chunkReader;
+    public static TerraContainer getOrCreate(IChunk chunk, TerraChunkGenerator generator) {
+        if (chunk.getBiomes() instanceof TerraContainer) {
+            return (TerraContainer) chunk.getBiomes();
+        } else {
+            TerraContainer container = TerraContainer.create(generator, chunk.getPos());
+            ((ChunkPrimer) chunk).func_225548_a_(container);
+            return container;
+        }
+    }
+
+    public static TerraContainer create(TerraChunkGenerator generator, ChunkPos pos) {
+        ChunkReader reader = generator.getChunkReader(pos.x, pos.z);
+
+        Biome[] biomes2D = new Biome[BIOMES_2D_SIZE];
+        Biome[] biomes3D = new Biome[BIOMES_3D_SIZE];
+        PosIterator iterator = PosIterator.area(0, 0, 16, 16);
+        while (iterator.next()) {
+            int dx = iterator.x();
+            int dz = iterator.z();
+            int x = pos.getXStart() + dx;
+            int z = pos.getZStart() + dz;
+            Biome biome = generator.getBiomeProvider().getBiome(reader.getCell(dx, dz), x, z);
+            biomes2D[indexOf(dx, dz)] = biome;
+            if ((dx & 3) == 0 && (dz & 3) == 0) {
+                for (int dy = 0; dy < 64; dy++) {
+                    biomes3D[indexOf(dx >> 2, dy, dz >> 2)] = biome;
+                }
+            }
+        }
+
+        return new TerraContainer(biomes3D, biomes2D, reader);
     }
 
     private static int indexOf(int x, int z) {
-        x &= 15;
-        z &= 15;
         return (z << 4) + x;
     }
 
-    private static int indexOf(int x, int y, int z) {
+    public static int indexOf(int x, int y, int z) {
         x &= MASK_HORIZ;
         y = MathHelper.clamp(y, 0, MASK_VERT);
         z &= MASK_HORIZ;
         return y << BITS_WIDTH + BITS_WIDTH | z << BITS_WIDTH | x;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-
-        private final Biome[] biomes = new Biome[SIZE];
-        private final Biome[] surfaceBiomeCache = new Biome[256];
-
-        public void set(int x, int z, Biome biome) {
-            surfaceBiomeCache[indexOf(x, z)] = biome;
-        }
-
-        public TerraContainer build(ChunkReader chunkReader) {
-            // biome storage format is 1 biome pos == 4x4x4 blocks, stored in an 4x64x4 (xyz) array
-            // sample the 1:1 surfaceBiomeCache every 4 blocks with a 2 block offset (roughly center of the 4x4 area)
-            for (int dy = 0; dy < 64; dy++) {
-                for (int dz = 0; dz < 4; dz++) {
-                    for (int dx = 0; dx < 4; dx++) {
-                        int x = dx * 4;
-                        int z = dz * 4;
-                        int index = indexOf(dx, dy, dz);
-                        biomes[index] = surfaceBiomeCache[indexOf(x, z)];
-                    }
-                }
-            }
-            return new TerraContainer(this, chunkReader);
-        }
     }
 }

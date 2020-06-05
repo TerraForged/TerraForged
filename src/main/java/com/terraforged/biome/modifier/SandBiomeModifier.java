@@ -40,7 +40,7 @@ public class SandBiomeModifier extends AbstractMaxHeightModifier {
     private final Set<Biome> biomes;
 
     public SandBiomeModifier(TerraContext context) {
-        super(context.seed, context.factory.getClimate(), 50, 2, context.levels.scale(16), context.levels.ground(10), context.levels.ground(25));
+        super(context.seed, context.factory.getClimate(), 10, 1, context.levels.scale(8), context.levels.ground(10), context.levels.ground(25));
         this.biomes = ForgeRegistries.BIOMES.getValues().stream()
                 .filter(biome -> context.materials.isSand(biome.getSurfaceBuilderConfig().getTop().getBlock()))
                 .collect(Collectors.toSet());

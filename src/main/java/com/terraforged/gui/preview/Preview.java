@@ -56,7 +56,7 @@ public class Preview extends Button {
     private static final int FACTOR = 4;
     public static final int WIDTH = Size.chunkToBlock(1 << FACTOR);
     private static final int SLICE_HEIGHT = 64;
-    public static final int HEIGHT = WIDTH + SLICE_HEIGHT;//Size.chunkToBlock(1 << FACTOR);
+    public static final int HEIGHT = WIDTH + SLICE_HEIGHT;
     private static final float[] LEGEND_SCALES = {1, 0.9F, 0.75F, 0.6F};
 
     private final int offsetX;
@@ -159,8 +159,8 @@ public class Preview extends Button {
         float zoomUnit = 1F - (zoom / 100F);
         float zoomStrength = 0.5F;
         float unit = (1 - zoomStrength) + (zoomStrength * zoomUnit);
-        float heightModifier = settings.world.levels.worldHeight / 256F;
-        float waterLevelModifier = settings.world.levels.seaLevel / (float) settings.world.levels.worldHeight;
+        float heightModifier = settings.world.properties.worldHeight / 256F;
+        float waterLevelModifier = settings.world.properties.seaLevel / (float) settings.world.properties.worldHeight;
         float imageWaterLevelY = image.getHeight() - 1 - (waterLevelModifier * SLICE_HEIGHT * unit);
 
         region.iterate((cell, x, z) -> {

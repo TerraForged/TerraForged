@@ -29,8 +29,15 @@ import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.surface.SurfaceManager;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.biome.provider.BiomeProvider;
-import com.terraforged.chunk.generator.*;
+import com.terraforged.chunk.generator.BiomeGenerator;
+import com.terraforged.chunk.generator.FeatureGenerator;
+import com.terraforged.chunk.generator.MobGenerator;
+import com.terraforged.chunk.generator.StructureGenerator;
+import com.terraforged.chunk.generator.SurfaceGenerator;
+import com.terraforged.chunk.generator.TerrainCarver;
+import com.terraforged.chunk.generator.TerrainGenerator;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.region.Region;
 import com.terraforged.core.region.Size;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.region.gen.RegionCache;
@@ -47,7 +54,11 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.*;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.GenerationSettings;
+import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 import net.minecraft.world.server.ServerWorld;
 
@@ -63,6 +74,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
     private final TerrainCarver terrainCarver;
     private final TerrainGenerator terrainGenerator;
     private final SurfaceGenerator surfaceGenerator;
+    private final FeatureGenerator featureGenerator;
     private final StructureGenerator structureGenerator;
 
     private final GeoManager geologyManager;
@@ -84,6 +96,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
         this.terrainCarver = new TerrainCarver(this);
         this.terrainGenerator = new TerrainGenerator(this);
         this.surfaceGenerator = new SurfaceGenerator(this);
+        this.featureGenerator = new FeatureGenerator(this);
         this.structureGenerator = new StructureGenerator(this);
 
         this.surfaceManager = TerraSetupFactory.createSurfaceManager(context);
@@ -131,7 +144,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
 
     @Override
     public final void decorate(WorldGenRegion region) {
-        terrainGenerator.generateFeatures(region);
+        featureGenerator.generateFeatures(region);
     }
 
     @Override
@@ -236,6 +249,12 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
         int rx = regionCache.chunkToRegion(chunkX);
         int rz = regionCache.chunkToRegion(chunkZ);
         regionCache.queueRegion(rx, rz);
+    }
+
+    public final Region getRegion(int chunkX, int chunkZ) {
+        int rx = regionCache.chunkToRegion(chunkX);
+        int rz = regionCache.chunkToRegion(chunkZ);
+        return regionCache.getRegion(rx, rz);
     }
 
     public final ChunkReader getChunkReader(int chunkX, int chunkZ) {

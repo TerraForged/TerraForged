@@ -33,7 +33,6 @@ import com.terraforged.chunk.TerraContext;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.terrain.ITerrain;
-import com.terraforged.world.terrain.TerrainType;
 import net.minecraft.world.biome.Biome;
 
 import java.util.ArrayList;

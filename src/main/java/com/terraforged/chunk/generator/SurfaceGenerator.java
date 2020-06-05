@@ -3,7 +3,6 @@ package com.terraforged.chunk.generator;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.surface.ChunkSurfaceBuffer;
 import com.terraforged.api.chunk.surface.SurfaceContext;
-import com.terraforged.biome.provider.BiomeProvider;
 import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.util.FastChunk;
 import com.terraforged.chunk.util.TerraContainer;
@@ -25,7 +24,7 @@ public class SurfaceGenerator {
     }
 
     public final void generateSurface(WorldGenRegion world, IChunk chunk) {
-        TerraContainer container = BiomeProvider.getBiomeContainer(generator, chunk);
+        TerraContainer container = TerraContainer.getOrCreate(chunk, generator);
         ChunkSurfaceBuffer buffer = new ChunkSurfaceBuffer(FastChunk.wrap(chunk));
 
         try (SurfaceContext context = generator.getContext().surface(buffer, generator.getSettings())) {

@@ -3,7 +3,6 @@ package com.terraforged.biome.provider;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.TerrainType;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 
 public class BiomeAccess {

@@ -1,7 +1,7 @@
 package com.terraforged.data;
 
 import com.terraforged.core.util.NameUtil;
-import com.terraforged.gui.preview.PreviewSettings;
+import com.terraforged.gui.preview2.PreviewSettings;
 import com.terraforged.settings.TerraSettings;
 import com.terraforged.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;

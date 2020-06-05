@@ -1,4 +1,4 @@
-package com.terraforged.gui.preview.again;
+package com.terraforged.gui.preview2;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraforged.core.concurrent.thread.ThreadPool;
@@ -10,11 +10,14 @@ import com.terraforged.core.render.RenderWorld;
 import com.terraforged.settings.TerraSettings;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.MutableVeci;
+import com.terraforged.world.continent.SpawnType;
 import com.terraforged.world.terrain.Terrains;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.renderer.RenderHelper;
 
-public class Preview2 extends Widget {
+public class Preview extends Widget {
+
+    private static final float ZOOM_SCALE = 200F;
 
     private final ThreadPool threadPool = ThreadPools.getPool();
 
@@ -28,7 +31,7 @@ public class Preview2 extends Widget {
     private RenderWorld world;
     private PreviewSettings previewSettings = new PreviewSettings();
 
-    public Preview2(TerraSettings settings, int seed) {
+    public Preview(TerraSettings settings, int seed) {
         super(0, 0, "preview");
         this.seed = seed;
         this.settings = settings;
@@ -79,8 +82,8 @@ public class Preview2 extends Widget {
 
     public void update(PreviewSettings settings, TerraSettings genSettings) {
         this.previewSettings = settings;
-//        this.world = createWorld(genSettings);
-        world.update(offsetX, offsetZ, previewSettings.zoom, true);
+        this.world = createWorld(genSettings);
+        world.update(offsetX, offsetZ, previewSettings.getZoom(ZOOM_SCALE), true);
     }
 
     private RenderWorld createWorld(TerraSettings settings) {
@@ -90,7 +93,12 @@ public class Preview2 extends Widget {
         GeneratorContext context = GeneratorContext.createNoCache(Terrains.create(settings), settings);
 
         MutableVeci center = new MutableVeci();
-        context.factory.getHeightmap().getContinent().getNearestCenter(0, 0, center);
+        if (settings.world.properties.spawnType == SpawnType.CONTINENT_CENTER) {
+            context.factory.getHeightmap().getContinent().getNearestCenter(0, 0, center);
+        }
+
+        offsetX = center.x;
+        offsetZ = center.z;
 
         RegionGenerator generator = RegionGenerator.builder()
                 .pool(threadPool)
@@ -103,8 +111,8 @@ public class Preview2 extends Widget {
         RenderSettings renderSettings = new RenderSettings(context);
         renderSettings.width = width;
         renderSettings.height = height;
-        renderSettings.zoom = previewSettings.zoom;
-        renderSettings.renderMode = previewSettings.renderMode;
+        renderSettings.zoom = previewSettings.getZoom(ZOOM_SCALE);
+        renderSettings.renderMode = previewSettings.display;
 
         return new RenderWorld(generator, renderAPI, renderSettings, regions, size);
     }

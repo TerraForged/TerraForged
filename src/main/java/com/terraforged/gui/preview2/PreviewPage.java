@@ -1,24 +1,23 @@
-package com.terraforged.gui.preview.again;
+package com.terraforged.gui.preview2;
 
 import com.terraforged.gui.OverlayScreen;
 import com.terraforged.gui.element.TerraButton;
 import com.terraforged.gui.page.UpdatablePage;
-import com.terraforged.gui.preview.Preview;
 import com.terraforged.settings.TerraSettings;
 import com.terraforged.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
 
 import java.util.function.Consumer;
 
-public class PreviewPage2 extends UpdatablePage {
+public class PreviewPage extends UpdatablePage {
 
-    private final Preview2 preview;
+    private final Preview preview;
     private final CompoundNBT settings;
     private final TerraSettings genSettings = new TerraSettings();
 
-    public PreviewPage2(TerraSettings settings, int seed) {
-        this.preview = new Preview2(settings, seed);
-        this.settings = NBTHelper.serialize(new PreviewSettings());
+    public PreviewPage(TerraSettings settings, int seed) {
+        this.preview = new Preview(settings, seed);
+        this.settings = NBTHelper.serialize("preview", new PreviewSettings());
     }
 
     public int getSeed() {
@@ -27,7 +26,7 @@ public class PreviewPage2 extends UpdatablePage {
 
     @Override
     public void apply(Consumer<TerraSettings> consumer) {
-//        consumer.accept(genSettings);
+        consumer.accept(genSettings);
         update();
     }
 
@@ -36,8 +35,8 @@ public class PreviewPage2 extends UpdatablePage {
         Column right = getColumn(1);
         preview.x = 0;
         preview.y = 0;
-        preview.setWidth(Preview.WIDTH);
-        preview.setHeight(Preview.HEIGHT);
+        preview.setWidth(com.terraforged.gui.preview.Preview.WIDTH);
+        preview.setHeight(com.terraforged.gui.preview.Preview.HEIGHT);
 
         addElements(right.left, right.top, right, settings, right.scrollPane::addButton, this::update);
 
@@ -57,7 +56,7 @@ public class PreviewPage2 extends UpdatablePage {
             right.scrollPane.addButton(spacer);
         }
 
-        update();
+//        update();
     }
 
     @Override

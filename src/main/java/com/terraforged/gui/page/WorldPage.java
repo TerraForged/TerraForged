@@ -28,7 +28,6 @@ package com.terraforged.gui.page;
 import com.terraforged.TerraWorld;
 import com.terraforged.gui.OverlayScreen;
 import com.terraforged.gui.element.TerraTextInput;
-import com.terraforged.gui.preview.PreviewPage;
 import com.terraforged.settings.TerraSettings;
 import com.terraforged.util.nbt.NBTHelper;
 import net.minecraft.client.gui.widget.Widget;
@@ -87,7 +86,10 @@ public class WorldPage extends BasePage {
 
     protected void update() {
         super.update();
-        preview.apply(settings -> NBTHelper.deserialize(worldSettings, settings.world));
+        preview.apply(settings -> {
+            NBTHelper.deserialize(worldSettings, settings.world);
+            NBTHelper.deserialize(dimSettings, settings.dimensions);
+        });
     }
 
     private static ListNBT getWorldTypes() {

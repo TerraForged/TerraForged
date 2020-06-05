@@ -2,6 +2,7 @@ package com.terraforged.chunk.generator;
 
 import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.fix.ChunkCarverFix;
+import com.terraforged.fm.template.StructureUtils;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
@@ -11,7 +12,6 @@ import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
 
 import java.util.BitSet;
-import java.util.List;
 import java.util.ListIterator;
 
 public class TerrainCarver {
@@ -23,26 +23,23 @@ public class TerrainCarver {
     }
 
     public void carveTerrain(BiomeManager biomes, IChunk chunk, GenerationStage.Carving type) {
-        // World carvers have hardcoded 'carvable' blocks which can be problematic with modded blocks
-        // AirCarverFix shims the actual blockstates to an equivalent carvable type
+        if (StructureUtils.hasOvergroundStructure(chunk)) {
+            return;
+        }
+
         chunk = new ChunkCarverFix(chunk, generator.getContext().materials);
 
         SharedSeedRandom random = new SharedSeedRandom();
-
         ChunkPos chunkpos = chunk.getPos();
         int chunkX = chunkpos.x;
         int chunkZ = chunkpos.z;
-
         BitSet mask = chunk.getCarvingMask(type);
         Biome biome = generator.getBiome(biomes, chunkpos.asBlockPos());
 
-        List<ConfiguredCarver<?>> carvers = biome.getCarvers(type);
-        ListIterator<ConfiguredCarver<?>> iterator = carvers.listIterator();
-
-        for(int cx = chunkX - 8; cx <= chunkX + 8; ++cx) {
-            for(int cz = chunkZ - 8; cz <= chunkZ + 8; ++cz) {
-
-                while(iterator.hasNext()) {
+        for (int cx = chunkX - 8; cx <= chunkX + 8; ++cx) {
+            for (int cz = chunkZ - 8; cz <= chunkZ + 8; ++cz) {
+                ListIterator<ConfiguredCarver<?>> iterator = biome.getCarvers(type).listIterator();
+                while (iterator.hasNext()) {
                     int index = iterator.nextIndex();
                     ConfiguredCarver<?> carver = iterator.next();
                     random.setLargeFeatureSeed(generator.getSeed() + index, cx, cz);
