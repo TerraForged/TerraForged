@@ -29,10 +29,11 @@ public class FeatureGenerator {
         int chunkX = region.getMainChunkX();
         int chunkZ = region.getMainChunkZ();
         IChunk chunk = region.getChunk(chunkX, chunkZ);
-        TerraContainer container = TerraContainer.getOrCreate(chunk, generator);
 
-        ChunkReader chunkReader = generator.getChunkReader(chunkX, chunkZ);
-        Biome biome = container.getFeatureBiome(chunkReader);
+        ChunkReader reader = generator.getChunkReader(chunkX, chunkZ);
+        TerraContainer container = TerraContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
+
+        Biome biome = container.getFeatureBiome(reader);
         DecoratorContext context = generator.getContext().decorator(chunk);
 
         IWorld regionFix = new RegionFix(region, generator);
@@ -42,15 +43,21 @@ public class FeatureGenerator {
         generator.getFeatureManager().decorate(generator, regionFix, chunk, biome, pos);
 
         // run post processes on chunk
-        postProcess(chunkReader, container, context);
+        postProcess(reader, container, context);
 
-        // bake biome array & discard gen data
+        // bake biome array
         ((ChunkPrimer) chunk).func_225548_a_(container.bakeBiomes(Environment.isVanillaBiomes()));
+
+        // close the current chunk reader
+        reader.close();
+
+        // mark chunk disposed as this is the last usage of the reader
+        reader.dispose();
     }
 
-    private void postProcess(ChunkReader chunk, TerraContainer container, DecoratorContext context) {
+    private void postProcess(ChunkReader reader, TerraContainer container, DecoratorContext context) {
         List<ColumnDecorator> decorators = generator.getPostProcessors();
-        container.getChunkReader().iterate(context, (cell, dx, dz, ctx) -> {
+        reader.iterate(context, (cell, dx, dz, ctx) -> {
             int px = ctx.blockX + dx;
             int pz = ctx.blockZ + dz;
             int py = ctx.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, dx, dz);

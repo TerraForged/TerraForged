@@ -15,6 +15,7 @@ import com.terraforged.chunk.column.post.LayerDecorator;
 import com.terraforged.chunk.column.post.SnowEroder;
 import com.terraforged.feature.BlockDataManager;
 import com.terraforged.feature.Matchers;
+import com.terraforged.feature.feature.FreezeLayer;
 import com.terraforged.fm.FeatureManager;
 import com.terraforged.fm.data.DataManager;
 import com.terraforged.fm.matcher.biome.BiomeMatcher;
@@ -24,6 +25,7 @@ import com.terraforged.fm.predicate.DeepWater;
 import com.terraforged.fm.predicate.FeaturePredicate;
 import com.terraforged.fm.predicate.MinHeight;
 import com.terraforged.fm.structure.StructureManager;
+import com.terraforged.fm.transformer.FeatureTransformer;
 import com.terraforged.material.geology.GeoManager;
 import com.terraforged.util.setup.SetupHooks;
 import net.minecraft.world.biome.Biome;
@@ -90,6 +92,13 @@ public class TerraSetupFactory {
         if (context.terraSettings.features.customBiomeFeatures) {
             // remove default trees from river biomes since forests can go up to the edge of rivers
             modifiers.getPredicates().add(BiomeMatcher.of(Biome.Category.RIVER), Matchers.tree(), FeaturePredicate.DENY);
+
+            // places snow layers below and on top of trees
+            modifiers.getTransformers().add(
+                    BiomeMatcher.ANY,
+                    FeatureMatcher.of(Feature.FREEZE_TOP_LAYER),
+                    FeatureTransformer.replace(Feature.FREEZE_TOP_LAYER, FreezeLayer.INSTANCE)
+            );
         }
 
         // block ugly features

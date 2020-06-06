@@ -1,21 +1,22 @@
 package com.terraforged.feature.context;
 
+import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.fix.RegionDelegate;
-import com.terraforged.chunk.util.TerraContainer;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
+import com.terraforged.core.concurrent.cache.SafeCloseable;
 import com.terraforged.core.concurrent.pool.ObjectPool;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.world.heightmap.Levels;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.BiomeContainer;
 import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 
 import java.util.Random;
 
-public class ChanceContext {
+public class ChanceContext implements SafeCloseable {
 
     private static final ObjectPool<ChanceContext> pool = new ObjectPool<>(10, ChanceContext::new);
 
@@ -27,6 +28,14 @@ public class ChanceContext {
     private int length;
     private float total = 0F;
     private float[] buffer;
+
+    @Override
+    public void close() {
+        if (reader != null) {
+            reader.close();
+            reader = null;
+        }
+    }
 
     void setPos(BlockPos pos) {
         cell = reader.getCell(pos.getX(), pos.getZ());
@@ -61,25 +70,16 @@ public class ChanceContext {
         return -1;
     }
 
-    public static Resource<ChanceContext> pooled(IWorld world) {
-        if (world instanceof RegionDelegate) {
-            Levels levels = new Levels(world.getMaxHeight(), world.getSeaLevel());
+    public static Resource<ChanceContext> pooled(IWorld world, ChunkGenerator<?> generator) {
+        if (generator instanceof TerraChunkGenerator && world instanceof RegionDelegate) {
+            TerraChunkGenerator terraGenerator = (TerraChunkGenerator) generator;
+            Levels levels = terraGenerator.getContext().levels;
             WorldGenRegion region = ((RegionDelegate) world).getRegion();
             IChunk chunk = region.getChunk(region.getMainChunkX(), region.getMainChunkZ());
-            return pooled(chunk, levels);
-        }
-        return null;
-    }
-
-    public static Resource<ChanceContext> pooled(IChunk chunk, Levels levels) {
-        BiomeContainer container = chunk.getBiomes();
-        if (container instanceof TerraContainer) {
-            ChunkReader reader = ((TerraContainer) container).getChunkReader();
             Resource<ChanceContext> item = pool.get();
-            ChanceContext context = item.get();
-            context.chunk = chunk;
-            context.levels = levels;
-            context.reader = reader;
+            item.get().chunk = chunk;
+            item.get().levels = levels;
+            item.get().reader = terraGenerator.getChunkReader(chunk.getPos().x, chunk.getPos().z);
             return item;
         }
         return null;

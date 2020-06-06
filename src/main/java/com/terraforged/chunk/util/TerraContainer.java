@@ -1,11 +1,10 @@
 package com.terraforged.chunk.util;
 
 import com.terraforged.api.biome.BiomeVariant;
-import com.terraforged.chunk.TerraChunkGenerator;
+import com.terraforged.biome.provider.BiomeProvider;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.core.util.PosIterator;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeContainer;
@@ -23,17 +22,11 @@ public class TerraContainer extends BiomeContainer {
 
     private final Biome[] biomes;
     private final Biome[] surface;
-    private final ChunkReader chunkReader;
 
-    public TerraContainer(Biome[] biomes, Biome[] surface, ChunkReader chunkReader) {
+    public TerraContainer(Biome[] biomes, Biome[] surface) {
         super(biomes);
         this.biomes = biomes;
         this.surface = surface;
-        this.chunkReader = chunkReader;
-    }
-
-    public ChunkReader getChunkReader() {
-        return chunkReader;
     }
 
     public Biome getBiome(int x, int z) {
@@ -68,28 +61,26 @@ public class TerraContainer extends BiomeContainer {
         return new BiomeContainer(biomes);
     }
 
-    public static TerraContainer getOrCreate(IChunk chunk, TerraChunkGenerator generator) {
+    public static TerraContainer getOrCreate(IChunk chunk, ChunkReader reader, BiomeProvider biomeProvider) {
         if (chunk.getBiomes() instanceof TerraContainer) {
             return (TerraContainer) chunk.getBiomes();
         } else {
-            TerraContainer container = TerraContainer.create(generator, chunk.getPos());
+            TerraContainer container = TerraContainer.create(reader, biomeProvider);
             ((ChunkPrimer) chunk).func_225548_a_(container);
             return container;
         }
     }
 
-    public static TerraContainer create(TerraChunkGenerator generator, ChunkPos pos) {
-        ChunkReader reader = generator.getChunkReader(pos.x, pos.z);
-
+    public static TerraContainer create(ChunkReader chunkReader, BiomeProvider biomeProvider) {
         Biome[] biomes2D = new Biome[BIOMES_2D_SIZE];
         Biome[] biomes3D = new Biome[BIOMES_3D_SIZE];
         PosIterator iterator = PosIterator.area(0, 0, 16, 16);
         while (iterator.next()) {
             int dx = iterator.x();
             int dz = iterator.z();
-            int x = pos.getXStart() + dx;
-            int z = pos.getZStart() + dz;
-            Biome biome = generator.getBiomeProvider().getBiome(reader.getCell(dx, dz), x, z);
+            int x = chunkReader.getBlockX() + dx;
+            int z = chunkReader.getBlockZ() + dz;
+            Biome biome = biomeProvider.getBiome(chunkReader.getCell(dx, dz), x, z);
             biomes2D[indexOf(dx, dz)] = biome;
             if ((dx & 3) == 0 && (dz & 3) == 0) {
                 for (int dy = 0; dy < 64; dy++) {
@@ -97,8 +88,7 @@ public class TerraContainer extends BiomeContainer {
                 }
             }
         }
-
-        return new TerraContainer(biomes3D, biomes2D, reader);
+        return new TerraContainer(biomes3D, biomes2D);
     }
 
     private static int indexOf(int x, int z) {

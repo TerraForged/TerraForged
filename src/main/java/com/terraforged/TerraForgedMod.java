@@ -31,6 +31,7 @@ import com.terraforged.data.DataGen;
 import com.terraforged.feature.context.ContextSelectorFeature;
 import com.terraforged.feature.decorator.poisson.PoissonAtSurface;
 import com.terraforged.feature.feature.DiskFeature;
+import com.terraforged.feature.feature.FreezeLayer;
 import com.terraforged.fm.template.TemplateManager;
 import com.terraforged.settings.SettingsHelper;
 import com.terraforged.util.DataPackFinder;
@@ -83,6 +84,7 @@ public class TerraForgedMod {
         Log.info("Registering features");
         TemplateManager.register(event);
         event.getRegistry().register(DiskFeature.INSTANCE);
+        event.getRegistry().register(FreezeLayer.INSTANCE);
         event.getRegistry().register(ContextSelectorFeature.INSTANCE);
     }
 

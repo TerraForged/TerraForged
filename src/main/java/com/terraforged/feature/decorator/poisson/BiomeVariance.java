@@ -1,16 +1,13 @@
 package com.terraforged.feature.decorator.poisson;
 
-import com.terraforged.chunk.fix.RegionDelegate;
-import com.terraforged.chunk.util.TerraContainer;
+import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.region.chunk.ChunkReader;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import me.dags.noise.util.NoiseUtil;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.BiomeContainer;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.gen.ChunkGenerator;
 
 public class BiomeVariance implements Module {
 
@@ -32,19 +29,9 @@ public class BiomeVariance implements Module {
         return NoiseUtil.map(1 - cell.biomeEdge, MIN_FADE, fade, range);
     }
 
-    public static Module of(IWorld world, float fade) {
-        if (world instanceof RegionDelegate) {
-            WorldGenRegion region = ((RegionDelegate) world).getRegion();
-            IChunk chunk = region.getChunk(region.getMainChunkX(), region.getMainChunkZ());
-            return of(chunk, fade);
-        }
-        return Source.ONE;
-    }
-
-    public static Module of(IChunk chunk, float fade) {
-        BiomeContainer container = chunk.getBiomes();
-        if (container instanceof TerraContainer) {
-            ChunkReader reader = ((TerraContainer) container).getChunkReader();
+    public static Module of(IWorld world, ChunkGenerator<?> generator, float fade) {
+        ChunkReader reader = TerraChunkGenerator.getChunk(world, generator);
+        if (reader != null) {
             return new BiomeVariance(reader, fade);
         }
         return Source.ONE;

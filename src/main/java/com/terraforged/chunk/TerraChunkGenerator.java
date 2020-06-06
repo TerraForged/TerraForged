@@ -176,13 +176,14 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
     public final int func_222529_a(int x, int z, Heightmap.Type type) {
         int chunkX = Size.blockToChunk(x);
         int chunkZ = Size.blockToChunk(z);
-        ChunkReader chunk = getChunkReader(chunkX, chunkZ);
-        Cell cell = chunk.getCell(x, z);
-        int level = context.levels.scale(cell.value) + 1;
-        if (type == Heightmap.Type.OCEAN_FLOOR || type == Heightmap.Type.OCEAN_FLOOR_WG) {
-            return level;
+        try (ChunkReader chunk = getChunkReader(chunkX, chunkZ)) {
+            Cell cell = chunk.getCell(x, z);
+            int level = context.levels.scale(cell.value) + 1;
+            if (type == Heightmap.Type.OCEAN_FLOOR || type == Heightmap.Type.OCEAN_FLOOR_WG) {
+                return level;
+            }
+            return Math.max(getSeaLevel(), level);
         }
-        return Math.max(getSeaLevel(), level);
     }
 
     @Override
@@ -259,5 +260,21 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
 
     public final ChunkReader getChunkReader(int chunkX, int chunkZ) {
         return regionCache.getChunk(chunkX, chunkZ);
+    }
+
+    public static ChunkReader getChunk(IWorld world, ChunkGenerator<?> generator) {
+        if (generator instanceof TerraChunkGenerator) {
+            TerraChunkGenerator terra = (TerraChunkGenerator) generator;
+            if (world instanceof IChunk) {
+                IChunk chunk = (IChunk) world;
+                return terra.getChunkReader(chunk.getPos().x, chunk.getPos().z);
+            }
+
+            if (world instanceof WorldGenRegion) {
+                WorldGenRegion region = (WorldGenRegion) world;
+                return terra.getChunkReader(region.getMainChunkX(), region.getMainChunkZ());
+            }
+        }
+        return null;
     }
 }

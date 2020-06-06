@@ -50,6 +50,7 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
         modifiers.add(new BeachModifier(biomes, context));
         modifiers.add(new DesertColorModifier(desertBiomes));
         modifiers.add(new SandBiomeModifier(context));
+        modifiers.add(new MushroomModifier());
         Collections.sort(modifiers);
         this.biomeModifiers = modifiers;
     }

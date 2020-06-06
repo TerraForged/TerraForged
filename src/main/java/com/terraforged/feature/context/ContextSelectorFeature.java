@@ -20,7 +20,7 @@ public class ContextSelectorFeature extends Feature<ContextSelectorConfig> {
 
     @Override
     public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random random, BlockPos pos, ContextSelectorConfig config) {
-        try (Resource<ChanceContext> item = ChanceContext.pooled(world)) {
+        try (Resource<ChanceContext> item = ChanceContext.pooled(world, generator)) {
             if (item == null) {
                 return false;
             }

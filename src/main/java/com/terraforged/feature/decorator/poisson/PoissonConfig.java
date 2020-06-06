@@ -7,6 +7,7 @@ import com.terraforged.core.util.poisson.PoissonContext;
 import me.dags.noise.Module;
 import me.dags.noise.Source;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.placement.IPlacementConfig;
 
 public class PoissonConfig implements IPlacementConfig {
@@ -25,12 +26,12 @@ public class PoissonConfig implements IPlacementConfig {
         this.densityNoiseMax = densityNoiseMax;
     }
 
-    public void apply(IWorld world, PoissonContext context) {
+    public void apply(IWorld world, ChunkGenerator<?> generator, PoissonContext context) {
         Module fade = Source.ONE;
         Module density = Source.ONE;
 
         if (biomeFade > 0.075F) {
-            fade = BiomeVariance.of(world, biomeFade);
+            fade = BiomeVariance.of(world, generator, biomeFade);
         }
 
         if (densityNoiseScale > 0) {

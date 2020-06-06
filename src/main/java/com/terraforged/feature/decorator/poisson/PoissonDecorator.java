@@ -27,7 +27,7 @@ public abstract class PoissonDecorator extends Placement<PoissonConfig> {
         int radius = Math.max(1, Math.min(30, config.radius));
         Poisson poisson = getInstance(radius);
         PoissonVisitor visitor = new PoissonVisitor(this, feature, world, generator, random, pos);
-        config.apply(world, visitor);
+        config.apply(world, generator, visitor);
         int chunkX = pos.getX() >> 4;
         int chunkZ = pos.getZ() >> 4;
         poisson.visit(chunkX, chunkZ, visitor, visitor);

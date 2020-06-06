@@ -6,6 +6,7 @@ import com.terraforged.api.chunk.surface.SurfaceContext;
 import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.util.FastChunk;
 import com.terraforged.chunk.util.TerraContainer;
+import com.terraforged.core.region.chunk.ChunkReader;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
@@ -24,30 +25,32 @@ public class SurfaceGenerator {
     }
 
     public final void generateSurface(WorldGenRegion world, IChunk chunk) {
-        TerraContainer container = TerraContainer.getOrCreate(chunk, generator);
-        ChunkSurfaceBuffer buffer = new ChunkSurfaceBuffer(FastChunk.wrap(chunk));
+        try (ChunkReader reader = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z)) {
+            TerraContainer container = TerraContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
+            ChunkSurfaceBuffer buffer = new ChunkSurfaceBuffer(FastChunk.wrap(chunk));
 
-        try (SurfaceContext context = generator.getContext().surface(buffer, generator.getSettings())) {
-            container.getChunkReader().iterate(context, (cell, dx, dz, ctx) -> {
-                int px = ctx.blockX + dx;
-                int pz = ctx.blockZ + dz;
-                int top = ctx.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, dx, dz);
+            try (SurfaceContext context = generator.getContext().surface(buffer, generator.getSettings())) {
+                reader.iterate(context, (cell, dx, dz, ctx) -> {
+                    int px = ctx.blockX + dx;
+                    int pz = ctx.blockZ + dz;
+                    int top = ctx.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, dx, dz);
 
-                ctx.buffer.setSurfaceLevel(top);
+                    ctx.buffer.setSurfaceLevel(top);
 
-                ctx.cell = cell;
-                ctx.biome = container.getBiome(dx, dz);
-                ctx.noise = getSurfaceNoise(px, pz) * 15D;
+                    ctx.cell = cell;
+                    ctx.biome = container.getBiome(dx, dz);
+                    ctx.noise = getSurfaceNoise(px, pz) * 15D;
 
-                generator.getSurfaceManager().getSurface(ctx).buildSurface(px, pz, top, ctx);
+                    generator.getSurfaceManager().getSurface(ctx).buildSurface(px, pz, top, ctx);
 
-                int py = ctx.levels.scale(cell.value);
-                for (ColumnDecorator processor : generator.getBaseDecorators()) {
-                    processor.decorate(ctx.buffer, ctx, px, py, pz);
-                }
-            });
+                    int py = ctx.levels.scale(cell.value);
+                    for (ColumnDecorator processor : generator.getBaseDecorators()) {
+                        processor.decorate(ctx.buffer, ctx, px, py, pz);
+                    }
+                });
 
-            FastChunk.updateWGHeightmaps(chunk, context.pos);
+                FastChunk.updateWGHeightmaps(chunk, context.pos);
+            }
         }
     }
 

@@ -5,6 +5,7 @@ import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.column.ChunkPopulator;
 import com.terraforged.chunk.util.FastChunk;
 import com.terraforged.chunk.util.TerraContainer;
+import com.terraforged.core.region.chunk.ChunkReader;
 import com.terraforged.feature.TerrainHelper;
 import com.terraforged.world.climate.Climate;
 import com.terraforged.world.heightmap.Levels;
@@ -29,17 +30,19 @@ public class TerrainGenerator {
     }
 
     public final void generateTerrain(IWorld world, IChunk chunk) {
-        TerraContainer container = TerraContainer.getOrCreate(chunk, generator);
-        try (DecoratorContext context = new DecoratorContext(FastChunk.wrap(chunk), levels, terrain, climate)) {
-            container.getChunkReader().iterate(context, (cell, dx, dz, ctx) -> {
-                int px = ctx.blockX + dx;
-                int pz = ctx.blockZ + dz;
-                int py = ctx.levels.scale(cell.value);
-                ctx.cell = cell;
-                ctx.biome = container.getNoiseBiome(dx, world.getSeaLevel(), dz);
-                ChunkPopulator.INSTANCE.decorate(ctx.chunk, ctx, px, py, pz);
-            });
-            terrainHelper.flatten(world, chunk);
+        try (ChunkReader reader = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z)) {
+            TerraContainer container = TerraContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
+            try (DecoratorContext context = new DecoratorContext(FastChunk.wrap(chunk), levels, terrain, climate)) {
+                reader.iterate(context, (cell, dx, dz, ctx) -> {
+                    int px = ctx.blockX + dx;
+                    int pz = ctx.blockZ + dz;
+                    int py = ctx.levels.scale(cell.value);
+                    ctx.cell = cell;
+                    ctx.biome = container.getNoiseBiome(dx, world.getSeaLevel(), dz);
+                    ChunkPopulator.INSTANCE.decorate(ctx.chunk, ctx, px, py, pz);
+                });
+                terrainHelper.flatten(world, chunk);
+            }
         }
     }
 }
