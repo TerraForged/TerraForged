@@ -24,4 +24,9 @@ public class BothSearchTask extends Search {
     public boolean test(BlockPos pos) {
         return a.test(pos) && b.test(pos);
     }
+
+    @Override
+    public BlockPos success(BlockPos.Mutable pos) {
+        return a.success(pos);
+    }
 }

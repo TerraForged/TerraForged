@@ -194,7 +194,8 @@ public class TerraCommand {
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
         WorldGenerator worldGenerator = terraContext.factory.get();
-        Search search = new TerrainSearchTask(pos, worldGenerator, target);
+        IWorldReader reader = context.getSource().asPlayer().getServerWorld();
+        Search search = new TerrainSearchTask(pos, reader, worldGenerator, target);
         doSearch(server, playerID, search);
         context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
 
@@ -235,8 +236,9 @@ public class TerraCommand {
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
         WorldGenerator worldGenerator = terraContext.factory.get();
+        IWorldReader reader = context.getSource().asPlayer().getServerWorld();
         Search biomeSearch = new BiomeSearchTask(pos, world, biome);
-        Search terrainSearch = new TerrainSearchTask(pos, worldGenerator, target);
+        Search terrainSearch = new TerrainSearchTask(pos, reader, worldGenerator, target);
         Search search = new BothSearchTask(pos, biomeSearch, terrainSearch);
         doSearch(server, playerID, search);
         context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
