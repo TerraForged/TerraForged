@@ -40,7 +40,7 @@ public class DesertColorModifier implements BiomeModifier {
 
     @Override
     public int priority() {
-        return 0;
+        return 5;
     }
 
     @Override

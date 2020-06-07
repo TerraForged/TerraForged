@@ -47,10 +47,10 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
     public BiomeModifierManager(TerraContext context, BiomeMap biomes) {
         desertBiomes = new DesertBiomes(context.materials, biomes.getAllBiomes(BiomeType.DESERT));
         List<BiomeModifier> modifiers = new ArrayList<>();
-        modifiers.add(new BeachModifier(biomes, context));
+        modifiers.add(new CoastModifier(biomes, context));
         modifiers.add(new DesertColorModifier(desertBiomes));
         modifiers.add(new SandBiomeModifier(context));
-        modifiers.add(new MushroomModifier());
+        modifiers.add(new BeachModifier(biomes, context));
         Collections.sort(modifiers);
         this.biomeModifiers = modifiers;
     }

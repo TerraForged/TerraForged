@@ -23,16 +23,42 @@
  * SOFTWARE.
  */
 
-package com.terraforged.biome.map;
+package com.terraforged.biome.modifier;
 
-import com.terraforged.core.util.grid.FixedGrid;
+import com.terraforged.api.biome.modifier.BiomeModifier;
+import com.terraforged.biome.map.BiomeMap;
+import com.terraforged.chunk.TerraContext;
+import com.terraforged.core.cell.Cell;
+import com.terraforged.world.terrain.Terrains;
 import net.minecraft.world.biome.Biome;
 
-public class BiomeGroup {
+public class CoastModifier implements BiomeModifier {
 
-    public final FixedGrid<Biome> biomes;
+    private final float height;
+    private final Terrains terrain;
+    private final BiomeMap biomeMap;
 
-    public BiomeGroup(FixedGrid<Biome> biomes) {
-        this.biomes = biomes;
+    public CoastModifier(BiomeMap biomeMap, TerraContext context) {
+        this.terrain = context.terrain;
+        this.biomeMap = biomeMap;
+        this.height = context.levels.water(8);
+    }
+
+    @Override
+    public int priority() {
+        return 10;
+    }
+
+    @Override
+    public boolean test(Biome biome) {
+        return true;
+    }
+
+    @Override
+    public Biome modify(Biome in, Cell cell, int x, int z) {
+        if (cell.terrain.isCoast()) {
+            return biomeMap.getCoast(cell, in);
+        }
+        return in;
     }
 }

@@ -28,50 +28,42 @@ package com.terraforged.biome.map;
 import com.google.gson.JsonElement;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.world.biome.BiomeType;
+import com.terraforged.world.heightmap.Levels;
 import net.minecraft.world.biome.Biome;
 
 import java.util.List;
-import java.util.Set;
 
 public interface BiomeMap {
 
-    Biome getBeach(float temperature, float moisture, float shape);
+    Biome getBeach(Cell cell);
 
-    Biome getRiver(float temperature, float moisture, float shape);
+    Biome getCoast(Cell cell, Biome current);
 
-    Biome getLake(float temperature, float moisture, float shape);
+    Biome getRiver(Cell cell);
 
-    Biome getWetland(float temperature, float moisture, float shape);
+    Biome getLake(Cell cell);
 
-    Biome getOcean(float temperature, float moisture, float shape);
+    Biome getWetland(Cell cell);
 
-    Biome getDeepOcean(float temperature, float moisture, float shape);
+    Biome getShallowOcean(Cell cell);
 
-    Biome getBiome(BiomeType type, float temperature, float moisture, float shape);
+    Biome getDeepOcean(Cell cell);
 
-    default Biome getBiome(Cell cell) {
-        return getBiome(cell.biomeType, cell.temperature, cell.moisture, cell.biome);
-    }
+    Biome getLand(Cell cell);
+
+    Biome provideBiome(Cell cell, Levels levels);
 
     List<Biome> getAllBiomes(BiomeType type);
 
-    Set<Biome> getBiomes(BiomeType type);
-
-    Set<Biome> getRivers(Biome.TempCategory temp);
-
-    Set<Biome> getOceanBiomes(Biome.TempCategory temp);
-
-    Set<Biome> getDeepOceanBiomes(Biome.TempCategory temp);
-
     JsonElement toJson();
-
-    static Biome getBiome(Biome biome) {
-        return biome.delegate.get();
-    }
 
     interface Builder {
 
+        Builder addOcean(Biome biome, int count);
+
         Builder addBeach(Biome biome, int count);
+
+        Builder addCoast(Biome biome, int count);
 
         Builder addRiver(Biome biome, int count);
 
@@ -79,9 +71,7 @@ public interface BiomeMap {
 
         Builder addWetland(Biome biome, int count);
 
-        Builder addOcean(Biome biome, int count);
-
-        Builder addBiome(BiomeType type, Biome biome, int count);
+        Builder addLand(BiomeType type, Biome biome, int count);
 
         BiomeMap build();
     }

@@ -1,7 +1,7 @@
 {
   "biomes": [
-    "minecraft:birch_forest",
-    "minecraft:birch_forest_hills",
+    "minecraft:birch*",
+    "minecraft:tall_birch*",
     "minecraft:forest",
     "minecraft:forest_hills",
     "minecraft:dark_forest",

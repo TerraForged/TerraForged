@@ -41,7 +41,12 @@ import net.minecraft.block.MyceliumBlock;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 public class Materials {
@@ -102,5 +107,17 @@ public class Materials {
             reader.get().set(state);
             return state.getBlockHardness(reader.get(), BlockPos.ZERO);
         }
+    }
+
+    public static <T extends IForgeRegistryEntry<T>> List<T> toList(Collection<T> collection) {
+        List<T> list = new ArrayList<>(collection);
+        list.sort(Materials::compare);
+        return Collections.unmodifiableList(list);
+    }
+
+    public static int compare(IForgeRegistryEntry<?> a, IForgeRegistryEntry<?> b) {
+        String as = a.getRegistryName() + "";
+        String bs = b.getRegistryName() + "";
+        return as.compareTo(bs);
     }
 }

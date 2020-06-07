@@ -42,11 +42,11 @@
       "decorator": {
         "name": "terraforged:poisson_surface",
         "config": {
-          "radius": 9,
-          "biome_fade": 0.25,
+          "radius": 8,
+          "biome_fade": 0.12,
           "density_noise_scale": 300,
-          "density_noise_min": 0,
-          "density_noise_max": 2
+          "density_noise_min": 0.5,
+          "density_noise_max": 1.5
         }
       }
     }

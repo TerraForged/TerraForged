@@ -26,15 +26,10 @@
 package com.terraforged.biome.map;
 
 import com.terraforged.biome.provider.BiomeHelper;
-import com.terraforged.core.util.grid.FixedGrid;
-import com.terraforged.util.ListUtils;
-import com.terraforged.world.biome.BiomeData;
 import com.terraforged.world.biome.BiomeType;
 import net.minecraft.world.biome.Biome;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -43,25 +38,19 @@ import java.util.function.Function;
 
 public class BiomeMapBuilder implements BiomeMap.Builder {
 
-    private final Map<Biome.TempCategory, List<Biome>> rivers = new HashMap<>();
-    private final Map<Biome.TempCategory, List<Biome>> lakes = new HashMap<>();
-    private final Map<Biome.TempCategory, List<Biome>> wetlands = new HashMap<>();
-    private final Map<Biome.TempCategory, List<Biome>> beaches = new HashMap<>();
-    private final Map<Biome.TempCategory, List<Biome>> oceans = new HashMap<>();
-    private final Map<Biome.TempCategory, List<Biome>> deepOceans = new HashMap<>();
-    private final Map<BiomeType, List<Biome>> map = new EnumMap<>(BiomeType.class);
-    private final Map<Biome, BiomeData> dataMap = new HashMap<>();
+    protected final Map<Biome.TempCategory, List<Biome>> rivers = new HashMap<>();
+    protected final Map<Biome.TempCategory, List<Biome>> lakes = new HashMap<>();
+    protected final Map<Biome.TempCategory, List<Biome>> wetlands = new HashMap<>();
+    protected final Map<Biome.TempCategory, List<Biome>> coasts = new HashMap<>();
+    protected final Map<Biome.TempCategory, List<Biome>> beaches = new HashMap<>();
+    protected final Map<Biome.TempCategory, List<Biome>> oceans = new HashMap<>();
+    protected final Map<Biome.TempCategory, List<Biome>> deepOceans = new HashMap<>();
+    protected final Map<BiomeType, List<Biome>> map = new EnumMap<>(BiomeType.class);
 
-    private final int gridSize;
     private final Function<BiomeMapBuilder, BiomeMap> constructor;
 
-    BiomeMapBuilder(Function<BiomeMapBuilder, BiomeMap> constructor, int gridSize, List<BiomeData> biomes) {
+    BiomeMapBuilder(Function<BiomeMapBuilder, BiomeMap> constructor) {
         this.constructor = constructor;
-        this.gridSize = gridSize;
-
-        for (BiomeData data : biomes) {
-            dataMap.put((Biome) data.reference, data);
-        }
     }
 
     @Override
@@ -79,6 +68,13 @@ public class BiomeMapBuilder implements BiomeMap.Builder {
     public BiomeMap.Builder addBeach(Biome biome, int count) {
         Biome.TempCategory category = BiomeHelper.getTempCategory(biome);
         add(beaches.computeIfAbsent(category, c -> new ArrayList<>()), biome, count);
+        return this;
+    }
+
+    @Override
+    public BiomeMap.Builder addCoast(Biome biome, int count) {
+        Biome.TempCategory category = BiomeHelper.getTempCategory(biome);
+        add(coasts.computeIfAbsent(category, c -> new ArrayList<>()), biome, count);
         return this;
     }
 
@@ -104,7 +100,7 @@ public class BiomeMapBuilder implements BiomeMap.Builder {
     }
 
     @Override
-    public BiomeMapBuilder addBiome(BiomeType type, Biome biome, int count) {
+    public BiomeMapBuilder addLand(BiomeType type, Biome biome, int count) {
         add(map.computeIfAbsent(type, t -> new ArrayList<>()), biome, count);
         return this;
     }
@@ -114,87 +110,13 @@ public class BiomeMapBuilder implements BiomeMap.Builder {
         return constructor.apply(this);
     }
 
-    Biome[][] rivers() {
-        return collectTemps(rivers);
-    }
-
-    Biome[][] lakes() {
-        return collectTemps(lakes);
-    }
-
-    Biome[][] wetlands() {
-        return collectTemps(wetlands);
-    }
-
-    Biome[][] beaches() {
-        return collectTemps(beaches);
-    }
-
-    Biome[][] oceans() {
-        return collectTemps(oceans);
-    }
-
-    Biome[][] deepOceans() {
-        return collectTemps(deepOceans);
-    }
-
-    Biome[][] biomeList() {
-        return collectTypes(map);
-    }
-
-    BiomeGroup[] biomeGroups() {
-        BiomeGroup[] biomes = new BiomeGroup[BiomeType.values().length];
-
-        Function<Biome, Float> moisture = b -> dataMap.get(b).rainfall;
-        Function<Biome, Float> temperature = b -> dataMap.get(b).temperature;
-        for (BiomeType type : BiomeType.values()) {
-            List<Biome> list = map.getOrDefault(type, Collections.emptyList());
-            if (list.isEmpty()) {
-                continue;
-            }
-            FixedGrid<Biome> grid = FixedGrid.generate(gridSize, list, moisture, temperature);
-            biomes[type.ordinal()] = new BiomeGroup(grid);
-        }
-
-        return biomes;
-    }
-
     private void add(List<Biome> list, Biome biome, int count) {
         for (int i = 0; i < count; i++) {
             list.add(biome);
         }
     }
 
-    private Biome[][] collectTemps(Map<Biome.TempCategory, List<Biome>> map) {
-        Biome[][] biomes = new Biome[3][];
-        for (Biome.TempCategory category : Biome.TempCategory.values()) {
-            if (category == Biome.TempCategory.OCEAN) {
-                continue;
-            }
-            List<Biome> list = map.getOrDefault(category, Collections.emptyList());
-            list = ListUtils.minimize(list);
-            list.sort(Comparator.comparing(BiomeHelper::getId));
-            biomes[category.ordinal() - 1] = list.toArray(new Biome[0]);
-        }
-        return biomes;
-    }
-
-    private Biome[][] collectTypes(Map<BiomeType, List<Biome>> map) {
-        Biome[][] biomes = new Biome[BiomeType.values().length][];
-        for (BiomeType type : BiomeType.values()) {
-            List<Biome> list = map.getOrDefault(type, Collections.emptyList());
-            list = ListUtils.minimize(list);
-            list.sort(Comparator.comparing(BiomeHelper::getId));
-            biomes[type.ordinal()] = list.toArray(new Biome[0]);
-        }
-        return biomes;
-    }
-
-    public static BiomeMap.Builder basic(List<BiomeData> biomes) {
-        return new BiomeMapBuilder(BasicBiomeMap::new, 0, biomes);
-    }
-
-    public static BiomeMap.Builder grid(int size, List<BiomeData> biomes) {
-        return new BiomeMapBuilder(GridBiomeMap::new, size, biomes);
+    public static BiomeMap.Builder create() {
+        return new BiomeMapBuilder(SimpleBiomeMap::new);
     }
 }

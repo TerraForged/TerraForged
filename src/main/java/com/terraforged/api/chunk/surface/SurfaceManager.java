@@ -39,13 +39,6 @@ public class SurfaceManager {
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Map<ResourceLocation, Surface> surfaces = new HashMap<>();
 
-    public SurfaceManager replace(Biome biome, Surface surface) {
-        lock.writeLock().lock();
-        surfaces.put(biome.getRegistryName(), surface);
-        lock.writeLock().unlock();
-        return this;
-    }
-
     public Surface getSurface(Biome biome) {
         lock.readLock().lock();
         Surface surface = surfaces.get(biome.getRegistryName());
@@ -62,9 +55,42 @@ public class SurfaceManager {
         return surface;
     }
 
-    public SurfaceManager extend(Biome biome, Surface surface) {
+    public SurfaceManager replace(Biome biome, Surface surface) {
+        lock.writeLock().lock();
+        surfaces.put(biome.getRegistryName(), surface);
+        lock.writeLock().unlock();
+        return this;
+    }
+
+    public SurfaceManager replace(Surface surface, Biome... biomes) {
+        for (Biome biome : biomes) {
+            replace(biome, surface);
+        }
+        return this;
+    }
+
+    public SurfaceManager prepend(Biome biome, Surface surface) {
+        Surface result = surface.then(getOrCreateSurface(biome));
+        return replace(biome, result);
+    }
+
+    public SurfaceManager prepend(Surface surface, Biome... biomes) {
+        for (Biome biome : biomes) {
+            prepend(biome, surface);
+        }
+        return this;
+    }
+
+    public SurfaceManager append(Biome biome, Surface surface) {
         Surface result = getOrCreateSurface(biome).then(surface);
         return replace(biome, result);
+    }
+
+    public SurfaceManager append(Surface surface, Biome... biomes) {
+        for (Biome biome : biomes) {
+            append(biome, surface);
+        }
+        return this;
     }
 
     public Surface getSurface(SurfaceContext context) {

@@ -48,10 +48,10 @@ public class GeoGenerator implements StrataGenerator {
 
     public GeoGenerator(Materials materials) {
         types.add(Source.PERLIN);
-        rock = new ArrayList<>(materials.stone);
-        soil = new ArrayList<>(materials.dirt);
-        clay = new ArrayList<>(materials.clay);
-        sediment = new ArrayList<>(materials.sediment);
+        rock = Materials.toList(materials.stone);
+        soil = Materials.toList(materials.dirt);
+        clay = Materials.toList(materials.clay);
+        sediment = Materials.toList(materials.sediment);
     }
 
     @Override

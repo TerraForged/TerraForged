@@ -48,7 +48,7 @@ public class SandBiomeModifier extends AbstractMaxHeightModifier {
 
     @Override
     public int priority() {
-        return 1;
+        return 3;
     }
 
     @Override

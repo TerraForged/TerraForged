@@ -84,7 +84,8 @@ public interface BiomePredicate {
         return false;
     }
 
-    BiomePredicate COAST = type(Biome.Category.BEACH, Biome.Category.MUSHROOM).or(name("shore")).or(name("beach"));
+    BiomePredicate BEACH = type(Biome.Category.BEACH).or(name("beach"));
+    BiomePredicate COAST = type(Biome.Category.MUSHROOM).or(name("coast"));
     BiomePredicate COLD_STEPPE = name("steppe").and(temp(-1, 0.3));
     BiomePredicate DESERT = type(Biome.Category.DESERT).or(temp(0.9, 2).and(rain(-1, 0.2)));
     BiomePredicate GRASSLAND = type(Biome.Category.PLAINS);

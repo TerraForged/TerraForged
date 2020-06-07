@@ -1,4 +1,4 @@
-package com.terraforged.biome.map;
+package com.terraforged.biome.map.defaults;
 
 import net.minecraft.world.biome.Biome;
 

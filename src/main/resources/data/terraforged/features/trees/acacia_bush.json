@@ -1,0 +1,44 @@
+{
+  "biomes": [
+    "terraforged:savanna_scrub",
+    "terraforged:shattered_savanna_scrub"
+  ],
+  "match": [
+    [
+      "minecraft:dead_bush"
+    ]
+  ],
+  "before": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "minecraft:random_selector",
+        "config": {
+          "features": [
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:acacia_bush"
+              },
+              "chance": 0.1
+            }
+          ],
+          "default": {
+            "name": "terraforged:template",
+            "config": {
+              "template": "terraforged:acacia_bush"
+            }
+          }
+        }
+      },
+      "decorator": {
+        "name": "minecraft:count_extra_heightmap",
+        "config": {
+          "count": 0,
+          "extra_chance": 0.025,
+          "extra_count": 1
+        }
+      }
+    }
+  }
+}

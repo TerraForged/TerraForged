@@ -5,10 +5,10 @@ import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.surface.SurfaceManager;
 import com.terraforged.biome.ModBiomes;
 import com.terraforged.biome.surface.BriceSurface;
+import com.terraforged.biome.surface.ForestSurface;
 import com.terraforged.biome.surface.IcebergsSurface;
 import com.terraforged.biome.surface.SwampSurface;
 import com.terraforged.chunk.column.BedrockDecorator;
-import com.terraforged.chunk.column.CoastDecorator;
 import com.terraforged.chunk.column.ErosionDecorator;
 import com.terraforged.chunk.column.GeologyDecorator;
 import com.terraforged.chunk.column.post.LayerDecorator;
@@ -53,7 +53,6 @@ public class TerraSetupFactory {
             Log.info(" - Erosion decorator enabled");
             processors.add(new ErosionDecorator(context));
         }
-        processors.add(new CoastDecorator(context));
         processors.add(new BedrockDecorator(context));
         return processors;
     }
@@ -112,9 +111,21 @@ public class TerraSetupFactory {
         SurfaceManager manager = new SurfaceManager();
         manager.replace(Biomes.DEEP_FROZEN_OCEAN.delegate.get(), new IcebergsSurface(context, 30, 30));
         manager.replace(Biomes.FROZEN_OCEAN.delegate.get(), new IcebergsSurface(context, 20, 15));
-        manager.replace(Biomes.SWAMP.delegate.get(), new SwampSurface());
-        manager.replace(ModBiomes.MARSHLAND, new SwampSurface());
-        manager.extend(ModBiomes.BRICE, new BriceSurface(context.seed));
+        manager.append(ModBiomes.BRICE, new BriceSurface(context.seed));
+        manager.replace(
+                new SwampSurface(),
+                Biomes.SWAMP.delegate.get(),
+                ModBiomes.MARSHLAND
+        );
+        manager.append(
+                new ForestSurface(context),
+                Biomes.FOREST,
+                Biomes.BIRCH_FOREST,
+                Biomes.BIRCH_FOREST_HILLS,
+                Biomes.TALL_BIRCH_FOREST,
+                Biomes.DARK_FOREST,
+                Biomes.DARK_FOREST_HILLS
+        );
         return SetupHooks.setup(manager, context);
     }
 

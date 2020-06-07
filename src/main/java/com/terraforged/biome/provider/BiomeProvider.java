@@ -47,7 +47,6 @@ import java.util.Set;
 public class BiomeProvider extends AbstractBiomeProvider {
 
     private final BiomeMap biomeMap;
-    private final BiomeAccess biomeAccess;
     private final TerraContext context;
     private final WorldLookup worldLookup;
     private final BiomeModifierManager modifierManager;
@@ -55,8 +54,7 @@ public class BiomeProvider extends AbstractBiomeProvider {
 
     public BiomeProvider(TerraContext context) {
         this.context = context;
-        this.biomeMap = BiomeHelper.getDefaultBiomeMap();
-        this.biomeAccess = new BiomeAccess(context.levels);
+        this.biomeMap = BiomeHelper.createBiomeMap();
         this.worldLookup = new WorldLookup(context.factory, context);
         this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomeMap), context.copy());
     }
@@ -143,8 +141,7 @@ public class BiomeProvider extends AbstractBiomeProvider {
     }
 
     public Biome getBiome(Cell cell, int x, int z) {
-        BiomeAccessor accessor = biomeAccess.getAccessor(cell);
-        Biome biome = accessor.getBiome(biomeMap, cell);
+        Biome biome = biomeMap.provideBiome(cell, context.levels);
         if (modifierManager.hasModifiers(cell.terrain)) {
             return modifierManager.modify(biome, cell, x, z);
         }

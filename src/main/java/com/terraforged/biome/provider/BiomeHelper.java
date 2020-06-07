@@ -54,26 +54,22 @@ public class BiomeHelper {
 
     private static final Map<BiomeType, BiomePredicate> PREDICATES = new HashMap<BiomeType, BiomePredicate>() {{
         put(BiomeType.TROPICAL_RAINFOREST, BiomePredicate.TROPICAL_RAINFOREST);
-        put(BiomeType.SAVANNA, BiomePredicate.SAVANNA.or(BiomePredicate.MESA).not(BiomePredicate.DESERT).not(BiomePredicate.STEPPE).not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN).not(BiomePredicate.WETLAND));
-        put(BiomeType.DESERT, BiomePredicate.DESERT.or(BiomePredicate.MESA).not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN).not(BiomePredicate.WETLAND));
-        put(BiomeType.TEMPERATE_RAINFOREST, BiomePredicate.TEMPERATE_RAINFOREST.not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN));
-        put(BiomeType.TEMPERATE_FOREST, BiomePredicate.TEMPERATE_FOREST.not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN).not(BiomePredicate.WETLAND));
-        put(BiomeType.GRASSLAND, BiomePredicate.GRASSLAND.not(BiomePredicate.WETLAND).not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN));
-        put(BiomeType.COLD_STEPPE, BiomePredicate.COLD_STEPPE.not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN));
-        put(BiomeType.STEPPE, BiomePredicate.STEPPE.not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN));
-        put(BiomeType.TAIGA, BiomePredicate.TAIGA.not(BiomePredicate.TUNDRA).not(BiomePredicate.COLD_STEPPE).not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN));
-        put(BiomeType.TUNDRA, BiomePredicate.TUNDRA.not(BiomePredicate.TAIGA).not(BiomePredicate.COAST).not(BiomePredicate.MOUNTAIN));
+        put(BiomeType.SAVANNA, BiomePredicate.SAVANNA.or(BiomePredicate.MESA).not(BiomePredicate.DESERT).not(BiomePredicate.STEPPE).not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN).not(BiomePredicate.WETLAND));
+        put(BiomeType.DESERT, BiomePredicate.DESERT.or(BiomePredicate.MESA).not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN).not(BiomePredicate.WETLAND));
+        put(BiomeType.TEMPERATE_RAINFOREST, BiomePredicate.TEMPERATE_RAINFOREST.not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN));
+        put(BiomeType.TEMPERATE_FOREST, BiomePredicate.TEMPERATE_FOREST.not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN).not(BiomePredicate.WETLAND));
+        put(BiomeType.GRASSLAND, BiomePredicate.GRASSLAND.not(BiomePredicate.WETLAND).not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN));
+        put(BiomeType.COLD_STEPPE, BiomePredicate.COLD_STEPPE.not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN));
+        put(BiomeType.STEPPE, BiomePredicate.STEPPE.not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN));
+        put(BiomeType.TAIGA, BiomePredicate.TAIGA.not(BiomePredicate.TUNDRA).not(BiomePredicate.COLD_STEPPE).not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN));
+        put(BiomeType.TUNDRA, BiomePredicate.TUNDRA.not(BiomePredicate.TAIGA).not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN));
         put(BiomeType.ALPINE, BiomePredicate.MOUNTAIN);
     }};
 
-    public static BiomeMap.Builder getBuilder(List<BiomeData> biomes) {
-        return BiomeMapBuilder.basic(biomes);
-    }
-
-    public static BiomeMap getDefaultBiomeMap() {
+    public static BiomeMap createBiomeMap() {
         List<BiomeData> biomes = getAllBiomeData();
         BiomeWeights weights = new BiomeWeights();
-        BiomeMap.Builder builder = getBuilder(biomes);
+        BiomeMap.Builder builder = BiomeMapBuilder.create();
         for (BiomeData data : biomes) {
             Biome biome = (Biome) data.reference;
             if (biome.isMutation() && getId(biome).contains("hills")) {
@@ -81,8 +77,10 @@ public class BiomeHelper {
             }
 
             int weight = weights.getWeight(biome);
-            if (BiomePredicate.COAST.test(data)) {
+            if (BiomePredicate.BEACH.test(data)) {
                 builder.addBeach(biome, weight);
+            } else if (BiomePredicate.COAST.test(data)) {
+                builder.addCoast(biome, weight);
             } else if (biome.getCategory() == Biome.Category.OCEAN) {
                 builder.addOcean(biome, weight);
             } else if (BiomePredicate.RIVER.test(data)) {
@@ -94,16 +92,16 @@ public class BiomeHelper {
             } else {
                 Collection<BiomeType> types = getTypes(data, biome);
                 for (BiomeType type : types) {
-                    builder.addBiome(type, biome, weight);
+                    builder.addLand(type, biome, weight);
                 }
             }
         }
 
-        builder.addBiome(BiomeType.TEMPERATE_RAINFOREST, Biomes.PLAINS, 10);
-        builder.addBiome(BiomeType.TEMPERATE_FOREST, Biomes.FLOWER_FOREST, 2);
-        builder.addBiome(BiomeType.TEMPERATE_FOREST, Biomes.PLAINS, 10);
-        builder.addBiome(BiomeType.TUNDRA, ModBiomes.SNOWY_TAIGA_SCRUB, 5);
-        builder.addBiome(BiomeType.TAIGA, ModBiomes.TAIGA_SCRUB, 5);
+        builder.addLand(BiomeType.TEMPERATE_RAINFOREST, Biomes.PLAINS, 5);
+        builder.addLand(BiomeType.TEMPERATE_FOREST, Biomes.FLOWER_FOREST, 2);
+        builder.addLand(BiomeType.TEMPERATE_FOREST, Biomes.PLAINS, 5);
+        builder.addLand(BiomeType.TUNDRA, ModBiomes.SNOWY_TAIGA_SCRUB, 2);
+        builder.addLand(BiomeType.TAIGA, ModBiomes.TAIGA_SCRUB, 2);
 
         return builder.build();
     }
@@ -183,6 +181,9 @@ public class BiomeHelper {
             return true;
         }
         if (biome.getCategory() == Biome.Category.NETHER) {
+            return true;
+        }
+        if (biome == Biomes.MUSHROOM_FIELD_SHORE) {
             return true;
         }
         return !BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.OVERWORLD);

@@ -26,54 +26,26 @@
 package com.terraforged.data;
 
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.terraforged.biome.map.BiomeMap;
 import com.terraforged.biome.provider.BiomeHelper;
 import com.terraforged.world.biome.BiomeType;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.Biome;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Set;
 
 public class WorldGenBiomes extends DataGen {
 
     public static void genBiomeMap(File dataDir) {
-        BiomeMap map = BiomeHelper.getDefaultBiomeMap();
-        for (BiomeType type : BiomeType.values()) {
-            genBiomes(dataDir, type, map);
-        }
-
-        try (Writer writer = new BufferedWriter(new FileWriter(new File("biome_map.json")))) {
+        BiomeMap map = BiomeHelper.createBiomeMap();
+        try (Writer writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_map.json")))) {
             new GsonBuilder().setPrettyPrinting().create().toJson(map.toJson(), writer);
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private static void genBiomes(File dir, BiomeType type, BiomeMap map) {
-        String path = getJsonPath("tags/biomes", getName(type));
-
-        write(new File(dir, path), writer -> {
-            Set<Biome> biomes = map.getBiomes(type);
-            JsonObject root = new JsonObject();
-            JsonArray values = new JsonArray();
-
-            root.addProperty("replaceable", false);
-            root.add("values", values);
-
-            biomes.stream()
-                    .map(b -> b.getRegistryName() + "")
-                    .sorted()
-                    .forEach(values::add);
-
-            write(root, writer);
-        });
     }
 
     private static ResourceLocation getName(BiomeType type) {
