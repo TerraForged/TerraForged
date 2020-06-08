@@ -52,7 +52,7 @@ public class FreezeLayer extends Feature<NoFeatureConfig> {
         return true;
     }
 
-    private boolean freeze(IWorld world, Biome biome, BlockPos top, BlockPos below, boolean force) {
+    private boolean freeze(IWorld world, Biome biome, BlockPos.Mutable top, BlockPos below, boolean force) {
         boolean hasFrozen = false;
         if (biome.doesWaterFreeze(world, below, false)) {
             world.setBlockState(below, Blocks.ICE.getDefaultState(), 2);
@@ -62,9 +62,17 @@ public class FreezeLayer extends Feature<NoFeatureConfig> {
         if (force || biome.doesSnowGenerate(world, top)) {
             hasFrozen = true;
             world.setBlockState(top, Blocks.SNOW.getDefaultState(), 2);
-            BlockState blockstate = world.getBlockState(below);
-            if (blockstate.has(SnowyDirtBlock.SNOWY)) {
-                world.setBlockState(below, blockstate.with(SnowyDirtBlock.SNOWY, true), 2);
+
+            // mark block below as snowy if supported
+            BlockState stateUnder = world.getBlockState(below);
+            if (stateUnder.has(SnowyDirtBlock.SNOWY)) {
+                world.setBlockState(below, stateUnder.with(SnowyDirtBlock.SNOWY, true), 2);
+            }
+
+            // remove floating blocks above
+            top.move(Direction.UP, 1);
+            if (!world.isAirBlock(top)) {
+                world.setBlockState(top, Blocks.AIR.getDefaultState(), 2);
             }
         }
         return hasFrozen;
