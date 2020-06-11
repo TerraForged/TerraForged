@@ -14,7 +14,7 @@ import net.minecraft.world.gen.carver.ConfiguredCarver;
 import java.util.BitSet;
 import java.util.ListIterator;
 
-public class TerrainCarver {
+public class TerrainCarver implements Generator.Carvers {
 
     private final TerraChunkGenerator generator;
 
@@ -22,6 +22,7 @@ public class TerrainCarver {
         this.generator = generator;
     }
 
+    @Override
     public void carveTerrain(BiomeManager biomes, IChunk chunk, GenerationStage.Carving type) {
         if (StructureUtils.hasOvergroundStructure(chunk)) {
             return;

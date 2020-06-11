@@ -39,7 +39,7 @@ import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.MutableVeci;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.Terrains;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.util.NoiseUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;

@@ -9,7 +9,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunk;
 
-public class BiomeGenerator {
+public class BiomeGenerator implements Generator.Biomes {
 
     private final TerraChunkGenerator generator;
     private final BiomeProvider biomeProvider;
@@ -19,6 +19,7 @@ public class BiomeGenerator {
         this.biomeProvider = generator.getBiomeProvider();
     }
 
+    @Override
     public void generateBiomes(IChunk chunk) {
         ChunkPos pos = chunk.getPos();
         try (ChunkReader reader = generator.getChunkReader(pos.x, pos.z)) {

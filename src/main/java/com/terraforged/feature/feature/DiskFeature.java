@@ -1,7 +1,7 @@
 package com.terraforged.feature.feature;
 
-import me.dags.noise.Module;
-import me.dags.noise.Source;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
 import net.minecraft.block.BlockState;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.math.BlockPos;

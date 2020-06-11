@@ -31,6 +31,7 @@ import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.biome.provider.BiomeProvider;
 import com.terraforged.chunk.generator.BiomeGenerator;
 import com.terraforged.chunk.generator.FeatureGenerator;
+import com.terraforged.chunk.generator.Generator;
 import com.terraforged.chunk.generator.MobGenerator;
 import com.terraforged.chunk.generator.StructureGenerator;
 import com.terraforged.chunk.generator.SurfaceGenerator;
@@ -69,13 +70,13 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
     private final TerraContext context;
     private final BiomeProvider biomeProvider;
 
-    private final MobGenerator mobGenerator;
-    private final BiomeGenerator biomeGenerator;
-    private final TerrainCarver terrainCarver;
-    private final TerrainGenerator terrainGenerator;
-    private final SurfaceGenerator surfaceGenerator;
-    private final FeatureGenerator featureGenerator;
-    private final StructureGenerator structureGenerator;
+    private final Generator.Mobs mobGenerator;
+    private final Generator.Biomes biomeGenerator;
+    private final Generator.Carvers terrainCarver;
+    private final Generator.Terrain terrainGenerator;
+    private final Generator.Surfaces surfaceGenerator;
+    private final Generator.Features featureGenerator;
+    private final Generator.Structures structureGenerator;
 
     private final GeoManager geologyManager;
     private final FeatureManager featureManager;
@@ -159,12 +160,12 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
 
     @Override
     public final void spawnMobs(ServerWorld worldIn, boolean hostile, boolean peaceful) {
-        mobGenerator.spawnMobs(worldIn, hostile, peaceful);
+        mobGenerator.tickSpawners(worldIn, hostile, peaceful);
     }
 
     @Override
     public final List<Biome.SpawnListEntry> getPossibleCreatures(EntityClassification type, BlockPos pos) {
-        return mobGenerator.getPossibleCreatures(world, type, pos);
+        return mobGenerator.getSpawns(world, type, pos);
     }
 
     @Override

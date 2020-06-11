@@ -14,7 +14,7 @@ import net.minecraft.world.gen.INoiseGenerator;
 import net.minecraft.world.gen.PerlinNoiseGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 
-public class SurfaceGenerator {
+public class SurfaceGenerator implements Generator.Surfaces {
 
     private final TerraChunkGenerator generator;
     private final INoiseGenerator surfaceNoise;
@@ -24,6 +24,7 @@ public class SurfaceGenerator {
         this.surfaceNoise = new PerlinNoiseGenerator(new SharedSeedRandom(generator.getSeed()), 3, 0);
     }
 
+    @Override
     public final void generateSurface(WorldGenRegion world, IChunk chunk) {
         try (ChunkReader reader = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z)) {
             TerraContainer container = TerraContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());

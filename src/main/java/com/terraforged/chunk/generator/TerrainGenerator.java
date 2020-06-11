@@ -13,7 +13,7 @@ import com.terraforged.world.terrain.Terrains;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
 
-public class TerrainGenerator {
+public class TerrainGenerator implements Generator.Terrain {
 
     private final Levels levels;
     private final Climate climate;
@@ -29,6 +29,7 @@ public class TerrainGenerator {
         this.terrainHelper = new TerrainHelper(0.75F);
     }
 
+    @Override
     public final void generateTerrain(IWorld world, IChunk chunk) {
         try (ChunkReader reader = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z)) {
             TerraContainer container = TerraContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());

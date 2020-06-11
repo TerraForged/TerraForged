@@ -31,7 +31,7 @@ import com.terraforged.biome.map.BiomeMapBuilder;
 import com.terraforged.biome.map.BiomePredicate;
 import com.terraforged.world.biome.BiomeData;
 import com.terraforged.world.biome.BiomeType;
-import me.dags.noise.util.Vec2f;
+import com.terraforged.n2d.util.Vec2f;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;

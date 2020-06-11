@@ -17,7 +17,7 @@ import net.minecraft.world.gen.WorldGenRegion;
 
 import java.util.List;
 
-public class FeatureGenerator {
+public class FeatureGenerator implements Generator.Features {
 
     private final TerraChunkGenerator generator;
 
@@ -25,6 +25,7 @@ public class FeatureGenerator {
         this.generator = generator;
     }
 
+    @Override
     public final void generateFeatures(WorldGenRegion region) {
         int chunkX = region.getMainChunkX();
         int chunkZ = region.getMainChunkZ();

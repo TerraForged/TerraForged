@@ -305,7 +305,7 @@ public class TerraCommand {
         return TextComponentUtils.wrapInSquareBrackets(new TranslationTextComponent(
                 "chat.coordinates", pos.getX(), "~", pos.getZ()
         )).applyTextStyle((style) -> style.setColor(TextFormatting.GREEN)
-                .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + pos.getX() + " ~ " + pos.getZ()))
+                .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + pos.getX() + " " + pos.getY() + " " + pos.getZ()))
                 .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("chat.coordinates.tooltip")))
         );
     }

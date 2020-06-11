@@ -6,8 +6,8 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.terrain.Terrains;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 

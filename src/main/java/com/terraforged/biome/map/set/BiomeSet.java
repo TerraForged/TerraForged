@@ -5,7 +5,7 @@ import com.terraforged.biome.map.defaults.DefaultBiome;
 import com.terraforged.biome.provider.BiomeHelper;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.util.ListUtils;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.util.NoiseUtil;
 import net.minecraft.world.biome.Biome;
 
 import java.util.Collections;

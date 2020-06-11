@@ -18,7 +18,7 @@ import net.minecraft.world.gen.feature.template.TemplateManager;
 
 import java.util.Map;
 
-public class StructureGenerator {
+public class StructureGenerator implements Generator.Structures {
 
     private final TerraChunkGenerator generator;
 
@@ -26,6 +26,7 @@ public class StructureGenerator {
         this.generator = generator;
     }
 
+    @Override
     public void generateStructureStarts(BiomeManager biomes, IChunk chunk, TemplateManager templates) {
         ChunkPos chunkpos = chunk.getPos();
         generator.queueChunk(chunkpos.x, chunkpos.z);

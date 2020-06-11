@@ -3,9 +3,9 @@ package com.terraforged.biome.surface;
 import com.terraforged.api.chunk.surface.Surface;
 import com.terraforged.api.chunk.surface.SurfaceContext;
 import com.terraforged.api.material.state.States;
-import me.dags.noise.Module;
-import me.dags.noise.Source;
-import me.dags.noise.func.CellFunc;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.func.CellFunc;
 import net.minecraft.block.BlockState;
 
 public class SteppeSurface implements Surface {

@@ -11,7 +11,7 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.TerrainType;
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.util.NoiseUtil;
 import net.minecraft.world.biome.Biome;
 
 import java.util.Arrays;

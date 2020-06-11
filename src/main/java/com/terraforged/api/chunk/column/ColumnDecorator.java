@@ -26,8 +26,8 @@
 package com.terraforged.api.chunk.column;
 
 import com.terraforged.api.chunk.surface.ChunkSurfaceBuffer;
-import me.dags.noise.Source;
-import me.dags.noise.source.FastSource;
+import com.terraforged.n2d.Source;
+import com.terraforged.n2d.source.FastSource;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.IChunk;

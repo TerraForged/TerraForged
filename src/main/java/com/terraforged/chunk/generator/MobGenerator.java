@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.List;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class MobGenerator {
+public class MobGenerator implements Generator.Mobs {
 
     // may be accessed cross-thread
     private static volatile boolean mobSpawning = true;
@@ -35,6 +35,7 @@ public class MobGenerator {
         this.generator = generator;
     }
 
+    @Override
     public final void generateMobs(WorldGenRegion region) {
         // vanilla does NOT check the mobSpawning gamerule before calling this
         if (MobGenerator.mobSpawning) {
@@ -47,13 +48,15 @@ public class MobGenerator {
         }
     }
 
-    public final void spawnMobs(ServerWorld world, boolean hostile, boolean peaceful) {
+    @Override
+    public final void tickSpawners(ServerWorld world, boolean hostile, boolean peaceful) {
         phantomSpawner.tick(world, hostile, peaceful);
         patrolSpawner.tick(world, hostile, peaceful);
         catSpawner.tick(world, hostile, peaceful);
     }
 
-    public final List<Biome.SpawnListEntry> getPossibleCreatures(IWorld world, EntityClassification type, BlockPos pos) {
+    @Override
+    public final List<Biome.SpawnListEntry> getSpawns(IWorld world, EntityClassification type, BlockPos pos) {
         if (Feature.SWAMP_HUT.func_202383_b(world, pos)) {
             if (type == EntityClassification.MONSTER) {
                 return Feature.SWAMP_HUT.getSpawnList();

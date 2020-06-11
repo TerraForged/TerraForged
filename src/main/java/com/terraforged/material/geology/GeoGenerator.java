@@ -29,7 +29,7 @@ import com.terraforged.api.material.geology.StrataConfig;
 import com.terraforged.api.material.geology.StrataGenerator;
 import com.terraforged.material.Materials;
 import com.terraforged.world.geology.Strata;
-import me.dags.noise.Source;
+import com.terraforged.n2d.Source;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 

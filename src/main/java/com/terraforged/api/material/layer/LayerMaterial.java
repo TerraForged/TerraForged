@@ -25,7 +25,7 @@
 
 package com.terraforged.api.material.layer;
 
-import me.dags.noise.util.NoiseUtil;
+import com.terraforged.n2d.util.NoiseUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
