@@ -26,11 +26,11 @@
 package com.terraforged.feature;
 
 import com.google.common.collect.ImmutableSet;
+import com.terraforged.n2d.util.NoiseUtil;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
-import com.terraforged.n2d.util.NoiseUtil;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;

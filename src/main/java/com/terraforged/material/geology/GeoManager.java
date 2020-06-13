@@ -30,10 +30,10 @@ import com.terraforged.api.material.geology.StrataConfig;
 import com.terraforged.chunk.TerraContext;
 import com.terraforged.core.Seed;
 import com.terraforged.material.Materials;
-import com.terraforged.world.geology.Geology;
-import com.terraforged.world.geology.Strata;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
+import com.terraforged.world.geology.Geology;
+import com.terraforged.world.geology.Strata;
 import net.minecraft.block.BlockState;
 import net.minecraft.world.biome.Biome;
 

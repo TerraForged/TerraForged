@@ -3,11 +3,11 @@ package com.terraforged.biome.modifier;
 import com.terraforged.api.biome.modifier.BiomeModifier;
 import com.terraforged.biome.map.BiomeMap;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.terrain.Terrains;
-import com.terraforged.n2d.Module;
-import com.terraforged.n2d.Source;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 

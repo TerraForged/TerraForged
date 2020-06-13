@@ -4,10 +4,10 @@ import com.terraforged.api.chunk.surface.Surface;
 import com.terraforged.api.chunk.surface.SurfaceContext;
 import com.terraforged.core.Seed;
 import com.terraforged.core.util.Variance;
-import com.terraforged.world.geology.Strata;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.world.geology.Strata;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 

@@ -26,8 +26,8 @@
 package com.terraforged.gui.preview;
 
 import com.terraforged.core.cell.Cell;
-import com.terraforged.world.heightmap.Levels;
 import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.world.heightmap.Levels;
 
 import java.awt.*;
 

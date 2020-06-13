@@ -27,9 +27,9 @@ package com.terraforged.biome.modifier;
 
 import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.world.climate.Climate;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
+import com.terraforged.world.climate.Climate;
 import net.minecraft.world.biome.Biome;
 
 public abstract class AbstractMaxHeightModifier extends AbstractOffsetModifier {
