@@ -28,7 +28,7 @@ public class BiomeSearchTask extends Search {
 
     @Override
     public BlockPos success(BlockPos.Mutable pos) {
-        pos.setY(reader.getHeight(Heightmap.Type.MOTION_BLOCKING, pos.getX(), pos.getZ()));
+        pos.setY(reader.getHeight(Heightmap.Type.WORLD_SURFACE_WG, pos.getX(), pos.getZ()));
         return super.success(pos);
     }
 }

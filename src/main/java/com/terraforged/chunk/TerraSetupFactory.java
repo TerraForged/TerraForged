@@ -120,8 +120,6 @@ public class TerraSetupFactory {
         manager.append(
                 new ForestSurface(context),
                 Biomes.FOREST,
-                Biomes.BIRCH_FOREST,
-                Biomes.BIRCH_FOREST_HILLS,
                 Biomes.TALL_BIRCH_FOREST,
                 Biomes.DARK_FOREST,
                 Biomes.DARK_FOREST_HILLS

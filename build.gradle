@@ -13,6 +13,9 @@ apply plugin: "net.minecraftforge.gradle"
 apply plugin: "maven-publish"
 apply plugin: "eclipse"
 
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
 version = "${mc_version}-${mod_version}${getClassifier()}"
 
 allprojects {
