@@ -50,16 +50,16 @@ public class ConfigManager {
                 "batching",
                 true,
                 "Batching breaks heightmap tiles up into smaller pieces that can be generated concurrently.",
-                "This can help improve generation speed by utilizing more CPU cores.",
-                "It is better suited to higher core-count machines (6+ cores)"
+                "This can help improve generation speed by utilizing more threads.",
+                "It is more effective when a higher thread count (+6) is available."
         );
 
         set(
                 cfg,
-                "batch_size",
+                "batch_count",
                 PerfDefaults.BATCH_SIZE,
                 "Controls the number of pieces a heightmap tile is divided up into.",
-                "Higher core count CPUs may benefit from higher batch sizes."
+                "Higher batch counts may be able to utilize more of the available threads, improving performance."
         );
     }));
 
