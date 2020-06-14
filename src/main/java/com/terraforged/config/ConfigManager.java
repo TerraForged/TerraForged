@@ -57,7 +57,7 @@ public class ConfigManager {
         set(
                 cfg,
                 "batch_count",
-                PerfDefaults.BATCH_SIZE,
+                PerfDefaults.BATCH_COUNT,
                 "Controls the number of pieces a heightmap tile is divided up into.",
                 "Higher batch counts may be able to utilize more of the available threads, improving performance."
         );
