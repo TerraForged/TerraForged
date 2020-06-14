@@ -18,7 +18,7 @@ public class PerfDefaults {
         boolean yes = true;
         yes &= config.getOrElse("batching", true);
         yes &= config.getInt("thread_count") == THREAD_COUNT;
-        yes &= config.getInt("batch_size") == BATCH_COUNT;
+        yes &= config.getInt("batch_count") == BATCH_COUNT;
         yes &= config.getInt("tile_size") == TILE_SIZE;
         return yes;
     }
@@ -30,7 +30,7 @@ public class PerfDefaults {
         Log.info(" - Thread Count: {}", config.getInt("thread_count"));
         Log.info(" - Tile Size: {}", config.getInt("tile_size"));
         Log.info(" - Batching: {}", config.getOrElse("batching", true));
-        Log.info(" - Batch Size: {}", config.getInt("batch_size"));
+        Log.info(" - Batch Count: {}", config.getInt("batch_count"));
         return config;
     }
 }
