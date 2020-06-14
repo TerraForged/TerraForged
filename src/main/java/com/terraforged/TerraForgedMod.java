@@ -27,6 +27,7 @@ package com.terraforged;
 
 import com.terraforged.api.material.WGTags;
 import com.terraforged.command.TerraCommand;
+import com.terraforged.config.ConfigManager;
 import com.terraforged.data.DataGen;
 import com.terraforged.feature.context.ContextSelectorFeature;
 import com.terraforged.feature.decorator.poisson.PoissonAtSurface;
@@ -63,6 +64,7 @@ public class TerraForgedMod {
         WGTags.init();
         TerraWorld.init();
         TerraCommand.init();
+        ConfigManager.init();
         SettingsHelper.init();
 
         // temp fix

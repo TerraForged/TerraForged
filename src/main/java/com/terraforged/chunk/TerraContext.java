@@ -25,9 +25,11 @@
 
 package com.terraforged.chunk;
 
+import com.electronwill.nightconfig.core.CommentedConfig;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.chunk.surface.ChunkSurfaceBuffer;
 import com.terraforged.api.chunk.surface.SurfaceContext;
+import com.terraforged.config.PerfDefaults;
 import com.terraforged.core.concurrent.thread.ThreadPools;
 import com.terraforged.core.region.gen.RegionCache;
 import com.terraforged.core.region.gen.RegionGenerator;
@@ -73,12 +75,16 @@ public class TerraContext extends GeneratorContext {
     }
 
     public static RegionCache createCache(WorldGeneratorFactory factory) {
+        CommentedConfig config = PerfDefaults.getAndPrintPerfSettings();
+        boolean batching = config.getOrElse("batching",false);
+        int tileSize = Math.min(PerfDefaults.MAX_TILE_SIZE, Math.max(2, config.getInt("tile_size")));
+        int batchSize = Math.min(PerfDefaults.MAX_BATCH_SIZE, Math.max(1, config.getInt("batch_size")));
+        int threadCount = Math.min(PerfDefaults.MAX_THREAD_COUNT, Math.max(1, config.getInt("thread_count")));
         return RegionGenerator.builder()
+                .pool(ThreadPools.create(threadCount, batching))
+                .size(tileSize, 2)
+                .batch(batchSize)
                 .factory(factory)
-                .size(3, 2)
-                .pool(ThreadPools.getPool())
-                .batch(6)
-                .build()
-                .toCache();
+                .build().toCache();
     }
 }
