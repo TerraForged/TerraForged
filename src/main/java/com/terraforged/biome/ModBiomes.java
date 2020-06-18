@@ -39,7 +39,7 @@ public class ModBiomes {
 
     private static final ArrayList<BiomeVariant> biomes = new ArrayList<>();
 
-    public static final Biome BRICE = register(new Brice());
+    public static final Biome BRYCE = register(new Bryce());
     public static final Biome COLD_STEPPE = register(new ColdSteppe());
     public static final Biome FIR_FOREST = register(new FirForest());
     public static final Biome FLOWER_PLAINS = register(new FlowerPlains());

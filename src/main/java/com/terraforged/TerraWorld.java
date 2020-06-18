@@ -124,6 +124,7 @@ public class TerraWorld extends WorldType {
     public static void init() {
         Log.info("Registered world type");
         new TerraWorld("terraforged", TerraChunkGenerator::new);
+
         if (Environment.isDev()) {
             Log.info("Registered developer world type");
             new TerraWorld("terratest", TestChunkGenerator::new);

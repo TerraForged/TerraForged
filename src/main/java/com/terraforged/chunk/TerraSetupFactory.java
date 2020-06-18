@@ -111,7 +111,7 @@ public class TerraSetupFactory {
         SurfaceManager manager = new SurfaceManager();
         manager.replace(Biomes.DEEP_FROZEN_OCEAN.delegate.get(), new IcebergsSurface(context, 30, 30));
         manager.replace(Biomes.FROZEN_OCEAN.delegate.get(), new IcebergsSurface(context, 20, 15));
-        manager.append(ModBiomes.BRICE, new BriceSurface(context.seed));
+        manager.append(ModBiomes.BRYCE, new BriceSurface(context.seed));
         manager.replace(
                 new SwampSurface(),
                 Biomes.SWAMP.delegate.get(),

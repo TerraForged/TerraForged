@@ -63,11 +63,11 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
@@ -109,14 +109,16 @@ public class TerraCommand {
                 .then(Commands.literal("debug")
                         .executes(TerraCommand::debugBiome))
                 .then(Commands.literal("locate")
-                        .then(Commands.argument("biome", BiomeArgType.biome())
-                                .executes(TerraCommand::findBiome)
-                                .then(Commands.argument("terrain", TerrainArgType.terrain())
-                                        .executes(TerraCommand::findTerrainAndBiome)))
-                        .then(Commands.argument("terrain", TerrainArgType.terrain())
-                                .executes(TerraCommand::findTerrain)
+                        .then(Commands.literal("biome")
                                 .then(Commands.argument("biome", BiomeArgType.biome())
-                                        .executes(TerraCommand::findTerrainAndBiome))));
+                                        .executes(TerraCommand::findBiome)))
+                        .then(Commands.literal("terrain")
+                                .then(Commands.argument("terrain", TerrainArgType.terrain())
+                                        .executes(TerraCommand::findTerrain)))
+                        .then(Commands.literal("both")
+                                .then(Commands.argument("biome", BiomeArgType.biome())
+                                        .then(Commands.argument("terrain", TerrainArgType.terrain())
+                                                .executes(TerraCommand::findTerrainAndBiome)))));
     }
 
     private static int query(CommandContext<CommandSource> context) throws CommandSyntaxException {
@@ -165,7 +167,6 @@ public class TerraCommand {
         ServerPlayerEntity player = context.getSource().asPlayer();
         BlockPos position = player.getPosition();
         int x = position.getX();
-        int y = position.getY();
         int z = position.getZ();
 
         long seed = player.getServerWorld().getSeed();
@@ -189,13 +190,12 @@ public class TerraCommand {
         ));
 
         Terrain terrain = TerrainArgType.getTerrain(context, "terrain");
-        Terrain target = getTerrainInstance(terrain, terraContext.terrain);
+        Terrain type = getTerrainInstance(terrain, terraContext.terrain);
         BlockPos pos = context.getSource().asPlayer().getPosition();
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
-        WorldGenerator worldGenerator = terraContext.factory.get();
-        IWorldReader reader = context.getSource().asPlayer().getServerWorld();
-        Search search = new TerrainSearchTask(pos, reader, worldGenerator, target);
+        WorldGenerator generator = terraContext.factory.get();
+        Search search = new TerrainSearchTask(pos, type, getChunkGenerator(context), generator);
         doSearch(server, playerID, search);
         context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
 
@@ -204,7 +204,7 @@ public class TerraCommand {
 
     private static int findBiome(CommandContext<CommandSource> context) throws CommandSyntaxException {
         // get the generator's context
-        TerraContext terraContext = getContext(context).orElseThrow(() -> createException(
+        getContext(context).orElseThrow(() -> createException(
                 "Invalid world type",
                 "This command can only be run in a TerraForged world!"
         ));
@@ -213,8 +213,8 @@ public class TerraCommand {
         BlockPos pos = context.getSource().asPlayer().getPosition();
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
-        IWorldReader reader = context.getSource().asPlayer().getServerWorld();
-        Search search = new BiomeSearchTask(pos, reader, biome);
+        ServerWorld world = context.getSource().asPlayer().getServerWorld();
+        Search search = new BiomeSearchTask(pos, biome, world.getChunkProvider().getChunkGenerator(), getBiomeProvider(context));
         doSearch(server, playerID, search);
         context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
 
@@ -232,13 +232,11 @@ public class TerraCommand {
         Terrain target = getTerrainInstance(terrain, terraContext.terrain);
         Biome biome = BiomeArgType.getBiome(context, "biome");
         BlockPos pos = context.getSource().asPlayer().getPosition();
-        IWorldReader world = context.getSource().asPlayer().getServerWorld();
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
-        WorldGenerator worldGenerator = terraContext.factory.get();
-        IWorldReader reader = context.getSource().asPlayer().getServerWorld();
-        Search biomeSearch = new BiomeSearchTask(pos, world, biome);
-        Search terrainSearch = new TerrainSearchTask(pos, reader, worldGenerator, target);
+        WorldGenerator generator = terraContext.factory.get();
+        Search biomeSearch = new BiomeSearchTask(pos, biome, getChunkGenerator(context), getBiomeProvider(context));
+        Search terrainSearch = new TerrainSearchTask(pos, target, getChunkGenerator(context), generator);
         Search search = new BothSearchTask(pos, biomeSearch, terrainSearch);
         doSearch(server, playerID, search);
         context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
@@ -288,6 +286,10 @@ public class TerraCommand {
             }
         }
         return find;
+    }
+
+    private static ChunkGenerator<?> getChunkGenerator(CommandContext<CommandSource> context) {
+        return context.getSource().getWorld().getChunkProvider().getChunkGenerator();
     }
 
     private static BiomeProvider getBiomeProvider(CommandContext<CommandSource> context) {

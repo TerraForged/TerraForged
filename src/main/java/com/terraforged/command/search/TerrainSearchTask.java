@@ -4,21 +4,18 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.world.WorldGenerator;
 import com.terraforged.world.terrain.Terrain;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.gen.ChunkGenerator;
 
-public class TerrainSearchTask extends Search {
+public class TerrainSearchTask extends ChunkGeneratorSearch {
 
     private final Terrain type;
-    private final IWorldReader reader;
-    private final WorldGenerator generator;
+    private final WorldGenerator worldGenerator;
     private final Cell cell = new Cell();
 
-    public TerrainSearchTask(BlockPos center, IWorldReader reader, WorldGenerator generator, Terrain type) {
-        super(center, 256);
+    public TerrainSearchTask(BlockPos center, Terrain type, ChunkGenerator<?> chunkGenerator, WorldGenerator worldGenerator) {
+        super(center, 256, chunkGenerator);
         this.type = type;
-        this.generator = generator;
-        this.reader = reader;
+        this.worldGenerator = worldGenerator;
     }
 
     @Override
@@ -28,13 +25,7 @@ public class TerrainSearchTask extends Search {
 
     @Override
     public boolean test(BlockPos pos) {
-        generator.getHeightmap().apply(cell, pos.getX(), pos.getZ());
+        worldGenerator.getHeightmap().apply(cell, pos.getX(), pos.getZ());
         return cell.terrain == type;
-    }
-
-    @Override
-    public BlockPos success(BlockPos.Mutable pos) {
-        pos.setY(reader.getHeight(Heightmap.Type.WORLD_SURFACE_WG, pos.getX(), pos.getZ()));
-        return super.success(pos);
     }
 }

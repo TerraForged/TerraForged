@@ -1,18 +1,21 @@
 package com.terraforged.command.search;
 
+import com.terraforged.biome.provider.BiomeProvider;
+import com.terraforged.core.cell.Cell;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.gen.ChunkGenerator;
 
-public class BiomeSearchTask extends Search {
+public class BiomeSearchTask extends ChunkGeneratorSearch {
 
     private final Biome biome;
-    private final IWorldReader reader;
+    private final BiomeProvider biomeProvider;
 
-    public BiomeSearchTask(BlockPos center, IWorldReader reader, Biome biome) {
-        super(center, 128);
-        this.reader = reader;
+    private final Cell cell = new Cell();
+
+    public BiomeSearchTask(BlockPos center, Biome biome, ChunkGenerator<?> generator, BiomeProvider biomeProvider) {
+        super(center, generator);
+        this.biomeProvider = biomeProvider;
         this.biome = biome;
     }
 
@@ -23,12 +26,7 @@ public class BiomeSearchTask extends Search {
 
     @Override
     public boolean test(BlockPos pos) {
-        return reader.getNoiseBiomeRaw(pos.getX() >> 2, pos.getY(), pos.getZ() >> 2) == biome;
-    }
-
-    @Override
-    public BlockPos success(BlockPos.Mutable pos) {
-        pos.setY(reader.getHeight(Heightmap.Type.WORLD_SURFACE_WG, pos.getX(), pos.getZ()));
-        return super.success(pos);
+        biomeProvider.getWorldLookup().applyCell(cell, pos.getX(), pos.getZ());
+        return biomeProvider.getBiome(cell, pos.getX(), pos.getZ()) == biome;
     }
 }
