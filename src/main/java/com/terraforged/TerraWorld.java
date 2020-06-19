@@ -25,7 +25,7 @@
 
 package com.terraforged;
 
-import com.terraforged.biome.provider.BiomeProvider;
+import com.terraforged.biome.provider.TerraBiomeProvider;
 import com.terraforged.chunk.ChunkGeneratorFactory;
 import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.TerraContext;
@@ -84,7 +84,7 @@ public class TerraWorld extends WorldType {
             world.getWorldInfo().setGeneratorOptions(NBTHelper.serializeCompact(settings));
 
             TerraContext context = new TerraContext(world, terrains, settings);
-            BiomeProvider biomeProvider = new BiomeProvider(context);
+            TerraBiomeProvider biomeProvider = new TerraBiomeProvider(context);
 
             Log.debug("Creating Terra {} generator", world.getDimension().getType().getRegistryName());
             return factory.create(context, biomeProvider, genSettings);

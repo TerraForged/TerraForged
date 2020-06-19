@@ -28,14 +28,23 @@ package com.terraforged.biome.modifier;
 import com.terraforged.api.biome.modifier.BiomeModifier;
 import com.terraforged.biome.provider.DesertBiomes;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.world.GeneratorContext;
+import com.terraforged.world.climate.Climate;
 import net.minecraft.world.biome.Biome;
 
 public class DesertColorModifier implements BiomeModifier {
 
+    private final Module noise;
+    private final Climate climate;
     private final DesertBiomes biomes;
 
-    public DesertColorModifier(DesertBiomes biomes) {
+    public DesertColorModifier(GeneratorContext context, DesertBiomes biomes) {
+        int scale = context.settings.terrain.general.terrainRegionSize;
         this.biomes = biomes;
+        this.climate = context.factory.getClimate();
+        this.noise = Source.cell(context.seed.next(), scale * 3).warp(context.seed.next(), scale / 2, 1, scale / 4F);
     }
 
     @Override
@@ -50,12 +59,17 @@ public class DesertColorModifier implements BiomeModifier {
 
     @Override
     public Biome modify(Biome in, Cell cell, int x, int z) {
+        float px = x + climate.getOffsetX(x, z, 12);
+        float pz = z + climate.getOffsetZ(x, z, 12);
+        float type = noise.getValue(px, pz);
         if (biomes.isRedDesert(in)) {
-            if (cell.continent <= 0.5F) {
+            if (type <= 0.5F) {
                 return biomes.getWhiteDesert(cell.biome);
             }
-        } else if (cell.continent > 0.5F) {
-            return biomes.getRedDesert(cell.biome);
+        } else {
+            if (type > 0.5F) {
+                return biomes.getRedDesert(cell.biome);
+            }
         }
         return in;
     }

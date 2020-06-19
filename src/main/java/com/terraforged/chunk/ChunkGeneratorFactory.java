@@ -25,11 +25,11 @@
 
 package com.terraforged.chunk;
 
-import com.terraforged.biome.provider.BiomeProvider;
+import com.terraforged.biome.provider.TerraBiomeProvider;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.OverworldGenSettings;
 
 public interface ChunkGeneratorFactory<T extends ChunkGenerator<?>> {
 
-    T create(TerraContext context, BiomeProvider biomeProvider, OverworldGenSettings settings);
+    T create(TerraContext context, TerraBiomeProvider biomeProvider, OverworldGenSettings settings);
 }

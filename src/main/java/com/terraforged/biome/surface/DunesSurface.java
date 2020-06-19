@@ -28,7 +28,7 @@ package com.terraforged.biome.surface;
 import com.terraforged.api.chunk.surface.Surface;
 import com.terraforged.api.chunk.surface.SurfaceContext;
 import com.terraforged.api.material.layer.LayerMaterial;
-import com.terraforged.biome.provider.BiomeProvider;
+import com.terraforged.biome.provider.TerraBiomeProvider;
 import com.terraforged.biome.provider.DesertBiomes;
 import com.terraforged.chunk.TerraContext;
 import com.terraforged.core.cell.Cell;
@@ -87,7 +87,7 @@ public class DunesSurface implements Surface {
         ctx.chunk.setBlockState(pos.setPos(x, duneTop, z), top, false);
     }
 
-    public static Surface create(TerraContext context, BiomeProvider provider) {
+    public static Surface create(TerraContext context, TerraBiomeProvider provider) {
         return create(context, provider.getModifierManager().getDesertBiomes());
     }
 

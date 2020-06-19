@@ -32,7 +32,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.terraforged.Log;
-import com.terraforged.biome.provider.BiomeProvider;
+import com.terraforged.biome.provider.TerraBiomeProvider;
 import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.TerraContext;
 import com.terraforged.command.arg.BiomeArgType;
@@ -128,7 +128,7 @@ public class TerraCommand {
         ));
 
         BlockPos pos = context.getSource().asPlayer().getPosition();
-        BiomeProvider biomeProvider = getBiomeProvider(context);
+        TerraBiomeProvider biomeProvider = getBiomeProvider(context);
         try (Resource<Cell> cell = biomeProvider.lookupPos(pos.getX(), pos.getZ())) {
             Biome biome = biomeProvider.getBiome(cell.get(), pos.getX(), pos.getZ());
             context.getSource().sendFeedback(
@@ -292,8 +292,8 @@ public class TerraCommand {
         return context.getSource().getWorld().getChunkProvider().getChunkGenerator();
     }
 
-    private static BiomeProvider getBiomeProvider(CommandContext<CommandSource> context) {
-        return (BiomeProvider) context.getSource().getWorld().getChunkProvider().getChunkGenerator().getBiomeProvider();
+    private static TerraBiomeProvider getBiomeProvider(CommandContext<CommandSource> context) {
+        return (TerraBiomeProvider) context.getSource().getWorld().getChunkProvider().getChunkGenerator().getBiomeProvider();
     }
 
     private static CommandSyntaxException createException(String type, String message, Object... args) {

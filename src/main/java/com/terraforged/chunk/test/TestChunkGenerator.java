@@ -25,7 +25,7 @@
 
 package com.terraforged.chunk.test;
 
-import com.terraforged.biome.provider.BiomeProvider;
+import com.terraforged.biome.provider.TerraBiomeProvider;
 import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.TerraContext;
 import com.terraforged.core.cell.Cell;
@@ -36,15 +36,15 @@ import net.minecraft.world.gen.GenerationSettings;
 
 public class TestChunkGenerator extends TerraChunkGenerator {
 
-    private final BiomeProvider biomeProvider;
+    private final TerraBiomeProvider biomeProvider;
 
-    public TestChunkGenerator(TerraContext context, BiomeProvider biomeProvider, GenerationSettings settings) {
+    public TestChunkGenerator(TerraContext context, TerraBiomeProvider biomeProvider, GenerationSettings settings) {
         super(new TestTerraContext(context), biomeProvider, settings);
         this.biomeProvider = new TestBiomeProvider(context);
     }
 
     @Override
-    public BiomeProvider getBiomeProvider() {
+    public TerraBiomeProvider getBiomeProvider() {
         return biomeProvider;
     }
 

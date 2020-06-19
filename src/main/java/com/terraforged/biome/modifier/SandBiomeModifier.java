@@ -53,7 +53,7 @@ public class SandBiomeModifier extends AbstractMaxHeightModifier {
 
     @Override
     public boolean test(Biome biome) {
-        return biome.getCategory() == Biome.Category.DESERT && biomes.contains(biome);
+        return false; // biome.getCategory() == Biome.Category.DESERT && biomes.contains(biome);
     }
 
     @Override

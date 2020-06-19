@@ -20,7 +20,7 @@ public class ConfigRef implements Supplier<CommentedFileConfig> {
     public CommentedFileConfig get() {
         synchronized (lock) {
             if (ref != null) {
-                Log.info("Loading config: %s", ref.getFile().getName());
+                Log.info("Loading config: {}", ref.getFile().getName());
                 ref.load();
                 return ref;
             }

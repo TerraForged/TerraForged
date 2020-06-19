@@ -1,6 +1,6 @@
 package com.terraforged.command.search;
 
-import com.terraforged.biome.provider.BiomeProvider;
+import com.terraforged.biome.provider.TerraBiomeProvider;
 import com.terraforged.core.cell.Cell;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
@@ -9,11 +9,11 @@ import net.minecraft.world.gen.ChunkGenerator;
 public class BiomeSearchTask extends ChunkGeneratorSearch {
 
     private final Biome biome;
-    private final BiomeProvider biomeProvider;
+    private final TerraBiomeProvider biomeProvider;
 
     private final Cell cell = new Cell();
 
-    public BiomeSearchTask(BlockPos center, Biome biome, ChunkGenerator<?> generator, BiomeProvider biomeProvider) {
+    public BiomeSearchTask(BlockPos center, Biome biome, ChunkGenerator<?> generator, TerraBiomeProvider biomeProvider) {
         super(center, generator);
         this.biomeProvider = biomeProvider;
         this.biome = biome;

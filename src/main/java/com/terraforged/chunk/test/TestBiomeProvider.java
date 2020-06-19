@@ -25,12 +25,12 @@
 
 package com.terraforged.chunk.test;
 
-import com.terraforged.biome.provider.BiomeProvider;
+import com.terraforged.biome.provider.TerraBiomeProvider;
 import com.terraforged.chunk.TerraContext;
 import com.terraforged.core.cell.Cell;
 import net.minecraft.world.biome.Biome;
 
-public class TestBiomeProvider extends BiomeProvider {
+public class TestBiomeProvider extends TerraBiomeProvider {
 
     public TestBiomeProvider(TerraContext chunkContext) {
         super(chunkContext);

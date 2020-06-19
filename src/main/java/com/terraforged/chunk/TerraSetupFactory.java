@@ -5,6 +5,7 @@ import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.surface.SurfaceManager;
 import com.terraforged.biome.ModBiomes;
 import com.terraforged.biome.surface.BriceSurface;
+import com.terraforged.biome.surface.DesertSurface;
 import com.terraforged.biome.surface.ForestSurface;
 import com.terraforged.biome.surface.IcebergsSurface;
 import com.terraforged.biome.surface.SwampSurface;
@@ -109,9 +110,15 @@ public class TerraSetupFactory {
 
     public static SurfaceManager createSurfaceManager(TerraContext context) {
         SurfaceManager manager = new SurfaceManager();
-        manager.replace(Biomes.DEEP_FROZEN_OCEAN.delegate.get(), new IcebergsSurface(context, 30, 30));
-        manager.replace(Biomes.FROZEN_OCEAN.delegate.get(), new IcebergsSurface(context, 20, 15));
+        manager.replace(Biomes.DEEP_FROZEN_OCEAN, new IcebergsSurface(context, 30, 30));
+        manager.replace(Biomes.FROZEN_OCEAN, new IcebergsSurface(context, 20, 15));
         manager.append(ModBiomes.BRYCE, new BriceSurface(context.seed));
+        manager.append(
+                new DesertSurface(context),
+                Biomes.DESERT,
+                Biomes.DESERT_HILLS,
+                Biomes.DESERT_LAKES
+        );
         manager.replace(
                 new SwampSurface(),
                 Biomes.SWAMP.delegate.get(),
@@ -120,6 +127,7 @@ public class TerraSetupFactory {
         manager.append(
                 new ForestSurface(context),
                 Biomes.FOREST,
+                Biomes.BIRCH_FOREST_HILLS,
                 Biomes.TALL_BIRCH_FOREST,
                 Biomes.DARK_FOREST,
                 Biomes.DARK_FOREST_HILLS

@@ -36,6 +36,8 @@ import com.terraforged.world.heightmap.WorldLookup;
 import com.terraforged.world.terrain.decorator.Decorator;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeManager;
+import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,16 +46,18 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-public class BiomeProvider extends AbstractBiomeProvider {
+public class TerraBiomeProvider extends AbstractBiomeProvider {
 
+    private final long seed;
     private final BiomeMap biomeMap;
     private final TerraContext context;
     private final WorldLookup worldLookup;
     private final BiomeModifierManager modifierManager;
     private final Map<Biome, List<Decorator>> decorators = new HashMap<>();
 
-    public BiomeProvider(TerraContext context) {
+    public TerraBiomeProvider(TerraContext context) {
         this.context = context;
+        this.seed = context.terraSettings.world.seed;
         this.biomeMap = BiomeHelper.createBiomeMap();
         this.worldLookup = new WorldLookup(context.factory, context);
         this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomeMap), context.copy());
@@ -122,6 +126,10 @@ public class BiomeProvider extends AbstractBiomeProvider {
             }
         }
         return blockpos;
+    }
+
+    public Biome getSurfaceBiome(int x, int z, BiomeManager.IBiomeReader reader) {
+        return ColumnFuzzedBiomeMagnifier.INSTANCE.getBiome(seed, x, 0, z, reader);
     }
 
     public WorldLookup getWorldLookup() {

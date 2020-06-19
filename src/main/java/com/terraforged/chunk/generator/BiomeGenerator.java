@@ -1,6 +1,6 @@
 package com.terraforged.chunk.generator;
 
-import com.terraforged.biome.provider.BiomeProvider;
+import com.terraforged.biome.provider.TerraBiomeProvider;
 import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.util.TerraContainer;
 import com.terraforged.core.region.chunk.ChunkReader;
@@ -12,7 +12,7 @@ import net.minecraft.world.chunk.IChunk;
 public class BiomeGenerator implements Generator.Biomes {
 
     private final TerraChunkGenerator generator;
-    private final BiomeProvider biomeProvider;
+    private final TerraBiomeProvider biomeProvider;
 
     public BiomeGenerator(TerraChunkGenerator generator) {
         this.generator = generator;

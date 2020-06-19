@@ -28,7 +28,7 @@ package com.terraforged.chunk;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.surface.SurfaceManager;
 import com.terraforged.api.material.layer.LayerManager;
-import com.terraforged.biome.provider.BiomeProvider;
+import com.terraforged.biome.provider.TerraBiomeProvider;
 import com.terraforged.chunk.generator.BiomeGenerator;
 import com.terraforged.chunk.generator.FeatureGenerator;
 import com.terraforged.chunk.generator.Generator;
@@ -68,7 +68,7 @@ import java.util.List;
 public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
 
     private final TerraContext context;
-    private final BiomeProvider biomeProvider;
+    private final TerraBiomeProvider biomeProvider;
 
     private final Generator.Mobs mobGenerator;
     private final Generator.Biomes biomeGenerator;
@@ -88,7 +88,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
 
     private final RegionCache regionCache;
 
-    public TerraChunkGenerator(TerraContext context, BiomeProvider biomeProvider, GenerationSettings settings) {
+    public TerraChunkGenerator(TerraContext context, TerraBiomeProvider biomeProvider, GenerationSettings settings) {
         super(context.world, biomeProvider, settings);
         this.context = context;
         this.biomeProvider = biomeProvider;
@@ -188,7 +188,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
     }
 
     @Override
-    public BiomeProvider getBiomeProvider() {
+    public TerraBiomeProvider getBiomeProvider() {
         return biomeProvider;
     }
 
