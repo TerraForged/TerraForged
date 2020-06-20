@@ -28,23 +28,26 @@ package com.terraforged.chunk.settings;
 import com.terraforged.core.serialization.annotation.Comment;
 import com.terraforged.core.serialization.annotation.Range;
 import com.terraforged.core.serialization.annotation.Serializable;
+import net.minecraft.world.gen.OverworldGenSettings;
 
 @Serializable
 public class StructureSettings {
 
-    public Structure villages = new Structure(32, 8);
+    private static final StructureDefaults defaults = new StructureDefaults();
 
-    public Structure mansions = new Structure(80, 20);
+    public Structure villages = new Structure(defaults.village_dist, defaults.village_sep);
 
-    public Structure strongholds = new Structure(32, 3);
+    public Structure mansions = new Structure(defaults.mansionDist, defaults.mansionSep);
 
-    public Structure shipwrecks = new Structure(16, 8);
+    public Structure strongholds = new Structure(defaults.strongholdDist, defaults.strongholdSep);
 
-    public Structure oceanRuins = new Structure(16, 8);
+    public Structure shipwrecks = new Structure(defaults.shipWreckDist, defaults.shipWreckSep);
 
-    public Structure oceanMonuments = new Structure(32, 5);
+    public Structure oceanRuins = new Structure(defaults.oceanRuinDist, defaults.oceanRuinSep);
 
-    public Structure otherStructures = new Structure(32, 1);
+    public Structure oceanMonuments = new Structure(defaults.oceanMonumentDist, defaults.oceanMonumentSep);
+
+    public Structure otherStructures = new Structure(defaults.otherStructureDist, defaults.otherStructureSep);
 
     @Serializable
     public static class Structure {
@@ -64,6 +67,48 @@ public class StructureSettings {
         public Structure(int distance, int separation) {
             this.distance = distance;
             this.separation = separation;
+        }
+    }
+
+    private static class StructureDefaults {
+
+        public final int village_dist;
+        public final int village_sep;
+        public final int mansionDist;
+        public final int mansionSep;
+        public final int strongholdDist;
+        public final int strongholdSep;
+        public final int shipWreckDist;
+        public final int shipWreckSep;
+        public final int oceanRuinDist;
+        public final int oceanRuinSep;
+        public final int oceanMonumentDist;
+        public final int oceanMonumentSep;
+        public final int otherStructureDist;
+        public final int otherStructureSep;
+
+        public StructureDefaults() {
+            OverworldGenSettings defaults = new OverworldGenSettings();
+            village_dist = (int) (defaults.getVillageDistance() * 1.5);
+            village_sep = (int) (defaults.getVillageSeparation() * 1.5);
+
+            shipWreckDist = (int) (defaults.getShipwreckDistance() * 2.0);
+            shipWreckSep = (int) (defaults.getShipwreckSeparation() * 2.0);
+
+            oceanRuinDist = (int) (defaults.getOceanRuinDistance() * 2.0);
+            oceanRuinSep = (int) (defaults.getOceanRuinSeparation() * 2.0);
+
+            oceanMonumentDist = (int) (defaults.getOceanRuinDistance() * 1.5);
+            oceanMonumentSep = (int) (defaults.getOceanRuinSeparation() * 1.5);
+
+            mansionDist = defaults.getMansionDistance();
+            mansionSep = defaults.getMansionSeparation();
+
+            strongholdDist = defaults.getMansionSeparation();
+            strongholdSep = defaults.getMansionSeparation();
+
+            otherStructureDist = defaults.getBiomeFeatureDistance();
+            otherStructureSep = defaults.getBiomeFeatureSeparation();
         }
     }
 }
