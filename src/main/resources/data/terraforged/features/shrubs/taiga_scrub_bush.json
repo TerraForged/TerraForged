@@ -1,13 +1,13 @@
 {
   "biomes": [
-    "terraforged:taiga_scrub"
+    "minecraft:snowy_tundra",
+    "minecraft:taiga",
+    "minecraft:taiga_hills",
+    "terraforged:taiga_scrub",
+    "terraforged:snowy_taiga_scrub"
   ],
-  "match": [
-    [
-      "minecraft:grass"
-    ]
-  ],
-  "before": {
+  "stage": "VEGETAL_DECORATION",
+  "prepend": {
     "name": "minecraft:decorated",
     "config": {
       "feature": {

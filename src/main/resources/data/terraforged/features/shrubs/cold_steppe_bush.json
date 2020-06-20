@@ -2,12 +2,8 @@
   "biomes": [
     "terraforged:cold_steppe"
   ],
-  "match": [
-    [
-      "minecraft:grass"
-    ]
-  ],
-  "before": {
+  "stage": "VEGETAL_DECORATION",
+  "prepend": {
     "name": "minecraft:decorated",
     "config": {
       "feature": {

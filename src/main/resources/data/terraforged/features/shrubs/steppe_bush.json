@@ -4,12 +4,8 @@
     "terraforged:savanna_scrub",
     "terraforged:shattered_savanna_scrub"
   ],
-  "match": [
-    [
-      "minecraft:grass"
-    ]
-  ],
-  "before": {
+  "stage": "VEGETAL_DECORATION",
+  "prepend": {
     "name": "minecraft:decorated",
     "config": {
       "feature": {

@@ -69,10 +69,18 @@ public class BushFeature extends Feature<BushFeature.Config> {
     private boolean place(IWorld world, BlockPos.Mutable center, BlockPos.Mutable pos, Random random, Config config) {
         center.setY(world.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, center.getX(), center.getZ()));
 
+        // don't replace solid blocks
         if (BlockUtils.isSolid(world, center)) {
             return false;
         }
 
+        // only place on solid blocks
+        center.move(Direction.DOWN, 1);
+        if (!BlockUtils.isSolid(world, center)) {
+            return false;
+        }
+
+        center.move(Direction.UP, 1);
         world.setBlockState(center, config.trunk, 2);
 
         for (Vec3i neighbour : leaves) {
