@@ -25,10 +25,10 @@
 
 package com.terraforged.gui.preview;
 
+import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.gui.OverlayScreen;
 import com.terraforged.gui.element.TerraButton;
 import com.terraforged.gui.page.UpdatablePage;
-import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
 

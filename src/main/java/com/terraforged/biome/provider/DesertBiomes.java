@@ -50,6 +50,7 @@ public class DesertBiomes {
 
     private final Set<Biome> reds;
     private final Set<Biome> whites;
+    private final Set<Biome> deserts;
     private final List<Biome> redSand;
     private final List<Biome> whiteSand;
     private final LayerManager layerManager;
@@ -76,12 +77,16 @@ public class DesertBiomes {
         this.layerManager = materials.getLayerManager();
         this.whiteSand = new ArrayList<>(white);
         this.redSand = new ArrayList<>(red);
+        this.deserts = new HashSet<>(deserts);
         this.whites = new HashSet<>(white);
         this.reds = new HashSet<>(red);
         this.whiteSand.sort(Comparator.comparing(BiomeHelper::getId));
         this.redSand.sort(Comparator.comparing(BiomeHelper::getId));
         this.maxRedIndex = red.size() - 1;
         this.maxWhiteIndex = white.size() - 1;
+    }
+    public boolean isDesert(Biome biome) {
+        return deserts.contains(biome);
     }
 
     public boolean isRedDesert(Biome biome) {

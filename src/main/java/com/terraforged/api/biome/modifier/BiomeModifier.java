@@ -36,6 +36,10 @@ public interface BiomeModifier extends Comparable<BiomeModifier> {
 
     Biome modify(Biome in, Cell cell, int x, int z);
 
+    default boolean exitEarly() {
+        return false;
+    }
+
     @Override
     default int compareTo(BiomeModifier other) {
         // reverse order

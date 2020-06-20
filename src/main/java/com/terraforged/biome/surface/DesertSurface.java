@@ -11,17 +11,21 @@ import net.minecraft.block.Blocks;
 
 public class DesertSurface implements Surface {
 
+    private final float min;
     private final float level;
     private final Module noise;
+    private final BlockState sandstone = States.SANDSTONE.get();
     private final BlockState low = Blocks.TERRACOTTA.delegate.get().getDefaultState();
     private final BlockState mid = Blocks.ORANGE_TERRACOTTA.delegate.get().getDefaultState();
     private final BlockState high = Blocks.BROWN_TERRACOTTA.delegate.get().getDefaultState();
 
     public DesertSurface(GeneratorContext context) {
+        min = context.levels.ground(10);
+
         level = context.levels.ground(40);
 
-        noise = Source.perlin(context.seed.next(), 10, 1)
-                .scale(context.levels.scale(10));
+        noise = Source.perlin(context.seed.next(), 8, 1)
+                .scale(context.levels.scale(16));
     }
 
     @Override
@@ -30,15 +34,22 @@ public class DesertSurface implements Surface {
             return;
         }
 
-        if (ctx.cell.steepness > 0.3 || ctx.cell.value + noise.getValue(x, z) > level) {
-            BlockState state = States.SANDSTONE.get();
+        if (ctx.cell.value < min) {
+            return;
+        }
 
-            if (ctx.cell.value > level) {
-                if (ctx.cell.steepness > 0.85) {
+        float value = ctx.cell.value + noise.getValue(x, z);
+        if (ctx.cell.steepness > 0.3 || value > level) {
+            BlockState state = sandstone;
+
+            if (value > level) {
+                if (ctx.cell.steepness > 0.975) {
+                    state = low;
+                } else if (ctx.cell.steepness > 0.85) {
                     state = high;
                 } else if (ctx.cell.steepness > 0.75) {
                     state = mid;
-                } else if (ctx.cell.steepness > 0.625) {
+                } else if (ctx.cell.steepness > 0.65) {
                     state = low;
                 }
             }

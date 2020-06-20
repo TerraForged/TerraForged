@@ -25,6 +25,8 @@
 
 package com.terraforged.gui;
 
+import com.terraforged.chunk.settings.SettingsHelper;
+import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.gui.element.TerraLabel;
 import com.terraforged.gui.page.Page;
 import com.terraforged.gui.page.PresetsPage;
@@ -32,8 +34,6 @@ import com.terraforged.gui.page.SimplePage;
 import com.terraforged.gui.page.SimplePreviewPage;
 import com.terraforged.gui.page.WorldPage;
 import com.terraforged.gui.preview2.PreviewPage;
-import com.terraforged.chunk.settings.SettingsHelper;
-import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.util.nbt.NBTHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;

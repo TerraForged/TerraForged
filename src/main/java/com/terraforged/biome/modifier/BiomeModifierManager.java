@@ -48,8 +48,7 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
         desertBiomes = new DesertBiomes(context.materials, biomes.getAllBiomes(BiomeType.DESERT));
         List<BiomeModifier> modifiers = new ArrayList<>();
         modifiers.add(new CoastModifier(biomes, context));
-        modifiers.add(new DesertColorModifier(context, desertBiomes));
-        modifiers.add(new SandBiomeModifier(context));
+        modifiers.add(new DesertColorModifier(desertBiomes));
         modifiers.add(new BeachModifier(biomes, context));
         Collections.sort(modifiers);
         this.biomeModifiers = modifiers;
@@ -84,6 +83,9 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
         for (BiomeModifier modifier : biomeModifiers) {
             if (modifier.test(biome)) {
                 biome = modifier.modify(biome, cell, x, z);
+                if (modifier.exitEarly()) {
+                    return biome;
+                }
             }
         }
         return biome;

@@ -1,13 +1,13 @@
 package com.terraforged.gui.preview2;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.core.concurrent.thread.ThreadPool;
 import com.terraforged.core.concurrent.thread.ThreadPools;
-import com.terraforged.core.tile.gen.TileGenerator;
 import com.terraforged.core.render.RenderAPI;
 import com.terraforged.core.render.RenderSettings;
 import com.terraforged.core.render.RenderWorld;
-import com.terraforged.chunk.settings.TerraSettings;
+import com.terraforged.core.tile.gen.TileGenerator;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.MutableVeci;
 import com.terraforged.world.continent.SpawnType;

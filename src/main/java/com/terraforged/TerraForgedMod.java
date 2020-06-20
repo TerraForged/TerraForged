@@ -26,6 +26,7 @@
 package com.terraforged;
 
 import com.terraforged.api.material.WGTags;
+import com.terraforged.chunk.settings.SettingsHelper;
 import com.terraforged.command.TerraCommand;
 import com.terraforged.config.ConfigManager;
 import com.terraforged.data.DataGen;
@@ -35,7 +36,6 @@ import com.terraforged.feature.feature.BushFeature;
 import com.terraforged.feature.feature.DiskFeature;
 import com.terraforged.feature.feature.FreezeLayer;
 import com.terraforged.fm.template.TemplateManager;
-import com.terraforged.chunk.settings.SettingsHelper;
 import com.terraforged.util.DataPackFinder;
 import com.terraforged.util.Environment;
 import net.minecraft.world.biome.Biomes;

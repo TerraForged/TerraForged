@@ -68,14 +68,7 @@ public class TerraContainer extends BiomeContainer {
             return (TerraContainer) biomes;
         }
 
-        TerraContainer container;
-        if (biomes == null) {
-            // create new container based on the provided ChunkReader
-            container = TerraContainer.create(reader, biomeProvider);
-        } else {
-            // converts an existing non-tf biome container into one that TerraForged can use
-            container = TerraContainer.convert(chunk.getPos(), biomes, biomeProvider);
-        }
+        TerraContainer container = TerraContainer.create(reader, biomeProvider);
 
         // replace/set the primer's biomes
         ((ChunkPrimer) chunk).func_225548_a_(container);

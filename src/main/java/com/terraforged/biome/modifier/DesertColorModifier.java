@@ -28,23 +28,19 @@ package com.terraforged.biome.modifier;
 import com.terraforged.api.biome.modifier.BiomeModifier;
 import com.terraforged.biome.provider.DesertBiomes;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.n2d.Module;
-import com.terraforged.n2d.Source;
-import com.terraforged.world.GeneratorContext;
-import com.terraforged.world.climate.Climate;
 import net.minecraft.world.biome.Biome;
 
 public class DesertColorModifier implements BiomeModifier {
 
-    private final Module noise;
-    private final Climate climate;
     private final DesertBiomes biomes;
 
-    public DesertColorModifier(GeneratorContext context, DesertBiomes biomes) {
-        int scale = context.settings.terrain.general.terrainRegionSize;
+    public DesertColorModifier(DesertBiomes biomes) {
         this.biomes = biomes;
-        this.climate = context.factory.getClimate();
-        this.noise = Source.cell(context.seed.next(), scale * 3).warp(context.seed.next(), scale / 2, 1, scale / 4F);
+    }
+
+    @Override
+    public boolean exitEarly() {
+        return true;
     }
 
     @Override
@@ -54,20 +50,19 @@ public class DesertColorModifier implements BiomeModifier {
 
     @Override
     public boolean test(Biome biome) {
-        return biome.getCategory() == Biome.Category.DESERT;
+        return biome.getCategory() == Biome.Category.DESERT
+                || biome.getCategory() == Biome.Category.MESA
+                || biomes.isDesert(biome);
     }
 
     @Override
     public Biome modify(Biome in, Cell cell, int x, int z) {
-        float px = x + climate.getOffsetX(x, z, 12);
-        float pz = z + climate.getOffsetZ(x, z, 12);
-        float type = noise.getValue(px, pz);
         if (biomes.isRedDesert(in)) {
-            if (type <= 0.5F) {
+            if (cell.macroNoise <= 0.5F) {
                 return biomes.getWhiteDesert(cell.biome);
             }
         } else {
-            if (type > 0.5F) {
+            if (cell.macroNoise > 0.5F) {
                 return biomes.getRedDesert(cell.biome);
             }
         }

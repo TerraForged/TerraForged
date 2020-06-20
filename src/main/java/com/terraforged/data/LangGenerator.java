@@ -1,8 +1,8 @@
 package com.terraforged.data;
 
+import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.core.util.NameUtil;
 import com.terraforged.gui.preview2.PreviewSettings;
-import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;

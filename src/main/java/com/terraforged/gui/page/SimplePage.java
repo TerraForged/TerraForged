@@ -1,7 +1,7 @@
 package com.terraforged.gui.page;
 
-import com.terraforged.gui.OverlayScreen;
 import com.terraforged.chunk.settings.TerraSettings;
+import com.terraforged.gui.OverlayScreen;
 import com.terraforged.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
 
