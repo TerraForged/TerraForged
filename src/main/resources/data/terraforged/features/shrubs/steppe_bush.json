@@ -20,7 +20,7 @@
           "leaves": {
             "Name": "minecraft:acacia_leaves",
             "Properties": {
-              "distance": "7",
+              "distance": "1",
               "persistent": "false"
             }
           },

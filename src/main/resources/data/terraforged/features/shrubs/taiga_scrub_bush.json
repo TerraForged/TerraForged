@@ -22,7 +22,7 @@
           "leaves": {
             "Name": "minecraft:spruce_leaves",
             "Properties": {
-              "distance": "7",
+              "distance": "1",
               "persistent": "false"
             }
           },
