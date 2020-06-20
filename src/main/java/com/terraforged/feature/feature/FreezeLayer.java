@@ -1,5 +1,6 @@
 package com.terraforged.feature.feature;
 
+import com.terraforged.fm.template.BlockUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SnowyDirtBlock;
@@ -73,15 +74,17 @@ public class FreezeLayer extends Feature<NoFeatureConfig> {
                     return false;
                 }
 
-                BlockState above = world.getBlockState(top.up());
+                top.move(Direction.UP, 1);
+                BlockState above = world.getBlockState(top);
                 if (BlockTags.LOGS.contains(above.getBlock()) || BlockTags.LEAVES.contains(above.getBlock())) {
                     return false;
                 }
 
-                setSnow(world, top, below, stateUnder);
-
-                if (above.getBlock() != Blocks.AIR) {
-                    world.setBlockState(top, Blocks.AIR.getDefaultState(), 2);
+                top.move(Direction.DOWN, 1);
+                if (setSnow(world, top, below, stateUnder)) {
+                    if (above.getBlock() != Blocks.AIR) {
+                        world.setBlockState(top, Blocks.AIR.getDefaultState(), 2);
+                    }
                 }
             } else {
                 setSnow(world, top, below, stateUnder);
@@ -90,11 +93,16 @@ public class FreezeLayer extends Feature<NoFeatureConfig> {
         return hasFrozen;
     }
 
-    private void setSnow(IWorld world, BlockPos pos1, BlockPos pos2, BlockState below) {
+    private boolean setSnow(IWorld world, BlockPos pos1, BlockPos pos2, BlockState below) {
+        if (BlockUtils.isSolid(world, pos1)) {
+            return false;
+        }
+
         world.setBlockState(pos1, Blocks.SNOW.getDefaultState(), 2);
 
         if (below.has(SnowyDirtBlock.SNOWY)) {
             world.setBlockState(pos2, below.with(SnowyDirtBlock.SNOWY, true), 2);
         }
+        return true;
     }
 }

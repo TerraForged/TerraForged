@@ -1,0 +1,44 @@
+{
+  "biomes": [
+    "terraforged:taiga_scrub"
+  ],
+  "match": [
+    [
+      "minecraft:grass"
+    ]
+  ],
+  "before": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "terraforged:bush",
+        "config": {
+          "trunk": {
+            "Name": "minecraft:spruce_log",
+            "Properties": {
+              "axis": "y"
+            }
+          },
+          "leaves": {
+            "Name": "minecraft:spruce_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "false"
+            }
+          },
+          "air_chance": 0.05,
+          "leaf_chance": 0.075,
+          "size_chance": 0.6
+        }
+      },
+      "decorator": {
+        "name": "minecraft:count_extra_heightmap",
+        "config": {
+          "count": 0,
+          "extra_chance": 0.1,
+          "extra_count": 1
+        }
+      }
+    }
+  }
+}
