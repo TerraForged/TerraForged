@@ -37,7 +37,7 @@
         "name": "minecraft:count_extra_heightmap",
         "config": {
           "count": 0,
-          "extra_chance": 0.12,
+          "extra_chance": 0.125,
           "extra_count": 1
         }
       }

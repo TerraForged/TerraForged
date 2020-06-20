@@ -67,12 +67,16 @@ public class BushFeature extends Feature<BushFeature.Config> {
     }
 
     private boolean place(IWorld world, BlockPos.Mutable center, BlockPos.Mutable pos, Random random, Config config) {
-        int y = world.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, center.getX(), center.getZ());
+        center.setY(world.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, center.getX(), center.getZ()));
 
-        center.setY(y);
+        if (BlockUtils.isSolid(world, center)) {
+            return false;
+        }
+
         world.setBlockState(center, config.trunk, 2);
 
         for (Vec3i neighbour : leaves) {
+            // randomly skip NESW neighbours
             if (neighbour.getY() == 0 && random.nextFloat() < config.airChance) {
                 continue;
             }
@@ -83,9 +87,21 @@ public class BushFeature extends Feature<BushFeature.Config> {
             if (!BlockUtils.isSolid(world, pos)) {
                 world.setBlockState(pos, config.leaves, 2);
 
+                // randomly place extra leaves below if non-solid
+                if (neighbour.getY() == 0 && random.nextFloat() < config.leafChance) {
+                    pos.move(Direction.DOWN, 1);
+                    if (!BlockUtils.isSolid(world, pos)) {
+                        world.setBlockState(pos, config.leaves, 2);
+                    }
+                    pos.move(Direction.UP, 1);
+                }
+
+                // randomly place extra leaves above
                 if (neighbour.getY() == 0 && random.nextFloat() < config.leafChance) {
                     pos.move(Direction.UP, 1);
-                    world.setBlockState(pos, config.leaves, 2);
+                    if (!BlockUtils.isSolid(world, pos)) {
+                        world.setBlockState(pos, config.leaves, 2);
+                    }
                 }
             }
         }
