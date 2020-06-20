@@ -172,6 +172,12 @@
   "display.terraforged.world.properties.sea_level": "Sea Level",
   "display.terraforged.world.properties.spawn_type": "Spawn Type",
   "display.terraforged.world.properties.world_height": "World Height",
+  "display.terraforged.world.transition_points": "Transition Points",
+  "display.terraforged.world.transition_points.beach": "Beach",
+  "display.terraforged.world.transition_points.coast": "Coast",
+  "display.terraforged.world.transition_points.deep_ocean": "Deep Ocean",
+  "display.terraforged.world.transition_points.inland": "Inland",
+  "display.terraforged.world.transition_points.shallow_ocean": "Shallow Ocean",
   "generator.terraforged": "TerraForged",
   "generator.terratest": "TerraTest",
   "tooltip.terraforged.climate.biome_edge_shape.gain": "Controls the gain subsequent noise octaves",
@@ -291,5 +297,10 @@
   "tooltip.terraforged.world.continent.ocean_scale": "Controls the amount of ocean between continents",
   "tooltip.terraforged.world.properties.sea_level": "Controls the sea level",
   "tooltip.terraforged.world.properties.spawn_type": "Set whether spawn should be close to x=0,z=0 or the centre of the nearest continent",
-  "tooltip.terraforged.world.properties.world_height": "Controls the world height"
+  "tooltip.terraforged.world.properties.world_height": "Controls the world height",
+  "tooltip.terraforged.world.transition_points.beach": "The beach transition point",
+  "tooltip.terraforged.world.transition_points.coast": "The coast transition point",
+  "tooltip.terraforged.world.transition_points.deep_ocean": "The deep ocean transition point",
+  "tooltip.terraforged.world.transition_points.inland": "The inland transition point",
+  "tooltip.terraforged.world.transition_points.shallow_ocean": "The shallow ocean transition point"
 }

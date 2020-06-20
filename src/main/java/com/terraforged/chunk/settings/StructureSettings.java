@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.settings;
+package com.terraforged.chunk.settings;
 
 import com.terraforged.core.serialization.annotation.Comment;
 import com.terraforged.core.serialization.annotation.Range;

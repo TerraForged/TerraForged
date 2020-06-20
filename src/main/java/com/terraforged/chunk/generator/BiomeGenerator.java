@@ -3,7 +3,7 @@ package com.terraforged.chunk.generator;
 import com.terraforged.biome.provider.TerraBiomeProvider;
 import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.util.TerraContainer;
-import com.terraforged.core.region.chunk.ChunkReader;
+import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.world.terrain.decorator.Decorator;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;

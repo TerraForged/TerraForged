@@ -28,7 +28,7 @@ package com.terraforged.gui.page;
 import com.terraforged.TerraWorld;
 import com.terraforged.gui.OverlayScreen;
 import com.terraforged.gui.element.TerraTextInput;
-import com.terraforged.settings.TerraSettings;
+import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.util.nbt.NBTHelper;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.nbt.CompoundNBT;

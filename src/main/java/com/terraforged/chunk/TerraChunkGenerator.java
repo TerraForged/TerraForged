@@ -38,10 +38,10 @@ import com.terraforged.chunk.generator.SurfaceGenerator;
 import com.terraforged.chunk.generator.TerrainCarver;
 import com.terraforged.chunk.generator.TerrainGenerator;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.region.Region;
-import com.terraforged.core.region.Size;
-import com.terraforged.core.region.chunk.ChunkReader;
-import com.terraforged.core.region.gen.RegionCache;
+import com.terraforged.core.tile.Tile;
+import com.terraforged.core.tile.Size;
+import com.terraforged.core.tile.chunk.ChunkReader;
+import com.terraforged.core.tile.gen.TileCache;
 import com.terraforged.feature.BlockDataManager;
 import com.terraforged.fm.FeatureManager;
 import com.terraforged.fm.data.DataManager;
@@ -86,7 +86,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
     private final List<ColumnDecorator> baseDecorators;
     private final List<ColumnDecorator> postProcessors;
 
-    private final RegionCache regionCache;
+    private final TileCache tileCache;
 
     public TerraChunkGenerator(TerraContext context, TerraBiomeProvider biomeProvider, GenerationSettings settings) {
         super(context.world, biomeProvider, settings);
@@ -105,7 +105,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
         this.geologyManager = TerraSetupFactory.createGeologyManager(context);
         this.baseDecorators = TerraSetupFactory.createBaseDecorators(geologyManager, context);
         this.postProcessors = TerraSetupFactory.createFeatureDecorators(context);
-        this.regionCache = context.cache;
+        this.tileCache = context.cache;
 
         try (DataManager data = TerraSetupFactory.createDataManager()) {
             FeatureManager.initData(data);
@@ -248,19 +248,19 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
     }
 
     public final void queueChunk(int chunkX, int chunkZ) {
-        int rx = regionCache.chunkToRegion(chunkX);
-        int rz = regionCache.chunkToRegion(chunkZ);
-        regionCache.queueRegion(rx, rz);
+        int rx = tileCache.chunkToRegion(chunkX);
+        int rz = tileCache.chunkToRegion(chunkZ);
+        tileCache.queueRegion(rx, rz);
     }
 
-    public final Region getRegion(int chunkX, int chunkZ) {
-        int rx = regionCache.chunkToRegion(chunkX);
-        int rz = regionCache.chunkToRegion(chunkZ);
-        return regionCache.getRegion(rx, rz);
+    public final Tile getTile(int chunkX, int chunkZ) {
+        int rx = tileCache.chunkToRegion(chunkX);
+        int rz = tileCache.chunkToRegion(chunkZ);
+        return tileCache.getRegion(rx, rz);
     }
 
     public final ChunkReader getChunkReader(int chunkX, int chunkZ) {
-        return regionCache.getChunk(chunkX, chunkZ);
+        return tileCache.getChunk(chunkX, chunkZ);
     }
 
     public static ChunkReader getChunk(IWorld world, ChunkGenerator<?> generator) {

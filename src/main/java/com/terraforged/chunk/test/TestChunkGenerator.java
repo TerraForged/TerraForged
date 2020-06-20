@@ -28,10 +28,6 @@ package com.terraforged.chunk.test;
 import com.terraforged.biome.provider.TerraBiomeProvider;
 import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.TerraContext;
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.cell.Populator;
-import com.terraforged.world.GeneratorContext;
-import com.terraforged.world.heightmap.WorldHeightmap;
 import net.minecraft.world.gen.GenerationSettings;
 
 public class TestChunkGenerator extends TerraChunkGenerator {
@@ -46,26 +42,5 @@ public class TestChunkGenerator extends TerraChunkGenerator {
     @Override
     public TerraBiomeProvider getBiomeProvider() {
         return biomeProvider;
-    }
-
-    private static class TestHeightMap extends WorldHeightmap {
-
-        private final Populator populator;
-
-        public TestHeightMap(GeneratorContext context) {
-            super(context);
-            this.populator = getPopulator(Test.getTerrainType(context.terrain));
-        }
-
-        @Override
-        public void apply(Cell cell, float x, float y) {
-            super.apply(cell, x, y);
-            populator.apply(cell, x, y);
-        }
-
-        @Override
-        public void tag(Cell cell, float x, float y) {
-            populator.tag(cell, x, y);
-        }
     }
 }

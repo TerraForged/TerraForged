@@ -5,7 +5,7 @@ import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.column.ChunkPopulator;
 import com.terraforged.chunk.util.FastChunk;
 import com.terraforged.chunk.util.TerraContainer;
-import com.terraforged.core.region.chunk.ChunkReader;
+import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.feature.TerrainHelper;
 import com.terraforged.world.climate.Climate;
 import com.terraforged.world.heightmap.Levels;

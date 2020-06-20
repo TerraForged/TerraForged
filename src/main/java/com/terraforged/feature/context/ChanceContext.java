@@ -6,7 +6,7 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.cache.SafeCloseable;
 import com.terraforged.core.concurrent.pool.ObjectPool;
-import com.terraforged.core.region.chunk.ChunkReader;
+import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.world.heightmap.Levels;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;

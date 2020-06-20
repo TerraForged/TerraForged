@@ -31,10 +31,10 @@ import com.terraforged.api.chunk.surface.ChunkSurfaceBuffer;
 import com.terraforged.api.chunk.surface.SurfaceContext;
 import com.terraforged.config.PerfDefaults;
 import com.terraforged.core.concurrent.thread.ThreadPools;
-import com.terraforged.core.region.gen.RegionCache;
-import com.terraforged.core.region.gen.RegionGenerator;
+import com.terraforged.core.tile.gen.TileCache;
+import com.terraforged.core.tile.gen.TileGenerator;
 import com.terraforged.material.Materials;
-import com.terraforged.settings.TerraSettings;
+import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.WorldGeneratorFactory;
 import com.terraforged.world.heightmap.Heightmap;
@@ -74,13 +74,13 @@ public class TerraContext extends GeneratorContext {
         return new SurfaceContext(buffer, levels, terrain, factory.getClimate(), settings, world.getSeed());
     }
 
-    public static RegionCache createCache(WorldGeneratorFactory factory) {
+    public static TileCache createCache(WorldGeneratorFactory factory) {
         CommentedConfig config = PerfDefaults.getAndPrintPerfSettings();
         boolean batching = config.getOrElse("batching",false);
         int tileSize = Math.min(PerfDefaults.MAX_TILE_SIZE, Math.max(2, config.getInt("tile_size")));
         int batchCount = Math.min(PerfDefaults.MAX_BATCH_COUNT, Math.max(1, config.getInt("batch_count")));
         int threadCount = Math.min(PerfDefaults.MAX_THREAD_COUNT, Math.max(1, config.getInt("thread_count")));
-        return RegionGenerator.builder()
+        return TileGenerator.builder()
                 .pool(ThreadPools.create(threadCount, batching))
                 .size(tileSize, 2)
                 .batch(batchCount)

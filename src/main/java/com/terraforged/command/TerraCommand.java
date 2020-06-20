@@ -44,7 +44,7 @@ import com.terraforged.command.search.TerrainSearchTask;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.data.DataGen;
-import com.terraforged.settings.SettingsHelper;
+import com.terraforged.chunk.settings.SettingsHelper;
 import com.terraforged.world.WorldGenerator;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.Terrains;

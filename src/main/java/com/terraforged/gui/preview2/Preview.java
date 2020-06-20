@@ -3,11 +3,11 @@ package com.terraforged.gui.preview2;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraforged.core.concurrent.thread.ThreadPool;
 import com.terraforged.core.concurrent.thread.ThreadPools;
-import com.terraforged.core.region.gen.RegionGenerator;
+import com.terraforged.core.tile.gen.TileGenerator;
 import com.terraforged.core.render.RenderAPI;
 import com.terraforged.core.render.RenderSettings;
 import com.terraforged.core.render.RenderWorld;
-import com.terraforged.settings.TerraSettings;
+import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.MutableVeci;
 import com.terraforged.world.continent.SpawnType;
@@ -100,7 +100,7 @@ public class Preview extends Widget {
         offsetX = center.x;
         offsetZ = center.z;
 
-        RegionGenerator generator = RegionGenerator.builder()
+        TileGenerator generator = TileGenerator.builder()
                 .pool(threadPool)
                 .size(size, 0)
                 .factory(context.factory)

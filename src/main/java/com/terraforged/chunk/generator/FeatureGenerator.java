@@ -5,7 +5,7 @@ import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.fix.RegionFix;
 import com.terraforged.chunk.util.TerraContainer;
-import com.terraforged.core.region.chunk.ChunkReader;
+import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.util.Environment;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;

@@ -1,4 +1,4 @@
-package com.terraforged.settings;
+package com.terraforged.chunk.settings;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

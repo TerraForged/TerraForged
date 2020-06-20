@@ -2,7 +2,7 @@ package com.terraforged.feature.decorator.poisson;
 
 import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.region.chunk.ChunkReader;
+import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import com.terraforged.n2d.util.NoiseUtil;

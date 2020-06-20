@@ -34,7 +34,7 @@ import com.terraforged.feature.decorator.poisson.PoissonAtSurface;
 import com.terraforged.feature.feature.DiskFeature;
 import com.terraforged.feature.feature.FreezeLayer;
 import com.terraforged.fm.template.TemplateManager;
-import com.terraforged.settings.SettingsHelper;
+import com.terraforged.chunk.settings.SettingsHelper;
 import com.terraforged.util.DataPackFinder;
 import com.terraforged.util.Environment;
 import net.minecraft.world.biome.Biomes;

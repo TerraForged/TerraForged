@@ -3,7 +3,7 @@ package com.terraforged.chunk.util;
 import com.terraforged.api.biome.BiomeVariant;
 import com.terraforged.biome.provider.TerraBiomeProvider;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.core.region.chunk.ChunkReader;
+import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.core.util.PosIterator;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;

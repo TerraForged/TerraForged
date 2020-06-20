@@ -25,7 +25,7 @@
 
 package com.terraforged.chunk;
 
-import com.terraforged.settings.StructureSettings;
+import com.terraforged.chunk.settings.StructureSettings;
 import net.minecraft.world.gen.OverworldGenSettings;
 
 public class TerraGenSettings extends OverworldGenSettings {

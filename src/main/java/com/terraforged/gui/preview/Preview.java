@@ -30,9 +30,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.cache.CacheEntry;
 import com.terraforged.core.concurrent.thread.ThreadPools;
-import com.terraforged.core.region.Region;
-import com.terraforged.core.region.Size;
-import com.terraforged.core.region.gen.RegionGenerator;
+import com.terraforged.core.tile.Tile;
+import com.terraforged.core.tile.Size;
+import com.terraforged.core.tile.gen.TileGenerator;
 import com.terraforged.core.settings.Settings;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.util.nbt.NBTHelper;
@@ -68,8 +68,8 @@ public class Preview extends Button {
     private int seed;
     private long lastUpdate = 0L;
     private Settings settings = new Settings();
-    private CacheEntry<Region> task = null;
-    private Region region = null;
+    private CacheEntry<Tile> task = null;
+    private Tile tile = null;
 
     private String[] labels = {"Area: ", "Terrain: ", "Biome: "};
     private String[] values = {"", "", ""};
@@ -130,8 +130,8 @@ public class Preview extends Button {
     private void preRender() {
         if (task != null && task.isDone()) {
             try {
-                region = task.get();
-                render(region);
+                tile = task.get();
+                render(tile);
             } catch (Throwable t) {
                 t.printStackTrace();
             } finally {
@@ -140,7 +140,7 @@ public class Preview extends Button {
         }
     }
 
-    private void render(Region region) {
+    private void render(Tile tile) {
         NativeImage image = texture.getTextureData();
         if (image == null) {
             return;
@@ -150,7 +150,7 @@ public class Preview extends Button {
         Levels levels = new Levels(settings.world);
 
         int stroke = 2;
-        int width = region.getBlockSize().size;
+        int width = tile.getBlockSize().size;
         int zoom = (101 - previewSettings.zoom);
         int half = width / 2;
 
@@ -163,7 +163,7 @@ public class Preview extends Button {
         float waterLevelModifier = settings.world.properties.seaLevel / (float) settings.world.properties.worldHeight;
         float imageWaterLevelY = image.getHeight() - 1 - (waterLevelModifier * SLICE_HEIGHT * unit);
 
-        region.iterate((cell, x, z) -> {
+        tile.iterate((cell, x, z) -> {
             if (x < stroke || z < stroke || x >= width - stroke || z >= width - stroke) {
                 image.setPixelRGBA(x, z, Color.BLACK.getRGB());
             } else {
@@ -192,7 +192,7 @@ public class Preview extends Button {
         texture.updateDynamicTexture();
     }
 
-    private CacheEntry<Region> generate(Settings settings, CompoundNBT prevSettings) {
+    private CacheEntry<Tile> generate(Settings settings, CompoundNBT prevSettings) {
         NBTHelper.deserialize(prevSettings, previewSettings);
         settings.world.seed = seed;
         this.settings = settings;
@@ -202,7 +202,7 @@ public class Preview extends Button {
         MutableVeci center = new MutableVeci();
         context.factory.getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ, center);
 
-        RegionGenerator renderer = RegionGenerator.builder()
+        TileGenerator renderer = TileGenerator.builder()
                 .pool(ThreadPools.getPool())
                 .size(FACTOR, 0)
                 .factory(context.factory)
@@ -215,20 +215,20 @@ public class Preview extends Button {
     }
 
     private void updateLegend(int mx ,int my) {
-        if (region != null) {
+        if (tile != null) {
             int left = this.x;
             int top = this.y;
             float size = this.width;
             int zoom = (101 - previewSettings.zoom);
-            int width = Math.max(1, region.getBlockSize().size * zoom);
-            int height = Math.max(1, region.getBlockSize().size * zoom);
+            int width = Math.max(1, tile.getBlockSize().size * zoom);
+            int height = Math.max(1, tile.getBlockSize().size * zoom);
             values[0] = width + "x" + height;
             if (mx >= left && mx <= left + size && my >= top && my <= top + size) {
                 float fx = (mx - left) / size;
                 float fz = (my - top) / size;
-                int ix = NoiseUtil.round(fx * region.getBlockSize().size);
-                int iz = NoiseUtil.round(fz * region.getBlockSize().size);
-                Cell cell = region.getCell(ix, iz);
+                int ix = NoiseUtil.round(fx * tile.getBlockSize().size);
+                int iz = NoiseUtil.round(fz * tile.getBlockSize().size);
+                Cell cell = tile.getCell(ix, iz);
                 values[1] = getTerrainName(cell);
                 values[2] = getBiomeName(cell);
             }

@@ -1,6 +1,6 @@
 package com.terraforged.gui.page;
 
-import com.terraforged.settings.TerraSettings;
+import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.util.nbt.NBTHelper;
 
 import java.util.function.Function;

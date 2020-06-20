@@ -6,7 +6,7 @@ import com.terraforged.api.chunk.surface.SurfaceContext;
 import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.util.FastChunk;
 import com.terraforged.chunk.util.TerraContainer;
-import com.terraforged.core.region.chunk.ChunkReader;
+import com.terraforged.core.tile.chunk.ChunkReader;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
