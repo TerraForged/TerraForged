@@ -1,8 +1,33 @@
 package com.terraforged.gui.page;
 
+import com.terraforged.chunk.settings.TerraSettings;
+import com.terraforged.chunk.settings.preset.Preset;
+import com.terraforged.chunk.settings.preset.PresetManager;
+import com.terraforged.gui.Instance;
 import com.terraforged.gui.OverlayScreen;
+import com.terraforged.gui.ScrollPane;
+import com.terraforged.gui.element.TerraButton;
+import com.terraforged.gui.element.TerraLabel;
+import com.terraforged.gui.element.TerraTextInput;
+import com.terraforged.util.nbt.NBTHelper;
+import net.minecraft.nbt.CompoundNBT;
+
+import java.util.Optional;
 
 public class PresetsPage extends BasePage {
+
+    private final UpdatablePage preview;
+    private final TerraTextInput nameInput;
+    private final Instance instance;
+    private final PresetManager manager = PresetManager.load();
+
+    public PresetsPage(Instance instance, UpdatablePage preview) {
+        CompoundNBT value = new CompoundNBT();
+        value.putString("name", "");
+        this.preview = preview;
+        this.instance = instance;
+        this.nameInput = new TerraTextInput("name", value);
+    }
 
     @Override
     public String getTitle() {
@@ -10,12 +35,102 @@ public class PresetsPage extends BasePage {
     }
 
     @Override
+    public void close() {
+        manager.saveAll();
+    }
+
+    @Override
     public void save() {
 
     }
 
+    protected void update() {
+        preview.apply(settings -> NBTHelper.deserialize(instance.settingsData, settings));
+    }
+
     @Override
     public void init(OverlayScreen parent) {
+        rebuildPresetList();
 
+        Column right = getColumn(1);
+        right.scrollPane.addButton(nameInput);
+
+        right.scrollPane.addButton(new TerraButton("Create") {
+            @Override
+            public void onClick(double x, double y) {
+                super.onClick(x, y);
+                // create new preset with default settings
+                Preset preset = new Preset(nameInput.getValue(), new TerraSettings());
+
+                // register with the manager & reset the text field
+                manager.add(preset);
+                nameInput.setText("");
+
+                // update the ui
+                rebuildPresetList();
+            }
+        });
+
+        right.scrollPane.addButton(new TerraButton("Load") {
+            @Override
+            public void onClick(double x, double y) {
+                super.onClick(x, y);
+                getSelected().ifPresent(preset -> load(preset));
+            }
+        });
+
+        right.scrollPane.addButton(new TerraButton("Save") {
+            @Override
+            public void onClick(double x, double y) {
+                super.onClick(x, y);
+                getSelected().ifPresent(preset -> {
+                    // create a copy of the settings
+                    TerraSettings settings = new TerraSettings();
+                    NBTHelper.deserialize(instance.settingsData, settings);
+
+                    // replace the current preset with the updated version
+                    manager.add(new Preset(preset.getName(), settings));
+
+                    // update the ui
+                    rebuildPresetList();
+                });
+            }
+        });
+
+        right.scrollPane.addButton(new TerraButton("Delete") {
+            @Override
+            public void onClick(double x, double y) {
+                super.onClick(x, y);
+                getSelected().ifPresent(preset -> {
+                    // remove & update the ui
+                    manager.remove(preset.getName());
+                    rebuildPresetList();
+                });
+            }
+        });
+    }
+
+    private void load(Preset preset) {
+        instance.sync(preset.getSettings());
+
+        update();
+    }
+
+    private Optional<Preset> getSelected() {
+        ScrollPane.Entry entry = getColumn(0).scrollPane.getSelected();
+        if (entry == null) {
+            return Optional.empty();
+        }
+        return manager.get(entry.option.getMessage());
+    }
+
+    private void rebuildPresetList() {
+        Column left = getColumn(0);
+        left.scrollPane.setRenderSelection(true);
+        left.scrollPane.children().clear();
+
+        for (Preset preset : manager) {
+            left.scrollPane.addButton(new TerraLabel(preset.getName()));
+        }
     }
 }

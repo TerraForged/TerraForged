@@ -1,6 +1,7 @@
 package com.terraforged.gui.page;
 
 import com.terraforged.chunk.settings.TerraSettings;
+import com.terraforged.gui.Instance;
 import com.terraforged.util.nbt.NBTHelper;
 
 import java.util.function.Function;
@@ -9,8 +10,8 @@ public class SimplePreviewPage extends SimplePage {
 
     private final UpdatablePage preview;
 
-    public SimplePreviewPage(String title, String sectionName, UpdatablePage preview, TerraSettings settings, Function<TerraSettings, Object> section) {
-        super(title, sectionName, settings, section);
+    public SimplePreviewPage(String title, String sectionName, UpdatablePage preview, Instance instance, Function<TerraSettings, Object> section) {
+        super(title, sectionName, instance, section);
         this.preview = preview;
     }
 

@@ -26,7 +26,7 @@
 package com.terraforged.gui.page;
 
 import com.terraforged.TerraWorld;
-import com.terraforged.chunk.settings.TerraSettings;
+import com.terraforged.gui.Instance;
 import com.terraforged.gui.OverlayScreen;
 import com.terraforged.gui.element.TerraTextInput;
 import com.terraforged.util.nbt.NBTHelper;
@@ -40,22 +40,15 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class WorldPage extends BasePage {
 
-    private final TerraSettings settings;
     private final UpdatablePage preview;
-    private final CompoundNBT worldSettings;
-    private final CompoundNBT dimSettings;
+    private final Instance instance;
 
-    public WorldPage(TerraSettings settings, UpdatablePage preview) {
-        this.settings = settings;
+    private CompoundNBT worldSettings = null;
+    private CompoundNBT dimSettings = null;
+
+    public WorldPage(Instance instance, UpdatablePage preview) {
+        this.instance = instance;
         this.preview = preview;
-        this.worldSettings = NBTHelper.serialize("world", settings.world);
-        this.dimSettings = NBTHelper.serialize("dimensions", settings.dimensions);
-
-        CompoundNBT generators = dimSettings.getCompound("dimensions").getCompound("value");
-        for (String name : generators.keySet()) {
-            CompoundNBT setting = generators.getCompound(name);
-            setting.put("#options", getWorldTypes());
-        }
     }
 
     @Override
@@ -65,12 +58,15 @@ public class WorldPage extends BasePage {
 
     @Override
     public void save() {
-        NBTHelper.deserialize(worldSettings, settings.world);
-        NBTHelper.deserialize(dimSettings, settings.dimensions);
+
     }
 
     @Override
     public void init(OverlayScreen parent) {
+        // re-sync settings from the settings object to the data structure
+        worldSettings = getWorldSettings();
+        dimSettings = getDimSettings();
+
         Column left = getColumn(0);
         addElements(left.left, left.top, left, worldSettings, true, left.scrollPane::addButton, this::update);
         addElements(left.left, left.top, left, dimSettings, true, left.scrollPane::addButton, this::update);
@@ -90,6 +86,22 @@ public class WorldPage extends BasePage {
             NBTHelper.deserialize(worldSettings, settings.world);
             NBTHelper.deserialize(dimSettings, settings.dimensions);
         });
+    }
+
+    private CompoundNBT getWorldSettings() {
+        return instance.settingsData.getCompound("world");
+    }
+
+    private CompoundNBT getDimSettings() {
+        CompoundNBT dimSettings = instance.settingsData.getCompound("dimensions");
+
+        CompoundNBT generators = dimSettings.getCompound("dimensions").getCompound("value");
+        for (String name : generators.keySet()) {
+            CompoundNBT setting = generators.getCompound(name);
+            setting.put("#options", getWorldTypes());
+        }
+
+        return dimSettings;
     }
 
     private static ListNBT getWorldTypes() {

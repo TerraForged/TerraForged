@@ -33,8 +33,10 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.list.AbstractOptionList;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements OverlayRenderer {
 
@@ -42,6 +44,7 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
 
     public ScrollPane(int slotHeightIn) {
         super(Minecraft.getInstance(), 0, 0, 0, 0, slotHeightIn);
+        setRenderSelection(false);
     }
 
     public void addButton(Widget button) {
@@ -82,12 +85,23 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
         return hovered && super.mouseScrolled(x, y, direction);
     }
 
+    @Override
+    protected boolean isSelectedItem(int index) {
+        return renderSelection && Objects.equals(getSelected(), children().get(index));
+    }
+
     public class Entry extends AbstractOptionList.Entry<Entry> {
 
         public final Widget option;
 
         public Entry(Widget option) {
             this.option = option;
+        }
+
+        @Nullable
+        @Override
+        public IGuiEventListener getFocused() {
+            return option;
         }
 
         @Override
@@ -97,16 +111,21 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
 
         @Override
         public boolean mouseClicked(double x, double y, int button) {
+//            super.mouseClicked(x, y, button);
+            if (isMouseOver(x, y)) {
+                setSelected(this);
+            }
             return option.mouseClicked(x, y, button);
         }
 
         @Override
         public boolean mouseReleased(double x, double y, int button) {
+//            super.mouseReleased(x, y, button);
             return option.mouseReleased(x, y, button);
         }
 
         @Override
-        public void render(int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean wut, float partialTicks) {
+        public void render(int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float partialTicks) {
             int optionWidth = Math.min(396, width);
             int padding = (width - optionWidth) / 2;
             option.x = left + padding;

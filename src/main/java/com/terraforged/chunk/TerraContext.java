@@ -76,7 +76,7 @@ public class TerraContext extends GeneratorContext {
 
     public static TileCache createCache(WorldGeneratorFactory factory) {
         CommentedConfig config = PerfDefaults.getAndPrintPerfSettings();
-        boolean batching = config.getOrElse("batching",false);
+        boolean batching = config.getOrElse("batching", false);
         int tileSize = Math.min(PerfDefaults.MAX_TILE_SIZE, Math.max(2, config.getInt("tile_size")));
         int batchCount = Math.min(PerfDefaults.MAX_BATCH_COUNT, Math.max(1, config.getInt("batch_count")));
         int threadCount = Math.min(PerfDefaults.MAX_THREAD_COUNT, Math.max(1, config.getInt("thread_count")));

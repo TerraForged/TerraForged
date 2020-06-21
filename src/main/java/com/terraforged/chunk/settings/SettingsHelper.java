@@ -44,7 +44,7 @@ public class SettingsHelper {
         }
     }
 
-    public static void applyDefaults(CompoundNBT options, TerraSettings dest) {
+    public static CompoundNBT applyDefaults(CompoundNBT options, TerraSettings dest) {
         if (options.isEmpty()) {
             try (Reader reader = new BufferedReader(new FileReader(SETTINGS_FILE))) {
                 JsonElement json = new JsonParser().parse(reader);
@@ -54,6 +54,7 @@ public class SettingsHelper {
             }
         }
         NBTHelper.deserialize(options, dest);
+        return options;
     }
 
     public static TerraSettings getSettings(WorldInfo info) {

@@ -24,6 +24,11 @@ public class TerraTextInput extends TextFieldWidget implements Element, Consumer
         this.tooltip = Element.getToolTip(name, value);
         setText(value.getString(name));
         setResponder(this);
+        setEnabled(true);
+    }
+
+    public String getValue() {
+        return value.getString(name);
     }
 
     public void setColorValidator(Predicate<String> validator) {
@@ -49,6 +54,7 @@ public class TerraTextInput extends TextFieldWidget implements Element, Consumer
     public void accept(String text) {
         value.put(name, StringNBT.valueOf(text));
         callback.accept(this);
+
         if (validator.test(text)) {
             setTextColor(14737632);
         } else {
