@@ -50,8 +50,8 @@ public class CoastModifier implements BiomeModifier {
     }
 
     @Override
-    public boolean test(Biome biome) {
-        return true;
+    public boolean test(Biome biome, Cell cell) {
+        return cell.terrain.isCoast();
     }
 
     @Override

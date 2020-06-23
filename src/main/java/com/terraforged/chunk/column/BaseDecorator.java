@@ -30,13 +30,13 @@ import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.material.state.States;
 import net.minecraft.world.chunk.IChunk;
 
-public class ChunkPopulator implements ColumnDecorator {
+public class BaseDecorator implements ColumnDecorator {
 
-    public static final ChunkPopulator INSTANCE = new ChunkPopulator();
+    public static final BaseDecorator INSTANCE = new BaseDecorator();
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        if (context.cell.terrain == context.terrains.volcanoPipe && context.cell.riverMask > 0.25F) {
+        if (context.cell.terrain == context.terrains.volcanoPipe && context.cell.riverMask > 0.5F) {
             int lavaStart = Math.max(context.levels.waterY + 10, y - 30);
             int lavaEnd = Math.max(5, context.levels.waterY - 10);
             fillDown(context, chunk, x, z, lavaStart, lavaEnd, States.LAVA.get());

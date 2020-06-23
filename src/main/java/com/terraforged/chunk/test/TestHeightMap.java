@@ -1,6 +1,7 @@
 package com.terraforged.chunk.test;
 
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.cell.Populator;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.terrain.Terrains;
@@ -12,16 +13,20 @@ public class TestHeightMap extends Heightmap {
     public TestHeightMap(GeneratorContext context) {
         super(context);
         terrains = context.terrain;
+        System.out.println("TESTETETEST");
     }
 
     @Override
-    public void apply(Cell cell, float x, float y) {
-        super.apply(cell, x, y);
-        getPopulator(Test.getTerrainType(terrains)).apply(cell, x, y);
-    }
+    public void applyBase(Cell cell, float x, float y) {
+        continentGenerator.apply(cell, x, y);
+        regionModule.apply(cell, x, y);
 
-    @Override
-    public void tag(Cell cell, float x, float y) {
-        getPopulator(Test.getTerrainType(terrains)).tag(cell, x, y);
+        Populator populator = getPopulator(Test.getTerrainType(terrains), Test.getTerrainVariant());
+        if (populator == this) {
+            return;
+        }
+
+        populator.apply(cell, x, y);
+        applyClimate(cell, x, y);
     }
 }

@@ -46,11 +46,11 @@ public class TerraSetupFactory {
 
     public static List<ColumnDecorator> createBaseDecorators(GeoManager geoManager, TerraContext context) {
         List<ColumnDecorator> processors = new ArrayList<>();
-        if (context.terraSettings.features.strataDecorator) {
+        if (context.terraSettings.miscellaneous.strataDecorator) {
             Log.info(" - Geology decorator enabled");
             processors.add(new GeologyDecorator(geoManager));
         }
-        if (context.terraSettings.features.erosionDecorator) {
+        if (context.terraSettings.miscellaneous.erosionDecorator) {
             Log.info(" - Erosion decorator enabled");
             processors.add(new ErosionDecorator(context));
         }
@@ -60,11 +60,11 @@ public class TerraSetupFactory {
 
     public static List<ColumnDecorator> createFeatureDecorators(TerraContext context) {
         List<ColumnDecorator> processors = new ArrayList<>();
-        if (context.terraSettings.features.naturalSnowDecorator) {
+        if (context.terraSettings.miscellaneous.naturalSnowDecorator) {
             Log.info(" - Natural snow decorator enabled");
             processors.add(new SnowEroder(context));
         }
-        if (context.terraSettings.features.smoothLayerDecorator) {
+        if (context.terraSettings.miscellaneous.smoothLayerDecorator) {
             Log.info(" - Smooth layer decorator enabled");
             processors.add(new LayerDecorator(context.materials.getLayerManager()));
         }
@@ -76,20 +76,20 @@ public class TerraSetupFactory {
     }
 
     public static FeatureManager createFeatureManager(DataManager data, TerraContext context) {
-        FeatureModifiers modifiers = FeatureManager.modifiers(data, context.terraSettings.features.customBiomeFeatures);
+        FeatureModifiers modifiers = FeatureManager.modifiers(data, context.terraSettings.miscellaneous.customBiomeFeatures);
 
-        if (context.terraSettings.features.strataDecorator) {
+        if (context.terraSettings.miscellaneous.strataDecorator) {
             // block stone blobs if strata enabled
             modifiers.getPredicates().add(Matchers.stoneBlobs(), FeaturePredicate.DENY);
         }
 
-        if (!context.terraSettings.features.vanillaWaterFeatures) {
+        if (!context.terraSettings.miscellaneous.vanillaWaterFeatures) {
             // block lakes and springs if not enabled
             modifiers.getPredicates().add(FeatureMatcher.of(Feature.LAKE), FeaturePredicate.DENY);
             modifiers.getPredicates().add(FeatureMatcher.of(Feature.SPRING_FEATURE), FeaturePredicate.DENY);
         }
 
-        if (context.terraSettings.features.customBiomeFeatures) {
+        if (context.terraSettings.miscellaneous.customBiomeFeatures) {
             // remove default trees from river biomes since forests can go up to the edge of rivers
             modifiers.getPredicates().add(BiomeMatcher.of(Biome.Category.RIVER), Matchers.tree(), FeaturePredicate.DENY);
 

@@ -35,9 +35,9 @@ public class States {
     public static final StateSupplier GRAVEL = DefaultState.of("minecraft:gravel").cache();
     public static final StateSupplier LAVA = DefaultState.of("minecraft:lava").cache();
     public static final StateSupplier PACKED_ICE = DefaultState.of("minecraft:packed_ice").cache();
-    public static final StateSupplier RED_SANDSTONE = DefaultState.of("minecraft:red_sandstone").cache();
     public static final StateSupplier SAND = DefaultState.of("minecraft:sand").cache();
-    public static final StateSupplier SANDSTONE = DefaultState.of("minecraft:sandstone").cache();
+    public static final StateSupplier SMOOTH_SANDSTONE = DefaultState.of("minecraft:smooth_sandstone").cache();
+    public static final StateSupplier SMOOTH_RED_SANDSTONE = DefaultState.of("minecraft:smooth_red_sandstone").cache();
     public static final StateSupplier SNOW_BLOCK = DefaultState.of("minecraft:snow_block").cache();
     public static final StateSupplier STONE = DefaultState.of("minecraft:stone").cache();
     public static final StateSupplier WATER = DefaultState.of("minecraft:water").cache();

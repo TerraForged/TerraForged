@@ -32,7 +32,7 @@ public interface BiomeModifier extends Comparable<BiomeModifier> {
 
     int priority();
 
-    boolean test(Biome biome);
+    boolean test(Biome biome, Cell cell);
 
     Biome modify(Biome in, Cell cell, int x, int z);
 

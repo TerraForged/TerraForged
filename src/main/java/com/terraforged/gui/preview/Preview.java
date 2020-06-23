@@ -146,7 +146,7 @@ public class Preview extends Button {
             return;
         }
 
-        RenderMode renderer = previewSettings.mode;
+        RenderMode renderer = previewSettings.display;
         Levels levels = new Levels(settings.world);
 
         int stroke = 2;

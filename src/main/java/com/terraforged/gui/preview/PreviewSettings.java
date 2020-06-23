@@ -37,5 +37,5 @@ public class PreviewSettings {
     public int zoom = 100 - 32;
 
     @Comment("Controls the rendering mode on the preview map")
-    public RenderMode mode = RenderMode.BIOME_TYPE;
+    public RenderMode display = RenderMode.BIOME_TYPE;
 }

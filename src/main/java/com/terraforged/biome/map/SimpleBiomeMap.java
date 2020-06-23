@@ -28,6 +28,7 @@ public class SimpleBiomeMap implements BiomeMap {
     private final BiomeSet lake;
     private final BiomeSet wetland;
     private final BiomeSet land;
+    private final BiomeSet mountains;
     private final BiomeSet[] terrainBiomes;
 
     public SimpleBiomeMap(BiomeMapBuilder builder) {
@@ -38,6 +39,7 @@ public class SimpleBiomeMap implements BiomeMap {
         river = new RiverSet(builder.rivers, DefaultBiomes::defaultRiver, this);
         lake = new TemperatureSet(builder.lakes, DefaultBiomes::defaultLake);
         wetland = new TemperatureSet(builder.wetlands, DefaultBiomes::defaultWetland);
+        mountains = new TemperatureSet(builder.mountains, DefaultBiomes::defaultMountain);
         land = new BiomeTypeSet(builder.map, DefaultBiomes::defaultBiome);
         terrainBiomes = new BiomeSet[TerrainType.values().length];
         terrainBiomes[TerrainType.SHALLOW_OCEAN.ordinal()] = shallowOcean;
@@ -103,12 +105,20 @@ public class SimpleBiomeMap implements BiomeMap {
     }
 
     @Override
+    public Biome getMountain(Cell cell) {
+        return mountains.getBiome(cell);
+    }
+
+    @Override
     public Biome getLand(Cell cell) {
         return land.getBiome(cell);
     }
 
     @Override
     public List<Biome> getAllBiomes(BiomeType type) {
+        if (type == BiomeType.ALPINE) {
+            return Collections.emptyList();
+        }
         int size = land.getSize(type.ordinal());
         if (size == 0) {
             return Collections.emptyList();
@@ -126,7 +136,13 @@ public class SimpleBiomeMap implements BiomeMap {
         root.add("RIVER", river.toJson());
         root.add("LAKE", lake.toJson());
         root.add("WETLAND", wetland.toJson());
-        root.add("LAND", land.toJson());
+        root.add("LAND", landToJson());
+        return root;
+    }
+
+    private JsonElement landToJson() {
+        JsonObject root = land.toJson().getAsJsonObject();
+        root.add(BiomeType.ALPINE.name(), mountains.toJson());
         return root;
     }
 }

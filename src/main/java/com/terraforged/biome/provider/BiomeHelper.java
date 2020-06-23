@@ -89,9 +89,15 @@ public class BiomeHelper {
                 builder.addLake(biome, weight);
             } else if (BiomePredicate.WETLAND.test(data)) {
                 builder.addWetland(biome, weight);
+            } else if (BiomePredicate.MOUNTAIN.test(data)) {
+                builder.addMountain(biome, weight);
             } else {
                 Collection<BiomeType> types = getTypes(data, biome);
                 for (BiomeType type : types) {
+                    // shouldn't happen
+                    if (type == BiomeType.ALPINE) {
+                        continue;
+                    }
                     builder.addLand(type, biome, weight);
                 }
             }
@@ -127,6 +133,16 @@ public class BiomeHelper {
         }
         // hopefully biomes otherwise have a sensible category
         return biome.getTempCategory();
+    }
+
+    public static Biome.TempCategory getMountainCategory(Biome biome) {
+        if (biome.getDefaultTemperature() < 0.2) {
+            return Biome.TempCategory.COLD;
+        }
+        if (biome.getDefaultTemperature() > 0.4) {
+            return Biome.TempCategory.WARM;
+        }
+        return Biome.TempCategory.MEDIUM;
     }
 
     public static String getId(Biome biome) {

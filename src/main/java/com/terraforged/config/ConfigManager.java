@@ -48,7 +48,7 @@ public class ConfigManager {
         set(
                 cfg,
                 "batching",
-                true,
+                PerfDefaults.BATCHING,
                 "Batching breaks heightmap tiles up into smaller pieces that can be generated concurrently.",
                 "This can help improve generation speed by utilizing more threads.",
                 "It is more effective when a higher thread count (+6) is available."

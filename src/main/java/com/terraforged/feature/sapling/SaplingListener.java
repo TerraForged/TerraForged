@@ -125,7 +125,7 @@ public class SaplingListener {
             ChunkGenerator<?> generator = serverWorld.getChunkProvider().generator;
             if (generator instanceof TerraChunkGenerator) {
                 TerraContext context = ((TerraChunkGenerator) generator).getContext();
-                if (context.terraSettings.features.customBiomeFeatures) {
+                if (context.terraSettings.miscellaneous.customBiomeFeatures) {
                     return Optional.of(((TerraChunkGenerator) generator).getBlockDataManager());
                 }
             }

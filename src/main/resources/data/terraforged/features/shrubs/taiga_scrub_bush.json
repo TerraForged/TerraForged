@@ -3,6 +3,11 @@
     "minecraft:snowy_tundra",
     "minecraft:taiga",
     "minecraft:taiga_hills",
+    "minecraft:wooded_mountains",
+    "minecraft:taiga_mountains",
+    "minecraft:snowy_taiga_mountains",
+    "minecraft:gravelly_mountains",
+    "minecraft:modified_gravelly_mountains",
     "terraforged:taiga_scrub",
     "terraforged:snowy_taiga_scrub"
   ],

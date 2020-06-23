@@ -2,7 +2,9 @@
   "biomes": [
     "minecraft:river",
     "minecraft:plains",
-    "minecraft:sunflower_plains"
+    "minecraft:sunflower_plains",
+    "minecraft:mountains",
+    "minecraft:mountain_edge"
   ],
   "match": [
     [

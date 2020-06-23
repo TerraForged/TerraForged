@@ -31,6 +31,7 @@ import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
 import net.minecraft.world.biome.Biome;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public interface BiomeMap {
@@ -51,6 +52,9 @@ public interface BiomeMap {
 
     Biome getLand(Cell cell);
 
+    @Nullable
+    Biome getMountain(Cell cell);
+
     Biome provideBiome(Cell cell, Levels levels);
 
     List<Biome> getAllBiomes(BiomeType type);
@@ -70,6 +74,8 @@ public interface BiomeMap {
         Builder addLake(Biome biome, int count);
 
         Builder addWetland(Biome biome, int count);
+
+        Builder addMountain(Biome biome, int count);
 
         Builder addLand(BiomeType type, Biome biome, int count);
 

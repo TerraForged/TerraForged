@@ -50,6 +50,7 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
         modifiers.add(new CoastModifier(biomes, context));
         modifiers.add(new DesertColorModifier(desertBiomes));
         modifiers.add(new BeachModifier(biomes, context));
+        modifiers.add(new MountainModifier(context, biomes));
         Collections.sort(modifiers);
         this.biomeModifiers = modifiers;
     }
@@ -74,14 +75,14 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
     }
 
     @Override
-    public boolean test(Biome biome) {
+    public boolean test(Biome biome, Cell cell) {
         return true;
     }
 
     @Override
     public Biome modify(Biome biome, Cell cell, int x, int z) {
         for (BiomeModifier modifier : biomeModifiers) {
-            if (modifier.test(biome)) {
+            if (modifier.test(biome, cell)) {
                 biome = modifier.modify(biome, cell, x, z);
                 if (modifier.exitEarly()) {
                     return biome;

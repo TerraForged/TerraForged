@@ -56,6 +56,13 @@ public class PresetsPage extends BasePage {
         right.scrollPane.addButton(nameInput);
 
         right.scrollPane.addButton(new TerraButton("Create") {
+
+            @Override
+            public void render(int x, int z, float ticks) {
+                super.active = !nameInput.getValue().isEmpty();
+                super.render(x, z, ticks);
+            }
+
             @Override
             public void onClick(double x, double y) {
                 super.onClick(x, y);

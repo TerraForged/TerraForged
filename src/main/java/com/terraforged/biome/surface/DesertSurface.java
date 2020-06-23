@@ -14,7 +14,7 @@ public class DesertSurface implements Surface {
     private final float min;
     private final float level;
     private final Module noise;
-    private final BlockState sandstone = States.SANDSTONE.get();
+    private final BlockState sandstone = States.SMOOTH_SANDSTONE.get();
     private final BlockState low = Blocks.TERRACOTTA.delegate.get().getDefaultState();
     private final BlockState mid = Blocks.ORANGE_TERRACOTTA.delegate.get().getDefaultState();
     private final BlockState high = Blocks.BROWN_TERRACOTTA.delegate.get().getDefaultState();

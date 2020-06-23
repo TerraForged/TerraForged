@@ -49,7 +49,7 @@ public class DesertColorModifier implements BiomeModifier {
     }
 
     @Override
-    public boolean test(Biome biome) {
+    public boolean test(Biome biome, Cell cell) {
         return biome.getCategory() == Biome.Category.DESERT
                 || biome.getCategory() == Biome.Category.MESA
                 || biomes.isDesert(biome);

@@ -57,6 +57,16 @@ public class DefaultBiomes {
         return Biomes.DEEP_OCEAN;
     }
 
+    public static Biome defaultMountain(float temperature) {
+        if (temperature < 0.25) {
+            return Biomes.SNOWY_MOUNTAINS;
+        }
+        if (temperature > 0.75) {
+            return DefaultBiome.NONE;
+        }
+        return Biomes.MOUNTAINS;
+    }
+
     public static Biome defaultBiome(float temperature) {
         if (temperature < 0.3) {
             return ModBiomes.TAIGA_SCRUB;

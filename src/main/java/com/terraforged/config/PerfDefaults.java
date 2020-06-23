@@ -6,6 +6,7 @@ import com.terraforged.core.concurrent.thread.ThreadPools;
 
 public class PerfDefaults {
 
+    public static final boolean BATCHING = false;
     public static final int TILE_SIZE = 3;
     public static final int BATCH_COUNT = 6;
     public static final int THREAD_COUNT = ThreadPools.defaultPoolSize();
@@ -16,7 +17,7 @@ public class PerfDefaults {
 
     private static boolean isUsingDefaultPerfSettings(CommentedConfig config) {
         boolean yes = true;
-        yes &= config.getOrElse("batching", true);
+        yes &= config.getOrElse("batching", BATCHING);
         yes &= config.getInt("thread_count") == THREAD_COUNT;
         yes &= config.getInt("batch_count") == BATCH_COUNT;
         yes &= config.getInt("tile_size") == TILE_SIZE;
@@ -29,7 +30,7 @@ public class PerfDefaults {
         Log.info("Performance Settings [default={}]", defaults);
         Log.info(" - Thread Count: {}", config.getInt("thread_count"));
         Log.info(" - Tile Size: {}", config.getInt("tile_size"));
-        Log.info(" - Batching: {}", config.getOrElse("batching", true));
+        Log.info(" - Batching: {}", config.getOrElse("batching", BATCHING));
         Log.info(" - Batch Count: {}", config.getInt("batch_count"));
         return config;
     }

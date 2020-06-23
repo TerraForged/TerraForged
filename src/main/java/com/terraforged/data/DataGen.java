@@ -55,7 +55,7 @@ public class DataGen {
     }
 
     protected static void write(JsonElement json, Writer writer) {
-        new GsonBuilder().setPrettyPrinting().create().toJson(json, writer);
+        new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(json, writer);
     }
 
     protected static String getJsonPath(String type, ResourceLocation location) {

@@ -75,7 +75,7 @@ public class ErosionDecorator implements ColumnDecorator {
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        if (context.cell.value < minY || context.cell.terrain == terrain.river || context.cell.terrain == terrain.riverBanks) {
+        if (context.cell.value < minY || context.cell.terrain.isRiver() || context.cell.terrain.isWetland()) {
             return;
         }
 
@@ -179,10 +179,10 @@ public class ErosionDecorator implements ColumnDecorator {
         }
         if (state.getMaterial() == Material.SAND) {
             if (state.getBlock() == Blocks.SAND) {
-                return States.SANDSTONE.get();
+                return States.SMOOTH_SANDSTONE.get();
             }
             if (state.getBlock() == Blocks.RED_SAND) {
-                return States.RED_SANDSTONE.get();
+                return States.SMOOTH_RED_SANDSTONE.get();
             }
         }
         return States.COARSE_DIRT.get();

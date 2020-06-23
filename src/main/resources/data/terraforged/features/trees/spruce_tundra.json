@@ -1,11 +1,19 @@
 {
   "biomes": [
     "minecraft:snowy_tundra",
-    "minecraft:wooded_mountains"
+    "minecraft:snowy_taiga_mountains",
+    "minecraft:wooded_mountains",
+    "minecraft:gravelly_mountains",
+    "minecraft:modified_gravelly_mountains"
   ],
   "match": [
     [
       "minecraft:normal_tree",
+      "minecraft:spruce_log",
+      "minecraft:spruce_leaves"
+    ],
+    [
+      "minecraft:fancy_tree",
       "minecraft:spruce_log",
       "minecraft:spruce_leaves"
     ]

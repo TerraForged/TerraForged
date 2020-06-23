@@ -25,20 +25,24 @@
 
 package com.terraforged.chunk.test;
 
+import com.terraforged.biome.ModBiomes;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.Terrains;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
 
 public class Test {
 
     public static boolean fixedBiome = false;
 
+    public static int getTerrainVariant() {
+        return 0;
+    }
+
     public static Terrain getTerrainType(Terrains terrains) {
-        return terrains.badlands;
+        return terrains.mountains;
     }
 
     public static Biome getBiome() {
-        return Biomes.BADLANDS;
+        return ModBiomes.TAIGA_SCRUB;
     }
 }

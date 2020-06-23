@@ -3,6 +3,7 @@ package com.terraforged.biome.map.set;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.terraforged.biome.map.defaults.BiomeTemps;
 import com.terraforged.biome.map.defaults.DefaultBiome;
 import com.terraforged.core.cell.Cell;
 import net.minecraft.world.biome.Biome;
@@ -20,10 +21,10 @@ public class TemperatureSet extends BiomeSet {
 
     @Override
     public int getIndex(Cell cell) {
-        if (cell.temperature < 0.25) {
+        if (cell.temperature < BiomeTemps.COLD) {
             return 0;
         }
-        if (cell.temperature > 0.75) {
+        if (cell.temperature > BiomeTemps.HOT) {
             return 2;
         }
         return 1;

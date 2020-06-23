@@ -31,7 +31,7 @@ import com.terraforged.core.settings.Settings;
 @Serializable
 public class TerraSettings extends Settings {
 
-    public Miscellaneous features = new Miscellaneous();
+    public Miscellaneous miscellaneous = new Miscellaneous();
 
     public StructureSettings structures = new StructureSettings();
 

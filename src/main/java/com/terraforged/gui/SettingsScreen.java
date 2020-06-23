@@ -68,7 +68,7 @@ public class SettingsScreen extends OverlayScreen {
                 new SimplePreviewPage("River Settings", "rivers", preview, instance, s -> s.rivers),
                 new SimplePreviewPage("Filter Settings", "filters", preview, instance, s -> s.filters),
                 new SimplePage("Structure Settings", "structures", instance, s -> s.structures),
-                new SimplePage("Feature Settings", "features", instance, s -> s.features)
+                new SimplePage("Feature Settings", "miscellaneous", instance, s -> s.miscellaneous)
         };
     }
 

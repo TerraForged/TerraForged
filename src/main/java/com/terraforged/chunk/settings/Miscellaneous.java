@@ -25,7 +25,9 @@
 
 package com.terraforged.chunk.settings;
 
+import com.terraforged.biome.modifier.MountainModifier;
 import com.terraforged.core.serialization.annotation.Comment;
+import com.terraforged.core.serialization.annotation.Range;
 import com.terraforged.core.serialization.annotation.Serializable;
 
 @Serializable
@@ -48,4 +50,11 @@ public class Miscellaneous {
 
     @Comment("Controls whether vanilla lakes & springs should generate")
     public boolean vanillaWaterFeatures = false;
+
+    @Comment({
+            "The probability that mountainous terrain will be set to a mountain biome type.",
+            "This may help improve compatibility with mods that rely exclusively on mountain biomes."
+    })
+    @Range(min = 0F, max = 1F)
+    public float mountainBiomeUsage = MountainModifier.MOUNTAIN_CHANCE;
 }

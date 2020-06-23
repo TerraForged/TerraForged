@@ -2,7 +2,7 @@ package com.terraforged.chunk.generator;
 
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.chunk.TerraChunkGenerator;
-import com.terraforged.chunk.column.ChunkPopulator;
+import com.terraforged.chunk.column.BaseDecorator;
 import com.terraforged.chunk.util.FastChunk;
 import com.terraforged.chunk.util.TerraContainer;
 import com.terraforged.core.tile.chunk.ChunkReader;
@@ -40,7 +40,7 @@ public class TerrainGenerator implements Generator.Terrain {
                     int py = ctx.levels.scale(cell.value);
                     ctx.cell = cell;
                     ctx.biome = container.getNoiseBiome(dx, world.getSeaLevel(), dz);
-                    ChunkPopulator.INSTANCE.decorate(ctx.chunk, ctx, px, py, pz);
+                    BaseDecorator.INSTANCE.decorate(ctx.chunk, ctx, px, py, pz);
                 });
                 terrainHelper.flatten(world, chunk);
             }
