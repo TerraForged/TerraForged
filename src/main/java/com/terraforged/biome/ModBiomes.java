@@ -41,6 +41,7 @@ public class ModBiomes {
 
     public static final Biome BRYCE = register(new Bryce());
     public static final Biome COLD_STEPPE = register(new ColdSteppe());
+    public static final Biome ERODED_PINNACLE = register(new StoneForest());
     public static final Biome FIR_FOREST = register(new FirForest());
     public static final Biome FLOWER_PLAINS = register(new FlowerPlains());
     public static final Biome FROZEN_LAKE = register(new FrozenLake());
@@ -63,12 +64,22 @@ public class ModBiomes {
     public static void register(RegistryEvent.Register<Biome> event) {
         biomes.forEach(biome -> {
             event.getRegistry().register(biome);
+
+            // TF biomes can specify a custom biome weight
+            biome.registerWeights();
+
+            // let forge generate the BiomeDictionary.Type's since TF biomes are just variants of vanilla ones
             BiomeDictionary.makeBestGuess(biome);
+
+            // overworld is required for TerraForged
             BiomeDictionary.addTypes(biome, BiomeDictionary.Type.OVERWORLD);
+
+            // if a variant of a rare biome, register as such
             if (BiomeDictionary.getTypes(biome.getBase()).contains(BiomeDictionary.Type.RARE)) {
                 BiomeDictionary.addTypes(biome, BiomeDictionary.Type.RARE);
             }
         });
+
         biomes.clear();
         biomes.trimToSize();
     }

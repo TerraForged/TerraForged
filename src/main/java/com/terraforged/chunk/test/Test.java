@@ -39,10 +39,10 @@ public class Test {
     }
 
     public static Terrain getTerrainType(Terrains terrains) {
-        return terrains.mountains;
+        return terrains.plains;
     }
 
     public static Biome getBiome() {
-        return ModBiomes.TAIGA_SCRUB;
+        return ModBiomes.ERODED_PINNACLE;
     }
 }

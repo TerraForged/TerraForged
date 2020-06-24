@@ -13,12 +13,16 @@ import com.terraforged.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
 
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 public class PresetsPage extends BasePage {
 
+    private static final Predicate<String> NAME_VALIDATOR = Pattern.compile("^[A-Za-z0-9\\-_ ]+$").asPredicate();
+
+    private final Instance instance;
     private final UpdatablePage preview;
     private final TerraTextInput nameInput;
-    private final Instance instance;
     private final PresetManager manager = PresetManager.load();
 
     public PresetsPage(Instance instance, UpdatablePage preview) {
@@ -27,6 +31,7 @@ public class PresetsPage extends BasePage {
         this.preview = preview;
         this.instance = instance;
         this.nameInput = new TerraTextInput("name", value);
+        this.nameInput.setColorValidator(NAME_VALIDATOR);
     }
 
     @Override
@@ -59,7 +64,8 @@ public class PresetsPage extends BasePage {
 
             @Override
             public void render(int x, int z, float ticks) {
-                super.active = !nameInput.getValue().isEmpty();
+                // only render as active if the text field is not empty
+                super.active = nameInput.isValid();
                 super.render(x, z, ticks);
             }
 
@@ -79,6 +85,13 @@ public class PresetsPage extends BasePage {
         });
 
         right.scrollPane.addButton(new TerraButton("Load") {
+
+            @Override
+            public void render(int x, int z, float ticks) {
+                super.active = hasSelectedPreset();
+                super.render(x, z, ticks);
+            }
+
             @Override
             public void onClick(double x, double y) {
                 super.onClick(x, y);
@@ -87,6 +100,13 @@ public class PresetsPage extends BasePage {
         });
 
         right.scrollPane.addButton(new TerraButton("Save") {
+
+            @Override
+            public void render(int x, int z, float ticks) {
+                super.active = hasSelectedPreset();
+                super.render(x, z, ticks);
+            }
+
             @Override
             public void onClick(double x, double y) {
                 super.onClick(x, y);
@@ -104,7 +124,38 @@ public class PresetsPage extends BasePage {
             }
         });
 
+        right.scrollPane.addButton(new TerraButton("Reset") {
+
+            @Override
+            public void render(int x, int z, float ticks) {
+                super.active = hasSelectedPreset();
+                super.render(x, z, ticks);
+            }
+
+            @Override
+            public void onClick(double x, double y) {
+                super.onClick(x, y);
+                getSelected().ifPresent(preset -> {
+                    // create new preset with the same name but default settings
+                    Preset reset = new Preset(preset.getName(), new TerraSettings());
+
+                    // replaces by name
+                    manager.add(reset);
+
+                    // update the ui
+                    rebuildPresetList();
+                });
+            }
+        });
+
         right.scrollPane.addButton(new TerraButton("Delete") {
+
+            @Override
+            public void render(int x, int z, float ticks) {
+                super.active = hasSelectedPreset();
+                super.render(x, z, ticks);
+            }
+
             @Override
             public void onClick(double x, double y) {
                 super.onClick(x, y);
@@ -115,6 +166,10 @@ public class PresetsPage extends BasePage {
                 });
             }
         });
+    }
+
+    private boolean hasSelectedPreset() {
+        return getColumn(0).scrollPane.getSelected() != null;
     }
 
     private void load(Preset preset) {

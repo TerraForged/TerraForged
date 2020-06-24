@@ -14,6 +14,9 @@ public class TerraTextInput extends TextFieldWidget implements Element, Consumer
     private final String name;
     private final CompoundNBT value;
     private final List<String> tooltip;
+
+    private String stringValue = "";
+    private boolean valid = true;
     private Predicate<String> validator = s -> true;
     private Consumer<TerraTextInput> callback = t -> {};
 
@@ -22,17 +25,31 @@ public class TerraTextInput extends TextFieldWidget implements Element, Consumer
         this.name = name;
         this.value = value;
         this.tooltip = Element.getToolTip(name, value);
+        this.stringValue = value.getString(name);
         setText(value.getString(name));
         setResponder(this);
         setEnabled(true);
     }
 
+    public boolean isValid() {
+        return valid;
+    }
+
     public String getValue() {
-        return value.getString(name);
+        return stringValue;
     }
 
     public void setColorValidator(Predicate<String> validator) {
         this.validator = validator;
+
+        // update validity immediately
+        if (validator.test(stringValue)) {
+            valid = true;
+            setTextColor(14737632);
+        } else {
+            valid = false;
+            setTextColor(0xffff3f30);
+        }
     }
 
     @Override
@@ -53,12 +70,16 @@ public class TerraTextInput extends TextFieldWidget implements Element, Consumer
     @Override
     public void accept(String text) {
         value.put(name, StringNBT.valueOf(text));
-        callback.accept(this);
 
+        stringValue = text;
         if (validator.test(text)) {
+            valid = true;
             setTextColor(14737632);
         } else {
+            valid = false;
             setTextColor(0xffff3f30);
         }
+
+        callback.accept(this);
     }
 }
