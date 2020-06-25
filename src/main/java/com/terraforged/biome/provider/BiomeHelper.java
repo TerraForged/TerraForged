@@ -199,7 +199,7 @@ public class BiomeHelper {
         if (biome.getCategory() == Biome.Category.NETHER) {
             return true;
         }
-        if (biome == Biomes.MUSHROOM_FIELD_SHORE) {
+        if (biome == Biomes.MUSHROOM_FIELD_SHORE || biome == Biomes.MOUNTAIN_EDGE) {
             return true;
         }
         return !BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.OVERWORLD);

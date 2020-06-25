@@ -2,8 +2,7 @@
   "biomes": [
     "minecraft:plains",
     "minecraft:sunflower_plains",
-    "minecraft:mountains",
-    "minecraft:mountain_edge"
+    "minecraft:mountains"
   ],
   "stage": "VEGETAL_DECORATION",
   "prepend": {
