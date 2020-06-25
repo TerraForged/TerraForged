@@ -64,6 +64,14 @@ public enum RenderMode {
             return rgba(cell.biome, saturation, brightness);
         }
     },
+    MACRO_NOISE_SHAPE {
+        @Override
+        public int getColor(Cell cell, float scale, float bias) {
+            float saturation = 0.7F;
+            float brightness = 0.8F;
+            return rgba(cell.macroNoise, saturation, brightness);
+        }
+    },
     REGION_SHAPE {
         @Override
         public int getColor(Cell cell, float scale, float bias) {
