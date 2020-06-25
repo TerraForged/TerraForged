@@ -25,8 +25,8 @@
 
 package com.terraforged.biome.surface;
 
-import com.terraforged.api.chunk.surface.Surface;
-import com.terraforged.api.chunk.surface.SurfaceContext;
+import com.terraforged.api.biome.surface.MaskedSurface;
+import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.api.material.state.States;
 import com.terraforged.chunk.TerraContext;
 import com.terraforged.core.cell.Cell;
@@ -38,7 +38,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
 
-public class IcebergsSurface implements Surface {
+public class IcebergsSurface implements MaskedSurface {
 
     private final Module up;
     private final Module down;
@@ -85,13 +85,28 @@ public class IcebergsSurface implements Surface {
     }
 
     @Override
-    public void buildSurface(int x, int z, int height, SurfaceContext ctx) {
-        float alpha = alpha(ctx.cell);
+    public float getMask(Cell cell) {
+        if (cell.value > minDepth) {
+            return 0;
+        }
 
+        float alpha = 1F;
+        float delta = minDepth - cell.value;
+        if (delta < depthRange) {
+            alpha -= ((depthRange - delta) / depthRange);
+        }
+
+        alpha *= NoiseUtil.map(cell.riverMask, 0.3F, 1F, 0.7F);
+
+        return NoiseUtil.clamp(alpha, 0, 1);
+    }
+
+    @Override
+    public void buildSurface(int x, int z, int height, float mask, SurfaceContext ctx) {
         int center = levels.waterLevel - 5;
-        int top = center + (int) (up.getValue(x, z) * levels.worldHeight * alpha);
-        int topDepth = (int) (bergTop.getValue(x, z) * levels.worldHeight * alpha);
-        int bottom = center - (int) (down.getValue(x, z) * levels.worldHeight * alpha);
+        int top = center + (int) (up.getValue(x, z) * levels.worldHeight * mask);
+        int topDepth = (int) (bergTop.getValue(x, z) * levels.worldHeight * mask);
+        int bottom = center - (int) (down.getValue(x, z) * levels.worldHeight * mask);
 
         // set iceberg materials
         BlockPos.Mutable pos = new BlockPos.Mutable(x, height, z);
@@ -115,21 +130,5 @@ public class IcebergsSurface implements Surface {
             return States.SNOW_BLOCK.get();
         }
         return States.PACKED_ICE.get();
-    }
-
-    private float alpha(Cell cell) {
-        if (cell.value > minDepth) {
-            return 0;
-        }
-
-        float alpha = 1F;
-        float delta = minDepth - cell.value;
-        if (delta < depthRange) {
-            alpha -= ((depthRange - delta) / depthRange);
-        }
-
-        alpha *= NoiseUtil.map(cell.riverMask, 0.3F, 1F, 0.7F);
-
-        return NoiseUtil.clamp(alpha, 0, 1);
     }
 }

@@ -1,15 +1,14 @@
 package com.terraforged.biome.surface;
 
-import com.terraforged.api.chunk.surface.Surface;
-import com.terraforged.api.chunk.surface.SurfaceContext;
+import com.terraforged.api.biome.surface.MaskedSurface;
+import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.api.material.state.States;
 import com.terraforged.core.Seed;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
-import com.terraforged.n2d.util.NoiseUtil;
 import net.minecraft.block.BlockState;
 
-public class StoneForestSurface implements Surface {
+public class StoneForestSurface implements MaskedSurface {
 
     private final Module module;
     private final BlockState dirt;
@@ -27,12 +26,12 @@ public class StoneForestSurface implements Surface {
     }
 
     @Override
-    public void buildSurface(int x, int z, int height, SurfaceContext ctx) {
-        float alpha = 1 - ctx.cell.steepness;
-        float mask = alpha * ctx.cell.biomeEdge * NoiseUtil.map(ctx.cell.riverMask,0, 0.0005F, 0.0005F);
-        float value = module.getValue(x, z) * mask;
-        int top = height + (int) (value * 50);
+    public void buildSurface(int x, int z, int height, float mask, SurfaceContext ctx) {
+        // reduce height on steeper terrain
+        float strength = 1 - ctx.cell.steepness;
+        float value = module.getValue(x, z) * mask * strength;
 
+        int top = height + (int) (value * 50);
         if (top > height) {
             for (int y = height; y < top - 1; y++) {
                 ctx.buffer.setBlockState(ctx.pos.setPos(x, y, z), stone, false);

@@ -1,7 +1,7 @@
 package com.terraforged.biome.surface;
 
-import com.terraforged.api.chunk.surface.Surface;
-import com.terraforged.api.chunk.surface.SurfaceContext;
+import com.terraforged.api.biome.surface.Surface;
+import com.terraforged.api.biome.surface.SurfaceContext;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilderConfig;

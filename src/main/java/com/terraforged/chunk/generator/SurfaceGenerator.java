@@ -1,8 +1,8 @@
 package com.terraforged.chunk.generator;
 
 import com.terraforged.api.chunk.column.ColumnDecorator;
-import com.terraforged.api.chunk.surface.ChunkSurfaceBuffer;
-import com.terraforged.api.chunk.surface.SurfaceContext;
+import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
+import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.chunk.TerraChunkGenerator;
 import com.terraforged.chunk.util.FastChunk;
 import com.terraforged.chunk.util.TerraContainer;

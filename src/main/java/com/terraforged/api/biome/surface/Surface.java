@@ -23,52 +23,30 @@
  * SOFTWARE.
  */
 
-package com.terraforged.api.chunk.surface;
+package com.terraforged.api.biome.surface;
 
-import com.terraforged.api.chunk.ChunkDelegate;
+
+import com.terraforged.api.biome.surface.builder.Combiner;
 import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.IChunk;
 
-import javax.annotation.Nullable;
+public interface Surface {
 
-public class ChunkSurfaceBuffer implements ChunkDelegate {
+    void buildSurface(int x, int z, int height, SurfaceContext ctx);
 
-    private int surfaceTop;
-    private int surfaceBottom;
-    private final IChunk delegate;
-
-    public ChunkSurfaceBuffer(IChunk chunk) {
-        this.delegate = chunk;
-    }
-
-    @Override
-    public IChunk getDelegate() {
-        return delegate;
-    }
-
-    @Nullable
-    @Override
-    public BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving) {
-        if (pos.getY() > surfaceTop) {
-            surfaceTop = pos.getY();
+    default void fill(int x, int z, int start, int end, SurfaceContext ctx, IChunk chunk, BlockState state) {
+        if (start < end) {
+            for (int y = start; y < end; y++) {
+                chunk.setBlockState(ctx.pos.setPos(x, y, z), state, false);
+            }
+        } else if (start > end) {
+            for (int y = start; y > end; y--) {
+                chunk.setBlockState(ctx.pos.setPos(x, y, z), state, false);
+            }
         }
-        if (pos.getY() < surfaceBottom) {
-            surfaceBottom = pos.getY();
-        }
-        return getDelegate().setBlockState(pos, state, isMoving);
     }
 
-    public int getSurfaceTop() {
-        return surfaceTop;
-    }
-
-    public int getSurfaceBottom() {
-        return surfaceBottom;
-    }
-
-    public void setSurfaceLevel(int y) {
-        surfaceTop = y;
-        surfaceBottom = y;
+    default Surface then(Surface next) {
+        return new Combiner(this, next);
     }
 }

@@ -25,8 +25,9 @@
 
 package com.terraforged.biome.surface;
 
-import com.terraforged.api.chunk.surface.Surface;
-import com.terraforged.api.chunk.surface.SurfaceContext;
+import com.terraforged.api.biome.surface.MaskedSurface;
+import com.terraforged.api.biome.surface.Surface;
+import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.api.material.layer.LayerMaterial;
 import com.terraforged.biome.provider.DesertBiomes;
 import com.terraforged.biome.provider.TerraBiomeProvider;
@@ -43,7 +44,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.Heightmap;
 
-public class DunesSurface implements Surface {
+public class DunesSurface implements MaskedSurface {
 
     private final int maxHeight;
     private final Levels levels;
@@ -63,8 +64,13 @@ public class DunesSurface implements Surface {
     }
 
     @Override
-    public void buildSurface(int x, int z, int surface, SurfaceContext ctx) {
-        float value = module.getValue(x, z) * getMask(ctx.cell);
+    public float getMask(Cell cell) {
+        return NoiseUtil.map(cell.biomeEdge, 0, 0.7F, 0.7F) * NoiseUtil.map(cell.riverMask, 0.5F, 0.95F, 0.45F);
+    }
+
+    @Override
+    public void buildSurface(int x, int z, int surface, float mask, SurfaceContext ctx) {
+        float value = module.getValue(x, z) * mask;
         float baseHeight = ctx.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, x & 15, z & 15);
         float duneHeight = baseHeight + value * maxHeight;
         int duneBase = (int) baseHeight;
@@ -93,9 +99,5 @@ public class DunesSurface implements Surface {
 
     public static Surface create(TerraContext context, DesertBiomes desertBiomes) {
         return new DunesSurface(context, 25, desertBiomes);
-    }
-
-    private static float getMask(Cell cell) {
-        return cell.biomeMask(0F, 0.7F) * (NoiseUtil.map(cell.riverMask, 0.5F, 0.95F, 0.45F));
     }
 }

@@ -23,34 +23,24 @@
  * SOFTWARE.
  */
 
-package com.terraforged.chunk.column;
+package com.terraforged.api.biome.surface.builder;
 
-import com.terraforged.api.chunk.column.ColumnDecorator;
-import com.terraforged.api.chunk.column.DecoratorContext;
-import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
-import com.terraforged.material.geology.GeoManager;
-import net.minecraft.world.chunk.IChunk;
+import com.terraforged.api.biome.surface.Surface;
+import com.terraforged.api.biome.surface.SurfaceContext;
 
-public class GeologyDecorator implements ColumnDecorator {
+public class Combiner implements Surface {
 
-    private final GeoManager geology;
+    private final Surface first;
+    private final Surface second;
 
-    public GeologyDecorator(GeoManager geology) {
-        this.geology = geology;
+    public Combiner(Surface first, Surface second) {
+        this.first = first;
+        this.second = second;
     }
 
     @Override
-    public void decorate(IChunk chunk, DecoratorContext context, int x, int dy, int z) {
-
-    }
-
-    @Override
-    public void decorate(ChunkSurfaceBuffer buffer, DecoratorContext context, int x, int y, int z) {
-        int top = buffer.getSurfaceBottom();
-        geology.getGeology(context.biome).getStrata(x, z).downwards(x, top, z, context.depthBuffer.get(), (py, state) -> {
-            context.pos.setPos(x, py, z);
-            buffer.getDelegate().setBlockState(context.pos, state, false);
-            return true;
-        });
+    public void buildSurface(int x, int z, int height, SurfaceContext ctx) {
+        first.buildSurface(x, z, height, ctx);
+        second.buildSurface(x, z, height, ctx);
     }
 }

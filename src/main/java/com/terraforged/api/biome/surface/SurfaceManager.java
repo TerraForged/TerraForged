@@ -23,9 +23,9 @@
  * SOFTWARE.
  */
 
-package com.terraforged.api.chunk.surface;
+package com.terraforged.api.biome.surface;
 
-import com.terraforged.api.chunk.surface.builder.Delegate;
+import com.terraforged.api.biome.surface.builder.Delegate;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 

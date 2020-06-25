@@ -61,7 +61,7 @@ public class SettingsScreen extends OverlayScreen {
         this.instance = new Instance(settings);
         this.preview = new PreviewPage(instance.settings, getSeed(parent));
         this.pages = new Page[]{
-                new PresetsPage(instance, preview),
+                new PresetsPage(instance, preview, preview.getPreviewWidget()),
                 new WorldPage(instance, preview),
                 new SimplePreviewPage("Climate Settings", "climate", preview, instance, s -> s.climate),
                 new SimplePreviewPage("Terrain Settings", "terrain", preview, instance, s -> s.terrain),

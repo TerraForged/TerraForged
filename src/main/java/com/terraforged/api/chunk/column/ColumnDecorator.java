@@ -25,7 +25,7 @@
 
 package com.terraforged.api.chunk.column;
 
-import com.terraforged.api.chunk.surface.ChunkSurfaceBuffer;
+import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
 import com.terraforged.n2d.Source;
 import com.terraforged.n2d.source.FastSource;
 import net.minecraft.block.BlockState;

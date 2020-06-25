@@ -1,5 +1,5 @@
 /*
- *
+ *   
  * MIT License
  *
  * Copyright (c) 2020 TerraForged
@@ -23,12 +23,45 @@
  * SOFTWARE.
  */
 
-package com.terraforged.api.chunk.surface;
+package com.terraforged.api.biome.surface.builder;
 
+import com.terraforged.api.biome.surface.Surface;
+import com.terraforged.api.biome.surface.SurfaceContext;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
 
-public class CachedSurface {
+import java.util.function.Function;
 
-    public Biome biome;
-    public Surface surface;
+public class Delegate implements Surface {
+
+    public static final Function<Biome, Surface> FUNC = Delegate::new;
+
+    private final ConfiguredSurfaceBuilder<?> surfaceBuilder;
+
+    public Delegate(Biome biome) {
+        this(biome.getSurfaceBuilder());
+    }
+
+    public Delegate(ConfiguredSurfaceBuilder<?> surfaceBuilder) {
+        this.surfaceBuilder = surfaceBuilder;
+    }
+
+    @Override
+    public void buildSurface(int x, int z, int height, SurfaceContext context) {
+        surfaceBuilder.setSeed(context.seed);
+
+        surfaceBuilder.buildSurface(
+                context.random,
+                context.chunk,
+                context.biome,
+                x,
+                z,
+                height,
+                context.noise,
+                context.solid,
+                context.fluid,
+                context.levels.waterLevel,
+                context.seed
+        );
+    }
 }

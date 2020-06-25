@@ -2,7 +2,7 @@ package com.terraforged.chunk;
 
 import com.terraforged.Log;
 import com.terraforged.api.chunk.column.ColumnDecorator;
-import com.terraforged.api.chunk.surface.SurfaceManager;
+import com.terraforged.api.biome.surface.SurfaceManager;
 import com.terraforged.biome.ModBiomes;
 import com.terraforged.biome.surface.BriceSurface;
 import com.terraforged.biome.surface.DesertSurface;

@@ -57,7 +57,7 @@ public class StoneForest extends BiomeVariant {
 
     @Override
     public void registerWeights() {
-        BiomeManager.addBiome(BiomeManager.BiomeType.WARM, new BiomeManager.BiomeEntry(this, 5));
+        BiomeManager.addBiome(BiomeManager.BiomeType.WARM, new BiomeManager.BiomeEntry(this, 2));
     }
 
     @Override

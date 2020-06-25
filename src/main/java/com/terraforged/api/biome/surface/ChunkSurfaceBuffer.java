@@ -23,30 +23,52 @@
  * SOFTWARE.
  */
 
-package com.terraforged.api.chunk.surface;
+package com.terraforged.api.biome.surface;
 
-import com.terraforged.api.chunk.column.DecoratorContext;
-import com.terraforged.world.climate.Climate;
-import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.api.chunk.ChunkDelegate;
 import net.minecraft.block.BlockState;
-import net.minecraft.world.gen.GenerationSettings;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.IChunk;
 
-public class SurfaceContext extends DecoratorContext implements AutoCloseable {
+import javax.annotation.Nullable;
 
-    public final long seed;
-    public final BlockState solid;
-    public final BlockState fluid;
-    public final ChunkSurfaceBuffer buffer;
-    public final CachedSurface cached = new CachedSurface();
+public class ChunkSurfaceBuffer implements ChunkDelegate {
 
-    public double noise;
+    private int surfaceTop;
+    private int surfaceBottom;
+    private final IChunk delegate;
 
-    public SurfaceContext(ChunkSurfaceBuffer buffer, Levels levels, Terrains terrain, Climate climate, GenerationSettings settings, long seed) {
-        super(buffer, levels, terrain, climate);
-        this.solid = settings.getDefaultBlock();
-        this.fluid = settings.getDefaultFluid();
-        this.buffer = buffer;
-        this.seed = seed;
+    public ChunkSurfaceBuffer(IChunk chunk) {
+        this.delegate = chunk;
+    }
+
+    @Override
+    public IChunk getDelegate() {
+        return delegate;
+    }
+
+    @Nullable
+    @Override
+    public BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving) {
+        if (pos.getY() > surfaceTop) {
+            surfaceTop = pos.getY();
+        }
+        if (pos.getY() < surfaceBottom) {
+            surfaceBottom = pos.getY();
+        }
+        return getDelegate().setBlockState(pos, state, isMoving);
+    }
+
+    public int getSurfaceTop() {
+        return surfaceTop;
+    }
+
+    public int getSurfaceBottom() {
+        return surfaceBottom;
+    }
+
+    public void setSurfaceLevel(int y) {
+        surfaceTop = y;
+        surfaceBottom = y;
     }
 }

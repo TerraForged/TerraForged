@@ -26,7 +26,7 @@
 package com.terraforged.chunk;
 
 import com.terraforged.api.chunk.column.ColumnDecorator;
-import com.terraforged.api.chunk.surface.SurfaceManager;
+import com.terraforged.api.biome.surface.SurfaceManager;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.biome.provider.TerraBiomeProvider;
 import com.terraforged.chunk.generator.BiomeGenerator;

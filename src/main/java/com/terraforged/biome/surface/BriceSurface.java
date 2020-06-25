@@ -1,19 +1,18 @@
 package com.terraforged.biome.surface;
 
-import com.terraforged.api.chunk.surface.Surface;
-import com.terraforged.api.chunk.surface.SurfaceContext;
+import com.terraforged.api.biome.surface.MaskedSurface;
+import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.core.Seed;
 import com.terraforged.core.util.Variance;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
-import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.geology.Strata;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 
 import java.util.Random;
 
-public class BriceSurface implements Surface {
+public class BriceSurface implements MaskedSurface {
 
     private final Module module;
     private final Strata<BlockState> stackStrata;
@@ -38,11 +37,14 @@ public class BriceSurface implements Surface {
     }
 
     @Override
-    public void buildSurface(int x, int z, int height, SurfaceContext ctx) {
-        float alpha = 1 - ctx.cell.steepness;
-        float mask = alpha * ctx.cell.biomeEdge * NoiseUtil.map(ctx.cell.riverMask,0, 0.0005F, 0.0005F);
-        float value = module.getValue(x, z) * mask;
+    public void buildSurface(int x, int z, int height, float mask, SurfaceContext ctx) {
+        float strength = 1 - ctx.cell.steepness;
+        float value = module.getValue(x, z) * mask * strength;
+
         int top = (int) (value * 30);
+        if (top == 0) {
+            return;
+        }
 
         stackStrata.downwards(x, top, z, ctx.depthBuffer.get(), (y, material) -> {
             if (y <= 0) {

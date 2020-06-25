@@ -23,24 +23,30 @@
  * SOFTWARE.
  */
 
-package com.terraforged.api.chunk.surface.builder;
+package com.terraforged.api.biome.surface;
 
-import com.terraforged.api.chunk.surface.Surface;
-import com.terraforged.api.chunk.surface.SurfaceContext;
+import com.terraforged.api.chunk.column.DecoratorContext;
+import com.terraforged.world.climate.Climate;
+import com.terraforged.world.heightmap.Levels;
+import com.terraforged.world.terrain.Terrains;
+import net.minecraft.block.BlockState;
+import net.minecraft.world.gen.GenerationSettings;
 
-public class Combiner implements Surface {
+public class SurfaceContext extends DecoratorContext implements AutoCloseable {
 
-    private final Surface first;
-    private final Surface second;
+    public final long seed;
+    public final BlockState solid;
+    public final BlockState fluid;
+    public final ChunkSurfaceBuffer buffer;
+    public final CachedSurface cached = new CachedSurface();
 
-    public Combiner(Surface first, Surface second) {
-        this.first = first;
-        this.second = second;
-    }
+    public double noise;
 
-    @Override
-    public void buildSurface(int x, int z, int height, SurfaceContext ctx) {
-        first.buildSurface(x, z, height, ctx);
-        second.buildSurface(x, z, height, ctx);
+    public SurfaceContext(ChunkSurfaceBuffer buffer, Levels levels, Terrains terrain, Climate climate, GenerationSettings settings, long seed) {
+        super(buffer, levels, terrain, climate);
+        this.solid = settings.getDefaultBlock();
+        this.fluid = settings.getDefaultFluid();
+        this.buffer = buffer;
+        this.seed = seed;
     }
 }

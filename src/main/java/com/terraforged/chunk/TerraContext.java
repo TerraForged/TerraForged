@@ -27,8 +27,8 @@ package com.terraforged.chunk;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.terraforged.api.chunk.column.DecoratorContext;
-import com.terraforged.api.chunk.surface.ChunkSurfaceBuffer;
-import com.terraforged.api.chunk.surface.SurfaceContext;
+import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
+import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.config.PerfDefaults;
 import com.terraforged.core.concurrent.thread.ThreadPools;

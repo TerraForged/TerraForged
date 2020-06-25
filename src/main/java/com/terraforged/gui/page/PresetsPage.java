@@ -10,6 +10,7 @@ import com.terraforged.gui.element.TerraButton;
 import com.terraforged.gui.element.TerraLabel;
 import com.terraforged.gui.element.TerraTextInput;
 import com.terraforged.util.nbt.NBTHelper;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.nbt.CompoundNBT;
 
 import java.util.Optional;
@@ -22,13 +23,15 @@ public class PresetsPage extends BasePage {
 
     private final Instance instance;
     private final UpdatablePage preview;
+    private final Widget previewWidget;
     private final TerraTextInput nameInput;
     private final PresetManager manager = PresetManager.load();
 
-    public PresetsPage(Instance instance, UpdatablePage preview) {
+    public PresetsPage(Instance instance, UpdatablePage preview, Widget widget) {
         CompoundNBT value = new CompoundNBT();
         value.putString("name", "");
         this.preview = preview;
+        this.previewWidget = widget;
         this.instance = instance;
         this.nameInput = new TerraTextInput("name", value);
         this.nameInput.setColorValidator(NAME_VALIDATOR);
@@ -78,6 +81,10 @@ public class PresetsPage extends BasePage {
                 // register with the manager & reset the text field
                 manager.add(preset);
                 nameInput.setText("");
+
+                // select newly created preset & load
+                setSelected(preset);
+                load(preset);
 
                 // update the ui
                 rebuildPresetList();
@@ -166,6 +173,14 @@ public class PresetsPage extends BasePage {
                 });
             }
         });
+
+        right.scrollPane.addButton(previewWidget);
+
+        // used to pad the scroll-pane out so that the preview legend scrolls on larger gui scales
+        TerraButton spacer = createSpacer();
+        for (int i = 0; i < 7; i++) {
+            right.scrollPane.addButton(spacer);
+        }
     }
 
     private boolean hasSelectedPreset() {
@@ -176,6 +191,16 @@ public class PresetsPage extends BasePage {
         instance.sync(preset.getSettings());
 
         update();
+    }
+
+    private void setSelected(Preset preset) {
+        ScrollPane pane = getColumn(0).scrollPane;
+        for (ScrollPane.Entry entry : pane.children()) {
+            if (entry.option.getMessage().equalsIgnoreCase(preset.getName())) {
+                pane.setSelected(entry);
+                return;
+            }
+        }
     }
 
     private Optional<Preset> getSelected() {
@@ -194,5 +219,12 @@ public class PresetsPage extends BasePage {
         for (Preset preset : manager) {
             left.scrollPane.addButton(new TerraLabel(preset.getName()));
         }
+    }
+
+    private static TerraButton createSpacer() {
+        return new TerraButton("") {
+            @Override
+            public void render(int x, int y, float tick) { }
+        };
     }
 }

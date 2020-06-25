@@ -45,6 +45,10 @@ public class PreviewPage extends UpdatablePage {
         this.settings = settings;
     }
 
+    public Preview getPreviewWidget() {
+        return preview;
+    }
+
     public int getSeed() {
         return preview.getSeed();
     }

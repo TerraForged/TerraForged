@@ -1,7 +1,7 @@
 package com.terraforged.biome.surface;
 
-import com.terraforged.api.chunk.surface.Surface;
-import com.terraforged.api.chunk.surface.SurfaceContext;
+import com.terraforged.api.biome.surface.Surface;
+import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.api.material.state.States;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
