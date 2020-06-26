@@ -14,7 +14,7 @@ apply plugin: "maven-publish"
 apply plugin: "eclipse"
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
-
+group = "com.terraforged"
 version = "${mc_version}-${mod_version}${getClassifier()}"
 
 allprojects {
@@ -80,6 +80,7 @@ minecraft {
 }
 
 sourceSets {
+    // add resources for the runData task to path
     main.resources {
         srcDirs += "generated/resources/"
         exclude ".cache"
@@ -87,34 +88,66 @@ sourceSets {
 }
 
 task collectLibs(type: Copy) {
+    // require upstream projects to be jar'd first
     dependsOn(dependsOn: subprojects.tasks["jar"])
+
+    // copy contents to build dir ignoring dupes
     from { configurations.lib.collect { it.isDirectory() ? it : zipTree(it) } }
     into("build/classes/java/main")
     duplicatesStrategy = "EXCLUDE"
 }
 
+// runs during publication
 task apiJar(type: Jar) {
+    // make sure jar is reobf'd before creating the api jar
+    // dependents must use fg.deobf("dependency") for their environment
+    dependsOn("reobfJar")
+
+    // copy contents of the main mod jar but only select packages
     from { zipTree(tasks.jar.archivePath) }
     include "com/terraforged/fm/**"
     include "com/terraforged/api/**"
     include "com/terraforged/core/**"
     include "com/terraforged/n2d/**"
     include "com/terraforged/world/**"
+
+    // self explanatory
     classifier "api"
 }
 
 processResources {
     filesMatching("**/mods.toml") {
+        // replaces the version string in the mods.toml
         expand("version": "${mod_version}${getClassifier()}", "mc_version": mc_version)
     }
 }
 
 classes {
+    // collect all dependency classes first
     dependsOn(collectLibs)
 }
 
-build {
-    finalizedBy(apiJar)
+publishing {
+    publications {
+        // publish the mod jar & api jar
+        mavenJava(MavenPublication) {
+            artifact jar
+            artifact apiJar
+        }
+    }
+
+    if (System.getenv("MAVEN_USER") != null && System.getenv("MAVEN_PASS") != null) {
+        repositories {
+            maven {
+                credentials {
+                    username System.getenv("MAVEN_USER")
+                    password System.getenv("MAVEN_PASS")
+                }
+                name = "nexus"
+                url = "https://io.terraforged.com/repository/maven/"
+            }
+        }
+    }
 }
 
 static def getClassifier() {
