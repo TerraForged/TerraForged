@@ -9,7 +9,7 @@ The project relies on Gradle for build and dependency management. In order to co
 to use the maven-publish task, with the mod binary being located under the 'TerraForgedMod'
 sub-project.
 
-Command:
+#### Command
 ```shell script
 ./gradlew publish
 ```
