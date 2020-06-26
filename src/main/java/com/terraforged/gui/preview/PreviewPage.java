@@ -26,6 +26,7 @@
 package com.terraforged.gui.preview;
 
 import com.terraforged.chunk.settings.TerraSettings;
+import com.terraforged.gui.GuiKeys;
 import com.terraforged.gui.OverlayScreen;
 import com.terraforged.gui.element.TerraButton;
 import com.terraforged.gui.page.UpdatablePage;
@@ -73,7 +74,7 @@ public class PreviewPage extends UpdatablePage {
         preview.setHeight(Preview.HEIGHT);
 
         addElements(right.left, right.top, right, previewerSettings, right.scrollPane::addButton, this::update);
-        right.scrollPane.addButton(new TerraButton("New Seed") {
+        right.scrollPane.addButton(new TerraButton(GuiKeys.PREVIEW_SEED.get()) {
             @Override
             public void onPress() {
                 preview.regenerate();

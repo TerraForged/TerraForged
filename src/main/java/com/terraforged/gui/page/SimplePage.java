@@ -3,6 +3,7 @@ package com.terraforged.gui.page;
 import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.gui.Instance;
 import com.terraforged.gui.OverlayScreen;
+import com.terraforged.util.TranslationKey;
 import net.minecraft.nbt.CompoundNBT;
 
 import java.util.function.Function;
@@ -16,8 +17,8 @@ public class SimplePage extends BasePage {
 
     protected CompoundNBT sectionSettings = null;
 
-    public SimplePage(String title, String sectionName, Instance instance, Function<TerraSettings, Object> section) {
-        this.title = title;
+    public SimplePage(TranslationKey title, String sectionName, Instance instance, Function<TerraSettings, Object> section) {
+        this.title = title.get();
         this.section = section;
         this.sectionName = sectionName;
         this.instance = instance;

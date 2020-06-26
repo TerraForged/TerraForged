@@ -34,6 +34,7 @@ import com.terraforged.core.settings.Settings;
 import com.terraforged.core.tile.Size;
 import com.terraforged.core.tile.Tile;
 import com.terraforged.core.tile.gen.TileGenerator;
+import com.terraforged.gui.GuiKeys;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.util.nbt.NBTHelper;
 import com.terraforged.world.GeneratorContext;
@@ -71,7 +72,7 @@ public class Preview extends Button {
     private CacheEntry<Tile> task = null;
     private Tile tile = null;
 
-    private String[] labels = {"Area: ", "Terrain: ", "Biome: "};
+    private String[] labels = {GuiKeys.PREVIEW_AREA.get(), GuiKeys.PREVIEW_TERRAIN.get(), GuiKeys.PREVIEW_BIOME.get()};
     private String[] values = {"", "", ""};
 
     public Preview(int seed) {
@@ -276,11 +277,10 @@ public class Preview extends Button {
     }
 
     private static String getTerrainName(Cell cell) {
-        String terrain = cell.terrain.getName().toLowerCase();
-        if (terrain.contains("river")) {
+        if (cell.terrain.isRiver()) {
             return "river";
         }
-        return terrain;
+        return cell.terrain.getName().toLowerCase();
     }
 
     private static String getBiomeName(Cell cell) {

@@ -1,8 +1,10 @@
 package com.terraforged.gui.page;
 
+import com.terraforged.chunk.settings.SettingsHelper;
 import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.chunk.settings.preset.Preset;
 import com.terraforged.chunk.settings.preset.PresetManager;
+import com.terraforged.gui.GuiKeys;
 import com.terraforged.gui.Instance;
 import com.terraforged.gui.OverlayScreen;
 import com.terraforged.gui.ScrollPane;
@@ -39,7 +41,7 @@ public class PresetsPage extends BasePage {
 
     @Override
     public String getTitle() {
-        return "Presets & Defaults";
+        return GuiKeys.PRESETS.get();
     }
 
     @Override
@@ -63,7 +65,7 @@ public class PresetsPage extends BasePage {
         Column right = getColumn(1);
         right.scrollPane.addButton(nameInput);
 
-        right.scrollPane.addButton(new TerraButton("Create") {
+        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_CREATE.get()) {
 
             @Override
             public void render(int x, int z, float ticks) {
@@ -91,7 +93,7 @@ public class PresetsPage extends BasePage {
             }
         });
 
-        right.scrollPane.addButton(new TerraButton("Load") {
+        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_LOAD.get()) {
 
             @Override
             public void render(int x, int z, float ticks) {
@@ -106,7 +108,7 @@ public class PresetsPage extends BasePage {
             }
         });
 
-        right.scrollPane.addButton(new TerraButton("Save") {
+        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_SAVE.get()) {
 
             @Override
             public void render(int x, int z, float ticks) {
@@ -131,7 +133,7 @@ public class PresetsPage extends BasePage {
             }
         });
 
-        right.scrollPane.addButton(new TerraButton("Reset") {
+        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_RESET.get()) {
 
             @Override
             public void render(int x, int z, float ticks) {
@@ -155,7 +157,26 @@ public class PresetsPage extends BasePage {
             }
         });
 
-        right.scrollPane.addButton(new TerraButton("Delete") {
+        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_DEFAULT.get()) {
+
+            @Override
+            public void render(int x, int z, float ticks) {
+                super.active = hasSelectedPreset();
+                super.render(x, z, ticks);
+            }
+
+            @Override
+            public void onClick(double x, double y) {
+                super.onClick(x, y);
+                getSelected().ifPresent(preset -> {
+                    TerraSettings settings = preset.getSettings();
+
+                    SettingsHelper.exportDefaults(settings);
+                });
+            }
+        });
+
+        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_DELETE.get()) {
 
             @Override
             public void render(int x, int z, float ticks) {

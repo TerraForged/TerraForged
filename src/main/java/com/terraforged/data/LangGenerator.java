@@ -2,7 +2,9 @@ package com.terraforged.data;
 
 import com.terraforged.chunk.settings.TerraSettings;
 import com.terraforged.core.util.NameUtil;
+import com.terraforged.gui.GuiKeys;
 import com.terraforged.gui.preview2.PreviewSettings;
+import com.terraforged.util.TranslationKey;
 import com.terraforged.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -21,14 +23,18 @@ public class LangGenerator {
 
     @SubscribeEvent
     public static void gather(GatherDataEvent event) {
+        GuiKeys.init();
+
         LanguageProvider langProvider = new LanguageProvider(event.getGenerator(), "terraforged", "en_us") {
             @Override
             protected void addTranslations() {
                 worlds(this);
                 biomes(this);
+                translationKeys(this);
                 settings(this);
             }
         };
+
         event.getGenerator().addProvider(langProvider);
     }
 
@@ -44,6 +50,10 @@ public class LangGenerator {
                 provider.add(biome, NameUtil.toDisplayName(name.getPath()));
             }
         }
+    }
+
+    private static void translationKeys(LanguageProvider provider) {
+        TranslationKey.each(key -> provider.add(key.getKey(), key.getDefaultValue()));
     }
 
     private static void settings(LanguageProvider provider) {

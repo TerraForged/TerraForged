@@ -26,6 +26,7 @@
 package com.terraforged.gui.page;
 
 import com.terraforged.TerraWorld;
+import com.terraforged.gui.GuiKeys;
 import com.terraforged.gui.Instance;
 import com.terraforged.gui.OverlayScreen;
 import com.terraforged.gui.element.TerraTextInput;
@@ -53,7 +54,7 @@ public class WorldPage extends BasePage {
 
     @Override
     public String getTitle() {
-        return "World Settings";
+        return GuiKeys.WORLD_SETTINGS.get();
     }
 
     @Override

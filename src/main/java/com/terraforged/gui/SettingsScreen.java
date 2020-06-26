@@ -63,12 +63,12 @@ public class SettingsScreen extends OverlayScreen {
         this.pages = new Page[]{
                 new PresetsPage(instance, preview, preview.getPreviewWidget()),
                 new WorldPage(instance, preview),
-                new SimplePreviewPage("Climate Settings", "climate", preview, instance, s -> s.climate),
-                new SimplePreviewPage("Terrain Settings", "terrain", preview, instance, s -> s.terrain),
-                new SimplePreviewPage("River Settings", "rivers", preview, instance, s -> s.rivers),
-                new SimplePreviewPage("Filter Settings", "filters", preview, instance, s -> s.filters),
-                new SimplePage("Structure Settings", "structures", instance, s -> s.structures),
-                new SimplePage("Feature Settings", "miscellaneous", instance, s -> s.miscellaneous)
+                new SimplePreviewPage(GuiKeys.CLIMATE_SETTINGS, "climate", preview, instance, s -> s.climate),
+                new SimplePreviewPage(GuiKeys.TERRAIN_SETTINGS, "terrain", preview, instance, s -> s.terrain),
+                new SimplePreviewPage(GuiKeys.RIVER_SETTINGS, "rivers", preview, instance, s -> s.rivers),
+                new SimplePreviewPage(GuiKeys.FILTER_SETTINGS, "filters", preview, instance, s -> s.filters),
+                new SimplePage(GuiKeys.STRUCTURE_SETTINGS, "structures", instance, s -> s.structures),
+                new SimplePage(GuiKeys.MISC_SETTINGS, "miscellaneous", instance, s -> s.miscellaneous)
         };
     }
 
@@ -104,10 +104,10 @@ public class SettingsScreen extends OverlayScreen {
         }
 
         // -52
-        addButton(new Button(buttonsCenter - buttonWidth - buttonPad, buttonsRow, buttonWidth, buttonHeight, "Cancel", b -> onClose()));
+        addButton(new Button(buttonsCenter - buttonWidth - buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.CANCEL.get(), b -> onClose()));
 
         // +2
-        addButton(new Button(buttonsCenter + buttonPad, buttonsRow, buttonWidth, buttonHeight, "Done", b -> {
+        addButton(new Button(buttonsCenter + buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.DONE.get(), b -> {
             for (Page page : pages) {
                 page.save();
             }
@@ -179,7 +179,7 @@ public class SettingsScreen extends OverlayScreen {
         boolean a = pages[pageIndex].action(pane -> pane.mouseClicked(x, y, button));
         boolean b =  isPresetsPage() || preview.action(pane -> pane.mouseClicked(x, y, button));;
         boolean c = super.mouseClicked(x, y, button);
-        return a || b || c || true;
+        return a || b || c;
     }
 
     @Override
@@ -187,7 +187,7 @@ public class SettingsScreen extends OverlayScreen {
         boolean a = pages[pageIndex].action(pane -> pane.mouseReleased(x, y, button));
         boolean b = isPresetsPage() || preview.action(pane -> pane.mouseReleased(x, y, button));
         boolean c = super.mouseReleased(x, y, button);
-        return a || b || c || true;
+        return a || b || c;
     }
 
     @Override
