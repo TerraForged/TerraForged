@@ -7,4 +7,6 @@ assignees: ''
 
 ---
 
-_Please take a look through the [existing questions](https://github.com/TerraForged/TerraForged/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3Aquestion+) to see if yours has already been asked/answered :)_
+### Please make sure you can reproduce any issues _without_ Optifine installed before reporting them here
+
+### Please also look through the [existing issues](https://github.com/TerraForged/TerraForged/issues) to see if your problem has already been reported :)
