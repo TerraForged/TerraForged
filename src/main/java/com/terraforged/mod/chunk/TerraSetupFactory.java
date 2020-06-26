@@ -106,7 +106,7 @@ public class TerraSetupFactory {
         modifiers.getPredicates().add(Matchers.sedimentDisks(), FeaturePredicate.DENY);
         modifiers.getPredicates().add(FeatureMatcher.of(Feature.MINESHAFT), new MinHeight(context.levels.waterY + 20));
 
-        return FeatureManager.create(context.world, SetupHooks.setup(modifiers, context.copy()));
+        return FeatureManager.create(SetupHooks.setup(modifiers, context.copy()));
     }
 
     public static SurfaceManager createSurfaceManager(TerraContext context) {
