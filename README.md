@@ -8,7 +8,7 @@ The primary outlet of which is a Forge mod for the popular game Minecraft (Java 
 Firstly you must recursively git-clone this repository and its submodules (Engine & FeatureManager). To build the
 mod jar just use the gradle build task. The jar will output to the `build/libs` directory.
 
-Commands:
+#### Commands
 ```shell script
 git clone --recursive https://github.com/TerraForged/TerraForged.git
 
@@ -17,7 +17,7 @@ git clone --recursive https://github.com/TerraForged/TerraForged.git
 
 ### Developing With TerraForged's API
 
-##### Dependency
+#### Dependency
 ```groovy
 repositories {
     maven { 
@@ -30,7 +30,7 @@ dependencies {
 }
 ```
 
-##### Usage
+#### Usage
 
 TerraForged fires a number of setup events each time its chunk generator is created. These events expose certain
 components of the generator allowing for world-gen content to be configured, modified, or added to dynamically.
