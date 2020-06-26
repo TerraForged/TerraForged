@@ -38,6 +38,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
+import net.minecraft.world.biome.provider.BiomeProvider;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,7 +47,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-public class TerraBiomeProvider extends AbstractBiomeProvider {
+public class TerraBiomeProvider extends BiomeProvider {
 
     private final long seed;
     private final BiomeMap biomeMap;
@@ -56,6 +57,7 @@ public class TerraBiomeProvider extends AbstractBiomeProvider {
     private final Map<Biome, List<Decorator>> decorators = new HashMap<>();
 
     public TerraBiomeProvider(TerraContext context) {
+        super(BiomeHelper.getAllBiomes());
         this.context = context;
         this.seed = context.terraSettings.world.seed;
         this.biomeMap = BiomeHelper.createBiomeMap();
@@ -77,7 +79,7 @@ public class TerraBiomeProvider extends AbstractBiomeProvider {
     }
 
     @Override
-    public Set<Biome> getBiomesInSquare(int centerX, int centerY, int centerZ, int radius) {
+    public Set<Biome> getBiomes(int centerX, int centerY, int centerZ, int radius) {
         int minX = centerX - radius >> 2;
         int minZ = centerZ - radius >> 2;
         int maxX = centerX + radius >> 2;
@@ -100,7 +102,7 @@ public class TerraBiomeProvider extends AbstractBiomeProvider {
     }
 
     @Override
-    public BlockPos findBiomePosition(int centerX, int centerY, int centerZ, int range, List<Biome> biomes, Random random) {
+    public BlockPos func_225531_a_(int centerX, int centerY, int centerZ, int range, List<Biome> biomes, Random random) {
         int minX = centerX - range >> 2;
         int minZ = centerZ - range >> 2;
         int maxX = centerX + range >> 2;

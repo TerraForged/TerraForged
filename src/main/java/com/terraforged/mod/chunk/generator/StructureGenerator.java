@@ -42,12 +42,12 @@ public class StructureGenerator implements Generator.Structures {
                 }
 
                 StructureStart existingStart = chunk.getStructureStart(structure.getStructureName());
-                int refCount = existingStart != null ? existingStart.func_227457_j_() : 0;
+                int refCount = existingStart != null ? existingStart.getRefCount() : 0;
 
                 SharedSeedRandom random = new SharedSeedRandom();
                 StructureStart start = StructureStart.DUMMY;
 
-                if (structure.func_225558_a_(biomes, generator, random, chunkpos.x, chunkpos.z, biome)) {
+                if (structure.canBeGenerated(biomes, generator, random, chunkpos.x, chunkpos.z, biome)) {
                     StructureStart altStart = structure.getStartFactory().create(structure, chunkpos.x, chunkpos.z, MutableBoundingBox.getNewBoundingBox(), refCount, generator.getSeed());
                     altStart.init(generator, templates, chunkpos.x, chunkpos.z, biome);
                     start = altStart.isValid() ? altStart : StructureStart.DUMMY;

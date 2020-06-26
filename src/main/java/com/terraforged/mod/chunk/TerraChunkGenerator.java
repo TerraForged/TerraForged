@@ -139,7 +139,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
     }
 
     @Override
-    public final void func_225551_a_(WorldGenRegion world, IChunk chunk) {
+    public final void generateSurface(WorldGenRegion world, IChunk chunk) {
         surfaceGenerator.generateSurface(world, chunk);
     }
 

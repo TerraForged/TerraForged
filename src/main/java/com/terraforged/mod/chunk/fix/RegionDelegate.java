@@ -129,8 +129,8 @@ public class RegionDelegate extends WorldGenRegion {
     }
 
     @Override
-    public boolean func_225521_a_(BlockPos pos, boolean drop, @Nullable Entity entity) {
-        return region.func_225521_a_(pos, drop, entity);
+    public boolean destroyBlock(BlockPos p_225521_1_, boolean p_225521_2_, @Nullable Entity p_225521_3_) {
+        return region.destroyBlock(p_225521_1_, p_225521_2_, p_225521_3_);
     }
 
     @Override
@@ -308,8 +308,8 @@ public class RegionDelegate extends WorldGenRegion {
     }
 
     @Override
-    public <T extends Entity> List<T> func_225316_b(Class<? extends T> p_225316_1_, AxisAlignedBB p_225316_2_, @Nullable Predicate<? super T> p_225316_3_) {
-        return region.func_225316_b(p_225316_1_, p_225316_2_, p_225316_3_);
+    public <T extends Entity> List<T> getLoadedEntitiesWithinAABB(Class<? extends T> p_225316_1_, AxisAlignedBB p_225316_2_, @Nullable Predicate<? super T> p_225316_3_) {
+        return region.getLoadedEntitiesWithinAABB(p_225316_1_, p_225316_2_, p_225316_3_);
     }
 
     @Override
@@ -323,8 +323,8 @@ public class RegionDelegate extends WorldGenRegion {
     }
 
     @Override
-    public <T extends Entity> List<T> func_225317_b(Class<? extends T> p_225317_1_, AxisAlignedBB p_225317_2_) {
-        return region.func_225317_b(p_225317_1_, p_225317_2_);
+    public <T extends Entity> List<T> getLoadedEntitiesWithinAABB(Class<? extends T> p_225317_1_, AxisAlignedBB p_225317_2_) {
+        return region.getLoadedEntitiesWithinAABB(p_225317_1_, p_225317_2_);
     }
 
     @Override
@@ -451,8 +451,8 @@ public class RegionDelegate extends WorldGenRegion {
 
     @Override
     @Nullable
-    public IBlockReader getBlockReader(int p_225522_1_, int p_225522_2_) {
-        return region.getBlockReader(p_225522_1_, p_225522_2_);
+    public IBlockReader getBlockReader(int chunkX, int chunkZ) {
+        return region.getBlockReader(chunkX, chunkZ);
     }
 
     @Override
@@ -545,38 +545,38 @@ public class RegionDelegate extends WorldGenRegion {
     }
 
     @Override
-    public boolean func_226669_j_(Entity entity) {
-        return region.func_226669_j_(entity);
+    public boolean checkNoEntityCollision(Entity p_226668_1_) {
+        return region.checkNoEntityCollision(p_226668_1_);
     }
 
     @Override
-    public boolean func_226664_a_(AxisAlignedBB bounds) {
-        return region.func_226664_a_(bounds);
+    public boolean hasNoCollisions(AxisAlignedBB p_226664_1_) {
+        return region.hasNoCollisions(p_226664_1_);
     }
 
     @Override
-    public boolean func_226668_i_(Entity entity) {
-        return region.func_226668_i_(entity);
+    public boolean hasNoCollisions(Entity p_226669_1_) {
+        return region.hasNoCollisions(p_226669_1_);
     }
 
     @Override
-    public boolean func_226665_a__(Entity entity, AxisAlignedBB bounds) {
-        return region.func_226665_a__(entity, bounds);
+    public boolean hasNoCollisions(Entity p_226665_1_, AxisAlignedBB p_226665_2_) {
+        return region.hasNoCollisions(p_226665_1_, p_226665_2_);
     }
 
     @Override
-    public boolean func_226662_a_(@Nullable Entity entity, AxisAlignedBB bounds, Set<Entity> set) {
-        return region.func_226662_a_(entity, bounds, set);
+    public boolean hasNoCollisions(@Nullable Entity p_226662_1_, AxisAlignedBB p_226662_2_, Set<Entity> p_226662_3_) {
+        return region.hasNoCollisions(p_226662_1_, p_226662_2_, p_226662_3_);
     }
 
     @Override
-    public Stream<VoxelShape> func_226667_c_(@Nullable Entity entity, AxisAlignedBB bounds, Set<Entity> entities) {
-        return region.func_226667_c_(entity, bounds, entities);
+    public Stream<VoxelShape> getCollisionShapes(@Nullable Entity p_226667_1_, AxisAlignedBB p_226667_2_, Set<Entity> p_226667_3_) {
+        return region.getCollisionShapes(p_226667_1_, p_226667_2_, p_226667_3_);
     }
 
     @Override
-    public Stream<VoxelShape> func_226666_b_(@Nullable Entity entity, AxisAlignedBB bounds) {
-        return region.func_226666_b_(entity, bounds);
+    public Stream<VoxelShape> getCollisionShapes(@Nullable Entity p_226666_1_, AxisAlignedBB p_226666_2_) {
+        return region.getCollisionShapes(p_226666_1_, p_226666_2_);
     }
 
     @Override
