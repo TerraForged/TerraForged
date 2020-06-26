@@ -1,11 +1,10 @@
 package com.terraforged.mod.chunk.util;
 
 import com.terraforged.api.biome.BiomeVariant;
-import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.core.util.PosIterator;
-import net.minecraft.util.math.ChunkPos;
+import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeContainer;
@@ -86,24 +85,6 @@ public class TerraContainer extends BiomeContainer {
             int x = chunkReader.getBlockX() + dx;
             int z = chunkReader.getBlockZ() + dz;
             Biome biome = biomeProvider.getBiome(chunkReader.getCell(dx, dz), x, z);
-            biomes2D[indexOf(dx, dz)] = biome;
-            if ((dx & 3) == 0 && (dz & 3) == 0) {
-                for (int dy = 0; dy < 64; dy++) {
-                    biomes3D[indexOf(dx >> 2, dy, dz >> 2)] = biome;
-                }
-            }
-        }
-        return new TerraContainer(biomes3D, biomes2D);
-    }
-
-    private static TerraContainer convert(ChunkPos pos, BiomeContainer biomes, TerraBiomeProvider biomeProvider) {
-        Biome[] biomes2D = new Biome[BIOMES_2D_SIZE];
-        Biome[] biomes3D = new Biome[BIOMES_3D_SIZE];
-        PosIterator iterator = PosIterator.area(0, 0, 16, 16);
-        while (iterator.next()) {
-            int dx = iterator.x();
-            int dz = iterator.z();
-            Biome biome = biomeProvider.getSurfaceBiome(pos.getXStart() + dx, pos.getZStart() + dz, biomes);
             biomes2D[indexOf(dx, dz)] = biome;
             if ((dx & 3) == 0 && (dz & 3) == 0) {
                 for (int dy = 0; dy < 64; dy++) {
