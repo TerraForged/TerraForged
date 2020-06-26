@@ -5,16 +5,15 @@ The primary outlet of which is a Forge mod for the popular game Minecraft (Java 
 
 ### Building From Source
 
-The project relies on Gradle for build and dependency management. In order to compile you need
-to use the maven-publish task, with the mod binary being located under the 'TerraForgedMod'
-sub-project.
+Firstly you must recursively git-clone this repository and its submodules (Engine & FeatureManager). To build the
+mod jar just use the gradle build task. The jar will output to the `build/libs` directory.
 
-#### Command
+Commands:
 ```shell script
-./gradlew publish
-```
+git clone --recursive https://github.com/TerraForged/TerraForged.git
 
-// TODO - more
+./gradlew build
+```
 
 ### Developing With TerraForged's API
 
