@@ -1,0 +1,66 @@
+{
+  "biomes": [
+    "minecraft:snowy_tundra",
+    "minecraft:snowy_taiga_mountains",
+    "minecraft:wooded_mountains",
+    "minecraft:gravelly_mountains",
+    "minecraft:modified_gravelly_mountains"
+  ],
+  "match": [
+    [
+      "minecraft:normal_tree",
+      "minecraft:spruce_log",
+      "minecraft:spruce_leaves"
+    ],
+    [
+      "minecraft:fancy_tree",
+      "minecraft:spruce_log",
+      "minecraft:spruce_leaves"
+    ]
+  ],
+  "replace": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "minecraft:decorated",
+        "config": {
+          "feature": {
+            "name": "minecraft:random_selector",
+            "config": {
+              "features": [
+                {
+                  "name": "terraforged:template",
+                  "config": {
+                    "template": "terraforged:pine"
+                  },
+                  "chance": 0.3
+                }
+              ],
+              "default": {
+                "name": "terraforged:template",
+                "config": {
+                  "template": "terraforged:pine"
+                }
+              }
+            }
+          },
+          "decorator": {
+            "name": "terraforged:poisson_surface",
+            "config": {
+              "radius": 10,
+              "density_noise_scale": 120,
+              "density_noise_min": 0.5,
+              "density_noise_max": 1.5
+            }
+          }
+        }
+      },
+      "decorator": {
+        "name": "minecraft:chance_passthrough",
+        "config": {
+          "chance": 0.02
+        }
+      }
+    }
+  }
+}

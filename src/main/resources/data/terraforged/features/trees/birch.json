@@ -1,0 +1,54 @@
+{
+  "biomes": [
+    "minecraft:birch*",
+    "minecraft:tall_birch*"
+  ],
+  "match": [
+    [
+      "minecraft:birch_log",
+      "minecraft:birch_leaves"
+    ]
+  ],
+  "replace": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "minecraft:random_selector",
+        "config": {
+          "features": [
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:birch_forest"
+              },
+              "chance": 0.2
+            },
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:birch_large"
+              },
+              "chance": 0.2
+            }
+          ],
+          "default": {
+            "name": "terraforged:template",
+            "config": {
+              "template": "terraforged:birch_forest"
+            }
+          }
+        }
+      },
+      "decorator": {
+        "name": "terraforged:poisson_surface",
+        "config": {
+          "radius": 8,
+          "biome_fade": 0.12,
+          "density_noise_scale": 300,
+          "density_noise_min": 0.5,
+          "density_noise_max": 1.5
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "action": "replace",
+  "biomes": [
+    "minecraft:swamp",
+    "minecraft:swamp_hills"
+  ],
+  "match": [
+    [
+      "minecraft:normal_tree",
+      "minecraft:oak_log",
+      "minecraft:oak_leaves"
+    ]
+  ],
+  "replace": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "minecraft:random_selector",
+        "config": {
+          "features": [
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:willow_small"
+              },
+              "chance": 0.2
+            },
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:willow_large"
+              },
+              "chance": 0.35
+            }
+          ],
+          "default": {
+            "name": "terraforged:template",
+            "config": {
+              "template": "terraforged:willow_large"
+            }
+          }
+        }
+      },
+      "decorator": {
+        "name": "minecraft:count_extra_heightmap",
+        "config": {
+          "count": 8,
+          "extra_chance": 0.1,
+          "extra_count": 1
+        }
+      }
+    }
+  }
+}

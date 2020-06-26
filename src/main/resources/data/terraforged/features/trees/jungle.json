@@ -1,0 +1,88 @@
+{
+  "biomes": [
+    "minecraft:jungle",
+    "minecraft:modified_jungle",
+    "minecraft:bamboo_jungle"
+  ],
+  "match": [
+    [
+      "minecraft:mega_jungle_tree"
+    ]
+  ],
+  "replace": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "minecraft:random_selector",
+        "config": {
+          "features": [
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:jungle_small"
+              },
+              "chance": 0.2
+            },
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:jungle_large"
+              },
+              "chance": 0.3
+            },
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:jungle_huge"
+              },
+              "chance": 0.4
+            },
+            {
+              "name": "minecraft:jungle_ground_bush",
+              "config": {
+                "trunk_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:jungle_log",
+                    "Properties": {
+                      "axis": "y"
+                    }
+                  }
+                },
+                "leaves_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:oak_leaves",
+                    "Properties": {
+                      "distance": "7",
+                      "persistent": "false"
+                    }
+                  }
+                },
+                "decorators": [],
+                "base_height": 4
+              },
+              "chance": 0.5
+            }
+          ],
+          "default": {
+            "name": "terraforged:template",
+            "config": {
+              "template": "terraforged:jungle_small"
+            }
+          }
+        }
+      },
+      "decorator": {
+        "name": "terraforged:poisson_surface",
+        "config": {
+          "radius": 6,
+          "biome_fade": 0.2,
+          "density_noise_scale": 400,
+          "density_noise_min": 0.25,
+          "density_noise_max": 2
+        }
+      }
+    }
+  }
+}

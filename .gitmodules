@@ -1,6 +1,6 @@
 [submodule "FeatureManager"]
 	path = FeatureManager
 	url = https://github.com/TerraForged/FeatureManager.git
-[submodule "Noise2D"]
-	path = Noise2D
-	url = https://github.com/TerraForged/Noise2D.git
+[submodule "Engine"]
+	path = Engine
+	url = https://github.com/TerraForged/Engine.git

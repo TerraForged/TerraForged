@@ -1,0 +1,100 @@
+{
+  "biomes": [
+    "minecraft:*"
+  ],
+  "match": [
+    [
+      "minecraft:mega_spruce_tree"
+    ]
+  ],
+  "replace": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "terraforged:context_selector",
+        "config": {
+          "features": [
+            {
+              "feature": {
+                "name": "terraforged:template",
+                "config": {
+                  "template": "terraforged:redwood_huge"
+                }
+              },
+              "context": {
+                "chance": 0.4,
+                "elevation": {
+                  "from": 0.15,
+                  "to": 0.0
+                },
+                "biome": {
+                  "from": 0.1,
+                  "to": 0.4
+                }
+              }
+            },
+            {
+              "feature": {
+                "name": "terraforged:template",
+                "config": {
+                  "template": "terraforged:redwood_large"
+                }
+              },
+              "context": {
+                "chance": 0.2,
+                "elevation": {
+                  "from": 0.25,
+                  "to": 0.0
+                }
+              },
+              "biome": {
+                "from": 0.0,
+                "to": 0.25
+              }
+            },
+            {
+              "feature": {
+                "name": "terraforged:template",
+                "config": {
+                  "template": "terraforged:spruce_large"
+                }
+              },
+              "context": {
+                "chance": 0.4,
+                "elevation": {
+                  "from": 0.35,
+                  "to": 0.15
+                }
+              }
+            },
+            {
+              "feature": {
+                "name": "terraforged:template",
+                "config": {
+                  "template": "terraforged:spruce_small"
+                }
+              },
+              "context": {
+                "chance": 0.2,
+                "elevation": {
+                  "from": 0.50,
+                  "to": 0.2
+                }
+              }
+            }
+          ]
+        }
+      },
+      "decorator": {
+        "name": "terraforged:poisson_surface",
+        "config": {
+          "radius": 8,
+          "biome_fade": 0.2,
+          "density_noise_scale": 250,
+          "density_noise_min": 0.15,
+          "density_noise_max": 2.25
+        }
+      }
+    }
+  }
+}

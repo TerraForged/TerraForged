@@ -1,0 +1,115 @@
+{
+  "biomes": [
+    "minecraft:birch*",
+    "minecraft:tall_birch*"
+  ],
+  "match": [
+    [
+      "minecraft:birch_log",
+      "minecraft:birch_leaves"
+    ],
+    [
+      "terraforged:poisson_surface"
+    ]
+  ],
+  "after": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "minecraft:random_selector",
+        "config": {
+          "features": [
+            {
+              "name": "minecraft:jungle_ground_bush",
+              "config": {
+                "trunk_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:oak_log",
+                    "Properties": {
+                      "axis": "y"
+                    }
+                  }
+                },
+                "leaves_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:birch_leaves",
+                    "Properties": {
+                      "distance": "3",
+                      "persistent": "false"
+                    }
+                  }
+                },
+                "decorators": [],
+                "base_height": 3
+              },
+              "chance": 0.15
+            },
+            {
+              "name": "minecraft:jungle_ground_bush",
+              "config": {
+                "trunk_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:oak_log",
+                    "Properties": {
+                      "axis": "y"
+                    }
+                  }
+                },
+                "leaves_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:oak_leaves",
+                    "Properties": {
+                      "distance": "3",
+                      "persistent": "false"
+                    }
+                  }
+                },
+                "decorators": [],
+                "base_height": 4
+              },
+              "chance": 0.25
+            }
+          ],
+          "default": {
+            "name": "minecraft:jungle_ground_bush",
+            "config": {
+              "trunk_provider": {
+                "type": "minecraft:simple_state_provider",
+                "state": {
+                  "Name": "minecraft:oak_log",
+                  "Properties": {
+                    "axis": "y"
+                  }
+                }
+              },
+              "leaves_provider": {
+                "type": "minecraft:simple_state_provider",
+                "state": {
+                  "Name": "minecraft:oak_leaves",
+                  "Properties": {
+                    "distance": "3",
+                    "persistent": "false"
+                  }
+                }
+              },
+              "decorators": [],
+              "base_height": 3
+            }
+          }
+        }
+      },
+      "decorator": {
+        "name": "minecraft:count_extra_heightmap",
+        "config": {
+          "count": 0,
+          "extra_chance": 0.05,
+          "extra_count": 1
+        }
+      }
+    }
+  }
+}

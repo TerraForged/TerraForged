@@ -1,0 +1,54 @@
+{
+  "biomes": [
+    "minecraft:river",
+    "minecraft:plains",
+    "minecraft:sunflower_plains",
+    "minecraft:mountains"
+  ],
+  "match": [
+    [
+      "minecraft:oak_log",
+      "minecraft:oak_leaves"
+    ]
+  ],
+  "replace": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "minecraft:random_selector",
+        "config": {
+          "features": [
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:oak_huge"
+              },
+              "chance": 0.1
+            },
+            {
+              "name": "terraforged:template",
+              "config": {
+                "template": "terraforged:oak_small"
+              },
+              "chance": 0.2
+            }
+          ],
+          "default": {
+            "name": "terraforged:template",
+            "config": {
+              "template": "terraforged:oak_small"
+            }
+          }
+        }
+      },
+      "decorator": {
+        "name": "minecraft:count_extra_heightmap",
+        "config": {
+          "count": 0,
+          "extra_chance": 0.02,
+          "extra_count": 1
+        }
+      }
+    }
+  }
+}
