@@ -1,11 +1,12 @@
 {
   "biomes": [
+    "minecraft:snowy_mountains",
+    "minecraft:wooded_mountains",
     "terraforged:fir_forest",
     "terraforged:snowy_fir_forest"
   ],
   "match": [
     [
-      "minecraft:normal_tree",
       "minecraft:spruce_log",
       "minecraft:spruce_leaves"
     ]

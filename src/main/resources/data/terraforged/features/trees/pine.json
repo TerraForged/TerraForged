@@ -6,7 +6,6 @@
   ],
   "match": [
     [
-      "minecraft:normal_tree",
       "minecraft:spruce_log",
       "minecraft:spruce_leaves"
     ]

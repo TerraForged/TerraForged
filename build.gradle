@@ -127,6 +127,10 @@ classes {
     dependsOn(collectLibs)
 }
 
+build {
+    dependsOn("reobfJar")
+}
+
 publishing {
     publications {
         // publish the mod jar & api jar

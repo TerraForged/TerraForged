@@ -29,6 +29,7 @@ import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.map.BiomeMapBuilder;
 import com.terraforged.mod.biome.map.BiomePredicate;
+import com.terraforged.mod.biome.map.defaults.BiomeTemps;
 import com.terraforged.n2d.util.Vec2f;
 import com.terraforged.world.biome.BiomeData;
 import com.terraforged.world.biome.BiomeType;
@@ -135,11 +136,18 @@ public class BiomeHelper {
         return biome.getTempCategory();
     }
 
+//        Biomes.MOUNTAINS 0.2F
+//        Biomes.GRAVELLY_MOUNTAINS 0.2F
+//        Biomes.SNOWY_MOUNTAINS 0.0F
+//        Biomes.SNOWY_TAIGA_MOUNTAINS -0.5F
+//        Biomes.TAIGA_MOUNTAINS 0.25F
+//        Biomes.WOODED_MOUNTAINS 0.2F
+//        Biomes.MODIFIED_GRAVELLY_MOUNTAINS 0.2F
     public static Biome.TempCategory getMountainCategory(Biome biome) {
-        if (biome.getDefaultTemperature() < 0.2) {
+        if (biome.getDefaultTemperature() <= BiomeTemps.COLD) {
             return Biome.TempCategory.COLD;
         }
-        if (biome.getDefaultTemperature() > 0.4) {
+        if (biome.getDefaultTemperature() >= BiomeTemps.HOT) {
             return Biome.TempCategory.WARM;
         }
         return Biome.TempCategory.MEDIUM;
