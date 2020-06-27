@@ -19,8 +19,7 @@ public class Preview extends Widget {
 
     private static final float ZOOM_SCALE = 200F;
 
-    private final ThreadPool threadPool = ThreadPools.getPool();
-
+    private final ThreadPool threadPool = ThreadPools.createDefault();
     private final TerraSettings settings;
 
     private int seed;
@@ -47,6 +46,10 @@ public class Preview extends Widget {
         seed++;
         world = createWorld(settings);
         world.update(offsetX, offsetZ, zoom, true);
+    }
+
+    public void close() {
+        threadPool.shutdown();
     }
 
     @Override

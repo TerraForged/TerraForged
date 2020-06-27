@@ -25,6 +25,11 @@ public class PreviewPage extends UpdatablePage {
     }
 
     @Override
+    public void close() {
+        preview.close();
+    }
+
+    @Override
     public void apply(Consumer<TerraSettings> consumer) {
         consumer.accept(genSettings);
         update();

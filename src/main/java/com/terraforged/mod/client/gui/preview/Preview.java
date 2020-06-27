@@ -29,6 +29,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.cache.CacheEntry;
+import com.terraforged.core.concurrent.thread.ThreadPool;
 import com.terraforged.core.concurrent.thread.ThreadPools;
 import com.terraforged.core.settings.Settings;
 import com.terraforged.core.tile.Size;
@@ -62,6 +63,7 @@ public class Preview extends Button {
 
     private final int offsetX;
     private final int offsetZ;
+    private final ThreadPool threadPool = ThreadPools.createDefault();
     private final Random random = new Random(System.currentTimeMillis());
     private final PreviewSettings previewSettings = new PreviewSettings();
     private final DynamicTexture texture = new DynamicTexture(new NativeImage(WIDTH, HEIGHT, true));
@@ -92,6 +94,7 @@ public class Preview extends Button {
 
     public void close() {
         texture.close();
+        threadPool.shutdown();
     }
 
     @Override
@@ -204,7 +207,7 @@ public class Preview extends Button {
         context.factory.getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ, center);
 
         TileGenerator renderer = TileGenerator.builder()
-                .pool(ThreadPools.getPool())
+                .pool(threadPool)
                 .size(FACTOR, 0)
                 .factory(context.factory)
                 .batch(6)

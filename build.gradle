@@ -34,8 +34,8 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
-    lib (project(":FeatureManager")) { transitive false }
-    lib project(":Engine")
+    lib(project(":FeatureManager")) { transitive false }
+    lib(project(":Engine"))
 }
 
 minecraft {
@@ -97,21 +97,6 @@ task collectLibs(type: Copy) {
     duplicatesStrategy = "EXCLUDE"
 }
 
-task apiJar(type: Jar) {
-    dependsOn("reobfJar")
-
-    // copy contents of the main mod jar but only select packages
-    from { zipTree(tasks.jar.archivePath) }
-    include "com/terraforged/fm/**"
-    include "com/terraforged/api/**"
-    include "com/terraforged/core/**"
-    include "com/terraforged/n2d/**"
-    include "com/terraforged/world/**"
-
-    // self explanatory
-    classifier "api"
-}
-
 processResources {
     filesMatching("**/mods.toml") {
         // replaces the version string in the mods.toml
@@ -133,7 +118,6 @@ publishing {
         // publish the mod jar & api jar
         mavenJava(MavenPublication) {
             artifact jar
-            artifact apiJar
         }
     }
 
