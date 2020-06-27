@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    implementation fg.deobf("com.terraforged:TerraForged:1.15.2-0.1.0:api")
+    implementation fg.deobf("com.terraforged:TerraForged:1.15.2-0.1.0")
 }
 ```
 
