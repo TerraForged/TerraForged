@@ -43,12 +43,8 @@ public class SettingsHelper {
 
     public static CompoundNBT applyDefaults(CompoundNBT options, TerraSettings dest) {
         if (options.isEmpty()) {
-            try (Reader reader = new BufferedReader(new FileReader(DEFAULTS_FILE))) {
-                JsonElement json = new JsonParser().parse(reader);
-                options = NBTHelper.fromJson(json);
-            } catch (IOException ignored) {
-
-            }
+            TerraSettings defaults = readDefaults();
+            options = NBTHelper.serialize(defaults);
         }
         NBTHelper.deserialize(options, dest);
         return options;
