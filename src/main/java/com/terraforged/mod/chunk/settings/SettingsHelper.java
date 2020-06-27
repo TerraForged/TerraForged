@@ -54,24 +54,30 @@ public class SettingsHelper {
         return options;
     }
 
-    public static TerraSettings getSettings(WorldInfo info) {
+    public static TerraSettings readDefaults() {
         TerraSettings settings = new TerraSettings();
-        if (info.getGeneratorOptions().isEmpty()) {
-            if (DEFAULTS_FILE.exists()) {
-                try (Reader reader = new BufferedReader(new FileReader(DEFAULTS_FILE))) {
-                    Log.info("Loading generator settings from json");
-                    JsonElement json = new JsonParser().parse(reader);
-                    CompoundNBT root = NBTHelper.fromJson(json);
-                    NBTHelper.deserialize(root, settings);
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                }
+        if (DEFAULTS_FILE.exists()) {
+            try (Reader reader = new BufferedReader(new FileReader(DEFAULTS_FILE))) {
+                Log.info("Loading generator settings from json");
+                JsonElement json = new JsonParser().parse(reader);
+                CompoundNBT root = NBTHelper.fromJson(json);
+                NBTHelper.deserialize(root, settings);
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
-        } else {
-            Log.info("Loading generator settings from level.dat");
-            NBTHelper.deserialize(info.getGeneratorOptions(), settings);
         }
         return settings;
+    }
+
+    public static TerraSettings getSettings(WorldInfo info) {
+        if (info.getGeneratorOptions().isEmpty()) {
+            return readDefaults();
+        } else {
+            Log.info("Loading generator settings from level.dat");
+            TerraSettings settings = new TerraSettings();
+            NBTHelper.deserialize(info.getGeneratorOptions(), settings);
+            return settings;
+        }
     }
 
     public static void init() {

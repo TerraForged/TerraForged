@@ -97,10 +97,7 @@ task collectLibs(type: Copy) {
     duplicatesStrategy = "EXCLUDE"
 }
 
-// runs during publication
 task apiJar(type: Jar) {
-    // make sure jar is reobf'd before creating the api jar
-    // dependents must use fg.deobf("dependency") for their environment
     dependsOn("reobfJar")
 
     // copy contents of the main mod jar but only select packages
@@ -127,8 +124,8 @@ classes {
     dependsOn(collectLibs)
 }
 
-build {
-    dependsOn("reobfJar")
+jar {
+    finalizedBy("reobfJar")
 }
 
 publishing {

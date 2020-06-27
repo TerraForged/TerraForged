@@ -77,8 +77,8 @@ public class PresetsPage extends BasePage {
             @Override
             public void onClick(double x, double y) {
                 super.onClick(x, y);
-                // create new preset with default settings
-                Preset preset = new Preset(nameInput.getValue(), new TerraSettings());
+                // create new preset with current settings
+                Preset preset = new Preset(nameInput.getValue(), instance.createCopy());
 
                 // register with the manager & reset the text field
                 manager.add(preset);
@@ -121,8 +121,7 @@ public class PresetsPage extends BasePage {
                 super.onClick(x, y);
                 getSelected().ifPresent(preset -> {
                     // create a copy of the settings
-                    TerraSettings settings = new TerraSettings();
-                    NBTHelper.deserialize(instance.settingsData, settings);
+                    TerraSettings settings = instance.createCopy();
 
                     // replace the current preset with the updated version
                     manager.add(new Preset(preset.getName(), settings));
@@ -234,6 +233,7 @@ public class PresetsPage extends BasePage {
 
     private void rebuildPresetList() {
         Column left = getColumn(0);
+        left.scrollPane.setSelected(null);
         left.scrollPane.setRenderSelection(true);
         left.scrollPane.children().clear();
 

@@ -116,7 +116,7 @@ public class PresetManager implements Iterable<Preset> {
         }
 
         File[] files = PRESETS_DIR.listFiles();
-        if (files == null || files.length == 0) {
+        if (files == null) {
             return new PresetManager(new ArrayList<>());
         }
 
