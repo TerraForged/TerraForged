@@ -112,7 +112,7 @@ public class SettingsScreen extends OverlayScreen {
             for (Page page : pages) {
                 page.save();
             }
-            parent.chunkProviderSettingsJson = NBTHelper.serializeCompact(instance.settings);
+            parent.chunkProviderSettingsJson = NBTHelper.stripMetadata(instance.settingsData);
             SettingsScreen.setSeed(parent, preview.getSeed());
             onClose();
         }));

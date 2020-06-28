@@ -1,8 +1,8 @@
 package com.terraforged.mod.chunk.generator;
 
+import com.terraforged.fm.template.StructureUtils;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.fix.ChunkCarverFix;
-import com.terraforged.fm.template.StructureUtils;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;

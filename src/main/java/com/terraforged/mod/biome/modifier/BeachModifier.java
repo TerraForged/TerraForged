@@ -1,8 +1,8 @@
 package com.terraforged.mod.biome.modifier;
 
 import com.terraforged.api.biome.modifier.BiomeModifier;
-import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import com.terraforged.world.GeneratorContext;

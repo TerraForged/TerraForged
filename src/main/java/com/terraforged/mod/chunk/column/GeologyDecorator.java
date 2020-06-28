@@ -25,9 +25,9 @@
 
 package com.terraforged.mod.chunk.column;
 
+import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
-import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
 import com.terraforged.mod.material.geology.GeoManager;
 import net.minecraft.world.chunk.IChunk;
 

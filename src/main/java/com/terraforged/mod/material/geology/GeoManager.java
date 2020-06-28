@@ -27,8 +27,8 @@ package com.terraforged.mod.material.geology;
 
 import com.terraforged.api.material.geology.GeologyManager;
 import com.terraforged.api.material.geology.StrataConfig;
-import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.core.Seed;
+import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;

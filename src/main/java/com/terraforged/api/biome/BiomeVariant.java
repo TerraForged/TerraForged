@@ -35,9 +35,7 @@ public abstract class BiomeVariant extends Biome {
     }
 
     // override to register a custom biome weight with Forge's BiomeManager (default is 10)
-    public void registerWeights() {
-
-    }
+    public void registerWeights() {}
 
     @Override
     public int getGrassColor(double x, double z) {

@@ -53,11 +53,11 @@ public class StructureSettings {
     public static class Structure {
 
         @Range(min = 1, max = 200)
-        @Comment("The distance (in chunks) between placements of this feature")
+        @Comment("The maximum distance in chunks between attempts to spawn a structure")
         public int distance;
 
         @Range(min = 1, max = 50)
-        @Comment("The separation (in chunks) between placements of this feature")
+        @Comment("The minimum distance in chunks between structure spawns")
         public int separation;
 
         public Structure() {

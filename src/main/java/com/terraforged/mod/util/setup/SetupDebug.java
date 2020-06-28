@@ -25,9 +25,9 @@
 
 package com.terraforged.mod.util.setup;
 
-import com.terraforged.mod.Log;
 import com.terraforged.api.event.SetupEvent;
 import com.terraforged.core.Seed;
+import com.terraforged.mod.Log;
 import com.terraforged.n2d.Source;
 import com.terraforged.n2d.source.Builder;
 import com.terraforged.world.geology.Strata;

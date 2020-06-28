@@ -9,9 +9,11 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class BiomeWeights {
 
@@ -58,6 +60,21 @@ public class BiomeWeights {
         return standardWeight;
     }
 
+    public void forEachEntry(BiConsumer<ResourceLocation, Integer> consumer) {
+        biomes.entrySet().stream()
+                .sorted(Comparator.comparing(e -> e.getKey().toString()))
+                .forEach(e -> consumer.accept(e.getKey(), e.getValue()));
+    }
+
+    public void forEachUnregistered(BiConsumer<ResourceLocation, Integer> consumer) {
+        for (Biome biome : ForgeRegistries.BIOMES) {
+            if (!biomes.containsKey(biome.getRegistryName())) {
+                int weight = getWeight(biome);
+                consumer.accept(biome.getRegistryName(), weight);
+            }
+        }
+    }
+
     private void readWeights() {
         CommentedConfig config = ConfigManager.BIOME_WEIGHTS.get();
 
@@ -69,11 +86,12 @@ public class BiomeWeights {
 
             ResourceLocation name = new ResourceLocation(key);
             if (!ForgeRegistries.BIOMES.containsKey(name)) {
+                Log.err("Invalid biome defined: {}", name);
                 continue;
             }
 
             biomes.put(name, weight);
-            Log.debug("Loaded custom biome weight: %s=%s", name, weight);
+            Log.debug("Loaded custom biome weight: {}={}", name, weight);
         }
     }
 }

@@ -1,10 +1,10 @@
 package com.terraforged.mod.biome.modifier;
 
 import com.terraforged.api.biome.modifier.BiomeModifier;
+import com.terraforged.core.cell.Cell;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.map.defaults.DefaultBiome;
 import com.terraforged.mod.chunk.TerraContext;
-import com.terraforged.core.cell.Cell;
 import net.minecraft.world.biome.Biome;
 
 public class MountainModifier implements BiomeModifier {

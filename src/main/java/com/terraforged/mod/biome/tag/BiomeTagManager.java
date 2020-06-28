@@ -25,8 +25,8 @@
 
 package com.terraforged.mod.biome.tag;
 
-import com.terraforged.mod.Log;
 import com.terraforged.api.biome.BiomeTags;
+import com.terraforged.mod.Log;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IFutureReloadListener;
 import net.minecraft.resources.IResourceManager;

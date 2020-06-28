@@ -1,8 +1,8 @@
 package com.terraforged.mod.config;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
-import com.terraforged.mod.Log;
 import com.terraforged.core.concurrent.thread.ThreadPools;
+import com.terraforged.mod.Log;
 
 public class PerfDefaults {
 

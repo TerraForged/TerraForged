@@ -74,6 +74,7 @@ public class PreviewPage extends UpdatablePage {
         preview.setHeight(Preview.HEIGHT);
 
         addElements(right.left, right.top, right, previewerSettings, right.scrollPane::addButton, this::update);
+
         right.scrollPane.addButton(new TerraButton(GuiKeys.PREVIEW_SEED.get()) {
             @Override
             public void onPress() {

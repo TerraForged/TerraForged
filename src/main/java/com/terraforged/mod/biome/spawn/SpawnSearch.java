@@ -1,9 +1,9 @@
 package com.terraforged.mod.biome.spawn;
 
+import com.terraforged.core.cell.Cell;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.server.command.search.Search;
-import com.terraforged.core.cell.Cell;
 import net.minecraft.util.math.BlockPos;
 
 public class SpawnSearch extends Search {

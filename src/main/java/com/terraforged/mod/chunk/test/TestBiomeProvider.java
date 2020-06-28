@@ -25,9 +25,9 @@
 
 package com.terraforged.mod.chunk.test;
 
+import com.terraforged.core.cell.Cell;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TerraContext;
-import com.terraforged.core.cell.Cell;
 import net.minecraft.world.biome.Biome;
 
 public class TestBiomeProvider extends TerraBiomeProvider {

@@ -36,8 +36,8 @@ import com.terraforged.core.tile.Size;
 import com.terraforged.core.tile.Tile;
 import com.terraforged.core.tile.gen.TileGenerator;
 import com.terraforged.mod.client.gui.GuiKeys;
-import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.mod.util.nbt.NBTHelper;
+import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.MutableVeci;
 import com.terraforged.world.heightmap.Levels;
@@ -290,12 +290,12 @@ public class Preview extends Button {
         String terrain = cell.terrain.getName().toLowerCase();
         if (terrain.contains("ocean")) {
             if (cell.temperature < 0.3) {
-                return "cold_ocean";
+                return "cold_" + terrain;
             }
             if (cell.temperature > 0.6) {
-                return "warm_ocean";
+                return "warm_" + terrain;
             }
-            return "ocean";
+            return terrain;
         }
         if (terrain.contains("river")) {
             return "river";

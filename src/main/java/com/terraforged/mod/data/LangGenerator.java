@@ -1,7 +1,7 @@
 package com.terraforged.mod.data;
 
-import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.core.util.NameUtil;
+import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.preview2.PreviewSettings;
 import com.terraforged.mod.util.TranslationKey;

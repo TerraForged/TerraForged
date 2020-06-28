@@ -1,9 +1,9 @@
 package com.terraforged.mod.chunk.generator;
 
+import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.util.TerraContainer;
-import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.world.terrain.decorator.Decorator;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;

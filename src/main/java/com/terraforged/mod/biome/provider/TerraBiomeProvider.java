@@ -26,11 +26,11 @@
 package com.terraforged.mod.biome.provider;
 
 import com.google.common.collect.Sets;
+import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.modifier.BiomeModifierManager;
 import com.terraforged.mod.chunk.TerraContext;
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.concurrent.Resource;
 import com.terraforged.mod.util.setup.SetupHooks;
 import com.terraforged.world.heightmap.WorldLookup;
 import com.terraforged.world.terrain.decorator.Decorator;
@@ -152,7 +152,7 @@ public class TerraBiomeProvider extends BiomeProvider {
 
     public Biome getBiome(Cell cell, int x, int z) {
         Biome biome = biomeMap.provideBiome(cell, context.levels);
-        if (modifierManager.hasModifiers(cell.terrain)) {
+        if (modifierManager.hasModifiers(cell, context.levels)) {
             return modifierManager.modify(biome, cell, x, z);
         }
         return biome;
