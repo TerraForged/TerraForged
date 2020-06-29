@@ -156,25 +156,6 @@ public class PresetsPage extends BasePage {
             }
         });
 
-        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_DEFAULT.get()) {
-
-            @Override
-            public void render(int x, int z, float ticks) {
-                super.active = hasSelectedPreset();
-                super.render(x, z, ticks);
-            }
-
-            @Override
-            public void onClick(double x, double y) {
-                super.onClick(x, y);
-                getSelected().ifPresent(preset -> {
-                    TerraSettings settings = preset.getSettings();
-
-                    SettingsHelper.exportDefaults(settings);
-                });
-            }
-        });
-
         right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_DELETE.get()) {
 
             @Override
@@ -191,6 +172,34 @@ public class PresetsPage extends BasePage {
                     manager.remove(preset.getName());
                     rebuildPresetList();
                 });
+            }
+        });
+
+        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_SET_DEFAULTS.get()) {
+
+            @Override
+            public void render(int x, int z, float ticks) {
+                super.active = hasSelectedPreset();
+                super.render(x, z, ticks);
+            }
+
+            @Override
+            public void onClick(double x, double y) {
+                super.onClick(x, y);
+                getSelected().ifPresent(preset -> {
+                    TerraSettings settings = preset.getSettings();
+                    SettingsHelper.exportDefaults(settings);
+                });
+            }
+        });
+
+        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_CLEAR_DEFAULTS.get()) {
+
+            @Override
+            public void onClick(double x, double y) {
+                super.onClick(x, y);
+                TerraSettings settings = new TerraSettings();
+                SettingsHelper.exportDefaults(settings);
             }
         });
 

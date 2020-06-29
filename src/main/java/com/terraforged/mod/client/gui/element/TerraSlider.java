@@ -36,6 +36,7 @@ public abstract class TerraSlider extends Slider implements Slider.ISlider, Elem
     private final CompoundNBT value;
     private final List<String> tooltip;
 
+    private boolean lock = false;
     private Runnable callback = () -> {};
 
     public TerraSlider(String name, CompoundNBT value, boolean decimal) {
@@ -58,7 +59,11 @@ public abstract class TerraSlider extends Slider implements Slider.ISlider, Elem
 
     @Override
     public void onChangeSliderValue(Slider slider) {
-        onChange(slider, value);
+        if (!lock) {
+            lock = true;
+            onChange(slider, value);
+            lock = false;
+        }
     }
 
     @Override

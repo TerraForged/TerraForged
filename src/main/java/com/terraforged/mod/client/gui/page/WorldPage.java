@@ -70,6 +70,7 @@ public class WorldPage extends BasePage {
 
         Column left = getColumn(0);
         addElements(left.left, left.top, left, worldSettings, true, left.scrollPane::addButton, this::update);
+
         addElements(left.left, left.top, left, dimSettings, true, left.scrollPane::addButton, this::update);
     }
 

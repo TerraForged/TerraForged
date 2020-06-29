@@ -25,8 +25,9 @@ public class GuiKeys {
     public static final TranslationKey PRESET_LOAD = TranslationKey.gui("preset.load", "Load");
     public static final TranslationKey PRESET_SAVE = TranslationKey.gui("preset.save", "Save");
     public static final TranslationKey PRESET_RESET = TranslationKey.gui("preset.reset", "Reset");
-    public static final TranslationKey PRESET_DEFAULT = TranslationKey.gui("preset.default", "Make Default");
     public static final TranslationKey PRESET_DELETE = TranslationKey.gui("preset.delete", "Delete");
+    public static final TranslationKey PRESET_SET_DEFAULTS = TranslationKey.gui("preset.default.set", "Make Defaults");
+    public static final TranslationKey PRESET_CLEAR_DEFAULTS = TranslationKey.gui("preset.default.reset", "Reset Defaults");
 
     public static void init() {
 

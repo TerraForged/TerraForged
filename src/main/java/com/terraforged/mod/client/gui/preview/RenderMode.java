@@ -40,6 +40,26 @@ public enum RenderMode {
             return rgba(hsb[0], hsb[1], (hsb[2] * scale) + bias);
         }
     },
+    TRANSITION_POINTS {
+        @Override
+        public int getColor(Cell cell, float scale, float bias) {
+            switch (cell.terrain.getType()) {
+                case DEEP_OCEAN:
+                    return rgba(0.65F, 0.7F, 0.7F);
+                case SHALLOW_OCEAN:
+                    return rgba(0.6F, 0.6F, 0.8F);
+                case BEACH:
+                    return rgba(0.2F, 0.4F, 0.75F);
+                case COAST:
+                    return rgba(0.35F, 0.75F, 0.65F);
+                default:
+                    if (cell.terrain.isRiver() || cell.terrain.isWetland()) {
+                        return rgba(0.6F, 0.6F, 0.8F);
+                    }
+                    return rgba(0.3F, 0.7F, 0.5F);
+            }
+        }
+    },
     TEMPERATURE {
         @Override
         public int getColor(Cell cell, float scale, float bias) {
@@ -80,26 +100,6 @@ public enum RenderMode {
             return rgba(cell.region, saturation, brightness);
         }
     },
-    TRANSITION_POINTS {
-        @Override
-        public int getColor(Cell cell, float scale, float bias) {
-            switch (cell.terrain.getType()) {
-                case DEEP_OCEAN:
-                    return rgba(0.65F, 0.7F, 0.7F);
-                case SHALLOW_OCEAN:
-                    return rgba(0.6F, 0.6F, 0.8F);
-                case BEACH:
-                    return rgba(0.2F, 0.4F, 0.75F);
-                case COAST:
-                    return rgba(0.35F, 0.75F, 0.65F);
-                default:
-                    if (cell.terrain.isRiver() || cell.terrain.isWetland()) {
-                        return rgba(0.6F, 0.6F, 0.8F);
-                    }
-                    return rgba(0.3F, 0.7F, 0.5F);
-            }
-        }
-    }
     ;
 
     public int getColor(Cell cell, Levels levels) {
