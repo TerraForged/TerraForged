@@ -117,6 +117,6 @@ public class Preview extends Widget {
         renderSettings.zoom = previewSettings.getZoom(ZOOM_SCALE);
         renderSettings.renderMode = previewSettings.display;
 
-        return new RenderWorld(generator, renderAPI, renderSettings, regions, size);
+        return new RenderWorld(threadPool, generator, renderAPI, renderSettings, regions, size);
     }
 }

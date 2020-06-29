@@ -76,7 +76,7 @@ public enum RenderMode {
             return rgba(step(cell.moisture, 8) * 0.65F, saturation, brightness);
         }
     },
-    BIOME_SHAPE {
+    BIOME {
         @Override
         public int getColor(Cell cell, float scale, float bias) {
             float saturation = 0.7F;
@@ -84,7 +84,7 @@ public enum RenderMode {
             return rgba(cell.biome, saturation, brightness);
         }
     },
-    MACRO_NOISE_SHAPE {
+    MACRO_NOISE {
         @Override
         public int getColor(Cell cell, float scale, float bias) {
             float saturation = 0.7F;
@@ -92,12 +92,12 @@ public enum RenderMode {
             return rgba(cell.macroNoise, saturation, brightness);
         }
     },
-    REGION_SHAPE {
+    TERRAIN_REGION {
         @Override
         public int getColor(Cell cell, float scale, float bias) {
             float saturation = 0.7F;
             float brightness = 0.8F;
-            return rgba(cell.region, saturation, brightness);
+            return rgba(cell.terrain.getHue(), saturation, brightness);
         }
     },
     ;

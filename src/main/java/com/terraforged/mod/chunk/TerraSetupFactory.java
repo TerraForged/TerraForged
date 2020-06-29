@@ -9,6 +9,8 @@ import com.terraforged.fm.matcher.feature.FeatureMatcher;
 import com.terraforged.fm.modifier.FeatureModifiers;
 import com.terraforged.fm.predicate.DeepWater;
 import com.terraforged.fm.predicate.FeaturePredicate;
+import com.terraforged.fm.predicate.MaxHeight;
+import com.terraforged.fm.predicate.MinDepth;
 import com.terraforged.fm.predicate.MinHeight;
 import com.terraforged.fm.structure.StructureManager;
 import com.terraforged.fm.transformer.FeatureTransformer;
@@ -105,6 +107,7 @@ public class TerraSetupFactory {
         // block ugly features
         modifiers.getPredicates().add(Matchers.sedimentDisks(), FeaturePredicate.DENY);
         modifiers.getPredicates().add(FeatureMatcher.of(Feature.MINESHAFT), new MinHeight(context.levels.waterY + 20));
+        modifiers.getPredicates().add(FeatureMatcher.of(Feature.WOODLAND_MANSION), new MaxHeight(context.levels.waterY + 64));
 
         return FeatureManager.create(SetupHooks.setup(modifiers, context.copy()));
     }
@@ -140,6 +143,7 @@ public class TerraSetupFactory {
         StructureManager manager = new StructureManager();
         manager.register(Structure.OCEAN_MONUMENT, DeepWater.INSTANCE);
         manager.register(Structure.OCEAN_RUIN, DeepWater.INSTANCE);
+        manager.register(Structure.SHIPWRECK, new MinDepth(context.levels.waterLevel - 8));
         return SetupHooks.setup(manager, context);
     }
 

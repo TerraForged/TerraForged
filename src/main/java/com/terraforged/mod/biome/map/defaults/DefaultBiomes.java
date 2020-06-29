@@ -6,6 +6,8 @@ import net.minecraft.world.biome.Biomes;
 
 public class DefaultBiomes {
 
+    public static final Biome NONE = Biomes.THE_VOID;
+
     public static Biome defaultBeach(float temperature) {
         if (temperature < 0.25) {
             return Biomes.SNOWY_BEACH;
@@ -61,10 +63,7 @@ public class DefaultBiomes {
         if (temperature < 0.25) {
             return Biomes.SNOWY_MOUNTAINS;
         }
-        if (temperature > 0.75) {
-            return DefaultBiome.NONE;
-        }
-        return Biomes.MOUNTAINS;
+        return DefaultBiomes.NONE;
     }
 
     public static Biome defaultBiome(float temperature) {
