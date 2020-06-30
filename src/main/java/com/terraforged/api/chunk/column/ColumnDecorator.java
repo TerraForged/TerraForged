@@ -52,6 +52,19 @@ public interface ColumnDecorator {
         }
     }
 
+    default void fillDownSolid(DecoratorContext context, IChunk chunk, int x, int z, int from, int to, BlockState state) {
+        for (int dy = from; dy > to; dy--) { ;
+            replaceSolid(chunk, context.pos.setPos(x, dy, z), state);
+        }
+    }
+
+    static void replaceSolid(IChunk chunk, BlockPos pos, BlockState state) {
+        if (chunk.getBlockState(pos).isAir(chunk, pos)) {
+            return;
+        }
+        chunk.setBlockState(pos, state, false);
+    }
+
     static float getNoise(float x, float z, int seed, float scale, float bias) {
         return (variance.getValue(x, z, seed) * scale) + bias;
     }

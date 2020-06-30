@@ -38,7 +38,7 @@ public interface BiomeMap {
 
     Biome getBeach(Cell cell);
 
-    Biome getCoast(Cell cell, Biome current);
+    Biome getCoast(Cell cell);
 
     Biome getRiver(Cell cell);
 

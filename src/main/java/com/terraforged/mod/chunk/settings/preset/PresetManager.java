@@ -3,20 +3,16 @@ package com.terraforged.mod.chunk.settings.preset;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -127,15 +123,8 @@ public class PresetManager implements Iterable<Preset> {
             }
 
             String name = file.getName().substring(0, file.getName().length() - 5);
-            try (Reader reader = new BufferedReader(new FileReader(file))) {
-                JsonElement data = new JsonParser().parse(reader);
-                CompoundNBT nbt = NBTHelper.fromJson(data);
-                TerraSettings settings = new TerraSettings();
-                NBTHelper.deserialize(nbt, settings);
-                presets.add(new Preset(name, file, settings));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            TerraSettings settings = SettingsHelper.loadSettings(file);
+            presets.add(new Preset(name, file, settings));
         }
 
         return new PresetManager(presets);

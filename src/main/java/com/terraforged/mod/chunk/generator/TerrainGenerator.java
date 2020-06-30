@@ -26,7 +26,7 @@ public class TerrainGenerator implements Generator.Terrain {
         this.levels = generator.getContext().levels;
         this.terrain = generator.getContext().terrain;
         this.climate = generator.getContext().factory.getClimate();
-        this.terrainHelper = new TerrainHelper(0.75F);
+        this.terrainHelper = new TerrainHelper(0.75F, 4F);
     }
 
     @Override

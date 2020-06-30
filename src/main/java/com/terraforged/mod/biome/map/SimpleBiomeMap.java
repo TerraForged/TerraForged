@@ -54,6 +54,7 @@ public class SimpleBiomeMap implements BiomeMap {
         }
     }
 
+    @Override
     public Biome provideBiome(Cell cell, Levels levels) {
         TerrainType type = cell.terrain.getType();
         if (type.isSubmerged() && cell.value > levels.water) {
@@ -78,7 +79,7 @@ public class SimpleBiomeMap implements BiomeMap {
     }
 
     @Override
-    public Biome getCoast(Cell cell, Biome current) {
+    public Biome getCoast(Cell cell) {
         int inland = land.getSize(cell);
         Biome[] coastal = coast.getSet(cell);
         int total = inland + coastal.length;
@@ -86,7 +87,7 @@ public class SimpleBiomeMap implements BiomeMap {
         if (index >= inland) {
             return coastal[index - inland];
         }
-        return current;
+        return DefaultBiomes.NONE;
     }
 
     @Override

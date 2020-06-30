@@ -96,7 +96,7 @@ public class ErosionDecorator implements ColumnDecorator {
                     erodeRock(context, chunk, x, y, z);
                     return;
                 } else {
-                    fillDown(context, chunk, x, z, y, y - 4, material);
+                    fillDownSolid(context, chunk, x, z, y, y - 4, material);
                 }
             }
             placeScree(chunk, context, x, y, z);
@@ -105,7 +105,7 @@ public class ErosionDecorator implements ColumnDecorator {
 
     protected void erodeRock(DecoratorContext context, IChunk chunk, int dx, int y, int dz) {
         int depth = 32;
-        BlockState material = Blocks.GRAVEL.getDefaultState();
+        BlockState material = States.GRAVEL.get();
         // find the uppermost layer of rock & record it's depth
         for (int dy = 3; dy < 32; dy++) {
             context.pos.setPos(dx, y - dy, dz);
@@ -119,8 +119,7 @@ public class ErosionDecorator implements ColumnDecorator {
 
         // fill downwards to the first rock layer
         for (int dy = 0; dy < depth; dy++) {
-            context.pos.setPos(dx, y - dy, dz);
-            chunk.setBlockState(context.pos, material, false);
+            ColumnDecorator.replaceSolid(chunk, context.pos.setPos(dx, y - dy, dz), material);
         }
     }
 
@@ -133,7 +132,7 @@ public class ErosionDecorator implements ColumnDecorator {
         float sediment = context.cell.sediment * SEDIMENT_MODIFIER;
         float noise = context.climate.getRand().getValue(x, z, seed3) * SEDIMENT_NOISE;
         if (sediment + noise > SCREE_VALUE) {
-            fillDown(context, chunk, x, z, y, y - 2, States.GRAVEL.get());
+            fillDownSolid(context, chunk, x, z, y, y - 2, States.GRAVEL.get());
         }
     }
 

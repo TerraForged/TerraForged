@@ -40,6 +40,7 @@ import com.terraforged.mod.util.nbt.NBTHelper;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.MutableVeci;
+import com.terraforged.world.continent.SpawnType;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.Terrains;
 import net.minecraft.client.Minecraft;
@@ -204,7 +205,9 @@ public class Preview extends Button {
         GeneratorContext context = GeneratorContext.createNoCache(Terrains.create(settings), settings);
 
         MutableVeci center = new MutableVeci();
-        context.factory.getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ, center);
+        if (settings.world.properties.spawnType == SpawnType.CONTINENT_CENTER) {
+            context.factory.getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ, center);
+        }
 
         TileGenerator renderer = TileGenerator.builder()
                 .pool(threadPool)

@@ -59,9 +59,15 @@ public class TerrainHelper {
     );
 
     private final float radius;
+    private final float overhang;
+    private final float overhang2;
 
-    public TerrainHelper(float radius) {
-        this.radius = radius;
+    // base - the size of the base built up around a piece as a percentage of its bounding box size
+    // overhang - the amount of overhead overhang to be cut out
+    public TerrainHelper(float base, float cutout) {
+        this.radius = base;
+        this.overhang = cutout;
+        this.overhang2 = cutout * cutout;
     }
 
     public void flatten(IWorld world, IChunk chunk) {
@@ -148,7 +154,22 @@ public class TerrainHelper {
 
                 if (highest != null) {
                     MutableBoundingBox bounds = highest.getBoundingBox();
-                    for (int dy = bounds.minY + highestOffset; dy <= surface; dy++) {
+                    int minY = bounds.minY + highestOffset;
+                    int maxY = minY + bounds.getYSize();
+
+                    if (maxY <= surface) {
+                        // gets weaker the further from the center of the piece
+                        float dist = getCenterDistance2(x, z, bounds);
+                        float distAlpha = 1F - NoiseUtil.clamp(dist / overhang2, 0, 1);
+
+                        // gets weaker the more material is overhead creating the inverse cutout (ie overhang)
+                        float depth = surface - maxY;
+                        float depthAlpha = 1F - NoiseUtil.clamp(depth / overhang, 0, 1);
+
+                        maxY += NoiseUtil.round(depthAlpha * distAlpha * overhang);
+                    }
+
+                    for (int dy = minY; dy <= maxY; dy++) {
                         pos.setPos(dx, dy, dz);
                         chunk.setBlockState(pos, Blocks.AIR.getDefaultState(), false);
                     }
@@ -162,6 +183,14 @@ public class TerrainHelper {
         float alpha = 1 - getDistAlpha(pos.getX(), pos.getZ(), bounds, radius2);
         alpha = (float) Math.pow(alpha, 2F - alpha);
         return NoiseUtil.lerp(surface, level, alpha);
+    }
+
+    private float getCenterDistance2(int x, int z, MutableBoundingBox bounds) {
+        float cx = bounds.minX + (bounds.getXSize() / 2F);
+        float cz = bounds.minZ + (bounds.getZSize() / 2F);
+        float dx = cx - x;
+        float dz = cz - z;
+        return dx * dx + dz * dz;
     }
 
     private static void collectPiece(StructurePiece structurepiece, List<StructurePiece> list) {

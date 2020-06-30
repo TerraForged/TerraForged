@@ -114,12 +114,13 @@ public class NBTHelper {
         return tag;
     }
 
-    public static void deserialize(CompoundNBT settings, Object object) {
+    public static boolean deserialize(CompoundNBT settings, Object object) {
         try {
             NBTReader reader = new NBTReader(settings);
-            reader.writeTo(object);
+            return reader.writeTo(object);
         } catch (Throwable e) {
             e.printStackTrace();
+            return false;
         }
     }
 }

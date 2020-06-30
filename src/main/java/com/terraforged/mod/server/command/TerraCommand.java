@@ -132,7 +132,11 @@ public class TerraCommand {
         try (Resource<Cell> cell = biomeProvider.lookupPos(pos.getX(), pos.getZ())) {
             Biome biome = biomeProvider.getBiome(cell.get(), pos.getX(), pos.getZ());
             context.getSource().sendFeedback(
-                    new StringTextComponent("Terrain=" + cell.get().terrain.getName() + ", Biome=" + biome.getRegistryName()),
+                    new StringTextComponent(
+                            "Terrain=" + cell.get().terrain.getName()
+                                    + ", Biome=" + biome.getRegistryName()
+                                    + ", BiomeType=" + cell.get().biomeType.name()
+                    ),
                     false
             );
         }

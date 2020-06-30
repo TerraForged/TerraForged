@@ -11,7 +11,7 @@ public class TerraBoundSlider extends TerraSlider.Float {
     private final String upper;
 
     public TerraBoundSlider(String name, CompoundNBT value) {
-        this(name, value, 0.01F);
+        this(name, value, 0.005F);
     }
 
     public TerraBoundSlider(String name, CompoundNBT value, float pad) {

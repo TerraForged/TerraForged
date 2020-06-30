@@ -109,8 +109,8 @@ classes {
     dependsOn(collectLibs)
 }
 
-jar {
-    finalizedBy("reobfJar")
+build {
+    dependsOn("reobfJar")
 }
 
 publishing {

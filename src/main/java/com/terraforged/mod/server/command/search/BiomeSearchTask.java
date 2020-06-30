@@ -27,6 +27,9 @@ public class BiomeSearchTask extends ChunkGeneratorSearch {
     @Override
     public boolean test(BlockPos pos) {
         biomeProvider.getWorldLookup().applyCell(cell, pos.getX(), pos.getZ());
-        return biomeProvider.getBiome(cell, pos.getX(), pos.getZ()) == biome;
+        if (biomeProvider.getBiome(cell, pos.getX(), pos.getZ()) == biome) {
+            return biomeProvider.getBiome(pos.getX(), pos.getZ()) == biome;
+        }
+        return false;
     }
 }

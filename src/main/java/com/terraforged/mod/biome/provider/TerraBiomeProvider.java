@@ -69,6 +69,12 @@ public class TerraBiomeProvider extends BiomeProvider {
         return getWorldLookup().getCell(x, z);
     }
 
+    public Biome getBiome(int x, int z) {
+        try (Resource<Cell> resource = getWorldLookup().getCell(x, z, true)) {
+            return getBiome(resource.get(), x, z);
+        }
+    }
+
     @Override
     public Biome getNoiseBiome(int x, int y, int z) {
         x = (x << 2);

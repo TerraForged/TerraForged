@@ -28,6 +28,7 @@ package com.terraforged.mod.biome.modifier;
 import com.terraforged.api.biome.modifier.BiomeModifier;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.mod.biome.map.BiomeMap;
+import com.terraforged.mod.biome.map.defaults.DefaultBiomes;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.world.terrain.Terrains;
 import net.minecraft.world.biome.Biome;
@@ -57,7 +58,10 @@ public class CoastModifier implements BiomeModifier {
     @Override
     public Biome modify(Biome in, Cell cell, int x, int z) {
         if (cell.terrain.isCoast()) {
-            return biomeMap.getCoast(cell, in);
+            Biome coast = biomeMap.getCoast(cell);
+            if (coast != DefaultBiomes.NONE) {
+                return coast;
+            }
         }
         return in;
     }

@@ -31,6 +31,28 @@ public class SettingsHelper {
         }
     }
 
+    public static TerraSettings loadSettings(File file) {
+        TerraSettings settings = new TerraSettings();
+        try (Reader reader = new BufferedReader(new FileReader(file))) {
+            JsonElement data = new JsonParser().parse(reader);
+            CompoundNBT nbt = NBTHelper.fromJson(data);
+            if (NBTHelper.deserialize(nbt, settings)) {
+                return settings;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (Writer writer = new BufferedWriter(new FileWriter(file))) {
+            CompoundNBT tag = NBTHelper.serializeCompact(settings);
+            JsonElement json = NBTHelper.toJson(tag);
+            GSON.toJson(json, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return settings;
+    }
+
     public static void exportDefaults(TerraSettings settings) {
         CompoundNBT tag = NBTHelper.serializeCompact(settings);
         JsonElement json = NBTHelper.toJson(tag);
@@ -51,18 +73,10 @@ public class SettingsHelper {
     }
 
     public static TerraSettings readDefaults() {
-        TerraSettings settings = new TerraSettings();
         if (DEFAULTS_FILE.exists()) {
-            try (Reader reader = new BufferedReader(new FileReader(DEFAULTS_FILE))) {
-                Log.info("Loading generator settings from json");
-                JsonElement json = new JsonParser().parse(reader);
-                CompoundNBT root = NBTHelper.fromJson(json);
-                NBTHelper.deserialize(root, settings);
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
+            return loadSettings(DEFAULTS_FILE);
         }
-        return settings;
+        return new TerraSettings();
     }
 
     public static TerraSettings getSettings(WorldInfo info) {

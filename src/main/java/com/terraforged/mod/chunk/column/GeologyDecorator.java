@@ -48,8 +48,7 @@ public class GeologyDecorator implements ColumnDecorator {
     public void decorate(ChunkSurfaceBuffer buffer, DecoratorContext context, int x, int y, int z) {
         int top = buffer.getSurfaceBottom();
         geology.getGeology(context.biome).getStrata(x, z).downwards(x, top, z, context.depthBuffer.get(), (py, state) -> {
-            context.pos.setPos(x, py, z);
-            buffer.getDelegate().setBlockState(context.pos, state, false);
+            ColumnDecorator.replaceSolid(buffer.getDelegate(), context.pos.setPos(x, py, z), state);
             return true;
         });
     }
