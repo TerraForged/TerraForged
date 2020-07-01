@@ -80,13 +80,25 @@ public class SimpleBiomeMap implements BiomeMap {
 
     @Override
     public Biome getCoast(Cell cell) {
-        int inland = land.getSize(cell);
+        // treat land & coast biome-sets as one combined set
+        Biome[] inland = land.getSet(cell);
         Biome[] coastal = coast.getSet(cell);
-        int total = inland + coastal.length;
-        int index = NoiseUtil.round((total - 1) * cell.biome);
-        if (index >= inland) {
-            return coastal[index - inland];
+
+        // calculate where in the combined set the cell.biome points
+        int maxIndex = inland.length + coastal.length - 1;
+        int index = NoiseUtil.round(maxIndex * cell.biome);
+
+        // if index lies within the coast section of the set
+        if (index >= inland.length) {
+            // relativize the index to start at 0
+            index -= inland.length;
+
+            // shouldn't be required but check that index is within bounds
+            if (index < coastal.length) {
+                return coastal[index];
+            }
         }
+
         return DefaultBiomes.NONE;
     }
 

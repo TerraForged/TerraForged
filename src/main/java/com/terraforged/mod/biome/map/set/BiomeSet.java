@@ -47,7 +47,16 @@ public abstract class BiomeSet {
         if (set.length == 0) {
             return defaultBiome.getDefaultBiome(cell.temperature);
         }
-        return set[NoiseUtil.round((set.length - 1) * cell.biome)];
+
+        int maxIndex = set.length - 1;
+        int index = NoiseUtil.round(maxIndex * cell.biome);
+
+        // shouldn't happen but safety check the bounds
+        if (index < 0 || index >= set.length) {
+            return defaultBiome.getDefaultBiome(cell.temperature);
+        }
+
+        return set[index];
     }
 
     public abstract int getIndex(Cell cell);
