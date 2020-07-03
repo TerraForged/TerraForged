@@ -96,8 +96,8 @@ public class BiomeProvider extends AbstractBiomeProvider {
         int rangeZ = maxZ - minZ + 1;
         Set<Biome> set = Sets.newHashSet();
         Cell<Terrain> cell = new Cell<>();
-        for(int dz = 0; dz < rangeZ; ++dz) {
-            for(int dx = 0; dx < rangeX; ++dx) {
+        for (int dz = 0; dz < rangeZ; ++dz) {
+            for (int dx = 0; dx < rangeX; ++dx) {
                 int x = (minX + dx) << 2;
                 int z = (minZ + dz) << 2;
                 worldLookup.applyCell(cell, x, z);
@@ -122,8 +122,8 @@ public class BiomeProvider extends AbstractBiomeProvider {
         int attempts = 0;
 
         Cell<Terrain> cell = new Cell<>();
-        for(int dz = 0; dz < rangeZ; ++dz) {
-            for(int dx = 0; dx < rangeX; ++dx) {
+        for (int dz = 0; dz < rangeZ; ++dz) {
+            for (int dx = 0; dx < rangeX; ++dx) {
                 int x = (minX + dx) << 2;
                 int z = (minZ + dz) << 2;
                 worldLookup.applyCell(cell, x, z);
@@ -182,33 +182,28 @@ public class BiomeProvider extends AbstractBiomeProvider {
             return biomeMap.getWetland(cell.temperature, cell.moisture, cell.biome);
         }
 
-        if (cell.value > context.levels.water) {
-            return getModifierManager().modify(biomeMap.getBiome(cell), cell, x, z);
-        }
-
-        if (cell.tag == context.terrain.river || cell.tag == context.terrain.riverBanks || cell.tag == context.terrain.lake) {
-            Biome biome = biomeMap.getBiome(cell);
-            if (overridesRiver(biome)) {
-                return biome;
+        if (cell.value <= context.levels.water) {
+            if (cell.tag == context.terrain.river || cell.tag == context.terrain.riverBanks || cell.tag == context.terrain.lake) {
+                Biome biome = biomeMap.getBiome(cell);
+                if (overridesRiver(biome)) {
+                    return biome;
+                }
+                return biomeMap.getRiver(cell.temperature, cell.moisture, cell.biome);
             }
-            return biomeMap.getRiver(cell.temperature, cell.moisture, cell.biome);
+
+            if (cell.tag == context.terrain.ocean) {
+                return biomeMap.getOcean(cell.temperature, cell.moisture, cell.biome);
+            }
+
+            if (cell.tag == context.terrain.deepOcean) {
+                return biomeMap.getDeepOcean(cell.temperature, cell.moisture, cell.biome);
+            }
         }
 
-        if (cell.tag == context.terrain.ocean) {
-            return biomeMap.getOcean(cell.temperature, cell.moisture, cell.biome);
-        }
-
-        return biomeMap.getDeepOcean(cell.temperature, cell.moisture, cell.biome);
+        return getModifierManager().modify(biomeMap.getBiome(cell), cell, x, z);
     }
 
     private static boolean overridesRiver(Biome biome) {
         return biome.getCategory() == Biome.Category.SWAMP || biome.getCategory() == Biome.Category.JUNGLE;
-    }
-
-    private static class SearchContext {
-
-        private int count = 0;
-        private boolean first = true;
-        private final BlockPos.Mutable pos = new BlockPos.Mutable();
     }
 }

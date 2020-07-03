@@ -32,6 +32,7 @@ import com.terraforged.core.util.VariablePredicate;
 import com.terraforged.core.world.terrain.Terrains;
 import com.terraforged.mod.chunk.TerraContext;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.material.Material;
 import net.minecraft.world.chunk.IChunk;
 
 public class CoastDecorator implements ColumnDecorator {
@@ -59,14 +60,22 @@ public class CoastDecorator implements ColumnDecorator {
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
+        // ignore non-beaches
         if (context.cell.tag != terrains.beach) {
             return;
         }
 
+        // ignore if already a sandy biome
+        if (context.biome.getSurfaceBuilderConfig().getTop().getMaterial() == Material.SAND) {
+            return;
+        }
+
+        // only below a noisey height
         if (!height.test(context.cell, x, z)) {
             return;
         }
 
+        // cold beach == gravel, others get sand
         if (context.cell.temperature < 0.3F) {
             setState(chunk, x, y, z, gravel, false);
         } else {
