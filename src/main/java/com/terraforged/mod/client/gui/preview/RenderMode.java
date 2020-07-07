@@ -34,18 +34,41 @@ import java.awt.*;
 public enum RenderMode {
     BIOME_TYPE {
         @Override
-        public int getColor(Cell cell, float scale, float bias) {
-            Color color = cell.biomeType.getColor();
-            float[] hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), new float[3]);
-            return rgba(hsb[0], hsb[1], (hsb[2] * scale) + bias);
+        public boolean handlesWater() {
+            return true;
+        }
+
+        @Override
+        public int getColor(Cell cell, Levels levels, float scale, float bias) {
+            switch (cell.terrain.getType()) {
+                case DEEP_OCEAN:
+                    return rgba(0.63F, 0.65F, 0.8F);
+                case SHALLOW_OCEAN:
+                    return rgba(0.6F, 0.6F, 0.8F);
+                case BEACH:
+                    return rgba(0.2F, 0.4F, 0.75F);
+                default:
+                    if (cell.value < levels.water) {
+                        return RenderMode.getWaterColor();
+                    } else {
+                        Color color = cell.biomeType.getColor();
+                        float[] hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), new float[3]);
+                        return rgba(hsb[0], hsb[1], (hsb[2] * scale) + bias);
+                    }
+            }
         }
     },
     TRANSITION_POINTS {
         @Override
-        public int getColor(Cell cell, float scale, float bias) {
+        public boolean handlesWater() {
+            return true;
+        }
+
+        @Override
+        public int getColor(Cell cell, Levels levels, float scale, float bias) {
             switch (cell.terrain.getType()) {
                 case DEEP_OCEAN:
-                    return rgba(0.65F, 0.7F, 0.7F);
+                    return rgba(0.63F, 0.65F, 0.8F);
                 case SHALLOW_OCEAN:
                     return rgba(0.6F, 0.6F, 0.8F);
                 case BEACH:
@@ -62,7 +85,7 @@ public enum RenderMode {
     },
     TEMPERATURE {
         @Override
-        public int getColor(Cell cell, float scale, float bias) {
+        public int getColor(Cell cell, Levels levels, float scale, float bias) {
             float saturation = 0.7F;
             float brightness = 0.8F;
             return rgba(step(1 - cell.temperature, 8) * 0.65F, saturation, brightness);
@@ -70,7 +93,7 @@ public enum RenderMode {
     },
     MOISTURE {
         @Override
-        public int getColor(Cell cell, float scale, float bias) {
+        public int getColor(Cell cell, Levels levels, float scale, float bias) {
             float saturation = 0.7F;
             float brightness = 0.8F;
             return rgba(step(cell.moisture, 8) * 0.65F, saturation, brightness);
@@ -78,7 +101,7 @@ public enum RenderMode {
     },
     BIOME {
         @Override
-        public int getColor(Cell cell, float scale, float bias) {
+        public int getColor(Cell cell, Levels levels, float scale, float bias) {
             float saturation = 0.7F;
             float brightness = 0.8F;
             return rgba(cell.biomeIdentity, saturation, brightness);
@@ -86,7 +109,7 @@ public enum RenderMode {
     },
     MACRO_NOISE {
         @Override
-        public int getColor(Cell cell, float scale, float bias) {
+        public int getColor(Cell cell, Levels levels, float scale, float bias) {
             float saturation = 0.7F;
             float brightness = 0.8F;
             return rgba(cell.macroNoise, saturation, brightness);
@@ -94,7 +117,7 @@ public enum RenderMode {
     },
     TERRAIN_REGION {
         @Override
-        public int getColor(Cell cell, float scale, float bias) {
+        public int getColor(Cell cell, Levels levels, float scale, float bias) {
             float saturation = 0.7F;
             float brightness = 0.8F;
             return rgba(cell.terrain.getHue(), saturation, brightness);
@@ -103,28 +126,33 @@ public enum RenderMode {
     ;
 
     public int getColor(Cell cell, Levels levels) {
-        float baseHeight = levels.water;
-        if (this != TRANSITION_POINTS) {
-            if (cell.value < baseHeight) {
-                return rgba(40, 140, 200);
-            }
+        if (!handlesWater() && cell.value < levels.water) {
+            return getWaterColor();
         }
         float bands = 10F;
         float alpha = 0.2F;
-        float elevation = (cell.value - baseHeight) / (1F - baseHeight);
+        float elevation = (cell.value - levels.water) / (1F - levels.water);
         int band = NoiseUtil.round(elevation * bands);
         float scale = 1F - alpha;
         float bias = alpha * (band / bands);
-        return getColor(cell, scale, bias);
+        return getColor(cell, levels, scale, bias);
     }
 
-    public abstract int getColor(Cell cell, float scale, float bias);
+    public abstract int getColor(Cell cell, Levels levels, float scale, float bias);
+
+    public boolean handlesWater() {
+        return false;
+    }
+
+    private static int getWaterColor() {
+        return rgba(40, 140, 200);
+    }
 
     private static float step(float value, int steps) {
         return ((float) NoiseUtil.round(value * steps)) / steps;
     }
 
-    public static int rgba(float h, float s, float b) {
+    private static int rgba(float h, float s, float b) {
         int argb = Color.HSBtoRGB(h, s, b);
         int red = (argb >> 16) & 0xFF;
         int green = (argb >> 8) & 0xFF;
@@ -132,7 +160,7 @@ public enum RenderMode {
         return rgba(red, green, blue);
     }
 
-    public static int rgba(int r, int g, int b) {
+    private static int rgba(int r, int g, int b) {
         return r + (g << 8) + (b << 16) + (255 << 24);
     }
 }

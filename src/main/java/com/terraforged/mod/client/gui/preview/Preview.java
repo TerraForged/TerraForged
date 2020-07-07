@@ -188,9 +188,7 @@ public class Preview extends Button {
                 .batch(6)
                 .build();
 
-        float zoom = 101 - previewSettings.zoom;
-
-        return renderer.getAsync(center.x, center.z, zoom, false);
+        return renderer.getAsync(center.x, center.z, getZoom(), false);
     }
 
     private void updateLegend(int mx ,int my) {
@@ -198,7 +196,8 @@ public class Preview extends Button {
             int left = this.x;
             int top = this.y;
             float size = this.width;
-            int zoom = (101 - previewSettings.zoom);
+
+            int zoom = getZoom();
             int width = Math.max(1, tile.getBlockSize().size * zoom);
             int height = Math.max(1, tile.getBlockSize().size * zoom);
             values[0] = width + "x" + height;
@@ -252,6 +251,10 @@ public class Preview extends Button {
         }
 
         RenderSystem.popMatrix();
+    }
+
+    private int getZoom() {
+        return NoiseUtil.round(1.5F * (101 - previewSettings.zoom));
     }
 
     private static String getTerrainName(Cell cell) {
