@@ -124,7 +124,7 @@ public class ErosionDecorator implements ColumnDecorator {
     }
 
     protected void placeScree(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        float steepness = context.cell.steepness + context.climate.getRand().getValue(x, z, seed2) * SLOPE_MODIFIER;
+        float steepness = context.cell.gradient + context.climate.getRand().getValue(x, z, seed2) * SLOPE_MODIFIER;
         if (steepness < SCREE_STEEPNESS) {
             return;
         }
@@ -146,7 +146,7 @@ public class ErosionDecorator implements ColumnDecorator {
 
     private BlockState getMaterial(float x, float z, DecoratorContext context, BlockState top, BlockState middle) {
         float height = context.cell.value + context.climate.getRand().getValue(x, z, seed1) * HEIGHT_MODIFIER;
-        float steepness = context.cell.steepness + context.climate.getRand().getValue(x, z, seed2) * SLOPE_MODIFIER;
+        float steepness = context.cell.gradient + context.climate.getRand().getValue(x, z, seed2) * SLOPE_MODIFIER;
 
         if (steepness > ROCK_STEEPNESS || height > ColumnDecorator.getNoise(x, z, seed1, ROCK_VAR, ROCK_MIN)) {
             return rock(middle);

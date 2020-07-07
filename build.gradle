@@ -110,30 +110,30 @@ classes {
 }
 
 build {
-    dependsOn("reobfJar")
+//    dependsOn("reobfJar")
 }
 
-publishing {
-    publications {
-        // publish the mod jar & api jar
-        mavenJava(MavenPublication) {
-            artifact jar
-        }
-    }
-
-    if (System.getenv("MAVEN_USER") != null && System.getenv("MAVEN_PASS") != null) {
-        repositories {
-            maven {
-                credentials {
-                    username System.getenv("MAVEN_USER")
-                    password System.getenv("MAVEN_PASS")
-                }
-                name = "nexus"
-                url = "https://io.terraforged.com/repository/maven/"
-            }
-        }
-    }
-}
+//publishing {
+//    publications {
+//        // publish the mod jar & api jar
+//        mavenJava(MavenPublication) {
+//            artifact jar
+//        }
+//    }
+//
+//    if (System.getenv("MAVEN_USER") != null && System.getenv("MAVEN_PASS") != null) {
+//        repositories {
+//            maven {
+//                credentials {
+//                    username System.getenv("MAVEN_USER")
+//                    password System.getenv("MAVEN_PASS")
+//                }
+//                name = "nexus"
+//                url = "https://io.terraforged.com/repository/maven/"
+//            }
+//        }
+//    }
+//}
 
 static def getClassifier() {
     if (System.getenv("GIT_TAG_NAME") != null) {

@@ -57,9 +57,7 @@ import java.util.Random;
 public class Preview extends Button {
 
     private static final int FACTOR = 4;
-    public static final int WIDTH = Size.chunkToBlock(1 << FACTOR);
-    private static final int SLICE_HEIGHT = 64;
-    public static final int HEIGHT = WIDTH + SLICE_HEIGHT;
+    public static final int SIZE = Size.chunkToBlock(1 << FACTOR);
     private static final float[] LEGEND_SCALES = {1, 0.9F, 0.75F, 0.6F};
 
     private final int offsetX;
@@ -67,7 +65,7 @@ public class Preview extends Button {
     private final ThreadPool threadPool = ThreadPools.createDefault();
     private final Random random = new Random(System.currentTimeMillis());
     private final PreviewSettings previewSettings = new PreviewSettings();
-    private final DynamicTexture texture = new DynamicTexture(new NativeImage(WIDTH, HEIGHT, true));
+    private final DynamicTexture texture = new DynamicTexture(new NativeImage(SIZE, SIZE, true));
 
     private int seed;
     private long lastUpdate = 0L;
@@ -100,8 +98,7 @@ public class Preview extends Button {
 
     @Override
     public void render(int mx, int my, float partialTicks) {
-        float scale = width / (float) WIDTH;
-        height = width + NoiseUtil.round(SLICE_HEIGHT * scale);
+        this.height = getSize();
 
         preRender();
 
@@ -132,6 +129,10 @@ public class Preview extends Button {
         task = generate(settings, prevSettings);
     }
 
+    private int getSize() {
+        return width;
+    }
+
     private void preRender() {
         if (task != null && task.isDone()) {
             try {
@@ -156,41 +157,12 @@ public class Preview extends Button {
 
         int stroke = 2;
         int width = tile.getBlockSize().size;
-        int zoom = (101 - previewSettings.zoom);
-        int half = width / 2;
-
-        int sliceStartY = image.getHeight() - 1 - SLICE_HEIGHT;
-
-        float zoomUnit = 1F - (zoom / 100F);
-        float zoomStrength = 0.5F;
-        float unit = (1 - zoomStrength) + (zoomStrength * zoomUnit);
-        float heightModifier = settings.world.properties.worldHeight / 256F;
-        float waterLevelModifier = settings.world.properties.seaLevel / (float) settings.world.properties.worldHeight;
-        float imageWaterLevelY = image.getHeight() - 1 - (waterLevelModifier * SLICE_HEIGHT * unit);
 
         tile.iterate((cell, x, z) -> {
             if (x < stroke || z < stroke || x >= width - stroke || z >= width - stroke) {
                 image.setPixelRGBA(x, z, Color.BLACK.getRGB());
             } else {
                 image.setPixelRGBA(x, z, renderer.getColor(cell, levels));
-            }
-
-            if (z == half) {
-                int height = (int) (cell.value * SLICE_HEIGHT * unit * heightModifier);
-                float imageSurfaceLevelY = image.getHeight() - 1 - height;
-                for (int dy = sliceStartY; dy < image.getHeight(); dy++) {
-                    if (x < stroke  || x >= width - stroke || dy > image.getHeight() - 1 - stroke) {
-                        image.setPixelRGBA(x, dy, Color.BLACK.getRGB());
-                        continue;
-                    }
-                    if (dy > imageSurfaceLevelY) {
-                        image.setPixelRGBA(x, dy, Color.BLACK.getRGB());
-                    } else if (dy > imageWaterLevelY) {
-                        image.setPixelRGBA(x, dy, Color.GRAY.getRGB());
-                    } else {
-                        image.setPixelRGBA(x, dy, Color.WHITE.getRGB());
-                    }
-                }
             }
         });
 

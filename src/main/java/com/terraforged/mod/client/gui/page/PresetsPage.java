@@ -203,7 +203,7 @@ public class PresetsPage extends BasePage {
 
         // used to pad the scroll-pane out so that the preview legend scrolls on larger gui scales
         TerraButton spacer = createSpacer();
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 10; i++) {
             right.scrollPane.addButton(spacer);
         }
     }

@@ -49,7 +49,7 @@ public abstract class BiomeSet {
         }
 
         int maxIndex = set.length - 1;
-        int index = NoiseUtil.round(maxIndex * cell.biome);
+        int index = NoiseUtil.round(maxIndex * cell.biomeIdentity);
 
         // shouldn't happen but safety check the bounds
         if (index < 0 || index >= set.length) {

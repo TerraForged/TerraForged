@@ -86,7 +86,7 @@ public class SimpleBiomeMap implements BiomeMap {
 
         // calculate where in the combined set the cell.biome points
         int maxIndex = inland.length + coastal.length - 1;
-        int index = NoiseUtil.round(maxIndex * cell.biome);
+        int index = NoiseUtil.round(maxIndex * cell.biomeIdentity);
 
         // if index lies within the coast section of the set
         if (index >= inland.length) {

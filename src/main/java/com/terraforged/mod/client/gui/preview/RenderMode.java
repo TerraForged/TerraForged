@@ -81,7 +81,7 @@ public enum RenderMode {
         public int getColor(Cell cell, float scale, float bias) {
             float saturation = 0.7F;
             float brightness = 0.8F;
-            return rgba(cell.biome, saturation, brightness);
+            return rgba(cell.biomeIdentity, saturation, brightness);
         }
     },
     MACRO_NOISE {

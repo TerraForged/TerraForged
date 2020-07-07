@@ -38,7 +38,7 @@ public class BriceSurface implements MaskedSurface {
 
     @Override
     public void buildSurface(int x, int z, int height, float mask, SurfaceContext ctx) {
-        float strength = 1 - ctx.cell.steepness;
+        float strength = 1 - ctx.cell.gradient;
         float value = module.getValue(x, z) * mask * strength;
 
         int top = (int) (value * 30);
