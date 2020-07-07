@@ -40,12 +40,12 @@ public class BiomeMapBuilder implements BiomeMap.Builder {
 
     protected final Map<Biome.TempCategory, List<Biome>> rivers = new HashMap<>();
     protected final Map<Biome.TempCategory, List<Biome>> lakes = new HashMap<>();
-    protected final Map<Biome.TempCategory, List<Biome>> wetlands = new HashMap<>();
     protected final Map<Biome.TempCategory, List<Biome>> coasts = new HashMap<>();
     protected final Map<Biome.TempCategory, List<Biome>> beaches = new HashMap<>();
     protected final Map<Biome.TempCategory, List<Biome>> oceans = new HashMap<>();
     protected final Map<Biome.TempCategory, List<Biome>> deepOceans = new HashMap<>();
     protected final Map<Biome.TempCategory, List<Biome>> mountains = new HashMap<>();
+    protected final Map<Biome.TempCategory, List<Biome>> wetlands = new HashMap<>();
     protected final Map<BiomeType, List<Biome>> map = new EnumMap<>(BiomeType.class);
 
     private final Function<BiomeMapBuilder, BiomeMap> constructor;

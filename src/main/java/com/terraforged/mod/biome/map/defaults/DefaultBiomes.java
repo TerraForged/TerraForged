@@ -33,10 +33,7 @@ public class DefaultBiomes {
     }
 
     public static Biome defaultWetland(float temperature) {
-        if (temperature < 0.15) {
-            return ModBiomes.TAIGA_SCRUB;
-        }
-        return ModBiomes.MARSHLAND;
+        return NONE;
     }
 
     public static Biome defaultOcean(float temperature) {

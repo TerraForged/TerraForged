@@ -41,6 +41,7 @@ public class ModBiomes {
 
     public static final Biome BRYCE = register(new Bryce());
     public static final Biome COLD_STEPPE = register(new ColdSteppe());
+    public static final Biome COLD_MARSHLAND = register(new ColdMarshland());
     public static final Biome ERODED_PINNACLE = register(new StoneForest());
     public static final Biome FIR_FOREST = register(new FirForest());
     public static final Biome FLOWER_PLAINS = register(new FlowerPlains());

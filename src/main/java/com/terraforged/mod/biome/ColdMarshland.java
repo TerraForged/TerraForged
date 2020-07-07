@@ -41,9 +41,9 @@ import net.minecraft.world.gen.placement.HeightWithChanceConfig;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
 
-public class Marshland extends BiomeVariant {
-    public Marshland() {
-        super((new Builder()).surfaceBuilder(SurfaceBuilder.SWAMP, SurfaceBuilder.GRASS_DIRT_GRAVEL_CONFIG).precipitation(RainType.RAIN).category(Category.SWAMP).depth(0.2F).scale(0.2F).temperature(0.8F).downfall(0.4F).waterColor(6388580).waterFogColor(2302743).parent((String) null));
+public class ColdMarshland extends BiomeVariant {
+    public ColdMarshland() {
+        super((new Builder()).surfaceBuilder(SurfaceBuilder.SWAMP, SurfaceBuilder.GRASS_DIRT_GRAVEL_CONFIG).precipitation(RainType.RAIN).category(Category.SWAMP).depth(0.2F).scale(0.2F).temperature(-0.5F).downfall(0.4F).waterColor(6388580).waterFogColor(2302743).parent((String) null));
         this.addStructure(Feature.SWAMP_HUT.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG));
         this.addStructure(Feature.MINESHAFT.withConfiguration(new MineshaftConfig(0.004D, MineshaftStructure.Type.NORMAL)));
         DefaultBiomeFeatures.addCarvers(this);
@@ -60,7 +60,7 @@ public class Marshland extends BiomeVariant {
         DefaultBiomeFeatures.addGrass(this);
         DefaultBiomeFeatures.addVeryDenseGrass(this);
         DefaultBiomeFeatures.addReedsAndPumpkins(this);
-        Marshland.addSwampVegetation(this);
+        ColdMarshland.addSwampVegetation(this);
         DefaultBiomeFeatures.addFreezeTopLayer(this);
         this.addSpawn(EntityClassification.CREATURE, new SpawnListEntry(EntityType.SHEEP, 12, 4, 4));
         this.addSpawn(EntityClassification.CREATURE, new SpawnListEntry(EntityType.PIG, 10, 4, 4));
@@ -78,7 +78,7 @@ public class Marshland extends BiomeVariant {
         this.addSpawn(EntityClassification.MONSTER, new SpawnListEntry(EntityType.SLIME, 100, 4, 4));
         this.addSpawn(EntityClassification.MONSTER, new SpawnListEntry(EntityType.ENDERMAN, 10, 1, 4));
         this.addSpawn(EntityClassification.MONSTER, new SpawnListEntry(EntityType.WITCH, 5, 1, 1));
-        this.setRegistryName("terraforged", "marshland");
+        this.setRegistryName("terraforged", "cold_marshland");
     }
 
     @Override
@@ -88,13 +88,8 @@ public class Marshland extends BiomeVariant {
     }
 
     @Override
-    public int getFoliageColor() {
-        return 6975545;
-    }
-
-    @Override
     public Biome getBase() {
-        return Biomes.SWAMP;
+        return Biomes.SNOWY_TAIGA;
     }
 
     private static void addSwampVegetation(Biome biome) {

@@ -1,42 +1,24 @@
 package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.core.tile.chunk.ChunkReader;
-import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.util.TerraContainer;
-import com.terraforged.world.terrain.decorator.Decorator;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunk;
 
 public class BiomeGenerator implements Generator.Biomes {
 
     private final TerraChunkGenerator generator;
-    private final TerraBiomeProvider biomeProvider;
 
     public BiomeGenerator(TerraChunkGenerator generator) {
         this.generator = generator;
-        this.biomeProvider = generator.getBiomeProvider();
     }
 
     @Override
     public void generateBiomes(IChunk chunk) {
         ChunkPos pos = chunk.getPos();
         try (ChunkReader reader = generator.getChunkReader(pos.x, pos.z)) {
-            TerraContainer container = TerraContainer.create(reader, generator.getBiomeProvider());
-            // apply chunk-local heightmap modifications
-            preProcess(reader, container);
+            TerraContainer.create(reader, generator.getBiomeProvider());
         }
-    }
-
-    private void preProcess(ChunkReader reader, TerraContainer biomes) {
-        reader.iterate((cell, dx, dz) -> {
-            Biome biome = biomes.getBiome(dx, dz);
-            for (Decorator decorator : generator.getBiomeProvider().getDecorators(biome)) {
-                if (decorator.apply(cell, reader.getBlockX() + dx, reader.getBlockZ() + dz)) {
-                    return;
-                }
-            }
-        });
     }
 }

@@ -125,7 +125,7 @@ public class TerraSetupFactory {
                 Biomes.DESERT_LAKES
         );
         manager.replace(
-                new SwampSurface(),
+                new SwampSurface(context),
                 Biomes.SWAMP.delegate.get(),
                 ModBiomes.MARSHLAND
         );

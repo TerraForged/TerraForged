@@ -18,8 +18,8 @@ public abstract class BiomeSet {
 
     private static final Biome[] EMPTY = new Biome[0];
 
-    private final Biome[][] biomes;
-    private final DefaultBiome defaultBiome;
+    protected final Biome[][] biomes;
+    protected final DefaultBiome defaultBiome;
 
     public BiomeSet(Biome[][] biomes, DefaultBiome defaultBiome) {
         this.biomes = biomes;
@@ -45,7 +45,7 @@ public abstract class BiomeSet {
     public Biome getBiome(Cell cell) {
         Biome[] set = biomes[getIndex(cell)];
         if (set.length == 0) {
-            return defaultBiome.getDefaultBiome(cell.temperature);
+            return defaultBiome.getDefaultBiome(cell);
         }
 
         int maxIndex = set.length - 1;
@@ -53,7 +53,7 @@ public abstract class BiomeSet {
 
         // shouldn't happen but safety check the bounds
         if (index < 0 || index >= set.length) {
-            return defaultBiome.getDefaultBiome(cell.temperature);
+            return defaultBiome.getDefaultBiome(cell);
         }
 
         return set[index];

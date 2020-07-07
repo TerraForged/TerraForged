@@ -1,0 +1,41 @@
+{
+  "biomes": [
+    "terraforged:marshland",
+    "terraforged:cold_marshland"
+  ],
+  "stage": "VEGETAL_DECORATION",
+  "prepend": {
+    "name": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "name": "terraforged:bush",
+        "config": {
+          "trunk": {
+            "Name": "minecraft:oak_log",
+            "Properties": {
+              "axis": "y"
+            }
+          },
+          "leaves": {
+            "Name": "minecraft:oak_leaves",
+            "Properties": {
+              "distance": "1",
+              "persistent": "false"
+            }
+          },
+          "air_chance": 0.05,
+          "leaf_chance": 0.09,
+          "size_chance": 0.65
+        }
+      },
+      "decorator": {
+        "name": "minecraft:count_extra_heightmap",
+        "config": {
+          "count": 0,
+          "extra_chance": 0.125,
+          "extra_count": 1
+        }
+      }
+    }
+  }
+}

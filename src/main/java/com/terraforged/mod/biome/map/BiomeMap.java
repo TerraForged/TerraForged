@@ -27,6 +27,7 @@ package com.terraforged.mod.biome.map;
 
 import com.google.gson.JsonElement;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.mod.biome.map.set.BiomeTypeSet;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
 import net.minecraft.world.biome.Biome;
@@ -57,6 +58,8 @@ public interface BiomeMap {
 
     Biome provideBiome(Cell cell, Levels levels);
 
+    BiomeTypeSet getLandSet();
+
     List<Biome> getAllBiomes(BiomeType type);
 
     JsonElement toJson();
@@ -71,9 +74,9 @@ public interface BiomeMap {
 
         Builder addRiver(Biome biome, int count);
 
-        Builder addLake(Biome biome, int count);
-
         Builder addWetland(Biome biome, int count);
+
+        Builder addLake(Biome biome, int count);
 
         Builder addMountain(Biome biome, int count);
 

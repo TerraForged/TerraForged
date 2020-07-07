@@ -8,6 +8,7 @@ import com.terraforged.mod.biome.map.set.BiomeSet;
 import com.terraforged.mod.biome.map.set.BiomeTypeSet;
 import com.terraforged.mod.biome.map.set.RiverSet;
 import com.terraforged.mod.biome.map.set.TemperatureSet;
+import com.terraforged.mod.biome.map.set.WetlandSet;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
@@ -27,7 +28,7 @@ public class SimpleBiomeMap implements BiomeMap {
     private final BiomeSet river;
     private final BiomeSet lake;
     private final BiomeSet wetland;
-    private final BiomeSet land;
+    private final BiomeTypeSet land;
     private final BiomeSet mountains;
     private final BiomeSet[] terrainBiomes;
 
@@ -38,7 +39,7 @@ public class SimpleBiomeMap implements BiomeMap {
         coast = new TemperatureSet(builder.coasts, DefaultBiomes::defaultBiome);
         river = new RiverSet(builder.rivers, DefaultBiomes::defaultRiver, this);
         lake = new TemperatureSet(builder.lakes, DefaultBiomes::defaultLake);
-        wetland = new TemperatureSet(builder.wetlands, DefaultBiomes::defaultWetland);
+        wetland = new WetlandSet(builder.wetlands, this);
         mountains = new TemperatureSet(builder.mountains, DefaultBiomes::defaultMountain);
         land = new BiomeTypeSet(builder.map, DefaultBiomes::defaultBiome);
         terrainBiomes = new BiomeSet[TerrainType.values().length];
@@ -125,6 +126,11 @@ public class SimpleBiomeMap implements BiomeMap {
     @Override
     public Biome getLand(Cell cell) {
         return land.getBiome(cell);
+    }
+
+    @Override
+    public BiomeTypeSet getLandSet() {
+        return land;
     }
 
     @Override
