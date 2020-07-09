@@ -26,6 +26,7 @@
 package com.terraforged.mod.chunk.settings;
 
 import com.terraforged.core.serialization.annotation.Comment;
+import com.terraforged.core.serialization.annotation.Limit;
 import com.terraforged.core.serialization.annotation.Range;
 import com.terraforged.core.serialization.annotation.Serializable;
 import net.minecraft.world.gen.OverworldGenSettings;
@@ -52,11 +53,13 @@ public class StructureSettings {
     @Serializable
     public static class Structure {
 
-        @Range(min = 1, max = 200)
+        @Range(min = 5, max = 200)
+        @Limit(lower = "separation", pad = 2)
         @Comment("The maximum distance in chunks between attempts to spawn a structure")
         public int distance;
 
-        @Range(min = 1, max = 50)
+        @Range(min = 4, max = 50)
+        @Limit(upper = "distance", pad = 2)
         @Comment("The minimum distance in chunks between structure spawns")
         public int separation;
 
