@@ -38,15 +38,15 @@ public class WorldGenBlocks extends DataGen {
 
     public static void genBlockTags(File dataDir) {
         if (dataDir.exists() || dataDir.mkdirs()) {
-            printMaterials(dataDir, "stone", WGTags.STONE.getAllElements());
-            printMaterials(dataDir, "dirt", WGTags.DIRT.getAllElements());
-            printMaterials(dataDir, "clay", WGTags.CLAY.getAllElements());
-            printMaterials(dataDir, "sediment", WGTags.SEDIMENT.getAllElements());
+            printMaterials(dataDir, "forge:wg_stone", WGTags.STONE.getAllElements());
+            printMaterials(dataDir, "forge:wg_dirt", WGTags.DIRT.getAllElements());
+            printMaterials(dataDir, "forge:wg_clay", WGTags.CLAY.getAllElements());
+            printMaterials(dataDir, "forge:wg_sediment", WGTags.SEDIMENT.getAllElements());
         }
     }
 
     private static void printMaterials(File dir, String name, Collection<Block> blocks) {
-        String path = getJsonPath("tags/blocks", new ResourceLocation("terraforged", name));
+        String path = getJsonPath("tags/blocks", new ResourceLocation(name));
         write(new File(dir, path), writer -> {
             JsonObject root = new JsonObject();
             JsonArray values = new JsonArray();

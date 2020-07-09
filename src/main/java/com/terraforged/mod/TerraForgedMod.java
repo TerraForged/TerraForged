@@ -44,6 +44,7 @@ import net.minecraft.world.gen.feature.OreFeatureConfig;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -106,6 +107,12 @@ public class TerraForgedMod {
             File dir = event.getServer().getFile("config/terraforged/datapacks");
             DataPackFinder dataPackFinder = new DataPackFinder(dir);
             event.getServer().getResourcePacks().addPackFinder(dataPackFinder);
+        }
+
+        @SubscribeEvent
+        public static void update(TagsUpdatedEvent event) {
+            Log.info("Tags Reloaded");
+            WGTags.printTags();
         }
     }
 }
