@@ -69,12 +69,14 @@ public class Preview extends Button {
 
     private int seed;
     private long lastUpdate = 0L;
+    private MutableVeci center = new MutableVeci();
     private Settings settings = new Settings();
     private CacheEntry<Tile> task = null;
     private Tile tile = null;
 
-    private String[] labels = {GuiKeys.PREVIEW_AREA.get(), GuiKeys.PREVIEW_TERRAIN.get(), GuiKeys.PREVIEW_BIOME.get()};
+    private String hoveredCoords = "";
     private String[] values = {"", "", ""};
+    private String[] labels = {GuiKeys.PREVIEW_AREA.get(), GuiKeys.PREVIEW_TERRAIN.get(), GuiKeys.PREVIEW_BIOME.get()};
 
     public Preview(int seed) {
         super(0, 0, 0, 0, "", b -> {});
@@ -113,7 +115,7 @@ public class Preview extends Button {
 
         updateLegend(mx, my);
 
-        renderLegend(labels, values, x, y + width, 10, 0xFFFFFF);
+        renderLegend(mx, my, labels, values, x, y + width, 10, 0xFFFFFF);
     }
 
     public void update(Settings settings, CompoundNBT prevSettings) {
@@ -176,9 +178,11 @@ public class Preview extends Button {
 
         GeneratorContext context = GeneratorContext.createNoCache(Terrains.create(settings), settings);
 
-        MutableVeci center = new MutableVeci();
         if (settings.world.properties.spawnType == SpawnType.CONTINENT_CENTER) {
             context.factory.getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ, center);
+        } else {
+            center.x = 0;
+            center.z = 0;
         }
 
         TileGenerator renderer = TileGenerator.builder()
@@ -209,6 +213,13 @@ public class Preview extends Button {
                 Cell cell = tile.getCell(ix, iz);
                 values[1] = getTerrainName(cell);
                 values[2] = getBiomeName(cell);
+
+                int dx = (ix - (tile.getBlockSize().size / 2)) * zoom;
+                int dz = (iz - (tile.getBlockSize().size / 2)) * zoom;
+
+                hoveredCoords = (center.x + dx) + ":" + (center.z + dz);
+            } else {
+                hoveredCoords = "";
             }
         }
     }
@@ -224,7 +235,7 @@ public class Preview extends Button {
         return LEGEND_SCALES[index];
     }
 
-    private void renderLegend(String[] labels, String[] values, int left, int top, int lineHeight, int color) {
+    private void renderLegend(int mx, int my, String[] labels, String[] values, int left, int top, int lineHeight, int color) {
         float scale = getLegendScale();
 
         RenderSystem.pushMatrix();
@@ -242,7 +253,7 @@ public class Preview extends Button {
             String label = labels[i];
             String value = values[i];
 
-            while (value.length() > 0 && spacing + Minecraft.getInstance().fontRenderer.getStringWidth(value) > maxWidth) {
+            while (value.length() > 0 && spacing + renderer.getStringWidth(value) > maxWidth) {
                 value = value.substring(0, value.length() - 1);
             }
 
@@ -251,6 +262,10 @@ public class Preview extends Button {
         }
 
         RenderSystem.popMatrix();
+
+        if (PreviewSettings.showCoords && !hoveredCoords.isEmpty()) {
+            drawCenteredString(renderer, hoveredCoords, mx, my - 10, 0xFFFFFF);
+        }
     }
 
     private int getZoom() {

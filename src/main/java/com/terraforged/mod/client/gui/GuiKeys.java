@@ -4,6 +4,8 @@ import com.terraforged.mod.util.TranslationKey;
 
 public class GuiKeys {
 
+    public static final TranslationKey COORDS = TranslationKey.gui("general.coords", "Coords");
+    public static final TranslationKey TOOLTIPS = TranslationKey.gui("general.tooltips", "Tooltips");
     public static final TranslationKey DONE = TranslationKey.gui("general.done", "Done");
     public static final TranslationKey CANCEL = TranslationKey.gui("general.cancel", "Cancel");
 
