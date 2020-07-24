@@ -28,6 +28,7 @@ package com.terraforged.mod.client.gui.element;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.CompoundNBT;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,11 +46,19 @@ public interface Element {
     }
 
     static String getDisplayName(String name, CompoundNBT value) {
-        return I18n.format(getDisplayKey(name, value));
+        String key = getDisplayKey(name, value);
+        if (key.endsWith(".")) {
+            return "";
+        }
+        return I18n.format(key);
     }
 
     static List<String> getToolTip(String name, CompoundNBT value) {
-        return Collections.singletonList(I18n.format(getCommentKey(name, value)));
+        String key = getCommentKey(name, value);
+        if (key.endsWith(".")) {
+            return Collections.emptyList();
+        }
+        return Collections.singletonList(I18n.format(key));
     }
 
     static String getDisplayKey(String name, CompoundNBT value) {
