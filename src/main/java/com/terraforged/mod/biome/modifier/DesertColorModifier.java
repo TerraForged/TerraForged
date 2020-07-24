@@ -26,8 +26,8 @@
 package com.terraforged.mod.biome.modifier;
 
 import com.terraforged.api.biome.modifier.BiomeModifier;
-import com.terraforged.mod.biome.provider.DesertBiomes;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.mod.biome.provider.DesertBiomes;
 import net.minecraft.world.biome.Biome;
 
 public class DesertColorModifier implements BiomeModifier {
@@ -59,11 +59,11 @@ public class DesertColorModifier implements BiomeModifier {
     public Biome modify(Biome in, Cell cell, int x, int z) {
         if (biomes.isRedDesert(in)) {
             if (cell.macroNoise <= 0.5F) {
-                return biomes.getWhiteDesert(cell.biome);
+                return biomes.getWhiteDesert(cell.biomeIdentity);
             }
         } else {
             if (cell.macroNoise > 0.5F) {
-                return biomes.getRedDesert(cell.biome);
+                return biomes.getRedDesert(cell.biomeIdentity);
             }
         }
         return in;

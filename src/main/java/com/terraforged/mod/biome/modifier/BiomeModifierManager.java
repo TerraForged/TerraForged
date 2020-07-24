@@ -27,12 +27,12 @@ package com.terraforged.mod.biome.modifier;
 
 import com.terraforged.api.biome.modifier.BiomeModifier;
 import com.terraforged.api.biome.modifier.ModifierManager;
+import com.terraforged.core.cell.Cell;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.provider.DesertBiomes;
 import com.terraforged.mod.chunk.TerraContext;
-import com.terraforged.core.cell.Cell;
 import com.terraforged.world.biome.BiomeType;
-import com.terraforged.world.terrain.ITerrain;
+import com.terraforged.world.heightmap.Levels;
 import net.minecraft.world.biome.Biome;
 
 import java.util.ArrayList;
@@ -50,13 +50,14 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
         modifiers.add(new CoastModifier(biomes, context));
         modifiers.add(new DesertColorModifier(desertBiomes));
         modifiers.add(new BeachModifier(biomes, context));
+        modifiers.add(new DesertWetlandModifier(biomes));
         modifiers.add(new MountainModifier(context, biomes));
         Collections.sort(modifiers);
         this.biomeModifiers = modifiers;
     }
 
-    public boolean hasModifiers(ITerrain type) {
-        return type.isOverground();
+    public boolean hasModifiers(Cell cell, Levels levels) {
+        return cell.terrain.isOverground() || (cell.terrain.isSubmerged() && cell.value > levels.water);
     }
 
     public DesertBiomes getDesertBiomes() {

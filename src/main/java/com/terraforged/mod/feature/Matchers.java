@@ -25,10 +25,10 @@
 
 package com.terraforged.mod.feature;
 
-import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.fm.matcher.BiomeFeatureMatcher;
 import com.terraforged.fm.matcher.biome.BiomeMatcher;
 import com.terraforged.fm.matcher.feature.FeatureMatcher;
+import com.terraforged.mod.feature.feature.DiskFeature;
 import net.minecraft.block.Blocks;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.Feature;

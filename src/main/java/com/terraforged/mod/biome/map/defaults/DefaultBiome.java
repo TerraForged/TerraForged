@@ -1,13 +1,15 @@
 package com.terraforged.mod.biome.map.defaults;
 
+import com.terraforged.core.cell.Cell;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.OceanBiome;
 
 public interface DefaultBiome {
 
-    Biome NONE = new OceanBiome().setRegistryName("terraforged", "none");
-
     Biome getBiome(float temperature);
+
+    default Biome getDefaultBiome(Cell cell) {
+        return getBiome(cell.temperature).delegate.get();
+    }
 
     default Biome getDefaultBiome(float temperature) {
         return getBiome(temperature).delegate.get();

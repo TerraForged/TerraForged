@@ -1,11 +1,11 @@
 package com.terraforged.mod.biome.map.set;
 
 import com.google.gson.JsonElement;
+import com.terraforged.core.cell.Cell;
 import com.terraforged.mod.biome.map.defaults.DefaultBiome;
 import com.terraforged.mod.biome.provider.BiomeHelper;
-import com.terraforged.core.cell.Cell;
-import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.mod.util.ListUtils;
+import com.terraforged.n2d.util.NoiseUtil;
 import net.minecraft.world.biome.Biome;
 
 import java.util.Collections;
@@ -18,8 +18,8 @@ public abstract class BiomeSet {
 
     private static final Biome[] EMPTY = new Biome[0];
 
-    private final Biome[][] biomes;
-    private final DefaultBiome defaultBiome;
+    protected final Biome[][] biomes;
+    protected final DefaultBiome defaultBiome;
 
     public BiomeSet(Biome[][] biomes, DefaultBiome defaultBiome) {
         this.biomes = biomes;
@@ -45,9 +45,18 @@ public abstract class BiomeSet {
     public Biome getBiome(Cell cell) {
         Biome[] set = biomes[getIndex(cell)];
         if (set.length == 0) {
-            return defaultBiome.getDefaultBiome(cell.temperature);
+            return defaultBiome.getDefaultBiome(cell);
         }
-        return set[NoiseUtil.round((set.length - 1) * cell.biome)];
+
+        int maxIndex = set.length - 1;
+        int index = NoiseUtil.round(maxIndex * cell.biomeIdentity);
+
+        // shouldn't happen but safety check the bounds
+        if (index < 0 || index >= set.length) {
+            return defaultBiome.getDefaultBiome(cell);
+        }
+
+        return set[index];
     }
 
     public abstract int getIndex(Cell cell);

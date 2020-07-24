@@ -25,6 +25,11 @@ public class PreviewPage extends UpdatablePage {
     }
 
     @Override
+    public void close() {
+        preview.close();
+    }
+
+    @Override
     public void apply(Consumer<TerraSettings> consumer) {
         consumer.accept(genSettings);
         update();
@@ -35,8 +40,8 @@ public class PreviewPage extends UpdatablePage {
         Column right = getColumn(1);
         preview.x = 0;
         preview.y = 0;
-        preview.setWidth(com.terraforged.mod.client.gui.preview.Preview.WIDTH);
-        preview.setHeight(com.terraforged.mod.client.gui.preview.Preview.HEIGHT);
+        preview.setWidth(com.terraforged.mod.client.gui.preview.Preview.SIZE);
+        preview.setHeight(com.terraforged.mod.client.gui.preview.Preview.SIZE);
 
         addElements(right.left, right.top, right, settings, right.scrollPane::addButton, this::update);
 

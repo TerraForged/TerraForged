@@ -1,7 +1,7 @@
 package com.terraforged.mod.chunk.generator;
 
-import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.fm.predicate.FeaturePredicate;
+import com.terraforged.mod.chunk.TerraChunkGenerator;
 import net.minecraft.network.DebugPacketSender;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;

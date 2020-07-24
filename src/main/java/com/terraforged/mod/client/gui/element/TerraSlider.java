@@ -25,6 +25,7 @@
 
 package com.terraforged.mod.client.gui.element;
 
+import com.terraforged.n2d.util.NoiseUtil;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.client.gui.widget.Slider;
 
@@ -36,6 +37,7 @@ public abstract class TerraSlider extends Slider implements Slider.ISlider, Elem
     private final CompoundNBT value;
     private final List<String> tooltip;
 
+    private boolean lock = false;
     private Runnable callback = () -> {};
 
     public TerraSlider(String name, CompoundNBT value, boolean decimal) {
@@ -58,7 +60,11 @@ public abstract class TerraSlider extends Slider implements Slider.ISlider, Elem
 
     @Override
     public void onChangeSliderValue(Slider slider) {
-        onChange(slider, value);
+        if (!lock) {
+            lock = true;
+            onChange(slider, value);
+            lock = false;
+        }
     }
 
     @Override
@@ -70,6 +76,16 @@ public abstract class TerraSlider extends Slider implements Slider.ISlider, Elem
     }
 
     protected abstract void onChange(Slider slider, CompoundNBT value);
+
+    private static float min(String name, CompoundNBT value) {
+        CompoundNBT meta = value.getCompound("#" + name);
+        return meta.getFloat("min");
+    }
+
+    private static float max(String name, CompoundNBT value) {
+        CompoundNBT meta = value.getCompound("#" + name);
+        return meta.getFloat("max");
+    }
 
     public static class Int extends TerraSlider {
 
@@ -102,13 +118,95 @@ public abstract class TerraSlider extends Slider implements Slider.ISlider, Elem
         }
     }
 
-    private static float min(String name, CompoundNBT value) {
-        CompoundNBT meta = value.getCompound("#" + name);
-        return meta.getFloat("min");
+    // A slider who's min/max value are dynamically linked with some other slider/numeric value
+    public abstract static class BoundSlider extends TerraSlider {
+
+        protected final float pad;
+        protected final String lower;
+        protected final String upper;
+
+        public BoundSlider(String name, CompoundNBT value, float defaultPad, boolean decimal) {
+            super(name, value, decimal);
+            CompoundNBT meta = value.getCompound("#" + name);
+            float pad = meta.getFloat("pad");
+            this.pad = pad < 0 ? defaultPad : pad;
+            this.lower = meta.getString("limit_lower");
+            this.upper = meta.getString("limit_upper");
+        }
+
+        protected float getLower(CompoundNBT value) {
+            if (lower == null || lower.isEmpty()) {
+                return (float) (super.minValue - pad);
+            }
+            return value.getFloat(lower);
+        }
+
+        protected float getUpper(CompoundNBT value) {
+            if (upper == null || upper.isEmpty()) {
+                return (float) (super.maxValue + pad);
+            }
+            return value.getFloat(upper);
+        }
     }
 
-    private static float max(String name, CompoundNBT value) {
-        CompoundNBT meta = value.getCompound("#" + name);
-        return meta.getFloat("max");
+    // float (0.0-1.0) variant of the bound slider
+    public static class BoundFloat extends BoundSlider {
+
+        public BoundFloat(String name, CompoundNBT value) {
+            this(name, value, 0.005F);
+        }
+
+        public BoundFloat(String name, CompoundNBT value, float pad) {
+            super(name, value, pad, true);
+            precision = 3;
+            setValue(value.getFloat(name));
+            updateSlider();
+        }
+
+        @Override
+        protected void onChange(Slider slider, CompoundNBT value) {
+            int i = (int) (slider.getValue() * 1000);
+
+            float lower = getLower(value) + pad;
+            float upper = getUpper(value) - pad;
+            float val = NoiseUtil.clamp(i / 1000F, lower, upper);
+
+            // update setting value
+            value.putFloat(name, val);
+
+            // update actual slider value
+            setValue(val);
+            updateSlider();
+        }
+    }
+
+    // int variant of the bound slider
+    public static class BoundInt extends BoundSlider {
+
+        public BoundInt(String name, CompoundNBT value) {
+            this(name, value, 1);
+        }
+
+        public BoundInt(String name, CompoundNBT value, int pad) {
+            super(name, value, pad, false);
+            setValue(value.getInt(name));
+            updateSlider();
+        }
+
+        @Override
+        protected void onChange(Slider slider, CompoundNBT value) {
+            int i = slider.getValueInt();
+
+            float lower = getLower(value) + pad;
+            float upper = getUpper(value) - pad;
+            int val = NoiseUtil.round(NoiseUtil.clamp(i, lower, upper));
+
+            // update setting value
+            value.putInt(name, val);
+
+            // update actual slider value
+            setValue(val);
+            updateSlider();
+        }
     }
 }

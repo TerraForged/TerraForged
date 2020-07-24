@@ -2,12 +2,13 @@ package com.terraforged.mod.biome.map;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.terraforged.core.cell.Cell;
 import com.terraforged.mod.biome.map.defaults.DefaultBiomes;
 import com.terraforged.mod.biome.map.set.BiomeSet;
 import com.terraforged.mod.biome.map.set.BiomeTypeSet;
 import com.terraforged.mod.biome.map.set.RiverSet;
 import com.terraforged.mod.biome.map.set.TemperatureSet;
-import com.terraforged.core.cell.Cell;
+import com.terraforged.mod.biome.map.set.WetlandSet;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
@@ -27,7 +28,7 @@ public class SimpleBiomeMap implements BiomeMap {
     private final BiomeSet river;
     private final BiomeSet lake;
     private final BiomeSet wetland;
-    private final BiomeSet land;
+    private final BiomeTypeSet land;
     private final BiomeSet mountains;
     private final BiomeSet[] terrainBiomes;
 
@@ -38,7 +39,7 @@ public class SimpleBiomeMap implements BiomeMap {
         coast = new TemperatureSet(builder.coasts, DefaultBiomes::defaultBiome);
         river = new RiverSet(builder.rivers, DefaultBiomes::defaultRiver, this);
         lake = new TemperatureSet(builder.lakes, DefaultBiomes::defaultLake);
-        wetland = new TemperatureSet(builder.wetlands, DefaultBiomes::defaultWetland);
+        wetland = new WetlandSet(builder.wetlands, this);
         mountains = new TemperatureSet(builder.mountains, DefaultBiomes::defaultMountain);
         land = new BiomeTypeSet(builder.map, DefaultBiomes::defaultBiome);
         terrainBiomes = new BiomeSet[TerrainType.values().length];
@@ -54,6 +55,7 @@ public class SimpleBiomeMap implements BiomeMap {
         }
     }
 
+    @Override
     public Biome provideBiome(Cell cell, Levels levels) {
         TerrainType type = cell.terrain.getType();
         if (type.isSubmerged() && cell.value > levels.water) {
@@ -78,15 +80,27 @@ public class SimpleBiomeMap implements BiomeMap {
     }
 
     @Override
-    public Biome getCoast(Cell cell, Biome current) {
-        int inland = land.getSize(cell);
+    public Biome getCoast(Cell cell) {
+        // treat land & coast biome-sets as one combined set
+        Biome[] inland = land.getSet(cell);
         Biome[] coastal = coast.getSet(cell);
-        int total = inland + coastal.length;
-        int index = NoiseUtil.round((total - 1) * cell.biome);
-        if (index >= inland) {
-            return coastal[index - inland];
+
+        // calculate where in the combined set the cell.biome points
+        int maxIndex = inland.length + coastal.length - 1;
+        int index = NoiseUtil.round(maxIndex * cell.biomeIdentity);
+
+        // if index lies within the coast section of the set
+        if (index >= inland.length) {
+            // relativize the index to start at 0
+            index -= inland.length;
+
+            // shouldn't be required but check that index is within bounds
+            if (index < coastal.length) {
+                return coastal[index];
+            }
         }
-        return current;
+
+        return DefaultBiomes.NONE;
     }
 
     @Override
@@ -112,6 +126,11 @@ public class SimpleBiomeMap implements BiomeMap {
     @Override
     public Biome getLand(Cell cell) {
         return land.getBiome(cell);
+    }
+
+    @Override
+    public BiomeTypeSet getLandSet() {
+        return land;
     }
 
     @Override

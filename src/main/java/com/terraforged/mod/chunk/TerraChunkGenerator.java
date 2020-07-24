@@ -25,9 +25,17 @@
 
 package com.terraforged.mod.chunk;
 
-import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.biome.surface.SurfaceManager;
+import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.material.layer.LayerManager;
+import com.terraforged.core.cell.Cell;
+import com.terraforged.core.tile.Size;
+import com.terraforged.core.tile.Tile;
+import com.terraforged.core.tile.chunk.ChunkReader;
+import com.terraforged.core.tile.gen.TileCache;
+import com.terraforged.fm.FeatureManager;
+import com.terraforged.fm.data.DataManager;
+import com.terraforged.fm.structure.StructureManager;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.generator.BiomeGenerator;
 import com.terraforged.mod.chunk.generator.FeatureGenerator;
@@ -37,15 +45,7 @@ import com.terraforged.mod.chunk.generator.StructureGenerator;
 import com.terraforged.mod.chunk.generator.SurfaceGenerator;
 import com.terraforged.mod.chunk.generator.TerrainCarver;
 import com.terraforged.mod.chunk.generator.TerrainGenerator;
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.tile.Size;
-import com.terraforged.core.tile.Tile;
-import com.terraforged.core.tile.chunk.ChunkReader;
-import com.terraforged.core.tile.gen.TileCache;
 import com.terraforged.mod.feature.BlockDataManager;
-import com.terraforged.fm.FeatureManager;
-import com.terraforged.fm.data.DataManager;
-import com.terraforged.fm.structure.StructureManager;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.material.geology.GeoManager;
 import com.terraforged.mod.util.setup.SetupHooks;

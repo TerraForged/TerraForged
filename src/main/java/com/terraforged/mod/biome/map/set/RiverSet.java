@@ -1,9 +1,9 @@
 package com.terraforged.mod.biome.map.set;
 
+import com.terraforged.core.cell.Cell;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.map.defaults.DefaultBiome;
 import com.terraforged.mod.biome.map.defaults.DefaultBiomes;
-import com.terraforged.core.cell.Cell;
 import net.minecraft.world.biome.Biome;
 
 import java.util.List;

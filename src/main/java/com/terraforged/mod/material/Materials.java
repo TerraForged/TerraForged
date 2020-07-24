@@ -35,10 +35,8 @@ import it.unimi.dsi.fastutil.objects.ObjectSets;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ConcretePowderBlock;
 import net.minecraft.block.GrassBlock;
 import net.minecraft.block.MyceliumBlock;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -46,10 +44,13 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
 public class Materials {
+
+    private static final Comparator<IForgeRegistryEntry<?>> COMPARATOR = Comparator.comparing(IForgeRegistryEntry::getRegistryName);
 
     public final LayerManager layerManager = new LayerManager();
     public final Set<Block> stone = create(WGTags.STONE, States.STONE.getBlock());
@@ -90,10 +91,6 @@ public class Materials {
         return block instanceof GrassBlock || block instanceof MyceliumBlock;
     }
 
-    public boolean isSand(Block block) {
-        return BlockTags.SAND.contains(block) && !(block instanceof ConcretePowderBlock);
-    }
-
     private static Set<Block> create(Tag<Block> tag, Block def) {
         ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(tag.getAllElements());
         if (set.isEmpty() && def != null) {
@@ -111,13 +108,7 @@ public class Materials {
 
     public static <T extends IForgeRegistryEntry<T>> List<T> toList(Collection<T> collection) {
         List<T> list = new ArrayList<>(collection);
-        list.sort(Materials::compare);
+        list.sort(Materials.COMPARATOR);
         return Collections.unmodifiableList(list);
-    }
-
-    public static int compare(IForgeRegistryEntry<?> a, IForgeRegistryEntry<?> b) {
-        String as = a.getRegistryName() + "";
-        String bs = b.getRegistryName() + "";
-        return as.compareTo(bs);
     }
 }

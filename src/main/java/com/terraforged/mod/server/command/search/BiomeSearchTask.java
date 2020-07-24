@@ -1,7 +1,7 @@
 package com.terraforged.mod.server.command.search;
 
-import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -27,6 +27,9 @@ public class BiomeSearchTask extends ChunkGeneratorSearch {
     @Override
     public boolean test(BlockPos pos) {
         biomeProvider.getWorldLookup().applyCell(cell, pos.getX(), pos.getZ());
-        return biomeProvider.getBiome(cell, pos.getX(), pos.getZ()) == biome;
+        if (biomeProvider.getBiome(cell, pos.getX(), pos.getZ()) == biome) {
+            return biomeProvider.getBiome(pos.getX(), pos.getZ()) == biome;
+        }
+        return false;
     }
 }

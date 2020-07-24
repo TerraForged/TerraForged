@@ -31,6 +31,7 @@ public class States {
     public static final StateSupplier COARSE_DIRT = DefaultState.of("minecraft:coarse_dirt").cache();
     public static final StateSupplier DIRT = DefaultState.of("minecraft:dirt").cache();
     public static final StateSupplier GRASS_BLOCK = DefaultState.of("minecraft:grass_block").cache();
+    public static final StateSupplier PODZOL = DefaultState.of("minecraft:podzol").cache();
     public static final StateSupplier CLAY = DefaultState.of("minecraft:clay").cache();
     public static final StateSupplier GRAVEL = DefaultState.of("minecraft:gravel").cache();
     public static final StateSupplier LAVA = DefaultState.of("minecraft:lava").cache();

@@ -70,10 +70,11 @@ public class PreviewPage extends UpdatablePage {
         Column right = getColumn(1);
         preview.x = 0;
         preview.y = 0;
-        preview.setWidth(Preview.WIDTH);
-        preview.setHeight(Preview.HEIGHT);
+        preview.setWidth(Preview.SIZE);
+        preview.setHeight(Preview.SIZE);
 
         addElements(right.left, right.top, right, previewerSettings, right.scrollPane::addButton, this::update);
+
         right.scrollPane.addButton(new TerraButton(GuiKeys.PREVIEW_SEED.get()) {
             @Override
             public void onPress() {
@@ -86,7 +87,7 @@ public class PreviewPage extends UpdatablePage {
 
         // used to pad the scroll-pane out so that the preview legend scrolls on larger gui scales
         TerraButton spacer = createSpacer();
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 10; i++) {
             right.scrollPane.addButton(spacer);
         }
 

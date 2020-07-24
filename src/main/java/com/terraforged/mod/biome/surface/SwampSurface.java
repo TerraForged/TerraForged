@@ -2,17 +2,29 @@ package com.terraforged.mod.biome.surface;
 
 import com.terraforged.api.biome.surface.Surface;
 import com.terraforged.api.biome.surface.SurfaceContext;
+import com.terraforged.api.material.state.States;
+import com.terraforged.n2d.Module;
+import com.terraforged.n2d.Source;
+import com.terraforged.world.GeneratorContext;
+import net.minecraft.block.BlockState;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilderConfig;
 
 public class SwampSurface implements Surface {
 
+    private final Module noise;
     private final SurfaceBuilderConfig config = SurfaceBuilder.GRASS_DIRT_GRAVEL_CONFIG;
+
+    public SwampSurface(GeneratorContext context) {
+        noise = Source.simplex(context.seed.next(), 40, 2).warp(Source.RAND, context.seed.next(), 2, 1, 4);
+    }
 
     @Override
     public void buildSurface(int x, int z, int height, SurfaceContext ctx) {
         double noise = Biome.INFO_NOISE.noiseAt(x * 0.25D, z * 0.25D, false);
+
         if (noise > 0.0D) {
             int dx = x & 15;
             int dz = z & 15;
@@ -30,5 +42,21 @@ public class SwampSurface implements Surface {
         }
 
         SurfaceBuilder.DEFAULT.buildSurface(ctx.random, ctx.buffer, ctx.biome, x, z, height, noise, ctx.solid, ctx.fluid, ctx.levels.waterLevel, ctx.seed, config);
+
+        int y = ctx.chunk.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, x, z);
+        if (y <= ctx.levels.waterY) {
+            ctx.buffer.setBlockState(ctx.pos.setPos(x, y, z), getMaterial(x, y, z, ctx), false);
+        }
+    }
+
+    private BlockState getMaterial(int x, int y, int z, SurfaceContext ctx) {
+        float value = noise.getValue(x, z);
+        if (value > 0.6) {
+            if (value < 0.75 && y < ctx.levels.waterY) {
+                return States.CLAY.get();
+            }
+            return States.GRAVEL.get();
+        }
+        return States.DIRT.get();
     }
 }

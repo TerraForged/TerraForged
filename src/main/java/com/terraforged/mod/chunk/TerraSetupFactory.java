@@ -1,14 +1,26 @@
 package com.terraforged.mod.chunk;
 
-import com.terraforged.mod.Log;
-import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.biome.surface.SurfaceManager;
+import com.terraforged.api.chunk.column.ColumnDecorator;
+import com.terraforged.fm.FeatureManager;
+import com.terraforged.fm.data.DataManager;
+import com.terraforged.fm.matcher.biome.BiomeMatcher;
+import com.terraforged.fm.matcher.feature.FeatureMatcher;
+import com.terraforged.fm.modifier.FeatureModifiers;
+import com.terraforged.fm.predicate.DeepWater;
+import com.terraforged.fm.predicate.FeaturePredicate;
+import com.terraforged.fm.predicate.MaxHeight;
+import com.terraforged.fm.predicate.MinDepth;
+import com.terraforged.fm.predicate.MinHeight;
+import com.terraforged.fm.structure.StructureManager;
+import com.terraforged.fm.transformer.FeatureTransformer;
+import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.surface.BriceSurface;
 import com.terraforged.mod.biome.surface.DesertSurface;
-import com.terraforged.mod.biome.surface.StoneForestSurface;
 import com.terraforged.mod.biome.surface.ForestSurface;
 import com.terraforged.mod.biome.surface.IcebergsSurface;
+import com.terraforged.mod.biome.surface.StoneForestSurface;
 import com.terraforged.mod.biome.surface.SwampSurface;
 import com.terraforged.mod.chunk.column.BedrockDecorator;
 import com.terraforged.mod.chunk.column.ErosionDecorator;
@@ -18,18 +30,9 @@ import com.terraforged.mod.chunk.column.post.SnowEroder;
 import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.feature.Matchers;
 import com.terraforged.mod.feature.feature.FreezeLayer;
-import com.terraforged.fm.FeatureManager;
-import com.terraforged.fm.data.DataManager;
-import com.terraforged.fm.matcher.biome.BiomeMatcher;
-import com.terraforged.fm.matcher.feature.FeatureMatcher;
-import com.terraforged.fm.modifier.FeatureModifiers;
-import com.terraforged.fm.predicate.DeepWater;
-import com.terraforged.fm.predicate.FeaturePredicate;
-import com.terraforged.fm.predicate.MinHeight;
-import com.terraforged.fm.structure.StructureManager;
-import com.terraforged.fm.transformer.FeatureTransformer;
 import com.terraforged.mod.material.geology.GeoManager;
 import com.terraforged.mod.util.setup.SetupHooks;
+import net.minecraft.block.Blocks;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.feature.Feature;
@@ -84,11 +87,21 @@ public class TerraSetupFactory {
             modifiers.getPredicates().add(Matchers.stoneBlobs(), FeaturePredicate.DENY);
         }
 
-        if (!context.terraSettings.miscellaneous.vanillaWaterFeatures) {
-            // block lakes and springs if not enabled
-            modifiers.getPredicates().add(FeatureMatcher.of(Feature.LAKE), FeaturePredicate.DENY);
+        if (!context.terraSettings.miscellaneous.vanillaLakes) {
+            // block lakes if not enabled
+            modifiers.getPredicates().add(FeatureMatcher.and(Feature.LAKE, Blocks.WATER), FeaturePredicate.DENY);
+        }
+
+        if (!context.terraSettings.miscellaneous.vanillaLavaLakes) {
+            // block lava-lakes if not enabled
+            modifiers.getPredicates().add(FeatureMatcher.and(Feature.LAKE, Blocks.LAVA), FeaturePredicate.DENY);
+        }
+
+        if (!context.terraSettings.miscellaneous.vanillaSprings) {
+            // block springs if not enabled
             modifiers.getPredicates().add(FeatureMatcher.of(Feature.SPRING_FEATURE), FeaturePredicate.DENY);
         }
+
 
         if (context.terraSettings.miscellaneous.customBiomeFeatures) {
             // remove default trees from river biomes since forests can go up to the edge of rivers
@@ -105,6 +118,7 @@ public class TerraSetupFactory {
         // block ugly features
         modifiers.getPredicates().add(Matchers.sedimentDisks(), FeaturePredicate.DENY);
         modifiers.getPredicates().add(FeatureMatcher.of(Feature.MINESHAFT), new MinHeight(context.levels.waterY + 20));
+        modifiers.getPredicates().add(FeatureMatcher.of(Feature.WOODLAND_MANSION), new MaxHeight(context.levels.waterY + 64));
 
         return FeatureManager.create(SetupHooks.setup(modifiers, context.copy()));
     }
@@ -122,7 +136,7 @@ public class TerraSetupFactory {
                 Biomes.DESERT_LAKES
         );
         manager.replace(
-                new SwampSurface(),
+                new SwampSurface(context),
                 Biomes.SWAMP.delegate.get(),
                 ModBiomes.MARSHLAND
         );
@@ -140,6 +154,7 @@ public class TerraSetupFactory {
         StructureManager manager = new StructureManager();
         manager.register(Structure.OCEAN_MONUMENT, DeepWater.INSTANCE);
         manager.register(Structure.OCEAN_RUIN, DeepWater.INSTANCE);
+        manager.register(Structure.SHIPWRECK, new MinDepth(context.levels.waterLevel - 8));
         return SetupHooks.setup(manager, context);
     }
 

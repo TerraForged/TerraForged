@@ -2,10 +2,10 @@ package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
+import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionFix;
 import com.terraforged.mod.chunk.util.TerraContainer;
-import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;

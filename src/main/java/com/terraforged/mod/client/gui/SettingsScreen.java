@@ -34,6 +34,7 @@ import com.terraforged.mod.client.gui.page.SimplePage;
 import com.terraforged.mod.client.gui.page.SimplePreviewPage;
 import com.terraforged.mod.client.gui.page.WorldPage;
 import com.terraforged.mod.client.gui.preview.PreviewPage;
+import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
@@ -111,7 +112,7 @@ public class SettingsScreen extends OverlayScreen {
             for (Page page : pages) {
                 page.save();
             }
-//            parent.chunkProviderSettingsJson = NBTHelper.serializeCompact(settings);
+            parent.chunkProviderSettingsJson = NBTHelper.stripMetadata(instance.settingsData);
             SettingsScreen.setSeed(parent, preview.getSeed());
             onClose();
         }));

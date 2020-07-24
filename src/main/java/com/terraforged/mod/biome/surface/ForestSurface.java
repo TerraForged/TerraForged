@@ -7,7 +7,6 @@ import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import com.terraforged.world.GeneratorContext;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.world.gen.Heightmap;
 
 public class ForestSurface implements Surface {
@@ -30,7 +29,7 @@ public class ForestSurface implements Surface {
         float value = noise.getValue(x, z);
         if (value > 0.6) {
             if (value < 0.75) {
-                return Blocks.PODZOL.getDefaultState();
+                return States.PODZOL.get();
             }
             return States.DIRT.get();
         }

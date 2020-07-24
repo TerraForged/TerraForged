@@ -30,7 +30,7 @@ public class DesertSurface implements Surface {
 
     @Override
     public void buildSurface(int x, int z, int height, SurfaceContext ctx) {
-        if (ctx.cell.steepness < 0.15) {
+        if (ctx.cell.gradient < 0.15) {
             return;
         }
 
@@ -39,17 +39,17 @@ public class DesertSurface implements Surface {
         }
 
         float value = ctx.cell.value + noise.getValue(x, z);
-        if (ctx.cell.steepness > 0.3 || value > level) {
+        if (ctx.cell.gradient > 0.3 || value > level) {
             BlockState state = sandstone;
 
             if (value > level) {
-                if (ctx.cell.steepness > 0.975) {
+                if (ctx.cell.gradient > 0.975) {
                     state = low;
-                } else if (ctx.cell.steepness > 0.85) {
+                } else if (ctx.cell.gradient > 0.85) {
                     state = high;
-                } else if (ctx.cell.steepness > 0.75) {
+                } else if (ctx.cell.gradient > 0.75) {
                     state = mid;
-                } else if (ctx.cell.steepness > 0.65) {
+                } else if (ctx.cell.gradient > 0.65) {
                     state = low;
                 }
             }

@@ -29,16 +29,18 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.cache.CacheEntry;
+import com.terraforged.core.concurrent.thread.ThreadPool;
 import com.terraforged.core.concurrent.thread.ThreadPools;
 import com.terraforged.core.settings.Settings;
 import com.terraforged.core.tile.Size;
 import com.terraforged.core.tile.Tile;
 import com.terraforged.core.tile.gen.TileGenerator;
 import com.terraforged.mod.client.gui.GuiKeys;
-import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.mod.util.nbt.NBTHelper;
+import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.MutableVeci;
+import com.terraforged.world.continent.SpawnType;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.Terrains;
 import net.minecraft.client.Minecraft;
@@ -55,25 +57,26 @@ import java.util.Random;
 public class Preview extends Button {
 
     private static final int FACTOR = 4;
-    public static final int WIDTH = Size.chunkToBlock(1 << FACTOR);
-    private static final int SLICE_HEIGHT = 64;
-    public static final int HEIGHT = WIDTH + SLICE_HEIGHT;
+    public static final int SIZE = Size.chunkToBlock(1 << FACTOR);
     private static final float[] LEGEND_SCALES = {1, 0.9F, 0.75F, 0.6F};
 
     private final int offsetX;
     private final int offsetZ;
+    private final ThreadPool threadPool = ThreadPools.createDefault();
     private final Random random = new Random(System.currentTimeMillis());
     private final PreviewSettings previewSettings = new PreviewSettings();
-    private final DynamicTexture texture = new DynamicTexture(new NativeImage(WIDTH, HEIGHT, true));
+    private final DynamicTexture texture = new DynamicTexture(new NativeImage(SIZE, SIZE, true));
 
     private int seed;
     private long lastUpdate = 0L;
+    private MutableVeci center = new MutableVeci();
     private Settings settings = new Settings();
     private CacheEntry<Tile> task = null;
     private Tile tile = null;
 
-    private String[] labels = {GuiKeys.PREVIEW_AREA.get(), GuiKeys.PREVIEW_TERRAIN.get(), GuiKeys.PREVIEW_BIOME.get()};
+    private String hoveredCoords = "";
     private String[] values = {"", "", ""};
+    private String[] labels = {GuiKeys.PREVIEW_AREA.get(), GuiKeys.PREVIEW_TERRAIN.get(), GuiKeys.PREVIEW_BIOME.get()};
 
     public Preview(int seed) {
         super(0, 0, 0, 0, "", b -> {});
@@ -92,12 +95,12 @@ public class Preview extends Button {
 
     public void close() {
         texture.close();
+        threadPool.shutdown();
     }
 
     @Override
     public void render(int mx, int my, float partialTicks) {
-        float scale = width / (float) WIDTH;
-        height = width + NoiseUtil.round(SLICE_HEIGHT * scale);
+        this.height = getSize();
 
         preRender();
 
@@ -112,7 +115,7 @@ public class Preview extends Button {
 
         updateLegend(mx, my);
 
-        renderLegend(labels, values, x, y + width, 10, 0xFFFFFF);
+        renderLegend(mx, my, labels, values, x, y + width, 10, 0xFFFFFF);
     }
 
     public void update(Settings settings, CompoundNBT prevSettings) {
@@ -126,6 +129,10 @@ public class Preview extends Button {
         settings.world.seed = seed;
 
         task = generate(settings, prevSettings);
+    }
+
+    private int getSize() {
+        return width;
     }
 
     private void preRender() {
@@ -152,41 +159,12 @@ public class Preview extends Button {
 
         int stroke = 2;
         int width = tile.getBlockSize().size;
-        int zoom = (101 - previewSettings.zoom);
-        int half = width / 2;
-
-        int sliceStartY = image.getHeight() - 1 - SLICE_HEIGHT;
-
-        float zoomUnit = 1F - (zoom / 100F);
-        float zoomStrength = 0.5F;
-        float unit = (1 - zoomStrength) + (zoomStrength * zoomUnit);
-        float heightModifier = settings.world.properties.worldHeight / 256F;
-        float waterLevelModifier = settings.world.properties.seaLevel / (float) settings.world.properties.worldHeight;
-        float imageWaterLevelY = image.getHeight() - 1 - (waterLevelModifier * SLICE_HEIGHT * unit);
 
         tile.iterate((cell, x, z) -> {
             if (x < stroke || z < stroke || x >= width - stroke || z >= width - stroke) {
                 image.setPixelRGBA(x, z, Color.BLACK.getRGB());
             } else {
                 image.setPixelRGBA(x, z, renderer.getColor(cell, levels));
-            }
-
-            if (z == half) {
-                int height = (int) (cell.value * SLICE_HEIGHT * unit * heightModifier);
-                float imageSurfaceLevelY = image.getHeight() - 1 - height;
-                for (int dy = sliceStartY; dy < image.getHeight(); dy++) {
-                    if (x < stroke  || x >= width - stroke || dy > image.getHeight() - 1 - stroke) {
-                        image.setPixelRGBA(x, dy, Color.BLACK.getRGB());
-                        continue;
-                    }
-                    if (dy > imageSurfaceLevelY) {
-                        image.setPixelRGBA(x, dy, Color.BLACK.getRGB());
-                    } else if (dy > imageWaterLevelY) {
-                        image.setPixelRGBA(x, dy, Color.GRAY.getRGB());
-                    } else {
-                        image.setPixelRGBA(x, dy, Color.WHITE.getRGB());
-                    }
-                }
             }
         });
 
@@ -200,19 +178,21 @@ public class Preview extends Button {
 
         GeneratorContext context = GeneratorContext.createNoCache(Terrains.create(settings), settings);
 
-        MutableVeci center = new MutableVeci();
-        context.factory.getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ, center);
+        if (settings.world.properties.spawnType == SpawnType.CONTINENT_CENTER) {
+            context.factory.getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ, center);
+        } else {
+            center.x = 0;
+            center.z = 0;
+        }
 
         TileGenerator renderer = TileGenerator.builder()
-                .pool(ThreadPools.getPool())
+                .pool(threadPool)
                 .size(FACTOR, 0)
                 .factory(context.factory)
                 .batch(6)
                 .build();
 
-        float zoom = 101 - previewSettings.zoom;
-
-        return renderer.getAsync(center.x, center.z, zoom, false);
+        return renderer.getAsync(center.x, center.z, getZoom(), false);
     }
 
     private void updateLegend(int mx ,int my) {
@@ -220,7 +200,8 @@ public class Preview extends Button {
             int left = this.x;
             int top = this.y;
             float size = this.width;
-            int zoom = (101 - previewSettings.zoom);
+
+            int zoom = getZoom();
             int width = Math.max(1, tile.getBlockSize().size * zoom);
             int height = Math.max(1, tile.getBlockSize().size * zoom);
             values[0] = width + "x" + height;
@@ -232,6 +213,13 @@ public class Preview extends Button {
                 Cell cell = tile.getCell(ix, iz);
                 values[1] = getTerrainName(cell);
                 values[2] = getBiomeName(cell);
+
+                int dx = (ix - (tile.getBlockSize().size / 2)) * zoom;
+                int dz = (iz - (tile.getBlockSize().size / 2)) * zoom;
+
+                hoveredCoords = (center.x + dx) + ":" + (center.z + dz);
+            } else {
+                hoveredCoords = "";
             }
         }
     }
@@ -247,7 +235,7 @@ public class Preview extends Button {
         return LEGEND_SCALES[index];
     }
 
-    private void renderLegend(String[] labels, String[] values, int left, int top, int lineHeight, int color) {
+    private void renderLegend(int mx, int my, String[] labels, String[] values, int left, int top, int lineHeight, int color) {
         float scale = getLegendScale();
 
         RenderSystem.pushMatrix();
@@ -265,7 +253,7 @@ public class Preview extends Button {
             String label = labels[i];
             String value = values[i];
 
-            while (value.length() > 0 && spacing + Minecraft.getInstance().fontRenderer.getStringWidth(value) > maxWidth) {
+            while (value.length() > 0 && spacing + renderer.getStringWidth(value) > maxWidth) {
                 value = value.substring(0, value.length() - 1);
             }
 
@@ -274,6 +262,14 @@ public class Preview extends Button {
         }
 
         RenderSystem.popMatrix();
+
+        if (PreviewSettings.showCoords && !hoveredCoords.isEmpty()) {
+            drawCenteredString(renderer, hoveredCoords, mx, my - 10, 0xFFFFFF);
+        }
+    }
+
+    private int getZoom() {
+        return NoiseUtil.round(1.5F * (101 - previewSettings.zoom));
     }
 
     private static String getTerrainName(Cell cell) {
@@ -287,12 +283,12 @@ public class Preview extends Button {
         String terrain = cell.terrain.getName().toLowerCase();
         if (terrain.contains("ocean")) {
             if (cell.temperature < 0.3) {
-                return "cold_ocean";
+                return "cold_" + terrain;
             }
             if (cell.temperature > 0.6) {
-                return "warm_ocean";
+                return "warm_" + terrain;
             }
-            return "ocean";
+            return terrain;
         }
         if (terrain.contains("river")) {
             return "river";

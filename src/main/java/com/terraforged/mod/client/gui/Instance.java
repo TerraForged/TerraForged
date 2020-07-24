@@ -17,4 +17,10 @@ public class Instance {
         this.settings = settings;
         this.settingsData = NBTHelper.serialize(settings);
     }
+
+    public TerraSettings createCopy() {
+        TerraSettings settings = new TerraSettings();
+        NBTHelper.deserialize(settingsData, settings);
+        return settings;
+    }
 }

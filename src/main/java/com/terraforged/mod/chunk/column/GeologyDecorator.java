@@ -25,13 +25,16 @@
 
 package com.terraforged.mod.chunk.column;
 
+import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
+import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
-import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
 import com.terraforged.mod.material.geology.GeoManager;
+import com.terraforged.world.geology.Stratum;
+import net.minecraft.block.BlockState;
 import net.minecraft.world.chunk.IChunk;
 
-public class GeologyDecorator implements ColumnDecorator {
+public class GeologyDecorator implements ColumnDecorator, Stratum.Visitor<BlockState, SurfaceContext> {
 
     private final GeoManager geology;
 
@@ -45,12 +48,16 @@ public class GeologyDecorator implements ColumnDecorator {
     }
 
     @Override
-    public void decorate(ChunkSurfaceBuffer buffer, DecoratorContext context, int x, int y, int z) {
+    public void decorate(ChunkSurfaceBuffer buffer, SurfaceContext context, int x, int y, int z) {
         int top = buffer.getSurfaceBottom();
-        geology.getGeology(context.biome).getStrata(x, z).downwards(x, top, z, context.depthBuffer.get(), (py, state) -> {
-            context.pos.setPos(x, py, z);
-            buffer.getDelegate().setBlockState(context.pos, state, false);
-            return true;
-        });
+        context.pos.setPos(x, y, z);
+        geology.getGeology(context.biome).getStrata(x, z).downwards(x, top, z, context.depthBuffer.get(), context, this);
+    }
+
+    @Override
+    public boolean visit(int y, BlockState state, SurfaceContext context) {
+        context.pos.setY(y);
+        ColumnDecorator.replaceSolid(context.buffer.getDelegate(), context.pos, state);
+        return true;
     }
 }

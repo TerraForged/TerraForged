@@ -26,8 +26,8 @@
 package com.terraforged.mod;
 
 import com.terraforged.api.material.WGTags;
+import com.terraforged.fm.template.TemplateManager;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
-import com.terraforged.mod.server.command.TerraCommand;
 import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.data.DataGen;
 import com.terraforged.mod.feature.context.ContextSelectorFeature;
@@ -35,7 +35,7 @@ import com.terraforged.mod.feature.decorator.poisson.PoissonAtSurface;
 import com.terraforged.mod.feature.feature.BushFeature;
 import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.mod.feature.feature.FreezeLayer;
-import com.terraforged.fm.template.TemplateManager;
+import com.terraforged.mod.server.command.TerraCommand;
 import com.terraforged.mod.util.DataPackFinder;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.world.biome.Biomes;
@@ -44,6 +44,7 @@ import net.minecraft.world.gen.feature.OreFeatureConfig;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -106,6 +107,12 @@ public class TerraForgedMod {
             File dir = event.getServer().getFile("config/terraforged/datapacks");
             DataPackFinder dataPackFinder = new DataPackFinder(dir);
             event.getServer().getResourcePacks().addPackFinder(dataPackFinder);
+        }
+
+        @SubscribeEvent
+        public static void update(TagsUpdatedEvent event) {
+            Log.info("Tags Reloaded");
+            WGTags.printTags();
         }
     }
 }

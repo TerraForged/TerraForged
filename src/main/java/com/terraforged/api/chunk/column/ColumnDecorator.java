@@ -26,6 +26,7 @@
 package com.terraforged.api.chunk.column;
 
 import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
+import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.n2d.Source;
 import com.terraforged.n2d.source.FastSource;
 import net.minecraft.block.BlockState;
@@ -38,7 +39,7 @@ public interface ColumnDecorator {
 
     void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z);
 
-    default void decorate(ChunkSurfaceBuffer buffer, DecoratorContext context, int x, int y, int z) {
+    default void decorate(ChunkSurfaceBuffer buffer, SurfaceContext context, int x, int y, int z) {
         decorate(buffer.getDelegate(), context, x, y, z);
     }
 
@@ -50,6 +51,19 @@ public interface ColumnDecorator {
         for (int dy = from; dy > to; dy--) {
             chunk.setBlockState(context.pos.setPos(x, dy, z), state, false);
         }
+    }
+
+    default void fillDownSolid(DecoratorContext context, IChunk chunk, int x, int z, int from, int to, BlockState state) {
+        for (int dy = from; dy > to; dy--) { ;
+            replaceSolid(chunk, context.pos.setPos(x, dy, z), state);
+        }
+    }
+
+    static void replaceSolid(IChunk chunk, BlockPos pos, BlockState state) {
+        if (chunk.getBlockState(pos).isAir(chunk, pos)) {
+            return;
+        }
+        chunk.setBlockState(pos, state, false);
     }
 
     static float getNoise(float x, float z, int seed, float scale, float bias) {

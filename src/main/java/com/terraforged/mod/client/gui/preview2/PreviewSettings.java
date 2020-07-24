@@ -1,6 +1,7 @@
 package com.terraforged.mod.client.gui.preview2;
 
 import com.terraforged.core.render.RenderMode;
+import com.terraforged.core.serialization.annotation.NoName;
 import com.terraforged.core.serialization.annotation.Range;
 import com.terraforged.core.serialization.annotation.Serializable;
 
@@ -10,6 +11,7 @@ public class PreviewSettings {
     @Range(min = 1, max = 100)
     public float zoom = 90F;
 
+    @NoName
     public RenderMode display = RenderMode.BIOME_TYPE;
 
     public float getZoom(float scale) {

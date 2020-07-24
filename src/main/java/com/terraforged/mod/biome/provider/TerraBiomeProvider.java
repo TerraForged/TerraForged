@@ -26,24 +26,20 @@
 package com.terraforged.mod.biome.provider;
 
 import com.google.common.collect.Sets;
+import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.modifier.BiomeModifierManager;
 import com.terraforged.mod.chunk.TerraContext;
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.concurrent.Resource;
 import com.terraforged.mod.util.setup.SetupHooks;
 import com.terraforged.world.heightmap.WorldLookup;
-import com.terraforged.world.terrain.decorator.Decorator;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
 import net.minecraft.world.biome.provider.BiomeProvider;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -54,7 +50,6 @@ public class TerraBiomeProvider extends BiomeProvider {
     private final TerraContext context;
     private final WorldLookup worldLookup;
     private final BiomeModifierManager modifierManager;
-    private final Map<Biome, List<Decorator>> decorators = new HashMap<>();
 
     public TerraBiomeProvider(TerraContext context) {
         super(BiomeHelper.getAllBiomes());
@@ -67,6 +62,12 @@ public class TerraBiomeProvider extends BiomeProvider {
 
     public Resource<Cell> lookupPos(int x, int z) {
         return getWorldLookup().getCell(x, z);
+    }
+
+    public Biome getBiome(int x, int z) {
+        try (Resource<Cell> resource = getWorldLookup().getCell(x, z, true)) {
+            return getBiome(resource.get(), x, z);
+        }
     }
 
     @Override
@@ -146,13 +147,9 @@ public class TerraBiomeProvider extends BiomeProvider {
         return modifierManager;
     }
 
-    public List<Decorator> getDecorators(Biome biome) {
-        return decorators.getOrDefault(biome, Collections.emptyList());
-    }
-
     public Biome getBiome(Cell cell, int x, int z) {
         Biome biome = biomeMap.provideBiome(cell, context.levels);
-        if (modifierManager.hasModifiers(cell.terrain)) {
+        if (modifierManager.hasModifiers(cell, context.levels)) {
             return modifierManager.modify(biome, cell, x, z);
         }
         return biome;

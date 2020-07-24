@@ -1,8 +1,8 @@
 package com.terraforged.mod.biome.modifier;
 
 import com.terraforged.api.biome.modifier.BiomeModifier;
-import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import com.terraforged.world.GeneratorContext;
@@ -20,7 +20,7 @@ public class BeachModifier implements BiomeModifier {
     public BeachModifier(BiomeMap biomeMap, GeneratorContext context) {
         this.biomes = biomeMap;
         this.height = context.levels.water(6);
-        this.noise = Source.perlin(context.seed.next(), 10, 1).scale(context.levels.scale(5));
+        this.noise = Source.perlin(context.seed.next(), 15, 1).scale(context.levels.scale(5));
     }
 
     @Override

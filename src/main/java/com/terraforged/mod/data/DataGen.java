@@ -40,6 +40,7 @@ public class DataGen {
     public static void dumpData() {
         File dataDir = new File("data");
         WorldGenBiomes.genBiomeMap(dataDir);
+        WorldGenBiomes.genBiomeWeights(dataDir);
         WorldGenBlocks.genBlockTags(dataDir);
         WorldGenFeatures.genBiomeFeatures(dataDir);
     }

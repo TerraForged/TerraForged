@@ -31,20 +31,20 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.Resource;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
+import com.terraforged.mod.data.DataGen;
 import com.terraforged.mod.server.command.arg.BiomeArgType;
 import com.terraforged.mod.server.command.arg.TerrainArgType;
 import com.terraforged.mod.server.command.search.BiomeSearchTask;
 import com.terraforged.mod.server.command.search.BothSearchTask;
 import com.terraforged.mod.server.command.search.Search;
 import com.terraforged.mod.server.command.search.TerrainSearchTask;
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.concurrent.Resource;
-import com.terraforged.mod.data.DataGen;
 import com.terraforged.world.WorldGenerator;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.Terrains;
@@ -132,7 +132,11 @@ public class TerraCommand {
         try (Resource<Cell> cell = biomeProvider.lookupPos(pos.getX(), pos.getZ())) {
             Biome biome = biomeProvider.getBiome(cell.get(), pos.getX(), pos.getZ());
             context.getSource().sendFeedback(
-                    new StringTextComponent("Terrain=" + cell.get().terrain.getName() + ", Biome=" + biome.getRegistryName()),
+                    new StringTextComponent(
+                            "Terrain=" + cell.get().terrain.getName()
+                                    + ", Biome=" + biome.getRegistryName()
+                                    + ", BiomeType=" + cell.get().biomeType.name()
+                    ),
                     false
             );
         }

@@ -28,6 +28,7 @@ package com.terraforged.mod.data;
 import com.google.gson.GsonBuilder;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.provider.BiomeHelper;
+import com.terraforged.mod.biome.provider.BiomeWeights;
 import com.terraforged.world.biome.BiomeType;
 import net.minecraft.util.ResourceLocation;
 
@@ -43,6 +44,32 @@ public class WorldGenBiomes extends DataGen {
         BiomeMap map = BiomeHelper.createBiomeMap();
         try (Writer writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_map.json")))) {
             new GsonBuilder().setPrettyPrinting().create().toJson(map.toJson(), writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void genBiomeWeights(File dataDir) {
+        BiomeWeights weights = new BiomeWeights();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_weights.txt")))) {
+            writer.write("# REGISTERED BIOME WEIGHTS\n");
+            weights.forEachEntry((name, weight) -> {
+                try {
+                    writer.write(name + "=" + weight + "\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            writer.write("\n");
+            writer.write("# UNREGISTERED BIOME WEIGHTS\n");
+            weights.forEachUnregistered((name, weight) -> {
+                try {
+                    writer.write(name + "=" + weight + "\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }

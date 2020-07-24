@@ -1,13 +1,13 @@
 package com.terraforged.mod.client.gui.preview2;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.core.concurrent.thread.ThreadPool;
 import com.terraforged.core.concurrent.thread.ThreadPools;
 import com.terraforged.core.render.RenderAPI;
 import com.terraforged.core.render.RenderSettings;
 import com.terraforged.core.render.RenderWorld;
 import com.terraforged.core.tile.gen.TileGenerator;
+import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.MutableVeci;
 import com.terraforged.world.continent.SpawnType;
@@ -19,8 +19,7 @@ public class Preview extends Widget {
 
     private static final float ZOOM_SCALE = 200F;
 
-    private final ThreadPool threadPool = ThreadPools.getPool();
-
+    private final ThreadPool threadPool = ThreadPools.createDefault();
     private final TerraSettings settings;
 
     private int seed;
@@ -47,6 +46,10 @@ public class Preview extends Widget {
         seed++;
         world = createWorld(settings);
         world.update(offsetX, offsetZ, zoom, true);
+    }
+
+    public void close() {
+        threadPool.shutdown();
     }
 
     @Override
@@ -114,6 +117,6 @@ public class Preview extends Widget {
         renderSettings.zoom = previewSettings.getZoom(ZOOM_SCALE);
         renderSettings.renderMode = previewSettings.display;
 
-        return new RenderWorld(generator, renderAPI, renderSettings, regions, size);
+        return new RenderWorld(threadPool, generator, renderAPI, renderSettings, regions, size);
     }
 }

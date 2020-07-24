@@ -25,13 +25,13 @@
 
 package com.terraforged.mod.feature.sapling;
 
+import com.terraforged.fm.template.Template;
+import com.terraforged.fm.template.feature.TemplateFeature;
+import com.terraforged.fm.template.feature.TemplateFeatureConfig;
 import com.terraforged.mod.TerraWorld;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.feature.BlockDataManager;
-import com.terraforged.fm.template.Template;
-import com.terraforged.fm.template.feature.TemplateFeature;
-import com.terraforged.fm.template.feature.TemplateFeatureConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Mirror;

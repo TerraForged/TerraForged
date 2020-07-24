@@ -66,6 +66,9 @@ public class GeoGenerator implements StrataGenerator {
     }
 
     private void addLayer(int seed, Random random, StrataConfig.Config config, List<Block> materials, Strata.Builder<BlockState> builder) {
+        if (materials.size() == 0) {
+            return;
+        }
         random.setSeed(seed);
         List<Layer> layers = generateLayers(materials, config, random);
         layers.forEach(l -> builder.add(l.type, l.state, l.depth));

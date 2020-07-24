@@ -25,28 +25,33 @@
 
 package com.terraforged.api.material;
 
+import com.terraforged.mod.Log;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class WGTags {
 
-    public static final Tag<Block> STONE = tag("wg_stone");
-    public static final Tag<Block> DIRT = tag("wg_dirt");
-    public static final Tag<Block> CLAY = tag("wg_clay");
-    public static final Tag<Block> SEDIMENT = tag("wg_sediment");
-    public static final Tag<Block> ERODIBLE = tag("wg_erodible");
+    public static final Tag<Block> STONE = tag("forge:wg_stone");
+    public static final Tag<Block> DIRT = tag("forge:wg_dirt");
+    public static final Tag<Block> CLAY = tag("forge:wg_clay");
+    public static final Tag<Block> SEDIMENT = tag("forge:wg_sediment");
+    public static final Tag<Block> ERODIBLE = tag("forge:wg_erodible");
+    private static final List<Tag<Block>> WG_TAGS = Collections.unmodifiableList(Arrays.asList(STONE, DIRT, CLAY, SEDIMENT, ERODIBLE));
 
     public static void init() {
 
     }
 
     private static Tag<Block> tag(String name) {
-        return new BlockTags.Wrapper(new ResourceLocation("forge", name));
+        return new BlockTags.Wrapper(new ResourceLocation(name));
     }
 
     public static Predicate<BlockState> stone() {
@@ -55,5 +60,14 @@ public class WGTags {
 
     private static Predicate<BlockState> toStatePredicate(Tag<Block> tag) {
         return state -> tag.contains(state.getBlock());
+    }
+
+    public static void printTags() {
+        for (Tag<Block> tag : WG_TAGS) {
+            Log.debug("World-Gen Tag: {}", tag.getId());
+            for (Block block : tag.getAllElements()) {
+                Log.debug(" - {}", block.getRegistryName());
+            }
+        }
     }
 }

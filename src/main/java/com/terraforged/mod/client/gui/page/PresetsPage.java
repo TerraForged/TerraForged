@@ -77,8 +77,8 @@ public class PresetsPage extends BasePage {
             @Override
             public void onClick(double x, double y) {
                 super.onClick(x, y);
-                // create new preset with default settings
-                Preset preset = new Preset(nameInput.getValue(), new TerraSettings());
+                // create new preset with current settings
+                Preset preset = new Preset(nameInput.getValue(), instance.createCopy());
 
                 // register with the manager & reset the text field
                 manager.add(preset);
@@ -121,8 +121,7 @@ public class PresetsPage extends BasePage {
                 super.onClick(x, y);
                 getSelected().ifPresent(preset -> {
                     // create a copy of the settings
-                    TerraSettings settings = new TerraSettings();
-                    NBTHelper.deserialize(instance.settingsData, settings);
+                    TerraSettings settings = instance.createCopy();
 
                     // replace the current preset with the updated version
                     manager.add(new Preset(preset.getName(), settings));
@@ -157,25 +156,6 @@ public class PresetsPage extends BasePage {
             }
         });
 
-        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_DEFAULT.get()) {
-
-            @Override
-            public void render(int x, int z, float ticks) {
-                super.active = hasSelectedPreset();
-                super.render(x, z, ticks);
-            }
-
-            @Override
-            public void onClick(double x, double y) {
-                super.onClick(x, y);
-                getSelected().ifPresent(preset -> {
-                    TerraSettings settings = preset.getSettings();
-
-                    SettingsHelper.exportDefaults(settings);
-                });
-            }
-        });
-
         right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_DELETE.get()) {
 
             @Override
@@ -195,11 +175,35 @@ public class PresetsPage extends BasePage {
             }
         });
 
+        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_SET_DEFAULTS.get()) {
+
+            @Override
+            public void onClick(double x, double y) {
+                super.onClick(x, y);
+                Optional<Preset> selected = getSelected();
+                if (selected.isPresent()) {
+                    SettingsHelper.exportDefaults(selected.get().getSettings());
+                } else {
+                    SettingsHelper.exportDefaults(instance.createCopy());
+                }
+            }
+        });
+
+        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_CLEAR_DEFAULTS.get()) {
+
+            @Override
+            public void onClick(double x, double y) {
+                super.onClick(x, y);
+                TerraSettings settings = new TerraSettings();
+                SettingsHelper.exportDefaults(settings);
+            }
+        });
+
         right.scrollPane.addButton(previewWidget);
 
         // used to pad the scroll-pane out so that the preview legend scrolls on larger gui scales
         TerraButton spacer = createSpacer();
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 10; i++) {
             right.scrollPane.addButton(spacer);
         }
     }
@@ -234,6 +238,7 @@ public class PresetsPage extends BasePage {
 
     private void rebuildPresetList() {
         Column left = getColumn(0);
+        left.scrollPane.setSelected(null);
         left.scrollPane.setRenderSelection(true);
         left.scrollPane.children().clear();
 

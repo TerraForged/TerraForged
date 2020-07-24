@@ -167,8 +167,14 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
 
         byte type = tag.getId();
         if (type == Constants.NBT.TAG_INT) {
+            if (hasLimit(name, value)) {
+                return new TerraSlider.BoundInt(name, value).callback(callback);
+            }
             return new TerraSlider.Int(name, value).callback(callback);
         } else if (type == Constants.NBT.TAG_FLOAT) {
+            if (hasLimit(name, value)) {
+                return new TerraSlider.BoundFloat(name, value).callback(callback);
+            }
             return new TerraSlider.Float(name, value).callback(callback);
         } else if (type == Constants.NBT.TAG_STRING && hasOptions(name, value)) {
             return new TerraToggle(name, value).callback(callback);
@@ -208,5 +214,9 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
 
     private static boolean hasOptions(String name, CompoundNBT value) {
         return value.getCompound("#" + name).contains("options");
+    }
+
+    private static boolean hasLimit(String name, CompoundNBT value) {
+        return value.getCompound("#" + name).contains("limit_lower") || value.getCompound("#" + name).contains("limit_upper");
     }
 }

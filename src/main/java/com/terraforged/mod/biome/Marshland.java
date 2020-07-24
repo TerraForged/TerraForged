@@ -81,11 +81,13 @@ public class Marshland extends BiomeVariant {
         this.setRegistryName("terraforged", "marshland");
     }
 
+    @Override
     public int getGrassColor(double p_225528_1_, double p_225528_3_) {
         double d0 = INFO_NOISE.noiseAt(p_225528_1_ * 0.0225D, p_225528_3_ * 0.0225D, false);
         return d0 < -0.1D ? 5011004 : 6975545;
     }
 
+    @Override
     public int getFoliageColor() {
         return 6975545;
     }

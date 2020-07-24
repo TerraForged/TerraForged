@@ -7,12 +7,13 @@ import com.terraforged.core.util.Variance;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import com.terraforged.world.geology.Strata;
+import com.terraforged.world.geology.Stratum;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 
 import java.util.Random;
 
-public class BriceSurface implements MaskedSurface {
+public class BriceSurface implements MaskedSurface, Stratum.Visitor<BlockState, SurfaceContext> {
 
     private final Module module;
     private final Strata<BlockState> stackStrata;
@@ -38,7 +39,7 @@ public class BriceSurface implements MaskedSurface {
 
     @Override
     public void buildSurface(int x, int z, int height, float mask, SurfaceContext ctx) {
-        float strength = 1 - ctx.cell.steepness;
+        float strength = 1 - ctx.cell.gradient;
         float value = module.getValue(x, z) * mask * strength;
 
         int top = (int) (value * 30);
@@ -46,12 +47,17 @@ public class BriceSurface implements MaskedSurface {
             return;
         }
 
-        stackStrata.downwards(x, top, z, ctx.depthBuffer.get(), (y, material) -> {
-            if (y <= 0) {
-                return false;
-            }
-            ctx.chunk.setBlockState(ctx.pos.setPos(x, height + y, z), material, false);
+        stackStrata.downwards(x, top, z, ctx.depthBuffer.get(), ctx, this);
+    }
+
+    @Override
+    public boolean visit(int y, BlockState state, SurfaceContext ctx) {
+        if (y <= 0) {
+            return false;
+        } else {
+            ctx.pos.setY(y);
+            ctx.chunk.setBlockState(ctx.pos, state, false);
             return true;
-        });
+        }
     }
 }

@@ -1,11 +1,11 @@
 package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.api.chunk.column.DecoratorContext;
+import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.column.BaseDecorator;
 import com.terraforged.mod.chunk.util.FastChunk;
 import com.terraforged.mod.chunk.util.TerraContainer;
-import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.mod.feature.TerrainHelper;
 import com.terraforged.world.climate.Climate;
 import com.terraforged.world.heightmap.Levels;
@@ -26,7 +26,7 @@ public class TerrainGenerator implements Generator.Terrain {
         this.levels = generator.getContext().levels;
         this.terrain = generator.getContext().terrain;
         this.climate = generator.getContext().factory.getClimate();
-        this.terrainHelper = new TerrainHelper(0.75F);
+        this.terrainHelper = new TerrainHelper(0.75F, 4F);
     }
 
     @Override

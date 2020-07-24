@@ -73,7 +73,7 @@ public class SnowEroder extends ErosionDecorator {
             float sNoise = rand.getValue(x, z, seed3) * SLOPE_MODIFIER;
             float vModifier = context.cell.terrain == context.terrains.volcano ? 0.15F : 0F;
             float height = context.cell.value + var + hNoise + vModifier;
-            float steepness = context.cell.steepness + var + sNoise + vModifier;
+            float steepness = context.cell.gradient + var + sNoise + vModifier;
             if (snowErosion(x, z, steepness, height)) {
                 Predicate<BlockState> predicate = Heightmap.Type.MOTION_BLOCKING.getHeightLimitPredicate();
                 for (int dy = 2; dy > 0; dy--) {

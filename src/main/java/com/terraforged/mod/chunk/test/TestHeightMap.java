@@ -13,7 +13,6 @@ public class TestHeightMap extends Heightmap {
     public TestHeightMap(GeneratorContext context) {
         super(context);
         terrains = context.terrain;
-        System.out.println("TESTETETEST");
     }
 
     @Override

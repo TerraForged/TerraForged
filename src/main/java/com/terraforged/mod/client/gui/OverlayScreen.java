@@ -27,6 +27,7 @@ package com.terraforged.mod.client.gui;
 
 import com.terraforged.mod.client.gui.element.CheckBox;
 import com.terraforged.mod.client.gui.element.Element;
+import com.terraforged.mod.client.gui.preview.PreviewSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
@@ -38,6 +39,7 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
 
     public OverlayScreen() {
         super(new TranslationTextComponent(""));
+        PreviewSettings.showCoords = false;
         super.minecraft = Minecraft.getInstance();
         super.font = minecraft.fontRenderer;
     }
@@ -69,7 +71,7 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
 
     @Override
     protected void init() {
-        addButton(new CheckBox("Tooltips", showTooltips) {
+        addButton(new CheckBox(GuiKeys.TOOLTIPS.get(), showTooltips) {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 super.onClick(mouseX, mouseY);
@@ -79,6 +81,22 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
             @Override
             public void render(int mouseX, int mouseY, float partial) {
                 this.x = OverlayScreen.this.width - width - 13;
+                this.y = 6;
+                super.render(mouseX, mouseY, partial);
+            }
+        });
+
+        addButton(new CheckBox(GuiKeys.COORDS.get(), showTooltips) {
+            @Override
+            public void onClick(double mouseX, double mouseY) {
+                super.onClick(mouseX, mouseY);
+                PreviewSettings.showCoords = isChecked();
+            }
+
+            @Override
+            public void render(int mouseX, int mouseY, float partial) {
+                setChecked(PreviewSettings.showCoords);
+                this.x = OverlayScreen.this.width - (width * 2) - 15;
                 this.y = 6;
                 super.render(mouseX, mouseY, partial);
             }

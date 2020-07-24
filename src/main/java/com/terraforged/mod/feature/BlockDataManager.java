@@ -1,9 +1,9 @@
 package com.terraforged.mod.feature;
 
 import com.google.common.collect.ImmutableMap;
-import com.terraforged.mod.feature.sapling.SaplingConfig;
 import com.terraforged.fm.data.DataManager;
 import com.terraforged.fm.util.Json;
+import com.terraforged.mod.feature.sapling.SaplingConfig;
 import net.minecraft.block.Block;
 
 import java.util.HashMap;

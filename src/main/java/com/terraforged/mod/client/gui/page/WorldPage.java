@@ -70,6 +70,7 @@ public class WorldPage extends BasePage {
 
         Column left = getColumn(0);
         addElements(left.left, left.top, left, worldSettings, true, left.scrollPane::addButton, this::update);
+
         addElements(left.left, left.top, left, dimSettings, true, left.scrollPane::addButton, this::update);
     }
 
@@ -95,13 +96,13 @@ public class WorldPage extends BasePage {
 
     private CompoundNBT getDimSettings() {
         CompoundNBT dimSettings = instance.settingsData.getCompound("dimensions");
-
-        CompoundNBT generators = dimSettings.getCompound("dimensions").getCompound("value");
+        CompoundNBT generators = dimSettings.getCompound("dimensions");
         for (String name : generators.keySet()) {
-            CompoundNBT setting = generators.getCompound(name);
-            setting.put("#options", getWorldTypes());
+            if (name.startsWith("#")) {
+                CompoundNBT metadata = generators.getCompound(name);
+                metadata.put("options", getWorldTypes());
+            }
         }
-
         return dimSettings;
     }
 

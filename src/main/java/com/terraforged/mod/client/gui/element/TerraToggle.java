@@ -34,6 +34,7 @@ import java.util.List;
 
 public class TerraToggle extends TerraButton {
 
+    private final boolean noname;
     private final String prefix;
     private final String name;
     private final CompoundNBT value;
@@ -50,6 +51,7 @@ public class TerraToggle extends TerraButton {
         this.prefix = Element.getDisplayName(name, value) + ": ";
         this.tooltip = Element.getToolTip(name, value);
         CompoundNBT meta = value.getCompound("#" + name);
+        this.noname = meta.contains("noname");
         this.options = meta.getList("options", Constants.NBT.TAG_STRING);
         for (int i = 0; i < options.size(); i++) {
             String s = options.getString(i);
@@ -58,7 +60,12 @@ public class TerraToggle extends TerraButton {
                 break;
             }
         }
-        setMessage(prefix + value.getString(name));
+
+        if (noname) {
+            setMessage(value.getString(name));
+        } else {
+            setMessage(prefix + value.getString(name));
+        }
     }
 
     public TerraToggle callback(Runnable runnable) {
@@ -92,7 +99,11 @@ public class TerraToggle extends TerraButton {
         }
         String option = options.getString(index);
         value.putString(name, option);
-        setMessage(prefix + option);
+        if (noname) {
+            setMessage(option);
+        } else {
+            setMessage(prefix + option);
+        }
         callback.run();
     }
 }
