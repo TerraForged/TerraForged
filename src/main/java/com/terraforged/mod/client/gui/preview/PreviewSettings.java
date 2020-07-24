@@ -33,6 +33,7 @@ import com.terraforged.core.serialization.annotation.Serializable;
 @Serializable
 public class PreviewSettings {
 
+    public static boolean showTooltips = false;
     public static boolean showCoords = false;
 
     @Range(min = 1, max = 100)

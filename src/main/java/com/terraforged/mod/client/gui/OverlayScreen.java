@@ -25,23 +25,26 @@
 
 package com.terraforged.mod.client.gui;
 
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.terraforged.mod.client.gui.element.CheckBox;
 import com.terraforged.mod.client.gui.element.Element;
 import com.terraforged.mod.client.gui.preview.PreviewSettings;
+import com.terraforged.mod.config.ConfigManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class OverlayScreen extends Screen implements OverlayRenderer {
-
-    public boolean showTooltips = false;
+    private final CommentedFileConfig config;
 
     public OverlayScreen() {
         super(new TranslationTextComponent(""));
-        PreviewSettings.showCoords = false;
         super.minecraft = Minecraft.getInstance();
         super.font = minecraft.fontRenderer;
+        this.config = ConfigManager.GENERAL.get();
+        PreviewSettings.showTooltips = config.getOrElse("tooltips", true);
+        PreviewSettings.showCoords = config.getOrElse("coords", false);
     }
 
     @Override
@@ -52,7 +55,7 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         super.render(mouseX, mouseY, partialTicks);
-        if (showTooltips) {
+        if (PreviewSettings.showTooltips) {
             renderOverlays(this, mouseX, mouseY);
         }
     }
@@ -71,11 +74,13 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
 
     @Override
     protected void init() {
-        addButton(new CheckBox(GuiKeys.TOOLTIPS.get(), showTooltips) {
+        addButton(new CheckBox(GuiKeys.TOOLTIPS.get(), PreviewSettings.showTooltips) {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 super.onClick(mouseX, mouseY);
-                showTooltips = isChecked();
+                PreviewSettings.showTooltips = isChecked();
+                config.set("tooltips", PreviewSettings.showTooltips);
+                config.save();
             }
 
             @Override
@@ -86,11 +91,13 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
             }
         });
 
-        addButton(new CheckBox(GuiKeys.COORDS.get(), showTooltips) {
+        addButton(new CheckBox(GuiKeys.COORDS.get(), PreviewSettings.showCoords) {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 super.onClick(mouseX, mouseY);
                 PreviewSettings.showCoords = isChecked();
+                config.set("coords", PreviewSettings.showCoords);
+                config.save();
             }
 
             @Override

@@ -257,6 +257,8 @@
   "tooltip.terraforged.miscellaneous.vanilla_lakes": "Allow vanilla lakes to generate",
   "tooltip.terraforged.miscellaneous.vanilla_lava_lakes": "Allow vanilla lava-lakes to generate",
   "tooltip.terraforged.miscellaneous.vanilla_springs": "Allow vanilla springs (water source blocks) to generate",
+  "tooltip.terraforged.preview.display": "Controls the rendering mode on the preview map",
+  "tooltip.terraforged.preview.zoom": "Controls the zoom level of the preview map",
   "tooltip.terraforged.rivers.branch_rivers.bank_width": "Controls the river-banks width",
   "tooltip.terraforged.rivers.branch_rivers.bed_depth": "Controls the depth of the river",
   "tooltip.terraforged.rivers.branch_rivers.bed_width": "Controls the river-bed width",

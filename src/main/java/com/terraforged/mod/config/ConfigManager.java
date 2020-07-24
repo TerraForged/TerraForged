@@ -63,6 +63,21 @@ public class ConfigManager {
         );
     }));
 
+    public static final ConfigRef GENERAL = new ConfigRef(() -> create("general", cfg -> {
+        set(
+                cfg,
+                "tooltips",
+                true,
+                "Set whether tooltips should be displayed by default in the config gui."
+        );
+        set(
+                cfg,
+                "coords",
+                false,
+                "Set whether coordinates should be displayed by default in the config gui."
+        );
+    }));
+
     public static void init() {
         Config.setInsertionOrderPreserved(true);
         BIOME_WEIGHTS.get();
