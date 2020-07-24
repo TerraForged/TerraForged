@@ -53,9 +53,6 @@ import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 
 import java.io.File;
 
-/**
- * Author <dags@dags.me>
- */
 @Mod("terraforged")
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class TerraForgedMod {
