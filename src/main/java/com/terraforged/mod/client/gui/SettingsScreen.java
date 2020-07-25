@@ -178,9 +178,10 @@ public class SettingsScreen extends OverlayScreen {
     @Override
     public boolean mouseClicked(double x, double y, int button) {
         boolean a = pages[pageIndex].action(pane -> pane.mouseClicked(x, y, button));
-        boolean b =  isPresetsPage() || preview.action(pane -> pane.mouseClicked(x, y, button));;
-        boolean c = super.mouseClicked(x, y, button);
-        return a || b || c;
+        boolean b =  isPresetsPage() || preview.action(pane -> pane.mouseClicked(x, y, button));
+        boolean c = preview.getPreviewWidget().click(x, y);
+        boolean d = super.mouseClicked(x, y, button);
+        return a || b || c || d;
     }
 
     @Override

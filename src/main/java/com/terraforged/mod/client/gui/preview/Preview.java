@@ -98,6 +98,15 @@ public class Preview extends Button {
         threadPool.shutdown();
     }
 
+    public boolean click(double mx, double my) {
+        if (updateLegend((int) mx, (int) my) && !hoveredCoords.isEmpty()) {
+            super.playDownSound(Minecraft.getInstance().getSoundHandler());
+            Minecraft.getInstance().keyboardListener.setClipboardString(hoveredCoords);
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void render(int mx, int my, float partialTicks) {
         this.height = getSize();
@@ -116,6 +125,8 @@ public class Preview extends Button {
         updateLegend(mx, my);
 
         renderLegend(mx, my, labels, values, x, y + width, 10, 0xFFFFFF);
+
+
     }
 
     public void update(Settings settings, CompoundNBT prevSettings) {
@@ -195,7 +206,7 @@ public class Preview extends Button {
         return renderer.getAsync(center.x, center.z, getZoom(), false);
     }
 
-    private void updateLegend(int mx ,int my) {
+    private boolean updateLegend(int mx ,int my) {
         if (tile != null) {
             int left = this.x;
             int top = this.y;
@@ -218,10 +229,12 @@ public class Preview extends Button {
                 int dz = (iz - (tile.getBlockSize().size / 2)) * zoom;
 
                 hoveredCoords = (center.x + dx) + ":" + (center.z + dz);
+                return true;
             } else {
                 hoveredCoords = "";
             }
         }
+        return false;
     }
 
     private float getLegendScale() {
