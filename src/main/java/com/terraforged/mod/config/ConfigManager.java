@@ -15,17 +15,15 @@ import java.util.function.Consumer;
 
 public class ConfigManager {
 
-    private static final Path COMMON_DIR = Paths.get("config", "terraforged");
+    private static final Path COMMON_DIR = Paths.get("config", "terraforged").toAbsolutePath();
 
-    public static final ConfigRef BIOME_WEIGHTS = new ConfigRef(() -> create("biome_weights", cfg -> {
-        set(
-                cfg,
-                "terraforged:example_biome",
-                10,
-                "Configure biome weights by entering their id and an integer value for their weight (default weight is 10)",
-                "This config will override the weights configured or provided by other mods for TerraForged worlds only."
-        );
-    }));
+    public static final ConfigRef BIOME_WEIGHTS = new ConfigRef(() -> create("biome_weights", cfg -> set(
+            cfg,
+            "terraforged:example_biome",
+            10,
+            "Configure biome weights by entering their id and an integer value for their weight (default weight is 10)",
+            "This config will override the weights configured or provided by other mods for TerraForged worlds only."
+    )));
 
     public static final ConfigRef PERFORMANCE = new ConfigRef(() -> create("performance", cfg -> {
         set (

@@ -20,7 +20,7 @@ import java.io.Writer;
 
 public class SettingsHelper {
 
-    public static final File SETTINGS_DIR = new File("config", "terraforged");
+    public static final File SETTINGS_DIR = new File("config", "terraforged").getAbsoluteFile();
     public static final File DEFAULTS_FILE = new File(SETTINGS_DIR, "generator-defaults.json");
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
