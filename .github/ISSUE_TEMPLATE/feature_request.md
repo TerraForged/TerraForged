@@ -1,22 +1,19 @@
 ---
 name: Feature request
-about: Suggest an idea or request a feature that you think would improve TerraForged
+about: Suggest an idea for this project
 title: ''
-labels: enhancement, review
+labels: review
 assignees: ''
 
 ---
 
-_Please take a look through the [existing enhancements](https://github.com/TerraForged/TerraForged/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3Aenhancement+) to see if yours has already been suggested. Feel free to add your own thoughts to the thread :)_
+**Feature requests should adhere to the following guidlines:**
+- be concise & describe in high-level terms (ie "please add a sand dunes biome, here's a picture")
+- technical proposals or system overhauls should be demonstrated in a working fork/pull-request
+- please do not solicit with the promise of donations and such
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Please describe the feature you'd like to see:**
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**What considerations for gameplay/performance/user-experience should be made:**
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
-
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**What alternatives or examples have you considered:**

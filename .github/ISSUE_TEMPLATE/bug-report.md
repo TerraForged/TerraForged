@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Help improve TerraForged by reporting bugs and inter-mod compatibility problems
+about: Report bugs and/or inter-mod compatibility problems
 title: ''
 labels: review
 assignees: ''
