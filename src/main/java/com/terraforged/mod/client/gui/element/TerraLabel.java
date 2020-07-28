@@ -30,15 +30,23 @@ import net.minecraft.client.gui.FontRenderer;
 
 public class TerraLabel extends TerraButton {
 
+    private int color = 0xFFFFFF;
+
     public TerraLabel(String text) {
         super(text);
         visible = true;
+    }
+
+    public TerraLabel(String text, String toolTip, int color) {
+        super(text, toolTip);
+        this.color = color;
+        this.visible = true;
     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         Minecraft minecraft = Minecraft.getInstance();
         FontRenderer fontrenderer = minecraft.fontRenderer;
-        fontrenderer.drawStringWithShadow(getMessage(), x, y + (height - 8) / 2, 0xFFFFFF);
+        fontrenderer.drawStringWithShadow(getMessage(), x, y + (height - 8) / 2F, color);
     }
 }

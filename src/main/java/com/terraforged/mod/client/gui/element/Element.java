@@ -28,7 +28,6 @@ package com.terraforged.mod.client.gui.element;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.CompoundNBT;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;

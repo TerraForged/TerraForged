@@ -97,7 +97,7 @@ public class PresetsPage extends BasePage {
 
             @Override
             public void render(int x, int z, float ticks) {
-                super.active = hasSelectedPreset();
+                super.active = hasSelectedPreset(false);
                 super.render(x, z, ticks);
             }
 
@@ -112,7 +112,7 @@ public class PresetsPage extends BasePage {
 
             @Override
             public void render(int x, int z, float ticks) {
-                super.active = hasSelectedPreset();
+                super.active = hasSelectedPreset(true);
                 super.render(x, z, ticks);
             }
 
@@ -120,11 +120,16 @@ public class PresetsPage extends BasePage {
             public void onClick(double x, double y) {
                 super.onClick(x, y);
                 getSelected().ifPresent(preset -> {
+                    if (preset.internal()) {
+                        return;
+                    }
+
                     // create a copy of the settings
                     TerraSettings settings = instance.createCopy();
 
                     // replace the current preset with the updated version
                     manager.add(new Preset(preset.getName(), settings));
+                    manager.saveAll();
 
                     // update the ui
                     rebuildPresetList();
@@ -136,7 +141,7 @@ public class PresetsPage extends BasePage {
 
             @Override
             public void render(int x, int z, float ticks) {
-                super.active = hasSelectedPreset();
+                super.active = hasSelectedPreset(true);
                 super.render(x, z, ticks);
             }
 
@@ -144,6 +149,10 @@ public class PresetsPage extends BasePage {
             public void onClick(double x, double y) {
                 super.onClick(x, y);
                 getSelected().ifPresent(preset -> {
+                    if (preset.internal()) {
+                        return;
+                    }
+
                     // create new preset with the same name but default settings
                     Preset reset = new Preset(preset.getName(), new TerraSettings());
 
@@ -160,7 +169,7 @@ public class PresetsPage extends BasePage {
 
             @Override
             public void render(int x, int z, float ticks) {
-                super.active = hasSelectedPreset();
+                super.active = hasSelectedPreset(true);
                 super.render(x, z, ticks);
             }
 
@@ -168,6 +177,9 @@ public class PresetsPage extends BasePage {
             public void onClick(double x, double y) {
                 super.onClick(x, y);
                 getSelected().ifPresent(preset -> {
+                    if (preset.internal()) {
+                        return;
+                    }
                     // remove & update the ui
                     manager.remove(preset.getName());
                     rebuildPresetList();
@@ -208,8 +220,8 @@ public class PresetsPage extends BasePage {
         }
     }
 
-    private boolean hasSelectedPreset() {
-        return getColumn(0).scrollPane.getSelected() != null;
+    private boolean hasSelectedPreset(boolean checkEditable) {
+        return getSelected().map(preset -> !checkEditable || !preset.internal()).orElse(false);
     }
 
     private void load(Preset preset) {
@@ -243,7 +255,11 @@ public class PresetsPage extends BasePage {
         left.scrollPane.children().clear();
 
         for (Preset preset : manager) {
-            left.scrollPane.addButton(new TerraLabel(preset.getName()));
+            if (preset.internal()) {
+                left.scrollPane.addButton(new TerraLabel(preset.getName(), preset.getDescription(), 0xAAAAAA));
+            } else {
+                left.scrollPane.addButton(new TerraLabel(preset.getName()));
+            }
         }
     }
 
