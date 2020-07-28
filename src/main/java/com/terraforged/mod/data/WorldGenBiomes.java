@@ -41,37 +41,41 @@ import java.io.Writer;
 public class WorldGenBiomes extends DataGen {
 
     public static void genBiomeMap(File dataDir) {
-        BiomeMap map = BiomeHelper.createBiomeMap();
-        try (Writer writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_map.json")))) {
-            new GsonBuilder().setPrettyPrinting().create().toJson(map.toJson(), writer);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (dataDir.exists() || dataDir.mkdirs()) {
+            BiomeMap map = BiomeHelper.createBiomeMap();
+            try (Writer writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_map.json")))) {
+                new GsonBuilder().setPrettyPrinting().create().toJson(map.toJson(), writer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public static void genBiomeWeights(File dataDir) {
-        BiomeWeights weights = new BiomeWeights();
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_weights.txt")))) {
-            writer.write("# REGISTERED BIOME WEIGHTS\n");
-            weights.forEachEntry((name, weight) -> {
-                try {
-                    writer.write(name + "=" + weight + "\n");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+        if (dataDir.exists() || dataDir.mkdirs()) {
+            BiomeWeights weights = new BiomeWeights();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_weights.txt")))) {
+                writer.write("# REGISTERED BIOME WEIGHTS\n");
+                weights.forEachEntry((name, weight) -> {
+                    try {
+                        writer.write(name + "=" + weight + "\n");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
 
-            writer.write("\n");
-            writer.write("# UNREGISTERED BIOME WEIGHTS\n");
-            weights.forEachUnregistered((name, weight) -> {
-                try {
-                    writer.write(name + "=" + weight + "\n");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
+                writer.write("\n");
+                writer.write("# UNREGISTERED BIOME WEIGHTS\n");
+                weights.forEachUnregistered((name, weight) -> {
+                    try {
+                        writer.write(name + "=" + weight + "\n");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

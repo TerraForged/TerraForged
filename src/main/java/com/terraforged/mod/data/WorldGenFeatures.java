@@ -28,14 +28,16 @@ package com.terraforged.mod.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.JsonOps;
+import com.terraforged.fm.FeatureSerializer;
+import com.terraforged.fm.util.FeatureDebugger;
+import com.terraforged.mod.Log;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.io.File;
+import java.util.List;
 
 public class WorldGenFeatures extends DataGen {
 
@@ -54,10 +56,19 @@ public class WorldGenFeatures extends DataGen {
                 JsonArray features = new JsonArray();
                 for (ConfiguredFeature<?, ?> feature : biome.getFeatures(type)) {
                     try {
-                        Dynamic<JsonElement> dynamic = feature.serialize(JsonOps.INSTANCE);
-                        features.add(dynamic.getValue());
-                    } catch (NullPointerException e) {
-                        new NullPointerException("Badly written feature: " + feature.feature.getRegistryName()).printStackTrace();
+                        JsonElement element = FeatureSerializer.serialize(feature);
+                        features.add(element);
+                    } catch (Throwable t) {
+                        String name = biome.getRegistryName() + "";
+                        List<String> errors = FeatureDebugger.getErrors(feature);
+                        Log.debug("Unable to serialize feature in biome: {}", name);
+                        if (errors.isEmpty()) {
+                            Log.debug("Unable to determine issues. See stacktrace:", t);
+                        } else {
+                            for (String error : errors) {
+                                Log.debug(" - {}", error);
+                            }
+                        }
                     }
                 }
                 root.add(type.getName(), features);
