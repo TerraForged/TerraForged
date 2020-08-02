@@ -3,13 +3,13 @@
   "sapling": "minecraft:jungle_sapling",
   "normal": {
     "terraforged:jungle_small": {
-      "weight": 2
-    },
-    "terraforged:jungle_large": {
       "weight": 1
     }
   },
   "giant": {
+    "terraforged:jungle_large": {
+      "weight": 2
+    },
     "terraforged:jungle_huge": {
       "weight": 1
     }

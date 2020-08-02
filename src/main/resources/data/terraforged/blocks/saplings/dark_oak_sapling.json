@@ -1,0 +1,12 @@
+{
+  "type": "terraforged:sapling",
+  "sapling": "minecraft:spruce_sapling",
+  "giant": {
+    "terraforged:dark_oak_small": {
+      "weight": 1
+    },
+    "terraforged:dark_oak_large": {
+      "weight": 2
+    }
+  }
+}

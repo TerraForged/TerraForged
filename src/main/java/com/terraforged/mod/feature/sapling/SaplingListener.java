@@ -86,8 +86,10 @@ public class SaplingListener {
             return;
         }
 
+
         // translate the pos so that the mirrored/rotated 2x2 grid aligns correctly
-        BlockPos origin = pos.subtract(getTranslation(directions, mirror, rotation));
+        Vec3i translation = getTranslation(directions, mirror, rotation);
+        BlockPos origin = pos.subtract(translation);
 
         // require that directly above the sapling(s) is open air
         if (!isClearOverhead(world, origin, directions)) {
@@ -157,7 +159,8 @@ public class SaplingListener {
                     }
                 }
                 if (match) {
-                    return pos.add(getMin(dirs, Mirror.NONE, Rotation.NONE));
+                    Vec3i min = getMin(dirs, Mirror.NONE, Rotation.NONE);
+                    return pos.add(min);
                 }
             }
         }
@@ -172,19 +175,15 @@ public class SaplingListener {
     }
 
     private static Vec3i getMin(Vec3i[] directions, Mirror mirror, Rotation rotation) {
-        Vec3i min = Vec3i.NULL_VECTOR;
+        int minX = 0;
+        int minZ = 0;
         BlockPos.Mutable pos = new BlockPos.Mutable();
         for (Vec3i vec : directions) {
             BlockPos dir = Template.transform(pos.setPos(vec), mirror, rotation);
-            if (dir.getX() < min.getX() && dir.getZ() <= min.getZ()) {
-                min = dir;
-                continue;
-            }
-            if (dir.getZ() < min.getZ() && dir.getX() <= min.getX()) {
-                min = dir;
-            }
+            minX = Math.min(dir.getX(), minX);
+            minZ = Math.min(dir.getZ(), minZ);
         }
-        return min;
+        return new Vec3i(minX, 0, minZ);
     }
 
     private static Vec3i[] getNeighbours(IWorld world, Block block, BlockPos pos, boolean checkNeighbours) {

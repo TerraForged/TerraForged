@@ -9,13 +9,15 @@
     "check_bounds": true
   },
   "decorators": {
-    "minecraft:alter_ground": {
-      "provider": {
-        "type": "minecraft:simple_state_provider",
-        "state": {
-          "Name": "minecraft:podzol",
-          "Properties": {
-            "snowy": "false"
+    "default": {
+      "minecraft:alter_ground": {
+        "provider": {
+          "type": "minecraft:simple_state_provider",
+          "state": {
+            "Name": "minecraft:podzol",
+            "Properties": {
+              "snowy": "false"
+            }
           }
         }
       }
