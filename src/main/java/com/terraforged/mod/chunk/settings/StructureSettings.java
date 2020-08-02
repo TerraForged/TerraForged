@@ -53,14 +53,14 @@ public class StructureSettings {
     @Serializable
     public static class Structure {
 
-        @Range(min = 5, max = 200)
+        @Range(min = 5, max = 1000)
         @Limit(lower = "separation", pad = 2)
-        @Comment("The maximum distance in chunks between attempts to spawn a structure")
+        @Comment({"The maximum distance in chunks between attempts to spawn a structure", "Values higher than 200 may break the game"})
         public int distance;
 
-        @Range(min = 4, max = 50)
+        @Range(min = 4, max = 1000)
         @Limit(upper = "distance", pad = 2)
-        @Comment("The minimum distance in chunks between structure spawns")
+        @Comment({"The minimum distance in chunks between structure spawns", "Values higher than 200 may break the game"})
         public int separation;
 
         public Structure() {
