@@ -1,6 +1,5 @@
 package com.terraforged.mod.chunk.generator;
 
-import com.terraforged.fm.template.StructureUtils;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.fix.ChunkCarverFix;
 import net.minecraft.util.SharedSeedRandom;
@@ -11,6 +10,7 @@ import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.ListIterator;
 
@@ -24,10 +24,6 @@ public class TerrainCarver implements Generator.Carvers {
 
     @Override
     public void carveTerrain(BiomeManager biomes, IChunk chunk, GenerationStage.Carving type) {
-        if (StructureUtils.hasOvergroundStructure(chunk)) {
-            return;
-        }
-
         chunk = new ChunkCarverFix(chunk, generator.getContext().materials);
 
         SharedSeedRandom random = new SharedSeedRandom();
@@ -37,9 +33,10 @@ public class TerrainCarver implements Generator.Carvers {
         BitSet mask = chunk.getCarvingMask(type);
         Biome biome = generator.getBiome(biomes, chunkpos.asBlockPos());
 
+        ListIterator<ConfiguredCarver<?>> iterator = biome.getCarvers(type).listIterator();
+
         for (int cx = chunkX - 8; cx <= chunkX + 8; ++cx) {
             for (int cz = chunkZ - 8; cz <= chunkZ + 8; ++cz) {
-                ListIterator<ConfiguredCarver<?>> iterator = biome.getCarvers(type).listIterator();
                 while (iterator.hasNext()) {
                     int index = iterator.nextIndex();
                     ConfiguredCarver<?> carver = iterator.next();
@@ -47,6 +44,11 @@ public class TerrainCarver implements Generator.Carvers {
                     if (carver.shouldCarve(random, cx, cz)) {
                         carver.func_227207_a_(chunk, pos -> generator.getBiome(biomes, pos), random, generator.getSeaLevel(), cx, cz, chunkX, chunkZ, mask);
                     }
+                }
+
+                // rewind
+                while (iterator.hasPrevious()) {
+                    iterator.previous();
                 }
             }
         }

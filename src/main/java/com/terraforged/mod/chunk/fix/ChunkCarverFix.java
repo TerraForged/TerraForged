@@ -27,19 +27,23 @@ package com.terraforged.mod.chunk.fix;
 
 import com.terraforged.api.chunk.ChunkDelegate;
 import com.terraforged.api.material.state.States;
+import com.terraforged.fm.template.StructureUtils;
 import com.terraforged.mod.material.Materials;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.Heightmap;
 
 public class ChunkCarverFix implements ChunkDelegate {
 
     private final IChunk delegate;
     private final Materials materials;
+    private final boolean hasSurfaceStructure;
 
     public ChunkCarverFix(IChunk chunk, Materials materials) {
         this.delegate = chunk;
         this.materials = materials;
+        this.hasSurfaceStructure = StructureUtils.hasOvergroundStructure(chunk);
     }
 
     @Override
@@ -69,5 +73,16 @@ public class ChunkCarverFix implements ChunkDelegate {
             return States.SAND.get();
         }
         return state;
+    }
+
+    @Override
+    public BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving) {
+        if (hasSurfaceStructure) {
+            int surface = delegate.getTopBlockY(Heightmap.Type.WORLD_SURFACE, pos.getX(), pos.getZ());
+            if (pos.getY() > surface - 3) {
+                return state;
+            }
+        }
+        return delegate.setBlockState(pos, state, isMoving);
     }
 }
