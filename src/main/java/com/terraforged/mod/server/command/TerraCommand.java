@@ -69,11 +69,14 @@ import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -82,23 +85,32 @@ import java.util.function.Supplier;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TerraCommand {
 
-    private static HashMap<UUID, Integer> searchId;
-    private static final TextFormatting BIOME_DISPLAY_FORMAT = TextFormatting.DARK_GREEN;
-    private static final TextFormatting BIOME_REGISTERED_FORMAT = TextFormatting.ITALIC;
-    private static final TextFormatting TERRAIN_DISPLAY_FORMAT = TextFormatting.DARK_GREEN;
-    private static final TextFormatting BIOME_TYPE_FORMAT = TextFormatting.ITALIC;
-    private static final TextFormatting IDENTIFIER_FORMAT = TextFormatting.GOLD;
+    private static final Map<UUID, Integer> LOCATE_QUERY_IDS = Collections.synchronizedMap(new HashMap<>());
+    private static final TextFormatting DISPLAY_NAME_FORMAT = TextFormatting.DARK_GREEN;
+    private static final TextFormatting INTERNAL_NAME_FORMAT = TextFormatting.ITALIC;
+    private static final TextFormatting LOCATE_QUERY_ID_FORMAT = TextFormatting.GOLD;
 
     public static void init() {
         ArgumentTypes.register("terraforged:biome", BiomeArgType.class, new ArgumentSerializer<>(BiomeArgType::new));
         ArgumentTypes.register("terraforged:terrain", TerrainArgType.class, new ArgumentSerializer<>(TerrainArgType::new));
-        searchId = new HashMap<>();
     }
 
     @SubscribeEvent
     public static void register(FMLServerStartingEvent event) {
         Log.info("Registering /terra command");
         register(event.getCommandDispatcher());
+    }
+
+    @SubscribeEvent
+    public static void register(PlayerEvent.PlayerLoggedInEvent event) {
+        Log.debug("Adding query id entry for {}", event.getPlayer().getDisplayNameAndUUID().getFormattedText());
+        LOCATE_QUERY_IDS.put(event.getPlayer().getUniqueID(), 0);
+    }
+
+    @SubscribeEvent
+    public static void register(PlayerEvent.PlayerLoggedOutEvent event) {
+        Log.debug("Removing query id history for {}", event.getPlayer().getDisplayNameAndUUID().getFormattedText());
+        LOCATE_QUERY_IDS.remove(event.getPlayer().getUniqueID());
     }
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
@@ -278,8 +290,8 @@ public class TerraCommand {
     }
 
     private static int doSearch(MinecraftServer server, UUID userId, Supplier<BlockPos> supplier) {
-        searchId.putIfAbsent(userId, 0);
-        int identifier = searchId.get(userId);
+        // Use getOrDefault in case player has disconnected before this command executes
+        int identifier = LOCATE_QUERY_IDS.getOrDefault(userId, 0);
         CompletableFuture.supplyAsync(supplier).thenAccept(pos -> server.deferTask(() -> {
             PlayerEntity player = server.getPlayerList().getPlayerByUUID(userId);
             if (player == null) {
@@ -301,7 +313,8 @@ public class TerraCommand {
 
             player.sendMessage(result);
         }));
-        searchId.replace(userId, identifier+1);
+        // Use replace so that if player has disconnected, an entry is not re-added
+        LOCATE_QUERY_IDS.replace(userId, identifier+1);
         return identifier;
     }
 
@@ -355,29 +368,29 @@ public class TerraCommand {
         return new StringTextComponent("") // Gotta make sure parent style is default
                    .appendSibling(TextComponentUtils.wrapInSquareBrackets(new StringTextComponent(
                         String.format("%03d", identifier)
-                   )).applyTextStyle(IDENTIFIER_FORMAT));
+                   )).applyTextStyle(LOCATE_QUERY_ID_FORMAT));
     }
 
     private static ITextComponent createTerrainMessage(Terrain terrain) {
         return new StringTextComponent("") // Gotta make sure parent style is default
-                   .appendSibling(new StringTextComponent(terrain.getName()).applyTextStyle(TERRAIN_DISPLAY_FORMAT));
+                   .appendSibling(new StringTextComponent(terrain.getName()).applyTextStyle(DISPLAY_NAME_FORMAT));
     }
 
     private static ITextComponent createBiomeDisplayMessage(Biome biome) {
         return new StringTextComponent("") // Gotta make sure parent style is default
                    .appendSibling(biome.getDisplayName())
-                       .applyTextStyle((style) -> style.setColor(BIOME_DISPLAY_FORMAT)
+                       .applyTextStyle((style) -> style.setColor(DISPLAY_NAME_FORMAT)
                                                        .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, createBiomeRegistryMessage(biome)))
                        );
     }
 
     private static ITextComponent createBiomeRegistryMessage(Biome biome) {
         return new StringTextComponent("") // Gotta make sure parent style is default
-                   .appendSibling(new StringTextComponent("" + biome.getRegistryName()).applyTextStyle(BIOME_REGISTERED_FORMAT));
+                   .appendSibling(new StringTextComponent("" + biome.getRegistryName()).applyTextStyle(INTERNAL_NAME_FORMAT));
     }
 
     private static ITextComponent createBiomeTypeMessage(BiomeType biomeType) {
         return new StringTextComponent("") // Gotta make sure parent style is default
-                   .appendSibling(new StringTextComponent(biomeType.name()).applyTextStyle(BIOME_TYPE_FORMAT));
+                   .appendSibling(new StringTextComponent(biomeType.name()).applyTextStyle(INTERNAL_NAME_FORMAT));
     }
 }
