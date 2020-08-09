@@ -12,6 +12,8 @@ mod jar just use the gradle build task. The jar will output to the `build/libs` 
 ```shell script
 git clone --recursive https://github.com/TerraForged/TerraForged.git
 
+cd TerraForged
+
 ./gradlew build
 ```
 
