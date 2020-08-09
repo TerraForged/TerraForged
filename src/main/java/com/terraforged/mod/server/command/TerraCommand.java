@@ -80,15 +80,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TerraCommand {
 
-    private static final Map<UUID, Integer> LOCATE_QUERY_IDS = Collections.synchronizedMap(new HashMap<>());
+    private static final Map<UUID, Integer> SEARCH_IDS = Collections.synchronizedMap(new HashMap<>());
+    private static final BiFunction<UUID, Integer, Integer> INCREMENTER = (k, v) -> v == null ? 0 : v + 1;
+
     private static final TextFormatting DISPLAY_NAME_FORMAT = TextFormatting.DARK_GREEN;
     private static final TextFormatting INTERNAL_NAME_FORMAT = TextFormatting.ITALIC;
-    private static final TextFormatting LOCATE_QUERY_ID_FORMAT = TextFormatting.GOLD;
+    private static final TextFormatting SEARCH_ID_FORMAT = TextFormatting.GOLD;
 
     public static void init() {
         ArgumentTypes.register("terraforged:biome", BiomeArgType.class, new ArgumentSerializer<>(BiomeArgType::new));
@@ -102,15 +105,8 @@ public class TerraCommand {
     }
 
     @SubscribeEvent
-    public static void register(PlayerEvent.PlayerLoggedInEvent event) {
-        Log.debug("Adding query id entry for {}", event.getPlayer().getDisplayNameAndUUID().getFormattedText());
-        LOCATE_QUERY_IDS.put(event.getPlayer().getUniqueID(), 0);
-    }
-
-    @SubscribeEvent
-    public static void register(PlayerEvent.PlayerLoggedOutEvent event) {
-        Log.debug("Removing query id history for {}", event.getPlayer().getDisplayNameAndUUID().getFormattedText());
-        LOCATE_QUERY_IDS.remove(event.getPlayer().getUniqueID());
+    public static void disconnect(PlayerEvent.PlayerLoggedOutEvent event) {
+        SEARCH_IDS.remove(event.getPlayer().getUniqueID());
     }
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
@@ -290,11 +286,11 @@ public class TerraCommand {
     }
 
     private static int doSearch(MinecraftServer server, UUID userId, Supplier<BlockPos> supplier) {
-        // Use getOrDefault in case player has disconnected before this command executes
-        int identifier = LOCATE_QUERY_IDS.getOrDefault(userId, 0);
+        int identifier = SEARCH_IDS.compute(userId, INCREMENTER);
         CompletableFuture.supplyAsync(supplier).thenAccept(pos -> server.deferTask(() -> {
             PlayerEntity player = server.getPlayerList().getPlayerByUUID(userId);
             if (player == null) {
+                SEARCH_IDS.remove(userId);
                 return;
             }
 
@@ -313,8 +309,6 @@ public class TerraCommand {
 
             player.sendMessage(result);
         }));
-        // Use replace so that if player has disconnected, an entry is not re-added
-        LOCATE_QUERY_IDS.replace(userId, identifier+1);
         return identifier;
     }
 
@@ -368,7 +362,7 @@ public class TerraCommand {
         return new StringTextComponent("") // Gotta make sure parent style is default
                    .appendSibling(TextComponentUtils.wrapInSquareBrackets(new StringTextComponent(
                         String.format("%03d", identifier)
-                   )).applyTextStyle(LOCATE_QUERY_ID_FORMAT));
+                   )).applyTextStyle(SEARCH_ID_FORMAT));
     }
 
     private static ITextComponent createTerrainMessage(Terrain terrain) {
