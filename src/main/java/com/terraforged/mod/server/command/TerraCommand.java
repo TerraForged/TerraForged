@@ -46,7 +46,6 @@ import com.terraforged.mod.server.command.search.BothSearchTask;
 import com.terraforged.mod.server.command.search.Search;
 import com.terraforged.mod.server.command.search.TerrainSearchTask;
 import com.terraforged.world.WorldGenerator;
-import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.Terrains;
 import net.minecraft.command.CommandSource;
@@ -89,9 +88,8 @@ public class TerraCommand {
     private static final Map<UUID, Integer> SEARCH_IDS = Collections.synchronizedMap(new HashMap<>());
     private static final BiFunction<UUID, Integer, Integer> INCREMENTER = (k, v) -> v == null ? 0 : v + 1;
 
-    private static final TextFormatting DISPLAY_NAME_FORMAT = TextFormatting.DARK_GREEN;
-    private static final TextFormatting INTERNAL_NAME_FORMAT = TextFormatting.ITALIC;
-    private static final TextFormatting SEARCH_ID_FORMAT = TextFormatting.GOLD;
+    private static final TextFormatting TITLE_FORMAT = TextFormatting.ITALIC;
+    private static final TextFormatting PREFIX_FORMAT = TextFormatting.GOLD;
 
     public static void init() {
         ArgumentTypes.register("terraforged:biome", BiomeArgType.class, new ArgumentSerializer<>(BiomeArgType::new));
@@ -152,11 +150,11 @@ public class TerraCommand {
             context.getSource().sendFeedback(new StringTextComponent("At ")
                     .appendSibling(createTeleportMessage(pos))
                     .appendSibling(new StringTextComponent(": Terrain = "))
-                    .appendSibling(createTerrainMessage(cell.get().terrain))
+                    .appendSibling(createTitle(cell.get().terrain.getName()))
                     .appendSibling(new StringTextComponent(", Biome = "))
-                    .appendSibling(createBiomeRegistryMessage(biome))
+                    .appendSibling(createTitle(biome.getRegistryName().toString()))
                     .appendSibling(new StringTextComponent(", BiomeType = "))
-                    .appendSibling(createBiomeTypeMessage(cell.get().biomeType)),
+                    .appendSibling(createTitle(cell.get().biomeType.name())),
                     false
             );
         }
@@ -200,9 +198,9 @@ public class TerraCommand {
         context.getSource().sendFeedback(new StringTextComponent("At ")
                         .appendSibling(createTeleportMessage(position))
                         .appendSibling(new StringTextComponent(": Actual Biome = "))
-                        .appendSibling(createBiomeRegistryMessage(actual))
+                        .appendSibling(createTitle(actual.getRegistryName().toString()))
                         .appendSibling(new StringTextComponent(", Lookup Biome = "))
-                        .appendSibling(createBiomeRegistryMessage(biome2)),
+                        .appendSibling(createTitle(biome2.getRegistryName().toString())),
                 false
         );
 
@@ -224,9 +222,9 @@ public class TerraCommand {
         WorldGenerator generator = terraContext.factory.get();
         Search search = new TerrainSearchTask(pos, type, getChunkGenerator(context), generator);
         int identifier = doSearch(server, playerID, search);
-        context.getSource().sendFeedback(createIdentifierMessage(identifier)
+        context.getSource().sendFeedback(createPrefix(identifier)
                                          .appendSibling(new StringTextComponent(" Searching for "))
-                                         .appendSibling(createTerrainMessage(type))
+                                         .appendSibling(createTitle(type.getName()))
                                          .appendSibling(new StringTextComponent("..."))
                                          , false);
 
@@ -247,9 +245,9 @@ public class TerraCommand {
         ServerWorld world = context.getSource().asPlayer().getServerWorld();
         Search search = new BiomeSearchTask(pos, biome, world.getChunkProvider().getChunkGenerator(), getBiomeProvider(context));
         int identifier = doSearch(server, playerID, search);
-        context.getSource().sendFeedback(createIdentifierMessage(identifier)
+        context.getSource().sendFeedback(createPrefix(identifier)
                                          .appendSibling(new StringTextComponent(" Searching for "))
-                                         .appendSibling(createBiomeDisplayMessage(biome))
+                                         .appendSibling(createTitleWithHover(biome.getDisplayName().getFormattedText(), biome.getRegistryName().toString()))
                                          .appendSibling(new StringTextComponent("..."))
                                          , false);
 
@@ -274,11 +272,11 @@ public class TerraCommand {
         Search terrainSearch = new TerrainSearchTask(pos, target, getChunkGenerator(context), generator);
         Search search = new BothSearchTask(pos, biomeSearch, terrainSearch);
         int identifier = doSearch(server, playerID, search);
-        context.getSource().sendFeedback(createIdentifierMessage(identifier)
+        context.getSource().sendFeedback(createPrefix(identifier)
                                          .appendSibling(new StringTextComponent(" Searching for "))
-                                         .appendSibling(createBiomeDisplayMessage(biome))
+                                         .appendSibling(createTitleWithHover(biome.getDisplayName().getFormattedText(), biome.getRegistryName().toString()))
                                          .appendSibling(new StringTextComponent(" and "))
-                                         .appendSibling(createTerrainMessage(target))
+                                         .appendSibling(createTitle(target.getName()))
                                          .appendSibling(new StringTextComponent("..."))
                                          , false);
 
@@ -295,14 +293,14 @@ public class TerraCommand {
             }
 
             if (pos == BlockPos.ZERO) {
-                player.sendMessage(createIdentifierMessage(identifier)
+                player.sendMessage(createPrefix(identifier)
                                    .appendSibling(new StringTextComponent(" Location not found :[")));
                 return;
             }
 
             double distance = Math.sqrt(player.getPosition().distanceSq(pos));
 
-            ITextComponent result = createIdentifierMessage(identifier)
+            ITextComponent result = createPrefix(identifier)
                                     .appendSibling(new StringTextComponent(" Nearest match: "))
                                     .appendSibling(createTeleportMessage(pos))
                                     .appendSibling(new StringTextComponent(String.format(" Distance: %.2f", distance)));
@@ -358,33 +356,22 @@ public class TerraCommand {
         );
     }
 
-    private static ITextComponent createIdentifierMessage(int identifier) {
+    private static ITextComponent createPrefix(int identifier) {
         return new StringTextComponent("") // Gotta make sure parent style is default
                    .appendSibling(TextComponentUtils.wrapInSquareBrackets(new StringTextComponent(
                         String.format("%03d", identifier)
-                   )).applyTextStyle(SEARCH_ID_FORMAT));
+                   )).applyTextStyle(PREFIX_FORMAT));
     }
 
-    private static ITextComponent createTerrainMessage(Terrain terrain) {
+    private static ITextComponent createTitle(String name) {
         return new StringTextComponent("") // Gotta make sure parent style is default
-                   .appendSibling(new StringTextComponent(terrain.getName()).applyTextStyle(DISPLAY_NAME_FORMAT));
+                   .appendSibling(new StringTextComponent(name).applyTextStyle(TITLE_FORMAT));
     }
 
-    private static ITextComponent createBiomeDisplayMessage(Biome biome) {
-        return new StringTextComponent("") // Gotta make sure parent style is default
-                   .appendSibling(biome.getDisplayName())
-                       .applyTextStyle((style) -> style.setColor(DISPLAY_NAME_FORMAT)
-                                                       .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, createBiomeRegistryMessage(biome)))
-                       );
-    }
-
-    private static ITextComponent createBiomeRegistryMessage(Biome biome) {
-        return new StringTextComponent("") // Gotta make sure parent style is default
-                   .appendSibling(new StringTextComponent("" + biome.getRegistryName()).applyTextStyle(INTERNAL_NAME_FORMAT));
-    }
-
-    private static ITextComponent createBiomeTypeMessage(BiomeType biomeType) {
-        return new StringTextComponent("") // Gotta make sure parent style is default
-                   .appendSibling(new StringTextComponent(biomeType.name()).applyTextStyle(INTERNAL_NAME_FORMAT));
+    private static ITextComponent createTitleWithHover(String display, String hover) {
+        return createTitle(display)
+                .appendSibling(new StringTextComponent(hover)
+                    .applyTextStyle((style) -> style.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, createTitle(hover))))
+                );
     }
 }
