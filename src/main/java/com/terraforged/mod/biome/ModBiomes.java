@@ -25,63 +25,60 @@
 
 package com.terraforged.mod.biome;
 
-import com.terraforged.api.biome.BiomeVariant;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.ArrayList;
-
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModBiomes {
 
-    private static final ArrayList<BiomeVariant> biomes = new ArrayList<>();
+    public static final RegistryKey<Biome> BRYCE = create("bryce");
+    public static final RegistryKey<Biome> COLD_STEPPE = create("cold_steppe");
+    public static final RegistryKey<Biome> COLD_MARSHLAND = create("cold_marshland");
+    public static final RegistryKey<Biome> ERODED_PINNACLE = create("stone_forest");
+    public static final RegistryKey<Biome> FIR_FOREST = create("fir_forest");
+    public static final RegistryKey<Biome> FLOWER_PLAINS = create("flower_plains");
+    public static final RegistryKey<Biome> FROZEN_LAKE = create("frozen_lake");
+    public static final RegistryKey<Biome> LAKE = create("lake");
+    public static final RegistryKey<Biome> MARSHLAND = create("marshland");
+    public static final RegistryKey<Biome> SAVANNA_SCRUB = create("savanna_scrub");
+    public static final RegistryKey<Biome> SHATTERED_SAVANNA_SCRUB = create("shattered_savanna_scrub");
+    public static final RegistryKey<Biome> SNOWY_FIR_FOREST = create("snowy_fir_forest");
+    public static final RegistryKey<Biome> SNOWY_TAIGA_SCRUB = create("snowy_taiga_scrub");
+    public static final RegistryKey<Biome> STEPPE = create("steppe");
+    public static final RegistryKey<Biome> TAIGA_SCRUB = create("taiga_scrub");
+    public static final RegistryKey<Biome> WARM_BEACH = create("warm_beach");
 
-    public static final Biome BRYCE = register(new Bryce());
-    public static final Biome COLD_STEPPE = register(new ColdSteppe());
-    public static final Biome COLD_MARSHLAND = register(new ColdMarshland());
-    public static final Biome ERODED_PINNACLE = register(new StoneForest());
-    public static final Biome FIR_FOREST = register(new FirForest());
-    public static final Biome FLOWER_PLAINS = register(new FlowerPlains());
-    public static final Biome FROZEN_LAKE = register(new FrozenLake());
-    public static final Biome LAKE = register(new Lake());
-    public static final Biome MARSHLAND = register(new Marshland());
-    public static final Biome SAVANNA_SCRUB = register(new SavannaScrub());
-    public static final Biome SHATTERED_SAVANNA_SCRUB = register(new ShatteredSavannaScrub());
-    public static final Biome SNOWY_FIR_FOREST = register(new SnowyFirForest());
-    public static final Biome SNOWY_TAIGA_SCRUB = register(new SnowyTaigaScrub());
-    public static final Biome STEPPE = register(new Steppe());
-    public static final Biome TAIGA_SCRUB = register(new TaigaScrub());
-    public static final Biome WARM_BEACH = register(new WarmBeach());
+    private static RegistryKey<Biome> create(String name) {
+        return RegistryKey.func_240903_a_(Registry.BIOME_KEY, new ResourceLocation("terraforged", name));
+    }
 
-    private static Biome register(BiomeVariant biome) {
-        biomes.add(biome);
-        return biome;
+    private static RegistryKey<Biome> register(Biome biome) {
+        return RegistryKey.func_240903_a_(Registry.BIOME_KEY, new ResourceLocation("todo"));
     }
 
     @SubscribeEvent
-    public static void register(RegistryEvent.Register<Biome> event) {
-        biomes.forEach(biome -> {
-            event.getRegistry().register(biome);
-
-            // TF biomes can specify a custom biome weight
-            biome.registerWeights();
-
-            // let forge generate the BiomeDictionary.Type's since TF biomes are just variants of vanilla ones
-            BiomeDictionary.makeBestGuess(biome);
-
-            // overworld is required for TerraForged
-            BiomeDictionary.addTypes(biome, BiomeDictionary.Type.OVERWORLD);
-
-            // if a variant of a rare biome, register as such
-            if (BiomeDictionary.getTypes(biome.getBase()).contains(BiomeDictionary.Type.RARE)) {
-                BiomeDictionary.addTypes(biome, BiomeDictionary.Type.RARE);
-            }
-        });
-
-        biomes.clear();
-        biomes.trimToSize();
+    public static void register(RegistryEvent.Register event) {
+//        biomes.forEach(biome -> {
+//            event.getRegistry().register(biome.get());
+//
+//            // TF biomes can specify a custom biome weight
+//            biome.registerWeights();
+//
+//            // let forge generate the BiomeDictionary.Type's since TF biomes are just variants of vanilla ones
+//            BiomeDictionary.makeBestGuess(biome.get());
+//
+//            // overworld is required for TerraForged
+//            BiomeDictionary.addTypes(biome.get(), BiomeDictionary.Type.OVERWORLD);
+//
+//            // if a variant of a rare biome, register as such
+//            if (BiomeDictionary.getTypes(biome.getBase()).contains(BiomeDictionary.Type.RARE)) {
+//                BiomeDictionary.addTypes(biome.get(), BiomeDictionary.Type.RARE);
+//            }
+//        });
     }
 }

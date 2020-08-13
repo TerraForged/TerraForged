@@ -25,6 +25,7 @@
 
 package com.terraforged.mod.chunk;
 
+import com.mojang.serialization.Codec;
 import com.terraforged.api.biome.surface.SurfaceManager;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.material.layer.LayerManager;
@@ -35,7 +36,7 @@ import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.core.tile.gen.TileCache;
 import com.terraforged.fm.FeatureManager;
 import com.terraforged.fm.data.DataManager;
-import com.terraforged.fm.structure.StructureManager;
+import com.terraforged.fm.structure.FMStructureManager;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.generator.BiomeGenerator;
 import com.terraforged.mod.chunk.generator.FeatureGenerator;
@@ -51,23 +52,31 @@ import com.terraforged.mod.material.geology.GeoManager;
 import com.terraforged.mod.util.setup.SetupHooks;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
+import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
+import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.TemplateManager;
-import net.minecraft.world.server.ServerWorld;
 
 import java.util.List;
 
-public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
+public class TerraChunkGenerator extends ChunkGenerator {
+
+    private final long seed;
 
     private final TerraContext context;
+    private final DimensionSettings settings;
     private final TerraBiomeProvider biomeProvider;
 
     private final Generator.Mobs mobGenerator;
@@ -80,7 +89,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
 
     private final GeoManager geologyManager;
     private final FeatureManager featureManager;
-    private final StructureManager structureManager;
+    private final FMStructureManager structureManager;
     private final SurfaceManager surfaceManager;
     private final BlockDataManager blockDataManager;
     private final List<ColumnDecorator> baseDecorators;
@@ -88,9 +97,11 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
 
     private final TileCache tileCache;
 
-    public TerraChunkGenerator(TerraContext context, TerraBiomeProvider biomeProvider, GenerationSettings settings) {
-        super(context.world, biomeProvider, settings);
+    public TerraChunkGenerator(TerraContext context, TerraBiomeProvider biomeProvider, DimensionSettings settings) {
+        super(biomeProvider, settings.getStructures());
+        this.seed = context.seed.get();
         this.context = context;
+        this.settings = settings;
         this.biomeProvider = biomeProvider;
         this.mobGenerator = new MobGenerator(this);
         this.biomeGenerator = new BiomeGenerator(this);
@@ -118,24 +129,47 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
         SetupHooks.setup(baseDecorators, postProcessors, context.copy());
     }
 
-    @Override
-    public final void generateStructures(BiomeManager biomes, IChunk chunk, ChunkGenerator<?> generator, TemplateManager templates) {
-        structureGenerator.generateStructureStarts(biomes, chunk, templates);
+    public long getSeed() {
+        return seed;
+    }
+
+    public DimensionSettings getSettings() {
+        return settings;
     }
 
     @Override
-    public final void generateStructureStarts(IWorld world, IChunk chunk) {
-        structureGenerator.generateStructureReferences(world, chunk);
+    protected Codec<? extends ChunkGenerator> func_230347_a_() {
+        return null;
     }
 
     @Override
-    public final void generateBiomes(IChunk chunk) {
+    public ChunkGenerator func_230349_a_(long p_230349_1_) {
+        return null;
+    }
+
+    @Override
+    public IBlockReader func_230348_a_(int p_230348_1_, int p_230348_2_) {
+        return null;
+    }
+
+    @Override
+    public final void func_242707_a(DynamicRegistries registries, StructureManager structures, IChunk chunk, TemplateManager templates, long seed) {
+        structureGenerator.generateStructureStarts(chunk, registries, structures, templates);
+    }
+
+    @Override
+    public final void func_235953_a_(ISeedReader world, StructureManager structures, IChunk chunk) {
+        structureGenerator.generateStructureReferences(world, chunk, structures);
+    }
+
+    @Override
+    public final void func_242706_a(Registry<Biome> registry, IChunk chunk) {
         biomeGenerator.generateBiomes(chunk);
     }
 
     @Override
-    public final void makeBase(IWorld world, IChunk chunk) {
-        terrainGenerator.generateTerrain(world, chunk);
+    public final void func_230352_b_(IWorld world, StructureManager structures, IChunk chunk) {
+        terrainGenerator.generateTerrain(world, chunk, structures);
     }
 
     @Override
@@ -144,37 +178,27 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
     }
 
     @Override
-    public final void decorate(WorldGenRegion region) {
-        featureGenerator.generateFeatures(region);
+    public final void func_230350_a_(long seed, BiomeManager biomes, IChunk chunk, GenerationStage.Carving carver) {
+        terrainCarver.carveTerrain(biomes, chunk, carver);
     }
 
     @Override
-    public final void func_225550_a_(BiomeManager biomes, IChunk chunk, GenerationStage.Carving type) {
-        terrainCarver.carveTerrain(biomes, chunk, type);
+    public final void func_230351_a_(WorldGenRegion region, StructureManager structures) {
+        featureGenerator.generateFeatures(region, structures);
     }
 
     @Override
-    public final void spawnMobs(WorldGenRegion region) {
+    public final void func_230354_a_(WorldGenRegion region) {
         mobGenerator.generateMobs(region);
     }
 
     @Override
-    public final void spawnMobs(ServerWorld worldIn, boolean hostile, boolean peaceful) {
-        mobGenerator.tickSpawners(worldIn, hostile, peaceful);
+    public final List<MobSpawnInfo.Spawners> func_230353_a_(Biome biome, StructureManager structures, EntityClassification type, BlockPos pos) {
+        return mobGenerator.getSpawns(biome, structures, type, pos);
     }
 
     @Override
-    public final List<Biome.SpawnListEntry> getPossibleCreatures(EntityClassification type, BlockPos pos) {
-        return mobGenerator.getSpawns(world, type, pos);
-    }
-
-    @Override
-    public Biome getBiome(BiomeManager manager, BlockPos pos) {
-        return super.getBiome(manager, pos);
-    }
-
-    @Override
-    public final int func_222529_a(int x, int z, Heightmap.Type type) {
+    public final int getHeight(int x, int z, Heightmap.Type type) {
         int chunkX = Size.blockToChunk(x);
         int chunkZ = Size.blockToChunk(z);
         try (ChunkReader chunk = getChunkReader(chunkX, chunkZ)) {
@@ -193,18 +217,28 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
     }
 
     @Override
-    public final int getMaxHeight() {
-        return getContext().levels.worldHeight;
+    public final int func_230355_e_() {
+        // getMaxHeight
+        return getWorldHeight();
     }
 
     @Override
-    public final int getSeaLevel() {
-        return getContext().levels.waterLevel;
+    public final int func_230356_f_() {
+        // getSeaLevel
+        return getSeaLevel();
     }
 
     @Override
     public final int getGroundHeight() {
         return getContext().levels.groundLevel;
+    }
+
+    public final int getWorldHeight() {
+        return getContext().levels.worldHeight;
+    }
+
+    public final int getSeaLevel() {
+        return getContext().levels.waterLevel;
     }
 
     public final TerraContext getContext() {
@@ -219,7 +253,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
         return featureManager;
     }
 
-    public final StructureManager getStructureManager() {
+    public final FMStructureManager getStructureManager() {
         return structureManager;
     }
 
@@ -263,7 +297,7 @@ public class TerraChunkGenerator extends ChunkGenerator<GenerationSettings> {
         return tileCache.getChunk(chunkX, chunkZ);
     }
 
-    public static ChunkReader getChunk(IWorld world, ChunkGenerator<?> generator) {
+    public static ChunkReader getChunk(IWorld world, ChunkGenerator generator) {
         if (generator instanceof TerraChunkGenerator) {
             TerraChunkGenerator terra = (TerraChunkGenerator) generator;
             if (world instanceof IChunk) {

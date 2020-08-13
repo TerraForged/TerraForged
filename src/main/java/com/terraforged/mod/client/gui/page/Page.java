@@ -25,6 +25,7 @@
 
 package com.terraforged.mod.client.gui.page;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.mod.client.gui.OverlayRenderer;
 import com.terraforged.mod.client.gui.OverlayScreen;
 import com.terraforged.mod.client.gui.ScrollPane;
@@ -72,18 +73,18 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
     public abstract void init(OverlayScreen parent);
 
     @Override
-    public void renderOverlays(Screen screen, int mouseX, int mouseY) {
+    public void renderOverlays(MatrixStack matrixStack, Screen screen, int mouseX, int mouseY) {
         for (Column column : columns) {
-            if (column.scrollPane.children().isEmpty()) {
+            if (column.scrollPane.getEventListeners().isEmpty()) {
                 continue;
             }
-            column.scrollPane.renderOverlays(screen, mouseX, mouseY);
+            column.scrollPane.renderOverlays(matrixStack, screen, mouseX, mouseY);
         }
     }
 
     public void visit(Consumer<ScrollPane> consumer) {
         for (Column column : columns) {
-            if (column.scrollPane.children().isEmpty()) {
+            if (column.scrollPane.getEventListeners().isEmpty()) {
                 continue;
             }
             consumer.accept(column.scrollPane);
@@ -93,7 +94,7 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
     public boolean action(Function<ScrollPane, Boolean> action) {
         boolean result = false;
         for (Column column : columns) {
-            if (column.scrollPane.children().isEmpty()) {
+            if (column.scrollPane.getEventListeners().isEmpty()) {
                 continue;
             }
             boolean b = action.apply(column.scrollPane);

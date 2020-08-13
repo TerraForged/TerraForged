@@ -7,21 +7,25 @@ import net.minecraft.entity.EntityPredicate;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.SectionPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.ITickList;
 import net.minecraft.world.LightType;
@@ -31,562 +35,622 @@ import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.AbstractChunkProvider;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.lighting.WorldLightManager;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.WorldInfo;
+import net.minecraft.world.storage.IWorldInfo;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class RegionDelegate extends WorldGenRegion {
+    
+    private final WorldGenRegion delegate;
 
-    protected final WorldGenRegion region;
-
-    // WorldGenRegion init notes:
-    // - list of chunks passed in must be square (ie (sqrt(size) * sqrt(size) == size)
-    // - list of chunks must not be empty due to: "list.get(list.size() / 2).getPos()"
-    public RegionDelegate(ServerWorld world, WorldGenRegion region) {
-        super(world, Collections.singletonList(getMainChunk(region)));
-        this.region = region;
+    public RegionDelegate(ServerWorld world, WorldGenRegion delegate) {
+        super(world, Collections.singletonList(getMainChunk(delegate)));
+        this.delegate = delegate;
     }
 
-    public WorldGenRegion getRegion() {
-        return region;
+    public WorldGenRegion getDelegate() {
+        return delegate;
     }
 
     @Override
     public int getMainChunkX() {
-        return region.getMainChunkX();
+        return delegate.getMainChunkX();
     }
 
     @Override
     public int getMainChunkZ() {
-        return region.getMainChunkZ();
+        return delegate.getMainChunkZ();
     }
 
     @Override
     public IChunk getChunk(int chunkX, int chunkZ) {
-        return region.getChunk(chunkX, chunkZ);
+        return delegate.getChunk(chunkX, chunkZ);
     }
 
     @Override
     @Nullable
     public IChunk getChunk(int x, int z, ChunkStatus requiredStatus, boolean nonnull) {
-        return region.getChunk(x, z, requiredStatus, nonnull);
+        return delegate.getChunk(x, z, requiredStatus, nonnull);
     }
 
     @Override
     public boolean chunkExists(int chunkX, int chunkZ) {
-        return region.chunkExists(chunkX, chunkZ);
+        return delegate.chunkExists(chunkX, chunkZ);
     }
 
     @Override
     public BlockState getBlockState(BlockPos pos) {
-        return region.getBlockState(pos);
+        return delegate.getBlockState(pos);
     }
 
     @Override
-    public IFluidState getFluidState(BlockPos pos) {
-        return region.getFluidState(pos);
+    public FluidState getFluidState(BlockPos pos) {
+        return delegate.getFluidState(pos);
     }
 
     @Override
     @Nullable
     public PlayerEntity getClosestPlayer(double x, double y, double z, double distance, Predicate<Entity> predicate) {
-        return region.getClosestPlayer(x, y, z, distance, predicate);
+        return delegate.getClosestPlayer(x, y, z, distance, predicate);
     }
 
     @Override
     public int getSkylightSubtracted() {
-        return region.getSkylightSubtracted();
+        return delegate.getSkylightSubtracted();
     }
 
     @Override
     public BiomeManager getBiomeManager() {
-        return region.getBiomeManager();
+        return delegate.getBiomeManager();
     }
 
     @Override
     public Biome getNoiseBiomeRaw(int x, int y, int z) {
-        return region.getNoiseBiomeRaw(x, y, z);
+        return delegate.getNoiseBiomeRaw(x, y, z);
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public float func_230487_a_(Direction p_230487_1_, boolean p_230487_2_) {
+        return delegate.func_230487_a_(p_230487_1_, p_230487_2_);
     }
 
     @Override
     public WorldLightManager getLightManager() {
-        return region.getLightManager();
+        return delegate.getLightManager();
     }
 
     @Override
-    public boolean destroyBlock(BlockPos p_225521_1_, boolean p_225521_2_, @Nullable Entity p_225521_3_) {
-        return region.destroyBlock(p_225521_1_, p_225521_2_, p_225521_3_);
+    public boolean destroyBlock(BlockPos pos, boolean dropBlock, Entity entity, int recursionLeft) {
+        return delegate.destroyBlock(pos, dropBlock, entity, recursionLeft);
     }
 
     @Override
     @Nullable
     public TileEntity getTileEntity(BlockPos pos) {
-        return region.getTileEntity(pos);
+        return delegate.getTileEntity(pos);
     }
 
     @Override
-    public boolean setBlockState(BlockPos pos, BlockState newState, int flags) {
-        return region.setBlockState(pos, newState, flags);
+    public boolean setBlockState(BlockPos pos, BlockState state, int flags, int recursionLeft) {
+        return delegate.setBlockState(pos, state, flags, recursionLeft);
     }
 
     @Override
     public boolean addEntity(Entity entityIn) {
-        return region.addEntity(entityIn);
+        return delegate.addEntity(entityIn);
     }
 
     @Override
     public boolean removeBlock(BlockPos pos, boolean isMoving) {
-        return region.removeBlock(pos, isMoving);
+        return delegate.removeBlock(pos, isMoving);
     }
 
     @Override
     public WorldBorder getWorldBorder() {
-        return region.getWorldBorder();
+        return delegate.getWorldBorder();
     }
 
     @Override
     public boolean isRemote() {
-        return region.isRemote();
+        return delegate.isRemote();
     }
 
     @Override
     @Deprecated
     public ServerWorld getWorld() {
-        return region.getWorld();
+        return delegate.getWorld();
     }
 
     @Override
-    public WorldInfo getWorldInfo() {
-        return region.getWorldInfo();
+    public DynamicRegistries func_241828_r() {
+        return delegate.func_241828_r();
+    }
+
+    @Override
+    public IWorldInfo getWorldInfo() {
+        return delegate.getWorldInfo();
     }
 
     @Override
     public DifficultyInstance getDifficultyForLocation(BlockPos pos) {
-        return region.getDifficultyForLocation(pos);
+        return delegate.getDifficultyForLocation(pos);
     }
 
     @Override
     public AbstractChunkProvider getChunkProvider() {
-        return region.getChunkProvider();
+        return delegate.getChunkProvider();
     }
 
     @Override
     public long getSeed() {
-        return region.getSeed();
+        return delegate.getSeed();
     }
 
     @Override
     public ITickList<Block> getPendingBlockTicks() {
-        return region.getPendingBlockTicks();
+        return delegate.getPendingBlockTicks();
     }
 
     @Override
     public ITickList<Fluid> getPendingFluidTicks() {
-        return region.getPendingFluidTicks();
+        return delegate.getPendingFluidTicks();
     }
 
     @Override
     public int getSeaLevel() {
-        return region.getSeaLevel();
+        return delegate.getSeaLevel();
     }
 
     @Override
     public Random getRandom() {
-        return region.getRandom();
-    }
-
-    @Override
-    public void notifyNeighbors(BlockPos pos, Block blockIn) {
-        region.notifyNeighbors(pos, blockIn);
+        return delegate.getRandom();
     }
 
     @Override
     public int getHeight(Heightmap.Type heightmapType, int x, int z) {
-        return region.getHeight(heightmapType, x, z);
+        return delegate.getHeight(heightmapType, x, z);
     }
 
     @Override
-    public void playSound(@Nullable PlayerEntity player, BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume, float pitch) {
-        region.playSound(player, pos, soundIn, category, volume, pitch);
+    public void playSound(PlayerEntity player, BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume, float pitch) {
+        delegate.playSound(player, pos, soundIn, category, volume, pitch);
     }
 
     @Override
     public void addParticle(IParticleData particleData, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-        region.addParticle(particleData, x, y, z, xSpeed, ySpeed, zSpeed);
+        delegate.addParticle(particleData, x, y, z, xSpeed, ySpeed, zSpeed);
     }
 
     @Override
-    public void playEvent(@Nullable PlayerEntity player, int type, BlockPos pos, int data) {
-        region.playEvent(player, type, pos, data);
+    public void playEvent(PlayerEntity player, int type, BlockPos pos, int data) {
+        delegate.playEvent(player, type, pos, data);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public BlockPos getSpawnPoint() {
-        return region.getSpawnPoint();
+    public DimensionType func_230315_m_() {
+        return delegate.func_230315_m_();
     }
 
     @Override
-    public Dimension getDimension() {
-        return region.getDimension();
+    public boolean hasBlockState(BlockPos pos, Predicate<BlockState> state) {
+        return delegate.hasBlockState(pos, state);
     }
 
     @Override
-    public boolean hasBlockState(BlockPos p_217375_1_, Predicate<BlockState> p_217375_2_) {
-        return region.hasBlockState(p_217375_1_, p_217375_2_);
+    public <T extends Entity> List<T> getEntitiesWithinAABB(Class<? extends T> clazz, AxisAlignedBB aabb, Predicate<? super T> filter) {
+        return delegate.getEntitiesWithinAABB(clazz, aabb, filter);
     }
 
     @Override
-    public <T extends Entity> List<T> getEntitiesWithinAABB(Class<? extends T> clazz, AxisAlignedBB aabb, @Nullable Predicate<? super T> filter) {
-        return region.getEntitiesWithinAABB(clazz, aabb, filter);
-    }
-
-    @Override
-    public List<Entity> getEntitiesInAABBexcluding(@Nullable Entity entityIn, AxisAlignedBB boundingBox, @Nullable Predicate<? super Entity> predicate) {
-        return region.getEntitiesInAABBexcluding(entityIn, boundingBox, predicate);
+    public List<Entity> getEntitiesInAABBexcluding(Entity entityIn, AxisAlignedBB boundingBox, Predicate<? super Entity> predicate) {
+        return delegate.getEntitiesInAABBexcluding(entityIn, boundingBox, predicate);
     }
 
     @Override
     public List<PlayerEntity> getPlayers() {
-        return region.getPlayers();
+        return delegate.getPlayers();
     }
 
     @Override
-    public float getCurrentMoonPhaseFactor() {
-        return region.getCurrentMoonPhaseFactor();
+    public Stream<? extends StructureStart<?>> func_241827_a(SectionPos p_241827_1_, Structure<?> p_241827_2_) {
+        return delegate.func_241827_a(p_241827_1_, p_241827_2_);
     }
 
     @Override
-    public float getCelestialAngle(float partialTicks) {
-        return region.getCelestialAngle(partialTicks);
+    public void func_242417_l(Entity p_242417_1_) {
+        delegate.func_242417_l(p_242417_1_);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public int getMoonPhase() {
-        return region.getMoonPhase();
+    public long func_241851_ab() {
+        return delegate.func_241851_ab();
     }
 
     @Override
     public Difficulty getDifficulty() {
-        return region.getDifficulty();
+        return delegate.getDifficulty();
+    }
+
+    @Override
+    public void func_230547_a_(BlockPos p_230547_1_, Block p_230547_2_) {
+        delegate.func_230547_a_(p_230547_1_, p_230547_2_);
+    }
+
+    @Override
+    public int func_234938_ad_() {
+        return delegate.func_234938_ad_();
     }
 
     @Override
     public void playEvent(int type, BlockPos pos, int data) {
-        region.playEvent(type, pos, data);
+        delegate.playEvent(type, pos, data);
     }
 
     @Override
-    public Stream<VoxelShape> getEmptyCollisionShapes(@Nullable Entity entityIn, AxisAlignedBB aabb, Set<Entity> entitiesToIgnore) {
-        return region.getEmptyCollisionShapes(entityIn, aabb, entitiesToIgnore);
+    public Stream<VoxelShape> func_230318_c_(Entity p_230318_1_, AxisAlignedBB p_230318_2_, Predicate<Entity> p_230318_3_) {
+        return delegate.func_230318_c_(p_230318_1_, p_230318_2_, p_230318_3_);
     }
 
     @Override
-    public boolean checkNoEntityCollision(@Nullable Entity entityIn, VoxelShape shape) {
-        return region.checkNoEntityCollision(entityIn, shape);
+    public boolean checkNoEntityCollision(Entity entityIn, VoxelShape shape) {
+        return delegate.checkNoEntityCollision(entityIn, shape);
     }
 
     @Override
     public BlockPos getHeight(Heightmap.Type heightmapType, BlockPos pos) {
-        return region.getHeight(heightmapType, pos);
+        return delegate.getHeight(heightmapType, pos);
     }
 
     @Override
-    public <T extends Entity> List<T> getLoadedEntitiesWithinAABB(Class<? extends T> p_225316_1_, AxisAlignedBB p_225316_2_, @Nullable Predicate<? super T> p_225316_3_) {
-        return region.getLoadedEntitiesWithinAABB(p_225316_1_, p_225316_2_, p_225316_3_);
+    public Optional<RegistryKey<Biome>> func_242406_i(BlockPos p_242406_1_) {
+        return delegate.func_242406_i(p_242406_1_);
     }
 
     @Override
-    public List<Entity> getEntitiesWithinAABBExcludingEntity(@Nullable Entity entityIn, AxisAlignedBB bb) {
-        return region.getEntitiesWithinAABBExcludingEntity(entityIn, bb);
+    public <T extends Entity> List<T> getLoadedEntitiesWithinAABB(Class<? extends T> p_225316_1_, AxisAlignedBB p_225316_2_, Predicate<? super T> p_225316_3_) {
+        return delegate.getLoadedEntitiesWithinAABB(p_225316_1_, p_225316_2_, p_225316_3_);
+    }
+
+    @Override
+    public List<Entity> getEntitiesWithinAABBExcludingEntity(Entity entityIn, AxisAlignedBB bb) {
+        return delegate.getEntitiesWithinAABBExcludingEntity(entityIn, bb);
     }
 
     @Override
     public <T extends Entity> List<T> getEntitiesWithinAABB(Class<? extends T> p_217357_1_, AxisAlignedBB p_217357_2_) {
-        return region.getEntitiesWithinAABB(p_217357_1_, p_217357_2_);
+        return delegate.getEntitiesWithinAABB(p_217357_1_, p_217357_2_);
     }
 
     @Override
     public <T extends Entity> List<T> getLoadedEntitiesWithinAABB(Class<? extends T> p_225317_1_, AxisAlignedBB p_225317_2_) {
-        return region.getLoadedEntitiesWithinAABB(p_225317_1_, p_225317_2_);
+        return delegate.getLoadedEntitiesWithinAABB(p_225317_1_, p_225317_2_);
     }
 
     @Override
     @Nullable
     public PlayerEntity getClosestPlayer(Entity entityIn, double distance) {
-        return region.getClosestPlayer(entityIn, distance);
+        return delegate.getClosestPlayer(entityIn, distance);
     }
 
     @Override
     @Nullable
     public PlayerEntity getClosestPlayer(double x, double y, double z, double distance, boolean creativePlayers) {
-        return region.getClosestPlayer(x, y, z, distance, creativePlayers);
-    }
-
-    @Override
-    @Nullable
-    public PlayerEntity getClosestPlayer(double x, double y, double z) {
-        return region.getClosestPlayer(x, y, z);
+        return delegate.getClosestPlayer(x, y, z, distance, creativePlayers);
     }
 
     @Override
     public boolean isPlayerWithin(double x, double y, double z, double distance) {
-        return region.isPlayerWithin(x, y, z, distance);
+        return delegate.isPlayerWithin(x, y, z, distance);
     }
 
     @Override
     @Nullable
     public PlayerEntity getClosestPlayer(EntityPredicate predicate, LivingEntity target) {
-        return region.getClosestPlayer(predicate, target);
+        return delegate.getClosestPlayer(predicate, target);
     }
 
     @Override
     @Nullable
     public PlayerEntity getClosestPlayer(EntityPredicate predicate, LivingEntity target, double p_217372_3_, double p_217372_5_, double p_217372_7_) {
-        return region.getClosestPlayer(predicate, target, p_217372_3_, p_217372_5_, p_217372_7_);
+        return delegate.getClosestPlayer(predicate, target, p_217372_3_, p_217372_5_, p_217372_7_);
     }
 
     @Override
     @Nullable
     public PlayerEntity getClosestPlayer(EntityPredicate predicate, double x, double y, double z) {
-        return region.getClosestPlayer(predicate, x, y, z);
+        return delegate.getClosestPlayer(predicate, x, y, z);
     }
 
     @Override
     @Nullable
-    public <T extends LivingEntity> T getClosestEntityWithinAABB(Class<? extends T> entityClazz, EntityPredicate p_217360_2_, @Nullable LivingEntity target, double x, double y, double z, AxisAlignedBB boundingBox) {
-        return region.getClosestEntityWithinAABB(entityClazz, p_217360_2_, target, x, y, z, boundingBox);
+    public <T extends LivingEntity> T getClosestEntityWithinAABB(Class<? extends T> entityClazz, EntityPredicate p_217360_2_, LivingEntity target, double x, double y, double z, AxisAlignedBB boundingBox) {
+        return delegate.getClosestEntityWithinAABB(entityClazz, p_217360_2_, target, x, y, z, boundingBox);
     }
 
     @Override
     @Nullable
-    public <T extends LivingEntity> T func_225318_b(Class<? extends T> p_225318_1_, EntityPredicate p_225318_2_, @Nullable LivingEntity p_225318_3_, double p_225318_4_, double p_225318_6_, double p_225318_8_, AxisAlignedBB p_225318_10_) {
-        return region.func_225318_b(p_225318_1_, p_225318_2_, p_225318_3_, p_225318_4_, p_225318_6_, p_225318_8_, p_225318_10_);
+    public <T extends LivingEntity> T func_225318_b(Class<? extends T> p_225318_1_, EntityPredicate p_225318_2_, LivingEntity p_225318_3_, double p_225318_4_, double p_225318_6_, double p_225318_8_, AxisAlignedBB p_225318_10_) {
+        return delegate.func_225318_b(p_225318_1_, p_225318_2_, p_225318_3_, p_225318_4_, p_225318_6_, p_225318_8_, p_225318_10_);
     }
 
     @Override
     @Nullable
-    public <T extends LivingEntity> T getClosestEntity(List<? extends T> entities, EntityPredicate predicate, @Nullable LivingEntity target, double x, double y, double z) {
-        return region.getClosestEntity(entities, predicate, target, x, y, z);
+    public <T extends LivingEntity> T getClosestEntity(List<? extends T> entities, EntityPredicate predicate, LivingEntity target, double x, double y, double z) {
+        return delegate.getClosestEntity(entities, predicate, target, x, y, z);
     }
 
     @Override
     public List<PlayerEntity> getTargettablePlayersWithinAABB(EntityPredicate predicate, LivingEntity target, AxisAlignedBB box) {
-        return region.getTargettablePlayersWithinAABB(predicate, target, box);
+        return delegate.getTargettablePlayersWithinAABB(predicate, target, box);
     }
 
     @Override
     public <T extends LivingEntity> List<T> getTargettableEntitiesWithinAABB(Class<? extends T> p_217374_1_, EntityPredicate p_217374_2_, LivingEntity p_217374_3_, AxisAlignedBB p_217374_4_) {
-        return region.getTargettableEntitiesWithinAABB(p_217374_1_, p_217374_2_, p_217374_3_, p_217374_4_);
+        return delegate.getTargettableEntitiesWithinAABB(p_217374_1_, p_217374_2_, p_217374_3_, p_217374_4_);
     }
 
     @Override
     @Nullable
     public PlayerEntity getPlayerByUuid(UUID uniqueIdIn) {
-        return region.getPlayerByUuid(uniqueIdIn);
+        return delegate.getPlayerByUuid(uniqueIdIn);
     }
 
     @Override
     public Biome getBiome(BlockPos p_226691_1_) {
-        return region.getBiome(p_226691_1_);
+        return delegate.getBiome(p_226691_1_);
+    }
+
+    @Override
+    public Stream<BlockState> func_234939_c_(AxisAlignedBB p_234939_1_) {
+        return delegate.func_234939_c_(p_234939_1_);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public int getBlockColor(BlockPos blockPosIn, ColorResolver colorResolverIn) {
-        return region.getBlockColor(blockPosIn, colorResolverIn);
+        return delegate.getBlockColor(blockPosIn, colorResolverIn);
     }
 
     @Override
     public Biome getNoiseBiome(int x, int y, int z) {
-        return region.getNoiseBiome(x, y, z);
+        return delegate.getNoiseBiome(x, y, z);
     }
 
     @Override
     public boolean isAirBlock(BlockPos pos) {
-        return region.isAirBlock(pos);
+        return delegate.isAirBlock(pos);
     }
 
     @Override
     public boolean canBlockSeeSky(BlockPos pos) {
-        return region.canBlockSeeSky(pos);
+        return delegate.canBlockSeeSky(pos);
     }
 
     @Override
     @Deprecated
     public float getBrightness(BlockPos pos) {
-        return region.getBrightness(pos);
+        return delegate.getBrightness(pos);
     }
 
     @Override
     public int getStrongPower(BlockPos pos, Direction direction) {
-        return region.getStrongPower(pos, direction);
+        return delegate.getStrongPower(pos, direction);
     }
 
     @Override
     public IChunk getChunk(BlockPos pos) {
-        return region.getChunk(pos);
+        return delegate.getChunk(pos);
     }
 
     @Override
     public IChunk getChunk(int chunkX, int chunkZ, ChunkStatus requiredStatus) {
-        return region.getChunk(chunkX, chunkZ, requiredStatus);
+        return delegate.getChunk(chunkX, chunkZ, requiredStatus);
     }
 
     @Override
     @Nullable
     public IBlockReader getBlockReader(int chunkX, int chunkZ) {
-        return region.getBlockReader(chunkX, chunkZ);
+        return delegate.getBlockReader(chunkX, chunkZ);
     }
 
     @Override
     public boolean hasWater(BlockPos pos) {
-        return region.hasWater(pos);
+        return delegate.hasWater(pos);
     }
 
     @Override
     public boolean containsAnyLiquid(AxisAlignedBB bb) {
-        return region.containsAnyLiquid(bb);
+        return delegate.containsAnyLiquid(bb);
     }
 
     @Override
     public int getLight(BlockPos pos) {
-        return region.getLight(pos);
+        return delegate.getLight(pos);
     }
 
     @Override
     public int getNeighborAwareLightSubtracted(BlockPos pos, int amount) {
-        return region.getNeighborAwareLightSubtracted(pos, amount);
+        return delegate.getNeighborAwareLightSubtracted(pos, amount);
     }
 
     @Override
     @Deprecated
     public boolean isBlockLoaded(BlockPos pos) {
-        return region.isBlockLoaded(pos);
+        return delegate.isBlockLoaded(pos);
     }
 
     @Override
     public boolean isAreaLoaded(BlockPos center, int range) {
-        return region.isAreaLoaded(center, range);
+        return delegate.isAreaLoaded(center, range);
     }
 
     @Override
     @Deprecated
     public boolean isAreaLoaded(BlockPos from, BlockPos to) {
-        return region.isAreaLoaded(from, to);
+        return delegate.isAreaLoaded(from, to);
     }
 
     @Override
     @Deprecated
     public boolean isAreaLoaded(int fromX, int fromY, int fromZ, int toX, int toY, int toZ) {
-        return region.isAreaLoaded(fromX, fromY, fromZ, toX, toY, toZ);
+        return delegate.isAreaLoaded(fromX, fromY, fromZ, toX, toY, toZ);
     }
 
     @Override
     public int getLightFor(LightType lightTypeIn, BlockPos blockPosIn) {
-        return region.getLightFor(lightTypeIn, blockPosIn);
+        return delegate.getLightFor(lightTypeIn, blockPosIn);
     }
 
     @Override
     public int getLightSubtracted(BlockPos blockPosIn, int amount) {
-        return region.getLightSubtracted(blockPosIn, amount);
+        return delegate.getLightSubtracted(blockPosIn, amount);
     }
 
     @Override
     public boolean canSeeSky(BlockPos blockPosIn) {
-        return region.canSeeSky(blockPosIn);
+        return delegate.canSeeSky(blockPosIn);
     }
 
     @Override
     public int getLightValue(BlockPos pos) {
-        return region.getLightValue(pos);
+        return delegate.getLightValue(pos);
     }
 
     @Override
     public int getMaxLightLevel() {
-        return region.getMaxLightLevel();
+        return delegate.getMaxLightLevel();
     }
 
     @Override
     public int getHeight() {
-        return region.getHeight();
+        return delegate.getHeight();
+    }
+
+    @Override
+    public Stream<BlockState> func_234853_a_(AxisAlignedBB p_234853_1_) {
+        return delegate.func_234853_a_(p_234853_1_);
     }
 
     @Override
     public BlockRayTraceResult rayTraceBlocks(RayTraceContext context) {
-        return region.rayTraceBlocks(context);
+        return delegate.rayTraceBlocks(context);
     }
 
     @Override
     @Nullable
-    public BlockRayTraceResult rayTraceBlocks(Vec3d p_217296_1_, Vec3d p_217296_2_, BlockPos p_217296_3_, VoxelShape p_217296_4_, BlockState p_217296_5_) {
-        return region.rayTraceBlocks(p_217296_1_, p_217296_2_, p_217296_3_, p_217296_4_, p_217296_5_);
+    public BlockRayTraceResult rayTraceBlocks(Vector3d startVec, Vector3d endVec, BlockPos pos, VoxelShape shape, BlockState state) {
+        return delegate.rayTraceBlocks(startVec, endVec, pos, shape, state);
+    }
+
+    @Override
+    public double func_242402_a(VoxelShape p_242402_1_, Supplier<VoxelShape> p_242402_2_) {
+        return delegate.func_242402_a(p_242402_1_, p_242402_2_);
+    }
+
+    @Override
+    public double func_242403_h(BlockPos p_242403_1_) {
+        return delegate.func_242403_h(p_242403_1_);
     }
 
     @Override
     public boolean func_226663_a_(BlockState p_226663_1_, BlockPos p_226663_2_, ISelectionContext p_226663_3_) {
-        return region.func_226663_a_(p_226663_1_, p_226663_2_, p_226663_3_);
+        return delegate.func_226663_a_(p_226663_1_, p_226663_2_, p_226663_3_);
     }
 
     @Override
     public boolean checkNoEntityCollision(Entity p_226668_1_) {
-        return region.checkNoEntityCollision(p_226668_1_);
+        return delegate.checkNoEntityCollision(p_226668_1_);
     }
 
     @Override
     public boolean hasNoCollisions(AxisAlignedBB p_226664_1_) {
-        return region.hasNoCollisions(p_226664_1_);
+        return delegate.hasNoCollisions(p_226664_1_);
     }
 
     @Override
     public boolean hasNoCollisions(Entity p_226669_1_) {
-        return region.hasNoCollisions(p_226669_1_);
+        return delegate.hasNoCollisions(p_226669_1_);
     }
 
     @Override
     public boolean hasNoCollisions(Entity p_226665_1_, AxisAlignedBB p_226665_2_) {
-        return region.hasNoCollisions(p_226665_1_, p_226665_2_);
+        return delegate.hasNoCollisions(p_226665_1_, p_226665_2_);
     }
 
     @Override
-    public boolean hasNoCollisions(@Nullable Entity p_226662_1_, AxisAlignedBB p_226662_2_, Set<Entity> p_226662_3_) {
-        return region.hasNoCollisions(p_226662_1_, p_226662_2_, p_226662_3_);
+    public boolean func_234865_b_(Entity p_234865_1_, AxisAlignedBB p_234865_2_, Predicate<Entity> p_234865_3_) {
+        return delegate.func_234865_b_(p_234865_1_, p_234865_2_, p_234865_3_);
     }
 
     @Override
-    public Stream<VoxelShape> getCollisionShapes(@Nullable Entity p_226667_1_, AxisAlignedBB p_226667_2_, Set<Entity> p_226667_3_) {
-        return region.getCollisionShapes(p_226667_1_, p_226667_2_, p_226667_3_);
+    public Stream<VoxelShape> func_234867_d_(Entity p_234867_1_, AxisAlignedBB p_234867_2_, Predicate<Entity> p_234867_3_) {
+        return delegate.func_234867_d_(p_234867_1_, p_234867_2_, p_234867_3_);
     }
 
     @Override
-    public Stream<VoxelShape> getCollisionShapes(@Nullable Entity p_226666_1_, AxisAlignedBB p_226666_2_) {
-        return region.getCollisionShapes(p_226666_1_, p_226666_2_);
+    public Stream<VoxelShape> getCollisionShapes(Entity p_226666_1_, AxisAlignedBB p_226666_2_) {
+        return delegate.getCollisionShapes(p_226666_1_, p_226666_2_);
     }
 
     @Override
-    public int getMaxHeight() {
-        return region.getMaxHeight();
+    @OnlyIn(Dist.CLIENT)
+    public boolean func_242405_a(Entity p_242405_1_, AxisAlignedBB p_242405_2_, BiPredicate<BlockState, BlockPos> p_242405_3_) {
+        return delegate.func_242405_a(p_242405_1_, p_242405_2_, p_242405_3_);
+    }
+
+    @Override
+    public Stream<VoxelShape> func_241457_a_(Entity p_241457_1_, AxisAlignedBB p_241457_2_, BiPredicate<BlockState, BlockPos> p_241457_3_) {
+        return delegate.func_241457_a_(p_241457_1_, p_241457_2_, p_241457_3_);
+    }
+
+    @Override
+    public boolean setBlockState(BlockPos pos, BlockState newState, int flags) {
+        return delegate.setBlockState(pos, newState, flags);
     }
 
     @Override
     public boolean destroyBlock(BlockPos pos, boolean dropBlock) {
-        return region.destroyBlock(pos, dropBlock);
+        return delegate.destroyBlock(pos, dropBlock);
+    }
+
+    @Override
+    public boolean destroyBlock(BlockPos pos, boolean dropBlock, Entity entity) {
+        return delegate.destroyBlock(pos, dropBlock, entity);
+    }
+
+    @Override
+    public float func_242413_ae() {
+        return delegate.func_242413_ae();
+    }
+
+    @Override
+    public float func_242415_f(float p_242415_1_) {
+        return delegate.func_242415_f(p_242415_1_);
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public int func_242414_af() {
+        return delegate.func_242414_af();
     }
 
     private static IChunk getMainChunk(WorldGenRegion region) {

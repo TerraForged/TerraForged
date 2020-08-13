@@ -5,10 +5,11 @@ import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.gen.WorldGenRegion;
-import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.spawner.CatSpawner;
 import net.minecraft.world.spawner.PatrolSpawner;
@@ -50,31 +51,38 @@ public class MobGenerator implements Generator.Mobs {
 
     @Override
     public final void tickSpawners(ServerWorld world, boolean hostile, boolean peaceful) {
-        phantomSpawner.tick(world, hostile, peaceful);
-        patrolSpawner.tick(world, hostile, peaceful);
-        catSpawner.tick(world, hostile, peaceful);
+        phantomSpawner.func_230253_a_(world, hostile, peaceful);
+        patrolSpawner.func_230253_a_(world, hostile, peaceful);
+        catSpawner.func_230253_a_(world, hostile, peaceful);
     }
 
     @Override
-    public final List<Biome.SpawnListEntry> getSpawns(IWorld world, EntityClassification type, BlockPos pos) {
-        if (Feature.SWAMP_HUT.func_202383_b(world, pos)) {
+    public List<MobSpawnInfo.Spawners> getSpawns(Biome biome, StructureManager structures, EntityClassification type, BlockPos pos) {
+        if (structures.func_235010_a_(pos, true, Structure.field_236374_j_).isValid()) {
             if (type == EntityClassification.MONSTER) {
-                return Feature.SWAMP_HUT.getSpawnList();
+                return Structure.field_236374_j_.getSpawnList();
             }
 
             if (type == EntityClassification.CREATURE) {
-                return Feature.SWAMP_HUT.getCreatureSpawnList();
-            }
-        } else if (type == EntityClassification.MONSTER) {
-            if (Feature.PILLAGER_OUTPOST.isPositionInStructure(world, pos)) {
-                return Feature.PILLAGER_OUTPOST.getSpawnList();
-            }
-
-            if (Feature.OCEAN_MONUMENT.isPositionInStructure(world, pos)) {
-                return Feature.OCEAN_MONUMENT.getSpawnList();
+                return Structure.field_236374_j_.getCreatureSpawnList();
             }
         }
-        return world.getBiome(pos).getSpawns(type);
+
+        if (type == EntityClassification.MONSTER) {
+            if (structures.func_235010_a_(pos, false, Structure.field_236366_b_).isValid()) {
+                return Structure.field_236366_b_.getSpawnList();
+            }
+
+            if (structures.func_235010_a_(pos, false, Structure.field_236376_l_).isValid()) {
+                return Structure.field_236376_l_.getSpawnList();
+            }
+
+            if (structures.func_235010_a_(pos, true, Structure.field_236378_n_).isValid()) {
+                return Structure.field_236378_n_.getSpawnList();
+            }
+        }
+
+        return biome.func_242433_b().func_242559_a(type);
     }
 
     @SubscribeEvent

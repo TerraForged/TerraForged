@@ -26,6 +26,7 @@
 package com.terraforged.mod.data;
 
 import com.google.gson.GsonBuilder;
+import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.mod.biome.provider.BiomeWeights;
@@ -40,20 +41,20 @@ import java.io.Writer;
 
 public class WorldGenBiomes extends DataGen {
 
-    public static void genBiomeMap(File dataDir) {
+    public static void genBiomeMap(File dataDir, GameContext context) {
         if (dataDir.exists() || dataDir.mkdirs()) {
-            BiomeMap map = BiomeHelper.createBiomeMap();
+            BiomeMap map = BiomeHelper.createBiomeMap(context);
             try (Writer writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_map.json")))) {
-                new GsonBuilder().setPrettyPrinting().create().toJson(map.toJson(), writer);
+                new GsonBuilder().setPrettyPrinting().create().toJson(map.toJson(context), writer);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public static void genBiomeWeights(File dataDir) {
+    public static void genBiomeWeights(File dataDir, GameContext context) {
         if (dataDir.exists() || dataDir.mkdirs()) {
-            BiomeWeights weights = new BiomeWeights();
+            BiomeWeights weights = new BiomeWeights(context);
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_weights.txt")))) {
                 writer.write("# REGISTERED BIOME WEIGHTS\n");
                 weights.forEachEntry((name, weight) -> {

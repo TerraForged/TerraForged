@@ -7,7 +7,7 @@ import com.google.gson.JsonParser;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.world.storage.WorldInfo;
+import net.minecraft.world.storage.ServerWorldInfo;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -79,15 +79,16 @@ public class SettingsHelper {
         return new TerraSettings();
     }
 
-    public static TerraSettings getSettings(WorldInfo info) {
-        if (info.getGeneratorOptions().isEmpty()) {
-            return readDefaults();
-        } else {
-            Log.info("Loading generator settings from level.dat");
-            TerraSettings settings = new TerraSettings();
-            NBTHelper.deserialize(info.getGeneratorOptions(), settings);
-            return settings;
-        }
+    public static TerraSettings getSettings(ServerWorldInfo info) {
+//        if (info.getGeneratorOptions().isEmpty()) {
+//            return readDefaults();
+//        } else {
+//            Log.info("Loading generator settings from level.dat");
+//            TerraSettings settings = new TerraSettings();
+//            NBTHelper.deserialize(info.getGeneratorOptions(), settings);
+//            return settings;
+//        }
+        return new TerraSettings();
     }
 
     public static void init() {

@@ -26,6 +26,7 @@
 package com.terraforged.mod;
 
 import com.terraforged.api.material.WGTags;
+import com.terraforged.fm.data.FolderDataPackFinder;
 import com.terraforged.fm.template.TemplateManager;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.config.ConfigManager;
@@ -36,13 +37,9 @@ import com.terraforged.mod.feature.feature.BushFeature;
 import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.mod.feature.feature.FreezeLayer;
 import com.terraforged.mod.server.command.TerraCommand;
-import com.terraforged.mod.util.DataPackFinder;
 import com.terraforged.mod.util.Environment;
-import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.OreFeatureConfig;
 import net.minecraft.world.gen.placement.Placement;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -61,16 +58,13 @@ public class TerraForgedMod {
     public static void setup(FMLCommonSetupEvent event) {
         Log.info("Common setup");
         WGTags.init();
-        TerraWorld.init();
         TerraCommand.init();
         ConfigManager.init();
         SettingsHelper.init();
 
         // temp fix
-        BiomeDictionary.addTypes(Biomes.BAMBOO_JUNGLE, BiomeDictionary.Type.OVERWORLD);
-        BiomeDictionary.addTypes(Biomes.BAMBOO_JUNGLE_HILLS, BiomeDictionary.Type.OVERWORLD);
-
-        OreFeatureConfig.FillerBlockType.create("wg_stone", "wg_stone", WGTags.stone());
+//        BiomeDictionary.addTypes(Biomes.BAMBOO_JUNGLE, BiomeDictionary.Type.OVERWORLD);
+//        BiomeDictionary.addTypes(Biomes.BAMBOO_JUNGLE_HILLS, BiomeDictionary.Type.OVERWORLD);
     }
 
     @SubscribeEvent
@@ -102,7 +96,7 @@ public class TerraForgedMod {
         public static void serverStart(FMLServerAboutToStartEvent event) {
             Log.info("Adding DataPackFinder");
             File dir = event.getServer().getFile("config/terraforged/datapacks");
-            DataPackFinder dataPackFinder = new DataPackFinder(dir);
+            FolderDataPackFinder dataPackFinder = new FolderDataPackFinder(dir);
             event.getServer().getResourcePacks().addPackFinder(dataPackFinder);
         }
 

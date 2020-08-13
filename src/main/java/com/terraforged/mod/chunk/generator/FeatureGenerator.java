@@ -8,12 +8,13 @@ import com.terraforged.mod.chunk.fix.RegionFix;
 import com.terraforged.mod.chunk.util.TerraContainer;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.gen.feature.structure.StructureManager;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class FeatureGenerator implements Generator.Features {
     }
 
     @Override
-    public final void generateFeatures(WorldGenRegion region) {
+    public final void generateFeatures(WorldGenRegion region, StructureManager manager) {
         int chunkX = region.getMainChunkX();
         int chunkZ = region.getMainChunkZ();
         IChunk chunk = region.getChunk(chunkX, chunkZ);
@@ -37,17 +38,17 @@ public class FeatureGenerator implements Generator.Features {
         Biome biome = container.getFeatureBiome(reader);
         DecoratorContext context = generator.getContext().decorator(chunk);
 
-        IWorld regionFix = new RegionFix(region, generator);
+        ISeedReader regionFix = new RegionFix(region, generator);
         BlockPos pos = new BlockPos(context.blockX, 0, context.blockZ);
 
         // place biome features
-        generator.getFeatureManager().decorate(generator, regionFix, chunk, biome, pos);
+        generator.getFeatureManager().decorate(generator, manager, regionFix, chunk, biome, pos);
 
         // run post processes on chunk
         postProcess(reader, container, context);
 
         // bake biome array
-        ((ChunkPrimer) chunk).func_225548_a_(container.bakeBiomes(Environment.isVanillaBiomes()));
+        ((ChunkPrimer) chunk).setBiomes(container.bakeBiomes(Environment.isVanillaBiomes(), generator.getContext().gameContext));
 
         // close the current chunk reader
         reader.close();

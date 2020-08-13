@@ -26,7 +26,8 @@
 package com.terraforged.api.biome.surface;
 
 import com.terraforged.api.biome.surface.builder.Delegate;
-import net.minecraft.util.ResourceLocation;
+import com.terraforged.fm.GameContext;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 
 import java.util.HashMap;
@@ -36,12 +37,17 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class SurfaceManager {
 
+    private final GameContext context;
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private final Map<ResourceLocation, Surface> surfaces = new HashMap<>();
+    private final Map<Biome, Surface> surfaces = new HashMap<>();
+
+    public SurfaceManager(GameContext context) {
+        this.context = context;
+    }
 
     public Surface getSurface(Biome biome) {
         lock.readLock().lock();
-        Surface surface = surfaces.get(biome.getRegistryName());
+        Surface surface = surfaces.get(biome);
         lock.readLock().unlock();
         return surface;
     }
@@ -55,39 +61,75 @@ public class SurfaceManager {
         return surface;
     }
 
-    public SurfaceManager replace(Biome biome, Surface surface) {
+    public final SurfaceManager replace(RegistryKey<Biome> biome, Surface surface) {
+        return replace(context.biomes.get(biome), surface);
+    }
+
+    public final SurfaceManager replace(Biome biome, Surface surface) {
         lock.writeLock().lock();
-        surfaces.put(biome.getRegistryName(), surface);
+        surfaces.put(biome, surface);
         lock.writeLock().unlock();
         return this;
     }
 
-    public SurfaceManager replace(Surface surface, Biome... biomes) {
+    @SafeVarargs
+    public final SurfaceManager replace(Surface surface, RegistryKey<Biome>... biomes) {
+        for (RegistryKey<Biome> biome : biomes) {
+            replace(biome, surface);
+        }
+        return this;
+    }
+
+    public final SurfaceManager replace(Surface surface, Biome... biomes) {
         for (Biome biome : biomes) {
             replace(biome, surface);
         }
         return this;
     }
 
-    public SurfaceManager prepend(Biome biome, Surface surface) {
+    public final SurfaceManager prepend(Biome biome, Surface surface) {
         Surface result = surface.then(getOrCreateSurface(biome));
         return replace(biome, result);
     }
 
-    public SurfaceManager prepend(Surface surface, Biome... biomes) {
+    public final SurfaceManager prepend(RegistryKey<Biome> biome, Surface surface) {
+        return prepend(context.biomes.get(biome), surface);
+    }
+
+    public final SurfaceManager prepend(Surface surface, Biome... biomes) {
         for (Biome biome : biomes) {
             prepend(biome, surface);
         }
         return this;
     }
 
-    public SurfaceManager append(Biome biome, Surface surface) {
+    @SafeVarargs
+    public final SurfaceManager prepend(Surface surface, RegistryKey<Biome>... biomes) {
+        for (RegistryKey<Biome> biome : biomes) {
+            prepend(biome, surface);
+        }
+        return this;
+    }
+
+    public final SurfaceManager append(Biome biome, Surface surface) {
         Surface result = getOrCreateSurface(biome).then(surface);
         return replace(biome, result);
     }
 
-    public SurfaceManager append(Surface surface, Biome... biomes) {
+    public final SurfaceManager append(RegistryKey<Biome> biome, Surface surface) {
+        return append(context.biomes.get(biome), surface);
+    }
+
+    public final SurfaceManager append(Surface surface, Biome... biomes) {
         for (Biome biome : biomes) {
+            append(biome, surface);
+        }
+        return this;
+    }
+
+    @SafeVarargs
+    public final SurfaceManager append(Surface surface, RegistryKey<Biome>... biomes) {
+        for (RegistryKey<Biome> biome : biomes) {
             append(biome, surface);
         }
         return this;

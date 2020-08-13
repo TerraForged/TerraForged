@@ -28,6 +28,7 @@ package com.terraforged.mod.client.gui.element;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.List;
@@ -62,9 +63,9 @@ public class TerraToggle extends TerraButton {
         }
 
         if (noname) {
-            setMessage(value.getString(name));
+            setMessage(new StringTextComponent(value.getString(name)));
         } else {
-            setMessage(prefix + value.getString(name));
+            setMessage(new StringTextComponent(prefix + value.getString(name)));
         }
     }
 
@@ -100,9 +101,9 @@ public class TerraToggle extends TerraButton {
         String option = options.getString(index);
         value.putString(name, option);
         if (noname) {
-            setMessage(option);
+            setMessage(new StringTextComponent(option));
         } else {
-            setMessage(prefix + option);
+            setMessage(new StringTextComponent(prefix + option));
         }
         callback.run();
     }

@@ -26,6 +26,7 @@
 package com.terraforged.mod.biome.provider;
 
 import com.google.common.collect.Sets;
+import com.mojang.serialization.Codec;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.mod.biome.map.BiomeMap;
@@ -39,9 +40,10 @@ import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
 import net.minecraft.world.biome.provider.BiomeProvider;
 
-import java.util.List;
+import javax.annotation.Nullable;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class TerraBiomeProvider extends BiomeProvider {
 
@@ -52,10 +54,10 @@ public class TerraBiomeProvider extends BiomeProvider {
     private final BiomeModifierManager modifierManager;
 
     public TerraBiomeProvider(TerraContext context) {
-        super(BiomeHelper.getAllBiomes());
+        super(BiomeHelper.getAllBiomes(context.gameContext));
         this.context = context;
         this.seed = context.terraSettings.world.seed;
-        this.biomeMap = BiomeHelper.createBiomeMap();
+        this.biomeMap = BiomeHelper.createBiomeMap(context.gameContext);
         this.worldLookup = new WorldLookup(context.factory, context);
         this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomeMap), context.copy());
     }
@@ -80,6 +82,16 @@ public class TerraBiomeProvider extends BiomeProvider {
     }
 
     @Override
+    protected Codec<? extends BiomeProvider> func_230319_a_() {
+        return null;
+    }
+
+    @Override
+    public BiomeProvider func_230320_a_(long seed) {
+        return this;
+    }
+
+    @Override
     public Set<Biome> getBiomes(int centerX, int centerY, int centerZ, int radius) {
         int minX = centerX - radius >> 2;
         int minZ = centerZ - radius >> 2;
@@ -89,8 +101,8 @@ public class TerraBiomeProvider extends BiomeProvider {
         int rangeZ = maxZ - minZ + 1;
         Set<Biome> set = Sets.newHashSet();
         Cell cell = new Cell();
-        for(int dz = 0; dz < rangeZ; ++dz) {
-            for(int dx = 0; dx < rangeX; ++dx) {
+        for (int dz = 0; dz < rangeZ; ++dz) {
+            for (int dx = 0; dx < rangeX; ++dx) {
                 int x = (minX + dx) << 2;
                 int z = (minZ + dz) << 2;
                 worldLookup.applyCell(cell, x, z);
@@ -103,32 +115,61 @@ public class TerraBiomeProvider extends BiomeProvider {
     }
 
     @Override
-    public BlockPos func_225531_a_(int centerX, int centerY, int centerZ, int range, List<Biome> biomes, Random random) {
-        int minX = centerX - range >> 2;
-        int minZ = centerZ - range >> 2;
-        int maxX = centerX + range >> 2;
-        int maxZ = centerZ + range >> 2;
-        int rangeX = maxX - minX + 1;
-        int rangeZ = maxZ - minZ + 1;
-        int y = centerY >> 2;
-        BlockPos blockpos = null;
-        int attempts = 0;
+    @Nullable
+    public BlockPos func_230321_a_(int centerX, int centerY, int centerZ, int radius, int increment, Predicate<Biome> biomes, Random random, boolean centerOutSearch) {
+        // convert block coords to biome coords
+        int biomeRadius = radius >> 2;
+        int biomeCenterX = centerX >> 2;
+        int biomeCenterZ = centerZ >> 2;
 
         Cell cell = new Cell();
-        for(int dz = 0; dz < rangeZ; ++dz) {
-            for(int dx = 0; dx < rangeX; ++dx) {
-                int x = (minX + dx) << 2;
-                int z = (minZ + dz) << 2;
-                worldLookup.applyCell(cell, x, z);
-                if (biomes.contains(getBiome(cell, x, z))) {
-                    if (blockpos == null || random.nextInt(attempts + 1) == 0) {
-                        blockpos = new BlockPos(x, y, z);
+        BlockPos.Mutable pos = null;
+
+        // keeps track of the number of matched positions and progressively reduces the likelihood of a matching position
+        // being selected as the result
+        int count = 0;
+
+        // centerOutSearch iterates concentric rings around the center coordinates to find the closest matching position
+        // non-centerOut iterates the entire square around the center and returns a random matching position
+        int startRadius = centerOutSearch ? 0 : biomeRadius;
+
+        for (int r = startRadius; r < biomeRadius; r += increment) {
+            for (int dz = -r; dz <= r; dz++) {
+                boolean onRadiusZ = Math.abs(dz) == r;
+
+                for (int dx = -r; dx <= r; dx++) {
+                    if (centerOutSearch) {
+                        boolean onRadiusX = Math.abs(dx) == r;
+                        if (!onRadiusX && !onRadiusZ) {
+                            continue;
+                        }
                     }
-                    ++attempts;
+
+                    int biomeX = biomeCenterX + dx;
+                    int biomeZ = biomeCenterZ + dz;
+
+                    // getBiome(Cell,int,int) expects block coords, not biome coords
+                    int x = biomeX << 2;
+                    int z = biomeZ << 2;
+
+                    if (biomes.test(getBiome(cell, x, z))) {
+                        if (centerOutSearch) {
+                            return new BlockPos(x, centerY, z);
+                        }
+
+                        if (pos == null) {
+                            pos = new BlockPos.Mutable(x, centerY, z);
+                        } else if (random.nextInt(count + 1) == 0) {
+                            // as the match count increases the chance of getting a zero reduces
+                            pos.setPos(x, centerY, z);
+                        }
+
+                        count++;
+                    }
                 }
             }
         }
-        return blockpos;
+        return pos;
     }
 
     public Biome getSurfaceBiome(int x, int z, BiomeManager.IBiomeReader reader) {

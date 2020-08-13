@@ -25,6 +25,7 @@
 
 package com.terraforged.mod.client.gui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.mod.client.gui.element.Element;
 import com.terraforged.mod.client.gui.preview.Preview;
 import net.minecraft.client.Minecraft;
@@ -41,6 +42,7 @@ import java.util.Objects;
 public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements OverlayRenderer {
 
     private boolean hovered = false;
+    private boolean renderSelection = true;
 
     public ScrollPane(int slotHeightIn) {
         super(Minecraft.getInstance(), 0, 0, 0, 0, slotHeightIn);
@@ -52,12 +54,12 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
     }
 
     @Override
-    public void renderOverlays(Screen screen, int x, int y) {
-        for (Entry entry : this.children()) {
+    public void renderOverlays(MatrixStack matrixStack, Screen screen, int x, int y) {
+        for (Entry entry : this.getEventListeners()) {
             if (entry.isMouseOver(x, y) && entry.option.isMouseOver(x, y)) {
                 Widget button = entry.option;
                 if (button instanceof Element) {
-                    screen.renderTooltip(((Element) button).getTooltip(), x, y);
+                    screen.renderTooltip(matrixStack, ((Element) button).getToolTipText(), x, y);
                     return;
                 }
             }
@@ -70,8 +72,8 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
     }
 
     @Override
-    public void render(int x, int y, float partialTicks) {
-        super.render(x, y, partialTicks);
+    public void render(MatrixStack matrixStack, int x, int y, float partialTicks) {
+        super.render(matrixStack, x, y, partialTicks);
         hovered = isMouseOver(x, y);
     }
 
@@ -87,7 +89,7 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
 
     @Override
     protected boolean isSelectedItem(int index) {
-        return renderSelection && Objects.equals(getSelected(), children().get(index));
+        return renderSelection && Objects.equals(getSelected(), getEventListeners().get(index));
     }
 
     public class Entry extends AbstractOptionList.Entry<Entry> {
@@ -99,13 +101,12 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
         }
 
         @Nullable
-        @Override
         public IGuiEventListener getFocused() {
             return option;
         }
 
         @Override
-        public List<? extends IGuiEventListener> children() {
+        public List<? extends IGuiEventListener> getEventListeners() {
             return Collections.singletonList(option);
         }
 
@@ -125,7 +126,7 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
         }
 
         @Override
-        public void render(int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float partialTicks) {
+        public void render(MatrixStack matrixStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float partialTicks) {
             int optionWidth = Math.min(396, width);
             int padding = (width - optionWidth) / 2;
             option.x = left + padding;
@@ -136,7 +137,7 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
             if (option instanceof Preview) {
                 option.setHeight(option.getWidth());
             }
-            option.render(mouseX, mouseY, partialTicks);
+            option.render(matrixStack, mouseX, mouseY, partialTicks);
         }
     }
 }

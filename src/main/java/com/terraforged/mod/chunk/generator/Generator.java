@@ -2,12 +2,16 @@ package com.terraforged.mod.chunk.generator;
 
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
+import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 import net.minecraft.world.server.ServerWorld;
 
@@ -28,7 +32,7 @@ public interface Generator {
         /**
          * Generates the basic heightmap and populates with stone/water/bedrock accordinly
          */
-        void generateTerrain(IWorld world, IChunk chunk);
+        void generateTerrain(IWorld world, IChunk chunk, StructureManager structures);
     }
 
     interface Features {
@@ -37,7 +41,7 @@ public interface Generator {
          * Places biome specific features into the center-chunk of the world gen region
          * The region consists of the center chunk (the chunk being generated) and it's 8 neighbouring chunks (citation needed)
          */
-        void generateFeatures(WorldGenRegion region);
+        void generateFeatures(WorldGenRegion region, StructureManager manager);
     }
 
     interface Structures {
@@ -45,12 +49,12 @@ public interface Generator {
         /**
          * Determines where structures will be placed during chunk gen
          */
-        void generateStructureStarts(BiomeManager biomes, IChunk chunk, TemplateManager templates);
+        void generateStructureStarts(IChunk chunk, DynamicRegistries registries, StructureManager structures, TemplateManager templates);
 
         /**
          * Determines where individual structure pieces will be placed based on the start positions
          */
-        void generateStructureReferences(IWorld world, IChunk chunk);
+        void generateStructureReferences(ISeedReader world, IChunk chunk, StructureManager structures);
     }
 
     interface Surfaces {
@@ -84,6 +88,6 @@ public interface Generator {
         /**
          * Gets a list of possible spawns at the given position
          */
-        List<Biome.SpawnListEntry> getSpawns(IWorld world, EntityClassification type, BlockPos pos);
+        List<MobSpawnInfo.Spawners> getSpawns(Biome biome, StructureManager structures, EntityClassification type, BlockPos pos);
     }
 }

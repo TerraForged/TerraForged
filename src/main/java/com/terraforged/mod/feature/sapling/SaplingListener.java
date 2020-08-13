@@ -28,7 +28,6 @@ package com.terraforged.mod.feature.sapling;
 import com.terraforged.fm.template.Template;
 import com.terraforged.fm.template.feature.TemplateFeature;
 import com.terraforged.fm.template.feature.TemplateFeatureConfig;
-import com.terraforged.mod.TerraWorld;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.feature.BlockDataManager;
@@ -37,11 +36,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.server.ServerChunkProvider;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.IWorldInfo;
 import net.minecraftforge.event.world.SaplingGrowTreeEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -54,11 +56,11 @@ public class SaplingListener {
 
     private static final BlockPos[] CENTER = {BlockPos.ZERO};
 
-    private static final Vec3i[][] DIRECTIONS = {
-            {new Vec3i(0, 0, 1), new Vec3i(1, 0, 1), new Vec3i(1, 0, 0)},
-            {new Vec3i(1, 0, 0), new Vec3i(1, 0, -1), new Vec3i(0, 0, -1)},
-            {new Vec3i(0, 0, -1), new Vec3i(-1, 0, -1), new Vec3i(-1, 0, 0)},
-            {new Vec3i(-1, 0, 0), new Vec3i(-1, 0, 1), new Vec3i(0, 0, 1)},
+    private static final Vector3i[][] DIRECTIONS = {
+            {new Vector3i(0, 0, 1), new Vector3i(1, 0, 1), new Vector3i(1, 0, 0)},
+            {new Vector3i(1, 0, 0), new Vector3i(1, 0, -1), new Vector3i(0, 0, -1)},
+            {new Vector3i(0, 0, -1), new Vector3i(-1, 0, -1), new Vector3i(-1, 0, 0)},
+            {new Vector3i(-1, 0, 0), new Vector3i(-1, 0, 1), new Vector3i(0, 0, 1)},
     };
 
     @SubscribeEvent
@@ -68,7 +70,7 @@ public class SaplingListener {
             return;
         }
 
-        IWorld world = event.getWorld();
+        ISeedReader world = (ISeedReader) event.getWorld();
         Block block = world.getBlockState(event.getPos()).getBlock();
         Optional<SaplingConfig> saplingConfig = dataManager.get().getConfig(block, SaplingConfig.class);
         if (!saplingConfig.isPresent()) {
@@ -80,7 +82,7 @@ public class SaplingListener {
 
         // if part of a 2x2 grid get the min corner of it
         BlockPos pos = getMinPos(world, block, event.getPos(), saplingConfig.get().hasGiant());
-        Vec3i[] directions = getNeighbours(world, block, pos, saplingConfig.get().hasGiant());
+        Vector3i[] directions = getNeighbours(world, block, pos, saplingConfig.get().hasGiant());
         TemplateFeatureConfig feature = saplingConfig.get().next(event.getRand(), directions.length == 3);
         if (feature == null) {
             return;
@@ -98,7 +100,7 @@ public class SaplingListener {
         // attempt to paste the tree & then clear up any remaining saplings
         if (TemplateFeature.pasteChecked(world, event.getRand(), origin, mirror, rotation, feature, feature.decorator)) {
             event.setResult(Event.Result.DENY);
-            for (Vec3i dir : directions) {
+            for (Vector3i dir : directions) {
                 BlockPos neighbour = origin.add(dir);
                 BlockState state = world.getBlockState(neighbour);
                 if (state.getBlock() == block) {
@@ -114,15 +116,15 @@ public class SaplingListener {
             return Optional.empty();
         }
 
-        // ignore other world types
-        if (!TerraWorld.isTerraWorld(event.getWorld())) {
+        // ignore if not TF world
+        if (isTerraGen(event.getWorld())) {
             return Optional.empty();
         }
 
         // get the data manager from the world's chunk generator
         if (event.getWorld() instanceof ServerWorld) {
             ServerWorld serverWorld = (ServerWorld) event.getWorld();
-            ChunkGenerator<?> generator = serverWorld.getChunkProvider().generator;
+            ChunkGenerator generator = serverWorld.getChunkProvider().generator;
             if (generator instanceof TerraChunkGenerator) {
                 TerraContext context = ((TerraChunkGenerator) generator).getContext();
                 if (context.terraSettings.miscellaneous.customBiomeFeatures) {
@@ -133,8 +135,16 @@ public class SaplingListener {
         return Optional.empty();
     }
 
-    private static boolean isClearOverhead(IWorld world, BlockPos pos, Vec3i[] directions) {
-        for (Vec3i dir : directions) {
+    private static boolean isTerraGen(IWorld world) {
+        if (world.getChunkProvider() instanceof ServerChunkProvider) {
+            ServerChunkProvider chunkProvider = (ServerChunkProvider) world.getChunkProvider();
+            return chunkProvider.getChunkGenerator() instanceof TerraChunkGenerator;
+        }
+        return false;
+    }
+
+    private static boolean isClearOverhead(IWorld world, BlockPos pos, Vector3i[] directions) {
+        for (Vector3i dir : directions) {
             int x = pos.getX() + dir.getX();
             int z = pos.getZ() + dir.getZ();
             int y = world.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, x, z);
@@ -147,9 +157,9 @@ public class SaplingListener {
 
     private static BlockPos getMinPos(IWorld world, Block block, BlockPos pos, boolean checkNeighbours) {
         if (checkNeighbours) {
-            for (Vec3i[] dirs : DIRECTIONS) {
+            for (Vector3i[] dirs : DIRECTIONS) {
                 boolean match = true;
-                for (Vec3i dir : dirs) {
+                for (Vector3i dir : dirs) {
                     BlockState state = world.getBlockState(pos.add(dir));
                     if (state.getBlock() != block) {
                         match = false;
@@ -164,17 +174,17 @@ public class SaplingListener {
         return pos;
     }
 
-    private static Vec3i getTranslation(Vec3i[] directions, Mirror mirror, Rotation rotation) {
+    private static Vector3i getTranslation(Vector3i[] directions, Mirror mirror, Rotation rotation) {
         if (directions.length == 1 || mirror == Mirror.NONE && rotation == Rotation.NONE) {
-            return Vec3i.NULL_VECTOR;
+            return Vector3i.NULL_VECTOR;
         }
         return getMin(directions, mirror, rotation);
     }
 
-    private static Vec3i getMin(Vec3i[] directions, Mirror mirror, Rotation rotation) {
-        Vec3i min = Vec3i.NULL_VECTOR;
+    private static Vector3i getMin(Vector3i[] directions, Mirror mirror, Rotation rotation) {
+        Vector3i min = Vector3i.NULL_VECTOR;
         BlockPos.Mutable pos = new BlockPos.Mutable();
-        for (Vec3i vec : directions) {
+        for (Vector3i vec : directions) {
             BlockPos dir = Template.transform(pos.setPos(vec), mirror, rotation);
             if (dir.getX() < min.getX() && dir.getZ() <= min.getZ()) {
                 min = dir;
@@ -187,11 +197,11 @@ public class SaplingListener {
         return min;
     }
 
-    private static Vec3i[] getNeighbours(IWorld world, Block block, BlockPos pos, boolean checkNeighbours) {
+    private static Vector3i[] getNeighbours(IWorld world, Block block, BlockPos pos, boolean checkNeighbours) {
         if (checkNeighbours) {
-            for (Vec3i[] dirs : DIRECTIONS) {
+            for (Vector3i[] dirs : DIRECTIONS) {
                 boolean match = true;
-                for (Vec3i dir : dirs) {
+                for (Vector3i dir : dirs) {
                     BlockState state = world.getBlockState(pos.add(dir));
                     if (state.getBlock() != block) {
                         match = false;

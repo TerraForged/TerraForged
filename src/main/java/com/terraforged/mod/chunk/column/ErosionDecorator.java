@@ -28,6 +28,7 @@ package com.terraforged.mod.chunk.column;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.material.state.States;
+import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.world.terrain.Terrains;
@@ -85,7 +86,7 @@ public class ErosionDecorator implements ColumnDecorator {
 
         y = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
 
-        ISurfaceBuilderConfig config = context.biome.getSurfaceBuilderConfig();
+        ISurfaceBuilderConfig config = BiomeHelper.getSurface(context.biome);
         BlockState top = config.getTop();
         BlockState middle = config.getUnder();
 

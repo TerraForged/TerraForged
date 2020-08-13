@@ -1,9 +1,11 @@
 package com.terraforged.mod.feature.decorator.poisson;
 
 import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import com.terraforged.core.util.poisson.PoissonContext;
+import com.terraforged.fm.util.codec.Codecs;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import net.minecraft.world.IWorld;
@@ -11,6 +13,11 @@ import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.placement.IPlacementConfig;
 
 public class PoissonConfig implements IPlacementConfig {
+
+    public static final Codec<PoissonConfig> CODEC = Codecs.create(
+            PoissonConfig::serialize,
+            PoissonConfig::deserialize
+    );
 
     public final int radius;
     public final float biomeFade;
@@ -26,7 +33,7 @@ public class PoissonConfig implements IPlacementConfig {
         this.densityNoiseMax = densityNoiseMax;
     }
 
-    public void apply(IWorld world, ChunkGenerator<?> generator, PoissonContext context) {
+    public void apply(IWorld world, ChunkGenerator generator, PoissonContext context) {
         Module fade = Source.ONE;
         Module density = Source.ONE;
 
@@ -43,20 +50,19 @@ public class PoissonConfig implements IPlacementConfig {
         context.density = mult(fade, density);
     }
 
-    @Override
-    public <T> Dynamic<T> serialize(DynamicOps<T> ops) {
+    public static <T> Dynamic<T> serialize(PoissonConfig config, DynamicOps<T> ops) {
         return new Dynamic<>(ops, ops.createMap(
                 ImmutableMap.of(
-                        ops.createString("radius"), ops.createInt(radius),
-                        ops.createString("biome_fade"), ops.createFloat(biomeFade),
-                        ops.createString("density_noise_scale"), ops.createInt(densityNoiseScale),
-                        ops.createString("density_noise_min"), ops.createFloat(densityNoiseMin),
-                        ops.createString("density_noise_max"), ops.createFloat(densityNoiseMax)
+                        ops.createString("radius"), ops.createInt(config.radius),
+                        ops.createString("biome_fade"), ops.createFloat(config.biomeFade),
+                        ops.createString("density_noise_scale"), ops.createInt(config.densityNoiseScale),
+                        ops.createString("density_noise_min"), ops.createFloat(config.densityNoiseMin),
+                        ops.createString("density_noise_max"), ops.createFloat(config.densityNoiseMax)
                 ))
         );
     }
 
-    public static PoissonConfig deserialize(Dynamic<?> dynamic) {
+    public static <T> PoissonConfig deserialize(Dynamic<T> dynamic) {
         int radius = dynamic.get("radius").asInt(4);
         float biomeFade = dynamic.get("biome_fade").asFloat(0.2F);
         int variance = dynamic.get("density_noise_scale").asInt(0);

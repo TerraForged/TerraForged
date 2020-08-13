@@ -26,8 +26,8 @@
 package com.terraforged.mod.util.nbt;
 
 import com.google.gson.JsonElement;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.JsonOps;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import com.terraforged.core.serialization.serializer.Serializer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;

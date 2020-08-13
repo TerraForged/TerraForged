@@ -31,7 +31,7 @@ import com.terraforged.api.chunk.column.DecoratorManager;
 import com.terraforged.api.material.geology.GeologyManager;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.fm.modifier.FeatureModifiers;
-import com.terraforged.fm.structure.StructureManager;
+import com.terraforged.fm.structure.FMStructureManager;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.terrain.provider.TerrainProvider;
 import net.minecraftforge.eventbus.api.Event;
@@ -113,9 +113,9 @@ public abstract class SetupEvent<T> extends Event {
     /**
      * Register custom FeatureModifiers
      */
-    public static class Structures extends SetupEvent<StructureManager> {
+    public static class Structures extends SetupEvent<FMStructureManager> {
 
-        public Structures(StructureManager manager, GeneratorContext context) {
+        public Structures(FMStructureManager manager, GeneratorContext context) {
             super(manager, context);
         }
     }

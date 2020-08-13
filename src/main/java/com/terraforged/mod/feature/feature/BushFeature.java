@@ -1,16 +1,19 @@
 package com.terraforged.mod.feature.feature;
 
 import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import com.terraforged.fm.template.BlockUtils;
+import com.terraforged.fm.util.codec.CodecHelper;
+import com.terraforged.fm.util.codec.Codecs;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.IFeatureConfig;
@@ -20,50 +23,54 @@ import java.util.Random;
 public class BushFeature extends Feature<BushFeature.Config> {
 
     public static final BushFeature INSTANCE = new BushFeature();
+    public static final Codec<BushFeature.Config> CODEC = Codecs.create(
+            BushFeature::serialize,
+            BushFeature::deserialize
+    );
 
-    private static final Vec3i[] logs = {
-            new Vec3i(+1, 0, +1),
-            new Vec3i(+1, 0, -1),
-            new Vec3i(-1, 0, -1),
-            new Vec3i(-1, 0, +1),
+    private static final Vector3i[] logs = {
+            new Vector3i(+1, 0, +1),
+            new Vector3i(+1, 0, -1),
+            new Vector3i(-1, 0, -1),
+            new Vector3i(-1, 0, +1),
 
-            new Vec3i(+2, 0, +1),
-            new Vec3i(+2, 0, -1),
-            new Vec3i(-2, 0, +1),
-            new Vec3i(-2, 0, -1),
+            new Vector3i(+2, 0, +1),
+            new Vector3i(+2, 0, -1),
+            new Vector3i(-2, 0, +1),
+            new Vector3i(-2, 0, -1),
 
-            new Vec3i(+1, 0, +2),
-            new Vec3i(+1, 0, -2),
-            new Vec3i(-1, 0, +2),
-            new Vec3i(-1, 0, -2),
+            new Vector3i(+1, 0, +2),
+            new Vector3i(+1, 0, -2),
+            new Vector3i(-1, 0, +2),
+            new Vector3i(-1, 0, -2),
     };
 
-    private static final Vec3i[] leaves = {
-            new Vec3i(0, 0, 1),
-            new Vec3i(0, 0, -1),
-            new Vec3i(1, 0, 0),
-            new Vec3i(-1, 0, 0),
-            new Vec3i(0, 1, 0),
+    private static final Vector3i[] leaves = {
+            new Vector3i(0, 0, 1),
+            new Vector3i(0, 0, -1),
+            new Vector3i(1, 0, 0),
+            new Vector3i(-1, 0, 0),
+            new Vector3i(0, 1, 0),
     };
 
     public BushFeature() {
-        super(BushFeature::deserialize);
+        super(BushFeature.CODEC);
         setRegistryName("terraforged", "bush");
     }
 
     @Override
-    public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, Config config) {
-        try (BlockPos.PooledMutable log = BlockPos.PooledMutable.retain(); BlockPos.PooledMutable leaf = BlockPos.PooledMutable.retain()) {
-            place(world, log.setPos(pos), leaf, rand, config);
-            for (float chance = rand.nextFloat(); chance < config.size_chance; chance += rand.nextFloat()) {
-                add(log, logs[rand.nextInt(logs.length)]);
+    public boolean func_241855_a(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, Config config) {
+        BlockPos.Mutable log = new BlockPos.Mutable();
+        BlockPos.Mutable leaf = new BlockPos.Mutable();
+        place(world, log.setPos(pos), leaf, rand, config);
+        for (float chance = rand.nextFloat(); chance < config.size_chance; chance += rand.nextFloat()) {
+            add(log, logs[rand.nextInt(logs.length)]);
 
-                if (!place(world, log, leaf, rand, config)) {
-                    break;
-                }
+            if (!place(world, log, leaf, rand, config)) {
+                break;
             }
         }
-        return true;
+        return false;
     }
 
     private boolean place(IWorld world, BlockPos.Mutable center, BlockPos.Mutable pos, Random random, Config config) {
@@ -83,7 +90,7 @@ public class BushFeature extends Feature<BushFeature.Config> {
         center.move(Direction.UP, 1);
         world.setBlockState(center, config.trunk, 2);
 
-        for (Vec3i neighbour : leaves) {
+        for (Vector3i neighbour : leaves) {
             // randomly skip NESW neighbours
             if (neighbour.getY() == 0 && random.nextFloat() < config.airChance) {
                 continue;
@@ -117,13 +124,26 @@ public class BushFeature extends Feature<BushFeature.Config> {
         return true;
     }
 
-    private static void add(BlockPos.Mutable pos, Vec3i add) {
+    private static void add(BlockPos.Mutable pos, Vector3i add) {
         pos.setPos(pos.getX() + add.getX(), pos.getY() + add.getY(), pos.getZ() + add.getZ());
     }
 
-    public static Config deserialize(Dynamic<?> data) {
-        BlockState logs = BlockState.deserialize(data.get("trunk").get().get());
-        BlockState leaves = BlockState.deserialize(data.get("leaves").get().get());
+    public static <T> Dynamic<T> serialize(Config config, DynamicOps<T> ops) {
+        return new Dynamic<>(
+                ops,
+                ops.createMap(ImmutableMap.of(
+                        ops.createString("trunk"), CodecHelper.setState(config.trunk, ops),
+                        ops.createString("leaves"), CodecHelper.setState(config.leaves, ops),
+                        ops.createString("air_chance"), ops.createFloat(config.airChance),
+                        ops.createString("leaf_chance"), ops.createFloat(config.airChance),
+                        ops.createString("size_chance"), ops.createFloat(config.size_chance)
+                ))
+        );
+    }
+
+    public static <T> Config deserialize(Dynamic<T> data) {
+        BlockState logs = CodecHelper.getState(data.get("trunk"));
+        BlockState leaves = CodecHelper.getState(data.get("leaves"));
         float airChance = data.get("air_chance").asFloat(0.075F);
         float leafChance = data.get("leaf_chance").asFloat(0.075F);
         float sizeChance = data.get("size_chance").asFloat(0.75F);
@@ -144,20 +164,6 @@ public class BushFeature extends Feature<BushFeature.Config> {
             this.airChance = airChance;
             this.leafChance = leafChance;
             this.size_chance = size_chance;
-        }
-
-        @Override
-        public <T> Dynamic<T> serialize(DynamicOps<T> ops) {
-            return new Dynamic<>(
-                    ops,
-                    ops.createMap(ImmutableMap.of(
-                            ops.createString("trunk"), BlockState.serialize(ops, trunk).getValue(),
-                            ops.createString("leaves"), BlockState.serialize(ops, leaves).getValue(),
-                            ops.createString("air_chance"), ops.createFloat(airChance),
-                            ops.createString("leaf_chance"), ops.createFloat(airChance),
-                            ops.createString("size_chance"), ops.createFloat(size_chance)
-                    ))
-            );
         }
     }
 }

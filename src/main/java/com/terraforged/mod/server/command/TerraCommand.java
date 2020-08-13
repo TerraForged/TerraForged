@@ -35,7 +35,6 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.data.DataGen;
@@ -55,7 +54,9 @@ import net.minecraft.command.arguments.ArgumentTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.Color;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextComponentUtils;
@@ -65,7 +66,6 @@ import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -88,7 +88,7 @@ public class TerraCommand {
     @SubscribeEvent
     public static void register(FMLServerStartingEvent event) {
         Log.info("Registering /terra command");
-        register(event.getCommandDispatcher());
+//        register(event.getCommandDispatcher());
     }
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
@@ -134,7 +134,7 @@ public class TerraCommand {
             context.getSource().sendFeedback(
                     new StringTextComponent(
                             "Terrain=" + cell.get().terrain.getName()
-                                    + ", Biome=" + biome.getRegistryName()
+                                    + ", Biome=" + biome
                                     + ", BiomeType=" + cell.get().biomeType.name()
                     ),
                     false
@@ -178,8 +178,8 @@ public class TerraCommand {
         Biome biome2 = ColumnFuzzedBiomeMagnifier.INSTANCE.getBiome(seed, x, 0, z, player.getServerWorld().getWorldServer().getChunkProvider().generator.getBiomeProvider());
 
         context.getSource().sendFeedback(new StringTextComponent(
-                        "Actual Biome = " + actual.getRegistryName()
-                                + "\nLookup Biome = " + biome2.getRegistryName()),
+                        "Actual Biome = " + actual
+                                + "\nLookup Biome = " + biome2),
                 false
         );
 
@@ -256,28 +256,28 @@ public class TerraCommand {
             }
 
             if (pos.getX() == 0 && pos.getZ() == 0) {
-                player.sendMessage(new StringTextComponent("Location not found :["));
+                player.sendMessage(new StringTextComponent("Location not found :["), Util.DUMMY_UUID);
                 return;
             }
 
             double distance = Math.sqrt(player.getPosition().distanceSq(pos));
 
             ITextComponent result = new StringTextComponent("Nearest match: ")
-                    .appendSibling(createTeleportMessage(pos))
-                    .appendSibling(new StringTextComponent(String.format(" Distance: %.2f", distance)));
+                    .append(createTeleportMessage(pos))
+                    .append(new StringTextComponent(String.format(" Distance: %.2f", distance)));
 
-            player.sendMessage(result);
+            player.sendMessage(result, Util.DUMMY_UUID);
         }));
     }
 
     private static Optional<TerraContext> getContext(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        MinecraftServer server = context.getSource().getServer();
-        DimensionType dimension = context.getSource().asPlayer().dimension;
-        ChunkGenerator<?> generator = server.getWorld(dimension).getChunkProvider().getChunkGenerator();
-        if (generator instanceof TerraChunkGenerator) {
-            TerraChunkGenerator gen = (TerraChunkGenerator) generator;
-            return Optional.of(gen.getContext());
-        }
+//        MinecraftServer server = context.getSource().getServer();
+//        DimensionType dimension = context.getSource().asPlayer().dimension;
+//        ChunkGenerator<?> generator = server.getWorld(dimension).getChunkProvider().getChunkGenerator();
+//        if (generator instanceof TerraChunkGenerator) {
+//            TerraChunkGenerator gen = (TerraChunkGenerator) generator;
+//            return Optional.of(gen.getContext());
+//        }
         return Optional.empty();
     }
 
@@ -292,7 +292,7 @@ public class TerraCommand {
         return find;
     }
 
-    private static ChunkGenerator<?> getChunkGenerator(CommandContext<CommandSource> context) {
+    private static ChunkGenerator getChunkGenerator(CommandContext<CommandSource> context) {
         return context.getSource().getWorld().getChunkProvider().getChunkGenerator();
     }
 
@@ -308,9 +308,9 @@ public class TerraCommand {
     }
 
     private static ITextComponent createTeleportMessage(BlockPos pos) {
-        return TextComponentUtils.wrapInSquareBrackets(new TranslationTextComponent(
+        return TextComponentUtils.wrapWithSquareBrackets(new TranslationTextComponent(
                 "chat.coordinates", pos.getX(), "~", pos.getZ()
-        )).applyTextStyle((style) -> style.setColor(TextFormatting.GREEN)
+        )).modifyStyle(style -> style.setColor(Color.func_240744_a_(TextFormatting.GREEN))
                 .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + pos.getX() + " " + pos.getY() + " " + pos.getZ()))
                 .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("chat.coordinates.tooltip")))
         );

@@ -25,6 +25,7 @@
 
 package com.terraforged.mod.client.gui.element;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 
@@ -44,9 +45,9 @@ public class TerraLabel extends TerraButton {
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
+    public void render(MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
         Minecraft minecraft = Minecraft.getInstance();
         FontRenderer fontrenderer = minecraft.fontRenderer;
-        fontrenderer.drawStringWithShadow(getMessage(), x, y + (height - 8) / 2F, color);
+        fontrenderer.drawString(matrix, getMessage().getString(), x, y + (height - 8) / 2F, color);
     }
 }

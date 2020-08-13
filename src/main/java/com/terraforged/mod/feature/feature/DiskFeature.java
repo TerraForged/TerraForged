@@ -5,9 +5,8 @@ import com.terraforged.n2d.Source;
 import net.minecraft.block.BlockState;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.SphereReplaceConfig;
 
@@ -20,17 +19,20 @@ public class DiskFeature extends Feature<SphereReplaceConfig> {
     private final Module domain = Source.simplex(1, 6, 3);
 
     private DiskFeature() {
-        super(SphereReplaceConfig::deserialize);
+        super(SphereReplaceConfig.field_236516_a_);
         setRegistryName("terraforged", "disk");
     }
 
     @Override
-    public boolean place(IWorld worldIn, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, SphereReplaceConfig config) {
-        if (!worldIn.getFluidState(pos).isTagged(FluidTags.WATER)) {
+    public boolean func_241855_a(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, SphereReplaceConfig config) {
+        if (!world.getFluidState(pos).isTagged(FluidTags.WATER)) {
             return false;
         } else {
+            int cRadius = 6;
+            int ySize = 5;
+
             int i = 0;
-            int radius = 4 + rand.nextInt(config.radius - 2);
+            int radius = 4 + rand.nextInt(cRadius);
             float radius2 = (radius * radius)  * 0.65F;
             BlockPos.Mutable blockPos = new BlockPos.Mutable();
 
@@ -40,13 +42,13 @@ public class DiskFeature extends Feature<SphereReplaceConfig> {
                     int dz = z - pos.getZ();
                     float rad2 = domain.getValue(x, z) * radius2;
                     if (dx * dx + dz * dz <= rad2) {
-                        for(int y = pos.getY() - config.ySize; y <= pos.getY() + config.ySize && y + 1 < generator.getSeaLevel(); ++y) {
+                        for(int y = pos.getY() - ySize; y <= pos.getY() + ySize && y + 1 < generator.func_230356_f_(); ++y) {
                             blockPos.setPos(x, y, z);
-                            BlockState current = worldIn.getBlockState(blockPos);
+                            BlockState current = world.getBlockState(blockPos);
 
                             for(BlockState target : config.targets) {
                                 if (target.getBlock() == current.getBlock()) {
-                                    worldIn.setBlockState(blockPos, config.state, 2);
+                                    world.setBlockState(blockPos, config.state, 2);
                                     ++i;
                                     break;
                                 }

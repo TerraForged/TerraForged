@@ -1,9 +1,9 @@
 package com.terraforged.mod.chunk.util;
 
-import com.terraforged.api.biome.BiomeVariant;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.core.util.PosIterator;
+import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
@@ -23,8 +23,8 @@ public class TerraContainer extends BiomeContainer {
     private final Biome[] biomes;
     private final Biome[] surface;
 
-    public TerraContainer(Biome[] biomes, Biome[] surface) {
-        super(biomes);
+    public TerraContainer(Biome[] biomes, Biome[] surface, GameContext context) {
+        super(context.biomes.getRegistry(), biomes);
         this.biomes = biomes;
         this.surface = surface;
     }
@@ -46,19 +46,17 @@ public class TerraContainer extends BiomeContainer {
         return getBiome(8, 8);
     }
 
-    public BiomeContainer bakeBiomes(boolean convertToVanilla) {
+    public BiomeContainer bakeBiomes(boolean convertToVanilla, GameContext context) {
         if (convertToVanilla) {
             Biome[] biomeArray = new Biome[biomes.length];
             for (int i = 0; i < biomes.length; i++) {
                 Biome biome = biomes[i];
-                if (biome instanceof BiomeVariant) {
-                    biome = ((BiomeVariant) biome).getBase();
-                }
+                biome = context.biomes.getRemap(biome);
                 biomeArray[i] = biome;
             }
-            return new BiomeContainer(biomeArray);
+            return new BiomeContainer(context.biomes.getRegistry(), biomeArray);
         }
-        return new BiomeContainer(biomes);
+        return new BiomeContainer(context.biomes.getRegistry(), biomes);
     }
 
     public static TerraContainer getOrCreate(IChunk chunk, ChunkReader reader, TerraBiomeProvider biomeProvider) {
@@ -70,7 +68,7 @@ public class TerraContainer extends BiomeContainer {
         TerraContainer container = TerraContainer.create(reader, biomeProvider);
 
         // replace/set the primer's biomes
-        ((ChunkPrimer) chunk).func_225548_a_(container);
+        ((ChunkPrimer) chunk).setBiomes(container);
 
         return container;
     }
@@ -92,7 +90,7 @@ public class TerraContainer extends BiomeContainer {
                 }
             }
         }
-        return new TerraContainer(biomes3D, biomes2D);
+        return new TerraContainer(biomes3D, biomes2D, biomeProvider.getContext().gameContext);
     }
 
     private static int indexOf(int x, int z) {

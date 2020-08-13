@@ -27,6 +27,9 @@ package com.terraforged.mod.client.gui.element;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponent;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +38,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public interface Element {
 
     AtomicInteger ID_COUNTER = new AtomicInteger(0);
+
+    default ITextComponent getToolTipText() {
+        TextComponent base = new StringTextComponent("");
+        for (String s : getTooltip()) {
+            base.append(new StringTextComponent(s));
+        }
+        return base;
+    }
 
     default List<String> getTooltip() {
         return Collections.emptyList();

@@ -36,7 +36,6 @@ import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.heightmap.Levels;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
 
 public class IcebergsSurface implements MaskedSurface {
 
@@ -49,6 +48,8 @@ public class IcebergsSurface implements MaskedSurface {
 
     private final float minDepth;
     private final float depthRange;
+
+    private final BlockState gravel = States.GRAVEL.get();
 
     public IcebergsSurface(TerraContext context, int height, int depth) {
         Levels levels = context.levels;
@@ -121,7 +122,7 @@ public class IcebergsSurface implements MaskedSurface {
         int floorDepth = (int) (seaFloor.getValue(x, z) * levels.worldHeight);
         for (int dy = 0; dy < floorDepth; dy++) {
             pos.setY(floorBed - dy);
-            ctx.chunk.setBlockState(pos, SurfaceBuilder.GRAVEL, false);
+            ctx.chunk.setBlockState(pos, gravel, false);
         }
     }
 

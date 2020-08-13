@@ -1,6 +1,7 @@
 package com.terraforged.mod.data;
 
 import com.terraforged.core.util.NameUtil;
+import com.terraforged.fm.GameContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.preview.PreviewSettings;
@@ -14,7 +15,6 @@ import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.function.UnaryOperator;
 
@@ -24,12 +24,13 @@ public class LangGenerator {
     @SubscribeEvent
     public static void gather(GatherDataEvent event) {
         GuiKeys.init();
+        GameContext context = null;
 
         LanguageProvider langProvider = new LanguageProvider(event.getGenerator(), "terraforged", "en_us") {
             @Override
             protected void addTranslations() {
                 worlds(this);
-                biomes(this);
+                biomes(this, context);
                 translationKeys(this);
                 settings(this);
             }
@@ -43,11 +44,11 @@ public class LangGenerator {
         provider.add("generator.terratest", "TerraTest");
     }
 
-    private static void biomes(LanguageProvider provider) {
-        for (Biome biome : ForgeRegistries.BIOMES) {
-            ResourceLocation name = biome.getRegistryName();
+    private static void biomes(LanguageProvider provider, GameContext context) {
+        for (Biome biome : context.biomes) {
+            ResourceLocation name = context.biomes.getRegistryName(biome);
             if (name != null && name.getNamespace().equals("terraforged")) {
-                provider.add(biome, NameUtil.toDisplayName(name.getPath()));
+//                provider.add(biome, NameUtil.toDisplayName(name.getPath()));
             }
         }
     }

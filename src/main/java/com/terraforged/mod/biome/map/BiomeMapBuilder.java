@@ -25,7 +25,9 @@
 
 package com.terraforged.mod.biome.map;
 
+import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.provider.BiomeHelper;
+import com.terraforged.mod.biome.utils.TempCategory;
 import com.terraforged.world.biome.BiomeType;
 import net.minecraft.world.biome.Biome;
 
@@ -38,25 +40,27 @@ import java.util.function.Function;
 
 public class BiomeMapBuilder implements BiomeMap.Builder {
 
-    protected final Map<Biome.TempCategory, List<Biome>> rivers = new HashMap<>();
-    protected final Map<Biome.TempCategory, List<Biome>> lakes = new HashMap<>();
-    protected final Map<Biome.TempCategory, List<Biome>> coasts = new HashMap<>();
-    protected final Map<Biome.TempCategory, List<Biome>> beaches = new HashMap<>();
-    protected final Map<Biome.TempCategory, List<Biome>> oceans = new HashMap<>();
-    protected final Map<Biome.TempCategory, List<Biome>> deepOceans = new HashMap<>();
-    protected final Map<Biome.TempCategory, List<Biome>> mountains = new HashMap<>();
-    protected final Map<Biome.TempCategory, List<Biome>> wetlands = new HashMap<>();
+    protected final Map<TempCategory, List<Biome>> rivers = new HashMap<>();
+    protected final Map<TempCategory, List<Biome>> lakes = new HashMap<>();
+    protected final Map<TempCategory, List<Biome>> coasts = new HashMap<>();
+    protected final Map<TempCategory, List<Biome>> beaches = new HashMap<>();
+    protected final Map<TempCategory, List<Biome>> oceans = new HashMap<>();
+    protected final Map<TempCategory, List<Biome>> deepOceans = new HashMap<>();
+    protected final Map<TempCategory, List<Biome>> mountains = new HashMap<>();
+    protected final Map<TempCategory, List<Biome>> wetlands = new HashMap<>();
     protected final Map<BiomeType, List<Biome>> map = new EnumMap<>(BiomeType.class);
 
+    protected final GameContext context;
     private final Function<BiomeMapBuilder, BiomeMap> constructor;
 
-    BiomeMapBuilder(Function<BiomeMapBuilder, BiomeMap> constructor) {
+    BiomeMapBuilder(GameContext context, Function<BiomeMapBuilder, BiomeMap> constructor) {
+        this.context = context;
         this.constructor = constructor;
     }
 
     @Override
     public BiomeMapBuilder addOcean(Biome biome, int count) {
-        Biome.TempCategory category = BiomeHelper.getTempCategory(biome);
+        TempCategory category = TempCategory.forBiome(biome, context);
         if (biome.getDepth() < -1) {
             add(deepOceans.computeIfAbsent(category, c -> new ArrayList<>()), biome, count);
         } else {
@@ -67,42 +71,42 @@ public class BiomeMapBuilder implements BiomeMap.Builder {
 
     @Override
     public BiomeMap.Builder addBeach(Biome biome, int count) {
-        Biome.TempCategory category = BiomeHelper.getTempCategory(biome);
+        TempCategory category = TempCategory.forBiome(biome, context);
         add(beaches.computeIfAbsent(category, c -> new ArrayList<>()), biome, count);
         return this;
     }
 
     @Override
     public BiomeMap.Builder addCoast(Biome biome, int count) {
-        Biome.TempCategory category = BiomeHelper.getTempCategory(biome);
+        TempCategory category = TempCategory.forBiome(biome, context);
         add(coasts.computeIfAbsent(category, c -> new ArrayList<>()), biome, count);
         return this;
     }
 
     @Override
     public BiomeMapBuilder addRiver(Biome biome, int count) {
-        Biome.TempCategory category = BiomeHelper.getTempCategory(biome);
+        TempCategory category = TempCategory.forBiome(biome, context);
         add(rivers.computeIfAbsent(category, c -> new ArrayList<>()), biome, count);
         return this;
     }
 
     @Override
     public BiomeMapBuilder addLake(Biome biome, int count) {
-        Biome.TempCategory category = BiomeHelper.getTempCategory(biome);
+        TempCategory category = TempCategory.forBiome(biome, context);
         add(lakes.computeIfAbsent(category, c -> new ArrayList<>()), biome, count);
         return this;
     }
 
     @Override
     public BiomeMapBuilder addWetland(Biome biome, int count) {
-        Biome.TempCategory category = BiomeHelper.getTempCategory(biome);
+        TempCategory category = TempCategory.forBiome(biome, context);
         add(wetlands.computeIfAbsent(category, c -> new ArrayList<>()), biome, count);
         return this;
     }
 
     @Override
     public BiomeMapBuilder addMountain(Biome biome, int count) {
-        Biome.TempCategory category = BiomeHelper.getMountainCategory(biome);
+        TempCategory category = BiomeHelper.getMountainCategory(biome);
         add(mountains.computeIfAbsent(category, c -> new ArrayList<>()), biome, count);
         return this;
     }
@@ -124,7 +128,7 @@ public class BiomeMapBuilder implements BiomeMap.Builder {
         }
     }
 
-    public static BiomeMap.Builder create() {
-        return new BiomeMapBuilder(SimpleBiomeMap::new);
+    public static BiomeMap.Builder create(GameContext context) {
+        return new BiomeMapBuilder(context, SimpleBiomeMap::new);
     }
 }

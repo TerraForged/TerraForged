@@ -28,6 +28,7 @@ package com.terraforged.mod.biome.provider;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.api.material.layer.LayerMaterial;
 import com.terraforged.core.concurrent.Resource;
+import com.terraforged.fm.GameContext;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.util.DummyBlockReader;
 import com.terraforged.mod.util.ListUtils;
@@ -58,12 +59,15 @@ public class DesertBiomes {
     private final int maxRedIndex;
     private final int maxWhiteIndex;
 
-    public DesertBiomes(Materials materials, List<Biome> deserts) {
+    private final Biome defaultRed;
+    private final Biome defaultWhite;
+
+    public DesertBiomes(Materials materials, List<Biome> deserts, GameContext context) {
         List<Biome> white = new LinkedList<>();
         List<Biome> red = new LinkedList<>();
         try (Resource<DummyBlockReader> reader = DummyBlockReader.pooled()) {
             for (Biome biome : deserts) {
-                BlockState top = biome.getSurfaceBuilderConfig().getTop();
+                BlockState top = BiomeHelper.getSurface(biome).getTop();
                 MaterialColor color = top.getMaterialColor(reader.get().set(top), BlockPos.ZERO);
                 int whiteDist2 = distance2(color, MaterialColor.SAND);
                 int redDist2 = distance2(color, MaterialColor.ADOBE);
@@ -80,10 +84,12 @@ public class DesertBiomes {
         this.deserts = new HashSet<>(deserts);
         this.whites = new HashSet<>(white);
         this.reds = new HashSet<>(red);
-        this.whiteSand.sort(Comparator.comparing(BiomeHelper::getId));
-        this.redSand.sort(Comparator.comparing(BiomeHelper::getId));
+        this.whiteSand.sort(Comparator.comparing(context.biomes::getName));
+        this.redSand.sort(Comparator.comparing(context.biomes::getName));
         this.maxRedIndex = red.size() - 1;
         this.maxWhiteIndex = white.size() - 1;
+        this.defaultRed = context.biomes.get(Biomes.BADLANDS);
+        this.defaultWhite = context.biomes.get(Biomes.DESERT);
     }
     public boolean isDesert(Biome biome) {
         return deserts.contains(biome);
@@ -98,11 +104,11 @@ public class DesertBiomes {
     }
 
     public Biome getRedDesert(float shape) {
-        return ListUtils.get(redSand, maxRedIndex, shape, Biomes.MODIFIED_BADLANDS_PLATEAU);
+        return ListUtils.get(redSand, maxRedIndex, shape, defaultRed);
     }
 
     public Biome getWhiteDesert(float shape) {
-        return ListUtils.get(whiteSand, maxWhiteIndex, shape, Biomes.DESERT);
+        return ListUtils.get(whiteSand, maxWhiteIndex, shape, defaultWhite);
     }
 
     public LayerMaterial getSandLayers(Biome biome) {

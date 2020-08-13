@@ -32,19 +32,13 @@ import net.minecraft.world.chunk.IChunk;
 
 import javax.annotation.Nullable;
 
-public class ChunkSurfaceBuffer implements ChunkDelegate {
+public class ChunkSurfaceBuffer extends ChunkDelegate {
 
     private int surfaceTop;
     private int surfaceBottom;
-    private final IChunk delegate;
 
     public ChunkSurfaceBuffer(IChunk chunk) {
-        this.delegate = chunk;
-    }
-
-    @Override
-    public IChunk getDelegate() {
-        return delegate;
+        super(chunk);
     }
 
     @Nullable
@@ -56,7 +50,7 @@ public class ChunkSurfaceBuffer implements ChunkDelegate {
         if (pos.getY() < surfaceBottom) {
             surfaceBottom = pos.getY();
         }
-        return getDelegate().setBlockState(pos, state, isMoving);
+        return delegate.setBlockState(pos, state, isMoving);
     }
 
     public int getSurfaceTop() {

@@ -7,10 +7,10 @@ import net.minecraft.block.SnowyDirtBlock;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
@@ -22,12 +22,12 @@ public class FreezeLayer extends Feature<NoFeatureConfig> {
     public static final FreezeLayer INSTANCE = new FreezeLayer();
 
     public FreezeLayer() {
-        super(NoFeatureConfig::deserialize);
+        super(NoFeatureConfig.field_236558_a_);
         setRegistryName("terraforged", "freeze_top_layer");
     }
 
     @Override
-    public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, NoFeatureConfig config) {
+    public boolean func_241855_a(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
         BlockPos.Mutable pos1 = new BlockPos.Mutable();
         BlockPos.Mutable pos2 = new BlockPos.Mutable();
 
@@ -100,7 +100,7 @@ public class FreezeLayer extends Feature<NoFeatureConfig> {
 
         world.setBlockState(pos1, Blocks.SNOW.getDefaultState(), 2);
 
-        if (below.has(SnowyDirtBlock.SNOWY)) {
+        if (below.hasProperty(SnowyDirtBlock.SNOWY)) {
             world.setBlockState(pos2, below.with(SnowyDirtBlock.SNOWY, true), 2);
         }
         return true;

@@ -26,6 +26,7 @@
 package com.terraforged.mod.client.gui.element;
 
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.text.StringTextComponent;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,12 +37,12 @@ public class TerraButton extends Button implements Element {
     private final List<String> tooltip;
 
     public TerraButton(String displayString) {
-        super(0, 0, 200, 20, displayString, b -> {});
+        super(0, 0, 200, 20, new StringTextComponent(displayString), b -> {});
         this.tooltip = Collections.emptyList();
     }
 
     public TerraButton(String displayString, String... tooltip) {
-        super(0, 0, 200, 20, displayString, b -> {});
+        super(0, 0, 200, 20, new StringTextComponent(displayString), b -> {});
         this.tooltip = Arrays.asList(tooltip);
     }
 

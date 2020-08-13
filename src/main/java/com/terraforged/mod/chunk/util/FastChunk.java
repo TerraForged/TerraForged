@@ -15,7 +15,7 @@ import org.apache.commons.lang3.Validate;
 /**
  * A ChunkPrimer wrapper that handles setting BlockStates within the chunk & updating heightmaps accordingly
  */
-public class FastChunk implements ChunkDelegate {
+public class FastChunk extends ChunkDelegate {
 
     private static final int arraySize = 256;
     private static final int bitsPerEntry = 9;
@@ -29,16 +29,12 @@ public class FastChunk implements ChunkDelegate {
     private final BlockPos.Mutable mutable = new BlockPos.Mutable();
 
     private FastChunk(ChunkPrimer primer) {
+        super(primer);
         this.primer = primer;
         this.blockX = primer.getPos().getXStart();
         this.blockZ = primer.getPos().getZStart();
         this.worldSurface = primer.getHeightmap(Heightmap.Type.WORLD_SURFACE_WG);
         this.oceanSurface = primer.getHeightmap(Heightmap.Type.OCEAN_FLOOR_WG);
-    }
-
-    @Override
-    public IChunk getDelegate() {
-        return primer;
     }
 
     @Override
@@ -90,7 +86,7 @@ public class FastChunk implements ChunkDelegate {
     }
 
     public void setBiomes(BiomeContainer biomes) {
-        primer.func_225548_a_(biomes);
+        primer.setBiomes(biomes);
     }
 
     public static IChunk wrap(IChunk chunk) {

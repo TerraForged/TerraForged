@@ -1,28 +1,3 @@
-/*
- *
- * MIT License
- *
- * Copyright (c) 2020 TerraForged
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package com.terraforged.api.chunk;
 
 import it.unimi.dsi.fastutil.longs.LongSet;
@@ -31,15 +6,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.palette.UpgradeData;
 import net.minecraft.world.ITickList;
 import net.minecraft.world.IWorld;
@@ -47,282 +23,300 @@ import net.minecraft.world.biome.BiomeContainer;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureStart;
 
 import javax.annotation.Nullable;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public interface ChunkDelegate extends IChunk {
+public class ChunkDelegate implements IChunk {
 
-    IChunk getDelegate();
+    protected final IChunk delegate;
 
-    @Override
-    @Nullable
-    default BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving) {
-        return getDelegate().setBlockState(pos, state, isMoving);
+    public ChunkDelegate(IChunk delegate) {
+        this.delegate = delegate;
     }
 
-    @Override
-    default void addTileEntity(BlockPos pos, TileEntity tileEntityIn) {
-        getDelegate().addTileEntity(pos, tileEntityIn);
-    }
-
-    @Override
-    default void addEntity(Entity entityIn) {
-        getDelegate().addEntity(entityIn);
+    public IChunk getDelegate() {
+        return delegate;
     }
 
     @Override
     @Nullable
-    default ChunkSection getLastExtendedBlockStorage() {
-        return getDelegate().getLastExtendedBlockStorage();
+    public BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving) {
+        return delegate.setBlockState(pos, state, isMoving);
     }
 
     @Override
-    default int getTopFilledSegment() {
-        return getDelegate().getTopFilledSegment();
+    public void addTileEntity(BlockPos pos, TileEntity tileEntityIn) {
+        delegate.addTileEntity(pos, tileEntityIn);
     }
 
     @Override
-    default Set<BlockPos> getTileEntitiesPos() {
-        return getDelegate().getTileEntitiesPos();
-    }
-
-    @Override
-    default ChunkSection[] getSections() {
-        return getDelegate().getSections();
-    }
-
-    @Override
-    default Collection<Map.Entry<Heightmap.Type, Heightmap>> getHeightmaps() {
-        return getDelegate().getHeightmaps();
-    }
-
-    @Override
-    default void setHeightmap(Heightmap.Type type, long[] data) {
-        getDelegate().setHeightmap(type, data);
-    }
-
-    @Override
-    default Heightmap getHeightmap(Heightmap.Type type) {
-        return getDelegate().getHeightmap(type);
-    }
-
-    @Override
-    default int getTopBlockY(Heightmap.Type heightmapType, int x, int z) {
-        return getDelegate().getTopBlockY(heightmapType, x, z);
-    }
-
-    @Override
-    default ChunkPos getPos() {
-        return getDelegate().getPos();
-    }
-
-    @Override
-    default void setLastSaveTime(long saveTime) {
-        getDelegate().setLastSaveTime(saveTime);
-    }
-
-    @Override
-    default Map<String, StructureStart> getStructureStarts() {
-        return getDelegate().getStructureStarts();
-    }
-
-    @Override
-    default void setStructureStarts(Map<String, StructureStart> structureStartsIn) {
-        getDelegate().setStructureStarts(structureStartsIn);
-    }
-
-    @Override
-    default boolean isEmptyBetween(int startY, int endY) {
-        return getDelegate().isEmptyBetween(startY, endY);
+    public void addEntity(Entity entityIn) {
+        delegate.addEntity(entityIn);
     }
 
     @Override
     @Nullable
-    default BiomeContainer getBiomes() {
-        return getDelegate().getBiomes();
+    public ChunkSection getLastExtendedBlockStorage() {
+        return delegate.getLastExtendedBlockStorage();
     }
 
     @Override
-    default void setModified(boolean modified) {
-        getDelegate().setModified(modified);
+    public int getTopFilledSegment() {
+        return delegate.getTopFilledSegment();
     }
 
     @Override
-    default boolean isModified() {
-        return getDelegate().isModified();
+    public Set<BlockPos> getTileEntitiesPos() {
+        return delegate.getTileEntitiesPos();
     }
 
     @Override
-    default ChunkStatus getStatus() {
-        return getDelegate().getStatus();
+    public ChunkSection[] getSections() {
+        return delegate.getSections();
     }
 
     @Override
-    default void removeTileEntity(BlockPos pos) {
-        getDelegate().removeTileEntity(pos);
+    public Collection<Map.Entry<Heightmap.Type, Heightmap>> getHeightmaps() {
+        return delegate.getHeightmaps();
     }
 
     @Override
-    default void markBlockForPostprocessing(BlockPos pos) {
-        getDelegate().markBlockForPostprocessing(pos);
+    public void setHeightmap(Heightmap.Type type, long[] data) {
+        delegate.setHeightmap(type, data);
     }
 
     @Override
-    default ShortList[] getPackedPositions() {
-        return getDelegate().getPackedPositions();
+    public Heightmap getHeightmap(Heightmap.Type typeIn) {
+        return delegate.getHeightmap(typeIn);
     }
 
     @Override
-    default void func_201636_b(short packedPosition, int index) {
-        getDelegate().func_201636_b(packedPosition, index);
+    public int getTopBlockY(Heightmap.Type heightmapType, int x, int z) {
+        return delegate.getTopBlockY(heightmapType, x, z);
     }
 
     @Override
-    default void addTileEntity(CompoundNBT nbt) {
-        getDelegate().addTileEntity(nbt);
+    public ChunkPos getPos() {
+        return delegate.getPos();
     }
 
     @Override
-    @Nullable
-    default CompoundNBT getDeferredTileEntity(BlockPos pos) {
-        return getDelegate().getDeferredTileEntity(pos);
+    public void setLastSaveTime(long saveTime) {
+        delegate.setLastSaveTime(saveTime);
     }
 
     @Override
-    @Nullable
-    default CompoundNBT getTileEntityNBT(BlockPos pos) {
-        return getDelegate().getTileEntityNBT(pos);
+    public Map<Structure<?>, StructureStart<?>> getStructureStarts() {
+        return delegate.getStructureStarts();
     }
 
     @Override
-    default Stream<BlockPos> getLightSources() {
-        return getDelegate().getLightSources();
+    public void setStructureStarts(Map<Structure<?>, StructureStart<?>> structureStartsIn) {
+        delegate.setStructureStarts(structureStartsIn);
     }
 
     @Override
-    default ITickList<Block> getBlocksToBeTicked() {
-        return getDelegate().getBlocksToBeTicked();
-    }
-
-    @Override
-    default ITickList<Fluid> getFluidsToBeTicked() {
-        return getDelegate().getFluidsToBeTicked();
-    }
-
-    @Override
-    default BitSet getCarvingMask(GenerationStage.Carving type) {
-        return getDelegate().getCarvingMask(type);
-    }
-
-    @Override
-    default UpgradeData getUpgradeData() {
-        return getDelegate().getUpgradeData();
-    }
-
-    @Override
-    default void setInhabitedTime(long newInhabitedTime) {
-        getDelegate().setInhabitedTime(newInhabitedTime);
-    }
-
-    @Override
-    default long getInhabitedTime() {
-        return getDelegate().getInhabitedTime();
-    }
-
-    @Override
-    default boolean hasLight() {
-        return getDelegate().hasLight();
-    }
-
-    @Override
-    default void setLight(boolean p_217305_1_) {
-        getDelegate().setLight(p_217305_1_);
+    public boolean isEmptyBetween(int startY, int endY) {
+        return delegate.isEmptyBetween(startY, endY);
     }
 
     @Override
     @Nullable
-    default IWorld getWorldForge() {
-        return getDelegate().getWorldForge();
+    public BiomeContainer getBiomes() {
+        return delegate.getBiomes();
+    }
+
+    @Override
+    public void setModified(boolean modified) {
+        delegate.setModified(modified);
+    }
+
+    @Override
+    public boolean isModified() {
+        return delegate.isModified();
+    }
+
+    @Override
+    public ChunkStatus getStatus() {
+        return delegate.getStatus();
+    }
+
+    @Override
+    public void removeTileEntity(BlockPos pos) {
+        delegate.removeTileEntity(pos);
+    }
+
+    @Override
+    public void markBlockForPostprocessing(BlockPos pos) {
+        delegate.markBlockForPostprocessing(pos);
+    }
+
+    @Override
+    public ShortList[] getPackedPositions() {
+        return delegate.getPackedPositions();
+    }
+
+    @Override
+    public void addPackedPosition(short packedPosition, int index) {
+        delegate.addPackedPosition(packedPosition, index);
+    }
+
+    @Override
+    public void addTileEntity(CompoundNBT nbt) {
+        delegate.addTileEntity(nbt);
     }
 
     @Override
     @Nullable
-    default TileEntity getTileEntity(BlockPos pos) {
-        return getDelegate().getTileEntity(pos);
-    }
-
-    @Override
-    default BlockState getBlockState(BlockPos pos) {
-        return getDelegate().getBlockState(pos);
-    }
-
-    @Override
-    default IFluidState getFluidState(BlockPos pos) {
-        return getDelegate().getFluidState(pos);
-    }
-
-    @Override
-    default int getLightValue(BlockPos pos) {
-        return getDelegate().getLightValue(pos);
-    }
-
-    @Override
-    default int getMaxLightLevel() {
-        return getDelegate().getMaxLightLevel();
-    }
-
-    @Override
-    default int getHeight() {
-        return getDelegate().getHeight();
-    }
-
-    @Override
-    default BlockRayTraceResult rayTraceBlocks(RayTraceContext context) {
-        return getDelegate().rayTraceBlocks(context);
+    public CompoundNBT getDeferredTileEntity(BlockPos pos) {
+        return delegate.getDeferredTileEntity(pos);
     }
 
     @Override
     @Nullable
-    default BlockRayTraceResult rayTraceBlocks(Vec3d p_217296_1_, Vec3d p_217296_2_, BlockPos p_217296_3_, VoxelShape p_217296_4_, BlockState p_217296_5_) {
-        return getDelegate().rayTraceBlocks(p_217296_1_, p_217296_2_, p_217296_3_, p_217296_4_, p_217296_5_);
+    public CompoundNBT getTileEntityNBT(BlockPos pos) {
+        return delegate.getTileEntityNBT(pos);
+    }
+
+    @Override
+    public Stream<BlockPos> getLightSources() {
+        return delegate.getLightSources();
+    }
+
+    @Override
+    public ITickList<Block> getBlocksToBeTicked() {
+        return delegate.getBlocksToBeTicked();
+    }
+
+    @Override
+    public ITickList<Fluid> getFluidsToBeTicked() {
+        return delegate.getFluidsToBeTicked();
+    }
+
+    @Override
+    public UpgradeData getUpgradeData() {
+        return delegate.getUpgradeData();
+    }
+
+    @Override
+    public void setInhabitedTime(long newInhabitedTime) {
+        delegate.setInhabitedTime(newInhabitedTime);
+    }
+
+    @Override
+    public long getInhabitedTime() {
+        return delegate.getInhabitedTime();
+    }
+
+    @Override
+    public boolean hasLight() {
+        return delegate.hasLight();
+    }
+
+    @Override
+    public void setLight(boolean lightCorrectIn) {
+        delegate.setLight(lightCorrectIn);
     }
 
     @Override
     @Nullable
-    default StructureStart getStructureStart(String stucture) {
-        return getDelegate().getStructureStart(stucture);
+    public IWorld getWorldForge() {
+        return delegate.getWorldForge();
     }
 
     @Override
-    default void putStructureStart(String structureIn, StructureStart structureStartIn) {
-        getDelegate().putStructureStart(structureIn, structureStartIn);
+    @Nullable
+    public TileEntity getTileEntity(BlockPos pos) {
+        return delegate.getTileEntity(pos);
     }
 
     @Override
-    default LongSet getStructureReferences(String structureIn) {
-        return getDelegate().getStructureReferences(structureIn);
+    public BlockState getBlockState(BlockPos pos) {
+        return delegate.getBlockState(pos);
     }
 
     @Override
-    default void addStructureReference(String strucutre, long reference) {
-        getDelegate().addStructureReference(strucutre, reference);
+    public FluidState getFluidState(BlockPos pos) {
+        return delegate.getFluidState(pos);
     }
 
     @Override
-    default Map<String, LongSet> getStructureReferences() {
-        return getDelegate().getStructureReferences();
+    public int getLightValue(BlockPos pos) {
+        return delegate.getLightValue(pos);
     }
 
     @Override
-    default void setStructureReferences(Map<String, LongSet> p_201606_1_) {
-        getDelegate().setStructureReferences(p_201606_1_);
+    public int getMaxLightLevel() {
+        return delegate.getMaxLightLevel();
+    }
+
+    @Override
+    public int getHeight() {
+        return delegate.getHeight();
+    }
+
+    @Override
+    public Stream<BlockState> func_234853_a_(AxisAlignedBB p_234853_1_) {
+        return delegate.func_234853_a_(p_234853_1_);
+    }
+
+    @Override
+    public BlockRayTraceResult rayTraceBlocks(RayTraceContext context) {
+        return delegate.rayTraceBlocks(context);
+    }
+
+    @Override
+    @Nullable
+    public BlockRayTraceResult rayTraceBlocks(Vector3d startVec, Vector3d endVec, BlockPos pos, VoxelShape shape, BlockState state) {
+        return delegate.rayTraceBlocks(startVec, endVec, pos, shape, state);
+    }
+
+    @Override
+    public double func_242402_a(VoxelShape p_242402_1_, Supplier<VoxelShape> p_242402_2_) {
+        return delegate.func_242402_a(p_242402_1_, p_242402_2_);
+    }
+
+    @Override
+    public double func_242403_h(BlockPos p_242403_1_) {
+        return delegate.func_242403_h(p_242403_1_);
+    }
+
+    @Override
+    @Nullable
+    public StructureStart<?> func_230342_a_(Structure<?> p_230342_1_) {
+        return delegate.func_230342_a_(p_230342_1_);
+    }
+
+    @Override
+    public void func_230344_a_(Structure<?> p_230344_1_, StructureStart<?> p_230344_2_) {
+        delegate.func_230344_a_(p_230344_1_, p_230344_2_);
+    }
+
+    @Override
+    public LongSet func_230346_b_(Structure<?> p_230346_1_) {
+        return delegate.func_230346_b_(p_230346_1_);
+    }
+
+    @Override
+    public void func_230343_a_(Structure<?> p_230343_1_, long p_230343_2_) {
+        delegate.func_230343_a_(p_230343_1_, p_230343_2_);
+    }
+
+    @Override
+    public Map<Structure<?>, LongSet> getStructureReferences() {
+        return delegate.getStructureReferences();
+    }
+
+    @Override
+    public void setStructureReferences(Map<Structure<?>, LongSet> structureReferences) {
+        delegate.setStructureReferences(structureReferences);
     }
 }

@@ -25,15 +25,15 @@
 
 package com.terraforged.mod.chunk.fix;
 
-import net.minecraft.world.gen.ChunkGenerator;
+import com.terraforged.mod.chunk.TerraChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 
 // fixes hard-coded water and world height values
 public class RegionFix extends RegionDelegate {
 
-    private final ChunkGenerator<?> generator;
+    private final TerraChunkGenerator generator;
 
-    public RegionFix(WorldGenRegion region, ChunkGenerator<?> generator) {
+    public RegionFix(WorldGenRegion region, TerraChunkGenerator generator) {
         super(region.getWorld(), region);
         this.generator = generator;
     }
@@ -43,8 +43,8 @@ public class RegionFix extends RegionDelegate {
         return generator.getSeaLevel();
     }
 
-    @Override
+//    @Override ???
     public int getMaxHeight() {
-        return generator.getMaxHeight();
+        return generator.getWorldHeight();
     }
 }

@@ -37,6 +37,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.GrassBlock;
 import net.minecraft.block.MyceliumBlock;
+import net.minecraft.tags.ITag;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -91,7 +92,7 @@ public class Materials {
         return block instanceof GrassBlock || block instanceof MyceliumBlock;
     }
 
-    private static Set<Block> create(Tag<Block> tag, Block def) {
+    private static Set<Block> create(ITag<Block> tag, Block def) {
         ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(tag.getAllElements());
         if (set.isEmpty() && def != null) {
             set.add(def);

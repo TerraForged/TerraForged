@@ -27,6 +27,7 @@ package com.terraforged.mod.biome.map;
 
 import com.google.gson.JsonElement;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.map.set.BiomeTypeSet;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
@@ -62,7 +63,7 @@ public interface BiomeMap {
 
     List<Biome> getAllBiomes(BiomeType type);
 
-    JsonElement toJson();
+    JsonElement toJson(GameContext context);
 
     interface Builder {
 

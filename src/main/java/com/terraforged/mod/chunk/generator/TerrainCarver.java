@@ -1,11 +1,13 @@
 package com.terraforged.mod.chunk.generator;
 
-import com.terraforged.fm.template.StructureUtils;
+import com.terraforged.core.cell.Cell;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.fix.ChunkCarverFix;
 import net.minecraft.util.SharedSeedRandom;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeGenerationSettings;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.GenerationStage;
@@ -13,6 +15,8 @@ import net.minecraft.world.gen.carver.ConfiguredCarver;
 
 import java.util.BitSet;
 import java.util.ListIterator;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class TerrainCarver implements Generator.Carvers {
 
@@ -24,32 +28,47 @@ public class TerrainCarver implements Generator.Carvers {
 
     @Override
     public void carveTerrain(BiomeManager biomes, IChunk chunk, GenerationStage.Carving type) {
-        if (StructureUtils.hasOvergroundStructure(chunk)) {
-            return;
-        }
-
-        chunk = new ChunkCarverFix(chunk, generator.getContext().materials);
+        ChunkCarverFix carverChunk = new ChunkCarverFix(chunk, generator.getContext().materials);
 
         SharedSeedRandom random = new SharedSeedRandom();
-        ChunkPos chunkpos = chunk.getPos();
+        ChunkPos chunkpos = carverChunk.getPos();
         int chunkX = chunkpos.x;
         int chunkZ = chunkpos.z;
-        BitSet mask = chunk.getCarvingMask(type);
-        Biome biome = generator.getBiome(biomes, chunkpos.asBlockPos());
+
+        int seaLevel = generator.getSeaLevel();
+        BiomeLookup lookup = new BiomeLookup();
+        BitSet mask = carverChunk.getCarvingMask(type);
+        Biome biome = generator.getBiomeProvider().getBiome(chunkpos.getXStart(), chunkpos.getZStart());
+        BiomeGenerationSettings settings = biome.func_242440_e();
+
+        ListIterator<Supplier<ConfiguredCarver<?>>> iterator = settings.func_242489_a(type).listIterator();
 
         for (int cx = chunkX - 8; cx <= chunkX + 8; ++cx) {
             for (int cz = chunkZ - 8; cz <= chunkZ + 8; ++cz) {
-                ListIterator<ConfiguredCarver<?>> iterator = biome.getCarvers(type).listIterator();
                 while (iterator.hasNext()) {
                     int index = iterator.nextIndex();
-                    ConfiguredCarver<?> carver = iterator.next();
+                    ConfiguredCarver<?> carver = iterator.next().get();
                     random.setLargeFeatureSeed(generator.getSeed() + index, cx, cz);
                     if (carver.shouldCarve(random, cx, cz)) {
-                        carver.func_227207_a_(chunk, pos -> generator.getBiome(biomes, pos), random, generator.getSeaLevel(), cx, cz, chunkX, chunkZ, mask);
+                        carver.carveRegion(carverChunk, lookup, random, seaLevel, cx, cz, chunkX, chunkZ, mask);
                     }
+                }
+
+                // rewind
+                while (iterator.hasPrevious()) {
+                    iterator.previous();
                 }
             }
         }
+    }
 
+    private class BiomeLookup implements Function<BlockPos, Biome> {
+
+        private final Cell cell = new Cell();
+
+        @Override
+        public Biome apply(BlockPos pos) {
+            return generator.getBiomeProvider().getBiome(cell, pos.getX(), pos.getZ());
+        }
     }
 }

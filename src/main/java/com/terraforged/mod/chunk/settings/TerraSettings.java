@@ -33,7 +33,5 @@ public class TerraSettings extends Settings {
 
     public Miscellaneous miscellaneous = new Miscellaneous();
 
-    public StructureSettings structures = new StructureSettings();
-
     public DimesionSettings dimensions = new DimesionSettings();
 }

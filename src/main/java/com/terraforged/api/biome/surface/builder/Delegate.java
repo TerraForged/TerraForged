@@ -39,7 +39,7 @@ public class Delegate implements Surface {
     private final ConfiguredSurfaceBuilder<?> surfaceBuilder;
 
     public Delegate(Biome biome) {
-        this(biome.getSurfaceBuilder());
+        this(biome.func_242440_e().func_242500_d().get());
     }
 
     public Delegate(ConfiguredSurfaceBuilder<?> surfaceBuilder) {

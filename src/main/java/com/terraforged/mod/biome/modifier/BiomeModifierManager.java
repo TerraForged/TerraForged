@@ -45,7 +45,7 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
     private final List<BiomeModifier> biomeModifiers;
 
     public BiomeModifierManager(TerraContext context, BiomeMap biomes) {
-        desertBiomes = new DesertBiomes(context.materials, biomes.getAllBiomes(BiomeType.DESERT));
+        desertBiomes = new DesertBiomes(context.materials, biomes.getAllBiomes(BiomeType.DESERT), context.gameContext);
         List<BiomeModifier> modifiers = new ArrayList<>();
         modifiers.add(new CoastModifier(biomes, context));
         modifiers.add(new DesertColorModifier(desertBiomes));
@@ -82,9 +82,13 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
 
     @Override
     public Biome modify(Biome biome, Cell cell, int x, int z) {
+        Biome result;
         for (BiomeModifier modifier : biomeModifiers) {
             if (modifier.test(biome, cell)) {
-                biome = modifier.modify(biome, cell, x, z);
+                result = modifier.modify(biome, cell, x, z);
+                if (result != null) {
+                    biome = result;
+                }
                 if (modifier.exitEarly()) {
                     return biome;
                 }

@@ -1,22 +1,25 @@
 package com.terraforged.mod.chunk.generator;
 
-import com.terraforged.fm.predicate.FeaturePredicate;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
+import net.minecraft.crash.ReportedException;
 import net.minecraft.network.DebugPacketSender;
-import net.minecraft.util.SharedSeedRandom;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.IWorld;
+import net.minecraft.util.math.SectionPos;
+import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.gen.feature.StructureFeature;
+import net.minecraft.world.gen.feature.structure.StructureFeatures;
+import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.world.gen.settings.StructureSeparationSettings;
 
-import java.util.Map;
+import java.util.function.Supplier;
 
 public class StructureGenerator implements Generator.Structures {
 
@@ -27,66 +30,57 @@ public class StructureGenerator implements Generator.Structures {
     }
 
     @Override
-    public void generateStructureStarts(BiomeManager biomes, IChunk chunk, TemplateManager templates) {
-        ChunkPos chunkpos = chunk.getPos();
-        generator.queueChunk(chunkpos.x, chunkpos.z);
+    public void generateStructureStarts(IChunk chunk, DynamicRegistries registries, StructureManager structures, TemplateManager templates) {
+        long seed = generator.getContext().seed.get();
+        ChunkPos pos = chunk.getPos();
+        Biome biome = generator.getBiomeProvider().getNoiseBiome((pos.x << 2) + 2, 0, (pos.z << 2) + 2);
+        generate(chunk, pos, biome, StructureFeatures.field_244145_k, registries, structures, templates, seed);
 
-        BlockPos biomePos = new BlockPos(chunkpos.getXStart() + 9, 0, chunkpos.getZStart() + 9);
-        Biome biome = biomes.getBiome(biomePos);
-
-        for (Structure<?> structure : Feature.STRUCTURES.values()) {
-            if (generator.getBiomeProvider().hasStructure(structure)) {
-                FeaturePredicate predicate = generator.getStructureManager().getPredicate(structure);
-                if (!predicate.test(chunk, biome)) {
-                    continue;
-                }
-
-                StructureStart existingStart = chunk.getStructureStart(structure.getStructureName());
-                int refCount = existingStart != null ? existingStart.getRefCount() : 0;
-
-                SharedSeedRandom random = new SharedSeedRandom();
-                StructureStart start = StructureStart.DUMMY;
-
-                if (structure.canBeGenerated(biomes, generator, random, chunkpos.x, chunkpos.z, biome)) {
-                    StructureStart altStart = structure.getStartFactory().create(structure, chunkpos.x, chunkpos.z, MutableBoundingBox.getNewBoundingBox(), refCount, generator.getSeed());
-                    altStart.init(generator, templates, chunkpos.x, chunkpos.z, biome);
-                    start = altStart.isValid() ? altStart : StructureStart.DUMMY;
-                }
-
-                chunk.putStructureStart(structure.getStructureName(), start);
-            }
+        for (Supplier<StructureFeature<?, ?>> supplier : biome.func_242440_e().func_242487_a()) {
+            this.generate(chunk, pos, biome, supplier.get(), registries, structures, templates, seed);
         }
     }
 
-    public void generateStructureReferences(IWorld world, IChunk chunk) {
-        try {
-            int radius = 8;
+    private void generate(IChunk chunk, ChunkPos pos, Biome biome, StructureFeature<?, ?> structure, DynamicRegistries registries, StructureManager structures, TemplateManager templates, long seed) {
+        StructureStart<?> start = structures.func_235013_a_(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, chunk);
+        int i = start != null ? start.getRefCount() : 0;
+        StructureSeparationSettings settings = generator.func_235957_b_().func_236197_a_(structure.field_236268_b_);
+        if (settings != null) {
+            StructureStart<?> start1 = structure.func_242771_a(registries, generator, generator.getBiomeProvider(), templates, seed, pos, biome, i, settings);
+            structures.func_235014_a_(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, start1, chunk);
+        }
 
-            int chunkX = chunk.getPos().x;
-            int chunkZ = chunk.getPos().z;
+    }
 
-            int minX = chunkX << 4;
-            int minZ = chunkZ << 4;
-            int maxX = minX + 15;
-            int maxZ = minZ + 15;
+    @Override
+    public void generateStructureReferences(ISeedReader world, IChunk chunk, StructureManager structures) {
+        int radius = 8;
+        int chunkX = chunk.getPos().x;
+        int chunkZ = chunk.getPos().z;
+        int startX = chunkX << 4;
+        int startZ = chunkZ << 4;
+        SectionPos sectionpos = SectionPos.from(chunk.getPos(), 0);
 
-            for (int dx = -radius; dx <= radius; ++dx) {
-                for (int dz = -radius; dz <= radius; ++dz) {
-                    int cx = chunkX + dx;
-                    int cz = chunkZ + dz;
-                    long chunkSeed = ChunkPos.asLong(cx, cz);
-                    IChunk c = world.getChunk(cx, cz);
-                    for (Map.Entry<String, StructureStart> entry : c.getStructureStarts().entrySet()) {
-                        StructureStart start = entry.getValue();
-                        if (start != StructureStart.DUMMY && start.getBoundingBox().intersectsWith(minX, minZ, maxX, maxZ)) {
-                            chunk.addStructureReference(entry.getKey(), chunkSeed);
+        for (int x = chunkX - radius; x <= chunkX + radius; ++x) {
+            for (int z = chunkZ - radius; z <= chunkZ + radius; ++z) {
+                long posId = ChunkPos.asLong(x, z);
+
+                for (StructureStart<?> start : world.getChunk(x, z).getStructureStarts().values()) {
+                    try {
+                        if (start != StructureStart.DUMMY && start.getBoundingBox().intersectsWith(startX, startZ, startX + 15, startZ + 15)) {
+                            structures.func_235012_a_(sectionpos, start.getStructure(), posId, chunk);
                             DebugPacketSender.sendStructureStart(world, start);
                         }
+                    } catch (Exception exception) {
+                        CrashReport crashreport = CrashReport.makeCrashReport(exception, "Generating structure reference");
+                        CrashReportCategory crashreportcategory = crashreport.makeCategory("Structure");
+                        crashreportcategory.addDetail("Id", () -> Registry.STRUCTURE_FEATURE.getKey(start.getStructure()).toString());
+                        crashreportcategory.addDetail("Name", () -> start.getStructure().getStructureName());
+                        crashreportcategory.addDetail("Class", () -> start.getStructure().getClass().getCanonicalName());
+                        throw new ReportedException(crashreport);
                     }
                 }
             }
-        } catch (Throwable t) {
-            t.printStackTrace();
         }
     }
 }

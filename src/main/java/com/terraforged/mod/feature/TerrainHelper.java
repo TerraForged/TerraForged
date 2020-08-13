@@ -50,9 +50,9 @@ import java.util.Set;
 
 public class TerrainHelper {
 
+    private static final List<Structure<?>> ILLAGER_STRUCTURES = Structure.field_236384_t_;
     private static final Set<IStructurePieceType> SURFACE_STRUCTURES = ImmutableSet.of(
-            IStructurePieceType.PCP, // outpost
-            IStructurePieceType.NVI, // village
+            IStructurePieceType.field_242786_ad, // village
             IStructurePieceType.TEJP, // jungle temple
             IStructurePieceType.IGLU, // igloo
             IStructurePieceType.TEDP // desert pyramid
@@ -79,17 +79,16 @@ public class TerrainHelper {
     // see NoiseChunkGenerator
     private void collectPieces(IWorld world, IChunk chunk, ObjectList<StructurePiece> pieces) {
         ChunkPos pos = chunk.getPos();
-        for (Structure<?> structure : Structure.ILLAGER_STRUCTURES) {
-            String name = structure.getStructureName();
-            LongIterator structureIds = chunk.getStructureReferences(name).iterator();
+        for (Structure<?> structure : ILLAGER_STRUCTURES) {
+            LongIterator structureIds = chunk.getStructureReferences().get(structure).iterator();
 
             while (structureIds.hasNext()) {
                 long id = structureIds.nextLong();
                 ChunkPos structurePos = new ChunkPos(id);
                 IChunk neighbourChunk = world.getChunk(structurePos.asBlockPos());
-                StructureStart structurestart = neighbourChunk.getStructureStart(name);
-                if (structurestart != null && structurestart.isValid()) {
-                    for (StructurePiece structurepiece : structurestart.getComponents()) {
+                StructureStart<?> structureStart = neighbourChunk.getStructureStarts().get(structure);
+                if (structureStart != null && structureStart.isValid()) {
+                    for (StructurePiece structurepiece : structureStart.getComponents()) {
                         // collect if piece is within radius of the chunk
                         if (structurepiece.func_214810_a(pos, 12)) {
                             collectPiece(structurepiece, pieces);

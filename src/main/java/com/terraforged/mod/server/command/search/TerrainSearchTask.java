@@ -12,7 +12,7 @@ public class TerrainSearchTask extends ChunkGeneratorSearch {
     private final WorldGenerator worldGenerator;
     private final Cell cell = new Cell();
 
-    public TerrainSearchTask(BlockPos center, Terrain type, ChunkGenerator<?> chunkGenerator, WorldGenerator worldGenerator) {
+    public TerrainSearchTask(BlockPos center, Terrain type, ChunkGenerator chunkGenerator, WorldGenerator worldGenerator) {
         super(center, 256, chunkGenerator);
         this.type = type;
         this.worldGenerator = worldGenerator;

@@ -32,12 +32,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -46,13 +43,14 @@ public class BiomeArgType implements ArgumentType<Biome> {
     @Override
     public Biome parse(StringReader reader) throws CommandSyntaxException {
         ResourceLocation resourcelocation = ResourceLocation.read(reader);
-        return Registry.BIOME.getValue(resourcelocation)
-                .orElseThrow(() -> createException("Invalid biome", "%s is not a valid biome", resourcelocation));
+//        return Registry.BIOME.getValue(resourcelocation).orElseThrow(() -> createException("Invalid biome", "%s is not a valid biome", resourcelocation));
+        return null;
     }
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder suggestions) {
-        return ISuggestionProvider.suggestIterable(ForgeRegistries.BIOMES.getKeys(), suggestions);
+//        return ISuggestionProvider.suggestIterable(ForgeRegistries.BIOMES.getKeys(), suggestions);
+        return null;
     }
 
     private static CommandSyntaxException createException(String type, String message, Object... args) {

@@ -70,11 +70,11 @@ public class ChanceContext implements SafeCloseable {
         return -1;
     }
 
-    public static Resource<ChanceContext> pooled(IWorld world, ChunkGenerator<?> generator) {
+    public static Resource<ChanceContext> pooled(IWorld world, ChunkGenerator generator) {
         if (generator instanceof TerraChunkGenerator && world instanceof RegionDelegate) {
             TerraChunkGenerator terraGenerator = (TerraChunkGenerator) generator;
             Levels levels = terraGenerator.getContext().levels;
-            WorldGenRegion region = ((RegionDelegate) world).getRegion();
+            WorldGenRegion region = ((RegionDelegate) world).getDelegate();
             IChunk chunk = region.getChunk(region.getMainChunkX(), region.getMainChunkZ());
             Resource<ChanceContext> item = pool.get();
             item.get().chunk = chunk;

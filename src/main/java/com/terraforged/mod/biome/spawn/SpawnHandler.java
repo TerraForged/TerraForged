@@ -11,6 +11,7 @@ import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.ServerWorldInfo;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -22,7 +23,7 @@ public class SpawnHandler {
     public static void createSpawn(WorldEvent.CreateSpawnPosition event) {
         if (event.getWorld() instanceof ServerWorld) {
             ServerWorld world =(ServerWorld) event.getWorld();
-            ChunkGenerator<?> generator = world.getChunkProvider().getChunkGenerator();
+            ChunkGenerator generator = world.getChunkProvider().getChunkGenerator();
             if (generator.getBiomeProvider() instanceof TerraBiomeProvider) {
                 Log.info("Searching for world spawn position");
                 TerraBiomeProvider provider = (TerraBiomeProvider) generator.getBiomeProvider();
@@ -36,9 +37,12 @@ public class SpawnHandler {
 
                 Log.info("Setting world spawn: {}", spawn);
                 event.setCanceled(true);
-                event.getWorld().getWorldInfo().setSpawn(spawn);
+                ServerWorldInfo info = (ServerWorldInfo) event.getSettings();
+                info.setSpawnX(spawn.getX());
+                info.setSpawnY(spawn.getY());
+                info.setSpawnZ(spawn.getZ());
 
-                if (event.getSettings().isBonusChestEnabled()) {
+                if (info.getDimensionGeneratorSettings().hasBonusChest()) {
                     Log.info("Generating bonus chest");
                     createBonusChest(world, spawn);
                 }
@@ -57,13 +61,13 @@ public class SpawnHandler {
         }
     }
 
-    private static BlockPos getSurface(ChunkGenerator<?> generator, BlockPos pos) {
-        int surface = generator.func_222529_a(pos.getX(), pos.getZ(), Heightmap.Type.WORLD_SURFACE_WG);
+    private static BlockPos getSurface(ChunkGenerator generator, BlockPos pos) {
+        int surface = generator.getHeight(pos.getX(), pos.getZ(), Heightmap.Type.WORLD_SURFACE_WG);
         return new BlockPos(pos.getX(), surface, pos.getZ());
     }
 
     private static void createBonusChest(ServerWorld world, BlockPos pos) {
         ConfiguredFeature<?, ?> chest = Feature.BONUS_CHEST.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
-        chest.place(world, world.getChunkProvider().getChunkGenerator(), world.rand, pos);
+        chest.func_242765_a(world, world.getChunkProvider().getChunkGenerator(), world.rand, pos);
     }
 }

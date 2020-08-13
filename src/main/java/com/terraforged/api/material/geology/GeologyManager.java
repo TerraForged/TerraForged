@@ -28,6 +28,7 @@ package com.terraforged.api.material.geology;
 import com.terraforged.world.geology.Geology;
 import com.terraforged.world.geology.Strata;
 import net.minecraft.block.BlockState;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 
 public interface GeologyManager {
@@ -42,17 +43,17 @@ public interface GeologyManager {
     /**
      * Register a biome specific strata group.
      */
-    default void register(Biome biome, Strata<BlockState> strata) {
+    default void register(RegistryKey<Biome> biome, Strata<BlockState> strata) {
         register(biome, strata, false);
     }
 
     /**
      * Register a biome specific strata group.
      */
-    void register(Biome biome, Strata<BlockState> strata, boolean inheritGlobal);
+    void register(RegistryKey<Biome> biome, Strata<BlockState> strata, boolean inheritGlobal);
 
     /**
      * Register/replace a biome-specific geology group
      */
-    void register(Biome biome, Geology<BlockState> geology);
+    void register(RegistryKey<Biome> biome, Geology<BlockState> geology);
 }

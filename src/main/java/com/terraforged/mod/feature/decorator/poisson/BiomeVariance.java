@@ -29,7 +29,7 @@ public class BiomeVariance implements Module {
         return NoiseUtil.map(1 - cell.biomeEdge, MIN_FADE, fade, range);
     }
 
-    public static Module of(IWorld world, ChunkGenerator<?> generator, float fade) {
+    public static Module of(IWorld world, ChunkGenerator generator, float fade) {
         ChunkReader reader = TerraChunkGenerator.getChunk(world, generator);
         if (reader != null) {
             return new BiomeVariance(reader, fade);

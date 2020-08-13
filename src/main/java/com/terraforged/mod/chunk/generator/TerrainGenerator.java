@@ -12,6 +12,7 @@ import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.Terrains;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.feature.structure.StructureManager;
 
 public class TerrainGenerator implements Generator.Terrain {
 
@@ -30,7 +31,7 @@ public class TerrainGenerator implements Generator.Terrain {
     }
 
     @Override
-    public final void generateTerrain(IWorld world, IChunk chunk) {
+    public final void generateTerrain(IWorld world, IChunk chunk, StructureManager structures) {
         try (ChunkReader reader = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z)) {
             TerraContainer container = TerraContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
             try (DecoratorContext context = new DecoratorContext(FastChunk.wrap(chunk), levels, terrain, climate)) {

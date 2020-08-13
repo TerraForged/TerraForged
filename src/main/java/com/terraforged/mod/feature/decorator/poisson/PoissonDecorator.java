@@ -1,42 +1,38 @@
 package com.terraforged.mod.feature.decorator.poisson;
 
 import com.terraforged.core.util.poisson.Poisson;
+import com.terraforged.mod.util.stream.PosStream;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.world.gen.feature.WorldDecoratingHelper;
 import net.minecraft.world.gen.placement.Placement;
 
+import java.lang.reflect.Field;
 import java.util.Random;
 import java.util.stream.Stream;
 
 public abstract class PoissonDecorator extends Placement<PoissonConfig> {
 
+    private static final HelperAccess ACCESS = new HelperAccess();
+
     private Poisson instance = null;
     private final Object lock = new Object();
 
     public PoissonDecorator() {
-        super(PoissonConfig::deserialize);
+        super(PoissonConfig.CODEC);
     }
 
     @Override
-    public <FC extends IFeatureConfig, F extends Feature<FC>> boolean place(IWorld world, ChunkGenerator<?> generator, Random random, BlockPos pos, PoissonConfig config, ConfiguredFeature<FC, F> feature) {
+    public final Stream<BlockPos> func_241857_a(WorldDecoratingHelper helper, Random random, PoissonConfig config, BlockPos pos) {
         int radius = Math.max(1, Math.min(30, config.radius));
         Poisson poisson = getInstance(radius);
-        PoissonVisitor visitor = new PoissonVisitor(this, feature, world, generator, random, pos);
+        ISeedReader world = ACCESS.getWorld(helper);
+        ChunkGenerator generator = ACCESS.getGenerator(helper);
+        PoissonVisitor visitor = new PoissonVisitor(world, this, poisson, random, pos);
         config.apply(world, generator, visitor);
-        int chunkX = pos.getX() >> 4;
-        int chunkZ = pos.getZ() >> 4;
-        poisson.visit(chunkX, chunkZ, visitor, visitor);
-        return visitor.hasPlacedOne();
-    }
-
-    @Override
-    public final Stream<BlockPos> getPositions(IWorld worldIn, ChunkGenerator<? extends GenerationSettings> generatorIn, Random random, PoissonConfig configIn, BlockPos pos) {
-        return Stream.empty();
+        return new PosStream(visitor);
     }
 
     public abstract int getYAt(IWorld world, BlockPos pos, Random random);
@@ -47,6 +43,50 @@ public abstract class PoissonDecorator extends Placement<PoissonConfig> {
                 instance = new Poisson(radius);
             }
             return instance;
+        }
+    }
+
+    private static class HelperAccess {
+
+        private final Field world;
+        private final Field generator;
+
+        private HelperAccess() {
+            Field world = null;
+            Field generator = null;
+
+            for (Field field : WorldDecoratingHelper.class.getDeclaredFields()) {
+                if (field.getType() == ISeedReader.class) {
+                    field.setAccessible(true);
+                    world = field;
+                } else if (field.getType() == ChunkGenerator.class) {
+                    field.setAccessible(true);
+                    generator = field;
+                }
+            }
+
+            if (world == null || generator == null) {
+                throw new RuntimeException();
+            }
+
+            this.world = world;
+            this.generator = generator;
+        }
+
+        private ISeedReader getWorld(WorldDecoratingHelper helper) {
+            try {
+                return (ISeedReader) world.get(helper);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private ChunkGenerator getGenerator(WorldDecoratingHelper helper) {
+            try {
+                return (ChunkGenerator) generator.get(helper);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

@@ -31,7 +31,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.IFluidState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
@@ -43,7 +42,7 @@ public class DummyBlockReader implements IBlockReader {
     private static final ObjectPool<DummyBlockReader> pool = new ObjectPool<>(10, DummyBlockReader::new);
 
     private BlockState state;
-    private IFluidState fluid;
+    private FluidState fluid;
 
     public DummyBlockReader set(BlockState state) {
         return set(state, Fluids.EMPTY.getDefaultState());
@@ -53,7 +52,7 @@ public class DummyBlockReader implements IBlockReader {
         return set(Blocks.AIR.getDefaultState(), fluid);
     }
 
-    public DummyBlockReader set(BlockState state, IFluidState fluid) {
+    public DummyBlockReader set(BlockState state, FluidState fluid) {
         this.state = state;
         this.fluid = fluid;
         return this;
@@ -71,7 +70,7 @@ public class DummyBlockReader implements IBlockReader {
     }
 
     @Override
-    public IFluidState getFluidState(BlockPos pos) {
+    public FluidState getFluidState(BlockPos pos) {
         return fluid;
     }
 

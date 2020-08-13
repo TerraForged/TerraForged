@@ -25,23 +25,21 @@
 
 package com.terraforged.mod.biome.provider;
 
+import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.map.BiomeMapBuilder;
 import com.terraforged.mod.biome.map.BiomePredicate;
 import com.terraforged.mod.biome.map.defaults.BiomeTemps;
+import com.terraforged.mod.biome.utils.TempCategory;
 import com.terraforged.n2d.util.Vec2f;
 import com.terraforged.world.biome.BiomeData;
 import com.terraforged.world.biome.BiomeType;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.structure.OceanRuinConfig;
-import net.minecraft.world.gen.feature.structure.OceanRuinStructure;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.gen.surfacebuilders.ISurfaceBuilderConfig;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,13 +65,13 @@ public class BiomeHelper {
         put(BiomeType.ALPINE, BiomePredicate.MOUNTAIN);
     }};
 
-    public static BiomeMap createBiomeMap() {
-        List<BiomeData> biomes = getAllBiomeData();
-        BiomeWeights weights = new BiomeWeights();
-        BiomeMap.Builder builder = BiomeMapBuilder.create();
+    public static BiomeMap createBiomeMap(GameContext context) {
+        List<BiomeData> biomes = getAllBiomeData(context);
+        BiomeWeights weights = new BiomeWeights(context);
+        BiomeMap.Builder builder = BiomeMapBuilder.create(context);
         for (BiomeData data : biomes) {
             Biome biome = (Biome) data.reference;
-            if (biome.isMutation() && getId(biome).contains("hills")) {
+            if (context.biomes.getName(biome).contains("hills")) {
                 continue;
             }
 
@@ -104,36 +102,13 @@ public class BiomeHelper {
             }
         }
 
-        builder.addLand(BiomeType.TEMPERATE_RAINFOREST, Biomes.PLAINS, 5);
-        builder.addLand(BiomeType.TEMPERATE_FOREST, Biomes.FLOWER_FOREST, 2);
-        builder.addLand(BiomeType.TEMPERATE_FOREST, Biomes.PLAINS, 5);
-        builder.addLand(BiomeType.TUNDRA, ModBiomes.SNOWY_TAIGA_SCRUB, 2);
-        builder.addLand(BiomeType.TAIGA, ModBiomes.TAIGA_SCRUB, 2);
+        builder.addLand(BiomeType.TEMPERATE_RAINFOREST, context.biomes.get(Biomes.PLAINS), 5);
+        builder.addLand(BiomeType.TEMPERATE_FOREST, context.biomes.get(Biomes.FLOWER_FOREST), 2);
+        builder.addLand(BiomeType.TEMPERATE_FOREST, context.biomes.get(Biomes.PLAINS), 5);
+        builder.addLand(BiomeType.TUNDRA, context.biomes.get(ModBiomes.SNOWY_TAIGA_SCRUB), 2);
+        builder.addLand(BiomeType.TAIGA, context.biomes.get(ModBiomes.TAIGA_SCRUB), 2);
 
         return builder.build();
-    }
-
-    public static Biome.TempCategory getTempCategory(Biome biome) {
-        // vanilla ocean biome properties are not at all helpful for determining temperature
-        if (biome.getCategory() == Biome.Category.OCEAN) {
-            // warm & luke_warm oceans get OceanRuinStructure.Type.WARM
-            OceanRuinConfig config = biome.getStructureConfig(Feature.OCEAN_RUIN);
-            if (config != null) {
-                if (config.field_204031_a == OceanRuinStructure.Type.WARM) {
-                    return Biome.TempCategory.WARM;
-                }
-            }
-
-            // if the id contains the world cold or frozen, assume it's cold
-            if (getId(biome).contains("cold") || getId(biome).contains("frozen")) {
-                return Biome.TempCategory.COLD;
-            }
-
-            // the rest we categorize as medium
-            return Biome.TempCategory.MEDIUM;
-        }
-        // hopefully biomes otherwise have a sensible category
-        return biome.getTempCategory();
     }
 
 //        Biomes.MOUNTAINS 0.2F
@@ -143,22 +118,22 @@ public class BiomeHelper {
 //        Biomes.TAIGA_MOUNTAINS 0.25F
 //        Biomes.WOODED_MOUNTAINS 0.2F
 //        Biomes.MODIFIED_GRAVELLY_MOUNTAINS 0.2F
-    public static Biome.TempCategory getMountainCategory(Biome biome) {
-        if (biome.getDefaultTemperature() <= BiomeTemps.COLD) {
-            return Biome.TempCategory.COLD;
+    public static TempCategory getMountainCategory(Biome biome) {
+        if (getDefaultTemperature(biome) <= BiomeTemps.COLD) {
+            return TempCategory.COLD;
         }
-        if (biome.getDefaultTemperature() >= BiomeTemps.HOT) {
-            return Biome.TempCategory.WARM;
+        if (getDefaultTemperature(biome) >= BiomeTemps.HOT) {
+            return TempCategory.WARM;
         }
-        return Biome.TempCategory.MEDIUM;
+        return TempCategory.MEDIUM;
     }
 
-    public static String getId(Biome biome) {
-        ResourceLocation name = biome.getRegistryName();
-        if (name == null) {
-            return "unknown";
-        }
-        return name.toString();
+    public static float getDefaultTemperature(Biome biome) {
+        return biome.func_242445_k();
+    }
+
+    public static ISurfaceBuilderConfig getSurface(Biome biome) {
+        return biome.func_242440_e().func_242502_e();
     }
 
     public static Collection<BiomeType> getTypes(BiomeData data, Biome biome) {
@@ -171,33 +146,33 @@ public class BiomeHelper {
         return types;
     }
 
-    public static List<BiomeData> getAllBiomeData() {
-        Collection<Biome> biomes = getAllBiomes();
-        Vec2f tempRange = getRange(biomes, Biome::getDefaultTemperature);
+    public static List<BiomeData> getAllBiomeData(GameContext context) {
+        Collection<Biome> biomes = getAllBiomes(context);
+        Vec2f tempRange = getRange(biomes, BiomeHelper::getDefaultTemperature);
         Vec2f moistRange = getRange(biomes, Biome::getDownfall);
         List<BiomeData> list = new LinkedList<>();
         for (Biome biome : biomes) {
-            String name = getId(biome);
+            String name = context.biomes.getName(biome);
             float moisture = (biome.getDownfall() - moistRange.x) / (moistRange.y - moistRange.x);
-            float temperature = (biome.getDefaultTemperature() - tempRange.x) / (tempRange.y - tempRange.x);
-            int color = biome.getSurfaceBuilderConfig().getTop().getMaterial().getColor().colorValue;
+            float temperature = (getDefaultTemperature(biome) - tempRange.x) / (tempRange.y - tempRange.x);
+            int color = getSurface(biome).getTop().getMaterial().getColor().colorValue;
             list.add(new BiomeData(name, biome, color, moisture, temperature));
         }
         return list;
     }
 
-    public static Set<Biome> getAllBiomes() {
-        Set<Biome> biomes = new HashSet<>();
-        for (Biome biome : ForgeRegistries.BIOMES) {
-            if (filter(biome)) {
+    public static List<Biome> getAllBiomes(GameContext context) {
+        List<Biome> biomes = new ArrayList<>(200);
+        for (Biome biome : context.biomes) {
+            if (filter(biome, context)) {
                 continue;
             }
-            biomes.add(biome.delegate.get());
+            biomes.add(biome);
         }
         return biomes;
     }
 
-    private static boolean filter(Biome biome) {
+    private static boolean filter(Biome biome, GameContext context) {
         if (biome.getCategory() == Biome.Category.NONE) {
             return true;
         }
@@ -207,10 +182,11 @@ public class BiomeHelper {
         if (biome.getCategory() == Biome.Category.NETHER) {
             return true;
         }
-        if (biome == Biomes.MUSHROOM_FIELD_SHORE || biome == Biomes.MOUNTAIN_EDGE) {
+        if (biome == context.biomes.get(Biomes.MUSHROOM_FIELD_SHORE) || biome == context.biomes.get(Biomes.MOUNTAIN_EDGE)) {
             return true;
         }
-        return !BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.OVERWORLD);
+//        return !BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.OVERWORLD);
+        return false;
     }
 
     private static Vec2f getRange(Collection<Biome> biomes, Function<Biome, Float> getter) {

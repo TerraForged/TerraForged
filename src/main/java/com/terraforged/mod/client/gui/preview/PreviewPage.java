@@ -25,6 +25,7 @@
 
 package com.terraforged.mod.client.gui.preview;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.OverlayScreen;
@@ -102,7 +103,7 @@ public class PreviewPage extends UpdatablePage {
     private static TerraButton createSpacer() {
         return new TerraButton("") {
             @Override
-            public void render(int x, int y, float tick) { }
+            public void render(MatrixStack matrixStack, int x, int y, float tick) { }
         };
     }
 }

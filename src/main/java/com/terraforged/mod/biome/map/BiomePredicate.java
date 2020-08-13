@@ -25,7 +25,6 @@
 
 package com.terraforged.mod.biome.map;
 
-import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.world.biome.BiomeData;
 import net.minecraft.world.biome.Biome;
 
@@ -52,7 +51,7 @@ public interface BiomePredicate {
     }
 
     static BiomePredicate name(String... name) {
-        return (d, b) -> anyMatch(BiomeHelper.getId(b), name, String::contains);
+        return (d, b) -> anyMatch(d.name, name, String::contains);
     }
 
     static BiomePredicate type(Biome.Category... categories) {

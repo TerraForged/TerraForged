@@ -12,7 +12,7 @@ import com.terraforged.fm.predicate.FeaturePredicate;
 import com.terraforged.fm.predicate.MaxHeight;
 import com.terraforged.fm.predicate.MinDepth;
 import com.terraforged.fm.predicate.MinHeight;
-import com.terraforged.fm.structure.StructureManager;
+import com.terraforged.fm.structure.FMStructureManager;
 import com.terraforged.fm.transformer.FeatureTransformer;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.ModBiomes;
@@ -22,6 +22,7 @@ import com.terraforged.mod.biome.surface.ForestSurface;
 import com.terraforged.mod.biome.surface.IcebergsSurface;
 import com.terraforged.mod.biome.surface.StoneForestSurface;
 import com.terraforged.mod.biome.surface.SwampSurface;
+import com.terraforged.mod.biome.utils.Structures;
 import com.terraforged.mod.chunk.column.BedrockDecorator;
 import com.terraforged.mod.chunk.column.ErosionDecorator;
 import com.terraforged.mod.chunk.column.GeologyDecorator;
@@ -36,7 +37,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.structure.Structure;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -80,7 +80,7 @@ public class TerraSetupFactory {
     }
 
     public static FeatureManager createFeatureManager(DataManager data, TerraContext context) {
-        FeatureModifiers modifiers = FeatureManager.modifiers(data, context.terraSettings.miscellaneous.customBiomeFeatures);
+        FeatureModifiers modifiers = FeatureManager.modifiers(data, context.terraSettings.miscellaneous.customBiomeFeatures, context.gameContext);
 
         if (context.terraSettings.miscellaneous.strataDecorator) {
             // block stone blobs if strata enabled
@@ -105,7 +105,7 @@ public class TerraSetupFactory {
 
         if (context.terraSettings.miscellaneous.customBiomeFeatures) {
             // remove default trees from river biomes since forests can go up to the edge of rivers
-            modifiers.getPredicates().add(BiomeMatcher.of(Biome.Category.RIVER), Matchers.tree(), FeaturePredicate.DENY);
+            modifiers.getPredicates().add(BiomeMatcher.of(context.gameContext, Biome.Category.RIVER), Matchers.tree(), FeaturePredicate.DENY);
 
             // places snow layers below and on top of trees
             modifiers.getTransformers().add(
@@ -116,15 +116,15 @@ public class TerraSetupFactory {
         }
 
         // block ugly features
-        modifiers.getPredicates().add(Matchers.sedimentDisks(), FeaturePredicate.DENY);
-        modifiers.getPredicates().add(FeatureMatcher.of(Feature.MINESHAFT), new MinHeight(context.levels.waterY + 20));
-        modifiers.getPredicates().add(FeatureMatcher.of(Feature.WOODLAND_MANSION), new MaxHeight(context.levels.waterY + 64));
+        modifiers.getPredicates().add(Matchers.sedimentDisks(context.gameContext), FeaturePredicate.DENY);
+        modifiers.getPredicates().add(FeatureMatcher.of(Structures.mineshaft()), new MinHeight(context.levels.waterY + 20));
+        modifiers.getPredicates().add(FeatureMatcher.of(Structures.mansion()), new MaxHeight(context.levels.waterY + 64));
 
         return FeatureManager.create(SetupHooks.setup(modifiers, context.copy()));
     }
 
     public static SurfaceManager createSurfaceManager(TerraContext context) {
-        SurfaceManager manager = new SurfaceManager();
+        SurfaceManager manager = new SurfaceManager(context.gameContext);
         manager.replace(Biomes.DEEP_FROZEN_OCEAN, new IcebergsSurface(context, 30, 30));
         manager.replace(Biomes.FROZEN_OCEAN, new IcebergsSurface(context, 20, 15));
         manager.append(ModBiomes.BRYCE, new BriceSurface(context.seed));
@@ -137,7 +137,7 @@ public class TerraSetupFactory {
         );
         manager.replace(
                 new SwampSurface(context),
-                Biomes.SWAMP.delegate.get(),
+                Biomes.SWAMP,
                 ModBiomes.MARSHLAND
         );
         manager.append(
@@ -150,11 +150,11 @@ public class TerraSetupFactory {
         return SetupHooks.setup(manager, context);
     }
 
-    public static StructureManager createStructureManager(TerraContext context) {
-        StructureManager manager = new StructureManager();
-        manager.register(Structure.OCEAN_MONUMENT, DeepWater.INSTANCE);
-        manager.register(Structure.OCEAN_RUIN, DeepWater.INSTANCE);
-        manager.register(Structure.SHIPWRECK, new MinDepth(context.levels.waterLevel - 8));
+    public static FMStructureManager createStructureManager(TerraContext context) {
+        FMStructureManager manager = new FMStructureManager();
+        manager.register(Structures.oceanMonument(), DeepWater.INSTANCE);
+        manager.register(Structures.oceanRuin(), DeepWater.INSTANCE);
+        manager.register(Structures.shipwreck(), new MinDepth(context.levels.waterLevel - 8));
         return SetupHooks.setup(manager, context);
     }
 

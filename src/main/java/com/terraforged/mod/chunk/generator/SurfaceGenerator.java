@@ -14,6 +14,8 @@ import net.minecraft.world.gen.INoiseGenerator;
 import net.minecraft.world.gen.PerlinNoiseGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 
+import java.util.stream.IntStream;
+
 public class SurfaceGenerator implements Generator.Surfaces {
 
     private final TerraChunkGenerator generator;
@@ -21,7 +23,7 @@ public class SurfaceGenerator implements Generator.Surfaces {
 
     public SurfaceGenerator(TerraChunkGenerator generator) {
         this.generator = generator;
-        this.surfaceNoise = new PerlinNoiseGenerator(new SharedSeedRandom(generator.getSeed()), 3, 0);
+        this.surfaceNoise = new PerlinNoiseGenerator(new SharedSeedRandom(generator.getSeed()), IntStream.rangeClosed(-3, 0));
     }
 
     @Override

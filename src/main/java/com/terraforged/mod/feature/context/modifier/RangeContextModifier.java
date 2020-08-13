@@ -1,8 +1,8 @@
 package com.terraforged.mod.feature.context.modifier;
 
 import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import com.terraforged.mod.feature.context.ChanceContext;
 import com.terraforged.mod.util.RangeModifier;
 import net.minecraft.util.math.BlockPos;

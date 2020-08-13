@@ -25,7 +25,7 @@
 
 package com.terraforged.mod.client.gui;
 
-import com.terraforged.mod.chunk.settings.SettingsHelper;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.element.TerraLabel;
 import com.terraforged.mod.client.gui.page.Page;
@@ -34,7 +34,6 @@ import com.terraforged.mod.client.gui.page.SimplePage;
 import com.terraforged.mod.client.gui.page.SimplePreviewPage;
 import com.terraforged.mod.client.gui.page.WorldPage;
 import com.terraforged.mod.client.gui.preview.PreviewPage;
-import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
@@ -42,10 +41,12 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.StringTextComponent;
 
 public class SettingsScreen extends OverlayScreen {
 
-    private static final Button.IPressable NO_ACTION = b -> {};
+    private static final Button.IPressable NO_ACTION = b -> {
+    };
 
     private final Page[] pages;
     private final PreviewPage preview;
@@ -56,7 +57,7 @@ public class SettingsScreen extends OverlayScreen {
 
     public SettingsScreen(CreateWorldScreen parent) {
         TerraSettings settings = new TerraSettings();
-        SettingsHelper.applyDefaults(parent.chunkProviderSettingsJson, settings);
+//        SettingsHelper.applyDefaults(parent.chunkProviderSettingsJson, settings);
 
         this.parent = parent;
         this.instance = new Instance(settings);
@@ -68,7 +69,6 @@ public class SettingsScreen extends OverlayScreen {
                 new SimplePreviewPage(GuiKeys.TERRAIN_SETTINGS, "terrain", preview, instance, s -> s.terrain),
                 new SimplePreviewPage(GuiKeys.RIVER_SETTINGS, "rivers", preview, instance, s -> s.rivers),
                 new SimplePreviewPage(GuiKeys.FILTER_SETTINGS, "filters", preview, instance, s -> s.filters),
-                new SimplePage(GuiKeys.STRUCTURE_SETTINGS, "structures", instance, s -> s.structures),
                 new SimplePage(GuiKeys.MISC_SETTINGS, "miscellaneous", instance, s -> s.miscellaneous)
         };
     }
@@ -105,24 +105,24 @@ public class SettingsScreen extends OverlayScreen {
         }
 
         // -52
-        addButton(new Button(buttonsCenter - buttonWidth - buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.CANCEL.get(), b -> onClose()));
+        addButton(new Button(buttonsCenter - buttonWidth - buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.CANCEL.getText(), b -> onClose()));
 
         // +2
-        addButton(new Button(buttonsCenter + buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.DONE.get(), b -> {
+        addButton(new Button(buttonsCenter + buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.DONE.getText(), b -> {
             for (Page page : pages) {
                 page.save();
             }
-            parent.chunkProviderSettingsJson = NBTHelper.stripMetadata(instance.settingsData);
+//            parent.chunkProviderSettingsJson = NBTHelper.stripMetadata(instance.settingsData);
             SettingsScreen.setSeed(parent, preview.getSeed());
             onClose();
         }));
 
         // -106
-        addButton(new Button(buttonsCenter - (buttonWidth * 2 + (buttonPad * 3)), buttonsRow, buttonWidth, buttonHeight, "<<", NO_ACTION) {
+        addButton(new Button(buttonsCenter - (buttonWidth * 2 + (buttonPad * 3)), buttonsRow, buttonWidth, buttonHeight, new StringTextComponent("<<"), NO_ACTION) {
             @Override
-            public void render(int mouseX, int mouseY, float partialTicks) {
+            public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
                 super.active = hasPrevious();
-                super.render(mouseX, mouseY, partialTicks);
+                super.render(matrixStack, mouseX, mouseY, partialTicks);
             }
 
             @Override
@@ -136,11 +136,11 @@ public class SettingsScreen extends OverlayScreen {
         });
 
         // +56
-        addButton(new Button(buttonsCenter + buttonWidth + (buttonPad * 3), buttonsRow, buttonWidth, buttonHeight, ">>", NO_ACTION) {
+        addButton(new Button(buttonsCenter + buttonWidth + (buttonPad * 3), buttonsRow, buttonWidth, buttonHeight, new StringTextComponent(">>"), NO_ACTION) {
             @Override
-            public void render(int mouseX, int mouseY, float partialTicks) {
+            public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
                 super.active = hasNext();
-                super.render(mouseX, mouseY, partialTicks);
+                super.render(matrixStack, mouseX, mouseY, partialTicks);
             }
 
             @Override
@@ -157,28 +157,28 @@ public class SettingsScreen extends OverlayScreen {
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        super.renderBackground();
-        pages[pageIndex].visit(pane -> pane.render(mouseX, mouseY, partialTicks));
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        super.renderBackground(matrixStack);
+        pages[pageIndex].visit(pane -> pane.render(matrixStack, mouseX, mouseY, partialTicks));
         if (pageIndex > 0) {
-            preview.visit(pane -> pane.render(mouseX, mouseY, partialTicks));
+            preview.visit(pane -> pane.render(matrixStack, mouseX, mouseY, partialTicks));
         }
-        super.render(mouseX, mouseY, partialTicks);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     @Override
-    public void renderOverlays(Screen screen, int mouseX, int mouseY) {
-        super.renderOverlays(screen, mouseX, mouseY);
-        pages[pageIndex].visit(pane -> pane.renderOverlays(screen, mouseX, mouseY));
+    public void renderOverlays(MatrixStack matrixStack, Screen screen, int mouseX, int mouseY) {
+        super.renderOverlays(matrixStack, screen, mouseX, mouseY);
+        pages[pageIndex].visit(pane -> pane.renderOverlays(matrixStack, screen, mouseX, mouseY));
         if (!isPresetsPage()) {
-            preview.visit(pane -> pane.renderOverlays(screen, mouseX, mouseY));
+            preview.visit(pane -> pane.renderOverlays(matrixStack, screen, mouseX, mouseY));
         }
     }
 
     @Override
     public boolean mouseClicked(double x, double y, int button) {
         boolean a = pages[pageIndex].action(pane -> pane.mouseClicked(x, y, button));
-        boolean b =  isPresetsPage() || preview.action(pane -> pane.mouseClicked(x, y, button));
+        boolean b = isPresetsPage() || preview.action(pane -> pane.mouseClicked(x, y, button));
         boolean c = preview.getPreviewWidget().click(x, y);
         boolean d = super.mouseClicked(x, y, button);
         return a || b || c || d;
@@ -263,7 +263,7 @@ public class SettingsScreen extends OverlayScreen {
 
     private static TextFieldWidget getWidget(CreateWorldScreen screen) {
         String message = I18n.format("selectWorld.enterSeed");
-        for (IGuiEventListener widget : screen.children()) {
+        for (IGuiEventListener widget : screen.getEventListeners()) {
             if (widget instanceof TextFieldWidget) {
                 TextFieldWidget field = (TextFieldWidget) widget;
                 if (field.getMessage().equals(message)) {

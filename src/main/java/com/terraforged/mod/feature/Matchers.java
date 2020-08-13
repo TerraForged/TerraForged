@@ -25,6 +25,7 @@
 
 package com.terraforged.mod.feature;
 
+import com.terraforged.fm.GameContext;
 import com.terraforged.fm.matcher.BiomeFeatureMatcher;
 import com.terraforged.fm.matcher.biome.BiomeMatcher;
 import com.terraforged.fm.matcher.feature.FeatureMatcher;
@@ -51,9 +52,9 @@ public class Matchers {
                 .build();
     }
 
-    public static BiomeFeatureMatcher sedimentDisks() {
+    public static BiomeFeatureMatcher sedimentDisks(GameContext context) {
         return new BiomeFeatureMatcher(
-                BiomeMatcher.of(Biome.Category.RIVER, Biome.Category.SWAMP),
+                BiomeMatcher.of(context, Biome.Category.RIVER, Biome.Category.SWAMP),
                 FeatureMatcher.builder()
                         .or(Feature.DISK).and("minecraft:sand")
                         .or(Feature.DISK).and("minecraft:dirt")

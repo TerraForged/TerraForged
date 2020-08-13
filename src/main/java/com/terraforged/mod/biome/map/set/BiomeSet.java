@@ -2,8 +2,8 @@ package com.terraforged.mod.biome.map.set;
 
 import com.google.gson.JsonElement;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.map.defaults.DefaultBiome;
-import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.mod.util.ListUtils;
 import com.terraforged.n2d.util.NoiseUtil;
 import net.minecraft.world.biome.Biome;
@@ -61,9 +61,9 @@ public abstract class BiomeSet {
 
     public abstract int getIndex(Cell cell);
 
-    public abstract JsonElement toJson();
+    public abstract JsonElement toJson(GameContext context);
 
-    protected static Biome[][] collect(Map<? extends Enum<?>, List<Biome>> map, int size, Function<Enum<?>, Integer> indexer) {
+    protected static Biome[][] collect(Map<? extends Enum<?>, List<Biome>> map, int size, Function<Enum<?>, Integer> indexer, GameContext context) {
         Biome[][] biomes = new Biome[size][];
         for (Enum<?> type : map.keySet()) {
             int index = indexer.apply(type);
@@ -72,7 +72,7 @@ public abstract class BiomeSet {
             }
             List<Biome> list = map.getOrDefault(type, Collections.emptyList());
             list = ListUtils.minimize(list);
-            list.sort(Comparator.comparing(BiomeHelper::getId));
+            list.sort(Comparator.comparing(context.biomes::getName));
             biomes[index] = list.toArray(new Biome[0]);
         }
         for (int i = 0; i < size; i++) {

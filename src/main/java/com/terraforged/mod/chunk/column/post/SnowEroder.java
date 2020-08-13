@@ -99,7 +99,7 @@ public class SnowEroder extends ErosionDecorator {
         if (pos.getY() > 0) {
             pos.setY(pos.getY() - 1);
             BlockState below = chunk.getBlockState(pos);
-            if (below.has(GrassBlock.SNOWY)) {
+            if (below.hasProperty(GrassBlock.SNOWY)) {
                 chunk.setBlockState(pos, below.with(GrassBlock.SNOWY, false), false);
             }
         }

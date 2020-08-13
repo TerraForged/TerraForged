@@ -2,6 +2,8 @@ package com.terraforged.mod.util;
 
 import com.terraforged.core.util.NameUtil;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -34,6 +36,10 @@ public class TranslationKey {
             return I18n.format(translationKey);
         }
         return defaultValue;
+    }
+
+    public ITextComponent getText() {
+        return new StringTextComponent(get());
     }
 
     public String get(Object... args) {

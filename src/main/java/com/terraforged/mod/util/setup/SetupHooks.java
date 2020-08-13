@@ -33,7 +33,7 @@ import com.terraforged.api.event.SetupEvent;
 import com.terraforged.api.material.geology.GeologyManager;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.fm.modifier.FeatureModifiers;
-import com.terraforged.fm.structure.StructureManager;
+import com.terraforged.fm.structure.FMStructureManager;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.terrain.provider.TerrainProvider;
 import net.minecraftforge.common.MinecraftForge;
@@ -72,7 +72,7 @@ public class SetupHooks {
         return manager;
     }
 
-    public static <T extends StructureManager> T setup(T manager, GeneratorContext context) {
+    public static <T extends FMStructureManager> T setup(T manager, GeneratorContext context) {
         MinecraftForge.EVENT_BUS.post(new SetupEvent.Structures(manager, context));
         return manager;
     }

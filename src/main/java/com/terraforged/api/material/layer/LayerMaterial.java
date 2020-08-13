@@ -29,7 +29,7 @@ import com.terraforged.n2d.util.NoiseUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.state.IProperty;
+import net.minecraft.state.Property;
 import net.minecraft.state.properties.BlockStateProperties;
 
 public class LayerMaterial {
@@ -40,9 +40,9 @@ public class LayerMaterial {
     private final int max;
     private final BlockState fullState;
     private final BlockState layerState;
-    private final IProperty<Integer> layerProperty;
+    private final Property<Integer> layerProperty;
 
-    private LayerMaterial(BlockState fullState, BlockState layerState, IProperty<Integer> layerProperty) {
+    private LayerMaterial(BlockState fullState, BlockState layerState, Property<Integer> layerProperty) {
         this.layerProperty = layerProperty;
         this.min = min(layerProperty);
         this.max = max(layerProperty);
@@ -93,11 +93,11 @@ public class LayerMaterial {
         return height - (int) height;
     }
 
-    private static int min(IProperty<Integer> property) {
+    private static int min(Property<Integer> property) {
         return property.getAllowedValues().stream().min(Integer::compareTo).orElse(0);
     }
 
-    private static int max(IProperty<Integer> property) {
+    private static int max(Property<Integer> property) {
         return property.getAllowedValues().stream().max(Integer::compareTo).orElse(0);
     }
 
@@ -105,7 +105,7 @@ public class LayerMaterial {
         return of(block, BlockStateProperties.LAYERS_1_8);
     }
 
-    public static LayerMaterial of(Block block, IProperty<Integer> property) {
+    public static LayerMaterial of(Block block, Property<Integer> property) {
         return of(block.getDefaultState(), block.getDefaultState(), property);
     }
 
@@ -113,7 +113,7 @@ public class LayerMaterial {
         return of(full.getDefaultState(), layer.getDefaultState());
     }
 
-    public static LayerMaterial of(Block full, Block layer, IProperty<Integer> property) {
+    public static LayerMaterial of(Block full, Block layer, Property<Integer> property) {
         return of(full.getDefaultState(), layer.getDefaultState(), property);
     }
 
@@ -121,7 +121,7 @@ public class LayerMaterial {
         return of(layer, BlockStateProperties.LAYERS_1_8);
     }
 
-    public static LayerMaterial of(BlockState layer, IProperty<Integer> property) {
+    public static LayerMaterial of(BlockState layer, Property<Integer> property) {
         return of(layer.with(property, max(property)), layer);
     }
 
@@ -129,7 +129,7 @@ public class LayerMaterial {
         return of(full, layer, BlockStateProperties.LAYERS_1_8);
     }
 
-    public static LayerMaterial of(BlockState full, BlockState layer, IProperty<Integer> property) {
+    public static LayerMaterial of(BlockState full, BlockState layer, Property<Integer> property) {
         return new LayerMaterial(full, layer, property);
     }
 }

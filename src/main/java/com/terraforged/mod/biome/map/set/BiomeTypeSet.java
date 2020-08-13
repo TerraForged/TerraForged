@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.map.defaults.DefaultBiome;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.biome.BiomeType;
@@ -16,8 +17,8 @@ import java.util.stream.Stream;
 
 public class BiomeTypeSet extends BiomeSet {
 
-    public BiomeTypeSet(Map<BiomeType, List<Biome>> map, DefaultBiome defaultBiome) {
-        super(BiomeSet.collect(map, BiomeType.values().length, Enum::ordinal), defaultBiome);
+    public BiomeTypeSet(Map<BiomeType, List<Biome>> map, DefaultBiome.Factory defaultBiome, GameContext context) {
+        super(BiomeSet.collect(map, BiomeType.values().length, Enum::ordinal, context), defaultBiome.create(context));
     }
 
     public Biome getBiome(BiomeType type, float temperature, float identity) {
@@ -43,12 +44,14 @@ public class BiomeTypeSet extends BiomeSet {
     }
 
     @Override
-    public JsonElement toJson() {
+    public JsonElement toJson(GameContext context) {
         JsonObject root = new JsonObject();
         for (BiomeType type : BiomeType.values()) {
             JsonArray array = new JsonArray();
             root.add(type.name(), array);
-            Stream.of(getSet(type.ordinal())).distinct().map(Biome::getRegistryName).map(Objects::toString).forEach(array::add);
+            Stream.of(getSet(type.ordinal())).distinct()
+                    .map(context.biomes::getName)
+                    .map(Objects::toString).forEach(array::add);
         }
         return root;
     }

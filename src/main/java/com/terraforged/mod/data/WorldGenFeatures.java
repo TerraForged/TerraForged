@@ -29,38 +29,41 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.terraforged.fm.FeatureSerializer;
+import com.terraforged.fm.GameContext;
 import com.terraforged.fm.util.FeatureDebugger;
 import com.terraforged.mod.Log;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.io.File;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class WorldGenFeatures extends DataGen {
 
-    public static void genBiomeFeatures(File dataDir) {
+    public static void genBiomeFeatures(File dataDir, GameContext context) {
         if (dataDir.exists() || dataDir.mkdirs()) {
-            for (Biome biome : ForgeRegistries.BIOMES) {
-                genBiomeFeatures(dataDir, biome);
+            for (Biome biome : context.biomes) {
+                genBiomeFeatures(dataDir, biome, context);
             }
         }
     }
 
-    private static void genBiomeFeatures(File dir, Biome biome) {
-        write(new File(dir, getJsonPath("features", biome.getRegistryName())), writer -> {
+    private static void genBiomeFeatures(File dir, Biome biome, GameContext context) {
+        write(new File(dir, getJsonPath("features", context.biomes.getRegistryName(biome))), writer -> {
             JsonObject root = new JsonObject();
+            List<List<Supplier<ConfiguredFeature<?, ?>>>> stageFeatures = biome.func_242440_e().func_242498_c();
+
             for (GenerationStage.Decoration type : GenerationStage.Decoration.values()) {
                 JsonArray features = new JsonArray();
-                for (ConfiguredFeature<?, ?> feature : biome.getFeatures(type)) {
+                for (Supplier<ConfiguredFeature<?, ?>> feature : stageFeatures.get(type.ordinal())) {
                     try {
-                        JsonElement element = FeatureSerializer.serialize(feature);
+                        JsonElement element = FeatureSerializer.serialize(feature.get());
                         features.add(element);
                     } catch (Throwable t) {
-                        String name = biome.getRegistryName() + "";
-                        List<String> errors = FeatureDebugger.getErrors(feature);
+                        String name = context.biomes.getName(biome) + "";
+                        List<String> errors = FeatureDebugger.getErrors(feature.get());
                         Log.debug("Unable to serialize feature in biome: {}", name);
                         if (errors.isEmpty()) {
                             Log.debug("Unable to determine issues. See stacktrace:", t);
@@ -71,7 +74,7 @@ public class WorldGenFeatures extends DataGen {
                         }
                     }
                 }
-                root.add(type.getName(), features);
+                root.add(type.name(), features);
             }
             write(root, writer);
         });

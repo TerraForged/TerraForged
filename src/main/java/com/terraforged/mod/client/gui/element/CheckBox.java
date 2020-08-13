@@ -25,6 +25,8 @@
 
 package com.terraforged.mod.client.gui.element;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+
 public class CheckBox extends TerraButton implements Element {
 
     private boolean checked = false;
@@ -52,9 +54,9 @@ public class CheckBox extends TerraButton implements Element {
     }
 
     @Override
-    public void render(int x, int y, float ticks) {
+    public void render(MatrixStack matrix, int x, int y, float ticks) {
         active = !checked;
-        super.render(x, y, ticks);
+        super.render(matrix, x, y, ticks);
         active = true;
     }
 }

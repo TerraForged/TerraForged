@@ -29,8 +29,7 @@ import com.terraforged.mod.Log;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.Tag;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.tags.ITag;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,32 +38,32 @@ import java.util.function.Predicate;
 
 public class WGTags {
 
-    public static final Tag<Block> STONE = tag("forge:wg_stone");
-    public static final Tag<Block> DIRT = tag("forge:wg_dirt");
-    public static final Tag<Block> CLAY = tag("forge:wg_clay");
-    public static final Tag<Block> SEDIMENT = tag("forge:wg_sediment");
-    public static final Tag<Block> ERODIBLE = tag("forge:wg_erodible");
-    private static final List<Tag<Block>> WG_TAGS = Collections.unmodifiableList(Arrays.asList(STONE, DIRT, CLAY, SEDIMENT, ERODIBLE));
+    public static final ITag.INamedTag<Block> STONE = tag("forge:wg_stone");
+    public static final ITag.INamedTag<Block> DIRT = tag("forge:wg_dirt");
+    public static final ITag.INamedTag<Block> CLAY = tag("forge:wg_clay");
+    public static final ITag.INamedTag<Block> SEDIMENT = tag("forge:wg_sediment");
+    public static final ITag.INamedTag<Block> ERODIBLE = tag("forge:wg_erodible");
+    private static final List<ITag.INamedTag<Block>> WG_TAGS = Collections.unmodifiableList(Arrays.asList(STONE, DIRT, CLAY, SEDIMENT, ERODIBLE));
 
     public static void init() {
 
     }
 
-    private static Tag<Block> tag(String name) {
-        return new BlockTags.Wrapper(new ResourceLocation(name));
+    private static ITag.INamedTag<Block> tag(String name) {
+        return BlockTags.makeWrapperTag(name);
     }
 
     public static Predicate<BlockState> stone() {
         return toStatePredicate(STONE);
     }
 
-    private static Predicate<BlockState> toStatePredicate(Tag<Block> tag) {
+    private static Predicate<BlockState> toStatePredicate(ITag<Block> tag) {
         return state -> tag.contains(state.getBlock());
     }
 
     public static void printTags() {
-        for (Tag<Block> tag : WG_TAGS) {
-            Log.debug("World-Gen Tag: {}", tag.getId());
+        for (ITag.INamedTag<Block> tag : WG_TAGS) {
+            Log.debug("World-Gen Tag: {}", tag.getName());
             for (Block block : tag.getAllElements()) {
                 Log.debug(" - {}", block.getRegistryName());
             }

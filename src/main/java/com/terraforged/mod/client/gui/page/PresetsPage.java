@@ -1,5 +1,6 @@
 package com.terraforged.mod.client.gui.page;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.chunk.settings.preset.Preset;
@@ -68,10 +69,10 @@ public class PresetsPage extends BasePage {
         right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_CREATE.get()) {
 
             @Override
-            public void render(int x, int z, float ticks) {
+            public void render(MatrixStack matrixStack, int x, int z, float ticks) {
                 // only render as active if the text field is not empty
                 super.active = nameInput.isValid();
-                super.render(x, z, ticks);
+                super.render(matrixStack, x, z, ticks);
             }
 
             @Override
@@ -96,9 +97,9 @@ public class PresetsPage extends BasePage {
         right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_LOAD.get()) {
 
             @Override
-            public void render(int x, int z, float ticks) {
+            public void render(MatrixStack matrixStack, int x, int z, float ticks) {
                 super.active = hasSelectedPreset(false);
-                super.render(x, z, ticks);
+                super.render(matrixStack, x, z, ticks);
             }
 
             @Override
@@ -111,9 +112,9 @@ public class PresetsPage extends BasePage {
         right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_SAVE.get()) {
 
             @Override
-            public void render(int x, int z, float ticks) {
+            public void render(MatrixStack matrixStack, int x, int z, float ticks) {
                 super.active = hasSelectedPreset(true);
-                super.render(x, z, ticks);
+                super.render(matrixStack, x, z, ticks);
             }
 
             @Override
@@ -140,9 +141,9 @@ public class PresetsPage extends BasePage {
         right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_RESET.get()) {
 
             @Override
-            public void render(int x, int z, float ticks) {
+            public void render(MatrixStack matrixStack, int x, int z, float ticks) {
                 super.active = hasSelectedPreset(true);
-                super.render(x, z, ticks);
+                super.render(matrixStack, x, z, ticks);
             }
 
             @Override
@@ -168,9 +169,9 @@ public class PresetsPage extends BasePage {
         right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_DELETE.get()) {
 
             @Override
-            public void render(int x, int z, float ticks) {
+            public void render(MatrixStack matrixStack, int x, int z, float ticks) {
                 super.active = hasSelectedPreset(true);
-                super.render(x, z, ticks);
+                super.render(matrixStack, x, z, ticks);
             }
 
             @Override
@@ -232,8 +233,8 @@ public class PresetsPage extends BasePage {
 
     private void setSelected(Preset preset) {
         ScrollPane pane = getColumn(0).scrollPane;
-        for (ScrollPane.Entry entry : pane.children()) {
-            if (entry.option.getMessage().equalsIgnoreCase(preset.getName())) {
+        for (ScrollPane.Entry entry : pane.getEventListeners()) {
+            if (entry.option.getMessage().getString().equalsIgnoreCase(preset.getName())) {
                 pane.setSelected(entry);
                 return;
             }
@@ -245,14 +246,14 @@ public class PresetsPage extends BasePage {
         if (entry == null) {
             return Optional.empty();
         }
-        return manager.get(entry.option.getMessage());
+        return manager.get(entry.option.getMessage().getString());
     }
 
     private void rebuildPresetList() {
         Column left = getColumn(0);
         left.scrollPane.setSelected(null);
         left.scrollPane.setRenderSelection(true);
-        left.scrollPane.children().clear();
+        left.scrollPane.getEventListeners().clear();
 
         for (Preset preset : manager) {
             if (preset.internal()) {
@@ -266,7 +267,7 @@ public class PresetsPage extends BasePage {
     private static TerraButton createSpacer() {
         return new TerraButton("") {
             @Override
-            public void render(int x, int y, float tick) { }
+            public void render(MatrixStack matrixStack, int x, int y, float tick) { }
         };
     }
 }

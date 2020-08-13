@@ -25,6 +25,7 @@
 
 package com.terraforged.mod.client.gui.preview;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraforged.core.cell.Cell;
@@ -50,6 +51,7 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.text.StringTextComponent;
 
 import java.awt.*;
 import java.util.Random;
@@ -79,7 +81,7 @@ public class Preview extends Button {
     private String[] labels = {GuiKeys.PREVIEW_AREA.get(), GuiKeys.PREVIEW_TERRAIN.get(), GuiKeys.PREVIEW_BIOME.get()};
 
     public Preview(int seed) {
-        super(0, 0, 0, 0, "", b -> {});
+        super(0, 0, 0, 0, new StringTextComponent(""), b -> {});
         this.seed = seed == -1 ? random.nextInt() : seed;
         this.offsetX = 0;
         this.offsetZ = 0;
@@ -108,7 +110,7 @@ public class Preview extends Button {
     }
 
     @Override
-    public void render(int mx, int my, float partialTicks) {
+    public void render(MatrixStack matrixStack, int mx, int my, float partialTicks) {
         this.height = getSize();
 
         preRender();
@@ -119,12 +121,12 @@ public class Preview extends Button {
         RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 
-        AbstractGui.blit(x, y, 0, 0, width, height, width, height);
+        AbstractGui.blit(matrixStack, x, y, 0, 0, width, height, width, height);
         RenderSystem.disableRescaleNormal();
 
         updateLegend(mx, my);
 
-        renderLegend(mx, my, labels, values, x, y + width, 10, 0xFFFFFF);
+        renderLegend(matrixStack, mx, my, labels, values, x, y + width, 10, 0xFFFFFF);
 
 
     }
@@ -248,7 +250,7 @@ public class Preview extends Button {
         return LEGEND_SCALES[index];
     }
 
-    private void renderLegend(int mx, int my, String[] labels, String[] values, int left, int top, int lineHeight, int color) {
+    private void renderLegend(MatrixStack matrixStack, int mx, int my, String[] labels, String[] values, int left, int top, int lineHeight, int color) {
         float scale = getLegendScale();
 
         RenderSystem.pushMatrix();
@@ -270,14 +272,14 @@ public class Preview extends Button {
                 value = value.substring(0, value.length() - 1);
             }
 
-            drawString(renderer, label, 0, i * lineHeight, color);
-            drawString(renderer, value, spacing, i * lineHeight, color);
+            drawString(matrixStack, renderer, label, 0, i * lineHeight, color);
+            drawString(matrixStack, renderer, value, spacing, i * lineHeight, color);
         }
 
         RenderSystem.popMatrix();
 
         if (PreviewSettings.showCoords && !hoveredCoords.isEmpty()) {
-            drawCenteredString(renderer, hoveredCoords, mx, my - 10, 0xFFFFFF);
+            drawCenteredString(matrixStack, renderer, hoveredCoords, mx, my - 10, 0xFFFFFF);
         }
     }
 

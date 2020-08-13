@@ -27,29 +27,35 @@ package com.terraforged.mod.chunk.fix;
 
 import com.terraforged.api.chunk.ChunkDelegate;
 import com.terraforged.api.material.state.States;
+import com.terraforged.fm.template.StructureUtils;
 import com.terraforged.mod.material.Materials;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.Heightmap;
 
-public class ChunkCarverFix implements ChunkDelegate {
+import java.util.BitSet;
 
-    private final IChunk delegate;
+public class ChunkCarverFix extends ChunkDelegate {
+
     private final Materials materials;
+    private final boolean hasSurfaceStructure;
 
     public ChunkCarverFix(IChunk chunk, Materials materials) {
-        this.delegate = chunk;
+        super(chunk);
         this.materials = materials;
+        this.hasSurfaceStructure = StructureUtils.hasOvergroundStructure(chunk);
     }
 
-    @Override
-    public IChunk getDelegate() {
-        return delegate;
+    public BitSet getCarvingMask(GenerationStage.Carving type) {
+        return ((ChunkPrimer) delegate).func_230345_b_(type);
     }
 
     @Override
     public BlockState getBlockState(BlockPos pos) {
-        BlockState state = getDelegate().getBlockState(pos);
+        BlockState state = delegate.getBlockState(pos);
         if (materials.isAir(state.getBlock())) {
             return state;
         }
@@ -69,5 +75,16 @@ public class ChunkCarverFix implements ChunkDelegate {
             return States.SAND.get();
         }
         return state;
+    }
+
+    @Override
+    public BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving) {
+        if (hasSurfaceStructure) {
+            int surface = delegate.getTopBlockY(Heightmap.Type.WORLD_SURFACE, pos.getX(), pos.getZ());
+            if (pos.getY() > surface - 3) {
+                return state;
+            }
+        }
+        return delegate.setBlockState(pos, state, isMoving);
     }
 }

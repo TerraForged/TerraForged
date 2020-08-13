@@ -3,6 +3,7 @@ package com.terraforged.mod.biome.map;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.map.defaults.DefaultBiomes;
 import com.terraforged.mod.biome.map.set.BiomeSet;
 import com.terraforged.mod.biome.map.set.BiomeTypeSet;
@@ -15,6 +16,7 @@ import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.TerrainType;
 import net.minecraft.world.biome.Biome;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,15 +35,15 @@ public class SimpleBiomeMap implements BiomeMap {
     private final BiomeSet[] terrainBiomes;
 
     public SimpleBiomeMap(BiomeMapBuilder builder) {
-        deepOcean = new TemperatureSet(builder.deepOceans, DefaultBiomes::defaultDeepOcean);
-        shallowOcean = new TemperatureSet(builder.oceans, DefaultBiomes::defaultOcean);
-        beach = new TemperatureSet(builder.beaches, DefaultBiomes::defaultBeach);
-        coast = new TemperatureSet(builder.coasts, DefaultBiomes::defaultBiome);
-        river = new RiverSet(builder.rivers, DefaultBiomes::defaultRiver, this);
-        lake = new TemperatureSet(builder.lakes, DefaultBiomes::defaultLake);
-        wetland = new WetlandSet(builder.wetlands, this);
-        mountains = new TemperatureSet(builder.mountains, DefaultBiomes::defaultMountain);
-        land = new BiomeTypeSet(builder.map, DefaultBiomes::defaultBiome);
+        deepOcean = new TemperatureSet(builder.deepOceans, DefaultBiomes.DEEP_OCEAN, builder.context);
+        shallowOcean = new TemperatureSet(builder.oceans, DefaultBiomes.OCEAN, builder.context);
+        beach = new TemperatureSet(builder.beaches, DefaultBiomes.BEACH, builder.context);
+        coast = new TemperatureSet(builder.coasts, DefaultBiomes.LAND, builder.context);
+        river = new RiverSet(builder.rivers, DefaultBiomes.RIVER, this, builder.context);
+        lake = new TemperatureSet(builder.lakes, DefaultBiomes.LAKE, builder.context);
+        wetland = new WetlandSet(builder.wetlands, this, builder.context);
+        mountains = new TemperatureSet(builder.mountains, DefaultBiomes.MOUNTAIN, builder.context);
+        land = new BiomeTypeSet(builder.map, DefaultBiomes.LAND, builder.context);
         terrainBiomes = new BiomeSet[TerrainType.values().length];
         terrainBiomes[TerrainType.SHALLOW_OCEAN.ordinal()] = shallowOcean;
         terrainBiomes[TerrainType.DEEP_OCEAN.ordinal()] = deepOcean;
@@ -80,6 +82,7 @@ public class SimpleBiomeMap implements BiomeMap {
     }
 
     @Override
+    @Nullable
     public Biome getCoast(Cell cell) {
         // treat land & coast biome-sets as one combined set
         Biome[] inland = land.getSet(cell);
@@ -100,7 +103,7 @@ public class SimpleBiomeMap implements BiomeMap {
             }
         }
 
-        return DefaultBiomes.NONE;
+        return null;
     }
 
     @Override
@@ -146,22 +149,22 @@ public class SimpleBiomeMap implements BiomeMap {
     }
 
     @Override
-    public JsonElement toJson() {
+    public JsonElement toJson(GameContext context) {
         JsonObject root = new JsonObject();
-        root.add("DEEP_OCEAN", deepOcean.toJson());
-        root.add("SHALLOW_OCEAN", shallowOcean.toJson());
-        root.add("BEACH", beach.toJson());
-        root.add("COAST", coast.toJson());
-        root.add("RIVER", river.toJson());
-        root.add("LAKE", lake.toJson());
-        root.add("WETLAND", wetland.toJson());
-        root.add("LAND", landToJson());
+        root.add("DEEP_OCEAN", deepOcean.toJson(context));
+        root.add("SHALLOW_OCEAN", shallowOcean.toJson(context));
+        root.add("BEACH", beach.toJson(context));
+        root.add("COAST", coast.toJson(context));
+        root.add("RIVER", river.toJson(context));
+        root.add("LAKE", lake.toJson(context));
+        root.add("WETLAND", wetland.toJson(context));
+        root.add("LAND", landToJson(context));
         return root;
     }
 
-    private JsonElement landToJson() {
-        JsonObject root = land.toJson().getAsJsonObject();
-        root.add(BiomeType.ALPINE.name(), mountains.toJson());
+    private JsonElement landToJson(GameContext context) {
+        JsonObject root = land.toJson(context).getAsJsonObject();
+        root.add(BiomeType.ALPINE.name(), mountains.toJson(context));
         return root;
     }
 }

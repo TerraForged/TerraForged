@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.StringNBT;
+import net.minecraft.util.text.StringTextComponent;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -21,7 +22,7 @@ public class TerraTextInput extends TextFieldWidget implements Element, Consumer
     private Consumer<TerraTextInput> callback = t -> {};
 
     public TerraTextInput(String name, CompoundNBT value) {
-        super(Minecraft.getInstance().fontRenderer, 0, 0, 100, 20, Element.getDisplayName(name, value) + ": ");
+        super(Minecraft.getInstance().fontRenderer, 0, 0, 100, 20, new StringTextComponent(Element.getDisplayName(name, value) + ": "));
         this.name = name;
         this.value = value;
         this.tooltip = Element.getToolTip(name, value);

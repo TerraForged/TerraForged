@@ -26,6 +26,7 @@
 package com.terraforged.mod.client.gui;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.mod.client.gui.element.CheckBox;
 import com.terraforged.mod.client.gui.element.Element;
 import com.terraforged.mod.client.gui.preview.PreviewSettings;
@@ -53,19 +54,19 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        super.render(mouseX, mouseY, partialTicks);
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
         if (PreviewSettings.showTooltips) {
-            renderOverlays(this, mouseX, mouseY);
+            renderOverlays(matrixStack, this, mouseX, mouseY);
         }
     }
 
     @Override
-    public void renderOverlays(Screen screen, int mouseX, int mouseY) {
+    public void renderOverlays(MatrixStack matrixStack, Screen screen, int mouseX, int mouseY) {
         for (Widget button : buttons) {
             if (button.isMouseOver(mouseX, mouseY)) {
                 if (button instanceof Element) {
-                    screen.renderTooltip(((Element) button).getTooltip(), mouseX, mouseY);
+                    screen.renderTooltip(matrixStack, ((Element) button).getToolTipText(), mouseX, mouseY);
                     return;
                 }
             }
@@ -84,10 +85,10 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
             }
 
             @Override
-            public void render(int mouseX, int mouseY, float partial) {
+            public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partial) {
                 this.x = OverlayScreen.this.width - width - 13;
                 this.y = 6;
-                super.render(mouseX, mouseY, partial);
+                super.render(matrixStack, mouseX, mouseY, partial);
             }
         });
 
@@ -101,11 +102,11 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
             }
 
             @Override
-            public void render(int mouseX, int mouseY, float partial) {
+            public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partial) {
                 setChecked(PreviewSettings.showCoords);
                 this.x = OverlayScreen.this.width - (width * 2) - 15;
                 this.y = 6;
-                super.render(mouseX, mouseY, partial);
+                super.render(matrixStack, mouseX, mouseY, partial);
             }
         });
     }

@@ -25,7 +25,6 @@
 
 package com.terraforged.mod.client.gui.page;
 
-import com.terraforged.mod.TerraWorld;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.Instance;
 import com.terraforged.mod.client.gui.OverlayScreen;
@@ -34,9 +33,7 @@ import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.WorldType;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class WorldPage extends BasePage {
@@ -108,14 +105,14 @@ public class WorldPage extends BasePage {
 
     private static ListNBT getWorldTypes() {
         ListNBT options = new ListNBT();
-        for (WorldType type : WorldType.WORLD_TYPES) {
-            if (type == null || (type.getId() >= 1 && type.getId() <= 6) || type.getId() == 8) {
-                continue;
-            }
-            if (!TerraWorld.isTerraType(type)) {
-                options.add(StringNBT.valueOf(type.getName()));
-            }
-        }
+//        for (WorldType type : WorldType.WORLD_TYPES) {
+//            if (type == null || (type.getId() >= 1 && type.getId() <= 6) || type.getId() == 8) {
+//                continue;
+//            }
+//            if (!TerraWorld.isTerraType(type)) {
+//                options.add(StringNBT.valueOf(type.getName()));
+//            }
+//        }
         return options;
     }
 }

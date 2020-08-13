@@ -13,7 +13,7 @@ public class BiomeSearchTask extends ChunkGeneratorSearch {
 
     private final Cell cell = new Cell();
 
-    public BiomeSearchTask(BlockPos center, Biome biome, ChunkGenerator<?> generator, TerraBiomeProvider biomeProvider) {
+    public BiomeSearchTask(BlockPos center, Biome biome, ChunkGenerator generator, TerraBiomeProvider biomeProvider) {
         super(center, generator);
         this.biomeProvider = biomeProvider;
         this.biome = biome;

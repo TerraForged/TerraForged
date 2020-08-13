@@ -25,7 +25,6 @@
 
 package com.terraforged.mod.chunk.test;
 
-import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.world.terrain.Terrain;
 import com.terraforged.world.terrain.Terrains;
 import net.minecraft.world.biome.Biome;
@@ -43,6 +42,6 @@ public class Test {
     }
 
     public static Biome getBiome() {
-        return ModBiomes.ERODED_PINNACLE;
+        return null;
     }
 }

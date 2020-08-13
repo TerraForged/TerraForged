@@ -32,6 +32,7 @@ import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.core.concurrent.thread.ThreadPools;
 import com.terraforged.core.tile.gen.TileCache;
 import com.terraforged.core.tile.gen.TileGenerator;
+import com.terraforged.fm.GameContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.config.PerfDefaults;
 import com.terraforged.mod.material.Materials;
@@ -39,28 +40,26 @@ import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.WorldGeneratorFactory;
 import com.terraforged.world.heightmap.Heightmap;
 import com.terraforged.world.terrain.Terrains;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.GenerationSettings;
+import net.minecraft.world.gen.DimensionSettings;
 
 public class TerraContext extends GeneratorContext {
 
-    public final IWorld world;
     public final Heightmap heightmap;
     public final Materials materials;
     public final TerraSettings terraSettings;
 
+    public GameContext gameContext;
+
     public TerraContext(TerraContext other) {
         super(other.terrain, other.settings, other.terrainFactory, TerraContext::createCache);
-        this.world = other.world;
         this.materials = other.materials;
         this.terraSettings = other.terraSettings;
         this.heightmap = factory.getHeightmap();
     }
 
-    public TerraContext(IWorld world, Terrains terrain, TerraSettings settings) {
+    public TerraContext(Terrains terrain, TerraSettings settings) {
         super(terrain, settings, TerraTerrainProvider::new, TerraContext::createCache);
-        this.world = world;
         this.materials = new Materials();
         this.terraSettings = settings;
         this.heightmap = factory.getHeightmap();
@@ -70,8 +69,8 @@ public class TerraContext extends GeneratorContext {
         return new DecoratorContext(chunk, levels, terrain, factory.getClimate(), false);
     }
 
-    public SurfaceContext surface(ChunkSurfaceBuffer buffer, GenerationSettings settings) {
-        return new SurfaceContext(buffer, levels, terrain, factory.getClimate(), settings, world.getSeed());
+    public SurfaceContext surface(ChunkSurfaceBuffer buffer, DimensionSettings settings) {
+        return new SurfaceContext(buffer, levels, terrain, factory.getClimate(), settings, seed.get());
     }
 
     public static TileCache createCache(WorldGeneratorFactory factory) {

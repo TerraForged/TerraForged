@@ -27,6 +27,7 @@ package com.terraforged.mod.data;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.terraforged.fm.GameContext;
 import net.minecraft.util.ResourceLocation;
 
 import java.io.BufferedWriter;
@@ -38,11 +39,12 @@ import java.io.Writer;
 public class DataGen {
 
     public static void dumpData() {
+        GameContext context = null;
         File dataDir = new File("data");
-        WorldGenBiomes.genBiomeMap(dataDir);
-        WorldGenBiomes.genBiomeWeights(dataDir);
+        WorldGenBiomes.genBiomeMap(dataDir, context);
+        WorldGenBiomes.genBiomeWeights(dataDir, context);
         WorldGenBlocks.genBlockTags(dataDir);
-        WorldGenFeatures.genBiomeFeatures(dataDir);
+        WorldGenFeatures.genBiomeFeatures(dataDir, context);
     }
 
     protected static void write(File file, IOConsumer consumer) {

@@ -28,6 +28,7 @@ package com.terraforged.mod.material.geology;
 import com.terraforged.api.material.geology.GeologyManager;
 import com.terraforged.api.material.geology.StrataConfig;
 import com.terraforged.core.Seed;
+import com.terraforged.fm.GameContext;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.n2d.Module;
@@ -35,6 +36,7 @@ import com.terraforged.n2d.Source;
 import com.terraforged.world.geology.Geology;
 import com.terraforged.world.geology.Strata;
 import net.minecraft.block.BlockState;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 
 import java.util.HashMap;
@@ -44,6 +46,7 @@ public class GeoManager implements GeologyManager {
 
     private final Module selector;
     private final Materials materials;
+    private final GameContext context;
     private final GeoGenerator builder;
     private final Geology<BlockState> general;
     private final Map<Biome, Geology<BlockState>> specific = new HashMap<>();
@@ -56,6 +59,7 @@ public class GeoManager implements GeologyManager {
         this.builder = new GeoGenerator(context.materials);
         this.general = new Geology<>(selector);
         this.materials = context.materials;
+        this.context = context.gameContext;
         init(context.seed);
     }
 
@@ -69,7 +73,7 @@ public class GeoManager implements GeologyManager {
     }
 
     @Override
-    public void register(Biome biome, Strata<BlockState> strata) {
+    public void register(RegistryKey<Biome> biome, Strata<BlockState> strata) {
         register(biome, strata, false);
     }
 
@@ -78,11 +82,11 @@ public class GeoManager implements GeologyManager {
      * If a specific geology doesn't exist for a given biome, the global geology can optionally be added using
      * the 'inheritGlobal' flag.
      */
-    public void register(Biome biome, Strata<BlockState> strata, boolean inheritGlobal) {
+    public void register(RegistryKey<Biome> biome, Strata<BlockState> strata, boolean inheritGlobal) {
         Geology<BlockState> geology = specific.get(biome);
         if (geology == null) {
             geology = new Geology<>(selector);
-            specific.put(biome, geology);
+            specific.put(context.biomes.get(biome), geology);
             if (inheritGlobal) {
                 geology.add(general);
             }
@@ -93,8 +97,8 @@ public class GeoManager implements GeologyManager {
     /**
      * Register/replace a biome-specific geology group
      */
-    public void register(Biome biome, Geology<BlockState> geology) {
-        specific.put(biome, geology);
+    public void register(RegistryKey<Biome> biome, Geology<BlockState> geology) {
+        specific.put(context.biomes.get(biome), geology);
     }
 
     public Geology<BlockState> getGeology(Biome biome) {
