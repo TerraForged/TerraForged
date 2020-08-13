@@ -1,5 +1,4 @@
 /*
- *
  * MIT License
  *
  * Copyright (c) 2020 TerraForged
@@ -43,7 +42,6 @@ import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.server.ServerChunkProvider;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.IWorldInfo;
 import net.minecraftforge.event.world.SaplingGrowTreeEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -88,8 +86,10 @@ public class SaplingListener {
             return;
         }
 
+
         // translate the pos so that the mirrored/rotated 2x2 grid aligns correctly
-        BlockPos origin = pos.subtract(getTranslation(directions, mirror, rotation));
+        Vector3i translation = getTranslation(directions, mirror, rotation);
+        BlockPos origin = pos.subtract(translation);
 
         // require that directly above the sapling(s) is open air
         if (!isClearOverhead(world, origin, directions)) {
@@ -116,8 +116,8 @@ public class SaplingListener {
             return Optional.empty();
         }
 
-        // ignore if not TF world
-        if (isTerraGen(event.getWorld())) {
+        // ignore other world types
+        if (!SaplingListener.isTerraGen(event.getWorld())) {
             return Optional.empty();
         }
 
@@ -167,7 +167,8 @@ public class SaplingListener {
                     }
                 }
                 if (match) {
-                    return pos.add(getMin(dirs, Mirror.NONE, Rotation.NONE));
+                    Vector3i min = getMin(dirs, Mirror.NONE, Rotation.NONE);
+                    return pos.add(min);
                 }
             }
         }
@@ -182,19 +183,15 @@ public class SaplingListener {
     }
 
     private static Vector3i getMin(Vector3i[] directions, Mirror mirror, Rotation rotation) {
-        Vector3i min = Vector3i.NULL_VECTOR;
+        int minX = 0;
+        int minZ = 0;
         BlockPos.Mutable pos = new BlockPos.Mutable();
         for (Vector3i vec : directions) {
             BlockPos dir = Template.transform(pos.setPos(vec), mirror, rotation);
-            if (dir.getX() < min.getX() && dir.getZ() <= min.getZ()) {
-                min = dir;
-                continue;
-            }
-            if (dir.getZ() < min.getZ() && dir.getX() <= min.getX()) {
-                min = dir;
-            }
+            minX = Math.min(dir.getX(), minX);
+            minZ = Math.min(dir.getZ(), minZ);
         }
-        return min;
+        return new Vector3i(minX, 0, minZ);
     }
 
     private static Vector3i[] getNeighbours(IWorld world, Block block, BlockPos pos, boolean checkNeighbours) {

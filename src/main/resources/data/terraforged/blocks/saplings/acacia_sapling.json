@@ -1,0 +1,12 @@
+{
+  "type": "terraforged:sapling",
+  "sapling": "minecraft:acacia_sapling",
+  "normal": {
+    "terraforged:acacia_small": {
+      "weight": 2
+    },
+    "terraforged:acacia_large": {
+      "weight": 1
+    }
+  }
+}
