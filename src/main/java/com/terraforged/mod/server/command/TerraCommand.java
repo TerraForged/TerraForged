@@ -247,7 +247,7 @@ public class TerraCommand {
         int identifier = doSearch(server, playerID, search);
         context.getSource().sendFeedback(createPrefix(identifier)
                                          .appendSibling(new StringTextComponent(" Searching for "))
-                                         .appendSibling(createTitleWithHover(biome.getDisplayName().getFormattedText(), biome.getRegistryName().toString()))
+                                         .appendSibling(createTitle(biome.getRegistryName().toString()))
                                          .appendSibling(new StringTextComponent("..."))
                                          , false);
 
@@ -274,7 +274,7 @@ public class TerraCommand {
         int identifier = doSearch(server, playerID, search);
         context.getSource().sendFeedback(createPrefix(identifier)
                                          .appendSibling(new StringTextComponent(" Searching for "))
-                                         .appendSibling(createTitleWithHover(biome.getDisplayName().getFormattedText(), biome.getRegistryName().toString()))
+                                         .appendSibling(createTitle(biome.getRegistryName().toString()))
                                          .appendSibling(new StringTextComponent(" and "))
                                          .appendSibling(createTitle(target.getName()))
                                          .appendSibling(new StringTextComponent("..."))
@@ -366,12 +366,5 @@ public class TerraCommand {
     private static ITextComponent createTitle(String name) {
         return new StringTextComponent("") // Gotta make sure parent style is default
                    .appendSibling(new StringTextComponent(name).applyTextStyle(TITLE_FORMAT));
-    }
-
-    private static ITextComponent createTitleWithHover(String display, String hover) {
-        return createTitle(display)
-                .appendSibling(new StringTextComponent(hover)
-                    .applyTextStyle((style) -> style.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, createTitle(hover))))
-                );
     }
 }
