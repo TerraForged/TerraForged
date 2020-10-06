@@ -44,6 +44,7 @@ import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.world.SaplingGrowTreeEvent;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -61,7 +62,7 @@ public class SaplingListener {
             {new Vec3i(-1, 0, 0), new Vec3i(-1, 0, 1), new Vec3i(0, 0, 1)},
     };
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onTreeGrow(SaplingGrowTreeEvent event) {
         Optional<BlockDataManager> dataManager = getDataManger(event);
         if (!dataManager.isPresent()) {
