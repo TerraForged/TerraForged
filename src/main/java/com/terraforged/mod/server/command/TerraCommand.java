@@ -73,6 +73,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -148,15 +149,13 @@ public class TerraCommand {
         try (Resource<Cell> cell = biomeProvider.lookupPos(pos.getX(), pos.getZ())) {
             Biome biome = biomeProvider.getBiome(cell.get(), pos.getX(), pos.getZ());
             context.getSource().sendFeedback(new StringTextComponent("At ")
-                    .appendSibling(createTeleportMessage(pos))
-                    .appendSibling(new StringTextComponent(": Terrain = "))
-                    .appendSibling(createTitle(cell.get().terrain.getName()))
-                    .appendSibling(new StringTextComponent(", Biome = "))
-                    .appendSibling(createTitle(biome.getRegistryName().toString()))
-                    .appendSibling(new StringTextComponent(", BiomeType = "))
-                    .appendSibling(createTitle(cell.get().biomeType.name())),
-                    false
-            );
+                            .appendSibling(createTeleportMessage(pos))
+                            .appendSibling(new StringTextComponent(": Terrain = "))
+                            .appendSibling(createTitle(cell.get().terrain.getName()))
+                            .appendSibling(new StringTextComponent(", Biome = "))
+                            .appendSibling(createTitle(biome.getRegistryName()))
+                            .appendSibling(new StringTextComponent(", BiomeType = "))
+                            .appendSibling(createTitle(cell.get().biomeType.name())), false);
         }
 
         return Command.SINGLE_SUCCESS;
@@ -198,9 +197,9 @@ public class TerraCommand {
         context.getSource().sendFeedback(new StringTextComponent("At ")
                         .appendSibling(createTeleportMessage(position))
                         .appendSibling(new StringTextComponent(": Actual Biome = "))
-                        .appendSibling(createTitle(actual.getRegistryName().toString()))
+                        .appendSibling(createTitle(actual.getRegistryName()))
                         .appendSibling(new StringTextComponent(", Lookup Biome = "))
-                        .appendSibling(createTitle(biome2.getRegistryName().toString())),
+                        .appendSibling(createTitle(biome2.getRegistryName())),
                 false
         );
 
@@ -223,10 +222,9 @@ public class TerraCommand {
         Search search = new TerrainSearchTask(pos, type, getChunkGenerator(context), generator);
         int identifier = doSearch(server, playerID, search);
         context.getSource().sendFeedback(createPrefix(identifier)
-                                         .appendSibling(new StringTextComponent(" Searching for "))
-                                         .appendSibling(createTitle(type.getName()))
-                                         .appendSibling(new StringTextComponent("..."))
-                                         , false);
+                        .appendSibling(new StringTextComponent(" Searching for "))
+                        .appendSibling(createTitle(type.getName()))
+                        .appendSibling(new StringTextComponent("...")), false);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -246,10 +244,9 @@ public class TerraCommand {
         Search search = new BiomeSearchTask(pos, biome, world.getChunkProvider().getChunkGenerator(), getBiomeProvider(context));
         int identifier = doSearch(server, playerID, search);
         context.getSource().sendFeedback(createPrefix(identifier)
-                                         .appendSibling(new StringTextComponent(" Searching for "))
-                                         .appendSibling(createTitle(biome.getRegistryName().toString()))
-                                         .appendSibling(new StringTextComponent("..."))
-                                         , false);
+                        .appendSibling(new StringTextComponent(" Searching for "))
+                        .appendSibling(createTitle(biome.getRegistryName()))
+                        .appendSibling(new StringTextComponent("...")), false);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -273,12 +270,11 @@ public class TerraCommand {
         Search search = new BothSearchTask(pos, biomeSearch, terrainSearch);
         int identifier = doSearch(server, playerID, search);
         context.getSource().sendFeedback(createPrefix(identifier)
-                                         .appendSibling(new StringTextComponent(" Searching for "))
-                                         .appendSibling(createTitle(biome.getRegistryName().toString()))
-                                         .appendSibling(new StringTextComponent(" and "))
-                                         .appendSibling(createTitle(target.getName()))
-                                         .appendSibling(new StringTextComponent("..."))
-                                         , false);
+                        .appendSibling(new StringTextComponent(" Searching for "))
+                        .appendSibling(createTitle(biome.getRegistryName()))
+                        .appendSibling(new StringTextComponent(" and "))
+                        .appendSibling(createTitle(target.getName()))
+                        .appendSibling(new StringTextComponent("...")), false);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -301,9 +297,9 @@ public class TerraCommand {
             double distance = Math.sqrt(player.getPosition().distanceSq(pos));
 
             ITextComponent result = createPrefix(identifier)
-                                    .appendSibling(new StringTextComponent(" Nearest match: "))
-                                    .appendSibling(createTeleportMessage(pos))
-                                    .appendSibling(new StringTextComponent(String.format(" Distance: %.2f", distance)));
+                    .appendSibling(new StringTextComponent(" Nearest match: "))
+                    .appendSibling(createTeleportMessage(pos))
+                    .appendSibling(new StringTextComponent(String.format(" Distance: %.2f", distance)));
 
             player.sendMessage(result);
         }));
@@ -363,8 +359,9 @@ public class TerraCommand {
                    )).applyTextStyle(PREFIX_FORMAT));
     }
 
-    private static ITextComponent createTitle(String name) {
+    private static ITextComponent createTitle(@Nullable Object name) {
+        String title = name == null ? "null" : name.toString();
         return new StringTextComponent("") // Gotta make sure parent style is default
-                   .appendSibling(new StringTextComponent(name).applyTextStyle(TITLE_FORMAT));
+                   .appendSibling(new StringTextComponent(title).applyTextStyle(TITLE_FORMAT));
     }
 }
