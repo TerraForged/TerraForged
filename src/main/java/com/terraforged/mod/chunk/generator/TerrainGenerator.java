@@ -58,7 +58,7 @@ public class TerrainGenerator implements Generator.Terrain {
     public final void generateTerrain(IWorld world, IChunk chunk, StructureManager structures) {
         try (ChunkReader reader = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z)) {
             TerraContainer container = TerraContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
-            try (DecoratorContext context = new DecoratorContext(FastChunk.wrap(chunk), levels, terrain, climate)) {
+            try (DecoratorContext context = new DecoratorContext(chunk, levels, terrain, climate)) {
                 reader.iterate(context, (cell, dx, dz, ctx) -> {
                     int px = ctx.blockX + dx;
                     int pz = ctx.blockZ + dz;

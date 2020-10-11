@@ -25,6 +25,7 @@
 package com.terraforged.api.level.client;
 
 import com.terraforged.api.level.type.LevelType;
+import com.terraforged.api.registry.Registries;
 import net.minecraft.client.gui.screen.BiomeGeneratorTypeScreens;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -47,7 +48,7 @@ public class ClientLevelManager {
     @SubscribeEvent
     public static void setup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            for (LevelType levelType : LevelType.REGISTRY) {
+            for (LevelType levelType : Registries.LEVEL_TYPES) {
                 BiomeGeneratorTypeScreens.IFactory editScreen = screens.get(levelType.getRegistryName());
                 LevelOption option = new LevelOption(levelType, editScreen);
                 LevelOption.register(option);

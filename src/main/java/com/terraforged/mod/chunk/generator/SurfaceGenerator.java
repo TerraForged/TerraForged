@@ -55,7 +55,7 @@ public class SurfaceGenerator implements Generator.Surfaces {
     public final void generateSurface(WorldGenRegion world, IChunk chunk) {
         try (ChunkReader reader = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z)) {
             TerraContainer container = TerraContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
-            ChunkSurfaceBuffer buffer = new ChunkSurfaceBuffer(FastChunk.wrap(chunk));
+            ChunkSurfaceBuffer buffer = new ChunkSurfaceBuffer(chunk);
 
             try (SurfaceContext context = generator.getContext().surface(buffer, generator.getSettings())) {
                 reader.iterate(context, (cell, dx, dz, ctx) -> {
@@ -81,8 +81,6 @@ public class SurfaceGenerator implements Generator.Surfaces {
                         processor.decorate(ctx.buffer, ctx, px, py, pz);
                     }
                 });
-
-                FastChunk.updateWGHeightmaps(chunk, context.pos);
             }
         }
     }

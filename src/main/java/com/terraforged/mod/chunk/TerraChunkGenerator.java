@@ -29,6 +29,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.terraforged.api.biome.surface.SurfaceManager;
+import com.terraforged.api.chunk.column.BlockColumn;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.core.cell.Cell;
@@ -42,17 +43,7 @@ import com.terraforged.fm.structure.FMStructureManager;
 import com.terraforged.fm.util.codec.Codecs;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
-import com.terraforged.mod.chunk.generator.BiomeGenerator;
-import com.terraforged.mod.chunk.generator.FeatureGenerator;
-import com.terraforged.mod.chunk.generator.Generator;
-import com.terraforged.mod.chunk.generator.MobGenerator;
-import com.terraforged.mod.chunk.generator.StructureGenerator;
-import com.terraforged.mod.chunk.generator.SurfaceGenerator;
-import com.terraforged.mod.chunk.generator.TerrainCarver;
-import com.terraforged.mod.chunk.generator.TerrainGenerator;
-import com.terraforged.mod.chunk.profiler.GenProfiler;
-import com.terraforged.mod.chunk.profiler.Section;
-import com.terraforged.mod.chunk.profiler.Ticket;
+import com.terraforged.mod.chunk.generator.*;
 import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.material.geology.GeoManager;
@@ -62,28 +53,19 @@ import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.Blockreader;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.MobSpawnInfo;
-import net.minecraft.world.biome.provider.BiomeProvider;
-import net.minecraft.world.biome.provider.OverworldBiomeProvider;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.DimensionSettings;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.gen.*;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.TemplateManager;
-import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class TerraChunkGenerator extends ChunkGenerator {
 
@@ -203,19 +185,18 @@ public class TerraChunkGenerator extends ChunkGenerator {
 
         int height = getContext().levels.scale(value) + 1;
         int surface = Math.max(height, getSeaLevel() + 1);
-
-        BlockState[] states = new BlockState[surface];
+        BlockColumn column = GeneratorResources.get().column.withCapacity(surface);
         BlockState solid = settings.getDefaultBlock();
         for (int y = 0; y < height; y++) {
-            states[y] = solid;
+            column.set(y, solid);
         }
 
         BlockState fluid = settings.getDefaultFluid();
         for (int y = height; y < surface; y++) {
-            states[y] = fluid;
+            column.set(y, fluid);
         }
 
-        return new Blockreader(states);
+        return column;
     }
 
     @Override

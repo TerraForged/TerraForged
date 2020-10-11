@@ -28,7 +28,7 @@ import com.terraforged.core.util.NameUtil;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
-import com.terraforged.mod.client.gui.preview.PreviewSettings;
+import com.terraforged.mod.client.gui.config.preview.PreviewSettings;
 import com.terraforged.mod.util.TranslationKey;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
