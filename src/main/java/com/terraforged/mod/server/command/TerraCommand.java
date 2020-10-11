@@ -67,6 +67,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
@@ -85,9 +86,9 @@ public class TerraCommand {
     }
 
     @SubscribeEvent
-    public static void register(FMLServerStartingEvent event) {
+    public static void register(RegisterCommandsEvent event) {
         Log.info("Registering /terra command");
-//        register(event.getCommandDispatcher());
+        register(event.getDispatcher());
     }
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
@@ -148,7 +149,13 @@ public class TerraCommand {
                 new StringTextComponent("Exporting data"),
                 true
         );
-        DataGen.dumpData();
+
+        try {
+            DataGen.dumpData();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+
         return Command.SINGLE_SUCCESS;
     }
 
@@ -197,7 +204,7 @@ public class TerraCommand {
         BlockPos pos = context.getSource().asPlayer().getPosition();
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
-        WorldGenerator generator = terraContext.factory.get();
+        WorldGenerator generator = terraContext.factory.get().get();
         Search search = new TerrainSearchTask(pos, type, getChunkGenerator(context), generator);
         doSearch(server, playerID, search);
         context.getSource().sendFeedback(new StringTextComponent("Searching..."), false);
@@ -237,7 +244,7 @@ public class TerraCommand {
         BlockPos pos = context.getSource().asPlayer().getPosition();
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
-        WorldGenerator generator = terraContext.factory.get();
+        WorldGenerator generator = terraContext.factory.get().get();
         Search biomeSearch = new BiomeSearchTask(pos, biome, getChunkGenerator(context), getBiomeProvider(context));
         Search terrainSearch = new TerrainSearchTask(pos, target, getChunkGenerator(context), generator);
         Search search = new BothSearchTask(pos, biomeSearch, terrainSearch);

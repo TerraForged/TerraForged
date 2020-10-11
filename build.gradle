@@ -2,20 +2,23 @@ buildscript {
     repositories {
         jcenter()
         mavenCentral()
+        maven { url "http://repo.spongepowered.org/maven" }
         maven { url "https://files.minecraftforge.net/maven" }
     }
     dependencies {
+        classpath group: "org.spongepowered", name: "mixingradle", version: "0.7-SNAPSHOT", changing: true
         classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "3.+", changing: true
     }
 }
 
 apply plugin: "net.minecraftforge.gradle"
+apply plugin: "org.spongepowered.mixin"
 apply plugin: "maven-publish"
 apply plugin: "eclipse"
 
-sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 group = "com.terraforged"
 version = "${mc_version}-${mod_version}${getClassifier()}"
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
 allprojects {
     apply plugin: "java"
@@ -26,20 +29,25 @@ configurations {
     compile.extendsFrom lib
 }
 
+mixin {
+    add sourceSets.main, "mixin.terraforged.refmap.json"
+}
+
 repositories {
     jcenter()
     mavenCentral()
+    maven { url "https://www.dogforce-games.com/maven/" }
     maven { url "https://io.terraforged.com/repository/maven/" }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
-    lib(project(":FeatureManager")) { transitive false }
     lib(project(":Engine"))
 }
 
 minecraft {
     mappings channel: mcp_channel, version: mcp_version
+    accessTransformer = file("src/main/resources/META-INF/transformers.cfg")
     runs {
         client {
             workingDirectory project.file("run/client")

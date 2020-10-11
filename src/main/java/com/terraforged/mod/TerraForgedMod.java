@@ -24,19 +24,23 @@
 
 package com.terraforged.mod;
 
+import com.terraforged.api.level.type.LevelType;
 import com.terraforged.api.material.WGTags;
+import com.terraforged.api.registry.Registries;
 import com.terraforged.fm.data.FolderDataPackFinder;
-import com.terraforged.fm.template.TemplateManager;
+import com.terraforged.mod.biome.provider.TerraBiomeProvider;
+import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.config.ConfigManager;
-import com.terraforged.mod.data.DataGen;
+import com.terraforged.mod.feature.TerraFeatures;
 import com.terraforged.mod.feature.context.ContextSelectorFeature;
 import com.terraforged.mod.feature.decorator.poisson.PoissonAtSurface;
 import com.terraforged.mod.feature.feature.BushFeature;
 import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.mod.feature.feature.FreezeLayer;
 import com.terraforged.mod.server.command.TerraCommand;
-import com.terraforged.mod.util.Environment;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.event.RegistryEvent;
@@ -44,14 +48,21 @@ import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 
 import java.io.File;
 
-@Mod("terraforged")
+@Mod(TerraForgedMod.MODID)
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class TerraForgedMod {
+
+    public static final String MODID = "terraforged";
+
+    public TerraForgedMod() {
+        Registries.init();
+        Registry.register(Registry.BIOME_PROVIDER_CODEC, "terraforged:climate", TerraBiomeProvider.CODEC);
+        Registry.register(Registry.CHUNK_GENERATOR_CODEC, "terraforged:terrain", TerraChunkGenerator.CODEC);
+    }
 
     @SubscribeEvent
     public static void setup(FMLCommonSetupEvent event) {
@@ -60,23 +71,17 @@ public class TerraForgedMod {
         TerraCommand.init();
         ConfigManager.init();
         SettingsHelper.init();
-
-        // temp fix
-//        BiomeDictionary.addTypes(Biomes.BAMBOO_JUNGLE, BiomeDictionary.Type.OVERWORLD);
-//        BiomeDictionary.addTypes(Biomes.BAMBOO_JUNGLE_HILLS, BiomeDictionary.Type.OVERWORLD);
     }
 
     @SubscribeEvent
-    public static void complete(FMLLoadCompleteEvent event) {
-        if (Environment.isDev()) {
-            DataGen.dumpData();
-        }
+    public static void registerLevels(RegistryEvent.Register<LevelType> event) {
+        event.getRegistry().register(new TerraForgedLevel().setRegistryName(TerraForgedLevel.NAME));
     }
 
     @SubscribeEvent
     public static void registerFeatures(RegistryEvent.Register<Feature<?>> event) {
         Log.info("Registering features");
-        TemplateManager.register(event);
+        event.getRegistry().register(TerraFeatures.INSTANCE);
         event.getRegistry().register(DiskFeature.INSTANCE);
         event.getRegistry().register(FreezeLayer.INSTANCE);
         event.getRegistry().register(BushFeature.INSTANCE);
@@ -86,7 +91,7 @@ public class TerraForgedMod {
     @SubscribeEvent
     public static void registerDecorators(RegistryEvent.Register<Placement<?>> event) {
         Log.info("Registering decorators");
-        event.getRegistry().register(new PoissonAtSurface());
+        event.getRegistry().register(PoissonAtSurface.INSTANCE);
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)

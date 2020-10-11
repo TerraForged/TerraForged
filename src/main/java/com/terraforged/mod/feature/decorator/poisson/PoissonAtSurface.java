@@ -32,12 +32,14 @@ import java.util.Random;
 
 public class PoissonAtSurface extends PoissonDecorator {
 
-    public PoissonAtSurface() {
+    public static final PoissonAtSurface INSTANCE = new PoissonAtSurface();
+
+    private PoissonAtSurface() {
         setRegistryName("terraforged", "poisson_surface");
     }
 
     @Override
     public int getYAt(IWorld world, BlockPos pos, Random random) {
-        return world.getHeight(Heightmap.Type.WORLD_SURFACE_WG, pos.getX(), pos.getZ());
+        return world.getHeight(Heightmap.Type.WORLD_SURFACE, pos.getX(), pos.getZ());
     }
 }

@@ -26,8 +26,10 @@ package com.terraforged.api.biome.surface.builder;
 
 import com.terraforged.api.biome.surface.Surface;
 import com.terraforged.api.biome.surface.SurfaceContext;
+import com.terraforged.mod.biome.provider.BiomeHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
+import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
 
 import java.util.function.Function;
 
@@ -38,7 +40,7 @@ public class Delegate implements Surface {
     private final ConfiguredSurfaceBuilder<?> surfaceBuilder;
 
     public Delegate(Biome biome) {
-        this(biome.func_242440_e().func_242500_d().get());
+        this(BiomeHelper.getSurfaceBuilder(biome));
     }
 
     public Delegate(ConfiguredSurfaceBuilder<?> surfaceBuilder) {

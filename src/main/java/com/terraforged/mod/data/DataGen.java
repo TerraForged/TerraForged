@@ -28,6 +28,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.terraforged.fm.GameContext;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.DynamicRegistries;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,8 +39,8 @@ import java.io.Writer;
 public class DataGen {
 
     public static void dumpData() {
-        GameContext context = null;
-        File dataDir = new File("data");
+        GameContext context = new GameContext(DynamicRegistries.func_239770_b_());
+        File dataDir = new File("data").getAbsoluteFile();
         WorldGenBiomes.genBiomeMap(dataDir, context);
         WorldGenBiomes.genBiomeWeights(dataDir, context);
         WorldGenBlocks.genBlockTags(dataDir);

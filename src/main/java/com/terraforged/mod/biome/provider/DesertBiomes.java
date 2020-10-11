@@ -36,7 +36,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeGenerationSettings;
 import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.gen.surfacebuilders.ISurfaceBuilderConfig;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -66,7 +68,18 @@ public class DesertBiomes {
         List<Biome> red = new LinkedList<>();
         try (Resource<DummyBlockReader> reader = DummyBlockReader.pooled()) {
             for (Biome biome : deserts) {
-                BlockState top = BiomeHelper.getSurface(biome).getTop();
+                if (biome == null) {
+                    continue;
+                }
+                BiomeGenerationSettings settings = BiomeHelper.getGenSettings(biome);
+                if (settings == null) {
+                    continue;
+                }
+                ISurfaceBuilderConfig config = settings.func_242502_e();
+                if (config == null) {
+                    continue;
+                }
+                BlockState top = config.getTop();
                 MaterialColor color = top.getMaterialColor(reader.get().set(top), BlockPos.ZERO);
                 int whiteDist2 = distance2(color, MaterialColor.SAND);
                 int redDist2 = distance2(color, MaterialColor.ADOBE);

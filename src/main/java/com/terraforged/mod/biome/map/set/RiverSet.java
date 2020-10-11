@@ -47,7 +47,7 @@ public class RiverSet extends TemperatureSet {
     @Override
     public Biome getBiome(Cell cell) {
         Biome biome = biomes.getLand(cell);
-        if (DefaultBiomes.overridesRiver(biome)) {
+        if (biome != null && DefaultBiomes.overridesRiver(biome)) {
             return biome;
         }
         return super.getBiome(cell);

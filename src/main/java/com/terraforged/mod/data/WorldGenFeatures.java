@@ -44,7 +44,11 @@ public class WorldGenFeatures extends DataGen {
     public static void genBiomeFeatures(File dataDir, GameContext context) {
         if (dataDir.exists() || dataDir.mkdirs()) {
             for (Biome biome : context.biomes) {
-                genBiomeFeatures(dataDir, biome, context);
+                try {
+                    genBiomeFeatures(dataDir, biome, context);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
             }
         }
     }
@@ -55,6 +59,10 @@ public class WorldGenFeatures extends DataGen {
             List<List<Supplier<ConfiguredFeature<?, ?>>>> stageFeatures = biome.func_242440_e().func_242498_c();
 
             for (GenerationStage.Decoration type : GenerationStage.Decoration.values()) {
+                if (type.ordinal() >= stageFeatures.size()) {
+                    continue;
+                }
+
                 JsonArray features = new JsonArray();
                 for (Supplier<ConfiguredFeature<?, ?>> feature : stageFeatures.get(type.ordinal())) {
                     try {

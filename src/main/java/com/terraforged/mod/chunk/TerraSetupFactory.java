@@ -74,12 +74,10 @@ public class TerraSetupFactory {
 
     public static List<ColumnDecorator> createBaseDecorators(GeoManager geoManager, TerraContext context) {
         List<ColumnDecorator> processors = new ArrayList<>();
-        if (context.terraSettings.miscellaneous.strataDecorator) {
-            Log.info(" - Geology decorator enabled");
+        if (test("Geology decorator", context.terraSettings.miscellaneous.strataDecorator)) {
             processors.add(new GeologyDecorator(geoManager));
         }
-        if (context.terraSettings.miscellaneous.erosionDecorator) {
-            Log.info(" - Erosion decorator enabled");
+        if (test("Erosion decorator", context.terraSettings.miscellaneous.erosionDecorator)) {
             processors.add(new ErosionDecorator(context));
         }
         processors.add(new BedrockDecorator(context));
@@ -88,12 +86,10 @@ public class TerraSetupFactory {
 
     public static List<ColumnDecorator> createFeatureDecorators(TerraContext context) {
         List<ColumnDecorator> processors = new ArrayList<>();
-        if (context.terraSettings.miscellaneous.naturalSnowDecorator) {
-            Log.info(" - Natural snow decorator enabled");
+        if (test("Natural snow decorator", context.terraSettings.miscellaneous.naturalSnowDecorator)) {
             processors.add(new SnowEroder(context));
         }
-        if (context.terraSettings.miscellaneous.smoothLayerDecorator) {
-            Log.info(" - Smooth layer decorator enabled");
+        if (test("Smooth layer decorator", context.terraSettings.miscellaneous.smoothLayerDecorator)) {
             processors.add(new LayerDecorator(context.materials.getLayerManager()));
         }
         return processors;
@@ -111,23 +107,23 @@ public class TerraSetupFactory {
             modifiers.getPredicates().add(Matchers.stoneBlobs(), FeaturePredicate.DENY);
         }
 
-        if (!context.terraSettings.miscellaneous.vanillaLakes) {
+        if (testInv("Vanilla lakes", !context.terraSettings.miscellaneous.vanillaLakes)) {
             // block lakes if not enabled
             modifiers.getPredicates().add(FeatureMatcher.and(Feature.LAKE, Blocks.WATER), FeaturePredicate.DENY);
         }
 
-        if (!context.terraSettings.miscellaneous.vanillaLavaLakes) {
+        if (testInv("Vanilla lava lakes", !context.terraSettings.miscellaneous.vanillaLavaLakes)) {
             // block lava-lakes if not enabled
             modifiers.getPredicates().add(FeatureMatcher.and(Feature.LAKE, Blocks.LAVA), FeaturePredicate.DENY);
         }
 
-        if (!context.terraSettings.miscellaneous.vanillaSprings) {
+        if (testInv("Vanilla springs", !context.terraSettings.miscellaneous.vanillaSprings)) {
             // block springs if not enabled
             modifiers.getPredicates().add(FeatureMatcher.of(Feature.SPRING_FEATURE), FeaturePredicate.DENY);
         }
 
 
-        if (context.terraSettings.miscellaneous.customBiomeFeatures) {
+        if (test("Custom features", context.terraSettings.miscellaneous.customBiomeFeatures)) {
             // remove default trees from river biomes since forests can go up to the edge of rivers
             modifiers.getPredicates().add(BiomeMatcher.of(context.gameContext, Biome.Category.RIVER), Matchers.tree(), FeaturePredicate.DENY);
 
@@ -184,5 +180,19 @@ public class TerraSetupFactory {
 
     public static GeoManager createGeologyManager(TerraContext context) {
         return new GeoManager(context);
+    }
+
+    private static String getEnabled(boolean flag) {
+        return flag ? "enabled" : "disabled";
+    }
+
+    private static boolean test(String message, boolean flag) {
+        Log.info(" - {} {}", message, getEnabled(flag));
+        return flag;
+    }
+
+    private static boolean testInv(String message, boolean flag) {
+        test(message, !flag);
+        return flag;
     }
 }

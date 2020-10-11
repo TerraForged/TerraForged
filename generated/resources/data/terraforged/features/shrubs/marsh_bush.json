@@ -1,0 +1,38 @@
+{
+  "match": [],
+  "stage": "VEGETAL_DECORATION",
+  "head": {
+    "config": {
+      "feature": {
+        "config": {
+          "trunk": {
+            "Properties": {
+              "axis": "y"
+            },
+            "Name": "minecraft:oak_log"
+          },
+          "leaves": {
+            "Properties": {
+              "persistent": "false",
+              "distance": "7"
+            },
+            "Name": "minecraft:birch_leaves"
+          },
+          "air_chance": 0.05,
+          "leaf_chance": 0.05,
+          "size_chance": 0.65
+        },
+        "type": "terraforged:bush"
+      },
+      "decorator": {
+        "config": {
+          "count": 0,
+          "extra_chance": 0.3,
+          "extra_count": 1
+        },
+        "type": "minecraft:count_extra"
+      }
+    },
+    "type": "minecraft:decorated"
+  }
+}

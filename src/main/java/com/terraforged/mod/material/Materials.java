@@ -36,8 +36,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.GrassBlock;
 import net.minecraft.block.MyceliumBlock;
+import net.minecraft.block.SnowBlock;
 import net.minecraft.tags.ITag;
-import net.minecraft.tags.Tag;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
@@ -92,11 +92,15 @@ public class Materials {
     }
 
     private static Set<Block> create(ITag<Block> tag, Block def) {
-        ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(tag.getAllElements());
-        if (set.isEmpty() && def != null) {
-            set.add(def);
+        try {
+            ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(tag.getAllElements());
+            if (set.isEmpty() && def != null) {
+                set.add(def);
+            }
+            return ObjectSets.unmodifiable(set);
+        } catch (Throwable t) {
+            return Collections.singleton(def);
         }
-        return ObjectSets.unmodifiable(set);
     }
 
     public static float getHardness(BlockState state) {

@@ -29,10 +29,15 @@ import com.terraforged.mod.Log;
 public class Environment {
 
     private static final boolean dev = System.getProperty("dev") != null;
+    private static final boolean profile = System.getProperty("profiler") != null;
     private static final boolean vanillaBiomes = System.getProperty("vanillaBiomes") != null;
 
     public static boolean isDev() {
         return dev;
+    }
+
+    public static boolean profile() {
+        return true;
     }
 
     public static boolean isVanillaBiomes() {

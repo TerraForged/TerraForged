@@ -34,9 +34,15 @@ import com.terraforged.mod.biome.utils.TempCategory;
 import com.terraforged.n2d.util.Vec2f;
 import com.terraforged.world.biome.BiomeData;
 import com.terraforged.world.biome.BiomeType;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeGenerationSettings;
 import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.biome.provider.BiomeProvider;
+import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
 import net.minecraft.world.gen.surfacebuilders.ISurfaceBuilderConfig;
+import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -132,7 +138,29 @@ public class BiomeHelper {
     }
 
     public static ISurfaceBuilderConfig getSurface(Biome biome) {
-        return biome.func_242440_e().func_242502_e();
+        if (biome != null) {
+            if (biome.func_242440_e() != null && biome.func_242440_e().func_242502_e() != null) {
+                return biome.func_242440_e().func_242502_e();
+            }
+        }
+        return SurfaceBuilder.GRASS_DIRT_GRAVEL_CONFIG;
+    }
+
+    public static ConfiguredSurfaceBuilder<?> getSurfaceBuilder(Biome biome) {
+        if (biome != null) {
+            if (biome.func_242440_e() != null && biome.func_242440_e().func_242500_d() != null) {
+                return biome.func_242440_e().func_242500_d().get();
+            }
+        }
+        return SurfaceBuilder.DEFAULT.func_242929_a(SurfaceBuilder.GRASS_DIRT_GRAVEL_CONFIG);
+    }
+
+    public static BiomeGenerationSettings getGenSettings(Biome biome) {
+        return biome.func_242440_e();
+    }
+
+    public static void test(Biome biome) {
+
     }
 
     public static Collection<BiomeType> getTypes(BiomeData data, Biome biome) {

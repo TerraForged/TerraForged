@@ -1,0 +1,33 @@
+{
+  "biomes": [
+    "minecraft:taiga_mountains",
+    "minecraft:snowy_taiga",
+    "minecraft:snowy_taiga_hills"
+  ],
+  "match": [
+    "minecraft:tree",
+    "minecraft:spruce_log",
+    "minecraft:spruce_leaves"
+  ],
+  "replace": {
+    "config": {
+      "feature": {
+        "config": {
+          "template": "terraforged:pine"
+        },
+        "type": "terraforged:template"
+      },
+      "decorator": {
+        "config": {
+          "radius": 10,
+          "biome_fade": 0.3,
+          "density_noise_scale": 250,
+          "density_noise_min": 0.15,
+          "density_noise_max": 1.75
+        },
+        "type": "terraforged:poisson_surface"
+      }
+    },
+    "type": "minecraft:decorated"
+  }
+}

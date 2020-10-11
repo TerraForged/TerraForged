@@ -25,8 +25,8 @@
 package com.terraforged.mod.client.gui.page;
 
 import com.terraforged.mod.chunk.settings.TerraSettings;
-import com.terraforged.mod.client.gui.Instance;
-import com.terraforged.mod.client.gui.OverlayScreen;
+import com.terraforged.mod.client.gui.config.Instance;
+import com.terraforged.mod.client.gui.config.OverlayScreen;
 import com.terraforged.mod.util.TranslationKey;
 import net.minecraft.nbt.CompoundNBT;
 

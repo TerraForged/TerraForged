@@ -24,7 +24,10 @@
 
 package com.terraforged.mod.chunk;
 
+import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import com.terraforged.api.biome.surface.SurfaceManager;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.material.layer.LayerManager;
@@ -36,6 +39,8 @@ import com.terraforged.core.tile.gen.TileCache;
 import com.terraforged.fm.FeatureManager;
 import com.terraforged.fm.data.DataManager;
 import com.terraforged.fm.structure.FMStructureManager;
+import com.terraforged.fm.util.codec.Codecs;
+import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.generator.BiomeGenerator;
 import com.terraforged.mod.chunk.generator.FeatureGenerator;
@@ -45,20 +50,27 @@ import com.terraforged.mod.chunk.generator.StructureGenerator;
 import com.terraforged.mod.chunk.generator.SurfaceGenerator;
 import com.terraforged.mod.chunk.generator.TerrainCarver;
 import com.terraforged.mod.chunk.generator.TerrainGenerator;
+import com.terraforged.mod.chunk.profiler.GenProfiler;
+import com.terraforged.mod.chunk.profiler.Section;
+import com.terraforged.mod.chunk.profiler.Ticket;
 import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.material.geology.GeoManager;
 import com.terraforged.mod.util.setup.SetupHooks;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.Blockreader;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.MobSpawnInfo;
+import net.minecraft.world.biome.provider.BiomeProvider;
+import net.minecraft.world.biome.provider.OverworldBiomeProvider;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.DimensionSettings;
@@ -67,13 +79,17 @@ import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class TerraChunkGenerator extends ChunkGenerator {
 
-    private final long seed;
+    public static final Codec<TerraChunkGenerator> CODEC = Codecs.create(TerraChunkGenerator::encodeGenerator, TerraChunkGenerator::decodeGenerator);
 
+    private final long seed;
     private final TerraContext context;
     private final DimensionSettings settings;
     private final TerraBiomeProvider biomeProvider;
@@ -96,9 +112,35 @@ public class TerraChunkGenerator extends ChunkGenerator {
 
     private final TileCache tileCache;
 
-    public TerraChunkGenerator(TerraContext context, TerraBiomeProvider biomeProvider, DimensionSettings settings) {
+    protected TerraChunkGenerator(long seed, TerraBiomeProvider biomeProvider, DimensionSettings settings) {
         super(biomeProvider, settings.getStructures());
-        this.seed = context.seed.get();
+
+        this.settings = settings;
+        this.biomeProvider = biomeProvider;
+
+        this.seed = seed;
+        this.context = null;
+        this.mobGenerator = null;
+        this.biomeGenerator = null;
+        this.terrainCarver = null;
+        this.terrainGenerator = null;
+        this.surfaceGenerator = null;
+        this.featureGenerator = null;
+        this.structureGenerator = null;
+        this.geologyManager = null;
+        this.featureManager = null;
+        this.structureManager = null;
+        this.surfaceManager = null;
+        this.blockDataManager = null;
+        this.baseDecorators = Collections.emptyList();
+        this.postProcessors = Collections.emptyList();
+        this.tileCache = null;
+    }
+
+    public TerraChunkGenerator(TerraBiomeProvider biomeProvider, DimensionSettings settings) {
+        super(biomeProvider, settings.getStructures());
+        TerraContext context = biomeProvider.getContext();
+        this.seed = context.terraSettings.world.seed;
         this.context = context;
         this.settings = settings;
         this.biomeProvider = biomeProvider;
@@ -115,7 +157,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         this.geologyManager = TerraSetupFactory.createGeologyManager(context);
         this.baseDecorators = TerraSetupFactory.createBaseDecorators(geologyManager, context);
         this.postProcessors = TerraSetupFactory.createFeatureDecorators(context);
-        this.tileCache = context.cache;
+        this.tileCache = context.cache.get();
 
         try (DataManager data = TerraSetupFactory.createDataManager()) {
             FeatureManager.initData(data);
@@ -128,6 +170,12 @@ public class TerraChunkGenerator extends ChunkGenerator {
         SetupHooks.setup(baseDecorators, postProcessors, context.copy());
     }
 
+    private TerraChunkGenerator create(long seed) {
+        Log.debug("Creating seeded generator: {}", seed);
+        TerraBiomeProvider biomes = getBiomeProvider().getBiomeProvider(seed);
+        return new TerraChunkGenerator(biomes, getSettings());
+    }
+
     public long getSeed() {
         return seed;
     }
@@ -138,17 +186,36 @@ public class TerraChunkGenerator extends ChunkGenerator {
 
     @Override
     protected Codec<? extends ChunkGenerator> func_230347_a_() {
-        return null;
+        return CODEC;
     }
 
     @Override
     public ChunkGenerator func_230349_a_(long p_230349_1_) {
-        return null;
+        return create(seed);
     }
 
-    @Override
-    public IBlockReader func_230348_a_(int p_230348_1_, int p_230348_2_) {
-        return null;
+    @Override // getBlockColumn
+    public IBlockReader func_230348_a_(int x, int z) {
+        float value;
+        try (ChunkReader chunkReader = getChunkReader(x >> 4, z >> 4)) {
+            value = chunkReader.getCell(x, z).value;
+        }
+
+        int height = getContext().levels.scale(value) + 1;
+        int surface = Math.max(height, getSeaLevel() + 1);
+
+        BlockState[] states = new BlockState[surface];
+        BlockState solid = settings.getDefaultBlock();
+        for (int y = 0; y < height; y++) {
+            states[y] = solid;
+        }
+
+        BlockState fluid = settings.getDefaultFluid();
+        for (int y = height; y < surface; y++) {
+            states[y] = fluid;
+        }
+
+        return new Blockreader(states);
     }
 
     @Override
@@ -309,6 +376,25 @@ public class TerraChunkGenerator extends ChunkGenerator {
                 return terra.getChunkReader(region.getMainChunkX(), region.getMainChunkZ());
             }
         }
-        return null;
+        throw new IllegalStateException("NONONO");
+    }
+
+    public static TerraChunkGenerator createDummy(long seed, TerraBiomeProvider biomes, DimensionSettings settings) {
+        return new TerraChunkGenerator(seed, biomes, settings);
+    }
+
+    private static <T> Dynamic<T> encodeGenerator(TerraChunkGenerator generator, DynamicOps<T> ops) {
+        T biomeProvider = Codecs.encodeAndGet(TerraBiomeProvider.CODEC, generator.getBiomeProvider(), ops);
+        T dimensionSettings = Codecs.encodeAndGet(DimensionSettings.field_236097_a_, generator.getSettings(), ops);
+        return new Dynamic<>(ops, ops.createMap(ImmutableMap.of(
+                ops.createString("biome_provider"), biomeProvider,
+                ops.createString("dimension_settings"), dimensionSettings
+        )));
+    }
+
+    private static <T> TerraChunkGenerator decodeGenerator(Dynamic<T> dynamic) {
+        TerraBiomeProvider biomes = Codecs.decodeAndGet(TerraBiomeProvider.CODEC, dynamic.get("biome_provider"));
+        DimensionSettings settings = Codecs.decodeAndGet(DimensionSettings.field_236097_a_, dynamic.get("dimension_settings"));
+        return new TerraChunkGenerator(biomes, settings);
     }
 }

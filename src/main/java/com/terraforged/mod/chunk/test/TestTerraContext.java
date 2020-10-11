@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.chunk.test;
 
+import com.terraforged.core.concurrent.task.LazySupplier;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.WorldGeneratorFactory;
@@ -31,11 +32,11 @@ import com.terraforged.world.WorldGeneratorFactory;
 public class TestTerraContext extends TerraContext {
 
     public TestTerraContext(TerraContext context) {
-        super(context);
+        super(context, context.gameContext);
     }
 
     @Override
-    protected WorldGeneratorFactory createFactory(GeneratorContext context) {
-        return new WorldGeneratorFactory(context, new TestHeightMap(context));
+    protected LazySupplier<WorldGeneratorFactory> createFactory(GeneratorContext context) {
+        return LazySupplier.of(() -> new WorldGeneratorFactory(context, new TestHeightMap(context)));
     }
 }

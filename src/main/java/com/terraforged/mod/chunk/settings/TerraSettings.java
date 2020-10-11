@@ -24,13 +24,40 @@
 
 package com.terraforged.mod.chunk.settings;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import com.terraforged.core.serialization.annotation.Serializable;
 import com.terraforged.core.settings.Settings;
+import com.terraforged.fm.util.codec.Codecs;
+import com.terraforged.mod.util.nbt.DynamicReader;
+import com.terraforged.mod.util.nbt.DynamicWriter;
 
 @Serializable
 public class TerraSettings extends Settings {
 
+    public static final Codec<TerraSettings> CODEC = Codecs.create(
+            TerraSettings::encode,
+            TerraSettings::decode
+    );
+
+    public TerraSettings() {
+
+    }
+
+    public TerraSettings(long seed) {
+        world.seed = seed;
+    }
+
     public Miscellaneous miscellaneous = new Miscellaneous();
 
     public DimesionSettings dimensions = new DimesionSettings();
+
+    private static <T> Dynamic<T> encode(TerraSettings settings, DynamicOps<T> ops) {
+        return new Dynamic<>(ops, DynamicWriter.serialize(settings, ops, false));
+    }
+
+    private static <T> TerraSettings decode(Dynamic<T> dynamic) {
+        return DynamicReader.deserialize(new TerraSettings(), dynamic);
+    }
 }

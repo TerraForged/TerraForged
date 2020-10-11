@@ -25,10 +25,13 @@
 package com.terraforged.mod.biome.map;
 
 import com.terraforged.fm.GameContext;
+import com.terraforged.mod.biome.map.defaults.BiomeTemps;
 import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.mod.biome.utils.TempCategory;
 import com.terraforged.world.biome.BiomeType;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -118,11 +121,37 @@ public class BiomeMapBuilder implements BiomeMap.Builder {
 
     @Override
     public BiomeMap build() {
+        makeSafe();
         return constructor.apply(this);
     }
 
+    private void makeSafe() {
+        addIfEmpty(rivers, Biomes.RIVER, TempCategory.class);
+        addIfEmpty(lakes, Biomes.RIVER, TempCategory.class);
+        addIfEmpty(coasts, Biomes.STONE_SHORE, TempCategory.class);
+        addIfEmpty(beaches, Biomes.BEACH, TempCategory.class);
+        addIfEmpty(oceans, Biomes.OCEAN, TempCategory.class);
+        addIfEmpty(deepOceans, Biomes.DEEP_OCEAN, TempCategory.class);
+        addIfEmpty(wetlands, Biomes.SWAMP, TempCategory.class);
+        addIfEmpty(map, Biomes.PLAINS, BiomeType.class);
+    }
+
     private void add(List<Biome> list, Biome biome, int count) {
-        for (int i = 0; i < count; i++) {
+        if (biome != null) {
+            for (int i = 0; i < count; i++) {
+                list.add(biome);
+            }
+        }
+    }
+
+    private <E extends Enum<E>> void addIfEmpty(Map<E, List<Biome>> map, RegistryKey<Biome> biome, Class<E> enumType) {
+        for (E e : enumType.getEnumConstants()) {
+            addIfEmpty(map.computeIfAbsent(e, t -> new ArrayList<>()), context.biomes.get(biome));
+        }
+    }
+
+    private void addIfEmpty(List<Biome> list, Biome biome) {
+        if (list.isEmpty()) {
             list.add(biome);
         }
     }

@@ -60,6 +60,17 @@ public enum TempCategory {
             // the rest we categorize as medium
             return TempCategory.MEDIUM;
         }
+
+        // snowy = 0.0F
+        // plains = 0.8F
+        // desert = 2.0F
+        float temp = biome.func_242445_k();
+        if (temp <= 0.3F) {
+            return TempCategory.COLD;
+        }
+        if (temp > 0.8) {
+            return TempCategory.WARM;
+        }
         // hopefully biomes otherwise have a sensible category
         return TempCategory.MEDIUM;
     }

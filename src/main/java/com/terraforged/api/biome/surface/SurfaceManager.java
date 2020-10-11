@@ -135,7 +135,7 @@ public class SurfaceManager {
     }
 
     public Surface getSurface(SurfaceContext context) {
-        if (context.biome == context.cached.biome) {
+        if (context.biome == context.cached.biome && context.cached.surface != null) {
             return context.cached.surface;
         }
         context.cached.biome = context.biome;

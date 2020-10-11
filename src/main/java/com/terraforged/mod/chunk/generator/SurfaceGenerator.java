@@ -28,6 +28,7 @@ import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
 import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.core.tile.chunk.ChunkReader;
+import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.util.FastChunk;
 import com.terraforged.mod.chunk.util.TerraContainer;
@@ -67,6 +68,11 @@ public class SurfaceGenerator implements Generator.Surfaces {
                     ctx.cell = cell;
                     ctx.biome = container.getBiome(dx, dz);
                     ctx.noise = getSurfaceNoise(px, pz) * 15D;
+
+                    if (ctx.biome == null) {
+                        Log.err("Null biome at {},{}", px, pz);
+                        return;
+                    }
 
                     generator.getSurfaceManager().getSurface(ctx).buildSurface(px, pz, top, ctx);
 

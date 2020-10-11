@@ -56,7 +56,7 @@ public abstract class PoissonDecorator extends Placement<PoissonConfig> {
         ChunkGenerator generator = ACCESS.getGenerator(helper);
         PoissonVisitor visitor = new PoissonVisitor(world, this, poisson, random, pos);
         config.apply(world, generator, visitor);
-        return new PosStream(visitor);
+        return visitor.stream();
     }
 
     public abstract int getYAt(IWorld world, BlockPos pos, Random random);

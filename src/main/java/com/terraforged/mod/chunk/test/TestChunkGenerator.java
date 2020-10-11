@@ -28,14 +28,13 @@ import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import net.minecraft.world.gen.DimensionSettings;
-import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 
 public class TestChunkGenerator extends TerraChunkGenerator {
 
     private final TerraBiomeProvider biomeProvider;
 
     public TestChunkGenerator(TerraContext context, TerraBiomeProvider biomeProvider, DimensionSettings settings) {
-        super(new TestTerraContext(context), biomeProvider, settings);
+        super(biomeProvider, settings);
         this.biomeProvider = new TestBiomeProvider(context);
     }
 

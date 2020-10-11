@@ -1,0 +1,53 @@
+{
+  "biomes": [
+    "minecraft:forest"
+  ],
+  "match": [
+    [
+      "minecraft:oak_log",
+      "minecraft:oak_leaves"
+    ]
+  ],
+  "replace": {
+    "type": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "type": "minecraft:random_selector",
+        "config": {
+          "features": [
+            {
+              "type": "terraforged:template",
+              "config": {
+                "template": "terraforged:oak_forest"
+              },
+              "chance": 0.2
+            },
+            {
+              "type": "terraforged:template",
+              "config": {
+                "template": "terraforged:oak_large"
+              },
+              "chance": 0.3
+            }
+          ],
+          "default": {
+            "type": "terraforged:template",
+            "config": {
+              "template": "terraforged:oak_forest"
+            }
+          }
+        }
+      },
+      "decorator": {
+        "type": "terraforged:poisson_surface",
+        "config": {
+          "radius": 8,
+          "biome_fade": 0.12,
+          "density_noise_scale": 150,
+          "density_noise_min": 0.5,
+          "density_noise_max": 1.75
+        }
+      }
+    }
+  }
+}

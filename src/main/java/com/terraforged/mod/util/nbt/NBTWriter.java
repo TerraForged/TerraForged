@@ -31,11 +31,12 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.IntNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
+import net.minecraftforge.common.util.Constants;
 
-public class NBTWriter extends AbstractWriter<INBT, NBTWriter> {
+public class NBTWriter extends AbstractWriter<INBT, CompoundNBT, ListNBT, NBTWriter> {
 
     public CompoundNBT compound() {
-        return (CompoundNBT) getRoot();
+        return (CompoundNBT) get();
     }
 
     @Override
@@ -45,32 +46,42 @@ public class NBTWriter extends AbstractWriter<INBT, NBTWriter> {
 
     @Override
     protected boolean isObject(INBT value) {
-        return value instanceof CompoundNBT;
+        return value.getId() == Constants.NBT.TAG_COMPOUND;
     }
 
     @Override
     protected boolean isArray(INBT value) {
-        return value instanceof ListNBT;
+        return value.getId() == Constants.NBT.TAG_LIST;
     }
 
     @Override
-    protected void add(INBT parent, String key, INBT value) {
-        ((CompoundNBT) parent).put(key, value);
+    protected void add(CompoundNBT parent, String key, INBT value) {
+        parent.put(key, value);
     }
 
     @Override
-    protected void add(INBT parent, INBT value) {
-        ((ListNBT) parent).add(value);
+    protected void add(ListNBT parent, INBT value) {
+        parent.add(value);
     }
 
     @Override
-    protected INBT createObject() {
+    protected CompoundNBT createObject() {
         return new CompoundNBT();
     }
 
     @Override
-    protected INBT createArray() {
+    protected ListNBT createArray() {
         return new ListNBT();
+    }
+
+    @Override
+    protected INBT closeObject(CompoundNBT o) {
+        return o;
+    }
+
+    @Override
+    protected INBT closeArray(ListNBT a) {
+        return a;
     }
 
     @Override

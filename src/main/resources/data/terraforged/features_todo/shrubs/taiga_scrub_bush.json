@@ -1,0 +1,49 @@
+{
+  "biomes": [
+    "minecraft:snowy_tundra",
+    "minecraft:taiga",
+    "minecraft:taiga_hills",
+    "minecraft:wooded_mountains",
+    "minecraft:taiga_mountains",
+    "minecraft:snowy_taiga_mountains",
+    "minecraft:gravelly_mountains",
+    "minecraft:modified_gravelly_mountains",
+    "terraforged:taiga_scrub",
+    "terraforged:snowy_taiga_scrub"
+  ],
+  "stage": "VEGETAL_DECORATION",
+  "prepend": {
+    "type": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "type": "terraforged:bush",
+        "config": {
+          "trunk": {
+            "Name": "minecraft:spruce_log",
+            "Properties": {
+              "axis": "y"
+            }
+          },
+          "leaves": {
+            "Name": "minecraft:spruce_leaves",
+            "Properties": {
+              "distance": "1",
+              "persistent": "false"
+            }
+          },
+          "air_chance": 0.05,
+          "leaf_chance": 0.075,
+          "size_chance": 0.6
+        }
+      },
+      "decorator": {
+        "type": "minecraft:count_extra",
+        "config": {
+          "count": 0,
+          "extra_chance": 0.1,
+          "extra_count": 1
+        }
+      }
+    }
+  }
+}

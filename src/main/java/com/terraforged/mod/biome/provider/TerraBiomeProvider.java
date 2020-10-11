@@ -24,16 +24,25 @@
 
 package com.terraforged.mod.biome.provider;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
+import com.terraforged.core.concurrent.task.LazySupplier;
+import com.terraforged.fm.GameContext;
+import com.terraforged.fm.util.codec.Codecs;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.modifier.BiomeModifierManager;
 import com.terraforged.mod.chunk.TerraContext;
+import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.util.setup.SetupHooks;
 import com.terraforged.world.heightmap.WorldLookup;
+import com.terraforged.world.terrain.Terrains;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
@@ -43,13 +52,16 @@ import javax.annotation.Nullable;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class TerraBiomeProvider extends BiomeProvider {
+
+    public static final Codec<TerraBiomeProvider> CODEC = Codecs.create(TerraBiomeProvider::encode, TerraBiomeProvider::decode);
 
     private final long seed;
     private final BiomeMap biomeMap;
     private final TerraContext context;
-    private final WorldLookup worldLookup;
+    private final Supplier<WorldLookup> worldLookup;
     private final BiomeModifierManager modifierManager;
 
     public TerraBiomeProvider(TerraContext context) {
@@ -57,18 +69,13 @@ public class TerraBiomeProvider extends BiomeProvider {
         this.context = context;
         this.seed = context.terraSettings.world.seed;
         this.biomeMap = BiomeHelper.createBiomeMap(context.gameContext);
-        this.worldLookup = new WorldLookup(context.factory, context);
+        this.worldLookup = LazySupplier.factory(context, WorldLookup::new);
         this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomeMap), context.copy());
     }
 
-    public Resource<Cell> lookupPos(int x, int z) {
-        return getWorldLookup().getCell(x, z);
-    }
-
-    public Biome getBiome(int x, int z) {
-        try (Resource<Cell> resource = getWorldLookup().getCell(x, z, true)) {
-            return getBiome(resource.get(), x, z);
-        }
+    @Override
+    protected Codec<TerraBiomeProvider> getBiomeProviderCodec() {
+        return CODEC;
     }
 
     @Override
@@ -81,13 +88,8 @@ public class TerraBiomeProvider extends BiomeProvider {
     }
 
     @Override
-    protected Codec<? extends BiomeProvider> func_230319_a_() {
-        return null;
-    }
-
-    @Override
-    public BiomeProvider func_230320_a_(long seed) {
-        return this;
+    public TerraBiomeProvider getBiomeProvider(long seed) {
+        return create(seed, context);
     }
 
     @Override
@@ -100,11 +102,12 @@ public class TerraBiomeProvider extends BiomeProvider {
         int rangeZ = maxZ - minZ + 1;
         Set<Biome> set = Sets.newHashSet();
         Cell cell = new Cell();
+        WorldLookup lookup = getWorldLookup();
         for (int dz = 0; dz < rangeZ; ++dz) {
             for (int dx = 0; dx < rangeX; ++dx) {
                 int x = (minX + dx) << 2;
                 int z = (minZ + dz) << 2;
-                worldLookup.applyCell(cell, x, z);
+                lookup.applyCell(cell, x, z);
                 Biome biome = getBiome(cell, x, z);
                 set.add(biome);
             }
@@ -115,7 +118,7 @@ public class TerraBiomeProvider extends BiomeProvider {
 
     @Override
     @Nullable
-    public BlockPos func_230321_a_(int centerX, int centerY, int centerZ, int radius, int increment, Predicate<Biome> biomes, Random random, boolean centerOutSearch) {
+    public BlockPos findBiomePosition(int centerX, int centerY, int centerZ, int radius, int increment, Predicate<Biome> biomes, Random random, boolean centerOutSearch) {
         // convert block coords to biome coords
         int biomeRadius = radius >> 2;
         int biomeCenterX = centerX >> 2;
@@ -171,12 +174,22 @@ public class TerraBiomeProvider extends BiomeProvider {
         return pos;
     }
 
+    public Resource<Cell> lookupPos(int x, int z) {
+        return getWorldLookup().getCell(x, z);
+    }
+
+    public Biome getBiome(int x, int z) {
+        try (Resource<Cell> resource = getWorldLookup().getCell(x, z, true)) {
+            return getBiome(resource.get(), x, z);
+        }
+    }
+
     public Biome getSurfaceBiome(int x, int z, BiomeManager.IBiomeReader reader) {
         return ColumnFuzzedBiomeMagnifier.INSTANCE.getBiome(seed, x, 0, z, reader);
     }
 
     public WorldLookup getWorldLookup() {
-        return worldLookup;
+        return worldLookup.get();
     }
 
     public TerraContext getContext() {
@@ -190,12 +203,50 @@ public class TerraBiomeProvider extends BiomeProvider {
     public Biome getBiome(Cell cell, int x, int z) {
         Biome biome = biomeMap.provideBiome(cell, context.levels);
         if (modifierManager.hasModifiers(cell, context.levels)) {
-            return modifierManager.modify(biome, cell, x, z);
+//            GenLog.in("getBiome.modify");
+//            biome = modifierManager.modify(biome, cell, x, z);
+//            GenLog.out("getBiome.modify");
         }
         return biome;
     }
 
     public boolean canSpawnAt(Cell cell) {
         return cell.terrain != context.terrain.ocean && cell.terrain != context.terrain.deepOcean;
+    }
+
+    public static TerraBiomeProvider create(long seed, Registry<Biome> registry) {
+        TerraSettings settings = new TerraSettings();
+        settings.world.seed = seed;
+        Terrains terrains = Terrains.create(settings);
+        GameContext gameContext = new GameContext(registry);
+        return new TerraBiomeProvider(new TerraContext(terrains, settings, gameContext));
+    }
+
+    public static TerraBiomeProvider create(long seed, TerraContext currentContext) {
+        TerraSettings settings = currentContext.terraSettings;
+        settings.world.seed = seed;
+
+        TerraContext context = new TerraContext(settings, currentContext.gameContext);
+
+        return new TerraBiomeProvider(context);
+    }
+
+    private static <T> Dynamic<T> encode(TerraBiomeProvider provider, DynamicOps<T> ops) {
+        T seed = Codecs.encodeAndGet(Codec.LONG, provider.seed, ops);
+        T gameContext = Codecs.encodeAndGet(GameContext.CODEC, provider.getContext().gameContext, ops);
+        T settings = Codecs.encodeAndGet(TerraSettings.CODEC, provider.getContext().terraSettings, ops);
+        return new Dynamic<>(ops, ops.createMap(ImmutableMap.of(
+                ops.createString("seed"), seed,
+                ops.createString("game_data"), gameContext,
+                ops.createString("generator_settings"), settings)
+        ));
+    }
+
+    private static <T> TerraBiomeProvider decode(Dynamic<T> dynamic) {
+        long seed = Codecs.decodeAndGet(Codec.LONG, dynamic.get("seed"));
+        GameContext gameContext = Codecs.decodeAndGet(GameContext.CODEC, dynamic.get("game_data"));
+        TerraSettings settings = Codecs.decodeAndGet(TerraSettings.CODEC, dynamic.get("generator_settings"));
+        settings.world.seed = seed;
+        return new TerraBiomeProvider(new TerraContext(settings, gameContext));
     }
 }

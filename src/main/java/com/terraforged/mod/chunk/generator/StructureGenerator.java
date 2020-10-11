@@ -55,7 +55,7 @@ public class StructureGenerator implements Generator.Structures {
 
     @Override
     public void generateStructureStarts(IChunk chunk, DynamicRegistries registries, StructureManager structures, TemplateManager templates) {
-        long seed = generator.getContext().seed.get();
+        long seed = generator.getSeed();
         ChunkPos pos = chunk.getPos();
         Biome biome = generator.getBiomeProvider().getNoiseBiome((pos.x << 2) + 2, 0, (pos.z << 2) + 2);
         generate(chunk, pos, biome, StructureFeatures.field_244145_k, registries, structures, templates, seed);
@@ -73,7 +73,6 @@ public class StructureGenerator implements Generator.Structures {
             StructureStart<?> start1 = structure.func_242771_a(registries, generator, generator.getBiomeProvider(), templates, seed, pos, biome, i, settings);
             structures.func_235014_a_(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, start1, chunk);
         }
-
     }
 
     @Override

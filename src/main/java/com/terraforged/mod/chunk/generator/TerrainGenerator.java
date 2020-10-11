@@ -43,14 +43,14 @@ public class TerrainGenerator implements Generator.Terrain {
     private final Levels levels;
     private final Climate climate;
     private final Terrains terrain;
-    private final TerraChunkGenerator generator;
     private final TerrainHelper terrainHelper;
+    private final TerraChunkGenerator generator;
 
     public TerrainGenerator(TerraChunkGenerator generator) {
         this.generator = generator;
         this.levels = generator.getContext().levels;
         this.terrain = generator.getContext().terrain;
-        this.climate = generator.getContext().factory.getClimate();
+        this.climate = generator.getContext().factory.get().getClimate();
         this.terrainHelper = new TerrainHelper(0.75F, 4F);
     }
 
@@ -67,7 +67,8 @@ public class TerrainGenerator implements Generator.Terrain {
                     ctx.biome = container.getNoiseBiome(dx, world.getSeaLevel(), dz);
                     BaseDecorator.INSTANCE.decorate(ctx.chunk, ctx, px, py, pz);
                 });
-                terrainHelper.flatten(world, chunk);
+
+//                terrainHelper.flatten(world, chunk);
             }
         }
     }

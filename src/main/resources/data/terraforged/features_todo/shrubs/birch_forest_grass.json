@@ -1,0 +1,188 @@
+{
+  "biomes": [
+    "minecraft:birch*",
+    "minecraft:tall_birch*"
+  ],
+  "match": [[
+    "minecraft:double_plant_placer"
+  ]],
+  "replace": {
+    "type": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "type": "minecraft:random_selector",
+        "config": {
+          "features": [
+            {
+              "chance": 0.8,
+              "type": "minecraft:random_patch",
+              "config": {
+                "state_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:tall_grass",
+                    "Properties": {
+                      "half": "lower"
+                    }
+                  }
+                },
+                "block_placer": {
+                  "type": "minecraft:double_plant_placer"
+                },
+                "whitelist": [],
+                "blacklist": [],
+                "tries": 56,
+                "xspread": 7,
+                "yspread": 3,
+                "zspread": 7,
+                "can_replace": false,
+                "project": false,
+                "need_water": false
+              }
+            },
+            {
+              "chance": 0.5,
+              "type": "minecraft:random_patch",
+              "config": {
+                "state_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:lilac",
+                    "Properties": {
+                      "half": "lower"
+                    }
+                  }
+                },
+                "block_placer": {
+                  "type": "minecraft:double_plant_placer"
+                },
+                "whitelist": [],
+                "blacklist": [],
+                "tries": 64,
+                "xspread": 7,
+                "yspread": 3,
+                "zspread": 7,
+                "can_replace": false,
+                "project": false,
+                "need_water": false
+              }
+            },
+            {
+              "chance": 0.3,
+              "type": "minecraft:random_patch",
+              "config": {
+                "state_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:large_fern",
+                    "Properties": {
+                      "half": "lower"
+                    }
+                  }
+                },
+                "block_placer": {
+                  "type": "minecraft:double_plant_placer"
+                },
+                "whitelist": [],
+                "blacklist": [],
+                "tries": 48,
+                "xspread": 5,
+                "yspread": 3,
+                "zspread": 5,
+                "can_replace": false,
+                "project": false,
+                "need_water": false
+              }
+            },
+            {
+              "chance": 0.2,
+              "type": "minecraft:random_patch",
+              "config": {
+                "state_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:fern",
+                    "Properties": {
+                      "half": "lower"
+                    }
+                  }
+                },
+                "block_placer": {
+                  "type": "minecraft:simple_block_placer"
+                },
+                "whitelist": [],
+                "blacklist": [],
+                "tries": 24,
+                "xspread": 4,
+                "yspread": 3,
+                "zspread": 4,
+                "can_replace": false,
+                "project": false,
+                "need_water": false
+              }
+            },
+            {
+              "chance": 0.1,
+              "type": "minecraft:random_patch",
+              "config": {
+                "state_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:peony",
+                    "Properties": {
+                      "half": "lower"
+                    }
+                  }
+                },
+                "block_placer": {
+                  "type": "minecraft:double_plant_placer"
+                },
+                "whitelist": [],
+                "blacklist": [],
+                "tries": 32,
+                "xspread": 6,
+                "yspread": 3,
+                "zspread": 6,
+                "can_replace": false,
+                "project": false,
+                "need_water": false
+              }
+            }
+          ],
+          "default": {
+            "type": "minecraft:random_patch",
+            "config": {
+              "state_provider": {
+                "type": "minecraft:simple_state_provider",
+                "state": {
+                  "Name": "minecraft:tall_grass",
+                  "Properties": {
+                    "half": "lower"
+                  }
+                }
+              },
+              "block_placer": {
+                "type": "minecraft:double_plant_placer"
+              },
+              "whitelist": [],
+              "blacklist": [],
+              "tries": 48,
+              "xspread": 7,
+              "yspread": 3,
+              "zspread": 7,
+              "can_replace": false,
+              "project": false,
+              "need_water": false
+            }
+          }
+        }
+      },
+      "decorator": {
+        "type": "minecraft:count",
+        "config": {
+          "count": 5
+        }
+      }
+    }
+  }
+}

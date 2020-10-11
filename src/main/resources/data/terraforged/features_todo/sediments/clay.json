@@ -1,0 +1,37 @@
+{
+  "match": [
+    [
+      "minecraft:disk",
+      "minecraft:clay"
+    ]
+  ],
+  "replace": {
+    "type": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "type": "terraforged:disk",
+        "config": {
+          "state": {
+            "Name": "minecraft:clay"
+          },
+          "radius": 4,
+          "y_size": 1,
+          "targets": [
+            {
+              "Name": "minecraft:dirt"
+            },
+            {
+              "Name": "minecraft:clay"
+            }
+          ]
+        }
+      },
+      "decorator": {
+        "type": "minecraft:top_solid_heightmap",
+        "config": {
+          "count": 1
+        }
+      }
+    }
+  }
+}

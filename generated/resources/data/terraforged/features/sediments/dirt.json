@@ -1,0 +1,9 @@
+{
+  "match": [
+    "minecraft:dirt",
+    "minecraft:disk"
+  ],
+  "transform": {
+    "minecraft:disk": "terraforged:disk"
+  }
+}

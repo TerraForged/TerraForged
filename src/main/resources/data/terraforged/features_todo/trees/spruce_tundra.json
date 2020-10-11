@@ -1,0 +1,51 @@
+{
+  "biomes": [
+    "minecraft:snowy_tundra",
+    "minecraft:snowy_taiga_mountains",
+    "minecraft:gravelly_mountains",
+    "minecraft:modified_gravelly_mountains"
+  ],
+  "match": [
+    [
+      "minecraft:normal_tree",
+      "minecraft:spruce_log",
+      "minecraft:spruce_leaves"
+    ],
+    [
+      "minecraft:fancy_tree",
+      "minecraft:spruce_log",
+      "minecraft:spruce_leaves"
+    ]
+  ],
+  "replace": {
+    "type": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "type": "minecraft:random_selector",
+        "config": {
+          "features": [
+            {
+              "type": "terraforged:template",
+              "config": {
+                "template": "terraforged:pine"
+              },
+              "chance": 0.3
+            }
+          ],
+          "default": {
+            "type": "terraforged:template",
+            "config": {
+              "template": "terraforged:pine"
+            }
+          }
+        }
+      },
+      "decorator": {
+        "type": "minecraft:chance_passthrough",
+        "config": {
+          "chance": 0.02
+        }
+      }
+    }
+  }
+}

@@ -80,7 +80,7 @@ public class SpawnHandler {
             return BlockPos.ZERO;
         } else {
             MutableVeci pos = new MutableVeci();
-            provider.getContext().heightmap.getContinent().getNearestCenter(0, 0, pos);
+            provider.getContext().heightmap.get().getContinent().getNearestCenter(0, 0, pos);
             return new BlockPos(pos.x, 0, pos.z);
         }
     }

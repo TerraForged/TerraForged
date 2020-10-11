@@ -28,10 +28,12 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
 import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.api.chunk.column.DecoratorContext;
+import com.terraforged.core.concurrent.task.LazySupplier;
 import com.terraforged.core.concurrent.thread.ThreadPools;
 import com.terraforged.core.tile.gen.TileCache;
 import com.terraforged.core.tile.gen.TileGenerator;
 import com.terraforged.fm.GameContext;
+import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.config.PerfDefaults;
 import com.terraforged.mod.material.Materials;
@@ -44,35 +46,50 @@ import net.minecraft.world.gen.DimensionSettings;
 
 public class TerraContext extends GeneratorContext {
 
-    public final Heightmap heightmap;
+    public final long worldSeed;
+    public final LazySupplier<Heightmap> heightmap;
     public final Materials materials;
     public final TerraSettings terraSettings;
 
-    public GameContext gameContext;
+    public final GameContext gameContext;
 
-    public TerraContext(TerraContext other) {
+    public TerraContext(TerraContext other, GameContext gameContext) {
         super(other.terrain, other.settings, other.terrainFactory, TerraContext::createCache);
+        this.worldSeed = other.worldSeed;
         this.materials = other.materials;
         this.terraSettings = other.terraSettings;
-        this.heightmap = factory.getHeightmap();
+        this.gameContext = gameContext;
+        this.heightmap = factory.then(WorldGeneratorFactory::getHeightmap);
     }
 
-    public TerraContext(Terrains terrain, TerraSettings settings) {
-        super(terrain, settings, TerraTerrainProvider::new, TerraContext::createCache);
+    public TerraContext(TerraSettings settings, GameContext gameContext) {
+        super(Terrains.create(settings), settings, TerraTerrainProvider::new, TerraContext::createCache);
+        this.worldSeed = settings.world.seed;
+        this.gameContext = gameContext;
         this.materials = new Materials();
         this.terraSettings = settings;
-        this.heightmap = factory.getHeightmap();
+        this.heightmap = factory.then(WorldGeneratorFactory::getHeightmap);
+    }
+
+    public TerraContext(Terrains terrain, TerraSettings settings, GameContext gameContext) {
+        super(terrain, settings, TerraTerrainProvider::new, TerraContext::createCache);
+        this.worldSeed = settings.world.seed;
+        this.gameContext = gameContext;
+        this.materials = new Materials();
+        this.terraSettings = settings;
+        this.heightmap = factory.then(WorldGeneratorFactory::getHeightmap);
     }
 
     public DecoratorContext decorator(IChunk chunk) {
-        return new DecoratorContext(chunk, levels, terrain, factory.getClimate(), false);
+        return new DecoratorContext(chunk, levels, terrain, factory.get().getClimate(), false);
     }
 
     public SurfaceContext surface(ChunkSurfaceBuffer buffer, DimensionSettings settings) {
-        return new SurfaceContext(buffer, levels, terrain, factory.getClimate(), settings, seed.get());
+        return new SurfaceContext(buffer, levels, terrain, factory.get().getClimate(), settings, seed.get());
     }
 
     public static TileCache createCache(WorldGeneratorFactory factory) {
+        Log.info("CREATING CACHE...");
         CommentedConfig config = PerfDefaults.getAndPrintPerfSettings();
         boolean batching = config.getOrElse("batching", false);
         int tileSize = Math.min(PerfDefaults.MAX_TILE_SIZE, Math.max(2, config.getInt("tile_size")));
@@ -83,6 +100,7 @@ public class TerraContext extends GeneratorContext {
                 .size(tileSize, 2)
                 .batch(batchCount)
                 .factory(factory)
-                .build().toCache();
+                .build()
+                .toCache();
     }
 }

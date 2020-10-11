@@ -47,10 +47,6 @@ import java.util.Random;
 public class BushFeature extends Feature<BushFeature.Config> {
 
     public static final BushFeature INSTANCE = new BushFeature();
-    public static final Codec<BushFeature.Config> CODEC = Codecs.create(
-            BushFeature::serialize,
-            BushFeature::deserialize
-    );
 
     private static final Vector3i[] logs = {
             new Vector3i(+1, 0, +1),
@@ -78,7 +74,7 @@ public class BushFeature extends Feature<BushFeature.Config> {
     };
 
     public BushFeature() {
-        super(BushFeature.CODEC);
+        super(Config.CODEC);
         setRegistryName("terraforged", "bush");
     }
 
@@ -175,6 +171,11 @@ public class BushFeature extends Feature<BushFeature.Config> {
     }
 
     public static class Config implements IFeatureConfig {
+
+        public static final Codec<Config> CODEC = Codecs.create(
+                BushFeature::serialize,
+                BushFeature::deserialize
+        );
 
         private final BlockState trunk;
         private final BlockState leaves;

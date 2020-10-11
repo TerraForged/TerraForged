@@ -60,25 +60,25 @@ public class FeatureGenerator implements Generator.Features {
         TerraContainer container = TerraContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
 
         Biome biome = container.getFeatureBiome(reader);
-        DecoratorContext context = generator.getContext().decorator(chunk);
+        try (DecoratorContext context = generator.getContext().decorator(chunk)) {
+            ISeedReader regionFix = new RegionFix(region, generator);
+            BlockPos pos = new BlockPos(context.blockX, 0, context.blockZ);
 
-        ISeedReader regionFix = new RegionFix(region, generator);
-        BlockPos pos = new BlockPos(context.blockX, 0, context.blockZ);
+            // place biome features
+            generator.getFeatureManager().decorate(generator, manager, regionFix, chunk, biome, pos);
 
-        // place biome features
-        generator.getFeatureManager().decorate(generator, manager, regionFix, chunk, biome, pos);
+            // run post processes on chunk
+            postProcess(reader, container, context);
 
-        // run post processes on chunk
-        postProcess(reader, container, context);
+            // bake biome array
+            ((ChunkPrimer) chunk).setBiomes(container.bakeBiomes(Environment.isVanillaBiomes(), generator.getContext().gameContext));
 
-        // bake biome array
-        ((ChunkPrimer) chunk).setBiomes(container.bakeBiomes(Environment.isVanillaBiomes(), generator.getContext().gameContext));
+            // close the current chunk reader
+            reader.close();
 
-        // close the current chunk reader
-        reader.close();
-
-        // mark chunk disposed as this is the last usage of the reader
-        reader.dispose();
+            // mark chunk disposed as this is the last usage of the reader
+            reader.dispose();
+        }
     }
 
     private void postProcess(ChunkReader reader, TerraContainer container, DecoratorContext context) {
@@ -86,7 +86,7 @@ public class FeatureGenerator implements Generator.Features {
         reader.iterate(context, (cell, dx, dz, ctx) -> {
             int px = ctx.blockX + dx;
             int pz = ctx.blockZ + dz;
-            int py = ctx.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, dx, dz);
+            int py = ctx.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE, dx, dz);
             ctx.cell = cell;
             ctx.biome = container.getBiome(dx, dz);
             for (ColumnDecorator decorator : decorators) {

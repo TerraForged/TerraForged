@@ -1,0 +1,117 @@
+{
+  "biomes": [
+    "minecraft:forest",
+    "minecraft:forest_hills",
+    "minecraft:dark_forest",
+    "minecraft:dark_forest_hills"
+  ],
+  "match": [
+    [
+      "minecraft:oak_log",
+      "minecraft:oak_leaves"
+    ],
+    [
+      "terraforged:poisson_surface"
+    ]
+  ],
+  "after": {
+    "type": "minecraft:decorated",
+    "config": {
+      "feature": {
+        "type": "minecraft:random_selector",
+        "config": {
+          "features": [
+            {
+              "type": "minecraft:bush_foliage_placer",
+              "config": {
+                "trunk_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:oak_log",
+                    "Properties": {
+                      "axis": "y"
+                    }
+                  }
+                },
+                "leaves_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:birch_leaves",
+                    "Properties": {
+                      "distance": "3",
+                      "persistent": "false"
+                    }
+                  }
+                },
+                "decorators": [],
+                "base_height": 3
+              },
+              "chance": 0.15
+            },
+            {
+              "type": "minecraft:bush_foliage_placer",
+              "config": {
+                "trunk_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:oak_log",
+                    "Properties": {
+                      "axis": "y"
+                    }
+                  }
+                },
+                "leaves_provider": {
+                  "type": "minecraft:simple_state_provider",
+                  "state": {
+                    "Name": "minecraft:oak_leaves",
+                    "Properties": {
+                      "distance": "3",
+                      "persistent": "false"
+                    }
+                  }
+                },
+                "decorators": [],
+                "base_height": 4
+              },
+              "chance": 0.25
+            }
+          ],
+          "default": {
+            "type": "minecraft:bush_foliage_placer",
+            "config": {
+              "trunk_provider": {
+                "type": "minecraft:simple_state_provider",
+                "state": {
+                  "Name": "minecraft:oak_log",
+                  "Properties": {
+                    "axis": "y"
+                  }
+                }
+              },
+              "leaves_provider": {
+                "type": "minecraft:simple_state_provider",
+                "state": {
+                  "Name": "minecraft:oak_leaves",
+                  "Properties": {
+                    "distance": "3",
+                    "persistent": "false"
+                  }
+                }
+              },
+              "decorators": [],
+              "base_height": 3
+            }
+          }
+        }
+      },
+      "decorator": {
+        "type": "minecraft:count_extra",
+        "config": {
+          "count": 1,
+          "extra_chance": 0.05,
+          "extra_count": 1
+        }
+      }
+    }
+  }
+}

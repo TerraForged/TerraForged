@@ -53,7 +53,7 @@ public class SnowEroder extends ErosionDecorator {
         this.seed1 = context.seed.next();
         this.seed2 = context.seed.next();
         this.seed3 = context.seed.next();
-        this.rand = context.factory.getHeightmap().getClimate().getRand();
+        this.rand = context.heightmap.get().getClimate().getRand();
     }
 
     @Override
