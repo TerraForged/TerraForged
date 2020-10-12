@@ -37,10 +37,12 @@ import com.terraforged.fm.template.decorator.DecoratorConfig;
 import com.terraforged.fm.template.type.FeatureType;
 import com.terraforged.fm.template.type.FeatureTypes;
 import com.terraforged.fm.util.Json;
+import com.terraforged.fm.util.codec.CodecException;
 import com.terraforged.fm.util.codec.Codecs;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -82,16 +84,28 @@ public class TemplateFeatureConfig implements IFeatureConfig {
     }
 
     public static <T> TemplateFeatureConfig deserialize(Dynamic<T> dynamic) {
-        ResourceLocation name = new ResourceLocation(dynamic.get("template").asString(""));
-        return TemplateManager.getInstance().getTemplateConfig(name);
+        ResourceLocation name = Codecs.getResult(dynamic.get("template").asString())
+                .map(ResourceLocation::tryCreate)
+                .orElseThrow(CodecException.get("Failed to load template entry"));
+
+        TemplateFeatureConfig config = TemplateManager.getInstance().getTemplateConfig(name);
+        if (config == TemplateFeatureConfig.NONE) {
+            throw CodecException.of("Failed to load config entry for %s", name);
+        }
+        
+        return config;
     }
 
-    public static TemplateFeatureConfig parse(TemplateLoader loader, JsonObject root) {
-        ResourceLocation name = new ResourceLocation(Json.getString("name", root, ""));
-        FeatureType type = FeatureTypes.getType(Json.getString("type", root, ""));
-        PasteConfig paste = PasteConfig.parse(root.getAsJsonObject("config"));
-        DecoratorConfig<?> decorator = DecoratorConfig.parse(type.getDecorator(), root.getAsJsonObject("decorators"));
-        List<Template> templates = loader.load(name.getNamespace(), root.getAsJsonArray("paths"));
-        return new TemplateFeatureConfig(name, type, paste, templates, decorator);
+    public static TemplateFeatureConfig parse(TemplateLoader loader, JsonObject root) throws IOException {
+        try {
+            ResourceLocation name = new ResourceLocation(Json.getString("name", root));
+            FeatureType type = FeatureTypes.getType(Json.getString("type", root));
+            PasteConfig paste = PasteConfig.parse(root.getAsJsonObject("config"));
+            DecoratorConfig<?> decorator = DecoratorConfig.parse(type.getDecorator(), root.getAsJsonObject("decorators"));
+            List<Template> templates = loader.load(name.getNamespace(), root.getAsJsonArray("paths"));
+            return new TemplateFeatureConfig(name, type, paste, templates, decorator);
+        } catch (CodecException e) {
+            throw new IOException(e);
+        }
     }
 }

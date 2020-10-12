@@ -43,11 +43,9 @@ import com.terraforged.mod.feature.decorator.poisson.PoissonAtSurface;
 import com.terraforged.mod.feature.decorator.poisson.PoissonConfig;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.ConfiguredRandomFeatureList;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.MultipleRandomFeatureConfig;
-import net.minecraft.world.gen.feature.TwoFeatureChoiceConfig;
+import net.minecraft.util.registry.WorldGenRegistries;
+import net.minecraft.world.biome.DefaultBiomeFeatures;
+import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.placement.AtSurfaceWithExtraConfig;
 import net.minecraft.world.gen.placement.ChanceConfig;
 import net.minecraft.world.gen.placement.Placement;
@@ -63,6 +61,13 @@ public class Trees {
         provider.add("trees/oak_badlands", oakBadlands(provider.getContext()));
         provider.add("trees/oak_forest", oakForest(provider.getContext()));
         provider.add("trees/oak_plains", oakPlains(provider.getContext()));
+        provider.add("trees/birch", birch(provider.getContext()));
+        provider.add("trees/birch_oak", birchOak(provider.getContext()));
+        provider.add("trees/dark_oak", darkForest(provider.getContext()));
+        provider.add("trees/flower_plains", flowerForest(provider.getContext()));
+        provider.add("trees/jungle", jungle(provider.getContext()));
+        provider.add("trees/jungle_edge", jungleEdge(provider.getContext()));
+        provider.add("trees/jungle_hills", jungleHills(provider.getContext()));
         provider.add("trees/pine", pine(provider.getContext()));
         provider.add("trees/redwood", redwood(provider.getContext()));
         provider.add("trees/spruce", spruce(provider.getContext()));
@@ -114,6 +119,109 @@ public class Trees {
         );
     }
 
+    private static Modifier<Jsonifiable> flowerForest(GameContext context) {
+        return new Modifier<>(
+                BiomeMatcher.of(context, "minecraft:flower_forest"),
+                FeatureMatcher.and(Blocks.BIRCH_LOG, Blocks.BIRCH_LEAVES, Blocks.OAK_LOG, Blocks.OAK_LEAVES),
+                FeatureReplacer.of(poisson(
+                        15, 0.3F, 500, 0.75F, 2F,
+                        "terraforged:birch_forest",
+                        Pair.of("terraforged:birch_forest", 0.2F),
+                        Pair.of("terraforged:birch_large", 0.2F),
+                        Pair.of("terraforged:oak_forest", 0.2F),
+                        Pair.of("terraforged:oak_large", 0.2F)
+                ))
+        );
+    }
+
+    private static Modifier<Jsonifiable> birch(GameContext context) {
+        return new Modifier<>(
+                BiomeMatcher.of(context, "minecraft:birch*", "minecraft:tall_birch*"),
+                FeatureMatcher.and(Blocks.BIRCH_LOG, Blocks.BIRCH_LEAVES),
+                FeatureReplacer.of(poisson(
+                        8, 0.12F, 300, 0.5F, 1.5F,
+                        "terraforged:birch_forest",
+                        Pair.of("terraforged:birch_forest", 0.2F),
+                        Pair.of("terraforged:birch_large", 0.2F)
+                ))
+        );
+    }
+
+    private static Modifier<Jsonifiable> birchOak(GameContext context) {
+        return new Modifier<>(
+                BiomeMatcher.of(context, "minecraft:wooded_hills"),
+                FeatureMatcher.and(Blocks.BIRCH_LOG, Blocks.BIRCH_LEAVES, Blocks.OAK_LOG, Blocks.OAK_LEAVES),
+                FeatureReplacer.of(poisson(
+                        8, 0.35F, 300, 0F, 2F,
+                        "terraforged:birch_forest",
+                        Pair.of("terraforged:birch_forest", 0.2F),
+                        Pair.of("terraforged:birch_large", 0.2F),
+                        Pair.of("terraforged:oak_forest", 0.2F),
+                        Pair.of("terraforged:oak_large", 0.2F)
+                ))
+        );
+    }
+
+    private static Modifier<Jsonifiable> darkForest(GameContext context) {
+        return new Modifier<>(
+                BiomeMatcher.of(context, "minecraft:dark_forest", "minecraft:dark_forest_hills"),
+                FeatureMatcher.and(Blocks.DARK_OAK_LOG, Blocks.DARK_OAK_LEAVES),
+                FeatureReplacer.of(poisson(
+                        8, 0.35F, 300, 0F, 2F,
+                        "terraforged:dark_oak_large",
+                        Pair.of("minecraft:huge_brown_mushroom", 0.025F),
+                        Pair.of("minecraft:huge_red_mushroom", 0.05F),
+                        Pair.of("terraforged:dark_oak_large", 0.3F),
+                        Pair.of("terraforged:dark_oak_small", 0.2F),
+                        Pair.of("terraforged:birch_forest", 0.05F),
+                        Pair.of("terraforged:oak_forest", 0.025F)
+                ))
+        );
+    }
+
+    private static Modifier<Jsonifiable> jungle(GameContext context) {
+        return new Modifier<>(
+                BiomeMatcher.of(context, "minecraft:jungle", "minecraft:modified_jungle", "minecraft:bamboo_jungle"),
+                FeatureMatcher.and( "minecraft:tree"),
+                FeatureReplacer.of(poisson(
+                        6, 0.2F, 400, 0.25F, 2F,
+                        "terraforged:jungle_small",
+                        Pair.of("terraforged:jungle_small", 0.2F),
+                        Pair.of("terraforged:jungle_large", 0.3F),
+                        Pair.of("terraforged:jungle_huge", 0.4F),
+                        Pair.of("minecraft:jungle_bush", 0.5F)
+                ))
+        );
+    }
+
+    private static Modifier<Jsonifiable> jungleEdge(GameContext context) {
+        return new Modifier<>(
+                BiomeMatcher.of(context, "minecraft:jungle_edge", "minecraft:modified_jungle_edge", "terraforged:stone_forest"),
+                FeatureMatcher.and( "minecraft:tree"),
+                FeatureReplacer.of(poisson(
+                        9, 0.3F, 350, 0.75F, 1.5F,
+                        "terraforged:jungle_small",
+                        Pair.of("terraforged:jungle_small", 0.2F),
+                        Pair.of("terraforged:jungle_large", 0.3F)
+                ))
+        );
+    }
+
+    private static Modifier<Jsonifiable> jungleHills(GameContext context) {
+        return new Modifier<>(
+                BiomeMatcher.of(context, "minecraft:jungle_hills", "minecraft:bamboo_jungle_hills"),
+                FeatureMatcher.or( "minecraft:tree"),
+                FeatureReplacer.of(poisson(
+                        8, 0.2F, 200, 0.35F, 1.85F,
+                        "terraforged:jungle_small",
+                        Pair.of("terraforged:jungle_small", 0.3F),
+                        Pair.of("terraforged:jungle_large", 0.4F),
+                        Pair.of("terraforged:jungle_huge", 0.3F),
+                        Pair.of("minecraft:jungle_bush", 0.2F)
+                ))
+        );
+    }
+
     private static Modifier<Jsonifiable> pine(GameContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:taiga", "minecraft:taiga_hills", "minecraft:taiga_mountains"),
@@ -160,7 +268,7 @@ public class Trees {
 
     private static Modifier<Jsonifiable> spruceTundra(GameContext context) {
         return new Modifier<>(
-                BiomeMatcher.of(context, "minecraft:snowy_taiga", "minecraft:snowy_taiga_hills", "minecraft:taiga_mountains"),
+                BiomeMatcher.of(context, "minecraft:snowy_tundra", "minecraft:snowy_taiga_mountains", "minecraft:gravelly_mountains", "minecraft:modified_gravelly_mountains"),
                 FeatureMatcher.and("minecraft:tree", Blocks.SPRUCE_LOG, Blocks.SPRUCE_LEAVES),
                 FeatureReplacer.of(template("terraforged:pine").withPlacement(Placement.field_242898_b.configure(new ChanceConfig(80))))
         );
@@ -194,12 +302,27 @@ public class Trees {
             List<ConfiguredRandomFeatureList> features = new ArrayList<>();
             for (Pair<String, Float> entry : entries) {
                 features.add(new ConfiguredRandomFeatureList(
-                        template(entry.getFirst()),
+                        getFeature(entry.getFirst()),
                         entry.getSecond()
                 ));
             }
             return Feature.RANDOM_SELECTOR.withConfiguration(new MultipleRandomFeatureConfig(features, template(def)));
         }
+    }
+
+    private static ConfiguredFeature<?, ?> getFeature(String name) {
+        if (name.startsWith("terraforged:")) {
+            return template(name);
+        }
+        return WorldGenRegistries.field_243653_e.func_241873_b(new ResourceLocation(name)).orElseThrow(RuntimeException::new);
+    }
+
+    private static ConfiguredFeature<?, ?> brownMushroom() {
+        return Features.field_243860_bF;
+    }
+
+    private static ConfiguredFeature<?, ?> redMushroom() {
+        return Features.field_243861_bG;
     }
 
     private static ConfiguredFeature<?, ?> context(ContextualFeature... features) {

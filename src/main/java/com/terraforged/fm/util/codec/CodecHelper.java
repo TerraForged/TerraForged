@@ -36,18 +36,23 @@ import net.minecraft.world.gen.treedecorator.TreeDecoratorType;
 public class CodecHelper {
 
     public static <T> BlockState getState(Dynamic<T> dynamic) {
-        return BlockState.CODEC.decode(dynamic).result().map(Pair::getFirst).orElseGet(Blocks.AIR::getDefaultState);
+        return Codecs.getResult(BlockState.CODEC.decode(dynamic))
+                .map(Pair::getFirst)
+                .orElseGet(Blocks.AIR::getDefaultState);
     }
 
     public static <T> BlockState getState(OptionalDynamic<T> dynamic) {
-        return dynamic.result().map(CodecHelper::getState).orElseGet(Blocks.AIR::getDefaultState);
+        return dynamic.result().map(CodecHelper::getState)
+                .orElseGet(Blocks.AIR::getDefaultState);
     }
 
     public static <T> T setState(BlockState state, DynamicOps<T> ops) {
-        return BlockState.CODEC.encodeStart(ops, state).result().orElseThrow(RuntimeException::new);
+        return Codecs.getResult(BlockState.CODEC.encodeStart(ops, state))
+                .orElseThrow(CodecException.get("Cannot encode BlockState %s", state));
     }
 
     public static <T> TreeDecorator treeDecorator(TreeDecoratorType<?> type, T t, DynamicOps<T> ops) {
-        return type.func_236876_a_().decode(ops, t).map(Pair::getFirst).result().orElseThrow(RuntimeException::new);
+        return Codecs.getResult(type.func_236876_a_().decode(ops, t).map(Pair::getFirst))
+                .orElseThrow(CodecException.get("Cannot decode TreeDecoratorType(%s) %s", type, t));
     }
 }

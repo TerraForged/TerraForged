@@ -26,6 +26,8 @@ package com.terraforged.fm;
 
 import com.terraforged.fm.biome.BiomeFeature;
 import com.terraforged.fm.biome.BiomeFeatures;
+import com.terraforged.fm.util.identity.FeatureIdentity;
+import com.terraforged.fm.util.identity.Identity;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -102,10 +104,19 @@ public interface FeatureDecorator {
                     BiomeFeature feature = features.get(featureIndex);
                     random.setFeatureSeed(decorationSeed, featureSeed++, stageIndex);
                     if (feature.getPredicate().test(chunk, biome)) {
-                        feature.getFeature().func_242765_a(region, generator, random, pos);
+                        try {
+                            feature.getFeature().func_242765_a(region, generator, random, pos);
+                        } catch (Throwable t) {
+                            handle(feature.getIdentity(), t);
+                        }
                     }
                 }
             }
         }
+    }
+
+    static void handle(Identity identity, Throwable t) {
+        FeatureManager.LOG.fatal("Fatal error placing feature {}", identity.getIdentity());
+//        t.printStackTrace();
     }
 }

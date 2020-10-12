@@ -31,7 +31,7 @@ import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.OptionalDynamic;
 import com.terraforged.fm.FeatureSerializer;
 import com.terraforged.fm.util.codec.Codecs;
-import com.terraforged.fm.util.codec.EncodingException;
+import com.terraforged.fm.util.codec.CodecException;
 import com.terraforged.mod.feature.context.modifier.ContextModifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
@@ -87,19 +87,15 @@ public class ContextualFeature {
     }
 
     public static <T> ContextualFeature deserialize(Dynamic<T> dynamic) {
-        ConfiguredFeature<?, ?> feature = FeatureSerializer.decode(dynamic.get("feature")).orElseThrow(EncodingException::new);
+        ConfiguredFeature<?, ?> feature = FeatureSerializer.decode(dynamic.get("feature")).orElseThrow(CodecException.get("Failed to deserialize ContextualFeature"));
         OptionalDynamic<?> context = dynamic.get("context");
         float chance = context.get("chance").asFloat(0);
         List<ContextModifier> contexts = deserializeContexts(context);
         return new ContextualFeature(feature, chance, contexts);
     }
 
-    private static <T> ConfiguredFeature<?, ?> deserializeFeature(OptionalDynamic<T> dynamic) {
-        return FeatureSerializer.decode(dynamic).orElseThrow(EncodingException::new);
-    }
-
     private static List<ContextModifier> deserializeContexts(OptionalDynamic<?> dynamic) {
-        return dynamic.flatMap(d -> d.getMapValues().map(map -> {
+        return Codecs.getResult(dynamic.flatMap(d -> d.getMapValues().map(map -> {
             List<ContextModifier> contexts = new ArrayList<>(map.size());
             map.forEach((key, value) -> {
                 String name = key.asString("");
@@ -108,6 +104,6 @@ public class ContextualFeature {
                 }
             });
             return contexts;
-        })).result().orElseThrow(EncodingException::new);
+        }))).orElseThrow(CodecException.get("Failed to deserialize Contexts"));
     }
 }

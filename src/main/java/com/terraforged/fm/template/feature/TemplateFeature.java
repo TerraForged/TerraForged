@@ -56,13 +56,13 @@ public class TemplateFeature extends Feature<TemplateFeatureConfig> {
         return false;
     }
 
-    public static  <T extends IWorld> boolean paste(ISeedReader world, Random rand, BlockPos pos, TemplateFeatureConfig config, DecoratorConfig<T> decorator) {
+    public static <T extends IWorld> boolean paste(ISeedReader world, Random rand, BlockPos pos, TemplateFeatureConfig config, DecoratorConfig<T> decorator) {
         Mirror mirror = nextMirror(rand);
         Rotation rotation = nextRotation(rand);
         return paste(world, rand, pos, mirror, rotation, config, decorator);
     }
 
-    public static  <T extends IWorld> boolean paste(ISeedReader world, Random rand, BlockPos pos, Mirror mirror, Rotation rotation, TemplateFeatureConfig config, DecoratorConfig<T> decorator) {
+    public static <T extends IWorld> boolean paste(ISeedReader world, Random rand, BlockPos pos, Mirror mirror, Rotation rotation, TemplateFeatureConfig config, DecoratorConfig<T> decorator) {
         if (config.templates.isEmpty()) {
             FeatureManager.LOG.warn("Empty template list for config: {}", config.name);
             return false;
@@ -79,7 +79,7 @@ public class TemplateFeature extends Feature<TemplateFeatureConfig> {
         return false;
     }
 
-    public static  <T extends IWorld> boolean pasteChecked(ISeedReader world, Random rand, BlockPos pos, Mirror mirror, Rotation rotation, TemplateFeatureConfig config, DecoratorConfig<T> decorator) {
+    public static <T extends IWorld> boolean pasteChecked(ISeedReader world, Random rand, BlockPos pos, Mirror mirror, Rotation rotation, TemplateFeatureConfig config, DecoratorConfig<T> decorator) {
         if (config.templates.isEmpty()) {
             FeatureManager.LOG.warn("Empty template list for config: {}", config.name);
             return false;

@@ -26,10 +26,43 @@ package com.terraforged.fm.util;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.terraforged.fm.util.codec.CodecException;
 
+import java.io.IOException;
 import java.util.function.Function;
 
 public class Json {
+
+    public static String getString(String path, JsonObject owner) throws CodecException {
+        String s = get(path, owner, JsonElement::getAsString, null);
+        if (s == null) {
+            throw CodecException.of("Missing string entry for %s", path);
+        }
+        return s;
+    }
+
+    public static int getInt(String path, JsonObject owner) throws CodecException {
+        Number n = get(path, owner, JsonElement::getAsNumber, null);
+        if (n == null) {
+            throw CodecException.of("Missing int entry value for %s", path);
+        }
+        return n.intValue();
+    }
+
+    public static float getFloat(String path, JsonObject owner) throws CodecException {
+        Number n = get(path, owner, JsonElement::getAsNumber, null);
+        if (n == null) {
+            throw CodecException.of("Missing float entry value for %s", path);
+        }
+        return n.floatValue();
+    }
+
+    public static boolean getBool(String path, JsonObject owner) throws CodecException {
+        if (owner.has(path)) {
+            return getBool(path, owner, false);
+        }
+        throw CodecException.of("Missing boolean entry value for %s", path);
+    }
 
     public static String getString(String path, JsonObject owner, String def) {
         return get(path, owner, JsonElement::getAsString, def);

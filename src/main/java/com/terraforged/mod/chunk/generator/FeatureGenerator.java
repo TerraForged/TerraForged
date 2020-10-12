@@ -86,7 +86,7 @@ public class FeatureGenerator implements Generator.Features {
         reader.iterate(context, (cell, dx, dz, ctx) -> {
             int px = ctx.blockX + dx;
             int pz = ctx.blockZ + dz;
-            int py = ctx.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE, dx, dz);
+            int py = ctx.chunk.getTopBlockY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, dx, dz);
             ctx.cell = cell;
             ctx.biome = container.getBiome(dx, dz);
             for (ColumnDecorator decorator : decorators) {

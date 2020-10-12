@@ -28,7 +28,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.terraforged.fm.util.codec.Codecs;
-import com.terraforged.fm.util.codec.EncodingException;
+import com.terraforged.fm.util.codec.CodecException;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -146,24 +146,23 @@ public class CodecRegistry<E extends IForgeRegistryEntry<E>> implements IForgeRe
     }
 
     private <T> E decode(Dynamic<T> dynamic) {
-        String value = dynamic.getOps().getStringValue(dynamic.getValue()).result().orElseThrow(EncodingException::new);
+        String value = dynamic.getOps().getStringValue(dynamic.getValue()).result().orElseThrow(CodecException.get("Missing registry key"));
         try {
             ResourceLocation name = new ResourceLocation(value);
             E e = delegate.getValue(name);
             if (e == null) {
-                throw new EncodingException();
+                throw CodecException.of("Missing registry entry for %s", name);
             }
             return e;
         } catch (Throwable t) {
-            t.printStackTrace();
-            throw new EncodingException();
+            throw CodecException.of(t, "Exception parsing %s", value);
         }
     }
 
     private <T> Dynamic<T> encode(E e, DynamicOps<T> ops) {
         ResourceLocation name = delegate.getKey(e);
         if (name == null) {
-            throw new EncodingException();
+            throw CodecException.of("Missing registry key for %s", e);
         }
         return new Dynamic<>(ops, ops.createString(name.toString()));
     }

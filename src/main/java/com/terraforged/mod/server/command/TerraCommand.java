@@ -34,6 +34,7 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
+import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.data.DataGen;
@@ -63,6 +64,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -277,13 +279,11 @@ public class TerraCommand {
     }
 
     private static Optional<TerraContext> getContext(CommandContext<CommandSource> context) throws CommandSyntaxException {
-//        MinecraftServer server = context.getSource().getServer();
-//        DimensionType dimension = context.getSource().asPlayer().dimension;
-//        ChunkGenerator<?> generator = server.getWorld(dimension).getChunkProvider().getChunkGenerator();
-//        if (generator instanceof TerraChunkGenerator) {
-//            TerraChunkGenerator gen = (TerraChunkGenerator) generator;
-//            return Optional.of(gen.getContext());
-//        }
+        ChunkGenerator generator = context.getSource().getWorld().getChunkProvider().getChunkGenerator();
+        if (generator instanceof TerraChunkGenerator) {
+            TerraChunkGenerator gen = (TerraChunkGenerator) generator;
+            return Optional.of(gen.getContext());
+        }
         return Optional.empty();
     }
 

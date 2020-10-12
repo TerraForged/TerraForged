@@ -55,22 +55,25 @@ public class FreezeLayer extends Feature<NoFeatureConfig> {
         BlockPos.Mutable pos1 = new BlockPos.Mutable();
         BlockPos.Mutable pos2 = new BlockPos.Mutable();
 
-        for(int dx = 0; dx < 16; ++dx) {
-            for(int dz = 0; dz < 16; ++dz) {
+        for(int dx = -16; dx < 32; ++dx) {
+            for(int dz = -16; dz < 32; ++dz) {
                 int x = pos.getX() + dx;
                 int z = pos.getZ() + dz;
-                int y1 = world.getHeight(Heightmap.Type.MOTION_BLOCKING, x, z);
-                int y2 = world.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, x, z);
-                pos1.setPos(x, y1, z);
+                int leavesY = world.getHeight(Heightmap.Type.MOTION_BLOCKING, x, z);
+                int groundY = world.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, x, z);
+
+                pos1.setPos(x, leavesY, z);
                 pos2.setPos(pos1).move(Direction.DOWN, 1);
-
                 Biome biome = world.getBiome(pos1);
-                boolean freezesHere = freeze(world, biome, pos1, pos2, false, false);
 
-                if (y1 != y2) {
-                    pos1.setPos(x, y2, z);
+                if (leavesY > groundY) {
+                    freezeLeaves(world, biome, pos1, pos2);
+                }
+
+                if (dx > -1 && dx < 16 && dz > -1 && dz < 16) {
+                    pos1.setPos(x, groundY, z);
                     pos2.setPos(pos1).move(Direction.DOWN, 1);
-                    freeze(world, biome, pos1, pos2, freezesHere, true);
+                    freezeGround(world, biome, pos1, pos2);
                 }
             }
         }
@@ -78,43 +81,45 @@ public class FreezeLayer extends Feature<NoFeatureConfig> {
         return true;
     }
 
-    private boolean freeze(IWorld world, Biome biome, BlockPos.Mutable top, BlockPos below, boolean force, boolean ground) {
-        boolean hasFrozen = false;
+    private void freezeLeaves(IWorld world, Biome biome, BlockPos.Mutable pos, BlockPos.Mutable below) {
+        if (biome.doesSnowGenerate(world, pos)) {
+            BlockState stateUnder = world.getBlockState(below);
+            if (stateUnder.getBlock() == Blocks.AIR) {
+                return;
+            }
+            setSnow(world, pos, below, stateUnder);
+        }
+    }
+
+    private void freezeGround(IWorld world, Biome biome, BlockPos.Mutable pos, BlockPos.Mutable below) {
         if (biome.doesWaterFreeze(world, below, false)) {
             world.setBlockState(below, Blocks.ICE.getDefaultState(), 2);
-            hasFrozen = true;
         }
 
-        if (force || biome.doesSnowGenerate(world, top)) {
-            hasFrozen = true;
+        if (biome.doesSnowGenerate(world, pos)) {
             BlockState stateUnder = world.getBlockState(below);
 
             if (stateUnder.getBlock() == Blocks.AIR) {
-                return false;
+                return;
             }
 
-            if (ground) {
-                if (BlockTags.LOGS.contains(stateUnder.getBlock())) {
-                    return false;
-                }
+            if (BlockTags.LOGS.contains(stateUnder.getBlock())) {
+                return;
+            }
 
-                top.move(Direction.UP, 1);
-                BlockState above = world.getBlockState(top);
-                if (BlockTags.LOGS.contains(above.getBlock()) || BlockTags.LEAVES.contains(above.getBlock())) {
-                    return false;
-                }
+            pos.move(Direction.UP, 1);
+            BlockState above = world.getBlockState(pos);
+            if (BlockTags.LOGS.contains(above.getBlock()) || BlockTags.LEAVES.contains(above.getBlock())) {
+                return;
+            }
 
-                top.move(Direction.DOWN, 1);
-                if (setSnow(world, top, below, stateUnder)) {
-                    if (above.getBlock() != Blocks.AIR) {
-                        world.setBlockState(top, Blocks.AIR.getDefaultState(), 2);
-                    }
+            pos.move(Direction.DOWN, 1);
+            if (setSnow(world, pos, below, stateUnder)) {
+                if (above.getBlock() != Blocks.AIR) {
+                    world.setBlockState(pos, Blocks.AIR.getDefaultState(), 2);
                 }
-            } else {
-                setSnow(world, top, below, stateUnder);
             }
         }
-        return hasFrozen;
     }
 
     private boolean setSnow(IWorld world, BlockPos pos1, BlockPos pos2, BlockState below) {

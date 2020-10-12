@@ -31,7 +31,7 @@ import com.mojang.serialization.ListBuilder;
 import com.mojang.serialization.RecordBuilder;
 import com.terraforged.core.serialization.serializer.AbstractWriter;
 import com.terraforged.core.serialization.serializer.Serializer;
-import com.terraforged.fm.util.codec.EncodingException;
+import com.terraforged.fm.util.codec.CodecException;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.NBTDynamicOps;
 
@@ -120,7 +120,7 @@ public class DynamicWriter<T> extends AbstractWriter<T, RecordBuilder<T>, ListBu
         try {
             Serializer.serialize(value, writer, metaData);
         } catch (IllegalAccessException e) {
-            throw new EncodingException();
+            throw CodecException.of(e, "Failed to serialize value %s", value);
         }
         return writer.get();
     }

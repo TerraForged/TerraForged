@@ -1,9 +1,0 @@
-{
-  "match": [
-    "minecraft:gravel",
-    "minecraft:disk"
-  ],
-  "transform": {
-    "minecraft:disk": "terraforged:disk"
-  }
-}

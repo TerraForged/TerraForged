@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class FeatureIdentity {
+public class FeatureIdentity implements Identity {
 
     public static final FeatureIdentity NONE = new FeatureIdentity(Collections.emptyList());
 
@@ -75,6 +75,7 @@ public class FeatureIdentity {
         return ownerString.get();
     }
 
+    @Override
     public String getIdentity() {
         return identityString.get();
     }

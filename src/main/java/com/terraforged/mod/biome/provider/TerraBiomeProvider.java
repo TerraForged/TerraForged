@@ -38,6 +38,8 @@ import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.modifier.BiomeModifierManager;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
+import com.terraforged.mod.chunk.settings.preset.Preset;
+import com.terraforged.mod.chunk.settings.preset.PresetManager;
 import com.terraforged.mod.util.setup.SetupHooks;
 import com.terraforged.world.heightmap.WorldLookup;
 import com.terraforged.world.terrain.Terrains;
@@ -215,7 +217,9 @@ public class TerraBiomeProvider extends BiomeProvider {
     }
 
     public static TerraBiomeProvider create(long seed, Registry<Biome> registry) {
-        TerraSettings settings = new TerraSettings();
+        TerraSettings settings = PresetManager.load().get("JustAddBiomes")
+                .map(Preset::getSettings)
+                .orElseGet(TerraSettings::new);
         settings.world.seed = seed;
         Terrains terrains = Terrains.create(settings);
         GameContext gameContext = new GameContext(registry);

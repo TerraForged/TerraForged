@@ -59,15 +59,11 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
 
     @Override
     public JsonElement toJson(GameContext context) {
-        if (rules.size() == 1) {
-            return rules.get(0).toJson();
-        } else {
-            JsonArray rules = new JsonArray();
-            for (Rule rule : this.rules) {
-                rules.add(rule.toJson());
-            }
-            return rules;
+        JsonArray rules = new JsonArray();
+        for (Rule rule : this.rules) {
+            rules.add(rule.toJson());
         }
+        return rules;
     }
 
     @Override

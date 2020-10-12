@@ -84,10 +84,11 @@ public class FeatureParser {
         for (Map.Entry<String, JsonElement> e : element.getAsJsonObject().entrySet()) {
             if (e.getValue().isJsonPrimitive()) {
                 JsonPrimitive key = keyToPrimitive(e.getKey(), e.getValue().getAsJsonPrimitive());
-                if (key == null) {
-                    return Optional.empty();
+                if (key != null) {
+                    builder.value(key, e.getValue().getAsJsonPrimitive());
+                } else {
+                    builder.key(e.getKey(), e.getValue());
                 }
-                builder.value(key, e.getValue().getAsJsonPrimitive());
             } else {
                 builder.key(e.getKey(), e.getValue());
             }
@@ -100,10 +101,17 @@ public class FeatureParser {
             return new JsonPrimitive(key);
         }
         if (value.isNumber()) {
-            return new JsonPrimitive(new JsonPrimitive(key).getAsNumber());
+            try {
+                Double.parseDouble(key);
+                return new JsonPrimitive(new JsonPrimitive(key).getAsNumber());
+            } catch (NumberFormatException e) {
+                return null;
+            }
         }
         if (value.isBoolean()) {
-            return new JsonPrimitive(new JsonPrimitive(key).getAsBoolean());
+            if (key.equalsIgnoreCase("true") || key.equalsIgnoreCase("false")) {
+                return new JsonPrimitive(new JsonPrimitive(key).getAsBoolean());
+            }
         }
         return null;
     }

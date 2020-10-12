@@ -35,7 +35,6 @@ import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.OptionalDynamic;
 import com.terraforged.fm.FeatureManager;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -52,11 +51,11 @@ public class Codecs {
     }
 
     public static <V, T> V decodeAndGet(Codec<V> codec, OptionalDynamic<T> dynamic) {
-        return dynamic.result().flatMap(d -> decode(codec, d)).orElseThrow(EncodingException::new);
+        return dynamic.result().flatMap(d -> decode(codec, d)).orElseThrow(CodecException.SUPPLIER);
     }
 
     public static <V, T> V decodeAndGet(Codec<V> codec, Dynamic<T> dynamic) {
-        return decode(codec, dynamic).orElseThrow(EncodingException::new);
+        return decode(codec, dynamic).orElseThrow(CodecException.SUPPLIER);
     }
 
     public static <V, T> Optional<V> decode(Codec<V> codec, OptionalDynamic<T> dynamic) {
@@ -69,7 +68,7 @@ public class Codecs {
 
     public static <V, T> Optional<V> decode(Codec<V> codec, T input, DynamicOps<T> ops) {
         Preconditions.checkNotNull(input);
-        return checkError(codec.decode(ops, input)).result().map(Pair::getFirst);
+        return getResult(codec.decode(ops, input)).map(Pair::getFirst);
     }
 
     public static <V> Optional<V> decode(Codec<V> codec, JsonElement element) {
@@ -83,22 +82,30 @@ public class Codecs {
 
     public static <V, T> T encodeAndGet(Codec<V> codec, V value, DynamicOps<T> ops) {
         Preconditions.checkNotNull(value);
-        return checkError(codec.encodeStart(ops, value)).result().orElseThrow(EncodingException::new);
+        return getOrThrow(codec.encodeStart(ops, value));
     }
 
     public static <V> JsonElement encode(Codec<V> codec, V value) {
         Preconditions.checkNotNull(value);
-        return checkError(encode(codec, value, JsonOps.INSTANCE)).result().orElse(JsonNull.INSTANCE);
+        return getResult(encode(codec, value, JsonOps.INSTANCE)).orElse(JsonNull.INSTANCE);
     }
 
     public static <V, T> T createList(Codec<V> codec, DynamicOps<T> ops, List<V> list) {
-        return codec.listOf().encodeStart(ops, list).result().orElse(ops.createList(Stream.empty()));
+        return getResult(codec.listOf().encodeStart(ops, list)).orElseGet(() -> ops.createList(Stream.empty()));
     }
 
-    public static <T> DataResult<T> checkError(DataResult<T> result) {
+    public static <T> Optional<T> getResult(DataResult<T> result) {
         if (result.error().isPresent()) {
             FeatureManager.LOG.error(MARKER, result.error().get().message());
         }
-        return result;
+        return result.result();
+    }
+
+    public static <T> T getOrThrow(DataResult<T> result) {
+        String error = null;
+        if (result.error().isPresent()) {
+            error = result.error().get().message();
+        }
+        return result.result().orElseThrow(CodecException.get(error));
     }
 }

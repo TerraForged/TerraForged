@@ -32,14 +32,13 @@ import com.terraforged.fm.GameContext;
 import com.terraforged.fm.matcher.feature.FeatureMatcher;
 import com.terraforged.fm.modifier.Jsonifiable;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 public class FeatureTransformer implements Function<JsonElement, JsonElement>, Jsonifiable {
 
     public static final FeatureTransformer NONE = FeatureTransformer.builder().build();
+    private static final ThreadLocal<Context> LOCAL_CONTEXT = ThreadLocal.withInitial(Context::new);
 
     private final boolean hasTransformations;
     private final Map<String, JsonElement> keyTransformers;
@@ -72,47 +71,62 @@ public class FeatureTransformer implements Function<JsonElement, JsonElement>, J
 
     @Override
     public JsonElement apply(JsonElement element) {
+        Context context = LOCAL_CONTEXT.get().init(keyTransformers.size() + valueTransformers.size());
+        JsonElement json = transform(element, context);
+        if (context.isComplete()) {
+            return json;
+        }
+        return element;
+    }
+
+    private JsonElement transform(JsonElement element, Context context) {
         if (hasTransformations) {
             if (element.isJsonArray()) {
-                return transformArray(element.getAsJsonArray());
+                return transformArray(element.getAsJsonArray(), context);
             }
             if (element.isJsonObject()) {
-                return transformObject(element.getAsJsonObject());
+                return transformObject(element.getAsJsonObject(), context);
             }
             if (element.isJsonPrimitive()) {
-                return transformValue(element.getAsJsonPrimitive());
+                return transformValue(element.getAsJsonPrimitive(), context);
             }
         }
         return element;
     }
 
-    private JsonPrimitive transformValue(JsonPrimitive primitive) {
-        return valueTransformers.getOrDefault(primitive, primitive);
+    private JsonPrimitive transformValue(JsonPrimitive primitive, Context context) {
+        JsonPrimitive result = valueTransformers.get(primitive);
+        if (result != null) {
+            context.add(primitive);
+            return result;
+        }
+        return primitive;
     }
 
-    private JsonArray transformArray(JsonArray source) {
+    private JsonArray transformArray(JsonArray source, Context context) {
         JsonArray dest = new JsonArray();
         for (JsonElement element : source) {
-            dest.add(apply(element));
+            dest.add(transform(element, context));
         }
         return dest;
     }
 
-    private JsonObject transformObject(JsonObject source) {
+    private JsonObject transformObject(JsonObject source, Context context) {
         JsonObject dest = new JsonObject();
         for (Map.Entry<String, JsonElement> entry : source.entrySet()) {
-            JsonElement result = transformEntry(entry.getKey(), entry.getValue());
+            JsonElement result = transformEntry(entry.getKey(), entry.getValue(), context);
             dest.add(entry.getKey(), result);
         }
         return dest;
     }
 
-    private JsonElement transformEntry(String key, JsonElement value) {
+    private JsonElement transformEntry(String key, JsonElement value, Context context) {
         JsonElement keyResult = keyTransformers.get(key);
         if (keyResult != null) {
+            context.add(key);
             return keyResult;
         }
-        return apply(value);
+        return transform(value, context);
     }
 
     public static Builder builder() {
@@ -130,6 +144,26 @@ public class FeatureTransformer implements Function<JsonElement, JsonElement>, J
             return builder().value(f.getAsJsonPrimitive(), r.getAsJsonPrimitive()).build();
         }
         return NONE;
+    }
+
+    private static class Context {
+
+        private int size;
+        private final Set<Object> visited = new HashSet<>();
+
+        private Context init(int size) {
+            this.size = size;
+            visited.clear();
+            return this;
+        }
+
+        private void add(Object o) {
+            visited.add(o);
+        }
+
+        private boolean isComplete() {
+            return visited.size() == size;
+        }
     }
 
     public static class Builder {
