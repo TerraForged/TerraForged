@@ -25,7 +25,6 @@
 package com.terraforged.mod.biome.map;
 
 import com.terraforged.fm.GameContext;
-import com.terraforged.mod.biome.map.defaults.BiomeTemps;
 import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.mod.biome.utils.TempCategory;
 import com.terraforged.world.biome.BiomeType;
@@ -33,11 +32,7 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 public class BiomeMapBuilder implements BiomeMap.Builder {

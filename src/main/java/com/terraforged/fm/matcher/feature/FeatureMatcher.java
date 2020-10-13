@@ -33,11 +33,7 @@ import com.terraforged.fm.modifier.Jsonifiable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {

@@ -38,7 +38,6 @@ import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.data.DataGen;
-import com.terraforged.mod.server.command.arg.BiomeArgType;
 import com.terraforged.mod.server.command.arg.TerrainArgType;
 import com.terraforged.mod.server.command.search.BiomeSearchTask;
 import com.terraforged.mod.server.command.search.BothSearchTask;
@@ -51,29 +50,28 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.ArgumentSerializer;
 import net.minecraft.command.arguments.ArgumentTypes;
+import net.minecraft.command.arguments.ResourceLocationArgument;
+import net.minecraft.command.arguments.SuggestionProviders;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.Color;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponentUtils;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.text.*;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
+import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -83,7 +81,6 @@ import java.util.function.Supplier;
 public class TerraCommand {
 
     public static void init() {
-        ArgumentTypes.register("terraforged:biome", BiomeArgType.class, new ArgumentSerializer<>(BiomeArgType::new));
         ArgumentTypes.register("terraforged:terrain", TerrainArgType.class, new ArgumentSerializer<>(TerrainArgType::new));
     }
 
@@ -112,13 +109,15 @@ public class TerraCommand {
                         .executes(TerraCommand::debugBiome))
                 .then(Commands.literal("locate")
                         .then(Commands.literal("biome")
-                                .then(Commands.argument("biome", BiomeArgType.biome())
+                                .then(Commands.argument("biome", ResourceLocationArgument.resourceLocation())
+                                        .suggests(SuggestionProviders.field_239574_d_)
                                         .executes(TerraCommand::findBiome)))
                         .then(Commands.literal("terrain")
                                 .then(Commands.argument("terrain", TerrainArgType.terrain())
                                         .executes(TerraCommand::findTerrain)))
                         .then(Commands.literal("both")
-                                .then(Commands.argument("biome", BiomeArgType.biome())
+                                .then(Commands.argument("biome", ResourceLocationArgument.resourceLocation())
+                                        .suggests(SuggestionProviders.field_239574_d_)
                                         .then(Commands.argument("terrain", TerrainArgType.terrain())
                                                 .executes(TerraCommand::findTerrainAndBiome)))));
     }
@@ -136,7 +135,7 @@ public class TerraCommand {
             context.getSource().sendFeedback(
                     new StringTextComponent(
                             "Terrain=" + cell.get().terrain.getName()
-                                    + ", Biome=" + biome
+                                    + ", Biome=" + getBiomeName(context, biome)
                                     + ", BiomeType=" + cell.get().biomeType.name()
                     ),
                     false
@@ -182,12 +181,13 @@ public class TerraCommand {
         int z = position.getZ();
 
         long seed = player.getServerWorld().getSeed();
+        BiomeProvider biomeProvider = player.getServerWorld().getChunkProvider().generator.getBiomeProvider();
         Biome actual = player.getServerWorld().getBiome(position);
-        Biome biome2 = ColumnFuzzedBiomeMagnifier.INSTANCE.getBiome(seed, x, 0, z, player.getServerWorld().getWorldServer().getChunkProvider().generator.getBiomeProvider());
+        Biome biome = ColumnFuzzedBiomeMagnifier.INSTANCE.getBiome(seed, x, 0, z, biomeProvider);
 
         context.getSource().sendFeedback(new StringTextComponent(
-                        "Actual Biome = " + actual
-                                + "\nLookup Biome = " + biome2),
+                        "Actual Biome = " + getBiomeName(context, actual)
+                                + "\nLookup Biome = " + getBiomeName(context, biome)),
                 false
         );
 
@@ -221,7 +221,7 @@ public class TerraCommand {
                 "This command can only be run in a TerraForged world!"
         ));
 
-        Biome biome = BiomeArgType.getBiome(context, "biome");
+        Biome biome = getBiome(context, "biome");
         BlockPos pos = context.getSource().asPlayer().getPosition();
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
@@ -242,7 +242,7 @@ public class TerraCommand {
 
         Terrain terrain = TerrainArgType.getTerrain(context, "terrain");
         Terrain target = getTerrainInstance(terrain, terraContext.terrain);
-        Biome biome = BiomeArgType.getBiome(context, "biome");
+        Biome biome = getBiome(context, "biome");
         BlockPos pos = context.getSource().asPlayer().getPosition();
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
@@ -285,6 +285,21 @@ public class TerraCommand {
             return Optional.of(gen.getContext());
         }
         return Optional.empty();
+    }
+
+    private static Biome getBiome(CommandContext<CommandSource> context, String name) throws CommandSyntaxException {
+        ResourceLocation location = ResourceLocationArgument.getResourceLocation(context, name);
+        return context.getSource().getServer().func_244267_aX().func_230521_a_(Registry.BIOME_KEY)
+                .flatMap(registry -> registry.func_241873_b(location))
+                .orElseThrow(() -> createException("biome", "Unrecognized biome %s", location));
+    }
+
+    private static String getBiomeName(CommandContext<CommandSource> context, Biome biome) {
+        return context.getSource().getServer().func_244267_aX()
+                .func_230521_a_(Registry.BIOME_KEY)
+                .map(r -> r.getKey(biome))
+                .map(Objects::toString)
+                .orElse("unknown");
     }
 
     // the terrain parsed from the command will not be the same instance as used in the

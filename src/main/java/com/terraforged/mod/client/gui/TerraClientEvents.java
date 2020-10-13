@@ -38,5 +38,6 @@ public class TerraClientEvents {
     @SubscribeEvent
     public static void setup(FMLClientSetupEvent event) {
         ClientLevelManager.register(TerraForgedLevel.NAME, SettingsScreen::create);
+        ClientLevelManager.setDefault(TerraForgedLevel.NAME);
     }
 }

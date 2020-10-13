@@ -34,24 +34,14 @@ import com.terraforged.mod.biome.utils.TempCategory;
 import com.terraforged.n2d.util.Vec2f;
 import com.terraforged.world.biome.BiomeData;
 import com.terraforged.world.biome.BiomeType;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeGenerationSettings;
 import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.biome.provider.BiomeProvider;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
 import net.minecraft.world.gen.surfacebuilders.ISurfaceBuilderConfig;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 public class BiomeHelper {

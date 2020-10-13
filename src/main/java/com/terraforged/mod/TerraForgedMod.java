@@ -39,7 +39,6 @@ import com.terraforged.mod.feature.feature.BushFeature;
 import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.mod.feature.feature.FreezeLayer;
 import com.terraforged.mod.server.command.TerraCommand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.placement.Placement;

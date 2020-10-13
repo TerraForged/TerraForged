@@ -26,7 +26,6 @@ package com.terraforged.fm.template.type.tree;
 
 import com.terraforged.fm.template.BlockUtils;
 import com.terraforged.fm.template.feature.Placement;
-import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;

@@ -28,7 +28,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.terraforged.fm.util.codec.CodecException;
 
-import java.io.IOException;
 import java.util.function.Function;
 
 public class Json {

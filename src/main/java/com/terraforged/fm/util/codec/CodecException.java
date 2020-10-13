@@ -24,8 +24,6 @@
 
 package com.terraforged.fm.util.codec;
 
-import com.google.common.base.Suppliers;
-
 import java.util.function.Supplier;
 
 public class CodecException extends RuntimeException {

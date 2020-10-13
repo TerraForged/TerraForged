@@ -25,16 +25,15 @@
 package com.terraforged.mod.client.gui.config;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.TerraDimGenSettings;
-import com.terraforged.mod.client.gui.element.TerraLabel;
-import com.terraforged.mod.client.gui.page.Page;
 import com.terraforged.mod.client.gui.config.page.PresetsPage;
-import com.terraforged.mod.client.gui.page.SimplePage;
 import com.terraforged.mod.client.gui.config.page.SimplePreviewPage;
 import com.terraforged.mod.client.gui.config.page.WorldPage;
 import com.terraforged.mod.client.gui.config.preview.PreviewPage;
+import com.terraforged.mod.client.gui.element.TerraLabel;
+import com.terraforged.mod.client.gui.page.Page;
+import com.terraforged.mod.client.gui.page.SimplePage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.CreateWorldScreen;

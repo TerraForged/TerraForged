@@ -25,7 +25,6 @@
 package com.terraforged.mod.feature.decorator.poisson;
 
 import com.terraforged.core.util.poisson.Poisson;
-import com.terraforged.mod.util.stream.PosStream;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;

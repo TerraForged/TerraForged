@@ -32,9 +32,7 @@ import com.terraforged.fm.util.codec.Codecs;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryLookupCodec;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.DimensionSettings;
 
 public class GameContext {
 

@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.chunk.profiler;
 
-import com.terraforged.core.concurrent.cache.map.StampedLockLongMap;
 import com.terraforged.core.concurrent.cache.map.LongMap;
+import com.terraforged.core.concurrent.cache.map.StampedLockLongMap;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.util.Environment;
 import com.terraforged.mod.util.StringUtils;

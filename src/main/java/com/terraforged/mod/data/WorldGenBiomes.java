@@ -32,11 +32,7 @@ import com.terraforged.mod.biome.provider.BiomeWeights;
 import com.terraforged.world.biome.BiomeType;
 import net.minecraft.util.ResourceLocation;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 
 public class WorldGenBiomes extends DataGen {
 

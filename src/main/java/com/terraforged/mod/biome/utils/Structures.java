@@ -25,17 +25,8 @@
 package com.terraforged.mod.biome.utils;
 
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.feature.IFeatureConfig;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
-import net.minecraft.world.gen.feature.ProbabilityConfig;
-import net.minecraft.world.gen.feature.RuinedPortalFeature;
-import net.minecraft.world.gen.feature.StructureFeature;
-import net.minecraft.world.gen.feature.structure.MineshaftConfig;
-import net.minecraft.world.gen.feature.structure.OceanRuinConfig;
-import net.minecraft.world.gen.feature.structure.ShipwreckConfig;
-import net.minecraft.world.gen.feature.structure.Structure;
-import net.minecraft.world.gen.feature.structure.SwampHutStructure;
-import net.minecraft.world.gen.feature.structure.VillageConfig;
+import net.minecraft.world.gen.feature.*;
+import net.minecraft.world.gen.feature.structure.*;
 
 import java.util.Optional;
 import java.util.function.Supplier;

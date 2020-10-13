@@ -2,9 +2,12 @@
   "required": true,
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
-  "package": "com.terraforged.mod.mixin",
+  "package": "com.terraforged.mixin",
   "refmap": "mixin.terraforged.refmap.json",
   "mixins": [
-    "MixinDimensionGeneratorSettings"
+    "common.MixinDimensionGeneratorSettings"
+  ],
+  "client": [
+    "client.MixinWorldOptionsScreen"
   ]
 }

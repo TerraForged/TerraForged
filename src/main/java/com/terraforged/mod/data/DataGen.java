@@ -30,11 +30,7 @@ import com.terraforged.fm.GameContext;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.DynamicRegistries;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 
 public class DataGen {
 

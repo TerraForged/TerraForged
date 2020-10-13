@@ -61,9 +61,13 @@ import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.*;
+import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.world.gen.settings.StructureSeparationSettings;
+import net.minecraft.world.server.ServerWorld;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
@@ -197,6 +201,21 @@ public class TerraChunkGenerator extends ChunkGenerator {
         }
 
         return column;
+    }
+
+    @Nullable // findStructure
+    public BlockPos func_235956_a_(ServerWorld world, Structure<?> structure, BlockPos pos, int attempts, boolean flag) {
+        if (!this.biomeProvider.hasStructure(structure)) {
+            return null;
+        }
+        if (structure == Structure.field_236375_k_) {
+            return super.func_235956_a_(world, structure, pos, attempts, flag);
+        }
+        StructureSeparationSettings settings = this.settings.getStructures().func_236197_a_(structure);
+        if (settings == null) {
+            return null;
+        }
+        return StructureGenerator.findStructure(this, world, world.func_241112_a_(), structure, pos, attempts, flag, settings);
     }
 
     @Override

@@ -30,7 +30,6 @@ import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
-import com.terraforged.mod.chunk.util.FastChunk;
 import com.terraforged.mod.chunk.util.TerraContainer;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.world.chunk.IChunk;

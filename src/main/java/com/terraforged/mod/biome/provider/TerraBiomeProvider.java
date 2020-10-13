@@ -156,6 +156,7 @@ public class TerraBiomeProvider extends BiomeProvider {
                     int x = biomeX << 2;
                     int z = biomeZ << 2;
 
+                    getWorldLookup().applyCell(cell, x, z);
                     if (biomes.test(getBiome(cell, x, z))) {
                         if (centerOutSearch) {
                             return new BlockPos(x, centerY, z);
@@ -184,6 +185,11 @@ public class TerraBiomeProvider extends BiomeProvider {
         try (Resource<Cell> resource = getWorldLookup().getCell(x, z, true)) {
             return getBiome(resource.get(), x, z);
         }
+    }
+
+    public Biome lookupBiome(Cell cell, int x, int z) {
+        getWorldLookup().getCell(x, z, true);
+        return getBiome(cell, x, z);
     }
 
     public Biome getSurfaceBiome(int x, int z, BiomeManager.IBiomeReader reader) {

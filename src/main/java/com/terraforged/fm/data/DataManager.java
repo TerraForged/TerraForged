@@ -27,20 +27,10 @@ package com.terraforged.fm.data;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.terraforged.fm.FeatureManager;
-import net.minecraft.resources.IResource;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.resources.ResourcePackInfo;
-import net.minecraft.resources.ResourcePackList;
-import net.minecraft.resources.ResourcePackType;
-import net.minecraft.resources.SimpleReloadableResourceManager;
+import net.minecraft.resources.*;
 import net.minecraft.util.ResourceLocation;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.function.Predicate;
 
 public class DataManager implements AutoCloseable {

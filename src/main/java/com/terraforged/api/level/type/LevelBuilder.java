@@ -25,7 +25,6 @@
 package com.terraforged.api.level.type;
 
 import com.mojang.serialization.Lifecycle;
-import com.terraforged.api.level.type.LevelType;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.SimpleRegistry;

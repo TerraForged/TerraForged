@@ -31,22 +31,12 @@ import com.terraforged.core.concurrent.Resource;
 import com.terraforged.mod.util.DummyBlockReader;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
-import net.minecraft.block.AirBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.GrassBlock;
-import net.minecraft.block.MyceliumBlock;
-import net.minecraft.block.SnowBlock;
+import net.minecraft.block.*;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Materials {
 

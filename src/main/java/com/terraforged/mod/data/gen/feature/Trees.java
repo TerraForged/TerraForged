@@ -44,7 +44,6 @@ import com.terraforged.mod.feature.decorator.poisson.PoissonConfig;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.WorldGenRegistries;
-import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.placement.AtSurfaceWithExtraConfig;
 import net.minecraft.world.gen.placement.ChanceConfig;

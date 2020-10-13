@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.mixin;
+package com.terraforged.mixin.common;
 
 import com.terraforged.api.level.LevelHelper;
 import net.minecraft.util.registry.DynamicRegistries;

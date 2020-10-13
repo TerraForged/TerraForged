@@ -34,15 +34,31 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientLevelManager {
 
+    private static final AtomicReference<ResourceLocation> DEFAULT = new AtomicReference<>();
+    private static final Map<ResourceLocation, LevelOption> options = new ConcurrentHashMap<>();
     private static final Map<ResourceLocation, BiomeGeneratorTypeScreens.IFactory> screens = new ConcurrentHashMap<>();
 
     public static void register(ResourceLocation name, BiomeGeneratorTypeScreens.IFactory factory) {
         screens.put(name, factory);
+    }
+
+    public static void setDefault(ResourceLocation levelType) {
+        DEFAULT.set(levelType);
+    }
+
+    public static Optional<BiomeGeneratorTypeScreens> getDefault() {
+        ResourceLocation levelType = DEFAULT.get();
+        if (levelType == null) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(options.get(levelType));
     }
 
     @SubscribeEvent
@@ -52,6 +68,7 @@ public class ClientLevelManager {
                 BiomeGeneratorTypeScreens.IFactory editScreen = screens.get(levelType.getRegistryName());
                 LevelOption option = new LevelOption(levelType, editScreen);
                 LevelOption.register(option);
+                options.put(levelType.getRegistryName(), option);
             }
         });
     }

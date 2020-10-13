@@ -41,12 +41,8 @@ import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.surfacebuilders.ISurfaceBuilderConfig;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class DesertBiomes {
 

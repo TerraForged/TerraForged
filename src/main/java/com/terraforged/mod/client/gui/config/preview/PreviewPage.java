@@ -28,8 +28,8 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.config.OverlayScreen;
-import com.terraforged.mod.client.gui.element.TerraButton;
 import com.terraforged.mod.client.gui.config.page.UpdatablePage;
+import com.terraforged.mod.client.gui.element.TerraButton;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
 

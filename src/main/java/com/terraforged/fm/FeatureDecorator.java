@@ -26,7 +26,6 @@ package com.terraforged.fm;
 
 import com.terraforged.fm.biome.BiomeFeature;
 import com.terraforged.fm.biome.BiomeFeatures;
-import com.terraforged.fm.util.identity.FeatureIdentity;
 import com.terraforged.fm.util.identity.Identity;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;

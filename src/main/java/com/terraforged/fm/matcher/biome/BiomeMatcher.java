@@ -27,19 +27,15 @@ package com.terraforged.fm.matcher.biome;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
-import com.google.gson.JsonPrimitive;
 import com.terraforged.fm.GameContext;
 import com.terraforged.fm.modifier.Jsonifiable;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collector;
 
 public class BiomeMatcher implements Predicate<Biome>, Comparable<BiomeMatcher>, Jsonifiable {
 

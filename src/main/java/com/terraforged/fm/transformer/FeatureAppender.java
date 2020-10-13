@@ -28,7 +28,6 @@ import com.google.gson.JsonObject;
 import com.terraforged.fm.GameContext;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
-import org.lwjgl.system.CallbackI;
 
 public class FeatureAppender extends FeatureInjector {
 

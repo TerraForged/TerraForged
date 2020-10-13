@@ -38,7 +38,7 @@ public class ForestSurface implements Surface {
     private final Module noise;
 
     public ForestSurface(GeneratorContext context) {
-        noise = Source.simplex(context.seed.next(), 40, 2).warp(Source.RAND, context.seed.next(), 2, 1, 4);
+        noise = Source.simplex(context.seed.next(), 50, 2).warp(Source.RAND, context.seed.next(), 2, 1, 3);
     }
 
     @Override
@@ -51,8 +51,8 @@ public class ForestSurface implements Surface {
 
     private BlockState getMaterial(int x, int z) {
         float value = noise.getValue(x, z);
-        if (value > 0.6) {
-            if (value < 0.75) {
+        if (value > 0.65) {
+            if (value < 0.725) {
                 return States.PODZOL.get();
             }
             return States.DIRT.get();

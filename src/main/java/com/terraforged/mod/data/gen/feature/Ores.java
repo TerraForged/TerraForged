@@ -31,7 +31,6 @@ import com.terraforged.fm.transformer.FeatureTransformer;
 import net.minecraft.block.Blocks;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.Features;
 
 public class Ores {
 

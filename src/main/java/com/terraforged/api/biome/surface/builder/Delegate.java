@@ -29,7 +29,6 @@ import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.mod.biome.provider.BiomeHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
-import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
 
 import java.util.function.Function;
 

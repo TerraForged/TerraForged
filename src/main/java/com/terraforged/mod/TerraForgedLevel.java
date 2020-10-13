@@ -27,8 +27,6 @@ package com.terraforged.mod;
 import com.terraforged.api.level.type.AbstractLevelType;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
-import com.terraforged.mod.chunk.settings.preset.Preset;
-import com.terraforged.mod.chunk.settings.preset.PresetManager;
 import com.terraforged.mod.client.gui.TerraDimGenSettings;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;

@@ -24,14 +24,7 @@
 
 package com.terraforged.fm.util;
 
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.ConfiguredRandomFeatureList;
-import net.minecraft.world.gen.feature.DecoratedFeatureConfig;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.IFeatureConfig;
-import net.minecraft.world.gen.feature.MultipleRandomFeatureConfig;
-import net.minecraft.world.gen.feature.SingleRandomFeature;
-import net.minecraft.world.gen.feature.TwoFeatureChoiceConfig;
+import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.placement.ConfiguredPlacement;
 import net.minecraftforge.registries.ForgeRegistries;
 

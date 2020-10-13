@@ -25,8 +25,8 @@
 package com.terraforged.mod.client.gui.config;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.terraforged.mod.client.gui.element.Element;
 import com.terraforged.mod.client.gui.config.preview.Preview;
+import com.terraforged.mod.client.gui.element.Element;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
