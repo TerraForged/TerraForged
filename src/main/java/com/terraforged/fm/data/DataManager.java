@@ -28,9 +28,18 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.terraforged.fm.FeatureManager;
 import net.minecraft.resources.*;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.io.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class DataManager implements AutoCloseable {
@@ -67,6 +76,35 @@ public class DataManager implements AutoCloseable {
                 try (InputStream inputStream = resource.getInputStream()) {
                     consumer.accept(location, inputStream);
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public <T extends IForgeRegistryEntry<T>> void forEachTag(String type, List<ITag.INamedTag<T>> tags, IForgeRegistry<T> registry, BiConsumer<ITag<T>, Set<T>> setter) {
+        JsonParser parser = new JsonParser();
+        String tagPath = "tags/" + type + "/";
+
+        for (ITag.INamedTag<T> tag : tags) {
+            try {
+                Set<T> set = new HashSet<>();
+                ResourceLocation name = tag.getName();
+                String namespace = name.getNamespace();
+                String filepath = tagPath + name.getPath() + ".json";
+                ResourceLocation path = new ResourceLocation(namespace, filepath);
+
+                for (IResource resource : resourceManager.getAllResources(path)) {
+                    try (InputStream inputStream = resource.getInputStream()) {
+                        Reader reader = new BufferedReader(new InputStreamReader(inputStream));
+                        JsonElement element = parser.parse(reader);
+                        if (element.isJsonObject()) {
+                            TagLoader.loadTag(element.getAsJsonObject(), tag, registry, set);
+                        }
+                    }
+                }
+
+                setter.accept(tag, set);
             } catch (IOException e) {
                 e.printStackTrace();
             }

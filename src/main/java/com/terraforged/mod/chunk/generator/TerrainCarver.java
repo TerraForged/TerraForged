@@ -52,7 +52,7 @@ public class TerrainCarver implements Generator.Carvers {
 
     @Override
     public void carveTerrain(BiomeManager biomes, IChunk chunk, GenerationStage.Carving type) {
-        ChunkCarverFix carverChunk = new ChunkCarverFix(chunk, generator.getContext().materials);
+        ChunkCarverFix carverChunk = new ChunkCarverFix(chunk, generator.getMaterials());
 
         SharedSeedRandom random = new SharedSeedRandom();
         ChunkPos chunkpos = carverChunk.getPos();

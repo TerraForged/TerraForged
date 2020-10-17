@@ -65,8 +65,8 @@ public class DefaultBiomes {
 
     public static final DefaultBiome.Factory WETLAND = context -> new DefaultBiomeSelector(
             context.biomes.get(ModBiomes.COLD_MARSHLAND),
-            context.biomes.get(Biomes.SWAMP),
             context.biomes.get(ModBiomes.MARSHLAND),
+            context.biomes.get(Biomes.SWAMP),
             0.4F,
             1F
     ) {

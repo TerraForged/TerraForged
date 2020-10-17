@@ -55,9 +55,9 @@ public class GeoManager implements GeologyManager {
         this.selector = Source.cell(context.seed.next(), scale)
                 .warp(context.seed.next(), scale / 4, 2, scale / 2D)
                 .warp(context.seed.next(), 15, 2, 30);
-        this.builder = new GeoGenerator(context.materials);
+        this.materials = context.materials.get();
         this.general = new Geology<>(selector);
-        this.materials = context.materials;
+        this.builder = new GeoGenerator(materials);
         this.context = context.gameContext;
         init(context.seed);
     }

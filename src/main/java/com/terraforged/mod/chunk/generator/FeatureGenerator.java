@@ -29,6 +29,7 @@ import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionFix;
+import com.terraforged.mod.chunk.util.FastChunk;
 import com.terraforged.mod.chunk.util.TerraContainer;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.util.math.BlockPos;
@@ -59,7 +60,7 @@ public class FeatureGenerator implements Generator.Features {
         ChunkReader reader = generator.getChunkReader(chunkX, chunkZ);
         TerraContainer container = TerraContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
 
-        Biome biome = container.getFeatureBiome(reader);
+        Biome biome = container.getFeatureBiome();
         try (DecoratorContext context = generator.getContext().decorator(chunk)) {
             ISeedReader regionFix = new RegionFix(region, generator);
             BlockPos pos = new BlockPos(context.blockX, 0, context.blockZ);

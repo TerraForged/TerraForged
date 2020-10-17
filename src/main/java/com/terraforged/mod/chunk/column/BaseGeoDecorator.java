@@ -27,49 +27,40 @@ package com.terraforged.mod.chunk.column;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.material.state.States;
-import com.terraforged.core.util.VariablePredicate;
-import com.terraforged.mod.chunk.TerraContext;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.world.geology.Stratum;
 import net.minecraft.block.BlockState;
 import net.minecraft.world.chunk.IChunk;
 
-public class CoastDecorator implements ColumnDecorator {
+public class BaseGeoDecorator implements ColumnDecorator, Stratum.Visitor<BlockState, DecoratorContext> {
 
-    private final Terrains terrains;
-    private final BlockState sand;
-    private final BlockState gravel;
-    private final VariablePredicate height;
+    private final TerraChunkGenerator generator;
 
-    public CoastDecorator(TerraContext context) {
-        int min = context.levels.waterLevel - 5;
-        int max = context.levels.waterLevel + 16;
-        sand = States.SAND.get();
-        gravel = States.GRAVEL.get();
-        terrains = context.terrain;
-        height = VariablePredicate.height(
-                context.seed,
-                context.levels,
-                min,
-                max,
-                75,
-                1
-        );
+    public BaseGeoDecorator(TerraChunkGenerator generator) {
+        this.generator = generator;
     }
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        if (context.cell.terrain != terrains.beach) {
-            return;
+        if (context.cell.terrain == context.terrains.volcanoPipe && context.cell.riverMask > 0.5F) {
+            int lavaStart = Math.max(context.levels.waterY + 10, y - 30);
+            int lavaEnd = Math.max(5, context.levels.waterY - 10);
+            fillDown(context, chunk, x, z, lavaStart, lavaEnd, States.LAVA.get());
+            y = lavaEnd;
+        } else if (y < context.levels.waterLevel) {
+            fillDown(context, chunk, x, z, context.levels.waterY, y, States.WATER.get());
         }
 
-        if (!height.test(context.cell, x, z)) {
-            return;
-        }
+        context.pos.setPos(x, y, z);
+        generator.getGeologyManager().getGeology(context.biome)
+                .getStrata(x, z)
+                .downwards(x, y, z, context.depthBuffer.get(), context, this);
+    }
 
-        if (context.cell.temperature < 0.3F) {
-            setState(chunk, x, y, z, gravel, false);
-        } else {
-            setState(chunk, x, y, z, sand, false);
-        }
+    @Override
+    public boolean visit(int y, BlockState state, DecoratorContext context) {
+        context.pos.setY(y);
+        context.chunk.setBlockState(context.pos, state, false);
+        return true;
     }
 }

@@ -24,22 +24,36 @@
 
 package com.terraforged.mod.feature.decorator.poisson;
 
+import com.terraforged.api.feature.decorator.DecorationContext;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.cache.SafeCloseable;
 import com.terraforged.core.tile.chunk.ChunkReader;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
-import com.terraforged.n2d.util.NoiseUtil;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.util.math.ChunkPos;
 
-public class BiomeVariance implements Module {
+public class BiomeVariance implements Module, SafeCloseable {
 
-    public static float MIN_FADE = 0.05F;
+    public static final BiomeVariance NONE = new BiomeVariance(null, 0F) {
+        @Override
+        public float getValue(float x, float y) {
+            return NO_SPREAD;
+        }
 
-    private final ChunkReader chunk;
+        @Override
+        public void close() {
+
+        }
+    };
+
+    public static final float MIN_FADE = 0.025F;
+    public static final float NO_SPREAD = 1F;
+    private static final float SPREAD_VARIANCE = 1F;
+    private static final float MAX_SPREAD = NO_SPREAD + SPREAD_VARIANCE;
+
     private final float fade;
     private final float range;
+    private final ChunkReader chunk;
 
     public BiomeVariance(ChunkReader chunk, float fade) {
         this.chunk = chunk;
@@ -50,11 +64,34 @@ public class BiomeVariance implements Module {
     @Override
     public float getValue(float x, float y) {
         Cell cell = chunk.getCell((int) x, (int) y);
-        return NoiseUtil.map(1 - cell.biomeEdge, MIN_FADE, fade, range);
+        float edge = 0.02F + cell.biomeEdge;
+
+        if (edge >= fade) {
+            return NO_SPREAD;
+        }
+
+        if (edge <= MIN_FADE) {
+            return MAX_SPREAD;
+        }
+
+        // alpha increases the further inside the biome region we are
+        float alpha = (edge - MIN_FADE) / range;
+
+        // invert so alpha increases the closer to the biome edge we are
+        alpha = 1 - alpha;
+
+        // higher output == more spread
+        return NO_SPREAD + alpha * SPREAD_VARIANCE;
     }
 
-    public static Module of(IWorld world, ChunkGenerator generator, float fade) {
-        ChunkReader reader = TerraChunkGenerator.getChunk(world, generator);
+    @Override
+    public void close() {
+        chunk.close();
+    }
+
+    public static Module of(DecorationContext decorationContext, float fade) {
+        ChunkPos pos = decorationContext.getChunk().getPos();
+        ChunkReader reader = decorationContext.getGenerator().getChunkReader(pos.x, pos.z);
         if (reader != null) {
             return new BiomeVariance(reader, fade);
         }

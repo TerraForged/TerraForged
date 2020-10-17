@@ -211,9 +211,10 @@ public class TerraBiomeProvider extends BiomeProvider {
     public Biome getBiome(Cell cell, int x, int z) {
         Biome biome = biomeMap.provideBiome(cell, context.levels);
         if (modifierManager.hasModifiers(cell, context.levels)) {
-//            GenLog.in("getBiome.modify");
-//            biome = modifierManager.modify(biome, cell, x, z);
-//            GenLog.out("getBiome.modify");
+            Biome modified = modifierManager.modify(biome, cell, x, z);
+            if (TerraBiomeProvider.isValidBiome(modified)) {
+                return modified;
+            }
         }
         return biome;
     }
@@ -239,6 +240,10 @@ public class TerraBiomeProvider extends BiomeProvider {
         TerraContext context = new TerraContext(settings, currentContext.gameContext);
 
         return new TerraBiomeProvider(context);
+    }
+
+    public static boolean isValidBiome(Biome biome) {
+        return biome != null && biome.getCategory() != Biome.Category.NONE;
     }
 
     private static <T> Dynamic<T> encode(TerraBiomeProvider provider, DynamicOps<T> ops) {

@@ -29,6 +29,7 @@ import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.api.material.layer.LayerMaterial;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.task.LazySupplier;
 import com.terraforged.world.heightmap.Levels;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
@@ -36,9 +37,9 @@ import net.minecraft.world.chunk.IChunk;
 
 public class LayerDecorator implements ColumnDecorator {
 
-    private final LayerManager layerManager;
+    private final LazySupplier<LayerManager> layerManager;
 
-    public LayerDecorator(LayerManager layerManager) {
+    public LayerDecorator(LazySupplier<LayerManager> layerManager) {
         this.layerManager = layerManager;
     }
 
@@ -55,7 +56,7 @@ public class LayerDecorator implements ColumnDecorator {
             }
         }
 
-        LayerMaterial material = layerManager.getMaterial(state.getBlock());
+        LayerMaterial material = layerManager.get().getMaterial(state.getBlock());
         if (material == null) {
             return;
         }

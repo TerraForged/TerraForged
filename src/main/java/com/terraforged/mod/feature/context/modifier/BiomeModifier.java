@@ -28,9 +28,9 @@ import com.mojang.serialization.Dynamic;
 import com.terraforged.mod.feature.context.ChanceContext;
 import net.minecraft.util.math.BlockPos;
 
-public class Biome extends RangeContextModifier {
+public class BiomeModifier extends RangeContextModifier {
 
-    public Biome(float from, float to, boolean exclusive) {
+    public BiomeModifier(float from, float to, boolean exclusive) {
         super(from, to, exclusive);
     }
 
@@ -45,6 +45,6 @@ public class Biome extends RangeContextModifier {
     }
 
     public static ContextModifier deserialize(Dynamic<?> dynamic) {
-        return RangeContextModifier.deserialize(dynamic, Biome::new);
+        return RangeContextModifier.deserialize(dynamic, BiomeModifier::new);
     }
 }

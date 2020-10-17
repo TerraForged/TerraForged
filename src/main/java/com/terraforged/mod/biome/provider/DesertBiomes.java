@@ -27,6 +27,7 @@ package com.terraforged.mod.biome.provider;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.api.material.layer.LayerMaterial;
 import com.terraforged.core.concurrent.Resource;
+import com.terraforged.core.concurrent.task.LazySupplier;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.util.DummyBlockReader;
@@ -51,7 +52,7 @@ public class DesertBiomes {
     private final Set<Biome> deserts;
     private final List<Biome> redSand;
     private final List<Biome> whiteSand;
-    private final LayerManager layerManager;
+    private final LazySupplier<LayerManager> layerManager;
 
     private final int maxRedIndex;
     private final int maxWhiteIndex;
@@ -59,7 +60,7 @@ public class DesertBiomes {
     private final Biome defaultRed;
     private final Biome defaultWhite;
 
-    public DesertBiomes(Materials materials, List<Biome> deserts, GameContext context) {
+    public DesertBiomes(LazySupplier<Materials> materials, List<Biome> deserts, GameContext context) {
         List<Biome> white = new LinkedList<>();
         List<Biome> red = new LinkedList<>();
         try (Resource<DummyBlockReader> reader = DummyBlockReader.pooled()) {
@@ -86,7 +87,7 @@ public class DesertBiomes {
                 }
             }
         }
-        this.layerManager = materials.getLayerManager();
+        this.layerManager = materials.then(Materials::getLayerManager);
         this.whiteSand = new ArrayList<>(white);
         this.redSand = new ArrayList<>(red);
         this.deserts = new HashSet<>(deserts);
@@ -120,7 +121,7 @@ public class DesertBiomes {
     }
 
     public LayerMaterial getSandLayers(Biome biome) {
-        return layerManager.getMaterial(Blocks.SAND);
+        return layerManager.get().getMaterial(Blocks.SAND);
     }
 
     private static int distance2(MaterialColor mc1, MaterialColor mc2) {

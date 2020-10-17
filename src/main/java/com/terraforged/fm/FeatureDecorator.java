@@ -116,6 +116,6 @@ public interface FeatureDecorator {
 
     static void handle(Identity identity, Throwable t) {
         FeatureManager.LOG.fatal("Fatal error placing feature {}", identity.getIdentity());
-//        t.printStackTrace();
+        t.printStackTrace();
     }
 }

@@ -43,12 +43,12 @@ public class FeatureParser {
     }
 
     public static Optional<FeatureInjector> parseInjector(JsonObject root) {
-        if (root.has("before")) {
-            return FeatureSerializer.deserialize(root.get("before"))
+        if (root.has(InjectionPosition.BEFORE.getName())) {
+            return FeatureSerializer.deserialize(root.get(InjectionPosition.BEFORE.getName()))
                     .map(feature -> new FeatureInjector(feature, InjectionPosition.BEFORE));
         }
-        if (root.has("after")) {
-            return FeatureSerializer.deserialize(root.get("after"))
+        if (root.has(InjectionPosition.AFTER.getName())) {
+            return FeatureSerializer.deserialize(root.get(InjectionPosition.AFTER.getName()))
                     .map(feature -> new FeatureInjector(feature, InjectionPosition.AFTER));
         }
         return Optional.empty();
@@ -57,12 +57,12 @@ public class FeatureParser {
     public static Optional<FeatureAppender> parseAppender(JsonObject root) {
         if (root.has("stage")) {
             GenerationStage.Decoration stage = GenerationStage.Decoration.valueOf(root.get("stage").getAsString());
-            if (root.has("prepend")) {
-                return FeatureSerializer.deserialize(root.get("prepend"))
+            if (root.has(InjectionPosition.HEAD.getName())) {
+                return FeatureSerializer.deserialize(root.get(InjectionPosition.HEAD.getName()))
                         .map(feature -> new FeatureAppender(feature, InjectionPosition.HEAD, stage));
             }
-            if (root.has("append")) {
-                return FeatureSerializer.deserialize(root.get("append"))
+            if (root.has(InjectionPosition.TAIL.getName())) {
+                return FeatureSerializer.deserialize(root.get(InjectionPosition.TAIL.getName()))
                         .map(feature -> new FeatureAppender(feature, InjectionPosition.TAIL, stage));
             }
         }

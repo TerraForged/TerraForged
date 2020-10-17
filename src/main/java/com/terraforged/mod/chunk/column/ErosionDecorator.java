@@ -27,6 +27,7 @@ package com.terraforged.mod.chunk.column;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.material.state.States;
+import com.terraforged.core.concurrent.task.LazySupplier;
 import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.material.Materials;
@@ -62,7 +63,7 @@ public class ErosionDecorator implements ColumnDecorator {
     private final int seed3;
     private final float minY;
     private final Terrains terrain;
-    private final Materials materials;
+    private final LazySupplier<Materials> materials;
 
     public ErosionDecorator(TerraContext context) {
         this.terrain = context.terrain;
@@ -88,12 +89,13 @@ public class ErosionDecorator implements ColumnDecorator {
         ISurfaceBuilderConfig config = BiomeHelper.getSurface(context.biome);
         BlockState top = config.getTop();
         BlockState middle = config.getUnder();
+        Materials materials = this.materials.get();
 
         if (materials.isErodible(top.getBlock())) {
             BlockState material = getMaterial(x, z, context, top, middle);
             if (material != top) {
                 if (materials.isStone(material.getBlock())) {
-                    erodeRock(context, chunk, x, y, z);
+                    erodeRock(context, chunk, materials, x, y, z);
                     return;
                 } else {
                     fillDownSolid(context, chunk, x, z, y, y - 4, material);
@@ -103,7 +105,7 @@ public class ErosionDecorator implements ColumnDecorator {
         }
     }
 
-    protected void erodeRock(DecoratorContext context, IChunk chunk, int dx, int y, int dz) {
+    protected void erodeRock(DecoratorContext context, IChunk chunk, Materials materials, int dx, int y, int dz) {
         int depth = 32;
         BlockState material = States.GRAVEL.get();
         // find the uppermost layer of rock & record it's depth

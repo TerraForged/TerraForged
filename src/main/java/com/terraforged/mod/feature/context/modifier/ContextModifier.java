@@ -37,7 +37,7 @@ public interface ContextModifier {
 
     Map<String, Function<Dynamic<?>, ContextModifier>> REGISTRY = ImmutableMap.of(
             "elevation", Elevation::deserialize,
-            "biome", Biome::deserialize
+            "biome", BiomeModifier::deserialize
     );
 
     ContextModifier NONE = new None();

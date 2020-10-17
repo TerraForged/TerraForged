@@ -30,6 +30,8 @@ import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.util.FastChunk;
+import com.terraforged.mod.chunk.util.SimpleChunk;
 import com.terraforged.mod.chunk.util.TerraContainer;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.world.chunk.IChunk;
@@ -54,9 +56,9 @@ public class SurfaceGenerator implements Generator.Surfaces {
     public final void generateSurface(WorldGenRegion world, IChunk chunk) {
         try (ChunkReader reader = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z)) {
             TerraContainer container = TerraContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
-            ChunkSurfaceBuffer buffer = new ChunkSurfaceBuffer(chunk);
+            ChunkSurfaceBuffer buffer = new ChunkSurfaceBuffer(SimpleChunk.wrap(chunk));
 
-            try (SurfaceContext context = generator.getContext().surface(buffer, generator.getSettings())) {
+            try (SurfaceContext context = generator.getContext().surface(buffer, container, generator.getSettings())) {
                 reader.iterate(context, (cell, dx, dz, ctx) -> {
                     int px = ctx.blockX + dx;
                     int pz = ctx.blockZ + dz;
@@ -65,7 +67,7 @@ public class SurfaceGenerator implements Generator.Surfaces {
                     ctx.buffer.setSurfaceLevel(top);
 
                     ctx.cell = cell;
-                    ctx.biome = container.getBiome(dx, dz);
+                    ctx.biome = ctx.biomes.getBiome(dx, dz);
                     ctx.noise = getSurfaceNoise(px, pz) * 15D;
 
                     if (ctx.biome == null) {
@@ -76,10 +78,12 @@ public class SurfaceGenerator implements Generator.Surfaces {
                     generator.getSurfaceManager().getSurface(ctx).buildSurface(px, pz, top, ctx);
 
                     int py = ctx.levels.scale(cell.value);
-                    for (ColumnDecorator processor : generator.getBaseDecorators()) {
-                        processor.decorate(ctx.buffer, ctx, px, py, pz);
+
+                    for (int i = 0; i < generator.getSurfaceDecorators().size(); i++) {
+                        generator.getSurfaceDecorators().get(i).decorate(ctx.buffer, ctx, px, py, pz);
                     }
                 });
+                FastChunk.updateWGHeightmaps(chunk, context.pos);
             }
         }
     }

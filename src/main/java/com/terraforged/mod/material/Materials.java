@@ -28,14 +28,18 @@ import com.terraforged.api.material.WGTags;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.api.material.state.States;
 import com.terraforged.core.concurrent.Resource;
+import com.terraforged.fm.data.DataManager;
+import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.util.DummyBlockReader;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
 import net.minecraft.block.*;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
+import java.io.File;
 import java.util.*;
 
 public class Materials {
@@ -48,6 +52,10 @@ public class Materials {
     public final Set<Block> clay = create(WGTags.CLAY, States.CLAY.getBlock());
     public final Set<Block> sediment = create(WGTags.SEDIMENT, States.GRAVEL.getBlock());
     public final Set<Block> erodible = create(WGTags.ERODIBLE, null);
+
+    private Materials() {
+
+    }
 
     public LayerManager getLayerManager() {
         return layerManager;
@@ -83,7 +91,7 @@ public class Materials {
 
     private static Set<Block> create(ITag<Block> tag, Block def) {
         try {
-            ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(tag.getAllElements());
+            ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(WGTags.getSet(tag));
             if (set.isEmpty() && def != null) {
                 set.add(def);
             }
@@ -104,5 +112,12 @@ public class Materials {
         List<T> list = new ArrayList<>(collection);
         list.sort(Materials.COMPARATOR);
         return Collections.unmodifiableList(list);
+    }
+
+    public static Materials create() {
+        try (DataManager manager = DataManager.of(new File(SettingsHelper.SETTINGS_DIR, "datapacks"))) {
+            manager.forEachTag("blocks", WGTags.WG_TAGS, ForgeRegistries.BLOCKS, WGTags::set);
+            return new Materials();
+        }
     }
 }

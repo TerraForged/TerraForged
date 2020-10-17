@@ -29,6 +29,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.terraforged.fm.GameContext;
 import com.terraforged.fm.modifier.Jsonifiable;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 
@@ -103,6 +104,15 @@ public class BiomeMatcher implements Predicate<Biome>, Comparable<BiomeMatcher>,
         BiomeMatcherParser.Collector collector = new BiomeMatcherParser.Collector();
         for (String name : biomes) {
             BiomeMatcherParser.collectBiomes(name, collector, context);
+        }
+        return collector.create();
+    }
+
+    @SafeVarargs
+    public static BiomeMatcher of(GameContext context, RegistryKey<Biome>... biomes) {
+        BiomeMatcherParser.Collector collector = new BiomeMatcherParser.Collector();
+        for (RegistryKey<Biome> name : biomes) {
+            BiomeMatcherParser.collectBiomes(name.func_240901_a_().toString(), collector, context);
         }
         return collector.create();
     }

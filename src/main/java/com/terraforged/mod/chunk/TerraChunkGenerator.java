@@ -31,6 +31,7 @@ import com.mojang.serialization.DynamicOps;
 import com.terraforged.api.biome.surface.SurfaceManager;
 import com.terraforged.api.chunk.column.BlockColumn;
 import com.terraforged.api.chunk.column.ColumnDecorator;
+import com.terraforged.api.material.WGTags;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.tile.Size;
@@ -43,6 +44,7 @@ import com.terraforged.fm.structure.FMStructureManager;
 import com.terraforged.fm.util.codec.Codecs;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
+import com.terraforged.mod.biome.utils.StructureLocator;
 import com.terraforged.mod.chunk.generator.*;
 import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.material.Materials;
@@ -93,7 +95,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
     private final FMStructureManager structureManager;
     private final SurfaceManager surfaceManager;
     private final BlockDataManager blockDataManager;
-    private final List<ColumnDecorator> baseDecorators;
+    private final List<ColumnDecorator> surfaceDecorators;
     private final List<ColumnDecorator> postProcessors;
 
     private final TileCache tileCache;
@@ -118,7 +120,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         this.structureManager = null;
         this.surfaceManager = null;
         this.blockDataManager = null;
-        this.baseDecorators = Collections.emptyList();
+        this.surfaceDecorators = Collections.emptyList();
         this.postProcessors = Collections.emptyList();
         this.tileCache = null;
     }
@@ -126,6 +128,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
     public TerraChunkGenerator(TerraBiomeProvider biomeProvider, DimensionSettings settings) {
         super(biomeProvider, settings.getStructures());
         TerraContext context = biomeProvider.getContext();
+
         this.seed = context.terraSettings.world.seed;
         this.context = context;
         this.settings = settings;
@@ -133,7 +136,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         this.mobGenerator = new MobGenerator(this);
         this.biomeGenerator = new BiomeGenerator(this);
         this.terrainCarver = new TerrainCarver(this);
-        this.terrainGenerator = new TerrainGenerator(this);
+        this.terrainGenerator = new BaseGenerator(this);
         this.surfaceGenerator = new SurfaceGenerator(this);
         this.featureGenerator = new FeatureGenerator(this);
         this.structureGenerator = new StructureGenerator(this);
@@ -141,7 +144,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         this.surfaceManager = TerraSetupFactory.createSurfaceManager(context);
         this.structureManager = TerraSetupFactory.createStructureManager(context);
         this.geologyManager = TerraSetupFactory.createGeologyManager(context);
-        this.baseDecorators = TerraSetupFactory.createBaseDecorators(geologyManager, context);
+        this.surfaceDecorators = TerraSetupFactory.createSurfaceDecorators(context);
         this.postProcessors = TerraSetupFactory.createFeatureDecorators(context);
         this.tileCache = context.cache.get();
 
@@ -153,7 +156,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         }
 
         SetupHooks.setup(getLayerManager(), context.copy());
-        SetupHooks.setup(baseDecorators, postProcessors, context.copy());
+        SetupHooks.setup(surfaceDecorators, postProcessors, context.copy());
     }
 
     private TerraChunkGenerator create(long seed) {
@@ -215,7 +218,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         if (settings == null) {
             return null;
         }
-        return StructureGenerator.findStructure(this, world, world.func_241112_a_(), structure, pos, attempts, flag, settings);
+        return StructureLocator.findStructure(this, world, world.func_241112_a_(), structure, pos, attempts, flag, settings);
     }
 
     @Override
@@ -312,7 +315,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
     }
 
     public final Materials getMaterials() {
-        return context.materials;
+        return context.materials.get();
     }
 
     public final FeatureManager getFeatureManager() {
@@ -328,7 +331,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
     }
 
     public final LayerManager getLayerManager() {
-        return context.materials.getLayerManager();
+        return getMaterials().getLayerManager();
     }
 
     public final SurfaceManager getSurfaceManager() {
@@ -339,8 +342,8 @@ public class TerraChunkGenerator extends ChunkGenerator {
         return blockDataManager;
     }
 
-    public final List<ColumnDecorator> getBaseDecorators() {
-        return baseDecorators;
+    public final List<ColumnDecorator> getSurfaceDecorators() {
+        return surfaceDecorators;
     }
 
     public final List<ColumnDecorator> getPostProcessors() {

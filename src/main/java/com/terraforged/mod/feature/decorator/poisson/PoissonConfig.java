@@ -28,12 +28,11 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
+import com.terraforged.api.feature.decorator.DecorationContext;
 import com.terraforged.core.util.poisson.PoissonContext;
 import com.terraforged.fm.util.codec.Codecs;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.placement.IPlacementConfig;
 
 public class PoissonConfig implements IPlacementConfig {
@@ -57,12 +56,12 @@ public class PoissonConfig implements IPlacementConfig {
         this.densityNoiseMax = densityNoiseMax;
     }
 
-    public void apply(IWorld world, ChunkGenerator generator, PoissonContext context) {
+    public void apply(DecorationContext decorationContext, PoissonContext context) {
         Module fade = Source.ONE;
         Module density = Source.ONE;
 
         if (biomeFade > 0.075F) {
-            fade = BiomeVariance.of(world, generator, biomeFade);
+            fade = BiomeVariance.of(decorationContext, biomeFade);
         }
 
         if (densityNoiseScale > 0) {

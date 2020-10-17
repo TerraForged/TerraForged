@@ -32,6 +32,9 @@ import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import net.minecraft.block.BlockState;
 
+import java.util.function.IntFunction;
+import java.util.function.Supplier;
+
 public class StoneForestSurface implements MaskedSurface {
 
     private final Module module;
@@ -43,10 +46,12 @@ public class StoneForestSurface implements MaskedSurface {
         dirt = States.DIRT.get();
         stone = States.STONE.get();
         grass = States.GRASS_BLOCK.get();
-        module = Source.ridge(seed.next(), 50, 4)
-                .clamp(0.7, 0.95).map(0, 1)
+
+        IntFunction<Module> func = scale ->Source.ridge(seed.next(), scale, 4).clamp(0.7, 0.95).map(0, 1)
                 .pow(1.5)
                 .terrace(1, 0.25, 4, 1);
+
+        module = func.apply(50).max(func.apply(55));
     }
 
     @Override

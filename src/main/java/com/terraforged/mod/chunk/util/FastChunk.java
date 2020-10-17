@@ -52,7 +52,7 @@ public class FastChunk extends ChunkDelegate {
     private final Heightmap oceanSurface;
     private final BlockPos.Mutable mutable = new BlockPos.Mutable();
 
-    private FastChunk(ChunkPrimer primer) {
+    protected FastChunk(ChunkPrimer primer) {
         super(primer);
         this.primer = primer;
         this.blockX = primer.getPos().getXStart();
@@ -82,31 +82,6 @@ public class FastChunk extends ChunkDelegate {
             return replaced;
         }
         return Blocks.VOID_AIR.getDefaultState();
-    }
-
-    public void fill(BlockState state) {
-        int surfaceMinY = 255;
-        for (int dz = 0; dz < 16; dz++) {
-            for (int dx = 0; dx < 16; dx++) {
-                int y = primer.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, dx, dz);
-                surfaceMinY = Math.min(surfaceMinY, y);
-            }
-        }
-
-        int topSection = (surfaceMinY >> 4);
-        for (int sectionIndex = 0; sectionIndex < topSection; sectionIndex++) {
-            ChunkSection section = primer.getSection(sectionIndex);
-            section.lock();
-            PalettedContainer<BlockState> container = section.getData();
-            for (int dy = 0; dy < 16; dy++) {
-                for (int dz = 0; dz < 16; dz++) {
-                    for (int dx = 0; dx < 16; dx++) {
-                        container.swap(dx, dy, dz, state);
-                    }
-                }
-            }
-            section.unlock();
-        }
     }
 
     public void setBiomes(BiomeContainer biomes) {

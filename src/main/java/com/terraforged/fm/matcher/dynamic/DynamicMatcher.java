@@ -94,6 +94,10 @@ public class DynamicMatcher implements Predicate<ConfiguredFeature<?, ?>> {
         return new DynamicMatcher(predicate);
     }
 
+    public static DynamicMatcher of(ConfiguredFeature<?, ?> feature) {
+        return of(f -> f == feature);
+    }
+
     public static DynamicMatcher feature(Predicate<Feature<?>> predicate) {
         return DynamicMatcher.of(f -> predicate.test(f.feature));
     }

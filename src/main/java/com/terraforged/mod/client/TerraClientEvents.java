@@ -22,15 +22,21 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.client.gui;
+package com.terraforged.mod.client;
 
 import com.terraforged.api.level.client.ClientLevelManager;
+import com.terraforged.fm.data.FolderDataPackFinder;
+import com.terraforged.fm.data.ModDataPackFinder;
+import com.terraforged.mod.Log;
 import com.terraforged.mod.TerraForgedLevel;
 import com.terraforged.mod.client.gui.config.SettingsScreen;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+
+import java.io.File;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class TerraClientEvents {
@@ -39,5 +45,15 @@ public class TerraClientEvents {
     public static void setup(FMLClientSetupEvent event) {
         ClientLevelManager.register(TerraForgedLevel.NAME, SettingsScreen::create);
         ClientLevelManager.setDefault(TerraForgedLevel.NAME);
+
+        event.enqueueWork(() -> {
+            Log.info("Adding DataPackFinder");
+            Minecraft minecraft = event.getMinecraftSupplier().get();
+            File dir = new File(minecraft.gameDir, "config/terraforged/datapacks");
+            FolderDataPackFinder dataPackFinder = new FolderDataPackFinder(dir);
+            minecraft.getResourcePackList().addPackFinder(dataPackFinder);
+            minecraft.getResourcePackList().addPackFinder(new ModDataPackFinder());
+            minecraft.getResourcePackList().reloadPacksFromFinders();
+        });
     }
 }

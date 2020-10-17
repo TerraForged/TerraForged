@@ -25,6 +25,7 @@
 package com.terraforged.mod.biome.map;
 
 import com.terraforged.fm.GameContext;
+import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.mod.biome.utils.TempCategory;
 import com.terraforged.world.biome.BiomeType;
@@ -122,7 +123,7 @@ public class BiomeMapBuilder implements BiomeMap.Builder {
 
     private void makeSafe() {
         addIfEmpty(rivers, Biomes.RIVER, TempCategory.class);
-        addIfEmpty(lakes, Biomes.RIVER, TempCategory.class);
+        addIfEmpty(lakes, ModBiomes.LAKE, TempCategory.class);
         addIfEmpty(coasts, Biomes.STONE_SHORE, TempCategory.class);
         addIfEmpty(beaches, Biomes.BEACH, TempCategory.class);
         addIfEmpty(oceans, Biomes.OCEAN, TempCategory.class);

@@ -30,9 +30,11 @@ import com.terraforged.mod.Log;
 import com.terraforged.mod.config.ConfigManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeManager;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -55,15 +57,15 @@ public class BiomeWeights {
         this.context = context;
 
         // Get biome weights from Forge
-//        for (BiomeManager.BiomeType type : BiomeManager.BiomeType.values()) {
-//            List<BiomeManager.BiomeEntry> entries = BiomeManager.getBiomes(type);
-//            if (entries == null) {
-//                continue;
-//            }
-//            for (BiomeManager.BiomeEntry entry : entries) {
-//                biomes.put(entry.biome.getRegistryName(), entry.itemWeight);
-//            }
-//        }
+        for (BiomeManager.BiomeType type : BiomeManager.BiomeType.values()) {
+            List<BiomeManager.BiomeEntry> entries = BiomeManager.getBiomes(type);
+            if (entries == null) {
+                continue;
+            }
+            for (BiomeManager.BiomeEntry entry : entries) {
+                biomes.put(entry.getKey().func_240901_a_(), entry.itemWeight);
+            }
+        }
 
         // TF config gets final say
         readWeights();

@@ -24,21 +24,17 @@
 
 package com.terraforged.mod.feature.decorator.poisson;
 
+import com.terraforged.api.feature.decorator.ContextualDecorator;
+import com.terraforged.api.feature.decorator.DecorationContext;
 import com.terraforged.core.util.poisson.Poisson;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.feature.WorldDecoratingHelper;
-import net.minecraft.world.gen.placement.Placement;
 
-import java.lang.reflect.Field;
 import java.util.Random;
 import java.util.stream.Stream;
 
-public abstract class PoissonDecorator extends Placement<PoissonConfig> {
-
-    private static final HelperAccess ACCESS = new HelperAccess();
+public abstract class PoissonDecorator extends ContextualDecorator<PoissonConfig> {
 
     private Poisson instance = null;
     private final Object lock = new Object();
@@ -48,13 +44,11 @@ public abstract class PoissonDecorator extends Placement<PoissonConfig> {
     }
 
     @Override
-    public final Stream<BlockPos> func_241857_a(WorldDecoratingHelper helper, Random random, PoissonConfig config, BlockPos pos) {
+    protected final Stream<BlockPos> getPositions(WorldDecoratingHelper helper, DecorationContext context, Random random, PoissonConfig config, BlockPos pos) {
         int radius = Math.max(1, Math.min(30, config.radius));
         Poisson poisson = getInstance(radius);
-        ISeedReader world = ACCESS.getWorld(helper);
-        ChunkGenerator generator = ACCESS.getGenerator(helper);
-        PoissonVisitor visitor = new PoissonVisitor(world, this, poisson, random, pos);
-        config.apply(world, generator, visitor);
+        PoissonVisitor visitor = new PoissonVisitor(context.getRegion(), this, poisson, random, pos);
+        config.apply(context, visitor);
         return visitor.stream();
     }
 
@@ -66,50 +60,6 @@ public abstract class PoissonDecorator extends Placement<PoissonConfig> {
                 instance = new Poisson(radius);
             }
             return instance;
-        }
-    }
-
-    private static class HelperAccess {
-
-        private final Field world;
-        private final Field generator;
-
-        private HelperAccess() {
-            Field world = null;
-            Field generator = null;
-
-            for (Field field : WorldDecoratingHelper.class.getDeclaredFields()) {
-                if (field.getType() == ISeedReader.class) {
-                    field.setAccessible(true);
-                    world = field;
-                } else if (field.getType() == ChunkGenerator.class) {
-                    field.setAccessible(true);
-                    generator = field;
-                }
-            }
-
-            if (world == null || generator == null) {
-                throw new RuntimeException();
-            }
-
-            this.world = world;
-            this.generator = generator;
-        }
-
-        private ISeedReader getWorld(WorldDecoratingHelper helper) {
-            try {
-                return (ISeedReader) world.get(helper);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        private ChunkGenerator getGenerator(WorldDecoratingHelper helper) {
-            try {
-                return (ChunkGenerator) generator.get(helper);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 }

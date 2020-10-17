@@ -29,6 +29,8 @@ import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.core.util.PosIterator;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
+import com.terraforged.n2d.source.Line;
+import com.terraforged.n2d.util.NoiseUtil;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeContainer;
@@ -46,11 +48,13 @@ public class TerraContainer extends BiomeContainer {
 
     private final Biome[] biomes;
     private final Biome[] surface;
+    private final Biome featureBiome;
 
-    public TerraContainer(Biome[] biomes, Biome[] surface, GameContext context) {
+    public TerraContainer(Biome[] biomes, Biome[] surface, Biome feature, GameContext context) {
         super(context.biomes.getRegistry(), biomes);
         this.biomes = biomes;
         this.surface = surface;
+        this.featureBiome = feature;
     }
 
     public Biome getBiome(int x, int z) {
@@ -59,15 +63,8 @@ public class TerraContainer extends BiomeContainer {
         return surface[z * 16 + x];
     }
 
-    public Biome getFeatureBiome(ChunkReader chunkReader) {
-        PosIterator iterator = PosIterator.area(0, 0, 16, 16);
-        while (iterator.next()) {
-            Cell cell = chunkReader.getCell(iterator.x(), iterator.z());
-            if (cell.biomeType.isExtreme()) {
-                return getBiome(iterator.x(), iterator.z());
-            }
-        }
-        return getBiome(8, 8);
+    public Biome getFeatureBiome() {
+        return featureBiome;
     }
 
     public BiomeContainer bakeBiomes(boolean convertToVanilla, GameContext context) {
@@ -90,14 +87,19 @@ public class TerraContainer extends BiomeContainer {
         }
 
         TerraContainer container = TerraContainer.create(reader, biomeProvider);
-
-        // replace/set the primer's biomes
-        ((ChunkPrimer) chunk).setBiomes(container);
+        if (chunk instanceof FastChunk) {
+            ((FastChunk) chunk).setBiomes(container);
+        } else {
+            // replace/set the primer's biomes
+            ((ChunkPrimer) chunk).setBiomes(container);
+        }
 
         return container;
     }
 
     public static TerraContainer create(ChunkReader chunkReader, TerraBiomeProvider biomeProvider) {
+        Biome feature = null;
+        float featureDist2 = Integer.MAX_VALUE;
         Biome[] biomes2D = new Biome[BIOMES_2D_SIZE];
         Biome[] biomes3D = new Biome[BIOMES_3D_SIZE];
         PosIterator iterator = PosIterator.area(0, 0, 16, 16);
@@ -106,15 +108,28 @@ public class TerraContainer extends BiomeContainer {
             int dz = iterator.z();
             int x = chunkReader.getBlockX() + dx;
             int z = chunkReader.getBlockZ() + dz;
-            Biome biome = biomeProvider.getBiome(chunkReader.getCell(dx, dz), x, z);
+            Cell cell = chunkReader.getCell(dx, dz);
+            Biome biome = biomeProvider.getBiome(cell, x, z);
             biomes2D[indexOf(dx, dz)] = biome;
+
+            if (cell.biomeType.isExtreme()) {
+                float dist2 = Line.dist2(dx, dz, 8, 8);
+                if (feature == null || dist2 < featureDist2) {
+                    featureDist2 = dist2;
+                    feature = biome;
+                }
+            }
+
             if ((dx & 3) == 0 && (dz & 3) == 0) {
                 for (int dy = 0; dy < 64; dy++) {
                     biomes3D[indexOf(dx >> 2, dy, dz >> 2)] = biome;
                 }
             }
         }
-        return new TerraContainer(biomes3D, biomes2D, biomeProvider.getContext().gameContext);
+        if (feature == null) {
+            feature = biomes2D[indexOf(8, 8)];
+        }
+        return new TerraContainer(biomes3D, biomes2D, feature, biomeProvider.getContext().gameContext);
     }
 
     private static int indexOf(int x, int z) {

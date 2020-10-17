@@ -90,7 +90,7 @@ public interface BiomePredicate {
     BiomePredicate LAKE = type(Biome.Category.RIVER).and(name("lake"));
     BiomePredicate MESA = type(Biome.Category.MESA);
     BiomePredicate MOUNTAIN = type(Biome.Category.EXTREME_HILLS).or(name("mountain"));
-    BiomePredicate RIVER = type(Biome.Category.RIVER).not(name("lake"));
+    BiomePredicate RIVER = type(Biome.Category.RIVER).not(LAKE);
     BiomePredicate SAVANNA = type(Biome.Category.SAVANNA).or(temp(0.8, 2).and(rain(-1, 0.4)));
     BiomePredicate STEPPE = name("steppe").and(temp(0.3, 1));
     BiomePredicate TAIGA = type(Biome.Category.TAIGA).or(temp(0.19, 0.35)).not(rainType(Biome.RainType.SNOW));

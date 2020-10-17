@@ -27,6 +27,7 @@ package com.terraforged.mod.feature;
 import com.google.common.collect.ImmutableSet;
 import com.terraforged.n2d.util.NoiseUtil;
 import it.unimi.dsi.fastutil.longs.LongIterator;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
@@ -75,8 +76,12 @@ public class TerrainHelper {
     private void collectPieces(IWorld world, IChunk chunk, ObjectList<StructurePiece> pieces) {
         ChunkPos pos = chunk.getPos();
         for (Structure<?> structure : ILLAGER_STRUCTURES) {
-            LongIterator structureIds = chunk.getStructureReferences().get(structure).iterator();
+            LongSet set = chunk.getStructureReferences().get(structure);
+            if (set == null) {
+                continue;
+            }
 
+            LongIterator structureIds = set.iterator();
             while (structureIds.hasNext()) {
                 long id = structureIds.nextLong();
                 ChunkPos structurePos = new ChunkPos(id);

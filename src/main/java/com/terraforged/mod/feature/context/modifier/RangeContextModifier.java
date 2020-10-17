@@ -49,7 +49,7 @@ public abstract class RangeContextModifier extends RangeModifier implements Cont
         return new Dynamic<>(ops, ops.createMap(ImmutableMap.of(
                 ops.createString("from"), ops.createFloat(from),
                 ops.createString("to"), ops.createFloat(to),
-                ops.createString("exclusive"), ops.createBoolean(max > 0)
+                ops.createString("exclusive"), ops.createBoolean(max == 0)
         )));
     }
 

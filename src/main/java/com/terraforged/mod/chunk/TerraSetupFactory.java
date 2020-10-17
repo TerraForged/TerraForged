@@ -46,6 +46,7 @@ import com.terraforged.mod.chunk.column.post.SnowEroder;
 import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.feature.Matchers;
 import com.terraforged.mod.feature.feature.FreezeLayer;
+import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.material.geology.GeoManager;
 import com.terraforged.mod.util.setup.SetupHooks;
 import net.minecraft.block.Blocks;
@@ -68,10 +69,15 @@ public class TerraSetupFactory {
         if (test("Geology decorator", context.terraSettings.miscellaneous.strataDecorator)) {
             processors.add(new GeologyDecorator(geoManager));
         }
+        processors.add(new BedrockDecorator(context));
+        return processors;
+    }
+
+    public static List<ColumnDecorator> createSurfaceDecorators(TerraContext context) {
+        List<ColumnDecorator> processors = new ArrayList<>();
         if (test("Erosion decorator", context.terraSettings.miscellaneous.erosionDecorator)) {
             processors.add(new ErosionDecorator(context));
         }
-        processors.add(new BedrockDecorator(context));
         return processors;
     }
 
@@ -81,7 +87,7 @@ public class TerraSetupFactory {
             processors.add(new SnowEroder(context));
         }
         if (test("Smooth layer decorator", context.terraSettings.miscellaneous.smoothLayerDecorator)) {
-            processors.add(new LayerDecorator(context.materials.getLayerManager()));
+            processors.add(new LayerDecorator(context.materials.then(Materials::getLayerManager)));
         }
         return processors;
     }
@@ -139,7 +145,7 @@ public class TerraSetupFactory {
         manager.replace(Biomes.DEEP_FROZEN_OCEAN, new IcebergsSurface(context, 30, 30));
         manager.replace(Biomes.FROZEN_OCEAN, new IcebergsSurface(context, 20, 15));
         manager.append(ModBiomes.BRYCE, new BriceSurface(context.seed));
-        manager.append(ModBiomes.ERODED_PINNACLE, new StoneForestSurface(context.seed));
+        manager.append(ModBiomes.STONE_FOREST, new StoneForestSurface(context.seed));
         manager.append(
                 new DesertSurface(context),
                 Biomes.DESERT,
@@ -170,7 +176,7 @@ public class TerraSetupFactory {
     }
 
     public static GeoManager createGeologyManager(TerraContext context) {
-        return new GeoManager(context);
+        return SetupHooks.setup(new GeoManager(context), context);
     }
 
     private static String getEnabled(boolean flag) {
