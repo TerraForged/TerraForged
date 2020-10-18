@@ -3,16 +3,13 @@ package com.terraforged.mod.biome;
 import com.terraforged.fm.matcher.dynamic.DynamicMatcher;
 import com.terraforged.mod.biome.utils.BiomeBuilder;
 import com.terraforged.mod.biome.utils.BiomeUtils;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.Features;
-import net.minecraft.world.gen.feature.IceAndSnowFeature;
 import net.minecraftforge.common.BiomeManager;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public class BiomeBuilders {
 

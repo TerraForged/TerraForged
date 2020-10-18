@@ -2,9 +2,9 @@ package com.terraforged.api.feature.decorator.filter;
 
 import com.terraforged.api.feature.decorator.ContextualDecorator;
 import com.terraforged.api.feature.decorator.DecorationContext;
+import com.terraforged.mod.TerraForgedMod;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.feature.WorldDecoratingHelper;
-import net.minecraft.world.gen.placement.ConfiguredPlacement;
 
 import java.util.Random;
 import java.util.stream.Stream;
@@ -15,7 +15,7 @@ public class FilterDecorator extends ContextualDecorator<FilterDecoratorConfig> 
 
     private FilterDecorator() {
         super(FilterDecoratorConfig.CODEC);
-        setRegistryName("terraforged", "filter");
+        setRegistryName(TerraForgedMod.MODID, "filter");
     }
 
     @Override

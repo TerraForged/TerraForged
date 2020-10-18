@@ -24,45 +24,36 @@
 
 package com.terraforged.mod.chunk.fix;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPredicate;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.world.*;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.LightType;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeManager;
-import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.chunk.AbstractChunkProvider;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.WorldGenRegion;
-import net.minecraft.world.gen.feature.structure.Structure;
-import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.level.ColorResolver;
-import net.minecraft.world.lighting.WorldLightManager;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.IWorldInfo;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -72,238 +63,13 @@ public class RegionDelegate extends WorldGenRegion {
     
     private final WorldGenRegion delegate;
 
-    public RegionDelegate(ServerWorld world, WorldGenRegion delegate) {
-        super(world, Collections.singletonList(getMainChunk(delegate)));
+    public RegionDelegate(WorldGenRegion delegate) {
+        super(delegate.getWorld(), Collections.singletonList(delegate.getChunk(delegate.getMainChunkX(), delegate.getMainChunkZ())));
         this.delegate = delegate;
     }
 
     public WorldGenRegion getDelegate() {
         return delegate;
-    }
-
-    @Override
-    public int getMainChunkX() {
-        return delegate.getMainChunkX();
-    }
-
-    @Override
-    public int getMainChunkZ() {
-        return delegate.getMainChunkZ();
-    }
-
-    @Override
-    public IChunk getChunk(int chunkX, int chunkZ) {
-        return delegate.getChunk(chunkX, chunkZ);
-    }
-
-    @Override
-    @Nullable
-    public IChunk getChunk(int x, int z, ChunkStatus requiredStatus, boolean nonnull) {
-        return delegate.getChunk(x, z, requiredStatus, nonnull);
-    }
-
-    @Override
-    public boolean chunkExists(int chunkX, int chunkZ) {
-        return delegate.chunkExists(chunkX, chunkZ);
-    }
-
-    @Override
-    public BlockState getBlockState(BlockPos pos) {
-        return delegate.getBlockState(pos);
-    }
-
-    @Override
-    public FluidState getFluidState(BlockPos pos) {
-        return delegate.getFluidState(pos);
-    }
-
-    @Override
-    @Nullable
-    public PlayerEntity getClosestPlayer(double x, double y, double z, double distance, Predicate<Entity> predicate) {
-        return delegate.getClosestPlayer(x, y, z, distance, predicate);
-    }
-
-    @Override
-    public int getSkylightSubtracted() {
-        return delegate.getSkylightSubtracted();
-    }
-
-    @Override
-    public BiomeManager getBiomeManager() {
-        return delegate.getBiomeManager();
-    }
-
-    @Override
-    public Biome getNoiseBiomeRaw(int x, int y, int z) {
-        return delegate.getNoiseBiomeRaw(x, y, z);
-    }
-
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public float func_230487_a_(Direction p_230487_1_, boolean p_230487_2_) {
-        return delegate.func_230487_a_(p_230487_1_, p_230487_2_);
-    }
-
-    @Override
-    public WorldLightManager getLightManager() {
-        return delegate.getLightManager();
-    }
-
-    @Override
-    public boolean destroyBlock(BlockPos pos, boolean dropBlock, Entity entity, int recursionLeft) {
-        return delegate.destroyBlock(pos, dropBlock, entity, recursionLeft);
-    }
-
-    @Override
-    @Nullable
-    public TileEntity getTileEntity(BlockPos pos) {
-        return delegate.getTileEntity(pos);
-    }
-
-    @Override
-    public boolean setBlockState(BlockPos pos, BlockState state, int flags, int recursionLeft) {
-        return delegate.setBlockState(pos, state, flags, recursionLeft);
-    }
-
-    @Override
-    public boolean addEntity(Entity entityIn) {
-        return delegate.addEntity(entityIn);
-    }
-
-    @Override
-    public boolean removeBlock(BlockPos pos, boolean isMoving) {
-        return delegate.removeBlock(pos, isMoving);
-    }
-
-    @Override
-    public WorldBorder getWorldBorder() {
-        return delegate.getWorldBorder();
-    }
-
-    @Override
-    public boolean isRemote() {
-        return delegate.isRemote();
-    }
-
-    @Override
-    @Deprecated
-    public ServerWorld getWorld() {
-        return delegate.getWorld();
-    }
-
-    @Override
-    public DynamicRegistries func_241828_r() {
-        return delegate.func_241828_r();
-    }
-
-    @Override
-    public IWorldInfo getWorldInfo() {
-        return delegate.getWorldInfo();
-    }
-
-    @Override
-    public DifficultyInstance getDifficultyForLocation(BlockPos pos) {
-        return delegate.getDifficultyForLocation(pos);
-    }
-
-    @Override
-    public AbstractChunkProvider getChunkProvider() {
-        return delegate.getChunkProvider();
-    }
-
-    @Override
-    public long getSeed() {
-        return delegate.getSeed();
-    }
-
-    @Override
-    public ITickList<Block> getPendingBlockTicks() {
-        return delegate.getPendingBlockTicks();
-    }
-
-    @Override
-    public ITickList<Fluid> getPendingFluidTicks() {
-        return delegate.getPendingFluidTicks();
-    }
-
-    @Override
-    public int getSeaLevel() {
-        return delegate.getSeaLevel();
-    }
-
-    @Override
-    public Random getRandom() {
-        return delegate.getRandom();
-    }
-
-    @Override
-    public int getHeight(Heightmap.Type heightmapType, int x, int z) {
-        return delegate.getHeight(heightmapType, x, z);
-    }
-
-    @Override
-    public void playSound(PlayerEntity player, BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume, float pitch) {
-        delegate.playSound(player, pos, soundIn, category, volume, pitch);
-    }
-
-    @Override
-    public void addParticle(IParticleData particleData, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-        delegate.addParticle(particleData, x, y, z, xSpeed, ySpeed, zSpeed);
-    }
-
-    @Override
-    public void playEvent(PlayerEntity player, int type, BlockPos pos, int data) {
-        delegate.playEvent(player, type, pos, data);
-    }
-
-    @Override
-    public DimensionType func_230315_m_() {
-        return delegate.func_230315_m_();
-    }
-
-    @Override
-    public boolean hasBlockState(BlockPos pos, Predicate<BlockState> state) {
-        return delegate.hasBlockState(pos, state);
-    }
-
-    @Override
-    public <T extends Entity> List<T> getEntitiesWithinAABB(Class<? extends T> clazz, AxisAlignedBB aabb, Predicate<? super T> filter) {
-        return delegate.getEntitiesWithinAABB(clazz, aabb, filter);
-    }
-
-    @Override
-    public List<Entity> getEntitiesInAABBexcluding(Entity entityIn, AxisAlignedBB boundingBox, Predicate<? super Entity> predicate) {
-        return delegate.getEntitiesInAABBexcluding(entityIn, boundingBox, predicate);
-    }
-
-    @Override
-    public List<PlayerEntity> getPlayers() {
-        return delegate.getPlayers();
-    }
-
-    @Override
-    public Stream<? extends StructureStart<?>> func_241827_a(SectionPos p_241827_1_, Structure<?> p_241827_2_) {
-        return delegate.func_241827_a(p_241827_1_, p_241827_2_);
-    }
-
-    @Override
-    public void func_242417_l(Entity p_242417_1_) {
-        delegate.func_242417_l(p_242417_1_);
-    }
-
-    @Override
-    public long func_241851_ab() {
-        return delegate.func_241851_ab();
-    }
-
-    @Override
-    public Difficulty getDifficulty() {
-        return delegate.getDifficulty();
-    }
-
-    @Override
-    public void func_230547_a_(BlockPos p_230547_1_, Block p_230547_2_) {
-        delegate.func_230547_a_(p_230547_1_, p_230547_2_);
     }
 
     @Override

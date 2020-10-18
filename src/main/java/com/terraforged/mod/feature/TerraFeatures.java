@@ -25,8 +25,9 @@
 package com.terraforged.mod.feature;
 
 import com.terraforged.fm.template.feature.TemplateFeature;
+import com.terraforged.mod.TerraForgedMod;
 
 public class TerraFeatures {
 
-    public static final TemplateFeature INSTANCE = new TemplateFeature("terraforged");
+    public static final TemplateFeature INSTANCE = new TemplateFeature(TerraForgedMod.MODID);
 }

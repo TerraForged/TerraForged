@@ -30,6 +30,7 @@ import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.column.BaseDecorator;
 import com.terraforged.mod.chunk.column.BaseGeoDecorator;
+import com.terraforged.mod.chunk.column.BedrockDecorator;
 import com.terraforged.mod.chunk.util.FastChunk;
 import com.terraforged.mod.chunk.util.TerraContainer;
 import com.terraforged.mod.feature.TerrainHelper;
@@ -46,6 +47,7 @@ public class BaseGenerator implements Generator.Terrain {
     private final TerrainHelper terrainHelper;
     private final TerraChunkGenerator generator;
     private final ColumnDecorator baseDecorator;
+    private final ColumnDecorator bedrockDecorator;
 
     public BaseGenerator(TerraChunkGenerator generator) {
         this.generator = generator;
@@ -53,6 +55,7 @@ public class BaseGenerator implements Generator.Terrain {
         this.climate = generator.getContext().factory.get().getClimate();
         this.terrainHelper = new TerrainHelper(0.75F, 4F);
         this.baseDecorator = getBaseDecorator(generator);
+        this.bedrockDecorator = new BedrockDecorator(generator.getContext());
     }
 
     @Override
@@ -67,8 +70,10 @@ public class BaseGenerator implements Generator.Terrain {
                     ctx.cell = cell;
                     ctx.biome = container.getBiome(dx, dz);
                     baseDecorator.decorate(ctx.chunk, ctx, px, py, pz);
+                    bedrockDecorator.decorate(ctx.chunk, ctx, px, py, pz);
                 });
-//                terrainHelper.flatten(world, chunk);
+
+                terrainHelper.flatten(world, chunk);
             }
         }
     }

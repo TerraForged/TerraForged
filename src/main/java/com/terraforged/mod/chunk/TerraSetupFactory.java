@@ -38,9 +38,7 @@ import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.surface.*;
 import com.terraforged.mod.biome.utils.Structures;
-import com.terraforged.mod.chunk.column.BedrockDecorator;
 import com.terraforged.mod.chunk.column.ErosionDecorator;
-import com.terraforged.mod.chunk.column.GeologyDecorator;
 import com.terraforged.mod.chunk.column.post.LayerDecorator;
 import com.terraforged.mod.chunk.column.post.SnowEroder;
 import com.terraforged.mod.feature.BlockDataManager;
@@ -62,15 +60,6 @@ public class TerraSetupFactory {
 
     public static DataManager createDataManager() {
         return FeatureManager.data(new File("config/terraforged/datapacks"));
-    }
-
-    public static List<ColumnDecorator> createBaseDecorators(GeoManager geoManager, TerraContext context) {
-        List<ColumnDecorator> processors = new ArrayList<>();
-        if (test("Geology decorator", context.terraSettings.miscellaneous.strataDecorator)) {
-            processors.add(new GeologyDecorator(geoManager));
-        }
-        processors.add(new BedrockDecorator(context));
-        return processors;
     }
 
     public static List<ColumnDecorator> createSurfaceDecorators(TerraContext context) {

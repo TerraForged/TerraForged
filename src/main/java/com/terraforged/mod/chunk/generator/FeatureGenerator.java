@@ -29,11 +29,9 @@ import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionFix;
-import com.terraforged.mod.chunk.util.FastChunk;
 import com.terraforged.mod.chunk.util.TerraContainer;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunk;
@@ -60,9 +58,13 @@ public class FeatureGenerator implements Generator.Features {
         ChunkReader reader = generator.getChunkReader(chunkX, chunkZ);
         TerraContainer container = TerraContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
 
+        // de-hardcode sea-level
+        RegionFix regionFix = new RegionFix(region, generator);
+        // lets us use the regionFix region in a structure manager
+        manager = regionFix.getStructureManager();
+
         Biome biome = container.getFeatureBiome();
         try (DecoratorContext context = generator.getContext().decorator(chunk)) {
-            ISeedReader regionFix = new RegionFix(region, generator);
             BlockPos pos = new BlockPos(context.blockX, 0, context.blockZ);
 
             // place biome features

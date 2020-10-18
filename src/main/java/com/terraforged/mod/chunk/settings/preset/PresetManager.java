@@ -29,6 +29,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.terraforged.mod.Log;
+import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.util.function.IOFunction;
@@ -178,7 +179,7 @@ public class PresetManager implements Iterable<Preset> {
     }
 
     private static void loadInternalPresets(List<Preset> presets) {
-        Path path = ModList.get().getModFileById("terraforged").getFile().getFilePath();
+        Path path = ModList.get().getModFileById(TerraForgedMod.MODID).getFile().getFilePath();
         if (Files.isDirectory(path)) {
             loadAll(() -> Files.walk(path), p -> toString(path.relativize(p)), Files::newInputStream, presets::add);
         } else {

@@ -98,12 +98,19 @@ public class ConfigManager {
                 false,
                 "Set whether coordinates should be displayed by default in the config gui."
         );
+        set(
+                cfg,
+                "could_height",
+                180F,
+                "Set the height of clouds."
+        );
     }));
 
     public static void init() {
         Config.setInsertionOrderPreserved(true);
         BIOME_WEIGHTS.get();
         PERFORMANCE.get();
+        GENERAL.get();
         PerfDefaults.getAndPrintPerfSettings();
     }
 

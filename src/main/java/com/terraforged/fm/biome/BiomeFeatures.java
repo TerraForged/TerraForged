@@ -25,9 +25,9 @@
 package com.terraforged.fm.biome;
 
 import com.google.common.base.Suppliers;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -47,12 +47,15 @@ public class BiomeFeatures {
             .collect(Collectors.toList());
 
     private static final Supplier<List<List<Structure<?>>>> STRUCTURES = Suppliers.memoize(() -> {
-        Map<GenerationStage.Decoration, List<Structure<?>>> map = Registry.STRUCTURE_FEATURE.stream().collect(Collectors.groupingBy(Structure::func_236396_f_));
+        Map<GenerationStage.Decoration, List<Structure<?>>> map = ForgeRegistries.STRUCTURE_FEATURES.getValues().stream()
+                .collect(Collectors.groupingBy(Structure::func_236396_f_));
+
         List<List<Structure<?>>> list = new ArrayList<>();
         for (GenerationStage.Decoration stage : GenerationStage.Decoration.values()) {
             list.add(map.getOrDefault(stage, Collections.emptyList()));
         }
-        return list;
+
+        return Collections.unmodifiableList(list);
     });
 
     private final List<List<BiomeFeature>> features;
@@ -65,7 +68,7 @@ public class BiomeFeatures {
 
     public BiomeFeatures(Builder builder) {
         this.features = builder.compileFeatures();
-        this.structures = NO_STRUCTURES;
+        this.structures = STRUCTURES.get();
     }
 
     public List<List<BiomeFeature>> getFeatures() {

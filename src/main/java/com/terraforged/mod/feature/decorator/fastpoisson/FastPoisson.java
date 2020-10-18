@@ -1,13 +1,10 @@
 package com.terraforged.mod.feature.decorator.fastpoisson;
 
-import com.terraforged.n2d.Source;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.n2d.util.Vec2f;
 import it.unimi.dsi.fastutil.longs.*;
 import net.minecraft.util.math.ChunkPos;
 
-import javax.swing.*;
-import java.awt.image.BufferedImage;
 import java.util.Random;
 
 public class FastPoisson {

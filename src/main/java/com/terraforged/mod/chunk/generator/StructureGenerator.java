@@ -24,27 +24,19 @@
 
 package com.terraforged.mod.chunk.generator;
 
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.concurrent.Resource;
-import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.crash.ReportedException;
 import net.minecraft.network.DebugPacketSender;
-import net.minecraft.util.SharedSeedRandom;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.SectionPos;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.feature.StructureFeature;
-import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureFeatures;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.structure.StructureStart;
@@ -76,10 +68,15 @@ public class StructureGenerator implements Generator.Structures {
     private void generate(IChunk chunk, ChunkPos pos, Biome biome, StructureFeature<?, ?> structure, DynamicRegistries registries, StructureManager structures, TemplateManager templates, long seed) {
         StructureStart<?> start = structures.func_235013_a_(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, chunk);
         int i = start != null ? start.getRefCount() : 0;
-        StructureSeparationSettings settings = generator.func_235957_b_().func_236197_a_(structure.field_236268_b_);
-        if (settings != null) {
-            StructureStart<?> start1 = structure.func_242771_a(registries, generator, generator.getBiomeProvider(), templates, seed, pos, biome, i, settings);
-            structures.func_235014_a_(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, start1, chunk);
+
+        try {
+            StructureSeparationSettings settings = generator.func_235957_b_().func_236197_a_(structure.field_236268_b_);
+            if (settings != null) {
+                StructureStart<?> start1 = structure.func_242771_a(registries, generator, generator.getBiomeProvider(), templates, seed, pos, biome, i, settings);
+                structures.func_235014_a_(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, start1, chunk);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 

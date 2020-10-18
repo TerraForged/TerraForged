@@ -26,6 +26,7 @@ package com.terraforged.mod.data;
 
 import com.google.gson.GsonBuilder;
 import com.terraforged.fm.GameContext;
+import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.mod.biome.provider.BiomeWeights;
@@ -76,6 +77,6 @@ public class WorldGenBiomes extends DataGen {
     }
 
     private static ResourceLocation getName(BiomeType type) {
-        return new ResourceLocation("terraforged", type.name().toLowerCase());
+        return new ResourceLocation(TerraForgedMod.MODID, type.name().toLowerCase());
     }
 }

@@ -44,8 +44,6 @@ import com.terraforged.world.heightmap.Heightmap;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.DimensionSettings;
 
-import java.util.function.Supplier;
-
 public class TerraContext extends GeneratorContext {
 
     public final long worldSeed;

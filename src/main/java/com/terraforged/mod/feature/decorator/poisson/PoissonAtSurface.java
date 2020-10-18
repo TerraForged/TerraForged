@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.feature.decorator.poisson;
 
+import com.terraforged.mod.TerraForgedMod;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.Heightmap;
@@ -35,7 +36,7 @@ public class PoissonAtSurface extends PoissonDecorator {
     public static final PoissonAtSurface INSTANCE = new PoissonAtSurface();
 
     private PoissonAtSurface() {
-        setRegistryName("terraforged", "poisson_surface");
+        setRegistryName(TerraForgedMod.MODID, "poisson_surface");
     }
 
     @Override

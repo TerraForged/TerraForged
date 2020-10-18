@@ -31,6 +31,7 @@ import com.mojang.serialization.DynamicOps;
 import com.terraforged.fm.template.BlockUtils;
 import com.terraforged.fm.util.codec.CodecHelper;
 import com.terraforged.fm.util.codec.Codecs;
+import com.terraforged.mod.TerraForgedMod;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -75,7 +76,7 @@ public class BushFeature extends Feature<BushFeature.Config> {
 
     public BushFeature() {
         super(Config.CODEC);
-        setRegistryName("terraforged", "bush");
+        setRegistryName(TerraForgedMod.MODID, "bush");
     }
 
     @Override

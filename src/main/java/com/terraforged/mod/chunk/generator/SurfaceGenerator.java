@@ -26,7 +26,6 @@ package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
 import com.terraforged.api.biome.surface.SurfaceContext;
-import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
@@ -83,7 +82,7 @@ public class SurfaceGenerator implements Generator.Surfaces {
                         generator.getSurfaceDecorators().get(i).decorate(ctx.buffer, ctx, px, py, pz);
                     }
                 });
-                FastChunk.updateWGHeightmaps(chunk, context.pos);
+                FastChunk.updateWGHeightmaps(chunk);
             }
         }
     }

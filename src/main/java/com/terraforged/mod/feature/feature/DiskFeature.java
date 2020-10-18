@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.feature.feature;
 
+import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import net.minecraft.block.BlockState;
@@ -44,7 +45,7 @@ public class DiskFeature extends Feature<SphereReplaceConfig> {
 
     private DiskFeature() {
         super(SphereReplaceConfig.field_236516_a_);
-        setRegistryName("terraforged", "disk");
+        setRegistryName(TerraForgedMod.MODID, "disk");
     }
 
     @Override

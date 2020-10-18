@@ -26,7 +26,6 @@ package com.terraforged.fm;
 
 import com.terraforged.fm.biome.BiomeFeature;
 import com.terraforged.fm.biome.BiomeFeatures;
-import com.terraforged.fm.util.identity.Identity;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -86,14 +85,18 @@ public interface FeatureDecorator {
                 for (int structureIndex = 0; structureIndex < structures.size(); structureIndex++) {
                     Structure<?> structure = structures.get(structureIndex);
                     random.setFeatureSeed(decorationSeed, featureSeed++, stageIndex);
-                    manager.func_235011_a_(SectionPos.from(pos), structure).forEach(start -> start.func_230366_a_(
-                            region,
-                            manager,
-                            generator,
-                            random,
-                            chunkBounds,
-                            chunkPos
-                    ));
+                    try {
+                        manager.func_235011_a_(SectionPos.from(pos), structure).forEach(start -> start.func_230366_a_(
+                                region,
+                                manager,
+                                generator,
+                                random,
+                                chunkBounds,
+                                chunkPos
+                        ));
+                    } catch (Throwable t) {
+                        handle("structure", structure.getStructureName(), t);
+                    }
                 }
             }
 
@@ -106,7 +109,7 @@ public interface FeatureDecorator {
                         try {
                             feature.getFeature().func_242765_a(region, generator, random, pos);
                         } catch (Throwable t) {
-                            handle(feature.getIdentity(), t);
+                            handle("feature", feature.getIdentity().getIdentity(), t);
                         }
                     }
                 }
@@ -114,8 +117,8 @@ public interface FeatureDecorator {
         }
     }
 
-    static void handle(Identity identity, Throwable t) {
-        FeatureManager.LOG.fatal("Fatal error placing feature {}", identity.getIdentity());
+    static void handle(String type, String identity, Throwable t) {
+        FeatureManager.LOG.fatal("Fatal error placing {} '{}'", type, identity);
         t.printStackTrace();
     }
 }

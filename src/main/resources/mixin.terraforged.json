@@ -9,6 +9,7 @@
     "common.MixinWorldDecorationHelper"
   ],
   "client": [
+    "client.MixinDimensionRenderInfo",
     "client.MixinWorldOptionsScreen"
   ]
 }

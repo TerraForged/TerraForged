@@ -31,7 +31,6 @@ import com.mojang.serialization.DynamicOps;
 import com.terraforged.api.biome.surface.SurfaceManager;
 import com.terraforged.api.chunk.column.BlockColumn;
 import com.terraforged.api.chunk.column.ColumnDecorator;
-import com.terraforged.api.material.WGTags;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.tile.Size;

@@ -33,7 +33,6 @@ import com.terraforged.n2d.Source;
 import net.minecraft.block.BlockState;
 
 import java.util.function.IntFunction;
-import java.util.function.Supplier;
 
 public class StoneForestSurface implements MaskedSurface {
 

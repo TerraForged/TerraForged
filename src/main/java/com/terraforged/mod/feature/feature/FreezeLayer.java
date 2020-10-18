@@ -25,6 +25,7 @@
 package com.terraforged.mod.feature.feature;
 
 import com.terraforged.fm.template.BlockUtils;
+import com.terraforged.mod.TerraForgedMod;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SnowyDirtBlock;
@@ -47,7 +48,7 @@ public class FreezeLayer extends Feature<NoFeatureConfig> {
 
     public FreezeLayer() {
         super(NoFeatureConfig.field_236558_a_);
-        setRegistryName("terraforged", "freeze_top_layer");
+        setRegistryName(TerraForgedMod.MODID, "freeze_top_layer");
     }
 
     @Override

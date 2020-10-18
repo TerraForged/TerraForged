@@ -26,6 +26,7 @@ package com.terraforged.mod.data.gen;
 
 import com.terraforged.core.util.NameUtil;
 import com.terraforged.fm.GameContext;
+import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.config.preview.PreviewSettings;
@@ -71,7 +72,7 @@ public class LangGenerator {
     private static void biomes(LanguageProvider provider, GameContext context) {
         for (Biome biome : context.biomes) {
             ResourceLocation name = context.biomes.getRegistryName(biome);
-            if (name != null && name.getNamespace().equals("terraforged")) {
+            if (name != null && name.getNamespace().equals(TerraForgedMod.MODID)) {
 //                provider.add(name.toString(), NameUtil.toDisplayName(name.getPath()));
             }
         }

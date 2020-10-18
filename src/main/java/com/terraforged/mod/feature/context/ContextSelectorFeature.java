@@ -25,6 +25,7 @@
 package com.terraforged.mod.feature.context;
 
 import com.terraforged.core.concurrent.Resource;
+import com.terraforged.mod.TerraForgedMod;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -38,7 +39,7 @@ public class ContextSelectorFeature extends Feature<ContextSelectorConfig> {
 
     public ContextSelectorFeature() {
         super(ContextSelectorConfig.CODEC);
-        setRegistryName("terraforged", "context_selector");
+        setRegistryName(TerraForgedMod.MODID, "context_selector");
     }
 
     @Override

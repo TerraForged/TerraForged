@@ -24,22 +24,25 @@
 
 package com.terraforged.mod.chunk.util;
 
+import com.google.common.collect.ImmutableSet;
 import com.terraforged.api.chunk.ChunkDelegate;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.palette.PalettedContainer;
 import net.minecraft.world.biome.BiomeContainer;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
-import org.apache.commons.lang3.Validate;
+
+import java.util.Set;
 
 /**
  * A ChunkPrimer wrapper that handles setting BlockStates within the chunk & updating heightmaps accordingly
  */
 public class FastChunk extends ChunkDelegate {
+
+    private static final Set<Heightmap.Type> HEIGHT_MAPS = ImmutableSet.of(Heightmap.Type.OCEAN_FLOOR_WG, Heightmap.Type.WORLD_SURFACE_WG);
 
     private static final int arraySize = 256;
     private static final int bitsPerEntry = 9;
@@ -70,7 +73,7 @@ public class FastChunk extends ChunkDelegate {
             int dy = pos.getY() & 15;
             int dz = pos.getZ() & 15;
             BlockState replaced = section.setBlockState(dx, dy, dz, state, false);
-            if (state.getBlock() != Blocks.AIR) {
+            if (!state.isAir()) {
                 mutable.setPos(blockX + dx, pos.getY(), blockZ + dz);
                 if (state.getLightValue(primer, mutable) != 0) {
                     primer.addLightPosition(mutable);
@@ -98,50 +101,7 @@ public class FastChunk extends ChunkDelegate {
         return chunk;
     }
 
-    public static void updateWGHeightmaps(IChunk chunk, BlockPos.Mutable pos) {
-        int topY = chunk.getTopFilledSegment() + 15;
-        long[] ocean = chunk.getHeightmap(Heightmap.Type.OCEAN_FLOOR_WG).getDataArray();
-        long[] surface = chunk.getHeightmap(Heightmap.Type.WORLD_SURFACE_WG).getDataArray();
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                boolean flag = false;
-                for (int y = topY; y >= 0; y--) {
-                    BlockState state = chunk.getBlockState(pos.setPos(x, y, z));
-                    if (state.getBlock() != Blocks.AIR) {
-                        if (!flag) {
-                            // WORLD_SURFACE_WG predicate is when block != air .: can set the height at this y value
-                            setAt(surface, index(x, z), y + 1);
-                            // flag = true means subsequent y values are ignored
-                            flag = true;
-                        }
-                        if (Heightmap.Type.OCEAN_FLOOR_WG.getHeightLimitPredicate().test(state)) {
-                            setAt(ocean, index(x, z), y + 1);
-                            // no more heightmaps to update at this x/z so can exit the y loop here
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // from BitArray
-    private static void setAt(long[] longArray, int index, int value) {
-        Validate.inclusiveBetween(0L, (arraySize - 1), index);
-        Validate.inclusiveBetween(0L, maxEntryValue, value);
-        int i = index * bitsPerEntry;
-        int j = i >> 6;
-        int k = (index + 1) * bitsPerEntry - 1 >> 6;
-        int l = i ^ j << 6;
-        longArray[j] = longArray[j] & ~(maxEntryValue << l) | ((long) value & maxEntryValue) << l;
-        if (j != k) {
-            int i1 = 64 - l;
-            int j1 = bitsPerEntry - i1;
-            longArray[k] = longArray[k] >>> j1 << j1 | ((long) value & maxEntryValue) >> i1;
-        }
-    }
-
-    private static int index(int x, int z) {
-        return x + (z << 4);
+    public static void updateWGHeightmaps(IChunk chunk) {
+        Heightmap.updateChunkHeightmaps(chunk, HEIGHT_MAPS);
     }
 }
