@@ -42,7 +42,6 @@ import com.terraforged.mod.chunk.settings.preset.Preset;
 import com.terraforged.mod.chunk.settings.preset.PresetManager;
 import com.terraforged.mod.util.setup.SetupHooks;
 import com.terraforged.world.heightmap.WorldLookup;
-import com.terraforged.world.terrain.Terrains;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
@@ -220,7 +219,7 @@ public class TerraBiomeProvider extends BiomeProvider {
     }
 
     public boolean canSpawnAt(Cell cell) {
-        return cell.terrain != context.terrain.ocean && cell.terrain != context.terrain.deepOcean;
+        return !cell.terrain.isSubmerged();
     }
 
     public static TerraBiomeProvider create(long seed, Registry<Biome> registry) {
@@ -228,9 +227,8 @@ public class TerraBiomeProvider extends BiomeProvider {
                 .map(Preset::getSettings)
                 .orElseGet(TerraSettings::new);
         settings.world.seed = seed;
-        Terrains terrains = Terrains.create(settings);
         GameContext gameContext = new GameContext(registry);
-        return new TerraBiomeProvider(new TerraContext(terrains, settings, gameContext));
+        return new TerraBiomeProvider(new TerraContext(settings, gameContext));
     }
 
     public static TerraBiomeProvider create(long seed, TerraContext currentContext) {

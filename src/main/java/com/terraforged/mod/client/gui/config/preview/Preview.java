@@ -42,7 +42,6 @@ import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.MutableVeci;
 import com.terraforged.world.continent.SpawnType;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.Terrains;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
@@ -188,7 +187,7 @@ public class Preview extends Button {
         settings.world.seed = seed;
         this.settings = settings;
 
-        GeneratorContext context = GeneratorContext.createNoCache(Terrains.create(settings), settings);
+        GeneratorContext context = GeneratorContext.createNoCache(settings);
 
         if (settings.world.properties.spawnType == SpawnType.CONTINENT_CENTER) {
             context.factory.get().getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ, center);

@@ -33,7 +33,7 @@ import com.terraforged.mod.biome.map.set.*;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.TerrainType;
+import com.terraforged.world.terrain.TerrainCategory;
 import net.minecraft.world.biome.Biome;
 
 import javax.annotation.Nullable;
@@ -64,13 +64,13 @@ public class SimpleBiomeMap implements BiomeMap {
         wetland = new WetlandSet(builder.wetlands, this, builder.context);
         mountains = new TemperatureSet(builder.mountains, DefaultBiomes.MOUNTAIN, builder.context);
         land = new BiomeTypeSet(builder.map, DefaultBiomes.LAND, builder.context);
-        terrainBiomes = new BiomeSet[TerrainType.values().length];
-        terrainBiomes[TerrainType.SHALLOW_OCEAN.ordinal()] = shallowOcean;
-        terrainBiomes[TerrainType.DEEP_OCEAN.ordinal()] = deepOcean;
-        terrainBiomes[TerrainType.WETLAND.ordinal()] = wetland;
-        terrainBiomes[TerrainType.RIVER.ordinal()] = river;
-        terrainBiomes[TerrainType.LAKE.ordinal()] = lake;
-        for (TerrainType type : TerrainType.values()) {
+        terrainBiomes = new BiomeSet[TerrainCategory.values().length];
+        terrainBiomes[TerrainCategory.SHALLOW_OCEAN.ordinal()] = shallowOcean;
+        terrainBiomes[TerrainCategory.DEEP_OCEAN.ordinal()] = deepOcean;
+        terrainBiomes[TerrainCategory.WETLAND.ordinal()] = wetland;
+        terrainBiomes[TerrainCategory.RIVER.ordinal()] = river;
+        terrainBiomes[TerrainCategory.LAKE.ordinal()] = lake;
+        for (TerrainCategory type : TerrainCategory.values()) {
             if (terrainBiomes[type.ordinal()] == null) {
                 terrainBiomes[type.ordinal()] = land;
             }
@@ -79,11 +79,11 @@ public class SimpleBiomeMap implements BiomeMap {
 
     @Override
     public Biome provideBiome(Cell cell, Levels levels) {
-        TerrainType type = cell.terrain.getType();
+        TerrainCategory type = cell.terrain.getCategory();
         if (type.isSubmerged() && cell.value > levels.water) {
             return land.getBiome(cell);
         }
-        return terrainBiomes[cell.terrain.getType().ordinal()].getBiome(cell);
+        return terrainBiomes[type.ordinal()].getBiome(cell);
     }
 
     @Override

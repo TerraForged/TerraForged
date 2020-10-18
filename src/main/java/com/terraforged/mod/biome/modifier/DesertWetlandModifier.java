@@ -28,7 +28,7 @@ import com.terraforged.api.biome.modifier.BiomeModifier;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.world.biome.BiomeType;
-import com.terraforged.world.terrain.TerrainType;
+import com.terraforged.world.terrain.TerrainCategory;
 import net.minecraft.world.biome.Biome;
 
 public class DesertWetlandModifier implements BiomeModifier {
@@ -52,7 +52,7 @@ public class DesertWetlandModifier implements BiomeModifier {
 
     @Override
     public boolean test(Biome biome, Cell cell) {
-        return cell.terrain.getType() == TerrainType.WETLAND && cell.biomeType == BiomeType.DESERT;
+        return cell.terrain.getDelegate() == TerrainCategory.WETLAND && cell.biomeType == BiomeType.DESERT;
     }
 
     @Override

@@ -25,7 +25,7 @@
 package com.terraforged.mod.chunk.test;
 
 import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainType;
 import net.minecraft.world.biome.Biome;
 
 public class Test {
@@ -36,8 +36,8 @@ public class Test {
         return 0;
     }
 
-    public static Terrain getTerrainType(Terrains terrains) {
-        return terrains.plains;
+    public static Terrain getTerrainType() {
+        return TerrainType.FLATS;
     }
 
     public static Biome getBiome() {

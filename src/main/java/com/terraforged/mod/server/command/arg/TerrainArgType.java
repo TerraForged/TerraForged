@@ -32,25 +32,25 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.terraforged.world.terrain.Terrain;
+import com.terraforged.world.terrain.TerrainType;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.text.StringTextComponent;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class TerrainArgType implements ArgumentType<Terrain> {
 
-    private final List<Terrain> terrains = Terrain.getRegistered();
-
     @Override
     public Terrain parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();
         String name = reader.readString();
-        for (Terrain terrain : terrains) {
-            if (terrain.getName().equalsIgnoreCase(name)) {
-                return terrain;
-            }
+        Optional<Terrain> terrain = TerrainType.find(t -> t.getName().equalsIgnoreCase(name));
+        if (terrain.isPresent()) {
+            return terrain.get();
         }
         reader.setCursor(cursor);
         throw createException("Invalid terrain", "%s is not a valid terrain type", name);
@@ -58,7 +58,9 @@ public class TerrainArgType implements ArgumentType<Terrain> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder suggestions) {
-        return ISuggestionProvider.suggest(terrains.stream().map(Terrain::getName).collect(Collectors.toList()), suggestions);
+        List<String> options = new ArrayList<>();
+        TerrainType.forEach(t -> options.add(t.getName()));
+        return ISuggestionProvider.suggest(options, suggestions);
     }
 
     public static ArgumentType<Terrain> terrain() {

@@ -31,7 +31,7 @@ import com.terraforged.core.concurrent.task.LazySupplier;
 import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.material.Materials;
-import com.terraforged.world.terrain.Terrains;
+import com.terraforged.world.terrain.TerrainType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
@@ -62,11 +62,9 @@ public class ErosionDecorator implements ColumnDecorator {
     private final int seed2;
     private final int seed3;
     private final float minY;
-    private final Terrains terrain;
     private final LazySupplier<Materials> materials;
 
     public ErosionDecorator(TerraContext context) {
-        this.terrain = context.terrain;
         this.seed1 = context.seed.next();
         this.seed2 = context.seed.next();
         this.seed3 = context.seed.next();
@@ -80,7 +78,7 @@ public class ErosionDecorator implements ColumnDecorator {
             return;
         }
 
-        if (context.cell.terrain == terrain.volcanoPipe) {
+        if (context.cell.terrain == TerrainType.VOLCANO_PIPE) {
             return;
         }
 

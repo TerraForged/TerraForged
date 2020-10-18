@@ -27,6 +27,7 @@ package com.terraforged.mod.chunk.column;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.api.material.state.States;
+import com.terraforged.world.terrain.TerrainType;
 import net.minecraft.world.chunk.IChunk;
 
 public class BaseDecorator implements ColumnDecorator {
@@ -35,14 +36,22 @@ public class BaseDecorator implements ColumnDecorator {
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        if (context.cell.terrain == context.terrains.volcanoPipe && context.cell.riverMask > 0.5F) {
+        y = decorateFluid(chunk, context, x, y, z);
+
+        fillDown(context, chunk, x, z, y, 0, States.STONE.get());
+    }
+
+    protected int decorateFluid(IChunk chunk, DecoratorContext context, int x, int y, int z) {
+        if (context.cell.terrain == TerrainType.VOLCANO_PIPE && context.cell.riverMask > 0.5F) {
             int lavaStart = Math.max(context.levels.waterY + 10, y - 30);
             int lavaEnd = Math.max(5, context.levels.waterY - 10);
             fillDown(context, chunk, x, z, lavaStart, lavaEnd, States.LAVA.get());
-            y = lavaEnd;
-        } else if (y < context.levels.waterLevel) {
+            return lavaEnd;
+        }
+
+        if (y < context.levels.waterLevel) {
             fillDown(context, chunk, x, z, context.levels.waterY, y, States.WATER.get());
         }
-        fillDown(context, chunk, x, z, y, 0, States.STONE.get());
+        return y;
     }
 }

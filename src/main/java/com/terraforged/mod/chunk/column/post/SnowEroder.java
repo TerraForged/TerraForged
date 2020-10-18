@@ -29,6 +29,7 @@ import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.column.ErosionDecorator;
 import com.terraforged.n2d.source.Rand;
+import com.terraforged.world.terrain.TerrainType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.GrassBlock;
@@ -70,7 +71,7 @@ public class SnowEroder extends ErosionDecorator {
             float var = -ColumnDecorator.getNoise(x, z, seed1, 16, 0);
             float hNoise = rand.getValue(x, z, seed2) * HEIGHT_MODIFIER;
             float sNoise = rand.getValue(x, z, seed3) * SLOPE_MODIFIER;
-            float vModifier = context.cell.terrain == context.terrains.volcano ? 0.15F : 0F;
+            float vModifier = context.cell.terrain == TerrainType.VOLCANO ? 0.15F : 0F;
             float height = context.cell.value + var + hNoise + vModifier;
             float steepness = context.cell.gradient + var + sNoise + vModifier;
             if (snowErosion(x, z, steepness, height)) {

@@ -45,7 +45,6 @@ import com.terraforged.mod.server.command.search.Search;
 import com.terraforged.mod.server.command.search.TerrainSearchTask;
 import com.terraforged.world.WorldGenerator;
 import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.Terrains;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.ArgumentSerializer;
@@ -201,8 +200,7 @@ public class TerraCommand {
                 "This command can only be run in a TerraForged world!"
         ));
 
-        Terrain terrain = TerrainArgType.getTerrain(context, "terrain");
-        Terrain type = getTerrainInstance(terrain, terraContext.terrain);
+        Terrain type = TerrainArgType.getTerrain(context, "terrain");
         BlockPos pos = context.getSource().asPlayer().getPosition();
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
@@ -240,8 +238,7 @@ public class TerraCommand {
                 "This command can only be run in a TerraForged world!"
         ));
 
-        Terrain terrain = TerrainArgType.getTerrain(context, "terrain");
-        Terrain target = getTerrainInstance(terrain, terraContext.terrain);
+        Terrain target = TerrainArgType.getTerrain(context, "terrain");
         Biome biome = getBiome(context, "biome");
         BlockPos pos = context.getSource().asPlayer().getPosition();
         UUID playerID = context.getSource().asPlayer().getUniqueID();
@@ -300,17 +297,6 @@ public class TerraCommand {
                 .map(r -> r.getKey(biome))
                 .map(Objects::toString)
                 .orElse("unknown");
-    }
-
-    // the terrain parsed from the command will not be the same instance as used in the
-    // world generator, so find the matching instance by name
-    private static Terrain getTerrainInstance(Terrain find, Terrains terrains) {
-        for (Terrain t : terrains.index) {
-            if (t.getName().equals(find.getName())) {
-                return t;
-            }
-        }
-        return find;
     }
 
     private static ChunkGenerator getChunkGenerator(CommandContext<CommandSource> context) {

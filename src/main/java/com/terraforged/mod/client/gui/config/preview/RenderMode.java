@@ -39,7 +39,7 @@ public enum RenderMode {
 
         @Override
         public int getColor(Cell cell, Levels levels, float scale, float bias) {
-            switch (cell.terrain.getType()) {
+            switch (cell.terrain.getCategory()) {
                 case DEEP_OCEAN:
                     return rgba(0.63F, 0.65F, 0.8F);
                 case SHALLOW_OCEAN:
@@ -65,7 +65,7 @@ public enum RenderMode {
 
         @Override
         public int getColor(Cell cell, Levels levels, float scale, float bias) {
-            switch (cell.terrain.getType()) {
+            switch (cell.terrain.getCategory()) {
                 case DEEP_OCEAN:
                     return rgba(0.63F, 0.65F, 0.8F);
                 case SHALLOW_OCEAN:
@@ -119,7 +119,7 @@ public enum RenderMode {
         public int getColor(Cell cell, Levels levels, float scale, float bias) {
             float saturation = 0.7F;
             float brightness = 0.8F;
-            return rgba(cell.terrain.getHue(), saturation, brightness);
+            return rgba(cell.terrain.getRenderHue(), saturation, brightness);
         }
     },
     ;

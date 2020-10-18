@@ -24,15 +24,13 @@
 
 package com.terraforged.mod.chunk.column;
 
-import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
-import com.terraforged.api.material.state.States;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.world.geology.Stratum;
 import net.minecraft.block.BlockState;
 import net.minecraft.world.chunk.IChunk;
 
-public class BaseGeoDecorator implements ColumnDecorator, Stratum.Visitor<BlockState, DecoratorContext> {
+public class BaseGeoDecorator extends BaseDecorator implements Stratum.Visitor<BlockState, DecoratorContext> {
 
     private final TerraChunkGenerator generator;
 
@@ -42,16 +40,10 @@ public class BaseGeoDecorator implements ColumnDecorator, Stratum.Visitor<BlockS
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        if (context.cell.terrain == context.terrains.volcanoPipe && context.cell.riverMask > 0.5F) {
-            int lavaStart = Math.max(context.levels.waterY + 10, y - 30);
-            int lavaEnd = Math.max(5, context.levels.waterY - 10);
-            fillDown(context, chunk, x, z, lavaStart, lavaEnd, States.LAVA.get());
-            y = lavaEnd;
-        } else if (y < context.levels.waterLevel) {
-            fillDown(context, chunk, x, z, context.levels.waterY, y, States.WATER.get());
-        }
+        y = decorateFluid(chunk, context, x, y, z);
 
         context.pos.setPos(x, y, z);
+
         generator.getGeologyManager().getGeology(context.biome)
                 .getStrata(x, z)
                 .downwards(x, y, z, context.depthBuffer.get(), context, this);

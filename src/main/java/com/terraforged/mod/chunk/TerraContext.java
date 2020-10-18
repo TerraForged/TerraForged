@@ -41,7 +41,6 @@ import com.terraforged.mod.material.Materials;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.WorldGeneratorFactory;
 import com.terraforged.world.heightmap.Heightmap;
-import com.terraforged.world.terrain.Terrains;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.DimensionSettings;
 
@@ -57,7 +56,7 @@ public class TerraContext extends GeneratorContext {
     public final GameContext gameContext;
 
     public TerraContext(TerraContext other, GameContext gameContext) {
-        super(other.terrain, other.settings, other.terrainFactory, TerraContext::createCache);
+        super(other.settings, other.terrainFactory, TerraContext::createCache);
         this.worldSeed = other.worldSeed;
         this.terraSettings = other.terraSettings;
         this.gameContext = gameContext;
@@ -65,15 +64,7 @@ public class TerraContext extends GeneratorContext {
     }
 
     public TerraContext(TerraSettings settings, GameContext gameContext) {
-        super(Terrains.create(settings), settings, TerraTerrainProvider::new, TerraContext::createCache);
-        this.worldSeed = settings.world.seed;
-        this.gameContext = gameContext;
-        this.terraSettings = settings;
-        this.heightmap = factory.then(WorldGeneratorFactory::getHeightmap);
-    }
-
-    public TerraContext(Terrains terrain, TerraSettings settings, GameContext gameContext) {
-        super(terrain, settings, TerraTerrainProvider::new, TerraContext::createCache);
+        super(settings, TerraTerrainProvider::new, TerraContext::createCache);
         this.worldSeed = settings.world.seed;
         this.gameContext = gameContext;
         this.terraSettings = settings;
@@ -81,11 +72,11 @@ public class TerraContext extends GeneratorContext {
     }
 
     public DecoratorContext decorator(IChunk chunk) {
-        return new DecoratorContext(chunk, levels, terrain, factory.get().getClimate(), false);
+        return new DecoratorContext(chunk, levels, factory.get().getClimate(), false);
     }
 
     public SurfaceContext surface(ChunkSurfaceBuffer buffer, TerraContainer biomes, DimensionSettings settings) {
-        return new SurfaceContext(buffer, biomes, levels, terrain, factory.get().getClimate(), settings, seed.get());
+        return new SurfaceContext(buffer, biomes, levels, factory.get().getClimate(), settings, seed.get());
     }
 
     public static TileCache createCache(WorldGeneratorFactory factory) {

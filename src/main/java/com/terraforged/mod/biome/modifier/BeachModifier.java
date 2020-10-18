@@ -31,7 +31,7 @@ import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.n2d.Module;
 import com.terraforged.n2d.Source;
 import com.terraforged.world.biome.BiomeType;
-import com.terraforged.world.terrain.TerrainType;
+import com.terraforged.world.terrain.TerrainCategory;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 
@@ -58,7 +58,7 @@ public class BeachModifier implements BiomeModifier {
 
     @Override
     public boolean test(Biome biome, Cell cell) {
-        return cell.terrain.getType() == TerrainType.BEACH && cell.biomeType != BiomeType.DESERT;
+        return cell.terrain.getDelegate() == TerrainCategory.BEACH && cell.biomeType != BiomeType.DESERT;
     }
 
     @Override

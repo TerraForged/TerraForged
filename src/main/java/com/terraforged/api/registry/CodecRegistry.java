@@ -70,7 +70,8 @@ public class CodecRegistry<E extends IForgeRegistryEntry<E>> implements IForgeRe
     }
 
     @Override
-    public void registerAll(E... values) {
+    @SafeVarargs
+    public final void registerAll(E... values) {
         delegate.registerAll(values);
     }
 

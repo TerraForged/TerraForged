@@ -78,8 +78,8 @@ public class BiomeBuilders {
         BiomeBuilder builder = BiomeUtils.getBuilder(Biomes.SNOWY_TAIGA);
         builder.type(BiomeManager.BiomeType.ICY);
         builder.category(Biome.Category.SWAMP);
-        builder.downfall(0.05F);
-        builder.temperature(0.15F);
+        builder.downfall(0.15F);
+        builder.temperature(0.14999F);
         builder.precipitation(Biome.RainType.SNOW);
         builder.filterFeatures(DynamicMatcher.config(BaseTreeFeatureConfig.class));
         return builder;

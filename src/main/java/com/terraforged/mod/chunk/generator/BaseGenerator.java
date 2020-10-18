@@ -35,7 +35,6 @@ import com.terraforged.mod.chunk.util.TerraContainer;
 import com.terraforged.mod.feature.TerrainHelper;
 import com.terraforged.world.climate.Climate;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.Terrains;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.feature.structure.StructureManager;
@@ -44,7 +43,6 @@ public class BaseGenerator implements Generator.Terrain {
 
     private final Levels levels;
     private final Climate climate;
-    private final Terrains terrain;
     private final TerrainHelper terrainHelper;
     private final TerraChunkGenerator generator;
     private final ColumnDecorator baseDecorator;
@@ -52,7 +50,6 @@ public class BaseGenerator implements Generator.Terrain {
     public BaseGenerator(TerraChunkGenerator generator) {
         this.generator = generator;
         this.levels = generator.getContext().levels;
-        this.terrain = generator.getContext().terrain;
         this.climate = generator.getContext().factory.get().getClimate();
         this.terrainHelper = new TerrainHelper(0.75F, 4F);
         this.baseDecorator = getBaseDecorator(generator);
@@ -62,7 +59,7 @@ public class BaseGenerator implements Generator.Terrain {
     public final void generateTerrain(IWorld world, IChunk chunk, StructureManager structures) {
         try (ChunkReader reader = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z)) {
             TerraContainer container = TerraContainer.getOrCreate(FastChunk.wrap(chunk), reader, generator.getBiomeProvider());
-            try (DecoratorContext context = new DecoratorContext(chunk, levels, terrain, climate)) {
+            try (DecoratorContext context = new DecoratorContext(chunk, levels, climate)) {
                 reader.iterate(context, (cell, dx, dz, ctx) -> {
                     int px = ctx.blockX + dx;
                     int pz = ctx.blockZ + dz;

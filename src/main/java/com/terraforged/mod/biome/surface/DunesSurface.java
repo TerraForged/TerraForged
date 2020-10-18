@@ -37,7 +37,6 @@ import com.terraforged.n2d.Source;
 import com.terraforged.n2d.func.CellFunc;
 import com.terraforged.n2d.util.NoiseUtil;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.Terrains;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -48,14 +47,12 @@ public class DunesSurface implements MaskedSurface {
     private final int maxHeight;
     private final Levels levels;
     private final Module module;
-    private final Terrains terrains;
     private final DesertBiomes deserts;
     private final BlockPos.Mutable pos = new BlockPos.Mutable();
 
     public DunesSurface(TerraContext context, int maxHeight, DesertBiomes deserts) {
         Module dunes = Source.cell(context.seed.next(), 80, CellFunc.DISTANCE)
                 .warp(context.seed.next(), 70, 1, 70);
-        this.terrains = context.terrain;
         this.levels = context.levels;
         this.maxHeight = maxHeight;
         this.deserts = deserts;

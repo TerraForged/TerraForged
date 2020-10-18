@@ -28,7 +28,6 @@ import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.chunk.util.TerraContainer;
 import com.terraforged.world.climate.Climate;
 import com.terraforged.world.heightmap.Levels;
-import com.terraforged.world.terrain.Terrains;
 import net.minecraft.block.BlockState;
 import net.minecraft.world.gen.DimensionSettings;
 
@@ -43,8 +42,8 @@ public class SurfaceContext extends DecoratorContext implements AutoCloseable {
 
     public double noise;
 
-    public SurfaceContext(ChunkSurfaceBuffer buffer, TerraContainer biomes, Levels levels, Terrains terrain, Climate climate, DimensionSettings settings, long seed) {
-        super(buffer, levels, terrain, climate);
+    public SurfaceContext(ChunkSurfaceBuffer buffer, TerraContainer biomes, Levels levels, Climate climate, DimensionSettings settings, long seed) {
+        super(buffer, levels, climate);
         this.solid = settings.getDefaultBlock();
         this.fluid = settings.getDefaultFluid();
         this.buffer = buffer;
