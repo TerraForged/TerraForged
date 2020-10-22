@@ -16,8 +16,9 @@ import java.util.function.Supplier;
 public class BiomeBuilder extends Biome.Builder {
 
     private final Biome parentBiome;
-    private final RegistryKey<Biome> parentKey;
     private final Map<GenerationStage.Decoration, List<Supplier<ConfiguredFeature<?, ?>>>> features = new EnumMap<>(GenerationStage.Decoration.class);
+
+    private RegistryKey<Biome> parentKey;
     private BiomeGenerationSettings.Builder settings = new BiomeGenerationSettings.Builder();
 
     private int weight = -1;
@@ -28,6 +29,14 @@ public class BiomeBuilder extends Biome.Builder {
         this.parentBiome = biome;
         this.parentKey = key;
         this.dictionaryTypes.addAll(BiomeDictionary.getTypes(parentKey));
+    }
+
+    public void setParentKey(RegistryKey<Biome> parentKey) {
+        this.parentKey = parentKey;
+    }
+
+    public RegistryKey<Biome> getParentKey() {
+        return parentKey;
     }
 
     public void registerTypes(RegistryKey<Biome> key) {

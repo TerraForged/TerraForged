@@ -28,18 +28,14 @@ import com.terraforged.api.material.WGTags;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.api.material.state.States;
 import com.terraforged.core.concurrent.Resource;
-import com.terraforged.fm.data.DataManager;
-import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.util.DummyBlockReader;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
 import net.minecraft.block.*;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
-import java.io.File;
 import java.util.*;
 
 public class Materials {
@@ -115,9 +111,6 @@ public class Materials {
     }
 
     public static Materials create() {
-        try (DataManager manager = DataManager.of(new File(SettingsHelper.SETTINGS_DIR, "datapacks"))) {
-            manager.forEachTag("blocks", WGTags.WG_TAGS, ForgeRegistries.BLOCKS, WGTags::set);
-            return new Materials();
-        }
+        return new Materials();
     }
 }

@@ -11,7 +11,10 @@ public interface DecorationHelper {
     ChunkGenerator getGenerator();
 
     static DecorationContext getContext(WorldDecoratingHelper helper) {
-        DecorationHelper decorationHelper = (DecorationHelper) helper;
-        return DecorationContext.of(decorationHelper.getRegion(), decorationHelper.getGenerator());
+        if (helper instanceof DecorationHelper) {
+            DecorationHelper decorationHelper = (DecorationHelper) helper;
+            return DecorationContext.of(decorationHelper.getRegion(), decorationHelper.getGenerator());
+        }
+        return DecorationHelperFallback.getContext(helper);
     }
 }

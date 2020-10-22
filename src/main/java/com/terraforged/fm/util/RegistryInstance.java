@@ -75,6 +75,10 @@ public class RegistryInstance<T> implements Iterable<T> {
         return registry.func_241873_b(name).orElse(null);
     }
 
+    public RegistryKey<T> getKey(T t) {
+        return registry.func_230519_c_(t).orElse(null);
+    }
+
     public ResourceLocation getRegistryName(T t) {
         return registry.getKey(t);
     }
@@ -84,7 +88,7 @@ public class RegistryInstance<T> implements Iterable<T> {
     }
 
     public boolean contains(ResourceLocation name) {
-        return registry.containsKey(name);
+        return registry.func_241873_b(name).isPresent();
     }
 
     @Override

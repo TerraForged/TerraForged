@@ -33,6 +33,7 @@ import com.terraforged.api.chunk.column.BlockColumn;
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.concurrent.task.LazySupplier;
 import com.terraforged.core.tile.Size;
 import com.terraforged.core.tile.Tile;
 import com.terraforged.core.tile.chunk.ChunkReader;
@@ -44,7 +45,9 @@ import com.terraforged.fm.util.codec.Codecs;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.biome.utils.StructureLocator;
+import com.terraforged.mod.chunk.column.ColumnResource;
 import com.terraforged.mod.chunk.generator.*;
+import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.material.geology.GeoManager;
@@ -52,6 +55,7 @@ import com.terraforged.mod.util.setup.SetupHooks;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.IBlockReader;
@@ -65,12 +69,14 @@ import net.minecraft.world.gen.*;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 import net.minecraft.world.gen.settings.StructureSeparationSettings;
 import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class TerraChunkGenerator extends ChunkGenerator {
 
@@ -88,46 +94,11 @@ public class TerraChunkGenerator extends ChunkGenerator {
     private final Generator.Surfaces surfaceGenerator;
     private final Generator.Features featureGenerator;
     private final Generator.Structures structureGenerator;
-
-    private final GeoManager geologyManager;
-    private final FeatureManager featureManager;
-    private final FMStructureManager structureManager;
-    private final SurfaceManager surfaceManager;
-    private final BlockDataManager blockDataManager;
-    private final List<ColumnDecorator> surfaceDecorators;
-    private final List<ColumnDecorator> postProcessors;
-
-    private final TileCache tileCache;
-
-    protected TerraChunkGenerator(long seed, TerraBiomeProvider biomeProvider, DimensionSettings settings) {
-        super(biomeProvider, settings.getStructures());
-
-        this.settings = settings;
-        this.biomeProvider = biomeProvider;
-
-        this.seed = seed;
-        this.context = null;
-        this.mobGenerator = null;
-        this.biomeGenerator = null;
-        this.terrainCarver = null;
-        this.terrainGenerator = null;
-        this.surfaceGenerator = null;
-        this.featureGenerator = null;
-        this.structureGenerator = null;
-        this.geologyManager = null;
-        this.featureManager = null;
-        this.structureManager = null;
-        this.surfaceManager = null;
-        this.blockDataManager = null;
-        this.surfaceDecorators = Collections.emptyList();
-        this.postProcessors = Collections.emptyList();
-        this.tileCache = null;
-    }
+    private final Supplier<GeneratorResources> resources;
 
     public TerraChunkGenerator(TerraBiomeProvider biomeProvider, DimensionSettings settings) {
         super(biomeProvider, settings.getStructures());
         TerraContext context = biomeProvider.getContext();
-
         this.seed = context.terraSettings.world.seed;
         this.context = context;
         this.settings = settings;
@@ -139,23 +110,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         this.surfaceGenerator = new SurfaceGenerator(this);
         this.featureGenerator = new FeatureGenerator(this);
         this.structureGenerator = new StructureGenerator(this);
-
-        this.surfaceManager = TerraSetupFactory.createSurfaceManager(context);
-        this.structureManager = TerraSetupFactory.createStructureManager(context);
-        this.geologyManager = TerraSetupFactory.createGeologyManager(context);
-        this.surfaceDecorators = TerraSetupFactory.createSurfaceDecorators(context);
-        this.postProcessors = TerraSetupFactory.createFeatureDecorators(context);
-        this.tileCache = context.cache.get();
-
-        try (DataManager data = TerraSetupFactory.createDataManager()) {
-            FeatureManager.initData(data);
-            this.featureManager = TerraSetupFactory.createFeatureManager(data, context);
-            this.blockDataManager = TerraSetupFactory.createBlockDataManager(data, context);
-            FeatureManager.clearData();
-        }
-
-        SetupHooks.setup(getLayerManager(), context.copy());
-        SetupHooks.setup(surfaceDecorators, postProcessors, context.copy());
+        this.resources = LazySupplier.factory(context, GeneratorResources::new);
     }
 
     private TerraChunkGenerator create(long seed) {
@@ -191,7 +146,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
 
         int height = getContext().levels.scale(value) + 1;
         int surface = Math.max(height, getSeaLevel() + 1);
-        BlockColumn column = GeneratorResources.get().column.withCapacity(surface);
+        BlockColumn column = ColumnResource.get().column.withCapacity(surface);
         BlockState solid = settings.getDefaultBlock();
         for (int y = 0; y < height; y++) {
             column.set(y, solid);
@@ -318,15 +273,15 @@ public class TerraChunkGenerator extends ChunkGenerator {
     }
 
     public final FeatureManager getFeatureManager() {
-        return featureManager;
+        return resources.get().featureManager;
     }
 
     public final FMStructureManager getStructureManager() {
-        return structureManager;
+        return resources.get().structureManager;
     }
 
     public final GeoManager getGeologyManager() {
-        return geologyManager;
+        return resources.get().geologyManager;
     }
 
     public final LayerManager getLayerManager() {
@@ -334,35 +289,45 @@ public class TerraChunkGenerator extends ChunkGenerator {
     }
 
     public final SurfaceManager getSurfaceManager() {
-        return surfaceManager;
+        return resources.get().surfaceManager;
     }
 
     public final BlockDataManager getBlockDataManager() {
-        return blockDataManager;
+        return resources.get().blockDataManager;
     }
 
     public final List<ColumnDecorator> getSurfaceDecorators() {
-        return surfaceDecorators;
+        return resources.get().surfaceDecorators;
     }
 
     public final List<ColumnDecorator> getPostProcessors() {
-        return postProcessors;
+        return resources.get().postProcessors;
+    }
+
+    public final void queueChunk(ChunkPos pos) {
+        queueChunk(pos.x, pos.z);
     }
 
     public final void queueChunk(int chunkX, int chunkZ) {
+        TileCache tileCache = resources.get().tileCache;
         int rx = tileCache.chunkToRegion(chunkX);
         int rz = tileCache.chunkToRegion(chunkZ);
         tileCache.queueRegion(rx, rz);
     }
 
+    public final Tile getTile(ChunkPos pos) {
+        return getTile(pos.x, pos.z);
+    }
+
     public final Tile getTile(int chunkX, int chunkZ) {
+        TileCache tileCache = resources.get().tileCache;
         int rx = tileCache.chunkToRegion(chunkX);
         int rz = tileCache.chunkToRegion(chunkZ);
         return tileCache.getRegion(rx, rz);
     }
 
     public final ChunkReader getChunkReader(int chunkX, int chunkZ) {
-        return tileCache.getChunk(chunkX, chunkZ);
+        return resources.get().tileCache.getChunk(chunkX, chunkZ);
     }
 
     public static ChunkReader getChunk(IWorld world, ChunkGenerator generator) {
@@ -380,11 +345,6 @@ public class TerraChunkGenerator extends ChunkGenerator {
         }
         throw new IllegalStateException("NONONO");
     }
-
-    public static TerraChunkGenerator createDummy(long seed, TerraBiomeProvider biomes, DimensionSettings settings) {
-        return new TerraChunkGenerator(seed, biomes, settings);
-    }
-
     private static <T> Dynamic<T> encodeGenerator(TerraChunkGenerator generator, DynamicOps<T> ops) {
         T biomeProvider = Codecs.encodeAndGet(TerraBiomeProvider.CODEC, generator.getBiomeProvider(), ops);
         T dimensionSettings = Codecs.encodeAndGet(DimensionSettings.field_236097_a_, generator.getSettings(), ops);

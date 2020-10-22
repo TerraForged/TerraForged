@@ -1,8 +1,14 @@
 package com.terraforged.mod.biome;
 
+import com.mojang.datafixers.util.Either;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
 import com.terraforged.fm.matcher.dynamic.DynamicMatcher;
 import com.terraforged.mod.biome.utils.BiomeBuilder;
 import com.terraforged.mod.biome.utils.BiomeUtils;
+import net.minecraft.block.BlockState;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
@@ -10,6 +16,8 @@ import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.Features;
 import net.minecraftforge.common.BiomeManager;
+
+import java.util.Optional;
 
 public class BiomeBuilders {
 
@@ -39,10 +47,16 @@ public class BiomeBuilders {
     public static BiomeBuilder coldSteppe() {
         BiomeBuilder builder = BiomeUtils.getBuilder(Biomes.GIANT_SPRUCE_TAIGA);
         builder.type(BiomeManager.BiomeType.COOL);
-        builder.downfall(0.05F);
-        builder.temperature(0.2F);
         builder.precipitation(Biome.RainType.SNOW);
-        builder.filterFeatures(DynamicMatcher.config(BaseTreeFeatureConfig.class), DynamicMatcher.feature(Feature.FOREST_ROCK));
+        builder.filterFeatures(
+                DynamicMatcher.config(BaseTreeFeatureConfig.class),
+                DynamicMatcher.feature(Feature.FOREST_ROCK),
+                // red/brown mushrooms
+                DynamicMatcher.of(Features.field_243826_aY),
+                DynamicMatcher.of(Features.field_243826_aY)
+        );
+        builder.temperature(0.2F);
+        builder.downfall(0.05F);
         deadBush(builder);
         denseGrass(builder);
         ferns(builder);
@@ -135,7 +149,6 @@ public class BiomeBuilders {
 
     public static BiomeBuilder steppe() {
         BiomeBuilder builder = BiomeUtils.getBuilder(Biomes.GIANT_SPRUCE_TAIGA);
-        builder.type(BiomeManager.BiomeType.WARM);
         builder.filterFeatures(
                 DynamicMatcher.config(BaseTreeFeatureConfig.class),
                 DynamicMatcher.feature(Feature.FOREST_ROCK),
@@ -143,6 +156,8 @@ public class BiomeBuilders {
                 DynamicMatcher.of(Features.field_243826_aY),
                 DynamicMatcher.of(Features.field_243826_aY)
         );
+        builder.setParentKey(Biomes.SHATTERED_SAVANNA_PLATEAU);
+        builder.category(Biome.Category.SAVANNA);
         builder.copyAmbience(Biomes.SAVANNA);
         builder.downfall(0.05F);
         builder.temperature(1.2F);

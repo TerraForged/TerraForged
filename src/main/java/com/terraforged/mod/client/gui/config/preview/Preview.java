@@ -35,6 +35,7 @@ import com.terraforged.core.settings.Settings;
 import com.terraforged.core.tile.Size;
 import com.terraforged.core.tile.Tile;
 import com.terraforged.core.tile.gen.TileGenerator;
+import com.terraforged.core.util.PosUtil;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import com.terraforged.n2d.util.NoiseUtil;
@@ -190,7 +191,9 @@ public class Preview extends Button {
         GeneratorContext context = GeneratorContext.createNoCache(settings);
 
         if (settings.world.properties.spawnType == SpawnType.CONTINENT_CENTER) {
-            context.factory.get().getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ, center);
+            long center = context.factory.get().getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ);
+            this.center.x = PosUtil.unpackX(center);
+            this.center.z = PosUtil.unpackY(center);
         } else {
             center.x = 0;
             center.z = 0;

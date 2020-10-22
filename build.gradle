@@ -65,7 +65,7 @@ minecraft {
             workingDirectory project.file("run/server")
             property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
             property "forge.logging.console.level", "debug"
-            jvmArgs "-Xmx8G", "-Xms6G", "-Ddev"
+            jvmArgs "-Xmx8G", "-Xms6G", "-Ddev", "-DvanillaBiomes"
             arg "-mixin.config=mixin.terraforged.json"
             mods {
                 terraforged {

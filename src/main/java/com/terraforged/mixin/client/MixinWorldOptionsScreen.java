@@ -1,5 +1,6 @@
 package com.terraforged.mixin.client;
 
+import com.terraforged.api.client.WorldOptionsCallback;
 import com.terraforged.api.level.client.ClientLevelManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -17,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Optional;
 
 @Mixin(WorldOptionsScreen.class)
-public class MixinWorldOptionsScreen {
+public abstract class MixinWorldOptionsScreen implements WorldOptionsCallback {
 
     @Shadow
     private Optional<BiomeGeneratorTypeScreens> field_239040_n_;
@@ -36,5 +37,10 @@ public class MixinWorldOptionsScreen {
             field_239040_n_ = option;
             field_239039_m_ = option.get().func_241220_a_(registries, seed, structures, chest);
         }
+    }
+
+    @Override
+    public void update(DimensionGeneratorSettings settings) {
+        field_239039_m_ = settings;
     }
 }

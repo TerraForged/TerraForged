@@ -25,8 +25,13 @@
 package com.terraforged.mod.client.gui.config;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.terraforged.api.client.WorldOptionsCallback;
+import com.terraforged.mod.Log;
+import com.terraforged.mod.TerraForgedLevel;
+import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TerraContext;
+import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
-import com.terraforged.mod.client.gui.TerraDimGenSettings;
 import com.terraforged.mod.client.gui.config.page.PresetsPage;
 import com.terraforged.mod.client.gui.config.page.SimplePreviewPage;
 import com.terraforged.mod.client.gui.config.page.WorldPage;
@@ -38,9 +43,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.WorldOptionsScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 
@@ -52,15 +59,17 @@ public class SettingsScreen extends OverlayScreen {
     private final Page[] pages;
     private final PreviewPage preview;
     private final CreateWorldScreen parent;
-    private final TerraDimGenSettings settings;
+    private final DimensionGeneratorSettings inputSettings;
     private final Instance instance;
 
     private int pageIndex = 0;
+    private DimensionGeneratorSettings outputSettings;
 
-    public SettingsScreen(CreateWorldScreen parent, TerraDimGenSettings settings) {
-        this.settings = settings;
+    public SettingsScreen(CreateWorldScreen parent, DimensionGeneratorSettings settings) {
+        this.inputSettings = settings;
+        this.outputSettings = settings;
         this.parent = parent;
-        this.instance = new Instance(settings.settings);
+        this.instance = new Instance(getInitialSettings(settings));
         this.preview = new PreviewPage(instance.settings, getSeed(parent));
         this.pages = new Page[]{
                 new PresetsPage(instance, preview, preview.getPreviewWidget()),
@@ -105,14 +114,18 @@ public class SettingsScreen extends OverlayScreen {
         }
 
         // -52
-        addButton(new Button(buttonsCenter - buttonWidth - buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.CANCEL.getText(), b -> onClose()));
+        addButton(new Button(buttonsCenter - buttonWidth - buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.CANCEL.getText(), b -> closeScreen()));
 
         // +2
         addButton(new Button(buttonsCenter + buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.DONE.getText(), b -> {
             for (Page page : pages) {
                 page.save();
             }
-            settings.settings = instance.settings;
+
+            Log.debug("Updating generator settings...");
+            DynamicRegistries registries = parent.field_238934_c_.func_239055_b_();
+            outputSettings = TerraForgedLevel.updateOverworld(inputSettings, registries, instance.settings);
+            Log.debug("Updating seed...");
             SettingsScreen.setSeed(parent, preview.getSeed());
             closeScreen();
         }));
@@ -226,11 +239,13 @@ public class SettingsScreen extends OverlayScreen {
 
     @Override
     public void closeScreen() {
+        Log.debug("Returning to parent screen");
         for (Page page : pages) {
             page.close();
         }
         preview.close();
         Minecraft.getInstance().displayGuiScreen(parent);
+        WorldOptionsCallback.update(parent.field_238934_c_, outputSettings);
     }
 
     private boolean hasNext() {
@@ -254,6 +269,14 @@ public class SettingsScreen extends OverlayScreen {
         return -1;
     }
 
+    private static TerraSettings getInitialSettings(DimensionGeneratorSettings level) {
+        if (level.func_236225_f_() instanceof TerraChunkGenerator) {
+            TerraContext context = ((TerraChunkGenerator) level.func_236225_f_()).getContext();
+            return context.terraSettings;
+        }
+        throw new IllegalStateException("Not a TerraForged generator :[");
+    }
+
     private static void setSeed(CreateWorldScreen screen, int seed) {
         TextFieldWidget field = getWidget(screen);
         if (field != null) {
@@ -266,7 +289,7 @@ public class SettingsScreen extends OverlayScreen {
         for (IGuiEventListener widget : screen.getEventListeners()) {
             if (widget instanceof TextFieldWidget) {
                 TextFieldWidget field = (TextFieldWidget) widget;
-                if (field.getMessage().equals(message)) {
+                if (field.getMessage().getString().equals(message)) {
                     return field;
                 }
             }
@@ -275,9 +298,6 @@ public class SettingsScreen extends OverlayScreen {
     }
 
     public static SettingsScreen create(CreateWorldScreen parent, DimensionGeneratorSettings settings) {
-        if (settings instanceof TerraDimGenSettings) {
-            return new SettingsScreen(parent, (TerraDimGenSettings) settings);
-        }
-        throw new UnsupportedOperationException();
+        return new SettingsScreen(parent, settings);
     }
 }

@@ -26,6 +26,7 @@ package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
+import com.terraforged.core.concurrent.task.LazySupplier;
 import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.column.BaseDecorator;
@@ -34,6 +35,7 @@ import com.terraforged.mod.chunk.column.BedrockDecorator;
 import com.terraforged.mod.chunk.util.FastChunk;
 import com.terraforged.mod.chunk.util.TerraContainer;
 import com.terraforged.mod.feature.TerrainHelper;
+import com.terraforged.world.WorldGeneratorFactory;
 import com.terraforged.world.climate.Climate;
 import com.terraforged.world.heightmap.Levels;
 import net.minecraft.world.IWorld;
@@ -43,16 +45,16 @@ import net.minecraft.world.gen.feature.structure.StructureManager;
 public class BaseGenerator implements Generator.Terrain {
 
     private final Levels levels;
-    private final Climate climate;
     private final TerrainHelper terrainHelper;
     private final TerraChunkGenerator generator;
     private final ColumnDecorator baseDecorator;
     private final ColumnDecorator bedrockDecorator;
+    private final LazySupplier<Climate> climate;
 
     public BaseGenerator(TerraChunkGenerator generator) {
         this.generator = generator;
         this.levels = generator.getContext().levels;
-        this.climate = generator.getContext().factory.get().getClimate();
+        this.climate = generator.getContext().factory.then(WorldGeneratorFactory::getClimate);
         this.terrainHelper = new TerrainHelper(0.75F, 4F);
         this.baseDecorator = getBaseDecorator(generator);
         this.bedrockDecorator = new BedrockDecorator(generator.getContext());
@@ -62,7 +64,7 @@ public class BaseGenerator implements Generator.Terrain {
     public final void generateTerrain(IWorld world, IChunk chunk, StructureManager structures) {
         try (ChunkReader reader = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z)) {
             TerraContainer container = TerraContainer.getOrCreate(FastChunk.wrap(chunk), reader, generator.getBiomeProvider());
-            try (DecoratorContext context = new DecoratorContext(chunk, levels, climate)) {
+            try (DecoratorContext context = new DecoratorContext(chunk, levels, climate.get())) {
                 reader.iterate(context, (cell, dx, dz, ctx) -> {
                     int px = ctx.blockX + dx;
                     int pz = ctx.blockZ + dz;

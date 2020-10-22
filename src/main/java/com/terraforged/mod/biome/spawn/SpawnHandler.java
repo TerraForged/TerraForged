@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.biome.spawn;
 
+import com.terraforged.core.util.PosUtil;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.world.continent.MutableVeci;
@@ -79,9 +80,10 @@ public class SpawnHandler {
         if (spawnType == SpawnType.WORLD_ORIGIN) {
             return BlockPos.ZERO;
         } else {
-            MutableVeci pos = new MutableVeci();
-            provider.getContext().heightmap.get().getContinent().getNearestCenter(0, 0, pos);
-            return new BlockPos(pos.x, 0, pos.z);
+            long center = provider.getContext().heightmap.get().getContinent().getNearestCenter(0, 0);
+            int x = PosUtil.unpackX(center);
+            int z = PosUtil.unpackY(center);
+            return new BlockPos(x, 0, z);
         }
     }
 

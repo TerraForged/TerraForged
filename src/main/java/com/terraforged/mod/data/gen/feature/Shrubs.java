@@ -54,7 +54,8 @@ public class Shrubs {
     private static final String[] FOREST = {"minecraft:forest", "minecraft:forest_hills", "minecraft:dark_forest", "minecraft:dark_forest_hills"};
     private static final String[] MARSH = {"terraforged:marshland", "terraforged:cold_marshland"};
     private static final String[] PLAINS = {"minecraft:birch*", "minecraft:plains", "minecraft:sunflower_plains", "minecraft:mountains"};
-    private static final String[] STEPPE = {"minecraft:savanna", "minecraft:shattered_savanna"};
+    private static final String[] STEPPE = {"minecraft:savanna", "minecraft:shattered_savanna", "terraforged:steppe"};
+    private static final String[] COLD_STEPPE = {"terraforged:cold_steppe"};
     private static final String[] TAIGA = {
             "minecraft:snowy_tundra",
             "minecraft:taiga",
@@ -77,6 +78,7 @@ public class Shrubs {
         addSmallBush(provider, "shrubs/marsh_bush", MARSH, Blocks.OAK_LOG, Blocks.BIRCH_LEAVES, 0.05F, 0.09F, 0.65F, 0, 0.3F, 1);
         addSmallBush(provider, "shrubs/plains_bush", PLAINS, Blocks.OAK_LOG, Blocks.BIRCH_LEAVES, 0.05F, 0.09F, 0.65F, 0, 0.05F, 1);
         addSmallBush(provider, "shrubs/steppe_bush", STEPPE, Blocks.ACACIA_LOG, Blocks.ACACIA_LEAVES, 0.06F, 0.08F, 0.7F, 0, 0.125F, 1);
+        addSmallBush(provider, "shrubs/cold_steppe_bush", COLD_STEPPE, Blocks.SPRUCE_LOG, Blocks.OAK_LEAVES, 0.05F, 0.075F, 0.6F, 0, 0.125F, 1);
         addSmallBush(provider, "shrubs/taiga_scrub_bush", TAIGA, Blocks.SPRUCE_LOG, Blocks.SPRUCE_LEAVES, 0.05F, 0.075F, 0.6F, 0, 0.1F, 1);
 
         // forestFern

@@ -28,6 +28,7 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.core.util.PosIterator;
 import com.terraforged.fm.GameContext;
+import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.n2d.source.Line;
 import net.minecraft.util.math.MathHelper;
@@ -71,7 +72,7 @@ public class TerraContainer extends BiomeContainer {
             Biome[] biomeArray = new Biome[biomes.length];
             for (int i = 0; i < biomes.length; i++) {
                 Biome biome = biomes[i];
-                biome = context.biomes.getRemap(biome);
+                biome = ModBiomes.remap(biome, context);
                 biomeArray[i] = biome;
             }
             return new BiomeContainer(context.biomes.getRegistry(), biomeArray);

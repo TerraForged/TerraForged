@@ -64,16 +64,9 @@ public class SurfaceGenerator implements Generator.Surfaces {
                     int top = ctx.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, dx, dz);
 
                     ctx.buffer.setSurfaceLevel(top);
-
                     ctx.cell = cell;
                     ctx.biome = ctx.biomes.getBiome(dx, dz);
                     ctx.noise = getSurfaceNoise(px, pz) * 15D;
-
-                    if (ctx.biome == null) {
-                        Log.err("Null biome at {},{}", px, pz);
-                        return;
-                    }
-
                     generator.getSurfaceManager().getSurface(ctx).buildSurface(px, pz, top, ctx);
 
                     int py = ctx.levels.scale(cell.value);

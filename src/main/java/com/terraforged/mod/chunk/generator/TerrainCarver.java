@@ -92,7 +92,7 @@ public class TerrainCarver implements Generator.Carvers {
 
         @Override
         public Biome apply(BlockPos pos) {
-            return generator.getBiomeProvider().getBiome(cell, pos.getX(), pos.getZ());
+            return generator.getBiomeProvider().lookupBiome(cell, pos.getX(), pos.getZ());
         }
     }
 }

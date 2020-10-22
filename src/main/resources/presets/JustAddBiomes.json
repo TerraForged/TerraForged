@@ -8,7 +8,7 @@
       "sizeMin": 175
     },
     "branchRivers": {
-      "fade": 0.95,
+      "fade": 0.75,
       "maxBankHeight": 4,
       "minBankHeight": 1,
       "bedDepth": 4,
@@ -16,7 +16,7 @@
       "bedWidth": 6
     },
     "mainRivers": {
-      "fade": 0.95,
+      "fade": 0.65,
       "maxBankHeight": 6,
       "minBankHeight": 1,
       "bedDepth": 7,

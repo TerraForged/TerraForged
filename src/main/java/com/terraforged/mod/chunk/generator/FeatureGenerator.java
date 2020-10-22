@@ -60,8 +60,6 @@ public class FeatureGenerator implements Generator.Features {
 
         // de-hardcode sea-level
         RegionFix regionFix = new RegionFix(region, generator);
-        // lets us use the regionFix region in a structure manager
-        manager = regionFix.getStructureManager();
 
         Biome biome = container.getFeatureBiome();
         try (DecoratorContext context = generator.getContext().decorator(chunk)) {

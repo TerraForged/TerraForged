@@ -34,6 +34,7 @@ import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.task.LazySupplier;
 import com.terraforged.fm.GameContext;
 import com.terraforged.fm.util.codec.Codecs;
+import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.modifier.BiomeModifierManager;
 import com.terraforged.mod.chunk.TerraContext;
@@ -60,18 +61,18 @@ public class TerraBiomeProvider extends BiomeProvider {
     public static final Codec<TerraBiomeProvider> CODEC = Codecs.create(TerraBiomeProvider::encode, TerraBiomeProvider::decode);
 
     private final long seed;
-    private final BiomeMap biomeMap;
     private final TerraContext context;
-    private final Supplier<WorldLookup> worldLookup;
-    private final BiomeModifierManager modifierManager;
+    private final LazySupplier<BiomeProviderResources> resources;
 
     public TerraBiomeProvider(TerraContext context) {
         super(BiomeHelper.getAllBiomes(context.gameContext));
         this.context = context;
         this.seed = context.terraSettings.world.seed;
-        this.biomeMap = BiomeHelper.createBiomeMap(context.gameContext);
-        this.worldLookup = LazySupplier.factory(context, WorldLookup::new);
-        this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomeMap), context.copy());
+        this.resources = LazySupplier.factory(context, BiomeProviderResources::new);
+    }
+
+    private BiomeProviderResources getResources() {
+        return resources.get();
     }
 
     @Override
@@ -90,6 +91,7 @@ public class TerraBiomeProvider extends BiomeProvider {
 
     @Override
     public TerraBiomeProvider getBiomeProvider(long seed) {
+        Log.debug("Creating seeded biome provider: {}", seed);
         return create(seed, context);
     }
 
@@ -181,13 +183,13 @@ public class TerraBiomeProvider extends BiomeProvider {
     }
 
     public Biome getBiome(int x, int z) {
-        try (Resource<Cell> resource = getWorldLookup().getCell(x, z, true)) {
-            return getBiome(resource.get(), x, z);
+        try (Resource<Cell> resource = Cell.pooled()) {
+            return lookupBiome(resource.get(), x, z);
         }
     }
 
     public Biome lookupBiome(Cell cell, int x, int z) {
-        getWorldLookup().getCell(x, z, true);
+        getWorldLookup().applyCell(cell, x, z, true);
         return getBiome(cell, x, z);
     }
 
@@ -196,7 +198,7 @@ public class TerraBiomeProvider extends BiomeProvider {
     }
 
     public WorldLookup getWorldLookup() {
-        return worldLookup.get();
+        return getResources().worldLookup;
     }
 
     public TerraContext getContext() {
@@ -204,13 +206,14 @@ public class TerraBiomeProvider extends BiomeProvider {
     }
 
     public BiomeModifierManager getModifierManager() {
-        return modifierManager;
+        return getResources().modifierManager;
     }
 
     public Biome getBiome(Cell cell, int x, int z) {
-        Biome biome = biomeMap.provideBiome(cell, context.levels);
-        if (modifierManager.hasModifiers(cell, context.levels)) {
-            Biome modified = modifierManager.modify(biome, cell, x, z);
+        BiomeProviderResources resources = this.getResources();
+        Biome biome = resources.biomeMap.provideBiome(cell, context.levels);
+        if (resources.modifierManager.hasModifiers(cell, context.levels)) {
+            Biome modified = resources.modifierManager.modify(biome, cell, x, z);
             if (TerraBiomeProvider.isValidBiome(modified)) {
                 return modified;
             }
@@ -223,10 +226,7 @@ public class TerraBiomeProvider extends BiomeProvider {
     }
 
     public static TerraBiomeProvider create(long seed, Registry<Biome> registry) {
-        TerraSettings settings = PresetManager.load().get("JustAddBiomes")
-                .map(Preset::getSettings)
-                .orElseGet(TerraSettings::new);
-        settings.world.seed = seed;
+        TerraSettings settings = new TerraSettings(seed);
         GameContext gameContext = new GameContext(registry);
         return new TerraBiomeProvider(new TerraContext(settings, gameContext));
     }

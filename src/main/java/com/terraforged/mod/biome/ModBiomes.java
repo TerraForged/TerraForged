@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.biome;
 
+import com.terraforged.fm.GameContext;
 import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.biome.utils.BiomeBuilder;
 import net.minecraft.util.RegistryKey;
@@ -34,8 +35,13 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModBiomes {
+
+    private static final Map<RegistryKey<Biome>, RegistryKey<Biome>> remaps = new HashMap<>();
 
     public static final RegistryKey<Biome> BRYCE = createKey("bryce");
     public static final RegistryKey<Biome> COLD_STEPPE = createKey("cold_steppe");
@@ -76,6 +82,20 @@ public class ModBiomes {
         register(event, WARM_BEACH, BiomeBuilders.warmBeach());
     }
 
+    public static Biome remap(Biome biome, GameContext context) {
+        RegistryKey<Biome> keyIn = context.biomes.getKey(biome);
+        if (keyIn != null) {
+            RegistryKey<Biome> keyOut = remaps.get(keyIn);
+            if (keyOut != null) {
+                Biome biomeOut = context.biomes.get(keyOut);
+                if (biomeOut != null) {
+                    return biomeOut;
+                }
+            }
+        }
+        return biome;
+    }
+
     private static RegistryKey<Biome> createKey(String name) {
         return RegistryKey.func_240903_a_(Registry.BIOME_KEY, new ResourceLocation(TerraForgedMod.MODID, name));
     }
@@ -84,5 +104,6 @@ public class ModBiomes {
         event.getRegistry().register(builder.build(key));
         builder.registerTypes(key);
         builder.registerWeight(key);
+        remaps.put(key, builder.getParentKey());
     }
 }
