@@ -25,16 +25,20 @@
 package com.terraforged.api.registry;
 
 import com.terraforged.api.level.type.LevelType;
+import com.terraforged.mod.Log;
+import com.terraforged.mod.TerraForgedMod;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.RegistryBuilder;
 
 public class Registries {
 
     public static final CodecRegistry<LevelType> LEVEL_TYPES = CodecRegistry.of(new RegistryBuilder<LevelType>()
-            .setName(new ResourceLocation("level_types"))
+            .setName(new ResourceLocation(TerraForgedMod.MODID, "level_type"))
             .setType(LevelType.class)
             .disableSaving()
             .disableSync());
 
-    public static void init() {}
+    public static void init() {
+        Log.info("Creating level-type registry");
+    }
 }

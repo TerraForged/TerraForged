@@ -26,12 +26,13 @@ package com.terraforged.api.level.client;
 
 import com.terraforged.api.level.type.LevelType;
 import com.terraforged.api.registry.Registries;
+import com.terraforged.mod.Log;
 import net.minecraft.client.gui.screen.BiomeGeneratorTypeScreens;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 
 import java.util.Map;
 import java.util.Optional;
@@ -46,10 +47,12 @@ public class ClientLevelManager {
     private static final Map<ResourceLocation, BiomeGeneratorTypeScreens.IFactory> screens = new ConcurrentHashMap<>();
 
     public static void register(ResourceLocation name, BiomeGeneratorTypeScreens.IFactory factory) {
+        Log.info("Registering level-type ", name);
         screens.put(name, factory);
     }
 
     public static void setDefault(ResourceLocation levelType) {
+        Log.info("Setting default level-type ", levelType);
         DEFAULT.set(levelType);
     }
 
@@ -62,13 +65,15 @@ public class ClientLevelManager {
     }
 
     @SubscribeEvent
-    public static void setup(FMLClientSetupEvent event) {
+    public static void setup(FMLLoadCompleteEvent event) {
         event.enqueueWork(() -> {
+            Log.info("Registering level-type options");
             for (LevelType levelType : Registries.LEVEL_TYPES) {
                 BiomeGeneratorTypeScreens.IFactory editScreen = screens.get(levelType.getRegistryName());
                 LevelOption option = new LevelOption(levelType, editScreen);
                 LevelOption.register(option);
                 options.put(levelType.getRegistryName(), option);
+                Log.info("Registered option for level-type ", levelType.getRegistryType());
             }
         });
     }

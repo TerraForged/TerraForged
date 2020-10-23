@@ -27,6 +27,7 @@ package com.terraforged.fm.template.buffer;
 import com.terraforged.fm.template.PasteConfig;
 import com.terraforged.fm.util.ObjectPool;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3i;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,13 +35,10 @@ import java.util.List;
 
 public class PasteBuffer implements BufferIterator {
 
-    private static final ObjectPool<PasteBuffer> pool = new ObjectPool<>(8, PasteBuffer::new);
-
-    private boolean updatePostPlacement;
-    private List<BlockPos> placedBlocks = Collections.emptyList();
-
     private int index = -1;
     private BlockPos pos = BlockPos.ZERO;
+    private boolean updatePostPlacement = false;
+    private List<BlockPos> placedBlocks = Collections.emptyList();
 
     @Override
     public int size() {
@@ -77,11 +75,5 @@ public class PasteBuffer implements BufferIterator {
             }
             placedBlocks.add(position);
         }
-    }
-
-    public static ObjectPool.Item<PasteBuffer> retain(PasteConfig config) {
-        ObjectPool.Item<PasteBuffer> buffer = pool.get();
-        buffer.getValue().configure(config);
-        return buffer;
     }
 }

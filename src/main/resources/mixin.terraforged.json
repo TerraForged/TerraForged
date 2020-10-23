@@ -7,9 +7,7 @@
   "mixins": [
     "common.MixinDimensionGeneratorSettings",
     "common.MixinUtils",
-    "common.MixinWorldDecorationHelper"
-  ],
-  "client": [
+    "common.MixinWorldDecorationHelper",
     "client.MixinDimensionRenderInfo",
     "client.MixinWorldOptionsScreen"
   ]

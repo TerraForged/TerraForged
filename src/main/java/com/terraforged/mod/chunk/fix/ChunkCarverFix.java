@@ -39,13 +39,13 @@ import java.util.BitSet;
 
 public class ChunkCarverFix extends ChunkDelegate {
 
+    private final int maskDepth;
     private final Materials materials;
-    private final boolean hasSurfaceStructure;
 
-    public ChunkCarverFix(IChunk chunk, Materials materials) {
+    public ChunkCarverFix(IChunk chunk, Materials materials, boolean nearStructure, boolean nearRiver) {
         super(chunk);
         this.materials = materials;
-        this.hasSurfaceStructure = StructureUtils.hasOvergroundStructure(chunk);
+        this.maskDepth = nearRiver ? 15 : nearStructure ? 5 : -1;
     }
 
     public BitSet getCarvingMask(GenerationStage.Carving type) {
@@ -78,9 +78,9 @@ public class ChunkCarverFix extends ChunkDelegate {
 
     @Override
     public BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving) {
-        if (hasSurfaceStructure) {
+        if (maskDepth != -1) {
             int surface = delegate.getTopBlockY(Heightmap.Type.WORLD_SURFACE, pos.getX(), pos.getZ());
-            if (pos.getY() > surface - 3) {
+            if (pos.getY() > surface - maskDepth) {
                 return state;
             }
         }

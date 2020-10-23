@@ -46,6 +46,7 @@ public class WGTags {
     public static final List<ITag.INamedTag<Block>> WG_TAGS = Collections.unmodifiableList(Arrays.asList(STONE, DIRT, CLAY, SEDIMENT, ERODIBLE));
 
     public static void init() {
+        Log.info("Initializing tags");
     }
 
     private static ITag.INamedTag<Block> tag(String name) {

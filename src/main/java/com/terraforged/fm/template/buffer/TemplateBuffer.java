@@ -27,37 +27,44 @@ package com.terraforged.fm.template.buffer;
 import com.terraforged.fm.template.BlockUtils;
 import com.terraforged.fm.template.PasteConfig;
 import com.terraforged.fm.template.Template;
-import com.terraforged.fm.util.ObjectPool;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IWorld;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class TemplateBuffer extends PasteBuffer {
-
-    private static final ObjectPool<TemplateBuffer> pool = new ObjectPool<>(10, TemplateBuffer::new);
 
     private IWorld world;
     private BlockPos origin;
 
-    private final Set<BlockPos> mask = new HashSet<>();
-    private final BlockPos.Mutable mutable = new BlockPos.Mutable();
-    private final List<Template.BlockInfo> buffer = new LinkedList<>();
+    private final BufferBitSet bitSet = new BufferBitSet();
+    private final List<Template.BlockInfo> buffer = new ArrayList<>(128);
 
-    public TemplateBuffer init(IWorld world, BlockPos origin) {
+    public TemplateBuffer init(IWorld world, BlockPos origin, Vector3i min, Vector3i max) {
+        int minX = min.getX();
+        int minY = min.getY();
+        int minZ = min.getZ();
+        int sizeX = max.getX() - min.getX();
+        int sizeY = max.getY() - min.getZ();
+        int sizeZ = max.getZ() - min.getZ();
         this.world = world;
         this.origin = origin;
+        this.bitSet.assign(minX, minY, minZ, sizeX, sizeY, sizeZ);
+        return this;
+    }
+
+    @Override
+    public TemplateBuffer configure(PasteConfig config) {
+        super.configure(config);
         return this;
     }
 
     public void flush() {
-        this.mask.clear();
         this.buffer.clear();
+        this.bitSet.clear();
     }
 
     public List<Template.BlockInfo> getBlocks() {
@@ -66,7 +73,7 @@ public class TemplateBuffer extends PasteBuffer {
 
     public void record(BlockPos pos, BlockState state, PasteConfig config) {
         if (!config.replaceSolid && BlockUtils.isSolid(world, pos)) {
-            mask.add(pos);
+            bitSet.set(pos.getX(), pos.getY(), pos.getZ());
             return;
         }
 
@@ -95,8 +102,7 @@ public class TemplateBuffer extends PasteBuffer {
         float z = start.getZ();
         int count = 0;
         while (x != origin.getX() && z != origin.getZ() && count < 10) {
-            mutable.setPos(x, start.getY(), z);
-            if (mask.contains(mutable)) {
+            if (bitSet.test(origin.getX(), start.getY(), origin.getZ())) {
                 return false;
             }
             x -= dx;
@@ -104,9 +110,5 @@ public class TemplateBuffer extends PasteBuffer {
             count++;
         }
         return true;
-    }
-
-    public static ObjectPool.Item<TemplateBuffer> pooled() {
-        return pool.get();
     }
 }

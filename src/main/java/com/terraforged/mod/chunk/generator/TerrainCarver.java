@@ -25,8 +25,11 @@
 package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.core.cell.Cell;
+import com.terraforged.core.tile.chunk.ChunkReader;
+import com.terraforged.fm.template.StructureUtils;
 import com.terraforged.mod.chunk.TerraChunkGenerator;
 import com.terraforged.mod.chunk.fix.ChunkCarverFix;
+import net.minecraft.test.StructureHelper;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -52,7 +55,9 @@ public class TerrainCarver implements Generator.Carvers {
 
     @Override
     public void carveTerrain(BiomeManager biomes, IChunk chunk, GenerationStage.Carving type) {
-        ChunkCarverFix carverChunk = new ChunkCarverFix(chunk, generator.getMaterials());
+        boolean nearRiver = nearRiver(chunk.getPos());
+        boolean nearStructure = StructureUtils.hasOvergroundStructure(chunk);
+        ChunkCarverFix carverChunk = new ChunkCarverFix(chunk, generator.getMaterials(), nearStructure, nearRiver);
 
         SharedSeedRandom random = new SharedSeedRandom();
         ChunkPos chunkpos = carverChunk.getPos();
@@ -66,7 +71,6 @@ public class TerrainCarver implements Generator.Carvers {
         BiomeGenerationSettings settings = biome.func_242440_e();
 
         ListIterator<Supplier<ConfiguredCarver<?>>> iterator = settings.func_242489_a(type).listIterator();
-
         for (int cx = chunkX - 8; cx <= chunkX + 8; ++cx) {
             for (int cz = chunkZ - 8; cz <= chunkZ + 8; ++cz) {
                 while (iterator.hasNext()) {
@@ -93,6 +97,12 @@ public class TerrainCarver implements Generator.Carvers {
         @Override
         public Biome apply(BlockPos pos) {
             return generator.getBiomeProvider().lookupBiome(cell, pos.getX(), pos.getZ());
+        }
+    }
+
+    private boolean nearRiver(ChunkPos pos) {
+        try (ChunkReader reader = generator.getChunkReader(pos)) {
+            return reader.getCell(8, 8).riverMask < 0.33F;
         }
     }
 }

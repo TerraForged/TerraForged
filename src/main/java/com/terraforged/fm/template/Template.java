@@ -24,6 +24,7 @@
 
 package com.terraforged.fm.template;
 
+import com.terraforged.core.concurrent.pool.ThreadLocalPool;
 import com.terraforged.fm.template.buffer.BufferIterator;
 import com.terraforged.fm.template.buffer.PasteBuffer;
 import com.terraforged.fm.template.buffer.TemplateBuffer;
@@ -54,11 +55,28 @@ public class Template {
 
     private static final int pasteFlag = 3 | 16;
     private static final Direction[] directions = Direction.values();
+    private static final ThreadLocal<PasteBuffer> PASTE_BUFFER = ThreadLocal.withInitial(PasteBuffer::new);
+    private static final ThreadLocal<TemplateBuffer> TEMPLATE_BUFFER = ThreadLocal.withInitial(TemplateBuffer::new);
 
+    private final BlockPos min;
+    private final BlockPos max;
     private final List<BlockInfo> blocks;
 
     public Template(List<BlockInfo> blocks) {
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+        for (int i = 0; i < blocks.size(); i++) {
+            BlockInfo block = blocks.get(i);
+            minX = Math.min(minX, block.pos.getX());
+            minY = Math.min(minY, block.pos.getY());
+            minZ = Math.min(minZ, block.pos.getZ());
+            maxX = Math.max(maxX, block.pos.getX());
+            maxY = Math.max(maxY, block.pos.getY());
+            maxZ = Math.max(maxZ, block.pos.getZ());
+        }
         this.blocks = blocks;
+        this.min = new BlockPos(minX, minY, minZ);
+        this.max = new BlockPos(maxX, maxY, maxZ);
     }
 
     public boolean paste(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, PasteConfig config) {
@@ -73,68 +91,68 @@ public class Template {
 
     public boolean pasteNormal(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, PasteConfig config) {
         boolean placed = false;
+        BlockReader reader = new BlockReader();
+        PasteBuffer buffer = PASTE_BUFFER.get().configure(config);
 
-        try (ObjectPool.Item<PasteBuffer> item = PasteBuffer.retain(config)) {
-            PasteBuffer buffer = item.getValue();
-            BlockReader reader = new BlockReader();
-
-            for (BlockInfo block : blocks) {
-                BlockState state = block.state.mirror(mirror).rotate(rotation);
-                if (!config.pasteAir && state.getBlock() == Blocks.AIR) {
-                    continue;
-                }
-
-                BlockPos pos = transform(block.pos, mirror, rotation).add(origin);
-                if (!config.replaceSolid && BlockUtils.isSolid(world, pos)) {
-                    continue;
-                }
-
-                if (block.pos.getY() <= 0 && block.state.isNormalCube(reader.setState(block.state), BlockPos.ZERO)) {
-                    placeBase(world, pos, block.state, config.baseDepth);
-                }
-
-                world.setBlockState(pos, state, 2);
-                buffer.record(pos);
-
-                placed = true;
+        for (int i = 0; i < blocks.size(); i++) {
+            BlockInfo block = blocks.get(i);
+            BlockState state = block.state.mirror(mirror).rotate(rotation);
+            if (!config.pasteAir && state.getBlock() == Blocks.AIR) {
+                continue;
             }
 
-            Template.updatePostPlacement(world, buffer);
+            BlockPos pos = transform(block.pos, mirror, rotation).add(origin);
+            if (!config.replaceSolid && BlockUtils.isSolid(world, pos)) {
+                continue;
+            }
+
+            if (block.pos.getY() <= 0 && block.state.isNormalCube(reader.setState(block.state), BlockPos.ZERO)) {
+                placeBase(world, pos, block.state, config.baseDepth);
+            }
+
+            world.setBlockState(pos, state, 2);
+            buffer.record(pos);
+
+            placed = true;
         }
+
+        Template.updatePostPlacement(world, buffer);
 
         return placed;
     }
 
     public boolean pasteWithBoundsCheck(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, PasteConfig config) {
-        try (ObjectPool.Item<TemplateBuffer> item = TemplateBuffer.pooled()) {
-            BlockReader reader = new BlockReader();
-            TemplateBuffer buffer = item.getValue().init(world, origin);
-            buffer.configure(config);
+        BlockPos min = transform(this.min, mirror, rotation).add(origin);
+        BlockPos max = transform(this.max, mirror, rotation).add(origin);
+        TemplateBuffer buffer = TEMPLATE_BUFFER.get().init(world, origin, min, max).configure(config);
 
-            for (BlockInfo block : blocks) {
-                BlockState state = block.state.mirror(mirror).rotate(rotation);
-                BlockPos pos = origin.add(transform(block.pos, mirror, rotation));
-                buffer.record(pos, state, config);
-            }
-
-            boolean placed = false;
-            for (BlockInfo block : buffer.getBlocks()) {
-                if (block.pos.getY() <= origin.getY() && block.state.isNormalCube(reader.setState(block.state), BlockPos.ZERO)) {
-                    placeBase(world, block.pos, block.state, config.baseDepth);
-                    world.setBlockState(block.pos, block.state, 2);
-                    placed = true;
-                } else if (buffer.test(block.pos)) {
-                    placed = true;
-                    world.setBlockState(block.pos, block.state, 2);
-                    buffer.record(block.pos);
-                }
-            }
-
-            Template.updatePostPlacement(world, buffer);
-
-            buffer.flush();
-            return placed;
+        for (int i = 0; i < blocks.size(); i++) {
+            BlockInfo block = blocks.get(i);
+            BlockState state = block.state.mirror(mirror).rotate(rotation);
+            BlockPos pos = origin.add(transform(block.pos, mirror, rotation));
+            buffer.record(pos, state, config);
         }
+
+        boolean placed = false;
+        BlockReader reader = new BlockReader();
+        List<BlockInfo> blocks = buffer.getBlocks();
+        for (int i = 0; i < blocks.size(); i++) {
+            BlockInfo block = blocks.get(i);
+            if (block.pos.getY() <= origin.getY() && block.state.isNormalCube(reader.setState(block.state), BlockPos.ZERO)) {
+                placeBase(world, block.pos, block.state, config.baseDepth);
+                world.setBlockState(block.pos, block.state, 2);
+                placed = true;
+            } else if (buffer.test(block.pos)) {
+                placed = true;
+                world.setBlockState(block.pos, block.state, 2);
+                buffer.record(block.pos);
+            }
+        }
+
+        Template.updatePostPlacement(world, buffer);
+
+        buffer.flush();
+        return placed;
     }
 
     private static void updatePostPlacement(IWorld world, BufferIterator iterator) {

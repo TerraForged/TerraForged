@@ -326,6 +326,10 @@ public class TerraChunkGenerator extends ChunkGenerator {
         return tileCache.getRegion(rx, rz);
     }
 
+    public final ChunkReader getChunkReader(ChunkPos pos) {
+        return getChunkReader(pos.x, pos.z);
+    }
+
     public final ChunkReader getChunkReader(int chunkX, int chunkZ) {
         return resources.get().tileCache.getChunk(chunkX, chunkZ);
     }

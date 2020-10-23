@@ -90,6 +90,7 @@ public class TerraForgedMod {
 
     @SubscribeEvent
     public static void registerLevels(RegistryEvent.Register<LevelType> event) {
+        Log.info("Registering levels");
         event.getRegistry().register(new TerraForgedLevel().setRegistryName(TerraForgedLevel.NAME));
     }
 
