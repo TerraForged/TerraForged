@@ -30,7 +30,7 @@ import com.terraforged.n2d.util.NoiseUtil;
 public interface MaskedSurface extends Surface {
 
     default float getMask(Cell cell) {
-        return cell.biomeEdge * NoiseUtil.map(cell.riverMask,0, 0.0005F, 0.0005F);
+        return cell.biomeRegionEdge * NoiseUtil.map(cell.riverMask,0, 0.0005F, 0.0005F);
     }
 
     @Override

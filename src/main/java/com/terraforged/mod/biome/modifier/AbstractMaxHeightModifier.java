@@ -57,7 +57,7 @@ public abstract class AbstractMaxHeightModifier extends AbstractOffsetModifier {
             return getModifiedBiome(in, cell, x, z, ox, oz);
         }
         float alpha = (value - minHeight) / range;
-        cell.biomeEdge *= alpha;
+        cell.biomeRegionEdge *= alpha;
         return in;
     }
 

@@ -112,7 +112,7 @@ public class TerraContainer extends BiomeContainer {
             Biome biome = biomeProvider.getBiome(cell, x, z);
             biomes2D[indexOf(dx, dz)] = biome;
 
-            if (cell.biomeType.isExtreme()) {
+            if (cell.biome.isExtreme()) {
                 float dist2 = Line.dist2(dx, dz, 8, 8);
                 if (feature == null || dist2 < featureDist2) {
                     featureDist2 = dist2;

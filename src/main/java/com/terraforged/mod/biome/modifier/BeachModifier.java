@@ -58,7 +58,7 @@ public class BeachModifier implements BiomeModifier {
 
     @Override
     public boolean test(Biome biome, Cell cell) {
-        return cell.terrain.getDelegate() == TerrainCategory.BEACH && cell.biomeType != BiomeType.DESERT;
+        return cell.terrain.getDelegate() == TerrainCategory.BEACH && cell.biome != BiomeType.DESERT;
     }
 
     @Override

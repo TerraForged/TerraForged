@@ -39,7 +39,6 @@ import com.terraforged.core.tile.Tile;
 import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.core.tile.gen.TileCache;
 import com.terraforged.fm.FeatureManager;
-import com.terraforged.fm.data.DataManager;
 import com.terraforged.fm.structure.FMStructureManager;
 import com.terraforged.fm.util.codec.Codecs;
 import com.terraforged.mod.Log;
@@ -47,11 +46,11 @@ import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.biome.utils.StructureLocator;
 import com.terraforged.mod.chunk.column.ColumnResource;
 import com.terraforged.mod.chunk.generator.*;
-import com.terraforged.mod.chunk.settings.TerraSettings;
+import com.terraforged.mod.chunk.profiler.Profiler;
+import com.terraforged.mod.chunk.profiler.Section;
 import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.material.geology.GeoManager;
-import com.terraforged.mod.util.setup.SetupHooks;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.math.BlockPos;
@@ -69,12 +68,10 @@ import net.minecraft.world.gen.*;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.TemplateManager;
-import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 import net.minecraft.world.gen.settings.StructureSeparationSettings;
 import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -111,6 +108,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         this.featureGenerator = new FeatureGenerator(this);
         this.structureGenerator = new StructureGenerator(this);
         this.resources = LazySupplier.factory(context, GeneratorResources::new);
+        Profiler.reset();
     }
 
     private TerraChunkGenerator create(long seed) {
@@ -162,57 +160,75 @@ public class TerraChunkGenerator extends ChunkGenerator {
 
     @Nullable // findStructure
     public BlockPos func_235956_a_(ServerWorld world, Structure<?> structure, BlockPos pos, int attempts, boolean flag) {
-        if (!this.biomeProvider.hasStructure(structure)) {
-            return null;
+        try (Section section = Profiler.FIND_STRUCTURE.punchIn()) {
+            if (!this.biomeProvider.hasStructure(structure)) {
+                return null;
+            }
+            if (structure == Structure.field_236375_k_) {
+                return super.func_235956_a_(world, structure, pos, attempts, flag);
+            }
+            StructureSeparationSettings settings = this.settings.getStructures().func_236197_a_(structure);
+            if (settings == null) {
+                return null;
+            }
+            return StructureLocator.findStructure(this, world, world.func_241112_a_(), structure, pos, attempts, flag, settings);
         }
-        if (structure == Structure.field_236375_k_) {
-            return super.func_235956_a_(world, structure, pos, attempts, flag);
-        }
-        StructureSeparationSettings settings = this.settings.getStructures().func_236197_a_(structure);
-        if (settings == null) {
-            return null;
-        }
-        return StructureLocator.findStructure(this, world, world.func_241112_a_(), structure, pos, attempts, flag, settings);
     }
 
     @Override
     public final void func_242707_a(DynamicRegistries registries, StructureManager structures, IChunk chunk, TemplateManager templates, long seed) {
-        structureGenerator.generateStructureStarts(chunk, registries, structures, templates);
+        try (Section section = Profiler.STRUCTURE_START.punchIn()) {
+            structureGenerator.generateStructureStarts(chunk, registries, structures, templates);
+        }
     }
 
     @Override
     public final void func_235953_a_(ISeedReader world, StructureManager structures, IChunk chunk) {
-        structureGenerator.generateStructureReferences(world, chunk, structures);
+        try (Section section = Profiler.STRUCTURE_SPREAD.punchIn()) {
+            structureGenerator.generateStructureReferences(world, chunk, structures);
+        }
     }
 
     @Override
     public final void func_242706_a(Registry<Biome> registry, IChunk chunk) {
-        biomeGenerator.generateBiomes(chunk);
+        try (Section section = Profiler.BIOMES.punchIn()) {
+            biomeGenerator.generateBiomes(chunk);
+        }
     }
 
     @Override
     public final void func_230352_b_(IWorld world, StructureManager structures, IChunk chunk) {
-        terrainGenerator.generateTerrain(world, chunk, structures);
+        try (Section section = Profiler.TERRAIN.punchIn()) {
+            terrainGenerator.generateTerrain(world, chunk, structures);
+        }
     }
 
     @Override
     public final void generateSurface(WorldGenRegion world, IChunk chunk) {
-        surfaceGenerator.generateSurface(world, chunk);
+        try (Section section = Profiler.SURFACE.punchIn()) {
+            surfaceGenerator.generateSurface(world, chunk);
+        }
     }
 
     @Override
     public final void func_230350_a_(long seed, BiomeManager biomes, IChunk chunk, GenerationStage.Carving carver) {
-        terrainCarver.carveTerrain(biomes, chunk, carver);
+        try (Section section = Profiler.CARVING.punchIn()) {
+            terrainCarver.carveTerrain(biomes, chunk, carver);
+        }
     }
 
     @Override
     public final void func_230351_a_(WorldGenRegion region, StructureManager structures) {
-        featureGenerator.generateFeatures(region, structures);
+        try (Section section = Profiler.DECORATION.punchIn()) {
+            featureGenerator.generateFeatures(region, structures);
+        }
     }
 
     @Override
     public final void func_230354_a_(WorldGenRegion region) {
-        mobGenerator.generateMobs(region);
+        try (Section section = Profiler.MOB_SPAWNS.punchIn()) {
+            mobGenerator.generateMobs(region);
+        }
     }
 
     @Override
@@ -323,7 +339,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         TileCache tileCache = resources.get().tileCache;
         int rx = tileCache.chunkToRegion(chunkX);
         int rz = tileCache.chunkToRegion(chunkZ);
-        return tileCache.getRegion(rx, rz);
+        return tileCache.getTile(rx, rz);
     }
 
     public final ChunkReader getChunkReader(ChunkPos pos) {

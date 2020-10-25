@@ -61,7 +61,7 @@ public class DunesSurface implements MaskedSurface {
 
     @Override
     public float getMask(Cell cell) {
-        return NoiseUtil.map(cell.biomeEdge, 0, 0.7F, 0.7F) * NoiseUtil.map(cell.riverMask, 0.5F, 0.95F, 0.45F);
+        return NoiseUtil.map(cell.biomeRegionEdge, 0, 0.7F, 0.7F) * NoiseUtil.map(cell.riverMask, 0.5F, 0.95F, 0.45F);
     }
 
     @Override

@@ -52,15 +52,15 @@ public class DesertWetlandModifier implements BiomeModifier {
 
     @Override
     public boolean test(Biome biome, Cell cell) {
-        return cell.terrain.getDelegate() == TerrainCategory.WETLAND && cell.biomeType == BiomeType.DESERT;
+        return cell.terrain.getDelegate() == TerrainCategory.WETLAND && cell.biome == BiomeType.DESERT;
     }
 
     @Override
     public Biome modify(Biome in, Cell cell, int x, int z) {
-        return biomes.getLandSet().getBiome(getBiomeType(cell), cell.temperature, cell.biomeIdentity);
+        return biomes.getLandSet().getBiome(getBiomeType(cell), cell.temperature, cell.biomeRegionId);
     }
 
     private static BiomeType getBiomeType(Cell cell) {
-        return cell.biomeIdentity < 0.5F ? BiomeType.SAVANNA : BiomeType.STEPPE;
+        return cell.biomeRegionId < 0.5F ? BiomeType.SAVANNA : BiomeType.STEPPE;
     }
 }

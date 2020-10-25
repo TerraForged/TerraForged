@@ -101,7 +101,7 @@ public class ConfigManager {
         set(
                 cfg,
                 "could_height",
-                180F,
+                100F,
                 "Set the height of clouds."
         );
     }));

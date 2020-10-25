@@ -41,7 +41,7 @@ public class BiomeModifier extends RangeContextModifier {
 
     @Override
     protected float getValue(BlockPos pos, ChanceContext context) {
-        return context.cell.biomeEdge;
+        return context.cell.biomeRegionEdge;
     }
 
     public static ContextModifier deserialize(Dynamic<?> dynamic) {

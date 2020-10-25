@@ -50,7 +50,7 @@ public enum RenderMode {
                     if (cell.value < levels.water) {
                         return RenderMode.getWaterColor();
                     } else {
-                        Color color = cell.biomeType.getColor();
+                        Color color = cell.biome.getColor();
                         float[] hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), new float[3]);
                         return rgba(hsb[0], hsb[1], (hsb[2] * scale) + bias);
                     }
@@ -103,7 +103,7 @@ public enum RenderMode {
         public int getColor(Cell cell, Levels levels, float scale, float bias) {
             float saturation = 0.7F;
             float brightness = 0.8F;
-            return rgba(cell.biomeIdentity, saturation, brightness);
+            return rgba(cell.biomeRegionId, saturation, brightness);
         }
     },
     MACRO_NOISE {
@@ -111,7 +111,7 @@ public enum RenderMode {
         public int getColor(Cell cell, Levels levels, float scale, float bias) {
             float saturation = 0.7F;
             float brightness = 0.8F;
-            return rgba(cell.macroNoise, saturation, brightness);
+            return rgba(cell.macroBiomeId, saturation, brightness);
         }
     },
     TERRAIN_REGION {

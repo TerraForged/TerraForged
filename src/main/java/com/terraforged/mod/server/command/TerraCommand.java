@@ -135,7 +135,7 @@ public class TerraCommand {
                     new StringTextComponent(
                             "Terrain=" + cell.get().terrain.getName()
                                     + ", Biome=" + getBiomeName(context, biome)
-                                    + ", BiomeType=" + cell.get().biomeType.name()
+                                    + ", BiomeType=" + cell.get().biome.name()
                     ),
                     false
             );

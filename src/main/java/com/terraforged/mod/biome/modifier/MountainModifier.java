@@ -56,7 +56,7 @@ public class MountainModifier implements BiomeModifier {
 
     @Override
     public boolean test(Biome biome, Cell cell) {
-        return cell.terrain.isMountain() && cell.macroNoise < chance;
+        return cell.terrain.isMountain() && cell.macroBiomeId < chance;
     }
 
     @Override

@@ -48,19 +48,6 @@ public interface FeatureDecorator {
 
     FeatureManager getFeatureManager();
 
-    default void decorate(ChunkGenerator generator, StructureManager manager, WorldGenRegion region) {
-        int chunkX = region.getMainChunkX();
-        int chunkZ = region.getMainChunkZ();
-        int blockX = chunkX << 4;
-        int blockZ = chunkZ << 4;
-        IChunk chunk = region.getChunk(chunkX, chunkZ);
-
-        BlockPos pos = new BlockPos(blockX, 0, blockZ);
-        Biome biome = region.getBiomeManager().getBiome(pos.add(8, 8, 8));
-
-        decorate(generator, manager, region, chunk, biome, pos);
-    }
-
     default void decorate(ChunkGenerator generator, StructureManager manager, ISeedReader region, IChunk chunk, Biome biome, BlockPos pos) {
         SharedSeedRandom random = new SharedSeedRandom();
         long decorationSeed = random.setDecorationSeed(region.getSeed(), pos.getX(), pos.getZ());

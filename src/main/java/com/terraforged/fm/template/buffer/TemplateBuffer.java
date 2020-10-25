@@ -48,7 +48,7 @@ public class TemplateBuffer extends PasteBuffer {
         int minY = min.getY();
         int minZ = min.getZ();
         int sizeX = max.getX() - min.getX();
-        int sizeY = max.getY() - min.getZ();
+        int sizeY = max.getY() - min.getY();
         int sizeZ = max.getZ() - min.getZ();
         this.world = world;
         this.origin = origin;

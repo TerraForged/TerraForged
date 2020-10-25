@@ -12,6 +12,6 @@ public class MixinDimensionRenderInfo {
 
     @Inject(method = "func_239213_a_", at = @At("HEAD"), cancellable = true)
     private void getCloudHeight(CallbackInfoReturnable<Float> ci) {
-        ConfigManager.GENERAL.getValue("cloud_height", 180F, ci::setReturnValue);
+        ConfigManager.GENERAL.getValue("cloud_height", 200F, ci::setReturnValue);
     }
 }

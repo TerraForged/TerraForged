@@ -64,7 +64,7 @@ public class BiomeTypeSet extends BiomeSet {
 
     @Override
     public int getIndex(Cell cell) {
-        return cell.biomeType.ordinal();
+        return cell.biome.ordinal();
     }
 
     @Override

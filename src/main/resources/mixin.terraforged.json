@@ -6,7 +6,6 @@
   "refmap": "mixin.terraforged.refmap.json",
   "mixins": [
     "common.MixinDimensionGeneratorSettings",
-    "common.MixinUtils",
     "common.MixinWorldDecorationHelper",
     "client.MixinDimensionRenderInfo",
     "client.MixinWorldOptionsScreen"

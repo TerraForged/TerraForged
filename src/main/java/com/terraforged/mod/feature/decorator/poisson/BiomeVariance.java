@@ -64,7 +64,7 @@ public class BiomeVariance implements Module, SafeCloseable {
     @Override
     public float getValue(float x, float y) {
         Cell cell = chunk.getCell((int) x, (int) y);
-        float edge = 0.02F + cell.biomeEdge;
+        float edge = 0.02F + cell.biomeRegionEdge;
 
         if (edge >= fade) {
             return NO_SPREAD;

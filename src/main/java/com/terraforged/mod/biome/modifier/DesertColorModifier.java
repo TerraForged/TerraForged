@@ -57,12 +57,12 @@ public class DesertColorModifier implements BiomeModifier {
     @Override
     public Biome modify(Biome in, Cell cell, int x, int z) {
         if (biomes.isRedDesert(in)) {
-            if (cell.macroNoise <= 0.5F) {
-                return biomes.getWhiteDesert(cell.biomeIdentity);
+            if (cell.macroBiomeId <= 0.5F) {
+                return biomes.getWhiteDesert(cell.biomeRegionId);
             }
         } else {
-            if (cell.macroNoise > 0.5F) {
-                return biomes.getRedDesert(cell.biomeIdentity);
+            if (cell.macroBiomeId > 0.5F) {
+                return biomes.getRedDesert(cell.biomeRegionId);
             }
         }
         return in;

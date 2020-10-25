@@ -309,6 +309,6 @@ public class Preview extends Button {
         if (terrain.contains("river")) {
             return "river";
         }
-        return cell.biomeType.name().toLowerCase();
+        return cell.biome.name().toLowerCase();
     }
 }
