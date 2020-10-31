@@ -59,10 +59,6 @@ public class WGTags {
         SETS.put(tag, set);
     }
 
-    public static Set<Block> getSet(ITag<?> tag) {
-        return SETS.getOrDefault(tag, Collections.emptySet());
-    }
-
     public static Predicate<BlockState> stone() {
         return toStatePredicate(STONE);
     }

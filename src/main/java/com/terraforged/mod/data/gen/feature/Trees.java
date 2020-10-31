@@ -25,9 +25,9 @@
 package com.terraforged.mod.data.gen.feature;
 
 import com.mojang.datafixers.util.Pair;
-import com.terraforged.api.feature.decorator.filter.FilterDecorator;
-import com.terraforged.api.feature.decorator.filter.FilterDecoratorConfig;
-import com.terraforged.api.feature.decorator.filter.PlacementFilter;
+import com.terraforged.mod.feature.decorator.FilterDecorator;
+import com.terraforged.mod.feature.decorator.filter.FilterDecoratorConfig;
+import com.terraforged.mod.feature.decorator.filter.PlacementFilter;
 import com.terraforged.fm.GameContext;
 import com.terraforged.fm.data.FeatureInjectorProvider;
 import com.terraforged.fm.matcher.biome.BiomeMatcher;
@@ -299,9 +299,9 @@ public class Trees {
 
     private static Modifier<Jsonifiable> willow(GameContext context) {
         return new Modifier<>(
-                BiomeMatcher.of(context, "minecraft:swamp", "minecraft:swamp_hills"),
+                BiomeMatcher.of(context, Biomes.SWAMP, Biomes.SWAMP_HILLS),
                 FeatureMatcher.and("minecraft:tree", Blocks.OAK_LEAVES, Blocks.OAK_LOG),
-                FeatureReplacer.of(extra(8, 0.1F, 1,
+                FeatureReplacer.of(extra(7, 0.1F, 1,
                         "terraforged:willow_large",
                         Pair.of("terraforged:willow_small", 0.2F),
                         Pair.of("terraforged:willow_large", 0.35F)
@@ -311,7 +311,9 @@ public class Trees {
 
     @SafeVarargs
     private static ConfiguredFeature<?, ?> extra(int count, float chance, int extra, String def, Pair<String, Float>... entries) {
-        return select(def, entries).withPlacement(Placement.field_242902_f.configure(new AtSurfaceWithExtraConfig(count, chance, extra)));
+        return select(def, entries)
+                .withPlacement(Features.Placements.field_244001_l)
+                .withPlacement(Placement.field_242902_f.configure(new AtSurfaceWithExtraConfig(count, chance, extra)));
     }
 
     @SafeVarargs

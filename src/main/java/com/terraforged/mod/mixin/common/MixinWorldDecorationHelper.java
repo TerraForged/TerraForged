@@ -1,4 +1,4 @@
-package com.terraforged.mixin.common;
+package com.terraforged.mod.mixin.common;
 
 import com.terraforged.api.feature.decorator.DecorationHelper;
 import net.minecraft.world.ISeedReader;

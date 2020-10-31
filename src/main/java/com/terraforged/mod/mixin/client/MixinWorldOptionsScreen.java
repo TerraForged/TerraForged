@@ -1,4 +1,4 @@
-package com.terraforged.mixin.client;
+package com.terraforged.mod.mixin.client;
 
 import com.terraforged.api.client.WorldOptionsCallback;
 import com.terraforged.api.level.client.ClientLevelManager;

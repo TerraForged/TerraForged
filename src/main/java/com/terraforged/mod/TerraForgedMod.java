@@ -24,7 +24,7 @@
 
 package com.terraforged.mod;
 
-import com.terraforged.api.feature.decorator.filter.FilterDecorator;
+import com.terraforged.mod.feature.decorator.FilterDecorator;
 import com.terraforged.api.level.type.LevelType;
 import com.terraforged.api.material.WGTags;
 import com.terraforged.api.registry.Registries;

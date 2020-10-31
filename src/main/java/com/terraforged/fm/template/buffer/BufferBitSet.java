@@ -30,7 +30,9 @@ public class BufferBitSet {
     }
 
     public void clear() {
-        bitSet.clear();
+        if (bitSet != null) {
+            bitSet.clear();
+        }
     }
 
     public void set(int x, int y, int z) {

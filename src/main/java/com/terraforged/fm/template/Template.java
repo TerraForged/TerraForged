@@ -42,6 +42,7 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraftforge.common.util.Constants;
 
 import java.io.IOException;
@@ -116,8 +117,6 @@ public class Template {
             placed = true;
         }
 
-        Template.updatePostPlacement(world, buffer);
-
         return placed;
     }
 
@@ -126,16 +125,23 @@ public class Template {
         BlockPos max = transform(this.max, mirror, rotation).add(origin);
         TemplateBuffer buffer = TEMPLATE_BUFFER.get().init(world, origin, min, max).configure(config);
 
+        List<BlockInfo> blocks = this.blocks;
         for (int i = 0; i < blocks.size(); i++) {
             BlockInfo block = blocks.get(i);
             BlockState state = block.state.mirror(mirror).rotate(rotation);
-            BlockPos pos = origin.add(transform(block.pos, mirror, rotation));
+            BlockPos pos = transform(block.pos, mirror, rotation).add(origin);
+            int cx = pos.getX() >> 4;
+            int cz = pos.getZ() >> 4;
+            if (!world.chunkExists(cx, cz)) {
+                return false;
+            }
             buffer.record(pos, state, config);
         }
 
         boolean placed = false;
         BlockReader reader = new BlockReader();
-        List<BlockInfo> blocks = buffer.getBlocks();
+        blocks = buffer.getBlocks();
+
         for (int i = 0; i < blocks.size(); i++) {
             BlockInfo block = blocks.get(i);
             if (block.pos.getY() <= origin.getY() && block.state.isNormalCube(reader.setState(block.state), BlockPos.ZERO)) {
@@ -148,8 +154,6 @@ public class Template {
                 buffer.record(block.pos);
             }
         }
-
-        Template.updatePostPlacement(world, buffer);
 
         buffer.flush();
         return placed;

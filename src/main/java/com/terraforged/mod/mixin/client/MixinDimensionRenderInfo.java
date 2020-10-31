@@ -1,4 +1,4 @@
-package com.terraforged.mixin.client;
+package com.terraforged.mod.mixin.client;
 
 import com.terraforged.mod.config.ConfigManager;
 import net.minecraft.client.world.DimensionRenderInfo;

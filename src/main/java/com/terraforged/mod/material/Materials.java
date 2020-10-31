@@ -87,7 +87,7 @@ public class Materials {
 
     private static Set<Block> create(ITag<Block> tag, Block def) {
         try {
-            ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(WGTags.getSet(tag));
+            ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(tag.getAllElements());
             if (set.isEmpty() && def != null) {
                 set.add(def);
             }

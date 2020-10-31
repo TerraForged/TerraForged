@@ -26,6 +26,7 @@ package com.terraforged.fm.template;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.pathfinding.PathType;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldReader;
 
@@ -33,6 +34,15 @@ public class BlockUtils {
 
     public static boolean isSolid(IWorldReader reader, BlockPos pos) {
         BlockState state = reader.getBlockState(pos);
+        return isSolid(state, reader, pos);
+    }
+
+    public static boolean isSolid(BlockState state, IWorldReader reader, BlockPos pos) {
         return state.isSolid() || !state.allowsMovement(reader, pos, PathType.LAND);
+    }
+
+    public static boolean isSolidNoIce(IWorldReader reader, BlockPos pos) {
+        BlockState state = reader.getBlockState(pos);
+        return isSolid(state, reader, pos) && !BlockTags.ICE.contains(state.getBlock());
     }
 }

@@ -1,6 +1,6 @@
-package com.terraforged.api.feature.decorator.filter;
+package com.terraforged.mod.feature.decorator;
 
-import com.terraforged.api.feature.decorator.ContextualDecorator;
+import com.terraforged.mod.feature.decorator.filter.FilterDecoratorConfig;
 import com.terraforged.api.feature.decorator.DecorationContext;
 import com.terraforged.mod.TerraForgedMod;
 import net.minecraft.util.math.BlockPos;

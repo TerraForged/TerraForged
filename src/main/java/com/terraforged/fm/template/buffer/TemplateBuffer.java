@@ -44,6 +44,8 @@ public class TemplateBuffer extends PasteBuffer {
     private final List<Template.BlockInfo> buffer = new ArrayList<>(128);
 
     public TemplateBuffer init(IWorld world, BlockPos origin, Vector3i min, Vector3i max) {
+        this.buffer.clear();
+        this.bitSet.clear();
         int minX = min.getX();
         int minY = min.getY();
         int minZ = min.getZ();
@@ -63,8 +65,7 @@ public class TemplateBuffer extends PasteBuffer {
     }
 
     public void flush() {
-        this.buffer.clear();
-        this.bitSet.clear();
+
     }
 
     public List<Template.BlockInfo> getBlocks() {

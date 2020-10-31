@@ -1,6 +1,8 @@
-package com.terraforged.api.feature.decorator;
+package com.terraforged.mod.feature.decorator;
 
 import com.mojang.serialization.Codec;
+import com.terraforged.api.feature.decorator.DecorationContext;
+import com.terraforged.api.feature.decorator.DecorationHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.feature.WorldDecoratingHelper;
 import net.minecraft.world.gen.placement.IPlacementConfig;

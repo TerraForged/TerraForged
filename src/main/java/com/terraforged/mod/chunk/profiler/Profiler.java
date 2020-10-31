@@ -1,5 +1,10 @@
 package com.terraforged.mod.chunk.profiler;
 
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.event.HoverEvent;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -35,11 +40,11 @@ public enum Profiler {
     }
 
     public long minMS() {
-        long min = TimeUnit.NANOSECONDS.toMillis(shortest.get());
+        long min = shortest.get();
         if (min == Long.MAX_VALUE) {
             return 0;
         }
-        return min;
+        return TimeUnit.NANOSECONDS.toMillis(min);
     }
 
     public long maxMS() {
@@ -52,6 +57,15 @@ public enum Profiler {
 
     public double averageMS() {
         return timeMS() / Math.max(1.0, hits());
+    }
+
+    public ITextComponent toText() {
+        return new StringTextComponent(name().toLowerCase())
+                .append(new StringTextComponent(String.format(": %.3fms", averageMS()))
+                        .modifyStyle(style -> style.forceFormatting(TextFormatting.WHITE)))
+                .modifyStyle(style -> style.applyFormatting(TextFormatting.YELLOW)
+                        .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent(String.format("Min: %sms, Max: %sms", minMS(), maxMS()))
+                                .modifyStyle(s -> s.forceFormatting(TextFormatting.WHITE)))));
     }
 
     public static void reset() {

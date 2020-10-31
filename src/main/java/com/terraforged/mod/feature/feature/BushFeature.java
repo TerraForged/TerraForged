@@ -102,9 +102,9 @@ public class BushFeature extends Feature<BushFeature.Config> {
             return false;
         }
 
-        // only place on solid blocks
+        // only place on solid non-ice blocks
         center.move(Direction.DOWN, 1);
-        if (!BlockUtils.isSolid(world, center)) {
+        if (!BlockUtils.isSolidNoIce(world, center)) {
             return false;
         }
 
