@@ -24,7 +24,6 @@
 
 package com.terraforged.mod;
 
-import com.terraforged.mod.feature.decorator.FilterDecorator;
 import com.terraforged.api.level.type.LevelType;
 import com.terraforged.api.material.WGTags;
 import com.terraforged.api.registry.Registries;
@@ -36,6 +35,7 @@ import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.data.WorldGenBiomes;
 import com.terraforged.mod.feature.TerraFeatures;
 import com.terraforged.mod.feature.context.ContextSelectorFeature;
+import com.terraforged.mod.feature.decorator.FilterDecorator;
 import com.terraforged.mod.feature.decorator.fastpoisson.FastPoissonAtSurface;
 import com.terraforged.mod.feature.decorator.poisson.PoissonAtSurface;
 import com.terraforged.mod.feature.feature.BushFeature;

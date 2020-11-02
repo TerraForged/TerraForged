@@ -180,7 +180,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.STRUCTURE_START.punchIn()) {
             structureGenerator.generateStructureStarts(chunk, registries, structures, templates);
         } catch (Throwable t) {
-            t.printStackTrace();
+            ChunkGenException.handle(t);
         }
     }
 
@@ -189,7 +189,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.STRUCTURE_SPREAD.punchIn()) {
             structureGenerator.generateStructureReferences(world, chunk, structures);
         } catch (Throwable t) {
-            t.printStackTrace();
+            ChunkGenException.handle(t);
         }
     }
 
@@ -198,7 +198,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.BIOMES.punchIn()) {
             biomeGenerator.generateBiomes(chunk);
         } catch (Throwable t) {
-            t.printStackTrace();
+            ChunkGenException.handle(t);
         }
     }
 
@@ -207,7 +207,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.TERRAIN.punchIn()) {
             terrainGenerator.generateTerrain(world, chunk, structures);
         } catch (Throwable t) {
-            t.printStackTrace();
+            ChunkGenException.handle(t);
         }
     }
 
@@ -216,7 +216,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.SURFACE.punchIn()) {
             surfaceGenerator.generateSurface(world, chunk);
         } catch (Throwable t) {
-            t.printStackTrace();
+            ChunkGenException.handle(t);
         }
     }
 
@@ -225,7 +225,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.CARVING.punchIn()) {
             terrainCarver.carveTerrain(biomes, chunk, carver);
         } catch (Throwable t) {
-            t.printStackTrace();
+            ChunkGenException.handle(t);
         }
     }
 
@@ -234,7 +234,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.DECORATION.punchIn()) {
             featureGenerator.generateFeatures(region, structures);
         } catch (Throwable t) {
-            t.printStackTrace();
+            ChunkGenException.handle(t);
         }
     }
 
@@ -243,7 +243,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.MOB_SPAWNS.punchIn()) {
             mobGenerator.generateMobs(region);
         } catch (Throwable t) {
-            t.printStackTrace();
+            ChunkGenException.handle(t);
         }
     }
 
