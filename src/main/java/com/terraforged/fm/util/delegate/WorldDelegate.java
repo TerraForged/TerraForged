@@ -323,8 +323,8 @@ public class WorldDelegate<T extends IWorld> implements IWorld {
     }
 
     @Override
-    public Stream<BlockState> func_234939_c_(AxisAlignedBB p_234939_1_) {
-        return delegate.func_234939_c_(p_234939_1_);
+    public Stream<BlockState> getStatesInArea(AxisAlignedBB area) {
+        return delegate.getStatesInArea(area);
     }
 
     @Override
@@ -355,8 +355,8 @@ public class WorldDelegate<T extends IWorld> implements IWorld {
     }
 
     @Override
-    public DimensionType func_230315_m_() {
-        return delegate.func_230315_m_();
+    public DimensionType getDimensionType() {
+        return delegate.getDimensionType();
     }
 
     @Override
@@ -533,8 +533,8 @@ public class WorldDelegate<T extends IWorld> implements IWorld {
     }
 
     @Override
-    public boolean func_226663_a_(BlockState p_226663_1_, BlockPos p_226663_2_, ISelectionContext p_226663_3_) {
-        return delegate.func_226663_a_(p_226663_1_, p_226663_2_, p_226663_3_);
+    public boolean placedBlockCollides(BlockState state, BlockPos pos, ISelectionContext context) {
+        return delegate.placedBlockCollides(state, pos, context);
     }
 
     @Override
@@ -558,8 +558,8 @@ public class WorldDelegate<T extends IWorld> implements IWorld {
     }
 
     @Override
-    public boolean func_234865_b_(Entity p_234865_1_, AxisAlignedBB p_234865_2_, Predicate<Entity> p_234865_3_) {
-        return delegate.func_234865_b_(p_234865_1_, p_234865_2_, p_234865_3_);
+    public boolean hasNoCollisions(Entity p_234865_1_, AxisAlignedBB p_234865_2_, Predicate<Entity> p_234865_3_) {
+        return delegate.hasNoCollisions(p_234865_1_, p_234865_2_, p_234865_3_);
     }
 
     @Override
@@ -624,8 +624,8 @@ public class WorldDelegate<T extends IWorld> implements IWorld {
     }
 
     @Override
-    public float func_242413_ae() {
-        return delegate.func_242413_ae();
+    public float getMoonFactor() {
+        return delegate.getMoonFactor();
     }
 
     @Override
@@ -635,7 +635,7 @@ public class WorldDelegate<T extends IWorld> implements IWorld {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public int func_242414_af() {
-        return delegate.func_242414_af();
+    public int getMoonPhase() {
+        return delegate.getMoonPhase();
     }
 }

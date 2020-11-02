@@ -296,7 +296,7 @@ public class TerraCommand {
     private static Biome getBiome(CommandContext<CommandSource> context, String name) throws CommandSyntaxException {
         ResourceLocation location = ResourceLocationArgument.getResourceLocation(context, name);
         return context.getSource().getServer().func_244267_aX().func_230521_a_(Registry.BIOME_KEY)
-                .flatMap(registry -> registry.func_241873_b(location))
+                .flatMap(registry -> registry.getOptional(location))
                 .orElseThrow(() -> createException("biome", "Unrecognized biome %s", location));
     }
 

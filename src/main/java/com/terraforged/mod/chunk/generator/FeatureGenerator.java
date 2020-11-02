@@ -152,7 +152,7 @@ public class FeatureGenerator implements Generator.Features {
                     if (feature.getPredicate().test(chunk, biome)) {
                         try {
                             timeStamp = System.currentTimeMillis();
-                            feature.getFeature().func_242765_a(region, generator, random, pos);
+                            feature.getFeature().generate(region, generator, random, pos);
                             checkTime(FEATURE, feature.getIdentity(), timeStamp);
                         } catch (Throwable t) {
                             throw new DecoratorException(FEATURE, feature.getIdentity().getIdentity(), t);

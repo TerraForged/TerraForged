@@ -49,7 +49,7 @@ public class TerraForgedLevel extends AbstractLevelType {
     @Override
     public ChunkGenerator create(long seed, Registry<Biome> biomes, Registry<DimensionSettings> settings) {
         TerraBiomeProvider biomeProvider = TerraBiomeProvider.create(seed, biomes);
-        DimensionSettings dimensionSettings = settings.func_243576_d(DimensionSettings.field_242734_c);
+        DimensionSettings dimensionSettings = settings.getOrThrow(DimensionSettings.field_242734_c);
         return new TerraChunkGenerator(biomeProvider, dimensionSettings);
     }
 
@@ -65,16 +65,16 @@ public class TerraForgedLevel extends AbstractLevelType {
                 level.hasBonusChest(),
                 DimensionGeneratorSettings.func_241520_a_(
                         level.func_236224_e_(),
-                        () -> registries.func_230520_a_().func_243576_d(DimensionType.OVERWORLD),
+                        () -> registries.func_230520_a_().getOrThrow(DimensionType.OVERWORLD),
                         createOverworld(registries, settings)
                 )
         );
     }
 
     private static TerraChunkGenerator createOverworld(DynamicRegistries registries, TerraSettings settings) {
-        Registry<DimensionSettings> dimSettings = registries.func_243612_b(Registry.field_243549_ar);
-        DimensionSettings overworldSettings = dimSettings.func_243576_d(DimensionSettings.field_242734_c);
-        GameContext game = new GameContext(registries.func_243612_b(Registry.BIOME_KEY));
+        Registry<DimensionSettings> dimSettings = registries.getRegistry(Registry.NOISE_SETTINGS_KEY);
+        DimensionSettings overworldSettings = dimSettings.getOrThrow(DimensionSettings.field_242734_c);
+        GameContext game = new GameContext(registries.getRegistry(Registry.BIOME_KEY));
         TerraContext context = new TerraContext(settings, game);
         TerraBiomeProvider biomeProvider = new TerraBiomeProvider(context);
         return new TerraChunkGenerator(biomeProvider, overworldSettings);

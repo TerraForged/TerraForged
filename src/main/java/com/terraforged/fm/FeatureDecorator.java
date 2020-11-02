@@ -94,7 +94,7 @@ public interface FeatureDecorator {
                     random.setFeatureSeed(decorationSeed, featureSeed++, stageIndex);
                     if (feature.getPredicate().test(chunk, biome)) {
                         try {
-                            feature.getFeature().func_242765_a(region, generator, random, pos);
+                            feature.getFeature().generate(region, generator, random, pos);
                         } catch (Throwable t) {
                             handle("feature", feature.getIdentity().getIdentity(), t);
                         }

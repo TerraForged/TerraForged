@@ -59,19 +59,19 @@ public class StructureGenerator implements Generator.Structures {
         ChunkPos pos = chunk.getPos();
         generator.queueChunk(pos);
         Biome biome = generator.getBiomeProvider().getNoiseBiome((pos.x << 2) + 2, 0, (pos.z << 2) + 2);
-        generate(chunk, pos, biome, StructureFeatures.field_244145_k, registries, structures, templates, seed);
-        for (Supplier<StructureFeature<?, ?>> supplier : biome.func_242440_e().func_242487_a()) {
+        generate(chunk, pos, biome, StructureFeatures.STRONGHOLD, registries, structures, templates, seed);
+        for (Supplier<StructureFeature<?, ?>> supplier : biome.getGenerationSettings().getStructures()) {
             this.generate(chunk, pos, biome, supplier.get(), registries, structures, templates, seed);
         }
     }
 
     private void generate(IChunk chunk, ChunkPos pos, Biome biome, StructureFeature<?, ?> structure, DynamicRegistries registries, StructureManager structures, TemplateManager templates, long seed) {
-        StructureStart<?> start = structures.func_235013_a_(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, chunk);
+        StructureStart<?> start = structures.getStructureStart(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, chunk);
         int i = start != null ? start.getRefCount() : 0;
         StructureSeparationSettings settings = generator.func_235957_b_().func_236197_a_(structure.field_236268_b_);
         if (settings != null) {
             StructureStart<?> start1 = structure.func_242771_a(registries, generator, generator.getBiomeProvider(), templates, seed, pos, biome, i, settings);
-            structures.func_235014_a_(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, start1, chunk);
+            structures.addStructureStart(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, start1, chunk);
         }
     }
 
@@ -93,7 +93,7 @@ public class StructureGenerator implements Generator.Structures {
                 for (StructureStart<?> start : world.getChunk(x, z).getStructureStarts().values()) {
                     try {
                         if (start != StructureStart.DUMMY && start.getBoundingBox().intersectsWith(startX, startZ, endX, endZ)) {
-                            structures.func_235012_a_(sectionpos, start.getStructure(), posId, chunk);
+                            structures.addReference(sectionpos, start.getStructure(), posId, chunk);
                             DebugPacketSender.sendStructureStart(world, start);
                         }
                     } catch (Exception exception) {

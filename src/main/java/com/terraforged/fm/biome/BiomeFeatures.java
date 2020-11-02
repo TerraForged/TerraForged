@@ -48,7 +48,7 @@ public class BiomeFeatures {
 
     private static final Supplier<List<List<Structure<?>>>> STRUCTURES = Suppliers.memoize(() -> {
         Map<GenerationStage.Decoration, List<Structure<?>>> map = ForgeRegistries.STRUCTURE_FEATURES.getValues().stream()
-                .collect(Collectors.groupingBy(Structure::func_236396_f_));
+                .collect(Collectors.groupingBy(Structure::getDecorationStage));
 
         List<List<Structure<?>>> list = new ArrayList<>();
         for (GenerationStage.Decoration stage : GenerationStage.Decoration.values()) {

@@ -43,7 +43,7 @@ public class TreeDecoratorFactory implements Decorator.Factory<TreeDecoratorBuff
 
     @Override
     public Optional<Decorator<TreeDecoratorBuffer>> parse(ResourceLocation name, JsonElement config) {
-        return Registry.TREE_DECORATOR_TYPE.func_241873_b(name)
+        return Registry.TREE_DECORATOR_TYPE.getOptional(name)
                 .map(type -> CodecHelper.treeDecorator(type, config, JsonOps.INSTANCE))
                 .map(TreeDecorator::new);
     }

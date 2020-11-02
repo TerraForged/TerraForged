@@ -1,23 +1,16 @@
 package com.terraforged.mod.biome;
 
-import com.mojang.datafixers.util.Either;
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
 import com.terraforged.fm.matcher.dynamic.DynamicMatcher;
 import com.terraforged.mod.biome.utils.BiomeBuilder;
 import com.terraforged.mod.biome.utils.BiomeUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
+import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.Features;
 import net.minecraftforge.common.BiomeManager;
-
-import java.util.Optional;
 
 public class BiomeBuilders {
 
@@ -26,7 +19,7 @@ public class BiomeBuilders {
         builder.type(BiomeManager.BiomeType.DESERT);
         builder.filterFeatures(DynamicMatcher.config(BaseTreeFeatureConfig.class));
         // dead bush
-        DefaultBiomeFeatures.func_243705_S(builder.getSettings());
+        DefaultBiomeFeatures.withDesertDeadBushes(builder.getSettings());
         return builder;
     }
 
@@ -52,8 +45,8 @@ public class BiomeBuilders {
                 DynamicMatcher.config(BaseTreeFeatureConfig.class),
                 DynamicMatcher.feature(Feature.FOREST_ROCK),
                 // red/brown mushrooms
-                DynamicMatcher.of(Features.field_243826_aY),
-                DynamicMatcher.of(Features.field_243826_aY)
+                DynamicMatcher.of(Features.RED_MUSHROOM_TAIGA),
+                DynamicMatcher.of(Features.BROWN_MUSHROOM_TAIGA)
         );
         builder.temperature(0.2F);
         builder.downfall(0.05F);
@@ -110,8 +103,9 @@ public class BiomeBuilders {
         builder.category(Biome.Category.SWAMP);
         builder.filterFeatures(DynamicMatcher.config(BaseTreeFeatureConfig.class));
         deadBush(builder);
-        denseGrass(builder);
         ferns(builder);
+        denseGrass(builder);
+        DefaultBiomeFeatures.withSwampSugarcaneAndPumpkin(builder.getSettings());
         return builder;
     }
 
@@ -153,8 +147,8 @@ public class BiomeBuilders {
                 DynamicMatcher.config(BaseTreeFeatureConfig.class),
                 DynamicMatcher.feature(Feature.FOREST_ROCK),
                 // red/brown mushrooms
-                DynamicMatcher.of(Features.field_243826_aY),
-                DynamicMatcher.of(Features.field_243826_aY)
+                DynamicMatcher.of(Features.RED_MUSHROOM_TAIGA),
+                DynamicMatcher.of(Features.BROWN_MUSHROOM_TAIGA)
         );
         builder.setParentKey(Biomes.SHATTERED_SAVANNA_PLATEAU);
         builder.category(Biome.Category.SAVANNA);
@@ -178,8 +172,8 @@ public class BiomeBuilders {
         builder.filterFeatures(
                 DynamicMatcher.config(BaseTreeFeatureConfig.class),
                 // red/brown mushrooms
-                DynamicMatcher.of(Features.field_243826_aY),
-                DynamicMatcher.of(Features.field_243826_aY)
+                DynamicMatcher.of(Features.RED_MUSHROOM_TAIGA),
+                DynamicMatcher.of(Features.BROWN_MUSHROOM_TAIGA)
         );
         deadBush(builder);
         denseGrass(builder);
@@ -198,19 +192,19 @@ public class BiomeBuilders {
 
     private static void deadBush(BiomeBuilder builder) {
         // dead bush
-        DefaultBiomeFeatures.func_243705_S(builder.getSettings());
+        DefaultBiomeFeatures.withDesertDeadBushes(builder.getSettings());
     }
 
     private static void denseGrass(BiomeBuilder builder) {
         // plains grass
-        DefaultBiomeFeatures.func_243711_Y(builder.getSettings());
+        builder.getSettings().withFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.PATCH_GRASS_PLAIN);
         // extra grass 1
-        DefaultBiomeFeatures.func_243696_J(builder.getSettings());
+        DefaultBiomeFeatures.withNormalGrassPatch(builder.getSettings());
         // extra grass 2
-        DefaultBiomeFeatures.func_243698_L(builder.getSettings());
+        DefaultBiomeFeatures.withSavannaGrass(builder.getSettings());
     }
 
     private static void ferns(BiomeBuilder builder) {
-        DefaultBiomeFeatures.func_243757_q(builder.getSettings());
+        DefaultBiomeFeatures.withLargeFern(builder.getSettings());
     }
 }

@@ -78,16 +78,16 @@ public class BiomeBuilder extends Biome.Builder {
     protected BiomeBuilder init() {
         settings = new BiomeGenerationSettings.Builder();
         // surface
-        settings.func_242517_a(parentBiome.func_242440_e().func_242500_d().get());
+        settings.withSurfaceBuilder(parentBiome.getGenerationSettings().getSurfaceBuilder().get());
         // mobs
-        func_242458_a(parentBiome.func_242433_b());
+        withMobSpawnSettings(parentBiome.getMobSpawnInfo());
         // category
         category(parentBiome.getCategory());
         // structures
-        parentBiome.func_242440_e().func_242487_a().forEach(s -> settings.func_242516_a(s.get()));
+        parentBiome.getGenerationSettings().getStructures().forEach(s -> settings.withStructure(s.get()));
         // features
         for (GenerationStage.Decoration stage : GenerationStage.Decoration.values()) {
-            List<Supplier<ConfiguredFeature<?, ?>>> features = parentBiome.func_242440_e().func_242498_c().get(stage.ordinal());
+            List<Supplier<ConfiguredFeature<?, ?>>> features = parentBiome.getGenerationSettings().getFeatures().get(stage.ordinal());
             features.forEach(f -> this.features.computeIfAbsent(stage, s -> new ArrayList<>()).add(f));
         }
         return this;
@@ -109,11 +109,11 @@ public class BiomeBuilder extends Biome.Builder {
     }
 
     public void copyAmbience(RegistryKey<Biome> key) {
-        Biome biome = ForgeRegistries.BIOMES.getValue(key.func_240901_a_());
+        Biome biome = ForgeRegistries.BIOMES.getValue(key.getLocation());
         if (biome == null) {
             return;
         }
-        func_235097_a_(biome.func_235089_q_());
+        setEffects(biome.getAmbience());
     }
 
     public Biome getBiome() {
@@ -125,13 +125,13 @@ public class BiomeBuilder extends Biome.Builder {
     }
 
     public Biome build() {
-        func_242457_a(settings.func_242508_a());
-        return func_242455_a();
+        withGenerationSettings(settings.build());
+        return super.build();
     }
 
     public Biome build(RegistryKey<Biome> key) {
-        features.forEach((stage, list) -> list.forEach(f -> getSettings().func_242513_a(stage, f.get())));
-        func_242457_a(settings.func_242508_a());
-        return func_242455_a().setRegistryName(key.func_240901_a_());
+        features.forEach((stage, list) -> list.forEach(f -> getSettings().withFeature(stage, f.get())));
+        withGenerationSettings(settings.build());
+        return super.build().setRegistryName(key.getLocation());
     }
 }

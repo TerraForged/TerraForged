@@ -164,7 +164,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
             if (!this.biomeProvider.hasStructure(structure)) {
                 return null;
             }
-            if (structure == Structure.field_236375_k_) {
+            if (structure == Structure.STRONGHOLD) {
                 return super.func_235956_a_(world, structure, pos, attempts, flag);
             }
             StructureSeparationSettings settings = this.settings.getStructures().func_236197_a_(structure);
@@ -179,6 +179,8 @@ public class TerraChunkGenerator extends ChunkGenerator {
     public final void func_242707_a(DynamicRegistries registries, StructureManager structures, IChunk chunk, TemplateManager templates, long seed) {
         try (Section section = Profiler.STRUCTURE_START.punchIn()) {
             structureGenerator.generateStructureStarts(chunk, registries, structures, templates);
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
@@ -186,6 +188,8 @@ public class TerraChunkGenerator extends ChunkGenerator {
     public final void func_235953_a_(ISeedReader world, StructureManager structures, IChunk chunk) {
         try (Section section = Profiler.STRUCTURE_SPREAD.punchIn()) {
             structureGenerator.generateStructureReferences(world, chunk, structures);
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
@@ -193,6 +197,8 @@ public class TerraChunkGenerator extends ChunkGenerator {
     public final void func_242706_a(Registry<Biome> registry, IChunk chunk) {
         try (Section section = Profiler.BIOMES.punchIn()) {
             biomeGenerator.generateBiomes(chunk);
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
@@ -200,6 +206,8 @@ public class TerraChunkGenerator extends ChunkGenerator {
     public final void func_230352_b_(IWorld world, StructureManager structures, IChunk chunk) {
         try (Section section = Profiler.TERRAIN.punchIn()) {
             terrainGenerator.generateTerrain(world, chunk, structures);
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
@@ -207,6 +215,8 @@ public class TerraChunkGenerator extends ChunkGenerator {
     public final void generateSurface(WorldGenRegion world, IChunk chunk) {
         try (Section section = Profiler.SURFACE.punchIn()) {
             surfaceGenerator.generateSurface(world, chunk);
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
@@ -214,6 +224,8 @@ public class TerraChunkGenerator extends ChunkGenerator {
     public final void func_230350_a_(long seed, BiomeManager biomes, IChunk chunk, GenerationStage.Carving carver) {
         try (Section section = Profiler.CARVING.punchIn()) {
             terrainCarver.carveTerrain(biomes, chunk, carver);
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
@@ -221,6 +233,8 @@ public class TerraChunkGenerator extends ChunkGenerator {
     public final void func_230351_a_(WorldGenRegion region, StructureManager structures) {
         try (Section section = Profiler.DECORATION.punchIn()) {
             featureGenerator.generateFeatures(region, structures);
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
@@ -228,6 +242,8 @@ public class TerraChunkGenerator extends ChunkGenerator {
     public final void func_230354_a_(WorldGenRegion region) {
         try (Section section = Profiler.MOB_SPAWNS.punchIn()) {
             mobGenerator.generateMobs(region);
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
@@ -256,28 +272,19 @@ public class TerraChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public final int func_230355_e_() {
+    public final int getMaxBuildHeight() {
         // getMaxHeight
-        return getWorldHeight();
+        return getContext().levels.worldHeight;
     }
 
     @Override
-    public final int func_230356_f_() {
-        // getSeaLevel
-        return getSeaLevel();
+    public final int getSeaLevel() {
+        return getContext().levels.waterLevel;
     }
 
     @Override
     public final int getGroundHeight() {
         return getContext().levels.groundLevel;
-    }
-
-    public final int getWorldHeight() {
-        return getContext().levels.worldHeight;
-    }
-
-    public final int getSeaLevel() {
-        return getContext().levels.waterLevel;
     }
 
     public final TerraContext getContext() {

@@ -63,7 +63,7 @@ public class BiomeWeights {
                 continue;
             }
             for (BiomeManager.BiomeEntry entry : entries) {
-                biomes.put(entry.getKey().func_240901_a_(), entry.itemWeight);
+                biomes.put(entry.getKey().getLocation(), entry.itemWeight);
             }
         }
 

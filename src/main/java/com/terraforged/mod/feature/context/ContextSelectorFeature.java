@@ -43,7 +43,7 @@ public class ContextSelectorFeature extends Feature<ContextSelectorConfig> {
     }
 
     @Override
-    public boolean func_241855_a(ISeedReader world, ChunkGenerator generator, Random random, BlockPos pos, ContextSelectorConfig config) {
+    public boolean generate(ISeedReader world, ChunkGenerator generator, Random random, BlockPos pos, ContextSelectorConfig config) {
         try (Resource<ChanceContext> item = ChanceContext.pooled(world, generator)) {
             if (item == null) {
                 return false;
@@ -60,7 +60,7 @@ public class ContextSelectorFeature extends Feature<ContextSelectorConfig> {
 
             int index = context.nextIndex(random);
             if (index > -1) {
-                return config.features.get(index).feature.func_242765_a(world, generator, random, pos);
+                return config.features.get(index).feature.generate(world, generator, random, pos);
             }
 
             return false;

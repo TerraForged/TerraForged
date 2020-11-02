@@ -97,7 +97,7 @@ public class FeatureIdentity implements Identity {
     }
 
     public static FeatureIdentity getIdentity(ConfiguredFeature<?, ?> feature, JsonElement jsonElement) {
-        ResourceLocation name = WorldGenRegistries.field_243653_e.getKey(feature);
+        ResourceLocation name = WorldGenRegistries.CONFIGURED_FEATURE.getKey(feature);
         if (name != null) {
             return new FeatureIdentity(Collections.singletonList(name.toString()));
         }

@@ -40,7 +40,7 @@ import java.util.function.Supplier;
 public class ModDataPackFinder implements IPackFinder {
 
     @Override
-    public void func_230230_a_(Consumer<ResourcePackInfo> consumer, ResourcePackInfo.IFactory factory) {
+    public void findPacks(Consumer<ResourcePackInfo> consumer, ResourcePackInfo.IFactory factory) {
         for (ModFileInfo info : ModList.get().getModFiles()) {
             ResourcePackInfo packInfo = ResourcePackInfo.createResourcePack(
                     info.getFile().getFileName(),

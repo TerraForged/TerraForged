@@ -94,6 +94,6 @@ public class SpawnHandler {
 
     private static void createBonusChest(ServerWorld world, BlockPos pos) {
         ConfiguredFeature<?, ?> chest = Feature.BONUS_CHEST.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
-        chest.func_242765_a(world, world.getChunkProvider().getChunkGenerator(), world.rand, pos);
+        chest.generate(world, world.getChunkProvider().getChunkGenerator(), world.rand, pos);
     }
 }

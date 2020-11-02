@@ -49,7 +49,7 @@ public class TemplateFeature extends Feature<TemplateFeatureConfig> {
     }
 
     @Override
-    public boolean func_241855_a(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, TemplateFeatureConfig config) {
+    public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, TemplateFeatureConfig config) {
         if (config.type.getPlacement().canPlaceAt(world, pos)) {
             return paste(world, rand, pos, config, config.decorator);
         }

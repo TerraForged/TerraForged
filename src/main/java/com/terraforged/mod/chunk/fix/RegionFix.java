@@ -45,10 +45,10 @@ public class RegionFix extends RegionDelegate {
 
     @Override // getWorldHeight
     public int func_234938_ad_() {
-        return generator.getWorldHeight();
+        return generator.getMaxBuildHeight();
     }
 
     public StructureManager getStructureManager() {
-        return new StructureManager(this, getWorld().getServer().func_240793_aU_().getDimensionGeneratorSettings());
+        return new StructureManager(this, getWorld().getServer().getServerConfiguration().getDimensionGeneratorSettings());
     }
 }

@@ -113,7 +113,7 @@ public class FeatureManager implements FeatureDecorator {
 
     private static BiomeFeatures compute(Biome biome, FeatureModifiers modifiers) {
         BiomeFeatures.Builder builder = BiomeFeatures.builder();
-        List<List<Supplier<ConfiguredFeature<?, ?>>>> features = biome.func_242440_e().func_242498_c();
+        List<List<Supplier<ConfiguredFeature<?, ?>>>> features = biome.getGenerationSettings().getFeatures();
         for (GenerationStage.Decoration stage : GenerationStage.Decoration.values()) {
             // add 'prepend' injectors to the head of the feature list
             builder.add(stage, modifiers.getAppenders(stage, biome, InjectionPosition.HEAD));

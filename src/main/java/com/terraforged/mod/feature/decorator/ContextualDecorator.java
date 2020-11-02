@@ -18,7 +18,7 @@ public abstract class ContextualDecorator<T extends IPlacementConfig> extends Pl
     }
 
     @Override
-    public Stream<BlockPos> func_241857_a(WorldDecoratingHelper helper, Random random, T config, BlockPos pos) {
+    public Stream<BlockPos> getPositions(WorldDecoratingHelper helper, Random random, T config, BlockPos pos) {
         DecorationContext context = DecorationHelper.getContext(helper);
         if (context == null) {
             new UnsupportedOperationException().printStackTrace();

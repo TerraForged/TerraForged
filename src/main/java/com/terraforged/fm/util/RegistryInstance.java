@@ -48,7 +48,7 @@ public class RegistryInstance<T> implements Iterable<T> {
     }
 
     public RegistryInstance(DynamicRegistries registries, RegistryKey<? extends Registry<T>> key) {
-        this(registries.func_243612_b(key));
+        this(registries.getRegistry(key));
     }
 
     public void addRemap(T in, T out) {
@@ -64,7 +64,7 @@ public class RegistryInstance<T> implements Iterable<T> {
     }
 
     public Optional<T> get(ResourceLocation name) {
-        return registry.func_241873_b(name);
+        return registry.getOptional(name);
     }
 
     public T get(RegistryKey<T> key) {
@@ -72,11 +72,11 @@ public class RegistryInstance<T> implements Iterable<T> {
     }
 
     public T mustGet(ResourceLocation name) {
-        return registry.func_241873_b(name).orElse(null);
+        return registry.getOrDefault(name);
     }
 
     public RegistryKey<T> getKey(T t) {
-        return registry.func_230519_c_(t).orElse(null);
+        return registry.getOptionalKey(t).orElse(null);
     }
 
     public ResourceLocation getRegistryName(T t) {
@@ -88,7 +88,7 @@ public class RegistryInstance<T> implements Iterable<T> {
     }
 
     public boolean contains(ResourceLocation name) {
-        return registry.func_241873_b(name).isPresent();
+        return registry.containsKey(name);
     }
 
     @Override

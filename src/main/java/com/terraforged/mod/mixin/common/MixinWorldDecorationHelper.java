@@ -16,7 +16,7 @@ public class MixinWorldDecorationHelper implements DecorationHelper {
     private ISeedReader field_242889_a;
     @Final
     @Shadow
-    private ChunkGenerator field_242890_b;
+    private ChunkGenerator chunkGenerator;
 
     @Override
     public ISeedReader getRegion() {
@@ -25,6 +25,6 @@ public class MixinWorldDecorationHelper implements DecorationHelper {
 
     @Override
     public ChunkGenerator getGenerator() {
-        return field_242890_b;
+        return chunkGenerator;
     }
 }

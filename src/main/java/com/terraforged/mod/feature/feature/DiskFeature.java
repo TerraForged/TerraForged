@@ -49,7 +49,7 @@ public class DiskFeature extends Feature<SphereReplaceConfig> {
     }
 
     @Override
-    public boolean func_241855_a(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, SphereReplaceConfig config) {
+    public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, SphereReplaceConfig config) {
         if (!world.getFluidState(pos).isTagged(FluidTags.WATER)) {
             return false;
         } else {
@@ -67,7 +67,7 @@ public class DiskFeature extends Feature<SphereReplaceConfig> {
                     int dz = z - pos.getZ();
                     float rad2 = domain.getValue(x, z) * radius2;
                     if (dx * dx + dz * dz <= rad2) {
-                        for(int y = pos.getY() - ySize; y <= pos.getY() + ySize && y + 1 < generator.func_230356_f_(); ++y) {
+                        for(int y = pos.getY() - ySize; y <= pos.getY() + ySize && y + 1 < generator.getMaxBuildHeight(); ++y) {
                             blockPos.setPos(x, y, z);
                             BlockState current = world.getBlockState(blockPos);
 

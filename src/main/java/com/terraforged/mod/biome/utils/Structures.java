@@ -34,7 +34,7 @@ import java.util.function.Supplier;
 public class Structures {
 
     public static Optional<? extends StructureFeature<?, ?>> getStructure(Biome biome, Structure<?> ref) {
-        return biome.func_242440_e().func_242487_a().stream().map(Supplier::get).filter(f -> f.field_236268_b_ == ref).findFirst();
+        return biome.getGenerationSettings().getStructures().stream().map(Supplier::get).filter(f -> f.field_236268_b_ == ref).findFirst();
     }
 
     public static <C extends IFeatureConfig> Optional<C> getConfig(Biome biome, Structure<?> ref, Class<C> type) {
@@ -42,75 +42,75 @@ public class Structures {
     }
 
     public static Structure<VillageConfig> outpost() {
-        return Structure.field_236366_b_;
+        return Structure.PILLAGER_OUTPOST;
     }
 
     public static Structure<MineshaftConfig> mineshaft() {
-        return Structure.field_236367_c_;
+        return Structure.MINESHAFT;
     }
 
     public static Structure<NoFeatureConfig> mansion() {
-        return Structure.field_236368_d_;
+        return Structure.WOODLAND_MANSION;
     }
 
     public static Structure<NoFeatureConfig> jungleTemple() {
-        return Structure.field_236369_e_;
+        return Structure.JUNGLE_PYRAMID;
     }
 
     public static Structure<NoFeatureConfig> desertTemple() {
-        return Structure.field_236370_f_;
+        return Structure.DESERT_PYRAMID;
     }
 
     public static Structure<NoFeatureConfig> igloo() {
-        return Structure.field_236371_g_;
+        return Structure.IGLOO;
     }
 
     public static Structure<RuinedPortalFeature> ruinedPortal() {
-        return Structure.field_236372_h_;
+        return Structure.RUINED_PORTAL;
     }
 
     public static Structure<ShipwreckConfig> shipwreck() {
-        return Structure.field_236373_i_;
+        return Structure.SHIPWRECK;
     }
 
     public static SwampHutStructure swampHut() {
-        return Structure.field_236374_j_;
+        return Structure.SWAMP_HUT;
     }
 
     public static Structure<NoFeatureConfig> stronghold() {
-        return Structure.field_236375_k_;
+        return Structure.STRONGHOLD;
     }
 
     public static Structure<NoFeatureConfig> oceanMonument() {
-        return Structure.field_236376_l_;
+        return Structure.MONUMENT;
     }
 
     public static Structure<OceanRuinConfig> oceanRuin() {
-        return Structure.field_236377_m_;
+        return Structure.OCEAN_RUIN;
     }
 
     public static Structure<NoFeatureConfig> fortress() {
-        return Structure.field_236378_n_;
+        return Structure.FORTRESS;
     }
 
     public static Structure<NoFeatureConfig> endCity() {
-        return Structure.field_236379_o_;
+        return Structure.END_CITY;
     }
 
     public static Structure<ProbabilityConfig> buriedTreasure() {
-        return Structure.field_236380_p_;
+        return Structure.BURIED_TREASURE;
     }
 
     public static Structure<VillageConfig> village() {
-        return Structure.field_236381_q_;
+        return Structure.VILLAGE;
     }
 
     public static Structure<NoFeatureConfig> netherFossil() {
-        return Structure.field_236382_r_;
+        return Structure.NETHER_FOSSIL;
     }
 
     public static Structure<VillageConfig> bastionRemnant() {
-        return Structure.field_236383_s_;
+        return Structure.BASTION_REMNANT;
     }
 
     public static void addDefaultMesaStructures(Biome biome) {

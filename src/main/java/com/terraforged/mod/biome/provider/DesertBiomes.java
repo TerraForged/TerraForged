@@ -72,7 +72,7 @@ public class DesertBiomes {
                 if (settings == null) {
                     continue;
                 }
-                ISurfaceBuilderConfig config = settings.func_242502_e();
+                ISurfaceBuilderConfig config = settings.getSurfaceBuilderConfig();
                 if (config == null) {
                     continue;
                 }

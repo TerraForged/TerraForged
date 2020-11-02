@@ -64,7 +64,7 @@ public enum TempCategory {
         // snowy = 0.0F
         // plains = 0.8F
         // desert = 2.0F
-        float temp = biome.func_242445_k();
+        float temp = biome.getTemperature();
         if (temp <= 0.3F) {
             return TempCategory.COLD;
         }

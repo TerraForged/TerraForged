@@ -49,7 +49,7 @@ public class ChunkCarverFix extends ChunkDelegate {
     }
 
     public BitSet getCarvingMask(GenerationStage.Carving type) {
-        return ((ChunkPrimer) delegate).func_230345_b_(type);
+        return ((ChunkPrimer) delegate).getOrAddCarvingMask(type);
     }
 
     @Override

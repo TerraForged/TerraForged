@@ -49,11 +49,11 @@ public class GameContext {
     }
 
     private static <T> GameContext decodeGameContext(Dynamic<T> dynamic) {
-        return new GameContext(Codecs.decodeAndGet(RegistryLookupCodec.func_244331_a(Registry.BIOME_KEY).codec(), dynamic));
+        return new GameContext(Codecs.decodeAndGet(RegistryLookupCodec.getLookUpCodec(Registry.BIOME_KEY).codec(), dynamic));
     }
 
     private static <T> Dynamic<T> encodeGameContext(GameContext context, DynamicOps<T> ops) {
-        return new Dynamic<>(ops, Codecs.encodeAndGet(RegistryLookupCodec.func_244331_a(Registry.BIOME_KEY).codec(), context.biomes.getRegistry(), ops));
+        return new Dynamic<>(ops, Codecs.encodeAndGet(RegistryLookupCodec.getLookUpCodec(Registry.BIOME_KEY).codec(), context.biomes.getRegistry(), ops));
     }
 
     public static GameContext dynamic() {

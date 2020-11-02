@@ -293,7 +293,7 @@ public class Trees {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:snowy_tundra", "minecraft:snowy_taiga_mountains", "minecraft:gravelly_mountains", "minecraft:modified_gravelly_mountains"),
                 FeatureMatcher.and("minecraft:tree", Blocks.SPRUCE_LOG, Blocks.SPRUCE_LEAVES),
-                FeatureReplacer.of(template("terraforged:pine").withPlacement(Placement.field_242898_b.configure(new ChanceConfig(80))))
+                FeatureReplacer.of(template("terraforged:pine").withPlacement(Placement.CHANCE.configure(new ChanceConfig(80))))
         );
     }
 
@@ -312,8 +312,8 @@ public class Trees {
     @SafeVarargs
     private static ConfiguredFeature<?, ?> extra(int count, float chance, int extra, String def, Pair<String, Float>... entries) {
         return select(def, entries)
-                .withPlacement(Features.Placements.field_244001_l)
-                .withPlacement(Placement.field_242902_f.configure(new AtSurfaceWithExtraConfig(count, chance, extra)));
+                .withPlacement(Features.Placements.HEIGHTMAP_PLACEMENT)
+                .withPlacement(Placement.COUNT_EXTRA.configure(new AtSurfaceWithExtraConfig(count, chance, extra)));
     }
 
     @SafeVarargs
@@ -385,7 +385,7 @@ public class Trees {
         if (name.startsWith("terraforged:")) {
             return template(name);
         }
-        return WorldGenRegistries.field_243653_e.func_241873_b(new ResourceLocation(name)).orElseThrow(RuntimeException::new);
+        return WorldGenRegistries.CONFIGURED_FEATURE.getOptional(new ResourceLocation(name)).orElseThrow(RuntimeException::new);
     }
 
     private static ConfiguredFeature<?, ?> context(ContextualFeature... features) {

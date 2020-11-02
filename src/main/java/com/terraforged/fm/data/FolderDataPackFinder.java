@@ -45,9 +45,9 @@ public class FolderDataPackFinder extends FolderPackFinder {
     }
 
     @Override
-    public void func_230230_a_(Consumer<ResourcePackInfo> consumer, ResourcePackInfo.IFactory factory) {
+    public void findPacks(Consumer<ResourcePackInfo> consumer, ResourcePackInfo.IFactory factory) {
         Log.debug("Searching for DataPacks...");
-        super.func_230230_a_(resourceTracker(consumer), factory);
+        super.findPacks(resourceTracker(consumer), factory);
     }
 
     private static Consumer<ResourcePackInfo> resourceTracker(Consumer<ResourcePackInfo> delegate) {

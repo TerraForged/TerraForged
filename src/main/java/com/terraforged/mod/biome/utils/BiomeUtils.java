@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class BiomeUtils {
 
-    private static final Codec<Biome.Climate> CLIMATE_CODEC = Biome.Climate.field_242459_a.codec();
+    private static final Codec<Biome.Climate> CLIMATE_CODEC = Biome.Climate.CODEC.codec();
     private static final Map<RegistryKey<Biome>, BiomeBuilder> BUILDERS = new HashMap<>();
 
     public static BiomeBuilder getBuilder(RegistryKey<Biome> biome) {
@@ -22,9 +22,9 @@ public class BiomeUtils {
     }
 
     public static BiomeBuilder copy(RegistryKey<Biome> key) {
-        Biome biome = ForgeRegistries.BIOMES.getValue(key.func_240901_a_());
+        Biome biome = ForgeRegistries.BIOMES.getValue(key.getLocation());
         if (biome == null) {
-            throw new NullPointerException(key.func_240901_a_().toString());
+            throw new NullPointerException(key.getLocation().toString());
         }
 
         BiomeBuilder builder = new BiomeBuilder(key, biome);
@@ -34,23 +34,23 @@ public class BiomeUtils {
         builder.category(biome.getCategory());
 
         // ambience
-        builder.func_235097_a_(biome.func_235089_q_());
+        builder.setEffects(biome.getAmbience());
 
         // climate
         Biome.Climate climate = getClimate(biome);
-        builder.downfall(climate.field_242463_e);
-        builder.temperature(climate.field_242461_c);
-        builder.precipitation(climate.field_242460_b);
-        builder.func_242456_a(climate.field_242462_d);
+        builder.downfall(climate.downfall);
+        builder.temperature(climate.temperature);
+        builder.precipitation(climate.precipitation);
+        builder.withTemperatureModifier(climate.temperatureModifier);
 
         // mobs
-        builder.func_242458_a(biome.func_242433_b());
+        builder.withMobSpawnSettings(biome.getMobSpawnInfo());
 
         return builder;
     }
 
     private static Biome.Climate getClimate(Biome biome) {
-        JsonElement json = Codecs.encodeAndGet(Biome.field_242419_c, biome, JsonOps.INSTANCE);
+        JsonElement json = Codecs.encodeAndGet(Biome.CODEC, biome, JsonOps.INSTANCE);
         return Codecs.decodeAndGet(CLIMATE_CODEC, new Dynamic<>(JsonOps.INSTANCE, json));
     }
 }

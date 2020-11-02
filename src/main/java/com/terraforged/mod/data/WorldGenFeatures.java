@@ -56,7 +56,7 @@ public class WorldGenFeatures extends DataGen {
     private static void genBiomeFeatures(File dir, Biome biome, GameContext context) {
         write(new File(dir, getJsonPath("features", context.biomes.getRegistryName(biome))), writer -> {
             JsonObject root = new JsonObject();
-            List<List<Supplier<ConfiguredFeature<?, ?>>>> stageFeatures = biome.func_242440_e().func_242498_c();
+            List<List<Supplier<ConfiguredFeature<?, ?>>>> stageFeatures = biome.getGenerationSettings().getFeatures();
 
             for (GenerationStage.Decoration type : GenerationStage.Decoration.values()) {
                 if (type.ordinal() >= stageFeatures.size()) {

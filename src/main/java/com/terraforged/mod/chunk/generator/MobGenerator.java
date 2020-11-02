@@ -82,31 +82,36 @@ public class MobGenerator implements Generator.Mobs {
 
     @Override
     public List<MobSpawnInfo.Spawners> getSpawns(Biome biome, StructureManager structures, EntityClassification type, BlockPos pos) {
-        if (structures.func_235010_a_(pos, true, Structure.field_236374_j_).isValid()) {
+        List<MobSpawnInfo.Spawners> spawns = net.minecraftforge.common.world.StructureSpawnManager.getStructureSpawns(structures, type, pos);
+        if (spawns != null) {
+            return spawns;
+        }
+
+        if (structures.getStructureStart(pos, true, Structure.SWAMP_HUT).isValid()) {
             if (type == EntityClassification.MONSTER) {
-                return Structure.field_236374_j_.getSpawnList();
+                return Structure.SWAMP_HUT.getSpawnList();
             }
 
             if (type == EntityClassification.CREATURE) {
-                return Structure.field_236374_j_.getCreatureSpawnList();
+                return Structure.SWAMP_HUT.getCreatureSpawnList();
             }
         }
 
         if (type == EntityClassification.MONSTER) {
-            if (structures.func_235010_a_(pos, false, Structure.field_236366_b_).isValid()) {
-                return Structure.field_236366_b_.getSpawnList();
+            if (structures.getStructureStart(pos, false, Structure.PILLAGER_OUTPOST).isValid()) {
+                return Structure.PILLAGER_OUTPOST.getSpawnList();
             }
 
-            if (structures.func_235010_a_(pos, false, Structure.field_236376_l_).isValid()) {
-                return Structure.field_236376_l_.getSpawnList();
+            if (structures.getStructureStart(pos, false, Structure.MONUMENT).isValid()) {
+                return Structure.MONUMENT.getSpawnList();
             }
 
-            if (structures.func_235010_a_(pos, true, Structure.field_236378_n_).isValid()) {
-                return Structure.field_236378_n_.getSpawnList();
+            if (structures.getStructureStart(pos, true, Structure.FORTRESS).isValid()) {
+                return Structure.FORTRESS.getSpawnList();
             }
         }
 
-        return biome.func_242433_b().func_242559_a(type);
+        return biome.getMobSpawnInfo().getSpawners(type);
     }
 
     @SubscribeEvent

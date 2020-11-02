@@ -35,8 +35,8 @@ import java.util.stream.Collectors;
 
 public class StructureUtils {
 
-    public static final List<Structure<?>> SURFACE_STRUCTURES = Structure.field_236365_a_.values().stream()
-            .filter(structure -> structure.func_236396_f_() == GenerationStage.Decoration.SURFACE_STRUCTURES)
+    public static final List<Structure<?>> SURFACE_STRUCTURES = Structure.NAME_STRUCTURE_BIMAP.values().stream()
+            .filter(structure -> structure.getDecorationStage() == GenerationStage.Decoration.SURFACE_STRUCTURES)
             .collect(Collectors.toList());
 
     public static boolean hasOvergroundStructure(IChunk chunk) {

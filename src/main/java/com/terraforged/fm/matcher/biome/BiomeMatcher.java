@@ -112,7 +112,7 @@ public class BiomeMatcher implements Predicate<Biome>, Comparable<BiomeMatcher>,
     public static BiomeMatcher of(GameContext context, RegistryKey<Biome>... biomes) {
         BiomeMatcherParser.Collector collector = new BiomeMatcherParser.Collector();
         for (RegistryKey<Biome> name : biomes) {
-            BiomeMatcherParser.collectBiomes(name.func_240901_a_().toString(), collector, context);
+            BiomeMatcherParser.collectBiomes(name.getLocation().toString(), collector, context);
         }
         return collector.create();
     }

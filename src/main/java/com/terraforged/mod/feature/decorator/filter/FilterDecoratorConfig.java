@@ -26,13 +26,13 @@ public class FilterDecoratorConfig implements IPlacementConfig {
 
     private static <T> Dynamic<T> encode(FilterDecoratorConfig config, DynamicOps<T> ops) {
         return new Dynamic<>(ops, ops.createMap(ImmutableMap.of(
-                ops.createString("placement"), Codecs.encodeAndGet(ConfiguredPlacement.field_236952_a_, config.placement, ops),
+                ops.createString("placement"), Codecs.encodeAndGet(ConfiguredPlacement.CODEC, config.placement, ops),
                 ops.createString("filter"), ops.createString(config.filter.getName())
         )));
     }
 
     private static <T> FilterDecoratorConfig decode(Dynamic<T> dynamic) {
-        ConfiguredPlacement<?> placement = Codecs.decodeAndGet(ConfiguredPlacement.field_236952_a_, dynamic.get("placement"));
+        ConfiguredPlacement<?> placement = Codecs.decodeAndGet(ConfiguredPlacement.CODEC, dynamic.get("placement"));
         PlacementFilter filter = Codecs.getResult(dynamic.get("filter").asString()).flatMap(PlacementFilter::decode)
                 .orElseThrow(CodecException.get("Unknown filter name"));
         return new FilterDecoratorConfig(placement, filter);

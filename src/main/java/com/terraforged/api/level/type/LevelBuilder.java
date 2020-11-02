@@ -60,7 +60,7 @@ public class LevelBuilder {
     }
 
     public LevelBuilder(LevelType type, long seed, boolean structures, boolean chest, Registry<DimensionType> types, Registry<Biome> biomes, Registry<DimensionSettings> settings) {
-        this(type, seed, structures, chest, types, biomes, settings, DimensionType.func_242718_a(types, biomes, settings, seed));
+        this(type, seed, structures, chest, types, biomes, settings, DimensionType.getDefaultSimpleRegistry(types, biomes, settings, seed));
     }
 
     public long getSeed() {
@@ -76,7 +76,7 @@ public class LevelBuilder {
     }
 
     public Supplier<DimensionType> getType(RegistryKey<DimensionType> key) {
-        return () -> types.func_243576_d(key);
+        return () -> types.getValueForKey(key);
     }
 
     public Registry<Biome> getBiomes() {
@@ -88,7 +88,7 @@ public class LevelBuilder {
     }
 
     public void add(RegistryKey<Dimension> key, Dimension dimension) {
-        dimensions.func_241874_a(OptionalInt.empty(), key, dimension, Lifecycle.stable());
+        dimensions.validateAndRegister(OptionalInt.empty(), key, dimension, Lifecycle.stable());
     }
 
     public DimensionGeneratorSettings build() {

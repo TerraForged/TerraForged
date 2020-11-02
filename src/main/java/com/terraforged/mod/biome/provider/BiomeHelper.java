@@ -124,13 +124,13 @@ public class BiomeHelper {
     }
 
     public static float getDefaultTemperature(Biome biome) {
-        return biome.func_242445_k();
+        return biome.getTemperature();
     }
 
     public static ISurfaceBuilderConfig getSurface(Biome biome) {
         if (biome != null) {
-            if (biome.func_242440_e() != null && biome.func_242440_e().func_242502_e() != null) {
-                return biome.func_242440_e().func_242502_e();
+            if (biome.getGenerationSettings() != null && biome.getGenerationSettings().getSurfaceBuilderConfig() != null) {
+                return biome.getGenerationSettings().getSurfaceBuilderConfig();
             }
         }
         return SurfaceBuilder.GRASS_DIRT_GRAVEL_CONFIG;
@@ -138,15 +138,15 @@ public class BiomeHelper {
 
     public static ConfiguredSurfaceBuilder<?> getSurfaceBuilder(Biome biome) {
         if (biome != null) {
-            if (biome.func_242440_e() != null && biome.func_242440_e().func_242500_d() != null) {
-                return biome.func_242440_e().func_242500_d().get();
+            if (biome.getGenerationSettings() != null && biome.getGenerationSettings().getSurfaceBuilder() != null) {
+                return biome.getGenerationSettings().getSurfaceBuilder().get();
             }
         }
         return SurfaceBuilder.DEFAULT.func_242929_a(SurfaceBuilder.GRASS_DIRT_GRAVEL_CONFIG);
     }
 
     public static BiomeGenerationSettings getGenSettings(Biome biome) {
-        return biome.func_242440_e();
+        return biome.getGenerationSettings();
     }
 
     public static void test(Biome biome) {

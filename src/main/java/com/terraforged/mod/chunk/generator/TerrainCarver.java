@@ -68,9 +68,9 @@ public class TerrainCarver implements Generator.Carvers {
         BiomeLookup lookup = new BiomeLookup();
         BitSet mask = carverChunk.getCarvingMask(type);
         Biome biome = generator.getBiomeProvider().getBiome(chunkpos.getXStart(), chunkpos.getZStart());
-        BiomeGenerationSettings settings = biome.func_242440_e();
+        BiomeGenerationSettings settings = biome.getGenerationSettings();
 
-        ListIterator<Supplier<ConfiguredCarver<?>>> iterator = settings.func_242489_a(type).listIterator();
+        ListIterator<Supplier<ConfiguredCarver<?>>> iterator = settings.getCarvers(type).listIterator();
         for (int cx = chunkX - 8; cx <= chunkX + 8; ++cx) {
             for (int cz = chunkZ - 8; cz <= chunkZ + 8; ++cz) {
                 while (iterator.hasNext()) {

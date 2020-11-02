@@ -50,9 +50,9 @@ public interface LevelType extends IForgeRegistryEntry<LevelType> {
     DimensionGeneratorSettings createLevel(long seed, boolean structures, boolean chest, SimpleRegistry<Dimension> dimensions);
 
     default DimensionGeneratorSettings createLevel(long seed, boolean structures, boolean chest, DynamicRegistries registries) {
-        Registry<Biome> biomes = registries.func_243612_b(Registry.BIOME_KEY);
-        Registry<DimensionType> types = registries.func_243612_b(Registry.DIMENSION_TYPE_KEY);
-        Registry<DimensionSettings> settings = registries.func_243612_b(Registry.field_243549_ar);
+        Registry<Biome> biomes = registries.getRegistry(Registry.BIOME_KEY);
+        Registry<DimensionType> types = registries.getRegistry(Registry.DIMENSION_TYPE_KEY);
+        Registry<DimensionSettings> settings = registries.getRegistry(Registry.NOISE_SETTINGS_KEY);
         LevelBuilder builder = new LevelBuilder(this, seed, structures, chest, types, biomes, settings);
         addDimensions(builder);
         return builder.build();

@@ -80,7 +80,7 @@ public class BushFeature extends Feature<BushFeature.Config> {
     }
 
     @Override
-    public boolean func_241855_a(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, Config config) {
+    public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, Config config) {
         BlockPos.Mutable log = new BlockPos.Mutable();
         BlockPos.Mutable leaf = new BlockPos.Mutable();
         place(world, log.setPos(pos), leaf, rand, config);

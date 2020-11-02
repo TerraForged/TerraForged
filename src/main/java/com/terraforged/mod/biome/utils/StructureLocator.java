@@ -40,13 +40,13 @@ public class StructureLocator {
                             int z = chunkZ + separation * dz;
 
                             Biome biome = biomeProvider.lookupBiome(cell.get(), x, z);
-                            if (!biome.func_242440_e().func_242493_a(structure)) {
+                            if (!biome.getGenerationSettings().hasStructure(structure)) {
                                 continue;
                             }
 
-                            ChunkPos chunkpos = structure.func_236392_a_(settings, seed, sharedseedrandom, x, z);
+                            ChunkPos chunkpos = structure.getChunkPosForStructure(settings, seed, sharedseedrandom, x, z);
                             IChunk ichunk = world.getChunk(chunkpos.x, chunkpos.z, ChunkStatus.STRUCTURE_STARTS);
-                            StructureStart<?> start = manager.func_235013_a_(SectionPos.from(ichunk.getPos(), 0), structure, ichunk);
+                            StructureStart<?> start = manager.getStructureStart(SectionPos.from(ichunk.getPos(), 0), structure, ichunk);
                             if (start != null && start.isValid()) {
                                 if (first && start.isRefCountBelowMax()) {
                                     start.incrementRefCount();

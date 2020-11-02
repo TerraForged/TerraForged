@@ -115,7 +115,7 @@ public class Shrubs {
                                 air,
                                 leaf,
                                 size
-                        )).withPlacement(Placement.field_242902_f.configure(new AtSurfaceWithExtraConfig(
+                        )).withPlacement(Placement.COUNT_EXTRA.configure(new AtSurfaceWithExtraConfig(
                                 count,
                                 chance,
                                 extra
@@ -139,7 +139,7 @@ public class Shrubs {
                                         patch(doubleBuilder(Blocks.PEONY).tries(32).func_227317_b_(), 0.1F)
                                 ),
                                 Feature.RANDOM_PATCH.withConfiguration(doubleBuilder(Blocks.TALL_GRASS).tries(48).func_227317_b_().build())
-                        )).withPlacement(Placement.field_242899_c.configure(new FeatureSpreadConfig(5)))
+                        )).withPlacement(Placement.COUNT.configure(new FeatureSpreadConfig(5)))
                 )
         );
     }
@@ -161,11 +161,11 @@ public class Shrubs {
     }
 
     private static ConfiguredFeature<?, ?> bush(int count, float chance, int extra) {
-        return bush(Placement.field_242902_f.configure(new AtSurfaceWithExtraConfig(count, chance, extra)));
+        return bush(Placement.COUNT_EXTRA.configure(new AtSurfaceWithExtraConfig(count, chance, extra)));
     }
 
     private static ConfiguredFeature<?, ?> bush(ConfiguredPlacement<?> placement) {
-        return Features.field_243870_bP.withPlacement(placement);
+        return Features.JUNGLE_BUSH.withPlacement(placement);
     }
 
     private static ConfiguredFeature<?, ?> transform(ConfiguredFeature<?, ?> feature, FeatureTransformer transformer) {
