@@ -52,6 +52,8 @@ public class Environment {
     static {
         if (dev) {
             Log.info("Running in developer mode!");
+        } else {
+            throw new IllegalStateException();
         }
     }
 }
