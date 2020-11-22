@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.client.gui.element;
 
-import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.client.gui.widget.Slider;

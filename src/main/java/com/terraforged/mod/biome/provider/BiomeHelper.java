@@ -31,7 +31,7 @@ import com.terraforged.mod.biome.map.BiomeMapBuilder;
 import com.terraforged.mod.biome.map.BiomePredicate;
 import com.terraforged.mod.biome.map.defaults.BiomeTemps;
 import com.terraforged.mod.biome.utils.TempCategory;
-import com.terraforged.n2d.util.Vec2f;
+import com.terraforged.noise.util.Vec2f;
 import com.terraforged.world.biome.BiomeData;
 import com.terraforged.world.biome.BiomeType;
 import net.minecraft.world.biome.Biome;

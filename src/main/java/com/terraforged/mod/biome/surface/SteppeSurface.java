@@ -27,9 +27,9 @@ package com.terraforged.mod.biome.surface;
 import com.terraforged.api.biome.surface.Surface;
 import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.api.material.state.States;
-import com.terraforged.n2d.Module;
-import com.terraforged.n2d.Source;
-import com.terraforged.n2d.func.CellFunc;
+import com.terraforged.noise.Module;
+import com.terraforged.noise.Source;
+import com.terraforged.noise.func.CellFunc;
 import net.minecraft.block.BlockState;
 
 public class SteppeSurface implements Surface {

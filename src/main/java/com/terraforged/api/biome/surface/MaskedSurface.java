@@ -25,7 +25,7 @@
 package com.terraforged.api.biome.surface;
 
 import com.terraforged.core.cell.Cell;
-import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.noise.util.NoiseUtil;
 
 public interface MaskedSurface extends Surface {
 

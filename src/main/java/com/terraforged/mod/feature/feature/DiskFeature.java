@@ -25,8 +25,8 @@
 package com.terraforged.mod.feature.feature;
 
 import com.terraforged.mod.TerraForgedMod;
-import com.terraforged.n2d.Module;
-import com.terraforged.n2d.Source;
+import com.terraforged.noise.Module;
+import com.terraforged.noise.Source;
 import net.minecraft.block.BlockState;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.math.BlockPos;

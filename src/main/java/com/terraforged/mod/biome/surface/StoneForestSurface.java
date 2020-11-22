@@ -28,8 +28,8 @@ import com.terraforged.api.biome.surface.MaskedSurface;
 import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.api.material.state.States;
 import com.terraforged.core.Seed;
-import com.terraforged.n2d.Module;
-import com.terraforged.n2d.Source;
+import com.terraforged.noise.Module;
+import com.terraforged.noise.Source;
 import net.minecraft.block.BlockState;
 
 import java.util.function.IntFunction;

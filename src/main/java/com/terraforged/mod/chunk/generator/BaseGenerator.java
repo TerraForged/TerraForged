@@ -28,7 +28,7 @@ import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.core.concurrent.task.LazySupplier;
 import com.terraforged.core.tile.chunk.ChunkReader;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.column.BaseDecorator;
 import com.terraforged.mod.chunk.column.BaseGeoDecorator;
 import com.terraforged.mod.chunk.column.BedrockDecorator;
@@ -46,12 +46,12 @@ public class BaseGenerator implements Generator.Terrain {
 
     private final Levels levels;
     private final TerrainHelper terrainHelper;
-    private final TerraChunkGenerator generator;
+    private final TFChunkGenerator generator;
     private final ColumnDecorator baseDecorator;
     private final ColumnDecorator bedrockDecorator;
     private final LazySupplier<Climate> climate;
 
-    public BaseGenerator(TerraChunkGenerator generator) {
+    public BaseGenerator(TFChunkGenerator generator) {
         this.generator = generator;
         this.levels = generator.getContext().levels;
         this.climate = generator.getContext().factory.then(WorldGeneratorFactory::getClimate);
@@ -80,7 +80,7 @@ public class BaseGenerator implements Generator.Terrain {
         }
     }
 
-    private static ColumnDecorator getBaseDecorator(TerraChunkGenerator generator) {
+    private static ColumnDecorator getBaseDecorator(TFChunkGenerator generator) {
         if (generator.getContext().terraSettings.miscellaneous.strataDecorator) {
             return new BaseGeoDecorator(generator);
         }

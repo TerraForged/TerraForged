@@ -26,8 +26,8 @@ package com.terraforged.mod.biome.modifier;
 
 import com.terraforged.core.Seed;
 import com.terraforged.core.cell.Cell;
-import com.terraforged.n2d.Module;
-import com.terraforged.n2d.Source;
+import com.terraforged.noise.Module;
+import com.terraforged.noise.Source;
 import com.terraforged.world.climate.Climate;
 import net.minecraft.world.biome.Biome;
 

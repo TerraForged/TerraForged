@@ -30,7 +30,7 @@ import com.terraforged.core.util.PosIterator;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
-import com.terraforged.n2d.source.Line;
+import com.terraforged.noise.source.Line;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeContainer;

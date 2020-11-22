@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.chunk.generator;
 
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.crash.ReportedException;
@@ -47,9 +47,9 @@ import java.util.function.Supplier;
 
 public class StructureGenerator implements Generator.Structures {
 
-    private final TerraChunkGenerator generator;
+    private final TFChunkGenerator generator;
 
-    public StructureGenerator(TerraChunkGenerator generator) {
+    public StructureGenerator(TFChunkGenerator generator) {
         this.generator = generator;
     }
 

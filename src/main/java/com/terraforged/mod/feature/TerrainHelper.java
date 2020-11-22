@@ -25,7 +25,7 @@
 package com.terraforged.mod.feature;
 
 import com.google.common.collect.ImmutableSet;
-import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.noise.util.NoiseUtil;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;

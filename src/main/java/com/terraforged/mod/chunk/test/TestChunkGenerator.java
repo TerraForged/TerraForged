@@ -25,11 +25,11 @@
 package com.terraforged.mod.chunk.test;
 
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import net.minecraft.world.gen.DimensionSettings;
 
-public class TestChunkGenerator extends TerraChunkGenerator {
+public class TestChunkGenerator extends TFChunkGenerator {
 
     private final TerraBiomeProvider biomeProvider;
 

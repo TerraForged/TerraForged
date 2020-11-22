@@ -1,6 +1,6 @@
 package com.terraforged.api.feature.decorator;
 
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionDelegate;
 import com.terraforged.mod.chunk.util.TerraContainer;
 import com.terraforged.world.heightmap.Levels;
@@ -17,9 +17,9 @@ public class DecorationContext {
     private final Levels levels;
     private final WorldGenRegion region;
     private final TerraContainer biomes;
-    private final TerraChunkGenerator generator;
+    private final TFChunkGenerator generator;
 
-    public DecorationContext(WorldGenRegion region, IChunk chunk, TerraContainer biomes, TerraChunkGenerator generator) {
+    public DecorationContext(WorldGenRegion region, IChunk chunk, TerraContainer biomes, TFChunkGenerator generator) {
         this.chunk = chunk;
         this.region = region;
         this.biomes = biomes;
@@ -47,13 +47,13 @@ public class DecorationContext {
         return levels;
     }
 
-    public TerraChunkGenerator getGenerator() {
+    public TFChunkGenerator getGenerator() {
         return generator;
     }
 
     public static DecorationContext of(ISeedReader world, ChunkGenerator generator) {
-        if (generator instanceof TerraChunkGenerator && world instanceof RegionDelegate) {
-            TerraChunkGenerator terraGenerator = (TerraChunkGenerator) generator;
+        if (generator instanceof TFChunkGenerator && world instanceof RegionDelegate) {
+            TFChunkGenerator terraGenerator = (TFChunkGenerator) generator;
             WorldGenRegion region = ((RegionDelegate) world).getDelegate();
             IChunk chunk = region.getChunk(region.getMainChunkX(), region.getMainChunkZ());
             if (chunk.getBiomes() instanceof TerraContainer) {

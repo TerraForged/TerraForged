@@ -3,7 +3,7 @@ package com.terraforged.mod.biome.utils;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -19,7 +19,7 @@ import net.minecraft.world.gen.settings.StructureSeparationSettings;
 
 public class StructureLocator {
 
-    public static BlockPos findStructure(TerraChunkGenerator generator, IWorld world, StructureManager manager, Structure<?> structure, BlockPos center, int attempts, boolean first, StructureSeparationSettings settings) {
+    public static BlockPos findStructure(TFChunkGenerator generator, IWorld world, StructureManager manager, Structure<?> structure, BlockPos center, int attempts, boolean first, StructureSeparationSettings settings) {
         long seed = generator.getSeed();
         int separation = settings.func_236668_a_();
         int chunkX = center.getX() >> 4;

@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.util;
 
-import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.noise.util.NoiseUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;

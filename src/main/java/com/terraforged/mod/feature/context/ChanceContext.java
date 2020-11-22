@@ -29,7 +29,7 @@ import com.terraforged.core.concurrent.Resource;
 import com.terraforged.core.concurrent.cache.SafeCloseable;
 import com.terraforged.core.concurrent.pool.ObjectPool;
 import com.terraforged.core.tile.chunk.ChunkReader;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionDelegate;
 import com.terraforged.world.heightmap.Levels;
 import net.minecraft.util.math.BlockPos;
@@ -95,8 +95,8 @@ public class ChanceContext implements SafeCloseable {
     }
 
     public static Resource<ChanceContext> pooled(IWorld world, ChunkGenerator generator) {
-        if (generator instanceof TerraChunkGenerator && world instanceof RegionDelegate) {
-            TerraChunkGenerator terraGenerator = (TerraChunkGenerator) generator;
+        if (generator instanceof TFChunkGenerator && world instanceof RegionDelegate) {
+            TFChunkGenerator terraGenerator = (TFChunkGenerator) generator;
             Levels levels = terraGenerator.getContext().levels;
             WorldGenRegion region = ((RegionDelegate) world).getDelegate();
             IChunk chunk = region.getChunk(region.getMainChunkX(), region.getMainChunkZ());

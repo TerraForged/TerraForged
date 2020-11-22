@@ -31,8 +31,8 @@ import com.mojang.serialization.DynamicOps;
 import com.terraforged.api.feature.decorator.DecorationContext;
 import com.terraforged.core.util.poisson.PoissonContext;
 import com.terraforged.fm.util.codec.Codecs;
-import com.terraforged.n2d.Module;
-import com.terraforged.n2d.Source;
+import com.terraforged.noise.Module;
+import com.terraforged.noise.Source;
 import net.minecraft.world.gen.placement.IPlacementConfig;
 
 public class PoissonConfig implements IPlacementConfig {

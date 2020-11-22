@@ -24,16 +24,16 @@
 
 package com.terraforged.mod.chunk.fix;
 
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 
 // fixes hard-coded water and world height values
 public class RegionFix extends RegionDelegate {
 
-    private final TerraChunkGenerator generator;
+    private final TFChunkGenerator generator;
 
-    public RegionFix(WorldGenRegion region, TerraChunkGenerator generator) {
+    public RegionFix(WorldGenRegion region, TFChunkGenerator generator) {
         super(region);
         this.generator = generator;
     }

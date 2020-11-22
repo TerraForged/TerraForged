@@ -29,6 +29,7 @@ import com.terraforged.fm.data.FolderDataPackFinder;
 import com.terraforged.fm.data.ModDataPackFinder;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.TerraForgedLevel;
+import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.client.gui.config.SettingsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
@@ -44,8 +45,9 @@ public class TerraClientEvents {
     @SubscribeEvent
     public static void setup(FMLClientSetupEvent event) {
         Log.info("Client setup");
-        ClientLevelManager.register(TerraForgedLevel.NAME, SettingsScreen::create);
-        ClientLevelManager.setDefault(TerraForgedLevel.NAME);
+        ClientLevelManager.register(TerraForgedMod.LEVEL_NAME, SettingsScreen::create);
+        ClientLevelManager.register(TerraForgedMod.LITE_LEVEL_NAME, SettingsScreen::create);
+        ClientLevelManager.setDefault(TerraForgedMod.LEVEL_NAME);
 
         event.enqueueWork(() -> {
             Log.info("Adding DataPackFinder");

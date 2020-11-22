@@ -29,7 +29,8 @@ import com.terraforged.api.material.WGTags;
 import com.terraforged.api.registry.Registries;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
+import com.terraforged.mod.chunk.lite.TFChunkGeneratorLite;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.data.WorldGenBiomes;
@@ -42,6 +43,7 @@ import com.terraforged.mod.feature.feature.BushFeature;
 import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.mod.feature.feature.FreezeLayer;
 import com.terraforged.mod.server.command.TerraCommand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biomes;
@@ -60,6 +62,9 @@ import java.io.File;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class TerraForgedMod {
 
+    public static final ResourceLocation LEVEL_NAME = new ResourceLocation(TerraForgedMod.MODID, "terraforged");
+    public static final ResourceLocation LITE_LEVEL_NAME = new ResourceLocation(TerraForgedMod.MODID, "terraforged_lite");
+
     public static final String MODID = "terraforged";
 
     public TerraForgedMod() {
@@ -67,7 +72,8 @@ public class TerraForgedMod {
         Registries.init();
 
         Registry.register(Registry.BIOME_PROVIDER_CODEC, "terraforged:climate", TerraBiomeProvider.CODEC);
-        Registry.register(Registry.CHUNK_GENERATOR_CODEC, "terraforged:terrain", TerraChunkGenerator.CODEC);
+        Registry.register(Registry.CHUNK_GENERATOR_CODEC, "terraforged:generator", TFChunkGenerator.CODEC);
+        Registry.register(Registry.CHUNK_GENERATOR_CODEC, "terraforged:lite_generator", TFChunkGeneratorLite.LITE_CODEC);
 
         BiomeManager.addBiome(BiomeManager.BiomeType.ICY, new BiomeManager.BiomeEntry(Biomes.ICE_SPIKES, 2));
         BiomeManager.addBiome(BiomeManager.BiomeType.WARM, new BiomeManager.BiomeEntry(Biomes.MUSHROOM_FIELDS, 2));
@@ -91,7 +97,8 @@ public class TerraForgedMod {
     @SubscribeEvent
     public static void registerLevels(RegistryEvent.Register<LevelType> event) {
         Log.info("Registering levels");
-        event.getRegistry().register(new TerraForgedLevel().setRegistryName(TerraForgedLevel.NAME));
+        event.getRegistry().register(new TerraForgedLevel(TFChunkGenerator::new).setRegistryName(LEVEL_NAME));
+        event.getRegistry().register(new TerraForgedLevel(TFChunkGeneratorLite::new).setRegistryName(LITE_LEVEL_NAME));
     }
 
     @SubscribeEvent

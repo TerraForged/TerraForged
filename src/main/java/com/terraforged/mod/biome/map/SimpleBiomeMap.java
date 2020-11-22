@@ -30,7 +30,7 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.map.defaults.DefaultBiomes;
 import com.terraforged.mod.biome.map.set.*;
-import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.noise.util.NoiseUtil;
 import com.terraforged.world.biome.BiomeType;
 import com.terraforged.world.heightmap.Levels;
 import com.terraforged.world.terrain.TerrainCategory;

@@ -27,6 +27,7 @@ package com.terraforged.fm.template.buffer;
 import com.terraforged.fm.template.BlockUtils;
 import com.terraforged.fm.template.PasteConfig;
 import com.terraforged.fm.template.Template;
+import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -43,18 +44,12 @@ public class TemplateBuffer extends PasteBuffer {
     private final BufferBitSet bitSet = new BufferBitSet();
     private final List<Template.BlockInfo> buffer = new ArrayList<>(128);
 
-    public TemplateBuffer init(IWorld world, BlockPos origin, Vector3i min, Vector3i max) {
+    public TemplateBuffer init(IWorld world, BlockPos origin, Vector3i p1, Vector3i p2) {
         this.buffer.clear();
         this.bitSet.clear();
-        int minX = min.getX();
-        int minY = min.getY();
-        int minZ = min.getZ();
-        int sizeX = max.getX() - min.getX();
-        int sizeY = max.getY() - min.getY();
-        int sizeZ = max.getZ() - min.getZ();
         this.world = world;
         this.origin = origin;
-        this.bitSet.assign(minX, minY, minZ, sizeX, sizeY, sizeZ);
+        this.bitSet.assign(p1.getX(), p1.getY(), p1.getZ(), p2.getX(), p2.getY(), p2.getZ());
         return this;
     }
 
@@ -99,15 +94,19 @@ public class TemplateBuffer extends PasteBuffer {
     }
 
     private boolean test(BlockPos start, float dx, float dz) {
-        float x = start.getX();
-        float z = start.getZ();
+        int x = start.getX();
+        int z = start.getZ();
+        float px = x;
+        float pz = z;
         int count = 0;
         while (x != origin.getX() && z != origin.getZ() && count < 10) {
-            if (bitSet.test(origin.getX(), start.getY(), origin.getZ())) {
+            if (bitSet.test(x, start.getY(), z)) {
                 return false;
             }
-            x -= dx;
-            z -= dz;
+            px -= dx;
+            pz -= dz;
+            x = NoiseUtil.floor(px);
+            z = NoiseUtil.floor(pz);
             count++;
         }
         return true;

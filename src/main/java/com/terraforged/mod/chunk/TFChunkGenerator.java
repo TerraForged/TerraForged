@@ -41,6 +41,8 @@ import com.terraforged.core.tile.gen.TileCache;
 import com.terraforged.fm.FeatureManager;
 import com.terraforged.fm.structure.FMStructureManager;
 import com.terraforged.fm.util.codec.Codecs;
+import com.terraforged.fm.util.codec.DecoderFunc;
+import com.terraforged.fm.util.codec.EncoderFunc;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.biome.utils.StructureLocator;
@@ -73,11 +75,12 @@ import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-public class TerraChunkGenerator extends ChunkGenerator {
+public class TFChunkGenerator extends ChunkGenerator {
 
-    public static final Codec<TerraChunkGenerator> CODEC = Codecs.create(TerraChunkGenerator::encodeGenerator, TerraChunkGenerator::decodeGenerator);
+    public static final Codec<TFChunkGenerator> CODEC = TFChunkGenerator.codec(TFChunkGenerator::new);
 
     private final long seed;
     private final TerraContext context;
@@ -93,7 +96,7 @@ public class TerraChunkGenerator extends ChunkGenerator {
     private final Generator.Structures structureGenerator;
     private final Supplier<GeneratorResources> resources;
 
-    public TerraChunkGenerator(TerraBiomeProvider biomeProvider, DimensionSettings settings) {
+    public TFChunkGenerator(TerraBiomeProvider biomeProvider, DimensionSettings settings) {
         super(biomeProvider, settings.getStructures());
         TerraContext context = biomeProvider.getContext();
         this.seed = context.terraSettings.world.seed;
@@ -111,10 +114,10 @@ public class TerraChunkGenerator extends ChunkGenerator {
         Profiler.reset();
     }
 
-    private TerraChunkGenerator create(long seed) {
+    protected TFChunkGenerator create(long seed) {
         Log.debug("Creating seeded generator: {}", seed);
         TerraBiomeProvider biomes = getBiomeProvider().getBiomeProvider(seed);
-        return new TerraChunkGenerator(biomes, getSettings());
+        return new TFChunkGenerator(biomes, getSettings());
     }
 
     public long getSeed() {
@@ -353,13 +356,13 @@ public class TerraChunkGenerator extends ChunkGenerator {
         return getChunkReader(pos.x, pos.z);
     }
 
-    public final ChunkReader getChunkReader(int chunkX, int chunkZ) {
+    public ChunkReader getChunkReader(int chunkX, int chunkZ) {
         return resources.get().tileCache.getChunk(chunkX, chunkZ);
     }
 
     public static ChunkReader getChunk(IWorld world, ChunkGenerator generator) {
-        if (generator instanceof TerraChunkGenerator) {
-            TerraChunkGenerator terra = (TerraChunkGenerator) generator;
+        if (generator instanceof TFChunkGenerator) {
+            TFChunkGenerator terra = (TFChunkGenerator) generator;
             if (world instanceof IChunk) {
                 IChunk chunk = (IChunk) world;
                 return terra.getChunkReader(chunk.getPos().x, chunk.getPos().z);
@@ -372,7 +375,8 @@ public class TerraChunkGenerator extends ChunkGenerator {
         }
         throw new IllegalStateException("NONONO");
     }
-    private static <T> Dynamic<T> encodeGenerator(TerraChunkGenerator generator, DynamicOps<T> ops) {
+
+    private static <TF extends TFChunkGenerator, T> Dynamic<T> encodeGenerator(TF generator, DynamicOps<T> ops) {
         T biomeProvider = Codecs.encodeAndGet(TerraBiomeProvider.CODEC, generator.getBiomeProvider(), ops);
         T dimensionSettings = Codecs.encodeAndGet(DimensionSettings.field_236097_a_, generator.getSettings(), ops);
         return new Dynamic<>(ops, ops.createMap(ImmutableMap.of(
@@ -381,9 +385,20 @@ public class TerraChunkGenerator extends ChunkGenerator {
         )));
     }
 
-    private static <T> TerraChunkGenerator decodeGenerator(Dynamic<T> dynamic) {
+    private static <TF extends TFChunkGenerator, T> TF decodeGenerator(Dynamic<T> dynamic, BiFunction<TerraBiomeProvider, DimensionSettings, TF> constructor) {
         TerraBiomeProvider biomes = Codecs.decodeAndGet(TerraBiomeProvider.CODEC, dynamic.get("biome_provider"));
         DimensionSettings settings = Codecs.decodeAndGet(DimensionSettings.field_236097_a_, dynamic.get("dimension_settings"));
-        return new TerraChunkGenerator(biomes, settings);
+        return constructor.apply(biomes, settings);
+    }
+
+    protected static <TF extends TFChunkGenerator> Codec<TF> codec(BiFunction<TerraBiomeProvider, DimensionSettings, TF> constructor) {
+        EncoderFunc<TF> encoder = TFChunkGenerator::encodeGenerator;
+        DecoderFunc<TF> decoder = new DecoderFunc<TF>() {
+            @Override
+            public <T> TF _decode(Dynamic<T> dynamic) {
+                return TFChunkGenerator.decodeGenerator(dynamic, constructor);
+            }
+        };
+        return Codecs.create(encoder, decoder);
     }
 }

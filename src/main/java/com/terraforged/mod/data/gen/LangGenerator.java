@@ -66,6 +66,7 @@ public class LangGenerator {
 
     private static void worlds(LanguageProvider provider) {
         provider.add("generator.terraforged", "TerraForged");
+        provider.add("generator.terraforged_lite", "TerraForged Lite");
         provider.add("generator.terratest", "TerraTest");
     }
 

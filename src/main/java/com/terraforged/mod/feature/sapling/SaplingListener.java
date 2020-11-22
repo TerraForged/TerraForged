@@ -27,7 +27,7 @@ package com.terraforged.mod.feature.sapling;
 import com.terraforged.fm.template.Template;
 import com.terraforged.fm.template.feature.TemplateFeature;
 import com.terraforged.fm.template.feature.TemplateFeatureConfig;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.feature.BlockDataManager;
 import net.minecraft.block.Block;
@@ -126,10 +126,10 @@ public class SaplingListener {
         if (event.getWorld() instanceof ServerWorld) {
             ServerWorld serverWorld = (ServerWorld) event.getWorld();
             ChunkGenerator generator = serverWorld.getChunkProvider().generator;
-            if (generator instanceof TerraChunkGenerator) {
-                TerraContext context = ((TerraChunkGenerator) generator).getContext();
+            if (generator instanceof TFChunkGenerator) {
+                TerraContext context = ((TFChunkGenerator) generator).getContext();
                 if (context.terraSettings.miscellaneous.customBiomeFeatures) {
-                    return Optional.of(((TerraChunkGenerator) generator).getBlockDataManager());
+                    return Optional.of(((TFChunkGenerator) generator).getBlockDataManager());
                 }
             }
         }
@@ -139,7 +139,7 @@ public class SaplingListener {
     private static boolean isTerraGen(IWorld world) {
         if (world.getChunkProvider() instanceof ServerChunkProvider) {
             ServerChunkProvider chunkProvider = (ServerChunkProvider) world.getChunkProvider();
-            return chunkProvider.getChunkGenerator() instanceof TerraChunkGenerator;
+            return chunkProvider.getChunkGenerator() instanceof TFChunkGenerator;
         }
         return false;
     }

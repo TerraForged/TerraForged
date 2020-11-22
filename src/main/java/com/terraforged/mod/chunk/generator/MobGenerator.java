@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.chunk.generator;
 
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
@@ -54,9 +54,9 @@ public class MobGenerator implements Generator.Mobs {
     private final CatSpawner catSpawner = new CatSpawner();
     private final PatrolSpawner patrolSpawner = new PatrolSpawner();
     private final PhantomSpawner phantomSpawner = new PhantomSpawner();
-    private final TerraChunkGenerator generator;
+    private final TFChunkGenerator generator;
 
-    public MobGenerator(TerraChunkGenerator generator) {
+    public MobGenerator(TFChunkGenerator generator) {
         this.generator = generator;
     }
 

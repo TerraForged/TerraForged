@@ -28,7 +28,7 @@ import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.column.ErosionDecorator;
-import com.terraforged.n2d.source.Rand;
+import com.terraforged.noise.source.Rand;
 import com.terraforged.world.terrain.TerrainType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

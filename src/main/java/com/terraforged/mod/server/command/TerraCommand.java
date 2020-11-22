@@ -34,7 +34,7 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.Resource;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.profiler.Profiler;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
@@ -286,8 +286,8 @@ public class TerraCommand {
 
     private static TerraContext getContext(CommandContext<CommandSource> context) throws CommandSyntaxException {
         ChunkGenerator generator = context.getSource().getWorld().getChunkProvider().getChunkGenerator();
-        if (generator instanceof TerraChunkGenerator) {
-            TerraChunkGenerator gen = (TerraChunkGenerator) generator;
+        if (generator instanceof TFChunkGenerator) {
+            TFChunkGenerator gen = (TFChunkGenerator) generator;
             return gen.getContext();
         }
         throw createException("Invalid world type", "This command can only be run in a TerraForged world!");

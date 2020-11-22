@@ -47,6 +47,9 @@ public class BufferBitSet {
 
     public boolean test(int x, int y, int z) {
         int index = indexOf(x - minX, y - minY, z - minZ);
+        if (index < 0 || index >= bitSet.length()) {
+            return false;
+        }
         return bitSet.get(index);
     }
 

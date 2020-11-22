@@ -24,7 +24,7 @@
 
 package com.terraforged.api.material.geology;
 
-import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.noise.util.NoiseUtil;
 
 public class StrataConfig {
 

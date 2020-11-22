@@ -32,9 +32,9 @@ import com.terraforged.api.feature.decorator.DecorationContext;
 import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.fm.util.codec.Codecs;
 import com.terraforged.mod.feature.decorator.poisson.BiomeVariance;
-import com.terraforged.n2d.Module;
-import com.terraforged.n2d.Source;
-import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.noise.Module;
+import com.terraforged.noise.Source;
+import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.gen.placement.IPlacementConfig;
 

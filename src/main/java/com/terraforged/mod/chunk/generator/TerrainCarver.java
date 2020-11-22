@@ -27,9 +27,8 @@ package com.terraforged.mod.chunk.generator;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.fm.template.StructureUtils;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.ChunkCarverFix;
-import net.minecraft.test.StructureHelper;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -47,9 +46,9 @@ import java.util.function.Supplier;
 
 public class TerrainCarver implements Generator.Carvers {
 
-    private final TerraChunkGenerator generator;
+    private final TFChunkGenerator generator;
 
-    public TerrainCarver(TerraChunkGenerator generator) {
+    public TerrainCarver(TFChunkGenerator generator) {
         this.generator = generator;
     }
 

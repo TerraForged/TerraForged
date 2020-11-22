@@ -2,8 +2,8 @@ package com.terraforged.mod.feature.decorator.fastpoisson;
 
 import com.terraforged.core.concurrent.cache.SafeCloseable;
 import com.terraforged.mod.feature.decorator.poisson.BiomeVariance;
-import com.terraforged.n2d.Module;
-import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.noise.Module;
+import com.terraforged.noise.util.NoiseUtil;
 
 public class DensityNoise implements SafeCloseable, Module {
 

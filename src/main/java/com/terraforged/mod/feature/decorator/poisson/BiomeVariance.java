@@ -28,8 +28,8 @@ import com.terraforged.api.feature.decorator.DecorationContext;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.cache.SafeCloseable;
 import com.terraforged.core.tile.chunk.ChunkReader;
-import com.terraforged.n2d.Module;
-import com.terraforged.n2d.Source;
+import com.terraforged.noise.Module;
+import com.terraforged.noise.Source;
 import net.minecraft.util.math.ChunkPos;
 
 public class BiomeVariance implements Module, SafeCloseable {

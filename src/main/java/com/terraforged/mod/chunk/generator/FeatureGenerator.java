@@ -31,7 +31,7 @@ import com.terraforged.fm.biome.BiomeFeature;
 import com.terraforged.fm.biome.BiomeFeatures;
 import com.terraforged.fm.util.identity.Identity;
 import com.terraforged.mod.Log;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionFix;
 import com.terraforged.mod.chunk.util.DecoratorException;
 import com.terraforged.mod.chunk.util.TerraContainer;
@@ -60,9 +60,9 @@ public class FeatureGenerator implements Generator.Features {
     private static final String FEATURE = "feature";
     private static final long WARN_TIME = 100;
 
-    private final TerraChunkGenerator generator;
+    private final TFChunkGenerator generator;
 
-    public FeatureGenerator(TerraChunkGenerator generator) {
+    public FeatureGenerator(TFChunkGenerator generator) {
         this.generator = generator;
     }
 

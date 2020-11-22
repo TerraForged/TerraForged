@@ -27,8 +27,9 @@ package com.terraforged.mod;
 import com.terraforged.api.level.type.AbstractLevelType;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
+import com.terraforged.mod.chunk.lite.TFChunkGeneratorLite;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.TerraDimGenSettings;
 import net.minecraft.util.ResourceLocation;
@@ -42,15 +43,23 @@ import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 
+import java.util.function.BiFunction;
+
 public class TerraForgedLevel extends AbstractLevelType {
 
     public static final ResourceLocation NAME = new ResourceLocation(TerraForgedMod.MODID, "terraforged");
+
+    private final BiFunction<TerraBiomeProvider, DimensionSettings, ChunkGenerator> constructor;
+
+    public TerraForgedLevel(BiFunction<TerraBiomeProvider, DimensionSettings, ChunkGenerator> constructor) {
+        this.constructor = constructor;
+    }
 
     @Override
     public ChunkGenerator create(long seed, Registry<Biome> biomes, Registry<DimensionSettings> settings) {
         TerraBiomeProvider biomeProvider = TerraBiomeProvider.create(seed, biomes);
         DimensionSettings dimensionSettings = settings.getOrThrow(DimensionSettings.field_242734_c);
-        return new TerraChunkGenerator(biomeProvider, dimensionSettings);
+        return constructor.apply(biomeProvider, dimensionSettings);
     }
 
     @Override
@@ -66,17 +75,20 @@ public class TerraForgedLevel extends AbstractLevelType {
                 DimensionGeneratorSettings.func_241520_a_(
                         level.func_236224_e_(),
                         () -> registries.func_230520_a_().getOrThrow(DimensionType.OVERWORLD),
-                        createOverworld(registries, settings)
+                        createOverworld(level, registries, settings)
                 )
         );
     }
 
-    private static TerraChunkGenerator createOverworld(DynamicRegistries registries, TerraSettings settings) {
+    private static TFChunkGenerator createOverworld(DimensionGeneratorSettings level, DynamicRegistries registries, TerraSettings settings) {
         Registry<DimensionSettings> dimSettings = registries.getRegistry(Registry.NOISE_SETTINGS_KEY);
         DimensionSettings overworldSettings = dimSettings.getOrThrow(DimensionSettings.field_242734_c);
         GameContext game = new GameContext(registries.getRegistry(Registry.BIOME_KEY));
         TerraContext context = new TerraContext(settings, game);
         TerraBiomeProvider biomeProvider = new TerraBiomeProvider(context);
-        return new TerraChunkGenerator(biomeProvider, overworldSettings);
+        if (level.func_236225_f_() instanceof TFChunkGeneratorLite) {
+            return new TFChunkGeneratorLite(biomeProvider, overworldSettings);
+        }
+        return new TFChunkGenerator(biomeProvider, overworldSettings);
     }
 }

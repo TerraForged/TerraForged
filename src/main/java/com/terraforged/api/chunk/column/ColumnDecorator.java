@@ -26,15 +26,15 @@ package com.terraforged.api.chunk.column;
 
 import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
 import com.terraforged.api.biome.surface.SurfaceContext;
-import com.terraforged.n2d.Source;
-import com.terraforged.n2d.source.FastSource;
+import com.terraforged.noise.Source;
+import com.terraforged.noise.source.NoiseSource;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.IChunk;
 
 public interface ColumnDecorator {
 
-    FastSource variance = (FastSource) Source.perlin(0, 100, 1);
+    NoiseSource variance = (NoiseSource) Source.perlin(0, 100, 1);
 
     void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z);
 

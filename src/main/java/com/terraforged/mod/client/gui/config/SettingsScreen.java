@@ -28,7 +28,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.api.client.WorldOptionsCallback;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.TerraForgedLevel;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
@@ -43,7 +43,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.WorldOptionsScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
@@ -270,8 +269,8 @@ public class SettingsScreen extends OverlayScreen {
     }
 
     private static TerraSettings getInitialSettings(DimensionGeneratorSettings level) {
-        if (level.func_236225_f_() instanceof TerraChunkGenerator) {
-            TerraContext context = ((TerraChunkGenerator) level.func_236225_f_()).getContext();
+        if (level.func_236225_f_() instanceof TFChunkGenerator) {
+            TerraContext context = ((TFChunkGenerator) level.func_236225_f_()).getContext();
             return context.terraSettings;
         }
         throw new IllegalStateException("Not a TerraForged generator :[");

@@ -38,7 +38,7 @@ import com.terraforged.core.tile.gen.TileGenerator;
 import com.terraforged.core.util.PosUtil;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.util.nbt.NBTHelper;
-import com.terraforged.n2d.util.NoiseUtil;
+import com.terraforged.noise.util.NoiseUtil;
 import com.terraforged.world.GeneratorContext;
 import com.terraforged.world.continent.MutableVeci;
 import com.terraforged.world.continent.SpawnType;

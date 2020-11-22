@@ -25,16 +25,16 @@
 package com.terraforged.mod.chunk.column;
 
 import com.terraforged.api.chunk.column.DecoratorContext;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.world.geology.Stratum;
 import net.minecraft.block.BlockState;
 import net.minecraft.world.chunk.IChunk;
 
 public class BaseGeoDecorator extends BaseDecorator implements Stratum.Visitor<BlockState, DecoratorContext> {
 
-    private final TerraChunkGenerator generator;
+    private final TFChunkGenerator generator;
 
-    public BaseGeoDecorator(TerraChunkGenerator generator) {
+    public BaseGeoDecorator(TFChunkGenerator generator) {
         this.generator = generator;
     }
 

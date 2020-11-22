@@ -27,8 +27,7 @@ package com.terraforged.mod.chunk.generator;
 import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
 import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.core.tile.chunk.ChunkReader;
-import com.terraforged.mod.Log;
-import com.terraforged.mod.chunk.TerraChunkGenerator;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.util.FastChunk;
 import com.terraforged.mod.chunk.util.SimpleChunk;
 import com.terraforged.mod.chunk.util.TerraContainer;
@@ -43,10 +42,10 @@ import java.util.stream.IntStream;
 
 public class SurfaceGenerator implements Generator.Surfaces {
 
-    private final TerraChunkGenerator generator;
+    private final TFChunkGenerator generator;
     private final INoiseGenerator surfaceNoise;
 
-    public SurfaceGenerator(TerraChunkGenerator generator) {
+    public SurfaceGenerator(TFChunkGenerator generator) {
         this.generator = generator;
         this.surfaceNoise = new PerlinNoiseGenerator(new SharedSeedRandom(generator.getSeed()), IntStream.rangeClosed(-3, 0));
     }
