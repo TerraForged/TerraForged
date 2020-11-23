@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.feature.sapling;
 
-import com.terraforged.fm.template.Template;
+import com.terraforged.fm.template.template.Template;
 import com.terraforged.fm.template.feature.TemplateFeature;
 import com.terraforged.fm.template.feature.TemplateFeatureConfig;
 import com.terraforged.mod.chunk.TFChunkGenerator;

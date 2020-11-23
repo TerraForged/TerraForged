@@ -34,7 +34,7 @@ import com.terraforged.fm.matcher.biome.BiomeMatcher;
 import com.terraforged.fm.matcher.feature.FeatureMatcher;
 import com.terraforged.fm.modifier.Jsonifiable;
 import com.terraforged.fm.modifier.Modifier;
-import com.terraforged.fm.template.TemplateManager;
+import com.terraforged.fm.template.template.TemplateManager;
 import com.terraforged.fm.transformer.FeatureReplacer;
 import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.feature.TerraFeatures;
@@ -121,7 +121,7 @@ public class Trees {
                 BiomeMatcher.of(context, "minecraft:forest"),
                 FeatureMatcher.and(Blocks.OAK_LOG, Blocks.OAK_LEAVES),
                 FeatureReplacer.of(poisson(
-                        0.25F, 6, 0.2F, 150, 0.5F,
+                        0.25F, 7, 0.3F, 150, 0.75F,
                         "terraforged:oak_forest",
                         Pair.of("terraforged:oak_forest", 0.2F),
                         Pair.of("terraforged:oak_large", 0.3F)
@@ -177,7 +177,7 @@ public class Trees {
                         contextEntry("terraforged:birch_forest", 0.2F, eCntx(0.3F, 0F), bCntx(0.05F, 0.2F)),
                         contextEntry("terraforged:birch_small", 0.1F, bCntx(0.25F, 0F)),
                         contextEntry("terraforged:birch_small", 0.1F, eCntx(0.25F, 0.65F))
-                ).withPlacement(poisson(0.3F, 6, 0.15F, 175, 0.95F)))
+                ).withPlacement(poisson(0.4F, 7, 0.25F, 175, 0.95F)))
         );
     }
 
@@ -233,7 +233,7 @@ public class Trees {
                 BiomeMatcher.of(context, "minecraft:jungle_edge", "minecraft:modified_jungle_edge", "terraforged:stone_forest"),
                 FeatureMatcher.and("minecraft:tree"),
                 FeatureReplacer.of(poisson(
-                        0.35F, 8, 0.15F, 350, 0.65F,
+                        0.35F, 7, 0.25F, 350, 0.75F,
                         "terraforged:jungle_small",
                         Pair.of("terraforged:jungle_small", 0.2F),
                         Pair.of("terraforged:jungle_large", 0.3F),
@@ -247,7 +247,7 @@ public class Trees {
                 BiomeMatcher.of(context, "minecraft:jungle_hills", "minecraft:bamboo_jungle_hills"),
                 FeatureMatcher.or("minecraft:tree"),
                 FeatureReplacer.of(poisson(
-                        0.35F, 7, 0.2F, 200, 0.7F,
+                        0.35F, 7, 0.25F, 200, 0.75F,
                         "terraforged:jungle_small",
                         Pair.of("terraforged:jungle_small", 0.3F),
                         Pair.of("terraforged:jungle_large", 0.4F),
@@ -262,7 +262,7 @@ public class Trees {
                 BiomeMatcher.of(context, "minecraft:taiga", "minecraft:taiga_hills", "minecraft:taiga_mountains"),
                 FeatureMatcher.and(Blocks.SPRUCE_LOG, Blocks.SPRUCE_LEAVES),
                 FeatureReplacer.of(poisson(
-                        0.25F, 6, 0.25F, 250, 0.4F,
+                        0.25F, 7, 0.25F, 250, 0.7F,
                         "terraforged:pine"
                 ))
         );
@@ -285,7 +285,7 @@ public class Trees {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:snowy_taiga", "minecraft:snowy_taiga_hills", "minecraft:taiga_mountains"),
                 FeatureMatcher.and("minecraft:tree", Blocks.SPRUCE_LOG, Blocks.SPRUCE_LEAVES),
-                FeatureReplacer.of(poisson(0.3F, 5, 0.25F, 250, 0.75F, "terraforged:pine"))
+                FeatureReplacer.of(poisson(0.3F, 7, 0.25F, 250, 0.75F, "terraforged:pine"))
         );
     }
 

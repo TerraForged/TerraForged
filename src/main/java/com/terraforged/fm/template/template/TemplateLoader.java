@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.fm.template;
+package com.terraforged.fm.template.template;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

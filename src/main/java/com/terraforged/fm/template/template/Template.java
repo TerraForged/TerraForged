@@ -22,14 +22,15 @@
  * SOFTWARE.
  */
 
-package com.terraforged.fm.template;
+package com.terraforged.fm.template.template;
 
-import com.terraforged.core.concurrent.pool.ThreadLocalPool;
+import com.terraforged.fm.template.BlockUtils;
+import com.terraforged.fm.template.PasteConfig;
+import com.terraforged.fm.template.StructureUtils;
 import com.terraforged.fm.template.buffer.BufferIterator;
 import com.terraforged.fm.template.buffer.PasteBuffer;
 import com.terraforged.fm.template.buffer.TemplateBuffer;
 import com.terraforged.fm.util.BlockReader;
-import com.terraforged.fm.util.ObjectPool;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundNBT;
@@ -42,7 +43,6 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraftforge.common.util.Constants;
 
 import java.io.IOException;
@@ -54,18 +54,19 @@ import java.util.Optional;
 
 public class Template {
 
-    private static final int pasteFlag = 3 | 16;
+    private static final int PASTE_FLAY = 3 | 16;
     private static final Direction[] directions = Direction.values();
     private static final ThreadLocal<PasteBuffer> PASTE_BUFFER = ThreadLocal.withInitial(PasteBuffer::new);
     private static final ThreadLocal<TemplateBuffer> TEMPLATE_BUFFER = ThreadLocal.withInitial(TemplateBuffer::new);
 
-    private final BlockPos min;
-    private final BlockPos max;
-    private final List<BlockInfo> blocks;
+    private final BakedTemplate template;
+    private final BakedDimensions dimensions;
 
     public Template(List<BlockInfo> blocks) {
         int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+        BlockInfo[] blockArray = blocks.toArray(new BlockInfo[0]);
+
         for (int i = 0; i < blocks.size(); i++) {
             BlockInfo block = blocks.get(i);
             minX = Math.min(minX, block.pos.getX());
@@ -74,10 +75,12 @@ public class Template {
             maxX = Math.max(maxX, block.pos.getX());
             maxY = Math.max(maxY, block.pos.getY());
             maxZ = Math.max(maxZ, block.pos.getZ());
+            blockArray[i] = block;
         }
-        this.blocks = blocks;
-        this.min = new BlockPos(minX, minY, minZ);
-        this.max = new BlockPos(maxX, maxY, maxZ);
+
+        Dimensions dimensions = new Dimensions(new BlockPos(minX, minY, minZ), new BlockPos(maxX, maxY, maxZ));
+        this.template = new BakedTemplate(blockArray);
+        this.dimensions = new BakedDimensions(dimensions);
     }
 
     public boolean paste(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, PasteConfig config) {
@@ -93,137 +96,165 @@ public class Template {
     public boolean pasteNormal(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, PasteConfig config) {
         boolean placed = false;
         BlockReader reader = new BlockReader();
-        PasteBuffer buffer = PASTE_BUFFER.get().configure(config);
+        PasteBuffer buffer = PASTE_BUFFER.get();
+        buffer.setRecording(config.updatePostPaste);
 
-        for (int i = 0; i < blocks.size(); i++) {
-            BlockInfo block = blocks.get(i);
-            BlockState state = block.state.mirror(mirror).rotate(rotation);
-            if (!config.pasteAir && state.getBlock() == Blocks.AIR) {
+        BlockPos.Mutable pos1 = new BlockPos.Mutable();
+        BlockPos.Mutable pos2 = new BlockPos.Mutable();
+
+        BlockInfo[] blocks = template.get(mirror, rotation);
+        for (int i = 0; i < blocks.length; i++) {
+            BlockInfo block = blocks[i];
+            addPos(pos1, origin, block.pos);
+
+            // make sure we don't leak outside the region
+            if (!hasChunk(pos1, world)) {
                 continue;
             }
 
-            BlockPos pos = transform(block.pos, mirror, rotation).add(origin);
-            if (!config.replaceSolid && BlockUtils.isSolid(world, pos)) {
+            // ignore air in the template
+            if (!config.pasteAir && block.state.getBlock() == Blocks.AIR) {
                 continue;
             }
 
+            // don't replace existing solids
+            if (!config.replaceSolid && BlockUtils.isSolid(world, pos1)) {
+                continue;
+            }
+
+            // generate a base going downwards if necessary
             if (block.pos.getY() <= 0 && block.state.isNormalCube(reader.setState(block.state), BlockPos.ZERO)) {
-                placeBase(world, pos, block.state, config.baseDepth);
+                placeBase(world, pos1, pos2, block.state, config.baseDepth);
             }
 
-            world.setBlockState(pos, state, 2);
-            buffer.record(pos);
+            world.setBlockState(pos1, block.state, 2);
+            buffer.record(i);
 
             placed = true;
+        }
+
+        if (config.updatePostPaste) {
+            // once all blocks placed, iterate them and update neighbours if required
+            buffer.reset();
+            updatePostPlacement(world, buffer, blocks, origin, pos1, pos2);
         }
 
         return placed;
     }
 
     public boolean pasteWithBoundsCheck(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, PasteConfig config) {
-        BlockPos min = transform(this.min, mirror, rotation).add(origin);
-        BlockPos max = transform(this.max, mirror, rotation).add(origin);
-        TemplateBuffer buffer = TEMPLATE_BUFFER.get().init(world, origin, min, max).configure(config);
+        Dimensions dimensions = this.dimensions.get(mirror, rotation);
+        TemplateBuffer buffer = TEMPLATE_BUFFER.get().init(world, origin, dimensions.min, dimensions.max);
 
-        List<BlockInfo> blocks = this.blocks;
-        for (int i = 0; i < blocks.size(); i++) {
-            BlockInfo block = blocks.get(i);
-            BlockState state = block.state.mirror(mirror).rotate(rotation);
-            BlockPos pos = transform(block.pos, mirror, rotation).add(origin);
-            int cx = pos.getX() >> 4;
-            int cz = pos.getZ() >> 4;
-            if (!world.chunkExists(cx, cz)) {
-                return false;
+        BlockPos.Mutable pos1 = new BlockPos.Mutable();
+        BlockPos.Mutable pos2 = new BlockPos.Mutable();
+        BlockInfo[] blocks = template.get(mirror, rotation);
+
+        // record valid BlockInfos into the buffer
+        for (int i = 0; i < blocks.length; i++) {
+            BlockInfo block = blocks[i];
+            addPos(pos1, origin, block.pos);
+
+            // make sure we don't leak outside the region
+            if (!hasChunk(pos1, world)) {
+                continue;
             }
-            buffer.record(pos, state, config);
+
+            buffer.record(i, block, pos1, config);
         }
 
         boolean placed = false;
         BlockReader reader = new BlockReader();
-        blocks = buffer.getBlocks();
+        while (buffer.next()) {
+            int i = buffer.nextIndex();
+            BlockInfo block = blocks[i];
+            addPos(pos1, origin, block.pos);
 
-        for (int i = 0; i < blocks.size(); i++) {
-            BlockInfo block = blocks.get(i);
-            if (block.pos.getY() <= origin.getY() && block.state.isNormalCube(reader.setState(block.state), BlockPos.ZERO)) {
-                placeBase(world, block.pos, block.state, config.baseDepth);
-                world.setBlockState(block.pos, block.state, 2);
+            if (pos1.getY() <= origin.getY() && block.state.isNormalCube(reader.setState(block.state), BlockPos.ZERO)) {
+                placeBase(world, pos1, pos2, block.state, config.baseDepth);
+                world.setBlockState(pos1, block.state, 2);
                 placed = true;
-            } else if (buffer.test(block.pos)) {
+            } else if (buffer.test(pos1)) {
+                // test uses the placement mask to prevent blocks overriding existing
+                // solid blocks
                 placed = true;
-                world.setBlockState(block.pos, block.state, 2);
-                buffer.record(block.pos);
+                world.setBlockState(pos1, block.state, 2);
+            } else {
+                // if failed to place mark the pos as invalid
+                buffer.exclude(i);
             }
         }
 
-        buffer.flush();
+        if (config.updatePostPaste) {
+            // once all blocks placed, iterate them and update neighbours if required
+            buffer.reset();
+            updatePostPlacement(world, buffer, blocks, origin, pos1, pos2);
+        }
+
         return placed;
     }
 
-    private static void updatePostPlacement(IWorld world, BufferIterator iterator) {
-        if (iterator.size() > 0) {
+    private static void updatePostPlacement(IWorld world, BufferIterator iterator, BlockInfo[] blocks, BlockPos origin, BlockPos.Mutable pos1, BlockPos.Mutable pos2) {
+        if (!iterator.isEmpty()) {
             while (iterator.next()) {
-                BlockPos pos = iterator.getPos();
+                int index = iterator.nextIndex();
+                if (index < 0 || index >= blocks.length) {
+                    continue;
+                }
+
+                BlockInfo block = blocks[index];
+                addPos(pos1, origin, block.pos);
+
                 for (Direction direction : directions) {
-                    updatePostPlacement(world, pos, direction);
+                    updatePostPlacement(world, pos1, pos2, direction);
                 }
             }
         }
     }
 
-    private static void updatePostPlacement(IWorld world, BlockPos pos1, Direction direction) {
-        BlockPos pos2 = pos1.offset(direction);
+    private static void updatePostPlacement(IWorld world, BlockPos.Mutable pos1, BlockPos.Mutable pos2, Direction direction) {
+        pos2.setPos(pos1).move(direction, 1);
+
         BlockState state1 = world.getBlockState(pos1);
         BlockState state2 = world.getBlockState(pos2);
 
         // update state at pos1 - the input position
         BlockState result1 = state1.updatePostPlacement(direction, state2, world, pos1, pos2);
         if (result1 != state1) {
-            world.setBlockState(pos1, result1, pasteFlag);
+            world.setBlockState(pos1, result1, PASTE_FLAY);
         }
 
         // update state at pos2 - the neighbour
         BlockState result2 = state2.updatePostPlacement(direction.getOpposite(), result1, world, pos2, pos1);
         if (result2 != state2) {
-            world.setBlockState(pos2, result2, pasteFlag);
+            world.setBlockState(pos2, result2, PASTE_FLAY);
         }
     }
 
-    private void placeBase(IWorld world, BlockPos pos, BlockState state, int depth) {
+    private void placeBase(IWorld world, BlockPos pos, BlockPos.Mutable pos2, BlockState state, int depth) {
         for (int dy = 0; dy < depth; dy++) {
-            pos = pos.down();
-            if (world.getBlockState(pos).isSolid()) {
+            pos2.setPos(pos).move(Direction.DOWN, dy);
+            if (world.getBlockState(pos2).isSolid()) {
                 return;
             }
-            world.setBlockState(pos, state, 2);
+            world.setBlockState(pos2, state, 2);
         }
+    }
+
+    private static boolean hasChunk(BlockPos pos, IWorld world){
+        int cx = pos.getX() >> 4;
+        int cz = pos.getZ() >> 4;
+        return world.chunkExists(cx, cz);
     }
 
     public static BlockPos transform(BlockPos pos, Mirror mirror, Rotation rotation) {
         return net.minecraft.world.gen.feature.template.Template.getTransformedPos(pos, mirror, rotation, BlockPos.ZERO);
     }
 
-    public static class BlockInfo {
-
-        private final BlockPos pos;
-        private final BlockState state;
-
-        public BlockInfo(BlockPos pos, BlockState state) {
-            this.pos = pos;
-            this.state = state;
-        }
-
-        public BlockPos getPos() {
-            return pos;
-        }
-
-        public BlockState getState() {
-            return state;
-        }
-
-        @Override
-        public String toString() {
-            return state.toString();
-        }
+    public static void addPos(BlockPos.Mutable pos, BlockPos a, BlockPos b) {
+        pos.setX(a.getX() + b.getX());
+        pos.setY(a.getY() + b.getY());
+        pos.setZ(a.getZ() + b.getZ());
     }
 
     public static Optional<Template> load(InputStream data) {
@@ -271,7 +302,7 @@ public class Template {
         int lowestSolid = Integer.MAX_VALUE;
 
         for (BlockInfo block : blocks) {
-            if (!block.state.isSolid()) {
+            if (!block.getState().isSolid()) {
                 continue;
             }
 

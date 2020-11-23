@@ -29,7 +29,7 @@ import com.terraforged.fm.data.DataManager;
 import com.terraforged.fm.modifier.FeatureModifierLoader;
 import com.terraforged.fm.modifier.FeatureModifiers;
 import com.terraforged.fm.modifier.ModifierSet;
-import com.terraforged.fm.template.TemplateManager;
+import com.terraforged.fm.template.template.TemplateManager;
 import com.terraforged.fm.transformer.InjectionPosition;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;

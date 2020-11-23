@@ -24,56 +24,90 @@
 
 package com.terraforged.fm.template.buffer;
 
-import com.terraforged.fm.template.PasteConfig;
-import com.terraforged.fm.util.ObjectPool;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3i;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.BitSet;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class PasteBuffer implements BufferIterator {
 
     private int index = -1;
-    private BlockPos pos = BlockPos.ZERO;
-    private boolean updatePostPlacement = false;
-    private List<BlockPos> placedBlocks = Collections.emptyList();
+    private BitSet placed = null;
+    private boolean recordPlaced = false;
+
+    public void reset() {
+        index = -1;
+    }
+
+    public void clear() {
+        index = -1;
+        if (placed != null) {
+            placed.clear();
+        }
+    }
+
+    public void setRecording(boolean recording) {
+        recordPlaced = recording;
+    }
 
     @Override
-    public int size() {
-        return placedBlocks.size();
+    public boolean isEmpty() {
+        return placed == null;
     }
 
     @Override
     public boolean next() {
-        while (++index < placedBlocks.size()) {
-            pos = placedBlocks.get(index);
-            if (pos != BlockPos.ZERO) {
-                return true;
-            }
-        }
-        return false;
+        index = placed.nextSetBit(index + 1);
+        return index != -1;
     }
 
     @Override
-    public BlockPos getPos() {
-        return pos;
+    public int nextIndex() {
+        return index;
     }
 
-    public PasteBuffer configure(PasteConfig config) {
-        updatePostPlacement = config.checkBounds;
-        placedBlocks.clear();
-        index = -1;
-        return this;
-    }
-
-    public void record(BlockPos position) {
-        if (updatePostPlacement) {
-            if (placedBlocks.isEmpty()) {
-                placedBlocks = new ArrayList<>();
+    public void record(int i) {
+        if (recordPlaced) {
+            if (placed == null) {
+                placed = new BitSet();
             }
-            placedBlocks.add(position);
+            placed.set(i);
+        }
+    }
+
+    public void exclude(int i) {
+        if (recordPlaced) {
+            if (placed != null) {
+                placed.set(i, false);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        BitSet bitSet = new BitSet();
+        for (int i = 0; i < 50; i++) {
+            bitSet.set(i, true);
+        }
+
+        int index = -1;
+        Set<Integer> visited = new HashSet<>();
+        while (true) {
+            index = bitSet.nextSetBit(index + 1);
+            if (index == -1) {
+                System.out.println("Done");
+                return;
+            }
+
+            if (!visited.add(index)) {
+                throw new RuntimeException("Duplicate " + index);
+            }
+
+            System.out.println(index);
+
+            if (ThreadLocalRandom.current().nextInt(10) < 4) {
+                bitSet.set(index, false);
+                System.out.println("Removed: " + index);
+            }
         }
     }
 }

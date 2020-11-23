@@ -26,58 +26,43 @@ package com.terraforged.fm.template.buffer;
 
 import com.terraforged.fm.template.BlockUtils;
 import com.terraforged.fm.template.PasteConfig;
-import com.terraforged.fm.template.Template;
+import com.terraforged.fm.template.template.BlockInfo;
 import com.terraforged.noise.util.NoiseUtil;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IWorld;
 
-import java.util.*;
-
 public class TemplateBuffer extends PasteBuffer {
 
     private IWorld world;
     private BlockPos origin;
+    private final BufferBitSet placementMask = new BufferBitSet();
 
-    private final BufferBitSet bitSet = new BufferBitSet();
-    private final List<Template.BlockInfo> buffer = new ArrayList<>(128);
+    public TemplateBuffer() {
+        setRecording(true);
+    }
 
     public TemplateBuffer init(IWorld world, BlockPos origin, Vector3i p1, Vector3i p2) {
-        this.buffer.clear();
-        this.bitSet.clear();
+        super.clear();
+        this.placementMask.clear();
         this.world = world;
         this.origin = origin;
-        this.bitSet.assign(p1.getX(), p1.getY(), p1.getZ(), p2.getX(), p2.getY(), p2.getZ());
+        this.placementMask.set(p1.getX(), p1.getY(), p1.getZ(), p2.getX(), p2.getY(), p2.getZ());
         return this;
     }
 
-    @Override
-    public TemplateBuffer configure(PasteConfig config) {
-        super.configure(config);
-        return this;
-    }
-
-    public void flush() {
-
-    }
-
-    public List<Template.BlockInfo> getBlocks() {
-        return buffer;
-    }
-
-    public void record(BlockPos pos, BlockState state, PasteConfig config) {
-        if (!config.replaceSolid && BlockUtils.isSolid(world, pos)) {
-            bitSet.set(pos.getX(), pos.getY(), pos.getZ());
+    public void record(int i, BlockInfo block, BlockPos pastePos, PasteConfig config) {
+        if (!config.replaceSolid && BlockUtils.isSolid(world, pastePos)) {
+            placementMask.set(block.pos.getX(), block.pos.getY(), block.pos.getZ());
             return;
         }
 
-        if (!config.pasteAir && state.getBlock() == Blocks.AIR) {
+        if (!config.pasteAir && block.state.getBlock() == Blocks.AIR) {
             return;
         }
 
-        buffer.add(new Template.BlockInfo(pos, state));
+        record(i);
     }
 
     public boolean test(BlockPos pos) {
@@ -100,7 +85,7 @@ public class TemplateBuffer extends PasteBuffer {
         float pz = z;
         int count = 0;
         while (x != origin.getX() && z != origin.getZ() && count < 10) {
-            if (bitSet.test(x, start.getY(), z)) {
+            if (placementMask.test(x, start.getY(), z)) {
                 return false;
             }
             px -= dx;

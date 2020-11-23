@@ -25,7 +25,7 @@
 package com.terraforged.fm.template.feature;
 
 import com.terraforged.fm.FeatureManager;
-import com.terraforged.fm.template.Template;
+import com.terraforged.fm.template.template.Template;
 import com.terraforged.fm.template.decorator.Decorator;
 import com.terraforged.fm.template.decorator.DecoratorConfig;
 import net.minecraft.util.Mirror;

@@ -13,7 +13,7 @@ public class BufferBitSet {
     private int sizeXZ;
     private BitSet bitSet;
 
-    public void assign(int x1, int y1, int z1, int x2, int y2, int z2) {
+    public void set(int x1, int y1, int z1, int x2, int y2, int z2) {
         this.minX = Math.min(x1, x2);
         this.minY = Math.min(y1, y2);
         this.minZ = Math.min(z1, z2);

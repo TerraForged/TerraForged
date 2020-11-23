@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.fm.template;
+package com.terraforged.fm.template.template;
 
 import com.terraforged.fm.FeatureManager;
 import com.terraforged.fm.data.DataManager;
