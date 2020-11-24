@@ -149,16 +149,23 @@ public class TerraCommand {
 
     private static int stats(CommandContext<CommandSource> context) throws CommandSyntaxException {
         getContext(context);
-        double sum = 0.0;
         context.getSource().sendFeedback(createText("===== Profiler Stats =====", PREFIX_FORMAT), false);
 
+        long fastest = 0L;
+        long slowest = 0L;
+        double average = 0.0;
         for (Profiler profiler : Profiler.values()) {
-            sum += profiler.averageMS();
+            average += profiler.averageMS();
+            slowest += profiler.maxMS();
+            fastest += profiler.minMS();
             context.getSource().sendFeedback(profiler.toText(), false);
         }
 
+        long min = fastest;
+        long max = slowest;
         context.getSource().sendFeedback(createText("Chunk Average", PREFIX_FORMAT)
-                .appendString(String.format(": %.3fms", sum)), false);
+                .appendString(String.format(": %.3fms", average))
+                .modifyStyle(style -> style.setHoverEvent(Profiler.createHoverStats(min, max))),false);
 
         return Command.SINGLE_SUCCESS;
     }

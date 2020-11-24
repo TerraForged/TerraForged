@@ -64,8 +64,13 @@ public enum Profiler {
                 .append(new StringTextComponent(String.format(": %.3fms", averageMS()))
                         .modifyStyle(style -> style.forceFormatting(TextFormatting.WHITE)))
                 .modifyStyle(style -> style.applyFormatting(TextFormatting.YELLOW)
-                        .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent(String.format("Min: %sms, Max: %sms", minMS(), maxMS()))
-                                .modifyStyle(s -> s.forceFormatting(TextFormatting.WHITE)))));
+                        .setHoverEvent(createHoverStats(minMS(), maxMS())));
+    }
+
+    public static HoverEvent createHoverStats(long min, long max) {
+        String message = String.format("Min: %sms, Max: %sms", min, max);
+        return new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                new StringTextComponent(message).modifyStyle(s -> s.forceFormatting(TextFormatting.WHITE)));
     }
 
     public static void reset() {
