@@ -64,7 +64,7 @@ public class TerraForgedMod {
         BiomeManager.addBiome(BiomeManager.BiomeType.WARM, new BiomeManager.BiomeEntry(Biomes.MUSHROOM_FIELDS, 2));
         BiomeManager.addBiome(BiomeManager.BiomeType.WARM, new BiomeManager.BiomeEntry(Biomes.MUSHROOM_FIELD_SHORE, 2));
 
-        VersionChecker.require("forge", 35, 1, 6);
+        VersionChecker.require("forge", 35, 1, 5);
     }
 
     @SubscribeEvent
