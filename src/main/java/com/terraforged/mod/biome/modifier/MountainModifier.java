@@ -29,19 +29,36 @@ import com.terraforged.core.cell.Cell;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TerraContext;
+import com.terraforged.noise.Module;
+import com.terraforged.noise.Source;
 import net.minecraft.world.biome.Biome;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MountainModifier implements BiomeModifier {
 
     // the probability that mountain terrain will get upgraded to a mountain biome
     public static final float MOUNTAIN_CHANCE = 0.4F;
+    // height above ground level where mountain biomes can start to take over
+    private static final int MOUNTAIN_START_HEIGHT = 24;
 
+    // probability of mountain biome overriding others
     private final float chance;
+    // float height where mountains can override
+    private final float height;
+    // amount of noise variance to be applied
+    private final float range;
+    // noise used to modulate the position's height
+    private final Module noise;
+
     private final BiomeMap biomes;
 
     public MountainModifier(TerraContext context, BiomeMap biomes) {
         this.biomes = biomes;
         this.chance = context.terraSettings.miscellaneous.mountainBiomeUsage;
+        this.range = context.levels.scale(12);
+        this.height = context.levels.ground(MOUNTAIN_START_HEIGHT);
+        this.noise = Source.perlin(ThreadLocalRandom.current().nextInt(), 64, 2).scale(range);
     }
 
     @Override
@@ -61,10 +78,22 @@ public class MountainModifier implements BiomeModifier {
 
     @Override
     public Biome modify(Biome in, Cell cell, int x, int z) {
-        Biome mountain = biomes.getMountain(cell);
-        if (TerraBiomeProvider.isValidBiome(mountain)) {
-            return mountain;
+        if (canModify(cell, x, z)) {
+            Biome mountain = biomes.getMountain(cell);
+            if (TerraBiomeProvider.isValidBiome(mountain)) {
+                return mountain;
+            }
         }
         return in;
+    }
+
+    private boolean canModify(Cell cell, int x, int z) {
+        if (cell.value > height) {
+            return true;
+        }
+        if (cell.value + range < height) {
+            return false;
+        }
+        return cell.value + noise.getValue(x, z) > height;
     }
 }

@@ -24,7 +24,6 @@
 
 package com.terraforged.mod;
 
-import com.terraforged.api.level.type.LevelType;
 import com.terraforged.api.material.WGTags;
 import com.terraforged.api.registry.Registries;
 import com.terraforged.fm.GameContext;
@@ -34,23 +33,12 @@ import com.terraforged.mod.chunk.lite.TFChunkGeneratorLite;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.data.WorldGenBiomes;
-import com.terraforged.mod.feature.TerraFeatures;
-import com.terraforged.mod.feature.context.ContextSelectorFeature;
-import com.terraforged.mod.feature.decorator.FilterDecorator;
-import com.terraforged.mod.feature.decorator.fastpoisson.FastPoissonAtSurface;
-import com.terraforged.mod.feature.decorator.poisson.PoissonAtSurface;
-import com.terraforged.mod.feature.feature.BushFeature;
-import com.terraforged.mod.feature.feature.DiskFeature;
-import com.terraforged.mod.feature.feature.FreezeLayer;
 import com.terraforged.mod.server.command.TerraCommand;
-import net.minecraft.util.ResourceLocation;
+import com.terraforged.mod.util.version.VersionChecker;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.common.BiomeManager;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -61,9 +49,6 @@ import java.io.File;
 @Mod(TerraForgedMod.MODID)
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class TerraForgedMod {
-
-    public static final ResourceLocation LEVEL_NAME = new ResourceLocation(TerraForgedMod.MODID, "terraforged");
-    public static final ResourceLocation LITE_LEVEL_NAME = new ResourceLocation(TerraForgedMod.MODID, "terraforged_lite");
 
     public static final String MODID = "terraforged";
 
@@ -78,6 +63,8 @@ public class TerraForgedMod {
         BiomeManager.addBiome(BiomeManager.BiomeType.ICY, new BiomeManager.BiomeEntry(Biomes.ICE_SPIKES, 2));
         BiomeManager.addBiome(BiomeManager.BiomeType.WARM, new BiomeManager.BiomeEntry(Biomes.MUSHROOM_FIELDS, 2));
         BiomeManager.addBiome(BiomeManager.BiomeType.WARM, new BiomeManager.BiomeEntry(Biomes.MUSHROOM_FIELD_SHORE, 2));
+
+        VersionChecker.require("forge", 35, 1, 6);
     }
 
     @SubscribeEvent
@@ -92,31 +79,6 @@ public class TerraForgedMod {
             File dataDir = new File("data").getAbsoluteFile();
             WorldGenBiomes.genBiomeMap(dataDir, context);
         });
-    }
-
-    @SubscribeEvent
-    public static void registerLevels(RegistryEvent.Register<LevelType> event) {
-        Log.info("Registering levels");
-        event.getRegistry().register(new TerraForgedLevel(TFChunkGenerator::new).setRegistryName(LEVEL_NAME));
-        event.getRegistry().register(new TerraForgedLevel(TFChunkGeneratorLite::new).setRegistryName(LITE_LEVEL_NAME));
-    }
-
-    @SubscribeEvent
-    public static void registerFeatures(RegistryEvent.Register<Feature<?>> event) {
-        Log.info("Registering features");
-        event.getRegistry().register(TerraFeatures.INSTANCE);
-        event.getRegistry().register(DiskFeature.INSTANCE);
-        event.getRegistry().register(FreezeLayer.INSTANCE);
-        event.getRegistry().register(BushFeature.INSTANCE);
-        event.getRegistry().register(ContextSelectorFeature.INSTANCE);
-    }
-
-    @SubscribeEvent
-    public static void registerDecorators(RegistryEvent.Register<Placement<?>> event) {
-        Log.info("Registering decorators");
-        event.getRegistry().register(FilterDecorator.INSTANCE);
-        event.getRegistry().register(PoissonAtSurface.INSTANCE);
-        event.getRegistry().register(FastPoissonAtSurface.INSTANCE);
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)

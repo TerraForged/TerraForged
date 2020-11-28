@@ -30,7 +30,7 @@ import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.util.FastChunk;
 import com.terraforged.mod.chunk.util.SimpleChunk;
-import com.terraforged.mod.chunk.util.TerraContainer;
+import com.terraforged.mod.biome.TFBiomeContainer;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
@@ -53,7 +53,7 @@ public class SurfaceGenerator implements Generator.Surfaces {
     @Override
     public final void generateSurface(WorldGenRegion world, IChunk chunk) {
         try (ChunkReader reader = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z)) {
-            TerraContainer container = TerraContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
+            TFBiomeContainer container = TFBiomeContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
             ChunkSurfaceBuffer buffer = new ChunkSurfaceBuffer(SimpleChunk.wrap(chunk));
 
             try (SurfaceContext context = generator.getContext().surface(buffer, container, generator.getSettings())) {

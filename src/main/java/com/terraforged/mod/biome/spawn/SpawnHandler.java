@@ -27,7 +27,6 @@ package com.terraforged.mod.biome.spawn;
 import com.terraforged.core.util.PosUtil;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
-import com.terraforged.world.continent.MutableVeci;
 import com.terraforged.world.continent.SpawnType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -49,6 +48,8 @@ public class SpawnHandler {
         if (event.getWorld() instanceof ServerWorld) {
             ServerWorld world =(ServerWorld) event.getWorld();
             ChunkGenerator generator = world.getChunkProvider().getChunkGenerator();
+            if (true) return;
+
             if (generator.getBiomeProvider() instanceof TerraBiomeProvider) {
                 Log.info("Searching for world spawn position");
                 TerraBiomeProvider provider = (TerraBiomeProvider) generator.getBiomeProvider();
@@ -81,8 +82,8 @@ public class SpawnHandler {
             return BlockPos.ZERO;
         } else {
             long center = provider.getContext().heightmap.get().getContinent().getNearestCenter(0, 0);
-            int x = PosUtil.unpackX(center);
-            int z = PosUtil.unpackY(center);
+            int x = PosUtil.unpackLeftInt(center);
+            int z = PosUtil.unpackRightInt(center);
             return new BlockPos(x, 0, z);
         }
     }

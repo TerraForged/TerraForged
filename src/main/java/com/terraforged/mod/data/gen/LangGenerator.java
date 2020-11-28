@@ -29,7 +29,7 @@ import com.terraforged.fm.GameContext;
 import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
-import com.terraforged.mod.client.gui.config.preview.PreviewSettings;
+import com.terraforged.mod.client.gui.screen.preview.PreviewSettings;
 import com.terraforged.mod.util.TranslationKey;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
@@ -37,9 +37,11 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.data.LanguageProvider;
+import net.minecraftforge.common.world.ForgeWorldType;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.function.UnaryOperator;
 
@@ -65,9 +67,14 @@ public class LangGenerator {
     }
 
     private static void worlds(LanguageProvider provider) {
-        provider.add("generator.terraforged", "TerraForged");
-        provider.add("generator.terraforged_lite", "TerraForged Lite");
-        provider.add("generator.terratest", "TerraTest");
+        for (ForgeWorldType type : ForgeRegistries.WORLD_TYPES) {
+            String namespace = type.getRegistryName().getNamespace();
+            if (!namespace.equals(TerraForgedMod.MODID)) {
+                continue;
+            }
+            String path = type.getRegistryName().getPath();
+            provider.add("generator." + namespace + '.' + path, NameUtil.toDisplayName(path));
+        }
     }
 
     private static void biomes(LanguageProvider provider, GameContext context) {

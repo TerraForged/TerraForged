@@ -1,9 +1,32 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 TerraForged
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.terraforged.mod.chunk.lite;
 
 import com.mojang.serialization.Codec;
 import com.terraforged.core.cell.Cell;
 import com.terraforged.core.concurrent.cache.Cache;
-import com.terraforged.core.module.Ridge;
 import com.terraforged.core.tile.chunk.ChunkReader;
 import com.terraforged.core.tile.chunk.ChunkWriter;
 import com.terraforged.core.util.PosUtil;
@@ -15,8 +38,6 @@ import com.terraforged.noise.util.NoiseUtil;
 import com.terraforged.noise.util.Vec2f;
 import com.terraforged.world.WorldGeneratorFactory;
 import com.terraforged.world.heightmap.Heightmap;
-import com.terraforged.world.rivermap.RiverCache;
-import com.terraforged.world.rivermap.Rivermap;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.DimensionSettings;
@@ -65,7 +86,7 @@ public class TFChunkGeneratorLite extends TFChunkGenerator {
 
     private void generatePos(Cell cell, int dx, int dz, int x, int z, Heightmap heightmap) {
         heightmap.apply(cell, x, z);
-        heightmap.applyRivers(cell, x, z, heightmap.getRivers().getRivers(cell));
+        heightmap.applyRivers(cell, x, z, heightmap.getContinent().getRivermap(cell));
     }
 
     private static TerraBiomeProvider simplifySettings(TerraBiomeProvider provider) {
@@ -89,7 +110,7 @@ public class TFChunkGeneratorLite extends TFChunkGenerator {
         distance = min(seed, x, y, ix - 1, iy + 1, distance);
         distance = min(seed, x, y, ix + 1, iy + 1, distance);
         distance = min(seed, x, y, ix, iy + 1, distance);
-        return PosUtil.unpackXf(distance) / PosUtil.unpackYf(distance);
+        return PosUtil.unpackLeftFloat(distance) / PosUtil.unpackRightFloat(distance);
     }
 
     private static long min(int seed, float x, float y, int cellX, int cellY, long current) {

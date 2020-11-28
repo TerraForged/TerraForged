@@ -25,7 +25,7 @@
 package com.terraforged.api.biome.surface;
 
 import com.terraforged.api.chunk.column.DecoratorContext;
-import com.terraforged.mod.chunk.util.TerraContainer;
+import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.world.climate.Climate;
 import com.terraforged.world.heightmap.Levels;
 import net.minecraft.block.BlockState;
@@ -36,13 +36,13 @@ public class SurfaceContext extends DecoratorContext implements AutoCloseable {
     public final long seed;
     public final BlockState solid;
     public final BlockState fluid;
-    public final TerraContainer biomes;
+    public final TFBiomeContainer biomes;
     public final ChunkSurfaceBuffer buffer;
     public final CachedSurface cached = new CachedSurface();
 
     public double noise;
 
-    public SurfaceContext(ChunkSurfaceBuffer buffer, TerraContainer biomes, Levels levels, Climate climate, DimensionSettings settings, long seed) {
+    public SurfaceContext(ChunkSurfaceBuffer buffer, TFBiomeContainer biomes, Levels levels, Climate climate, DimensionSettings settings, long seed) {
         super(buffer, levels, climate);
         this.solid = settings.getDefaultBlock();
         this.fluid = settings.getDefaultFluid();

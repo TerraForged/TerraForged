@@ -53,7 +53,7 @@ minecraft {
             workingDirectory project.file("run/client")
             property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
             property "forge.logging.console.level", "debug"
-            jvmArgs "-Xmx8G", "-Xms6G", "-Ddev"
+            jvmArgs "-Xmx8G", "-Xms6G", "-Ddev", "-DvanillaBiomes", "-Dfml.earlyprogresswindow=false"
             arg "-mixin.config=mixin.terraforged.json"
             mods {
                 terraforged {
@@ -90,9 +90,13 @@ minecraft {
 }
 
 sourceSets {
+    main.java {
+        srcDirs += "FeatureManager/src/main/java"
+    }
     // add resources for the runData task to path
     main.resources {
         srcDirs += "generated/resources/"
+        srcDirs += "FeatureManager/src/main/resources"
         exclude ".cache"
     }
 }

@@ -28,7 +28,7 @@ import com.terraforged.api.material.WGTags;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.api.material.state.States;
 import com.terraforged.core.concurrent.Resource;
-import com.terraforged.mod.util.DummyBlockReader;
+import com.terraforged.mod.chunk.util.DummyBlockReader;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
 import net.minecraft.block.*;

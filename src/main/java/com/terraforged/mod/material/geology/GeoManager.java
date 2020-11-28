@@ -37,8 +37,6 @@ import com.terraforged.world.geology.Strata;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeManager;
 
 import java.util.HashMap;
 import java.util.Map;

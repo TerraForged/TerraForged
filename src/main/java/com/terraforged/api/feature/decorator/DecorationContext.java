@@ -1,8 +1,32 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 TerraForged
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.terraforged.api.feature.decorator;
 
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionDelegate;
-import com.terraforged.mod.chunk.util.TerraContainer;
+import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.world.heightmap.Levels;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ISeedReader;
@@ -16,10 +40,10 @@ public class DecorationContext {
     private final IChunk chunk;
     private final Levels levels;
     private final WorldGenRegion region;
-    private final TerraContainer biomes;
+    private final TFBiomeContainer biomes;
     private final TFChunkGenerator generator;
 
-    public DecorationContext(WorldGenRegion region, IChunk chunk, TerraContainer biomes, TFChunkGenerator generator) {
+    public DecorationContext(WorldGenRegion region, IChunk chunk, TFBiomeContainer biomes, TFChunkGenerator generator) {
         this.chunk = chunk;
         this.region = region;
         this.biomes = biomes;
@@ -35,7 +59,7 @@ public class DecorationContext {
         return region;
     }
 
-    public TerraContainer getBiomes() {
+    public TFBiomeContainer getBiomes() {
         return biomes;
     }
 
@@ -56,8 +80,8 @@ public class DecorationContext {
             TFChunkGenerator terraGenerator = (TFChunkGenerator) generator;
             WorldGenRegion region = ((RegionDelegate) world).getDelegate();
             IChunk chunk = region.getChunk(region.getMainChunkX(), region.getMainChunkZ());
-            if (chunk.getBiomes() instanceof TerraContainer) {
-                TerraContainer container = (TerraContainer) chunk.getBiomes();
+            if (chunk.getBiomes() instanceof TFBiomeContainer) {
+                TFBiomeContainer container = (TFBiomeContainer) chunk.getBiomes();
                 return new DecorationContext(region, chunk, container, terraGenerator);
             }
         }

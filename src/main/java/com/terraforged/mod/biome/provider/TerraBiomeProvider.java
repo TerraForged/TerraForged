@@ -35,13 +35,9 @@ import com.terraforged.core.concurrent.task.LazySupplier;
 import com.terraforged.fm.GameContext;
 import com.terraforged.fm.util.codec.Codecs;
 import com.terraforged.mod.Log;
-import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.modifier.BiomeModifierManager;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
-import com.terraforged.mod.chunk.settings.preset.Preset;
-import com.terraforged.mod.chunk.settings.preset.PresetManager;
-import com.terraforged.mod.util.setup.SetupHooks;
 import com.terraforged.world.heightmap.WorldLookup;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -54,7 +50,6 @@ import javax.annotation.Nullable;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 public class TerraBiomeProvider extends BiomeProvider {
 

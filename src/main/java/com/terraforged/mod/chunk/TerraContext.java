@@ -35,7 +35,7 @@ import com.terraforged.core.tile.gen.TileGenerator;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.settings.TerraSettings;
-import com.terraforged.mod.chunk.util.TerraContainer;
+import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.config.PerfDefaults;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.world.GeneratorContext;
@@ -43,8 +43,6 @@ import com.terraforged.world.WorldGeneratorFactory;
 import com.terraforged.world.heightmap.Heightmap;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.DimensionSettings;
-
-import java.util.jar.JarFile;
 
 public class TerraContext extends GeneratorContext {
 
@@ -75,7 +73,7 @@ public class TerraContext extends GeneratorContext {
         return new DecoratorContext(chunk, levels, factory.get().getClimate(), false);
     }
 
-    public SurfaceContext surface(ChunkSurfaceBuffer buffer, TerraContainer biomes, DimensionSettings settings) {
+    public SurfaceContext surface(ChunkSurfaceBuffer buffer, TFBiomeContainer biomes, DimensionSettings settings) {
         return new SurfaceContext(buffer, biomes, levels, factory.get().getClimate(), settings, seed.get());
     }
 

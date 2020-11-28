@@ -34,7 +34,7 @@ import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionFix;
 import com.terraforged.mod.chunk.util.DecoratorException;
-import com.terraforged.mod.chunk.util.TerraContainer;
+import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
@@ -73,7 +73,7 @@ public class FeatureGenerator implements Generator.Features {
         IChunk chunk = region.getChunk(chunkX, chunkZ);
 
         ChunkReader reader = generator.getChunkReader(chunkX, chunkZ);
-        TerraContainer container = TerraContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
+        TFBiomeContainer container = TFBiomeContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
 
         // de-hardcode sea-level
         RegionFix regionFix = new RegionFix(region, generator);
@@ -163,7 +163,7 @@ public class FeatureGenerator implements Generator.Features {
         }
     }
 
-    private void postProcess(ChunkReader reader, TerraContainer container, DecoratorContext context) {
+    private void postProcess(ChunkReader reader, TFBiomeContainer container, DecoratorContext context) {
         List<ColumnDecorator> decorators = generator.getPostProcessors();
         reader.iterate(context, (cell, dx, dz, ctx) -> {
             int px = ctx.blockX + dx;

@@ -25,9 +25,9 @@
 package com.terraforged.mod.client.gui.page;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.terraforged.mod.client.gui.config.OverlayRenderer;
-import com.terraforged.mod.client.gui.config.OverlayScreen;
-import com.terraforged.mod.client.gui.config.ScrollPane;
+import com.terraforged.mod.client.gui.screen.overlay.OverlayRenderer;
+import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
+import com.terraforged.mod.client.gui.screen.ScrollPane;
 import com.terraforged.mod.client.gui.element.*;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.client.gui.IGuiEventListener;
