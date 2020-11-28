@@ -25,21 +25,20 @@
 package com.terraforged.mod.client.gui.screen;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.terraforged.api.client.WorldOptionsCallback;
 import com.terraforged.mod.LevelTypes;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
+import com.terraforged.mod.client.gui.element.TerraLabel;
+import com.terraforged.mod.client.gui.page.Page;
+import com.terraforged.mod.client.gui.page.SimplePage;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
 import com.terraforged.mod.client.gui.screen.page.PresetsPage;
 import com.terraforged.mod.client.gui.screen.page.SimplePreviewPage;
 import com.terraforged.mod.client.gui.screen.page.WorldPage;
 import com.terraforged.mod.client.gui.screen.preview.PreviewPage;
-import com.terraforged.mod.client.gui.element.TerraLabel;
-import com.terraforged.mod.client.gui.page.Page;
-import com.terraforged.mod.client.gui.page.SimplePage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
@@ -245,7 +244,7 @@ public class ConfigScreen extends OverlayScreen {
         }
         preview.close();
         Minecraft.getInstance().displayGuiScreen(parent);
-        WorldOptionsCallback.update(parent.field_238934_c_, outputSettings);
+        parent.field_238934_c_.func_239043_a_(outputSettings);
     }
 
     private boolean hasNext() {
