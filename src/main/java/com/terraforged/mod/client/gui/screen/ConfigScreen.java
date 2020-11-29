@@ -31,7 +31,7 @@ import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
-import com.terraforged.mod.client.gui.element.TerraLabel;
+import com.terraforged.mod.client.gui.element.TFLabel;
 import com.terraforged.mod.client.gui.page.Page;
 import com.terraforged.mod.client.gui.page.SimplePage;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
@@ -98,7 +98,7 @@ public class ConfigScreen extends OverlayScreen {
 
         if (pageIndex < pages.length) {
             Page page = pages[pageIndex];
-            TerraLabel title = new TerraLabel(page.getTitle());
+            TFLabel title = new TFLabel(page.getTitle());
             title.visible = true;
             title.x = 16;
             title.y = 15;

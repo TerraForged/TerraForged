@@ -31,21 +31,21 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class TerraButton extends Button implements Element {
+public class TFButton extends Button implements Element {
 
     private final List<String> tooltip;
 
-    public TerraButton(String displayString) {
+    public TFButton(String displayString) {
         super(0, 0, 200, 20, new StringTextComponent(displayString), b -> {});
         this.tooltip = Collections.emptyList();
     }
 
-    public TerraButton(String displayString, String... tooltip) {
+    public TFButton(String displayString, String... tooltip) {
         super(0, 0, 200, 20, new StringTextComponent(displayString), b -> {});
         this.tooltip = Arrays.asList(tooltip);
     }
 
-    public TerraButton init(int x, int y, int width, int height) {
+    public TFButton init(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
         setWidth(width);
@@ -58,8 +58,8 @@ public class TerraButton extends Button implements Element {
         return tooltip;
     }
 
-    public static TerraButton create(String title, int x, int y, int width, int height, String tooltip, Runnable action) {
-        TerraButton button = new TerraButton(title) {
+    public static TFButton create(String title, int x, int y, int width, int height, String tooltip, Runnable action) {
+        TFButton button = new TFButton(title) {
 
             private final List<String> tooltips = Collections.singletonList(tooltip);
 

@@ -26,11 +26,11 @@ package com.terraforged.mod.client.gui.element;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-public class CheckBox extends TerraButton implements Element {
+public class TFCheckBox extends TFButton implements Element {
 
     private boolean checked = false;
 
-    public CheckBox(String displayString, boolean isChecked) {
+    public TFCheckBox(String displayString, boolean isChecked) {
         super(displayString);
         this.visible = true;
         this.width = 70;

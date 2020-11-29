@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class TerraTextInput extends TextFieldWidget implements Element, Consumer<String> {
+public class TFTextBox extends TextFieldWidget implements Element, Consumer<String> {
 
     private final String name;
     private final CompoundNBT value;
@@ -43,9 +43,9 @@ public class TerraTextInput extends TextFieldWidget implements Element, Consumer
     private String stringValue = "";
     private boolean valid = true;
     private Predicate<String> validator = s -> true;
-    private Consumer<TerraTextInput> callback = t -> {};
+    private Consumer<TFTextBox> callback = t -> {};
 
-    public TerraTextInput(String name, CompoundNBT value) {
+    public TFTextBox(String name, CompoundNBT value) {
         super(Minecraft.getInstance().fontRenderer, 0, 0, 100, 20, new StringTextComponent(Element.getDisplayName(name, value) + ": "));
         this.name = name;
         this.value = value;
@@ -75,6 +75,14 @@ public class TerraTextInput extends TextFieldWidget implements Element, Consumer
             valid = false;
             setTextColor(0xffff3f30);
         }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!isMouseOver(mouseX, mouseY)) {
+            setFocused(false);
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override

@@ -112,16 +112,17 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
 
         @Override
         public boolean mouseClicked(double x, double y, int button) {
-//            super.mouseClicked(x, y, button);
+            super.mouseClicked(x, y, button);
             if (isMouseOver(x, y)) {
                 setSelected(this);
             }
+            System.out.println("Clicked");
             return option.mouseClicked(x, y, button);
         }
 
         @Override
         public boolean mouseReleased(double x, double y, int button) {
-//            super.mouseReleased(x, y, button);
+            super.mouseReleased(x, y, button);
             return option.mouseReleased(x, y, button);
         }
 

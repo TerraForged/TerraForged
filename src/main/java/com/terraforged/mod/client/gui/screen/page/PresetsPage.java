@@ -33,9 +33,9 @@ import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.screen.Instance;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
 import com.terraforged.mod.client.gui.screen.ScrollPane;
-import com.terraforged.mod.client.gui.element.TerraButton;
-import com.terraforged.mod.client.gui.element.TerraLabel;
-import com.terraforged.mod.client.gui.element.TerraTextInput;
+import com.terraforged.mod.client.gui.element.TFButton;
+import com.terraforged.mod.client.gui.element.TFLabel;
+import com.terraforged.mod.client.gui.element.TFTextBox;
 import com.terraforged.mod.client.gui.page.BasePage;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.client.gui.widget.Widget;
@@ -52,7 +52,7 @@ public class PresetsPage extends BasePage {
     private final Instance instance;
     private final UpdatablePage preview;
     private final Widget previewWidget;
-    private final TerraTextInput nameInput;
+    private final TFTextBox nameInput;
     private final PresetManager manager = PresetManager.load();
 
     public PresetsPage(Instance instance, UpdatablePage preview, Widget widget) {
@@ -61,7 +61,7 @@ public class PresetsPage extends BasePage {
         this.preview = preview;
         this.previewWidget = widget;
         this.instance = instance;
-        this.nameInput = new TerraTextInput("name", value);
+        this.nameInput = new TFTextBox("name", value);
         this.nameInput.setColorValidator(NAME_VALIDATOR);
     }
 
@@ -91,7 +91,7 @@ public class PresetsPage extends BasePage {
         Column right = getColumn(1);
         right.scrollPane.addButton(nameInput);
 
-        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_CREATE.get()) {
+        right.scrollPane.addButton(new TFButton(GuiKeys.PRESET_CREATE.get()) {
 
             @Override
             public void render(MatrixStack matrixStack, int x, int z, float ticks) {
@@ -119,7 +119,7 @@ public class PresetsPage extends BasePage {
             }
         });
 
-        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_LOAD.get()) {
+        right.scrollPane.addButton(new TFButton(GuiKeys.PRESET_LOAD.get()) {
 
             @Override
             public void render(MatrixStack matrixStack, int x, int z, float ticks) {
@@ -134,7 +134,7 @@ public class PresetsPage extends BasePage {
             }
         });
 
-        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_SAVE.get()) {
+        right.scrollPane.addButton(new TFButton(GuiKeys.PRESET_SAVE.get()) {
 
             @Override
             public void render(MatrixStack matrixStack, int x, int z, float ticks) {
@@ -163,7 +163,7 @@ public class PresetsPage extends BasePage {
             }
         });
 
-        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_RESET.get()) {
+        right.scrollPane.addButton(new TFButton(GuiKeys.PRESET_RESET.get()) {
 
             @Override
             public void render(MatrixStack matrixStack, int x, int z, float ticks) {
@@ -191,7 +191,7 @@ public class PresetsPage extends BasePage {
             }
         });
 
-        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_DELETE.get()) {
+        right.scrollPane.addButton(new TFButton(GuiKeys.PRESET_DELETE.get()) {
 
             @Override
             public void render(MatrixStack matrixStack, int x, int z, float ticks) {
@@ -213,7 +213,7 @@ public class PresetsPage extends BasePage {
             }
         });
 
-        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_SET_DEFAULTS.get()) {
+        right.scrollPane.addButton(new TFButton(GuiKeys.PRESET_SET_DEFAULTS.get()) {
 
             @Override
             public void onClick(double x, double y) {
@@ -227,7 +227,7 @@ public class PresetsPage extends BasePage {
             }
         });
 
-        right.scrollPane.addButton(new TerraButton(GuiKeys.PRESET_CLEAR_DEFAULTS.get()) {
+        right.scrollPane.addButton(new TFButton(GuiKeys.PRESET_CLEAR_DEFAULTS.get()) {
 
             @Override
             public void onClick(double x, double y) {
@@ -240,7 +240,7 @@ public class PresetsPage extends BasePage {
         right.scrollPane.addButton(previewWidget);
 
         // used to pad the scroll-pane out so that the preview legend scrolls on larger gui scales
-        TerraButton spacer = createSpacer();
+        TFButton spacer = createSpacer();
         for (int i = 0; i < 10; i++) {
             right.scrollPane.addButton(spacer);
         }
@@ -282,15 +282,15 @@ public class PresetsPage extends BasePage {
 
         for (Preset preset : manager) {
             if (preset.internal()) {
-                left.scrollPane.addButton(new TerraLabel(preset.getName(), preset.getDescription(), 0xAAAAAA));
+                left.scrollPane.addButton(new TFLabel(preset.getName(), preset.getDescription(), 0xAAAAAA));
             } else {
-                left.scrollPane.addButton(new TerraLabel(preset.getName()));
+                left.scrollPane.addButton(new TFLabel(preset.getName()));
             }
         }
     }
 
-    private static TerraButton createSpacer() {
-        return new TerraButton("") {
+    private static TFButton createSpacer() {
+        return new TFButton("") {
             @Override
             public void render(MatrixStack matrixStack, int x, int y, float tick) { }
         };

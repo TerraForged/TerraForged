@@ -28,16 +28,16 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 
-public class TerraLabel extends TerraButton {
+public class TFLabel extends TFButton {
 
     private int color = 0xFFFFFF;
 
-    public TerraLabel(String text) {
+    public TFLabel(String text) {
         super(text);
         visible = true;
     }
 
-    public TerraLabel(String text, String toolTip, int color) {
+    public TFLabel(String text, String toolTip, int color) {
         super(text, toolTip);
         this.color = color;
         this.visible = true;

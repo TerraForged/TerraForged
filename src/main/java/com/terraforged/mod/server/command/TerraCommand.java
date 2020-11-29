@@ -219,7 +219,6 @@ public class TerraCommand {
         MinecraftServer server = context.getSource().getServer();
         WorldGenerator generator = terraContext.factory.get().get();
         Search search = new TerrainSearchTask(pos, type, getChunkGenerator(context), generator);
-        doSearch(server, playerID, search);
         int identifier = doSearch(server, playerID, search);
         context.getSource().sendFeedback(createPrefix(identifier)
                 .append(new StringTextComponent(" Searching for "))

@@ -146,7 +146,7 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
                 if (child == null || child.getId() != Constants.NBT.TAG_COMPOUND) {
                     return;
                 }
-                TerraLabel label = new TerraLabel(Element.getDisplayName(name, settings));
+                TFLabel label = new TFLabel(Element.getDisplayName(name, settings));
                 label.x = x;
                 label.y = top.getAndAdd(SLIDER_HEIGHT + SLIDER_PAD);
                 consumer.accept(label);
@@ -164,18 +164,18 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
         byte type = tag.getId();
         if (type == Constants.NBT.TAG_INT) {
             if (hasLimit(name, value)) {
-                return new TerraSlider.BoundInt(name, value).callback(callback);
+                return new TFSlider.BoundInt(name, value).callback(callback);
             }
-            return new TerraSlider.Int(name, value).callback(callback);
+            return new TFSlider.Int(name, value).callback(callback);
         } else if (type == Constants.NBT.TAG_FLOAT) {
             if (hasLimit(name, value)) {
-                return new TerraSlider.BoundFloat(name, value).callback(callback);
+                return new TFSlider.BoundFloat(name, value).callback(callback);
             }
-            return new TerraSlider.Float(name, value).callback(callback);
+            return new TFSlider.Float(name, value).callback(callback);
         } else if (type == Constants.NBT.TAG_STRING && hasOptions(name, value)) {
-            return new TerraToggle(name, value).callback(callback);
+            return new TFToggle(name, value).callback(callback);
         } else if (type == Constants.NBT.TAG_STRING) {
-            return new TerraTextInput(name, value);
+            return new TFTextBox(name, value);
         } else {
             return null;
         }

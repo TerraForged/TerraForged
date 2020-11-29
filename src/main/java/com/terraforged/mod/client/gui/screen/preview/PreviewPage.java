@@ -29,7 +29,7 @@ import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
 import com.terraforged.mod.client.gui.screen.page.UpdatablePage;
-import com.terraforged.mod.client.gui.element.TerraButton;
+import com.terraforged.mod.client.gui.element.TFButton;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
 
@@ -75,7 +75,7 @@ public class PreviewPage extends UpdatablePage {
 
         addElements(right.left, right.top, right, previewerSettings, right.scrollPane::addButton, this::update);
 
-        right.scrollPane.addButton(new TerraButton(GuiKeys.PREVIEW_SEED.get()) {
+        right.scrollPane.addButton(new TFButton(GuiKeys.PREVIEW_SEED.get()) {
             @Override
             public void onPress() {
                 preview.regenerate();
@@ -86,7 +86,7 @@ public class PreviewPage extends UpdatablePage {
         right.scrollPane.addButton(preview);
 
         // used to pad the scroll-pane out so that the preview legend scrolls on larger gui scales
-        TerraButton spacer = createSpacer();
+        TFButton spacer = createSpacer();
         for (int i = 0; i < 10; i++) {
             right.scrollPane.addButton(spacer);
         }
@@ -99,8 +99,8 @@ public class PreviewPage extends UpdatablePage {
         preview.update(settings, previewerSettings);
     }
 
-    private static TerraButton createSpacer() {
-        return new TerraButton("") {
+    private static TFButton createSpacer() {
+        return new TFButton("") {
             @Override
             public void render(MatrixStack matrixStack, int x, int y, float tick) { }
         };

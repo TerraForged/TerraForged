@@ -31,7 +31,7 @@ import net.minecraftforge.fml.client.gui.widget.Slider;
 
 import java.util.List;
 
-public abstract class TerraSlider extends Slider implements Slider.ISlider, Element {
+public abstract class TFSlider extends Slider implements Slider.ISlider, Element {
 
     protected final String name;
     private final CompoundNBT value;
@@ -40,7 +40,7 @@ public abstract class TerraSlider extends Slider implements Slider.ISlider, Elem
     private boolean lock = false;
     private Runnable callback = () -> {};
 
-    public TerraSlider(String name, CompoundNBT value, boolean decimal) {
+    public TFSlider(String name, CompoundNBT value, boolean decimal) {
         super(0, 0, 100, 20, new StringTextComponent(Element.getDisplayName(name, value) + ": "), new StringTextComponent(""), min(name, value), max(name, value), 0F, decimal, true, b -> {});
         this.name = name;
         this.value = value;
@@ -48,7 +48,7 @@ public abstract class TerraSlider extends Slider implements Slider.ISlider, Elem
         this.tooltip = Element.getToolTip(name, value);
     }
 
-    public TerraSlider callback(Runnable callback) {
+    public TFSlider callback(Runnable callback) {
         this.callback = callback;
         return this;
     }
@@ -87,7 +87,7 @@ public abstract class TerraSlider extends Slider implements Slider.ISlider, Elem
         return meta.getFloat("max");
     }
 
-    public static class Int extends TerraSlider {
+    public static class Int extends TFSlider {
 
         public Int(String name, CompoundNBT value) {
             super(name, value, false);
@@ -101,7 +101,7 @@ public abstract class TerraSlider extends Slider implements Slider.ISlider, Elem
         }
     }
 
-    public static class Float extends TerraSlider {
+    public static class Float extends TFSlider {
 
         public Float(String name, CompoundNBT value) {
             super(name, value, true);
@@ -119,7 +119,7 @@ public abstract class TerraSlider extends Slider implements Slider.ISlider, Elem
     }
 
     // A slider who's min/max value are dynamically linked with some other slider/numeric value
-    public abstract static class BoundSlider extends TerraSlider {
+    public abstract static class BoundSlider extends TFSlider {
 
         protected final float pad;
         protected final String lower;

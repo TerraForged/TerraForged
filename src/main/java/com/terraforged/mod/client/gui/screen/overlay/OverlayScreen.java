@@ -28,7 +28,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.screen.preview.PreviewSettings;
-import com.terraforged.mod.client.gui.element.CheckBox;
+import com.terraforged.mod.client.gui.element.TFCheckBox;
 import com.terraforged.mod.client.gui.element.Element;
 import com.terraforged.mod.config.ConfigManager;
 import net.minecraft.client.Minecraft;
@@ -76,7 +76,7 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
 
     @Override
     protected void init() {
-        addButton(new CheckBox(GuiKeys.TOOLTIPS.get(), PreviewSettings.showTooltips) {
+        addButton(new TFCheckBox(GuiKeys.TOOLTIPS.get(), PreviewSettings.showTooltips) {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 super.onClick(mouseX, mouseY);
@@ -93,7 +93,7 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
             }
         });
 
-        addButton(new CheckBox(GuiKeys.COORDS.get(), PreviewSettings.showCoords) {
+        addButton(new TFCheckBox(GuiKeys.COORDS.get(), PreviewSettings.showCoords) {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 super.onClick(mouseX, mouseY);
