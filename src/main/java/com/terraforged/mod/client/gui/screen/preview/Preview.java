@@ -192,8 +192,8 @@ public class Preview extends Button {
 
         if (settings.world.properties.spawnType == SpawnType.CONTINENT_CENTER) {
             long center = context.factory.get().getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ);
-            this.center.x = PosUtil.unpackLeftInt(center);
-            this.center.z = PosUtil.unpackRightInt(center);
+            this.center.x = PosUtil.unpackLeft(center);
+            this.center.z = PosUtil.unpackRight(center);
         } else {
             center.x = 0;
             center.z = 0;

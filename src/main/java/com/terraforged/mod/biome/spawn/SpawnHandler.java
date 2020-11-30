@@ -48,8 +48,6 @@ public class SpawnHandler {
         if (event.getWorld() instanceof ServerWorld) {
             ServerWorld world =(ServerWorld) event.getWorld();
             ChunkGenerator generator = world.getChunkProvider().getChunkGenerator();
-            if (true) return;
-
             if (generator.getBiomeProvider() instanceof TerraBiomeProvider) {
                 Log.info("Searching for world spawn position");
                 TerraBiomeProvider provider = (TerraBiomeProvider) generator.getBiomeProvider();
@@ -82,8 +80,8 @@ public class SpawnHandler {
             return BlockPos.ZERO;
         } else {
             long center = provider.getContext().heightmap.get().getContinent().getNearestCenter(0, 0);
-            int x = PosUtil.unpackLeftInt(center);
-            int z = PosUtil.unpackRightInt(center);
+            int x = PosUtil.unpackLeft(center);
+            int z = PosUtil.unpackRight(center);
             return new BlockPos(x, 0, z);
         }
     }

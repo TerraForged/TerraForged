@@ -29,6 +29,7 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeGenerationSettings;
 import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
@@ -108,6 +109,11 @@ public class BiomeBuilder extends Biome.Builder {
         category(parentBiome.getCategory());
         // structures
         parentBiome.getGenerationSettings().getStructures().forEach(s -> settings.withStructure(s.get()));
+        // carvers
+        for (GenerationStage.Carving stage : GenerationStage.Carving.values()) {
+            List<Supplier<ConfiguredCarver<?>>> carvers = parentBiome.getGenerationSettings().getCarvers(stage);
+            carvers.forEach(c -> this.settings.withCarver(stage, c.get()));
+        }
         // features
         for (GenerationStage.Decoration stage : GenerationStage.Decoration.values()) {
             List<Supplier<ConfiguredFeature<?, ?>>> features = parentBiome.getGenerationSettings().getFeatures().get(stage.ordinal());
@@ -147,6 +153,7 @@ public class BiomeBuilder extends Biome.Builder {
         return settings;
     }
 
+    @Override
     public Biome build() {
         withGenerationSettings(settings.build());
         return super.build();

@@ -110,7 +110,7 @@ public class TFChunkGeneratorLite extends TFChunkGenerator {
         distance = min(seed, x, y, ix - 1, iy + 1, distance);
         distance = min(seed, x, y, ix + 1, iy + 1, distance);
         distance = min(seed, x, y, ix, iy + 1, distance);
-        return PosUtil.unpackLeftFloat(distance) / PosUtil.unpackRightFloat(distance);
+        return PosUtil.unpackLeftf(distance) / PosUtil.unpackRightf(distance);
     }
 
     private static long min(int seed, float x, float y, int cellX, int cellY, long current) {
