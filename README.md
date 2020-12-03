@@ -26,9 +26,12 @@ repositories {
 }
 
 dependencies {
-    implementation fg.deobf("com.terraforged:TerraForged:1.15.2-0.1.0")
+    implementation fg.deobf("com.terraforged:TerraForged:1.15.2-${version}")
 }
 ```
+
+Obtain a `${version}` from the [repository tags](https://github.com/TerraForged/TerraForged/releases) 
+(versions 0.1.0 to 0.1.2 inclusive were not published).
 
 #### Usage
 
