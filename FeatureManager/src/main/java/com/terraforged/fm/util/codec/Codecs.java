@@ -35,6 +35,8 @@ import org.apache.logging.log4j.MarkerManager;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 public class Codecs {
@@ -51,6 +53,10 @@ public class Codecs {
 
     public static <V, T> V decodeAndGet(Codec<V> codec, Dynamic<T> dynamic) {
         return decode(codec, dynamic).orElseThrow(CodecException.SUPPLIER);
+    }
+
+    public static <V, T> V decodeAndGet(Codec<V> codec, T value, DynamicOps<T> ops) {
+        return decode(codec, value, ops).orElseThrow(CodecException.SUPPLIER);
     }
 
     public static <V, T> Optional<V> decode(Codec<V> codec, OptionalDynamic<T> dynamic) {
@@ -102,5 +108,11 @@ public class Codecs {
             error = result.error().get().message();
         }
         return result.result().orElseThrow(CodecException.get(error));
+    }
+
+    public static <T> T modify(T value, Codec<T> codec, UnaryOperator<JsonElement> modifier) {
+        JsonElement input = encode(codec, value);
+        JsonElement output = modifier.apply(input);
+        return decodeAndGet(codec, output, JsonOps.INSTANCE);
     }
 }

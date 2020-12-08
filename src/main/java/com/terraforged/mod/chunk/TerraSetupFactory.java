@@ -43,6 +43,7 @@ import com.terraforged.mod.chunk.column.post.LayerDecorator;
 import com.terraforged.mod.chunk.column.post.SnowEroder;
 import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.feature.Matchers;
+import com.terraforged.mod.feature.VolcanoPredicate;
 import com.terraforged.mod.feature.feature.FreezeLayer;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.material.geology.GeoManager;
@@ -85,7 +86,7 @@ public class TerraSetupFactory {
         return new BlockDataManager(data);
     }
 
-    public static FeatureManager createFeatureManager(DataManager data, TerraContext context) {
+    public static FeatureManager createFeatureManager(DataManager data, TerraContext context, TFChunkGenerator generator) {
         FeatureModifiers modifiers = FeatureManager.modifiers(data, context.terraSettings.miscellaneous.customBiomeFeatures, context.gameContext);
 
         if (context.terraSettings.miscellaneous.strataDecorator) {
@@ -125,6 +126,8 @@ public class TerraSetupFactory {
         modifiers.getPredicates().add(Matchers.sedimentDisks(context.gameContext), FeaturePredicate.DENY);
         modifiers.getPredicates().add(FeatureMatcher.of(Structures.mineshaft()), new MinHeight(context.levels.waterY + 20));
         modifiers.getPredicates().add(FeatureMatcher.of(Structures.mansion()), new MaxHeight(context.levels.waterY + 64));
+
+        modifiers.getPredicates().add(Matchers.trees(), new VolcanoPredicate(generator));
 
         return FeatureManager.create(SetupHooks.setup(modifiers, context.copy()));
     }

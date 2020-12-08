@@ -31,6 +31,7 @@ import com.terraforged.fm.matcher.feature.FeatureMatcher;
 import com.terraforged.mod.feature.feature.DiskFeature;
 import net.minecraft.block.Blocks;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 
 public class Matchers {
@@ -48,6 +49,18 @@ public class Matchers {
     public static FeatureMatcher tree() {
         return FeatureMatcher.builder()
                 .or(Blocks.OAK_LOG).and(Blocks.OAK_LEAVES)
+                .build();
+    }
+
+    public static FeatureMatcher trees() {
+        return FeatureMatcher.builder()
+                .or(TerraFeatures.INSTANCE)
+                .or(Blocks.OAK_LOG).and(Blocks.OAK_LEAVES)
+                .or(Blocks.ACACIA_LOG).and(Blocks.ACACIA_LEAVES)
+                .or(Blocks.BIRCH_LOG).and(Blocks.BIRCH_LEAVES)
+                .or(Blocks.DARK_OAK_LOG).and(Blocks.DARK_OAK_LEAVES)
+                .or(Blocks.JUNGLE_LOG).and(Blocks.JUNGLE_LEAVES)
+                .or(Blocks.SPRUCE_LOG).and(Blocks.SPRUCE_LEAVES)
                 .build();
     }
 

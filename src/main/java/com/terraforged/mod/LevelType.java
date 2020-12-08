@@ -28,7 +28,6 @@ import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
-import com.terraforged.mod.chunk.lite.TFChunkGeneratorLite;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
@@ -41,17 +40,14 @@ import net.minecraftforge.common.world.ForgeWorldType;
 
 import java.util.function.BiFunction;
 
-public class LevelTypes implements ForgeWorldType.IChunkGeneratorFactory {
+public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
 
-    public static final ForgeWorldType TERRAFORGED = new ForgeWorldType(new LevelTypes(TFChunkGenerator::new))
+    public static final ForgeWorldType TERRAFORGED = new ForgeWorldType(new LevelType(TFChunkGenerator::new))
             .setRegistryName(TerraForgedMod.MODID, "terraforged");
-
-    public static final ForgeWorldType TERRAFORGED_LITE = new ForgeWorldType(new LevelTypes(TFChunkGeneratorLite::new))
-            .setRegistryName(TerraForgedMod.MODID, "terraforged_lite");
 
     private final BiFunction<TerraBiomeProvider, DimensionSettings, ChunkGenerator> constructor;
 
-    private LevelTypes(BiFunction<TerraBiomeProvider, DimensionSettings, ChunkGenerator> constructor) {
+    private LevelType(BiFunction<TerraBiomeProvider, DimensionSettings, ChunkGenerator> constructor) {
         this.constructor = constructor;
     }
 

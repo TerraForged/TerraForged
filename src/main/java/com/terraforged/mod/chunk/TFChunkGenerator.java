@@ -110,7 +110,7 @@ public class TFChunkGenerator extends ChunkGenerator {
         this.surfaceGenerator = new SurfaceGenerator(this);
         this.featureGenerator = new FeatureGenerator(this);
         this.structureGenerator = new StructureGenerator(this);
-        this.resources = LazySupplier.factory(context, GeneratorResources::new);
+        this.resources = LazySupplier.factory(context, GeneratorResources.factory(this));
         Profiler.reset();
     }
 
@@ -134,7 +134,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public ChunkGenerator func_230349_a_(long p_230349_1_) {
+    public ChunkGenerator func_230349_a_(long seed) {
         return create(seed);
     }
 

@@ -35,6 +35,7 @@ import com.terraforged.mod.material.geology.GeoManager;
 import com.terraforged.mod.util.setup.SetupHooks;
 
 import java.util.List;
+import java.util.function.Function;
 
 public class GeneratorResources {
 
@@ -47,7 +48,7 @@ public class GeneratorResources {
     final List<ColumnDecorator> surfaceDecorators;
     final List<ColumnDecorator> postProcessors;
 
-    public GeneratorResources(TerraContext context) {
+    public GeneratorResources(TFChunkGenerator generator, TerraContext context) {
         this.surfaceManager = TerraSetupFactory.createSurfaceManager(context);
         this.structureManager = TerraSetupFactory.createStructureManager(context);
         this.geologyManager = TerraSetupFactory.createGeologyManager(context);
@@ -56,7 +57,7 @@ public class GeneratorResources {
 
         try (DataManager data = TerraSetupFactory.createDataManager()) {
             FeatureManager.initData(data);
-            this.featureManager = TerraSetupFactory.createFeatureManager(data, context);
+            this.featureManager = TerraSetupFactory.createFeatureManager(data, context, generator);
             this.blockDataManager = TerraSetupFactory.createBlockDataManager(data, context);
             FeatureManager.clearData();
         }
@@ -65,5 +66,9 @@ public class GeneratorResources {
 
         SetupHooks.setup(context.materials.get().layerManager, context.copy());
         SetupHooks.setup(surfaceDecorators, postProcessors, context.copy());
+    }
+
+    public static Function<TerraContext, GeneratorResources> factory(TFChunkGenerator generator) {
+        return context -> new GeneratorResources(generator, context);
     }
 }

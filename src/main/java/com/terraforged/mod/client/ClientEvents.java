@@ -26,7 +26,7 @@ package com.terraforged.mod.client;
 
 import com.terraforged.fm.data.FolderDataPackFinder;
 import com.terraforged.fm.data.ModDataPackFinder;
-import com.terraforged.mod.LevelTypes;
+import com.terraforged.mod.LevelType;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.client.gui.screen.ConfigScreen;
 import net.minecraft.client.Minecraft;
@@ -55,6 +55,6 @@ public class ClientEvents {
             minecraft.getResourcePackList().reloadPacksFromFinders();
         });
 
-        ForgeWorldTypeScreens.registerFactory(LevelTypes.TERRAFORGED, ConfigScreen::new);
+        ForgeWorldTypeScreens.registerFactory(LevelType.TERRAFORGED, ConfigScreen::new);
     }
 }

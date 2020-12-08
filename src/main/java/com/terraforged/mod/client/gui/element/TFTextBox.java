@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.client.gui.element;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.nbt.CompoundNBT;
@@ -78,9 +79,19 @@ public class TFTextBox extends TextFieldWidget implements Element, Consumer<Stri
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (!isMouseOver(mouseX, mouseY)) {
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        if (!active) {
             setFocused(false);
+        }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (isMouseOver(mouseX, mouseY)) {
+            setFocused(true);
+            setEnabled(true);
+            active = true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }

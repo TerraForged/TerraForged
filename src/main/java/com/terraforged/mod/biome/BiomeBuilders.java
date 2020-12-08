@@ -136,6 +136,7 @@ public class BiomeBuilders {
     public static BiomeBuilder savannaScrub() {
         BiomeBuilder builder = BiomeUtils.getBuilder(Biomes.SAVANNA);
         builder.type(BiomeManager.BiomeType.WARM);
+        builder.filterFeatures(DynamicMatcher.config(BaseTreeFeatureConfig.class));
         deadBush(builder);
         denseGrass(builder);
         return builder;

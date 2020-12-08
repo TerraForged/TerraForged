@@ -26,10 +26,10 @@ package com.terraforged.mod;
 
 import com.terraforged.api.material.WGTags;
 import com.terraforged.api.registry.Registries;
+import com.terraforged.core.Engine;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
-import com.terraforged.mod.chunk.lite.TFChunkGeneratorLite;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.data.WorldGenBiomes;
@@ -53,12 +53,12 @@ public class TerraForgedMod {
     public static final String MODID = "terraforged";
 
     public TerraForgedMod() {
+        Engine.init();
         WGTags.init();
         Registries.init();
 
         Registry.register(Registry.BIOME_PROVIDER_CODEC, "terraforged:climate", TerraBiomeProvider.CODEC);
         Registry.register(Registry.CHUNK_GENERATOR_CODEC, "terraforged:generator", TFChunkGenerator.CODEC);
-        Registry.register(Registry.CHUNK_GENERATOR_CODEC, "terraforged:lite_generator", TFChunkGeneratorLite.LITE_CODEC);
 
         BiomeManager.addBiome(BiomeManager.BiomeType.ICY, new BiomeManager.BiomeEntry(Biomes.ICE_SPIKES, 2));
         BiomeManager.addBiome(BiomeManager.BiomeType.WARM, new BiomeManager.BiomeEntry(Biomes.MUSHROOM_FIELDS, 2));

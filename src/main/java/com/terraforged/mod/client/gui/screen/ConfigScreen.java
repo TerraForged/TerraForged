@@ -25,7 +25,7 @@
 package com.terraforged.mod.client.gui.screen;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.terraforged.mod.LevelTypes;
+import com.terraforged.mod.LevelType;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
@@ -123,7 +123,7 @@ public class ConfigScreen extends OverlayScreen {
 
             Log.debug("Updating generator settings...");
             DynamicRegistries registries = parent.field_238934_c_.func_239055_b_();
-            outputSettings = LevelTypes.updateOverworld(inputSettings, registries, instance.settings);
+            outputSettings = LevelType.updateOverworld(inputSettings, registries, instance.settings);
             Log.debug("Updating seed...");
             ConfigScreen.setSeed(parent, preview.getSeed());
             closeScreen();

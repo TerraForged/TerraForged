@@ -25,9 +25,9 @@
 package com.terraforged.mod.client.gui.screen;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.terraforged.mod.client.gui.element.Element;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayRenderer;
 import com.terraforged.mod.client.gui.screen.preview.Preview;
-import com.terraforged.mod.client.gui.element.Element;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
@@ -83,6 +83,16 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        for (Entry entry : getEventListeners()) {
+            if (!entry.isMouseOver(mouseX, mouseY) && entry.option.isFocused()) {
+                entry.option.changeFocus(true);
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
     public boolean mouseScrolled(double x, double y, double direction) {
         return hovered && super.mouseScrolled(x, y, direction);
     }
@@ -112,12 +122,12 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
 
         @Override
         public boolean mouseClicked(double x, double y, int button) {
-            super.mouseClicked(x, y, button);
-            if (isMouseOver(x, y)) {
+            if (super.mouseClicked(x, y, button)) {
                 setSelected(this);
+                option.active = true;
+                return true;
             }
-            System.out.println("Clicked");
-            return option.mouseClicked(x, y, button);
+            return false;
         }
 
         @Override

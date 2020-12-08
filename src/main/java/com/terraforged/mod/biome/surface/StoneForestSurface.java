@@ -31,6 +31,7 @@ import com.terraforged.core.Seed;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
 import net.minecraft.block.BlockState;
+import net.minecraft.world.gen.Heightmap;
 
 import java.util.function.IntFunction;
 
@@ -61,6 +62,8 @@ public class StoneForestSurface implements MaskedSurface {
 
         int top = height + (int) (value * 50);
         if (top > height) {
+            height = ctx.chunk.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, x, z);
+
             for (int y = height; y < top - 1; y++) {
                 ctx.buffer.setBlockState(ctx.pos.setPos(x, y, z), stone, false);
             }

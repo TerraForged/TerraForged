@@ -86,7 +86,7 @@ public class TerraContext extends GeneratorContext {
         int threadCount = Math.min(PerfDefaults.MAX_THREAD_COUNT, Math.max(1, config.getInt("thread_count")));
         return TileGenerator.builder()
                 .pool(ThreadPools.create(threadCount, batching))
-                .size(tileSize, 2)
+                .size(tileSize, 1)
                 .batch(batchCount)
                 .factory(factory)
                 .build()
