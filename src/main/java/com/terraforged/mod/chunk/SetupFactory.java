@@ -130,7 +130,6 @@ public class SetupFactory {
                 Matchers.deadBush(),
                 FeatureTransformer.builder()
                         .key("tries", 1)
-                        .key("count", 1)
                         .build()
         );
 

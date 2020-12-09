@@ -25,12 +25,12 @@
 package com.terraforged.mod.client.gui.element;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.*;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.List;
+import java.util.Objects;
 
 public class TFToggle extends TFButton {
 
@@ -51,20 +51,23 @@ public class TFToggle extends TFButton {
         this.prefix = Element.getDisplayName(name, value) + ": ";
         this.tooltip = Element.getToolTip(name, value);
         CompoundNBT meta = value.getCompound("#" + name);
+        INBT selected = value.get("selected");
         this.noname = meta.contains("noname");
-        this.options = meta.getList("options", Constants.NBT.TAG_STRING);
+        this.options = (ListNBT) meta.get("options");
+        Objects.requireNonNull(options, "Missing options list");
+
         for (int i = 0; i < options.size(); i++) {
-            String s = options.getString(i);
-            if (s.equals(value.getString(name))) {
+            INBT s = options.get(i);
+            if (s.equals(selected)) {
                 index = i;
                 break;
             }
         }
 
         if (noname) {
-            setMessage(new StringTextComponent(value.getString(name)));
+            setMessage(new StringTextComponent(toString(value.get(name)) + ""));
         } else {
-            setMessage(new StringTextComponent(prefix + value.getString(name)));
+            setMessage(new StringTextComponent(prefix + toString(value.get(name))));
         }
     }
 
@@ -97,13 +100,23 @@ public class TFToggle extends TFButton {
         } else if (index < 0) {
             index = options.size() - 1;
         }
-        String option = options.getString(index);
-        value.putString(name, option);
+        INBT option = options.get(index);
+        value.put(name, option);
         if (noname) {
-            setMessage(new StringTextComponent(option));
+            setMessage(new StringTextComponent(toString(option)));
         } else {
-            setMessage(new StringTextComponent(prefix + option));
+            setMessage(new StringTextComponent(prefix + toString(option)));
         }
         callback.run();
+    }
+
+    private static String toString(INBT nbt) {
+        if (nbt == null) {
+            return "null";
+        }
+        if (nbt.getId() == Constants.NBT.TAG_BYTE) {
+            return ((ByteNBT) nbt).getByte() == 0b01 ? "true" : "false";
+        }
+        return nbt.getString();
     }
 }

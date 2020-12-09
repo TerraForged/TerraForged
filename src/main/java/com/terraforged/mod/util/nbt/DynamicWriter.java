@@ -103,6 +103,11 @@ public class DynamicWriter<T> extends AbstractWriter<T, RecordBuilder<T>, ListBu
         return ops.createFloat(value);
     }
 
+    @Override
+    protected T create(boolean value) {
+        return ops.createBoolean(value);
+    }
+
     public static DynamicWriter<JsonElement> json() {
         return new DynamicWriter<>(JsonOps.INSTANCE);
     }

@@ -175,7 +175,7 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
                 return new TFSlider.BoundFloat(name, value).callback(callback);
             }
             return new TFSlider.Float(name, value).callback(callback);
-        } else if (type == Constants.NBT.TAG_STRING && hasOptions(name, value)) {
+        } else if (hasOptions(name, value)) {
             return new TFToggle(name, value).callback(callback);
         } else if (type == Constants.NBT.TAG_STRING) {
             return new TFTextBox(name, value);

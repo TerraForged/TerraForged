@@ -93,4 +93,9 @@ public class NBTWriter extends AbstractWriter<INBT, CompoundNBT, ListNBT, NBTWri
     protected INBT create(float value) {
         return FloatNBT.valueOf(value);
     }
+
+    @Override
+    protected INBT create(boolean value) {
+        return ByteNBT.valueOf(value);
+    }
 }

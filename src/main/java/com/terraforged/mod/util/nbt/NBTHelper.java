@@ -25,8 +25,10 @@
 package com.terraforged.mod.util.nbt;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
+import com.terraforged.core.serialization.serializer.Deserializer;
 import com.terraforged.core.serialization.serializer.Serializer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -46,10 +48,30 @@ public class NBTHelper {
         return output.getValue();
     }
 
+    public static JsonElement toJson(Object o) {
+        try {
+            DynamicWriter<JsonElement> writer = new DynamicWriter<>(JsonOps.INSTANCE);
+            Serializer.serialize(o, writer, false);
+            return writer.get();
+        } catch (Throwable t) {
+            return new JsonObject();
+        }
+    }
+
     public static CompoundNBT fromJson(JsonElement json) {
         Dynamic<JsonElement> input = new Dynamic<>(JsonOps.INSTANCE, json);
         Dynamic<INBT> output = input.convert(NBTDynamicOps.INSTANCE);
         return (CompoundNBT) output.getValue();
+    }
+
+    public static boolean fromJson(JsonElement json, Object o) {
+        try {
+            DynamicReader<JsonElement> reader = new DynamicReader<>(json, JsonOps.INSTANCE);
+            Deserializer.deserialize(reader, o);
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
     public static CompoundNBT serialize(Object object) {

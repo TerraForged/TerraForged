@@ -113,8 +113,7 @@ public class PresetManager implements Iterable<Preset> {
             }
 
             Log.debug("Saving preset: {}", preset.getName());
-            CompoundNBT nbt = NBTHelper.serializeCompact(preset.getSettings());
-            JsonElement json = NBTHelper.toJson(nbt);
+            JsonElement json = NBTHelper.toJson(preset.getSettings());
             try (Writer writer = new BufferedWriter(new FileWriter(preset.getFile()))) {
                 gson.toJson(json, writer);
             } catch (IOException e) {
