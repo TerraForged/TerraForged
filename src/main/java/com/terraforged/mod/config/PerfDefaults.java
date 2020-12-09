@@ -32,7 +32,7 @@ public class PerfDefaults {
 
     public static final boolean BATCHING = true;
     public static final int TILE_SIZE = 3;
-    public static final int BATCH_COUNT = 4;
+    public static final int BATCH_COUNT = 6;
     public static final int THREAD_COUNT = ThreadPools.defaultPoolSize();
 
     public static final int MAX_TILE_SIZE = 8;

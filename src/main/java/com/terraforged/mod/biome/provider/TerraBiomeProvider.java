@@ -92,25 +92,22 @@ public class TerraBiomeProvider extends BiomeProvider {
 
     @Override
     public Set<Biome> getBiomes(int centerX, int centerY, int centerZ, int radius) {
-        int minX = centerX - radius >> 2;
-        int minZ = centerZ - radius >> 2;
-        int maxX = centerX + radius >> 2;
-        int maxZ = centerZ + radius >> 2;
-        int rangeX = maxX - minX + 1;
-        int rangeZ = maxZ - minZ + 1;
+        // search smaller radius to encourage more attempts to generate structures like mansions
+        radius /= 2;
+        int minX = centerX - radius;
+        int minZ = centerZ - radius;
+        int maxX = centerX + radius;
+        int maxZ = centerZ + radius;
         Set<Biome> set = Sets.newHashSet();
         Cell cell = new Cell();
         WorldLookup lookup = getWorldLookup();
-        for (int dz = 0; dz < rangeZ; ++dz) {
-            for (int dx = 0; dx < rangeX; ++dx) {
-                int x = (minX + dx) << 2;
-                int z = (minZ + dz) << 2;
+        for (int z = minZ; z <= maxZ; z += 4) {
+            for (int x = minX; x <= maxX; x += 4) {
                 lookup.applyCell(cell, x, z);
                 Biome biome = getBiome(cell, x, z);
                 set.add(biome);
             }
         }
-
         return set;
     }
 

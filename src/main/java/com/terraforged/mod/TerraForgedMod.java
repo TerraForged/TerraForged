@@ -53,6 +53,8 @@ public class TerraForgedMod {
     public static final String MODID = "terraforged";
 
     public TerraForgedMod() {
+        VersionChecker.require("forge", 35, 1, 5);
+
         Engine.init();
         WGTags.init();
         Registries.init();
@@ -63,8 +65,6 @@ public class TerraForgedMod {
         BiomeManager.addBiome(BiomeManager.BiomeType.ICY, new BiomeManager.BiomeEntry(Biomes.ICE_SPIKES, 2));
         BiomeManager.addBiome(BiomeManager.BiomeType.WARM, new BiomeManager.BiomeEntry(Biomes.MUSHROOM_FIELDS, 2));
         BiomeManager.addBiome(BiomeManager.BiomeType.WARM, new BiomeManager.BiomeEntry(Biomes.MUSHROOM_FIELD_SHORE, 2));
-
-        VersionChecker.require("forge", 35, 1, 5);
     }
 
     @SubscribeEvent

@@ -77,6 +77,8 @@ public class BiomeBuilder extends Biome.Builder {
             BiomeManager.addBiome(type, new BiomeManager.BiomeEntry(key, weight));
         } else if (BiomeDictionary.getTypes(key).contains(BiomeDictionary.Type.RARE)) {
             BiomeManager.addBiome(type, new BiomeManager.BiomeEntry(key, 2));
+        } else if (BiomeDictionary.getTypes(key).contains(BiomeDictionary.Type.FOREST)) {
+            BiomeManager.addBiome(type, new BiomeManager.BiomeEntry(key, 5));
         } else {
             BiomeManager.addBiome(type, new BiomeManager.BiomeEntry(key, 10));
         }
