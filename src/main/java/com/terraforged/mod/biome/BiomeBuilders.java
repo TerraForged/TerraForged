@@ -72,7 +72,7 @@ public class BiomeBuilders {
                 DynamicMatcher.of(Features.RED_MUSHROOM_TAIGA),
                 DynamicMatcher.of(Features.BROWN_MUSHROOM_TAIGA)
         );
-        builder.temperature(0.2F);
+        builder.temperature(0.25F);
         builder.downfall(0.05F);
         deadBush(builder);
         denseGrass(builder);

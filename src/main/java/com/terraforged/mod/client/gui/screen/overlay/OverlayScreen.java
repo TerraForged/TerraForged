@@ -67,7 +67,10 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
         for (Widget button : buttons) {
             if (button.isMouseOver(mouseX, mouseY)) {
                 if (button instanceof Element) {
-                    screen.renderTooltip(matrixStack, ((Element) button).getToolTipText(), mouseX, mouseY);
+                    Element element = (Element) button;
+                    if (!element.getTooltip().isEmpty()) {
+                        screen.renderTooltip(matrixStack, element.getToolTipText(), mouseX, mouseY);
+                    }
                     return;
                 }
             }

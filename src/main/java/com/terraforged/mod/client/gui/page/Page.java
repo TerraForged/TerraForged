@@ -166,6 +166,9 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
             if (hasLimit(name, value)) {
                 return new TFSlider.BoundInt(name, value).callback(callback);
             }
+            if (isRand(name, value)) {
+                return new TFRandButton(name, value).callback(callback);
+            }
             return new TFSlider.Int(name, value).callback(callback);
         } else if (type == Constants.NBT.TAG_FLOAT) {
             if (hasLimit(name, value)) {
@@ -214,5 +217,9 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
 
     private static boolean hasLimit(String name, CompoundNBT value) {
         return value.getCompound("#" + name).contains("limit_lower") || value.getCompound("#" + name).contains("limit_upper");
+    }
+
+    private static boolean isRand(String name, CompoundNBT value) {
+        return value.getCompound("#" + name).contains("random");
     }
 }

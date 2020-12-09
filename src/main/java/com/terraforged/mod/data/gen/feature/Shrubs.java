@@ -55,7 +55,7 @@ public class Shrubs {
     private static final String[] MARSH = {"terraforged:marshland", "terraforged:cold_marshland"};
     private static final String[] PLAINS = {"minecraft:birch*", "minecraft:plains", "minecraft:sunflower_plains", "minecraft:mountains"};
     private static final String[] STEPPE = {"minecraft:savanna", "minecraft:shattered_savanna", "terraforged:steppe"};
-    private static final String[] COLD_STEPPE = {"terraforged:cold_steppe"};
+    private static final String[] COLD_STEPPE = {"terraforged:cold_steppe", "terraforged:cold_marshland"};
     private static final String[] TAIGA = {
             "minecraft:snowy_tundra",
             "minecraft:taiga",

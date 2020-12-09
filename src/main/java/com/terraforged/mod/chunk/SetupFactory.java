@@ -57,7 +57,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TerraSetupFactory {
+public class SetupFactory {
 
     public static DataManager createDataManager() {
         return FeatureManager.data(new File("config/terraforged/datapacks"));
@@ -121,13 +121,23 @@ public class TerraSetupFactory {
                     FeatureTransformer.replace(Feature.FREEZE_TOP_LAYER, FreezeLayer.INSTANCE)
             );
         }
+        // prevent trees growing at high elevation on volcanoes
+        modifiers.getPredicates().add(Matchers.trees(), new VolcanoPredicate(generator));
+
+        // reduce dead bushes in deserts/badlands
+        modifiers.getTransformers().add(
+                BiomeMatcher.of(context.gameContext, Biome.Category.MESA, Biome.Category.DESERT),
+                Matchers.deadBush(),
+                FeatureTransformer.builder()
+                        .key("tries", 1)
+                        .key("count", 1)
+                        .build()
+        );
 
         // block ugly features
         modifiers.getPredicates().add(Matchers.sedimentDisks(context.gameContext), FeaturePredicate.DENY);
         modifiers.getPredicates().add(FeatureMatcher.of(Structures.mineshaft()), new MinHeight(context.levels.waterY + 20));
         modifiers.getPredicates().add(FeatureMatcher.of(Structures.mansion()), new MaxHeight(context.levels.waterY + 64));
-
-        modifiers.getPredicates().add(Matchers.trees(), new VolcanoPredicate(generator));
 
         return FeatureManager.create(SetupHooks.setup(modifiers, context.copy()));
     }

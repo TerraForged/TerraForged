@@ -49,16 +49,16 @@ public class GeneratorResources {
     final List<ColumnDecorator> postProcessors;
 
     public GeneratorResources(TFChunkGenerator generator, TerraContext context) {
-        this.surfaceManager = TerraSetupFactory.createSurfaceManager(context);
-        this.structureManager = TerraSetupFactory.createStructureManager(context);
-        this.geologyManager = TerraSetupFactory.createGeologyManager(context);
-        this.surfaceDecorators = TerraSetupFactory.createSurfaceDecorators(context);
-        this.postProcessors = TerraSetupFactory.createFeatureDecorators(context);
+        this.surfaceManager = SetupFactory.createSurfaceManager(context);
+        this.structureManager = SetupFactory.createStructureManager(context);
+        this.geologyManager = SetupFactory.createGeologyManager(context);
+        this.surfaceDecorators = SetupFactory.createSurfaceDecorators(context);
+        this.postProcessors = SetupFactory.createFeatureDecorators(context);
 
-        try (DataManager data = TerraSetupFactory.createDataManager()) {
+        try (DataManager data = SetupFactory.createDataManager()) {
             FeatureManager.initData(data);
-            this.featureManager = TerraSetupFactory.createFeatureManager(data, context, generator);
-            this.blockDataManager = TerraSetupFactory.createBlockDataManager(data, context);
+            this.featureManager = SetupFactory.createFeatureManager(data, context, generator);
+            this.blockDataManager = SetupFactory.createBlockDataManager(data, context);
             FeatureManager.clearData();
         }
 

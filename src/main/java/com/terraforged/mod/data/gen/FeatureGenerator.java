@@ -27,7 +27,7 @@ package com.terraforged.mod.data.gen;
 import com.terraforged.fm.FeatureManager;
 import com.terraforged.fm.data.DataManager;
 import com.terraforged.fm.data.FeatureInjectorProvider;
-import com.terraforged.mod.chunk.TerraSetupFactory;
+import com.terraforged.mod.chunk.SetupFactory;
 import com.terraforged.mod.data.gen.feature.Ores;
 import com.terraforged.mod.data.gen.feature.Sediments;
 import com.terraforged.mod.data.gen.feature.Shrubs;
@@ -42,7 +42,7 @@ public class FeatureGenerator {
     @SubscribeEvent
     public static void gather(GatherDataEvent event) {
         FeatureInjectorProvider provider = new FeatureInjectorProvider(event.getGenerator(), "terraforged");
-        try (DataManager dataManager = TerraSetupFactory.createDataManager()) {
+        try (DataManager dataManager = SetupFactory.createDataManager()) {
             FeatureManager.initData(dataManager);
             Ores.addInjectors(provider);
             Sediments.addInjectors(provider);

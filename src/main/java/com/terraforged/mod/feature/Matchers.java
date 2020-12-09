@@ -46,6 +46,10 @@ public class Matchers {
                 .build();
     }
 
+    public static FeatureMatcher deadBush() {
+        return FeatureMatcher.of(Blocks.DEAD_BUSH);
+    }
+
     public static FeatureMatcher tree() {
         return FeatureMatcher.builder()
                 .or(Blocks.OAK_LOG).and(Blocks.OAK_LEAVES)

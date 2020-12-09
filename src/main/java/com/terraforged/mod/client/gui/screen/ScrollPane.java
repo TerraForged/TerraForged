@@ -59,8 +59,11 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
             if (entry.isMouseOver(x, y) && entry.option.isMouseOver(x, y)) {
                 Widget button = entry.option;
                 if (button instanceof Element) {
-                    screen.renderTooltip(matrixStack, ((Element) button).getToolTipText(), x, y);
-                    return;
+                    Element element = (Element) button;
+                    if (!element.getTooltip().isEmpty()) {
+                        screen.renderTooltip(matrixStack, element.getToolTipText(), x, y);
+                        return;
+                    }
                 }
             }
         }

@@ -56,8 +56,8 @@ public class FreezeLayer extends Feature<NoFeatureConfig> {
         BlockPos.Mutable pos1 = new BlockPos.Mutable();
         BlockPos.Mutable pos2 = new BlockPos.Mutable();
 
-        for(int dx = -16; dx < 32; ++dx) {
-            for(int dz = -16; dz < 32; ++dz) {
+        for(int dx = -8; dx < 25; ++dx) {
+            for(int dz = -8; dz < 25; ++dz) {
                 int x = pos.getX() + dx;
                 int z = pos.getZ() + dz;
                 int leavesY = world.getHeight(Heightmap.Type.MOTION_BLOCKING, x, z);
