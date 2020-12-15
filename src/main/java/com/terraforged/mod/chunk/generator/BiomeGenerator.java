@@ -25,8 +25,8 @@
 package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.core.tile.chunk.ChunkReader;
-import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.biome.TFBiomeContainer;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.IChunk;
 

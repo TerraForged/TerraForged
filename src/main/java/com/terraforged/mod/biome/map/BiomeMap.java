@@ -56,6 +56,9 @@ public interface BiomeMap {
     @Nullable
     Biome getMountain(Cell cell);
 
+    @Nullable
+    Biome getVolcano(Cell cell);
+
     Biome provideBiome(Cell cell, Levels levels);
 
     BiomeTypeSet getLandSet();
@@ -79,6 +82,8 @@ public interface BiomeMap {
         Builder addLake(Biome biome, int count);
 
         Builder addMountain(Biome biome, int count);
+
+        Builder addVolcano(Biome biome, int count);
 
         Builder addLand(BiomeType type, Biome biome, int count);
 

@@ -1,5 +1,5 @@
 modLoader="javafml"
-license="license.txt"
+license="MIT"
 loaderVersion="[35.1,)"
 [[mods]]
 modId="terraforged"

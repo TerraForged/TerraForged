@@ -45,6 +45,7 @@ public class BiomeMapBuilder implements BiomeMap.Builder {
     protected final Map<TempCategory, List<Biome>> oceans = new HashMap<>();
     protected final Map<TempCategory, List<Biome>> deepOceans = new HashMap<>();
     protected final Map<TempCategory, List<Biome>> mountains = new HashMap<>();
+    protected final Map<TempCategory, List<Biome>> volcanoes = new HashMap<>();
     protected final Map<TempCategory, List<Biome>> wetlands = new HashMap<>();
     protected final Map<BiomeType, List<Biome>> map = new EnumMap<>(BiomeType.class);
 
@@ -106,6 +107,13 @@ public class BiomeMapBuilder implements BiomeMap.Builder {
     public BiomeMapBuilder addMountain(Biome biome, int count) {
         TempCategory category = BiomeHelper.getMountainCategory(biome);
         add(mountains.computeIfAbsent(category, c -> new ArrayList<>()), biome, count);
+        return this;
+    }
+
+    @Override
+    public BiomeMapBuilder addVolcano(Biome biome, int count) {
+        TempCategory category = TempCategory.forBiome(biome, context);
+        add(volcanoes.computeIfAbsent(category, c -> new ArrayList<>()), biome, count);
         return this;
     }
 

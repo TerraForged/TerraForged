@@ -114,8 +114,13 @@ task collectLibs(type: Copy) {
 processResources {
     filesMatching("**/mods.toml") {
         // replaces the version string in the mods.toml
-        expand("version": "${mod_version}${getClassifier()}", "mc_version": mc_version)
+        expand("version": "${mod_version}${getBuildNumber()}", "mc_version": mc_version)
     }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }
 
 classes {
@@ -124,6 +129,7 @@ classes {
 }
 
 jar {
+    duplicatesStrategy = "EXCLUDE"
     manifest {
         attributes([
                 "Specification-Title": "TerraForged",
@@ -142,10 +148,35 @@ build {
     dependsOn("reobfJar")
 }
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+            artifact sourcesJar
+        }
+    }
+
+    if (System.getenv("MAVEN_USER") != null && System.getenv("MAVEN_PASS") != null) {
+        repositories {
+            maven {
+                url = "https://io.terraforged.com/repository/maven/"
+                credentials {
+                    username System.getenv("MAVEN_USER")
+                    password System.getenv("MAVEN_PASS")
+                }
+            }
+        }
+    }
+}
+
 static def getClassifier() {
     if (System.getenv("GIT_TAG_NAME") != null) {
         return ""
     }
+    return "-SNAPSHOT"
+}
+
+static def getBuildNumber() {
     def buildNumber = System.getenv("BUILD_NUMBER")
     if (buildNumber != null) {
         return "-${buildNumber}"

@@ -108,6 +108,14 @@ public class DefaultBiomes {
             1F
     );
 
+    public static final DefaultBiome.Factory VOLCANOES = context -> new DefaultBiomeSelector(
+            null,
+            null,
+            null,
+            0.25F,
+            1F
+    );
+
     public static final DefaultBiome.Factory LAND = context -> new DefaultBiomeSelector(
             context.biomes.get(ModBiomes.TAIGA_SCRUB),
             context.biomes.get(Biomes.PLAINS),

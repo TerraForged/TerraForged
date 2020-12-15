@@ -25,10 +25,10 @@
 package com.terraforged.mod.client.gui.screen.page;
 
 import com.terraforged.mod.client.gui.GuiKeys;
-import com.terraforged.mod.client.gui.screen.Instance;
-import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
 import com.terraforged.mod.client.gui.element.TFTextBox;
 import com.terraforged.mod.client.gui.page.BasePage;
+import com.terraforged.mod.client.gui.screen.Instance;
+import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.nbt.CompoundNBT;

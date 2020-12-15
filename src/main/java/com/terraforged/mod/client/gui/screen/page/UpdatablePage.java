@@ -25,8 +25,8 @@
 package com.terraforged.mod.client.gui.screen.page;
 
 import com.terraforged.mod.chunk.settings.TerraSettings;
-import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
 import com.terraforged.mod.client.gui.page.BasePage;
+import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
 
 import java.util.function.Consumer;
 

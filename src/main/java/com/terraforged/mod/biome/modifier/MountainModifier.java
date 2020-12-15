@@ -33,14 +33,12 @@ import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
 import net.minecraft.world.biome.Biome;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 public class MountainModifier implements BiomeModifier {
 
     // the probability that mountain terrain will get upgraded to a mountain biome
     public static final float MOUNTAIN_CHANCE = 0.4F;
     // height above ground level where mountain biomes can start to take over
-    private static final int MOUNTAIN_START_HEIGHT = 24;
+    private static final int MOUNTAIN_START_HEIGHT = 48;
 
     // probability of mountain biome overriding others
     private final float chance;
@@ -56,9 +54,9 @@ public class MountainModifier implements BiomeModifier {
     public MountainModifier(TerraContext context, BiomeMap biomes) {
         this.biomes = biomes;
         this.chance = context.terraSettings.miscellaneous.mountainBiomeUsage;
-        this.range = context.levels.scale(12);
+        this.range = context.levels.scale(10);
         this.height = context.levels.ground(MOUNTAIN_START_HEIGHT);
-        this.noise = Source.perlin(ThreadLocalRandom.current().nextInt(), 64, 2).scale(range);
+        this.noise = Source.perlin(context.seed.next(), 80, 2).scale(range);
     }
 
     @Override

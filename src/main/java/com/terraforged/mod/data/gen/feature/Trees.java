@@ -25,9 +25,6 @@
 package com.terraforged.mod.data.gen.feature;
 
 import com.mojang.datafixers.util.Pair;
-import com.terraforged.mod.feature.decorator.FilterDecorator;
-import com.terraforged.mod.feature.decorator.filter.FilterDecoratorConfig;
-import com.terraforged.mod.feature.decorator.filter.PlacementFilter;
 import com.terraforged.fm.GameContext;
 import com.terraforged.fm.data.FeatureInjectorProvider;
 import com.terraforged.fm.matcher.biome.BiomeMatcher;
@@ -44,8 +41,11 @@ import com.terraforged.mod.feature.context.ContextualFeature;
 import com.terraforged.mod.feature.context.modifier.BiomeModifier;
 import com.terraforged.mod.feature.context.modifier.ContextModifier;
 import com.terraforged.mod.feature.context.modifier.Elevation;
+import com.terraforged.mod.feature.decorator.FilterDecorator;
 import com.terraforged.mod.feature.decorator.fastpoisson.FastPoissonAtSurface;
 import com.terraforged.mod.feature.decorator.fastpoisson.FastPoissonConfig;
+import com.terraforged.mod.feature.decorator.filter.FilterDecoratorConfig;
+import com.terraforged.mod.feature.decorator.filter.PlacementFilter;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.WorldGenRegistries;
@@ -233,7 +233,7 @@ public class Trees {
                 BiomeMatcher.of(context, "minecraft:jungle_edge", "minecraft:modified_jungle_edge", "terraforged:stone_forest"),
                 FeatureMatcher.and("minecraft:tree"),
                 FeatureReplacer.of(poisson(
-                        0.35F, 7, 0.25F, 350, 0.75F,
+                        0.35F, 8, 0.25F, 350, 0.75F,
                         "terraforged:jungle_small",
                         Pair.of("terraforged:jungle_small", 0.2F),
                         Pair.of("terraforged:jungle_large", 0.3F),

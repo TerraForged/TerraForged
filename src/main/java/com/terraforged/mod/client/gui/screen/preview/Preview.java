@@ -35,7 +35,7 @@ import com.terraforged.core.settings.Settings;
 import com.terraforged.core.tile.Size;
 import com.terraforged.core.tile.Tile;
 import com.terraforged.core.tile.gen.TileGenerator;
-import com.terraforged.core.util.PosUtil;
+import com.terraforged.core.util.pos.PosUtil;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import com.terraforged.noise.util.NoiseUtil;

@@ -24,9 +24,9 @@
 
 package com.terraforged.mod.feature.decorator;
 
-import com.terraforged.mod.feature.decorator.filter.FilterDecoratorConfig;
 import com.terraforged.api.feature.decorator.DecorationContext;
 import com.terraforged.mod.TerraForgedMod;
+import com.terraforged.mod.feature.decorator.filter.FilterDecoratorConfig;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.feature.WorldDecoratingHelper;
 

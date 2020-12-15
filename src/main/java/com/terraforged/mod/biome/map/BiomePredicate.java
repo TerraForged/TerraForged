@@ -82,6 +82,7 @@ public interface BiomePredicate {
         return false;
     }
 
+    BiomePredicate OCEAN = type(Biome.Category.OCEAN);
     BiomePredicate BEACH = type(Biome.Category.BEACH).or(name("beach"));
     BiomePredicate COAST = type(Biome.Category.MUSHROOM).or(name("coast"));
     BiomePredicate COLD_STEPPE = name("steppe").and(temp(-1, 0.3));
@@ -90,6 +91,7 @@ public interface BiomePredicate {
     BiomePredicate LAKE = type(Biome.Category.RIVER).and(name("lake"));
     BiomePredicate MESA = type(Biome.Category.MESA);
     BiomePredicate MOUNTAIN = type(Biome.Category.EXTREME_HILLS).or(name("mountain"));
+    BiomePredicate VOLCANO = name("volcano");
     BiomePredicate RIVER = type(Biome.Category.RIVER).not(LAKE);
     BiomePredicate SAVANNA = type(Biome.Category.SAVANNA).or(temp(0.8, 2).and(rain(-1, 0.4)));
     BiomePredicate STEPPE = name("steppe").and(temp(0.3, 1));

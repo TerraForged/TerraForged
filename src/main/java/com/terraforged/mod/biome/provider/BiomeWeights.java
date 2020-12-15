@@ -28,8 +28,10 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.config.ConfigManager;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
 
 import java.util.Comparator;
@@ -47,7 +49,7 @@ public class BiomeWeights {
     private final Map<ResourceLocation, Integer> biomes = new HashMap<>();
 
     public BiomeWeights(GameContext context) {
-        this(10, 5, 1, context);
+        this(10, 5, 2, context);
     }
 
     public BiomeWeights(int standard, int forest, int rare, GameContext context) {
@@ -76,9 +78,9 @@ public class BiomeWeights {
         if (value != null) {
             return value;
         }
-//        if (BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.RARE)) {
-//            return rareWeight;
-//        }
+        if (BiomeDictionary.getTypes(context.biomes.getKey(biome)).contains(BiomeDictionary.Type.RARE)) {
+            return rareWeight;
+        }
         if (biome.getCategory() == Biome.Category.FOREST) {
             return forestWeight;
         }

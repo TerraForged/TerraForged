@@ -52,6 +52,7 @@ public class SimpleBiomeMap implements BiomeMap {
     private final BiomeSet wetland;
     private final BiomeTypeSet land;
     private final BiomeSet mountains;
+    private final BiomeSet volcanoes;
     private final BiomeSet[] terrainBiomes;
 
     public SimpleBiomeMap(BiomeMapBuilder builder) {
@@ -63,6 +64,7 @@ public class SimpleBiomeMap implements BiomeMap {
         lake = new TemperatureSet(builder.lakes, DefaultBiomes.LAKE, builder.context);
         wetland = new WetlandSet(builder.wetlands, this, builder.context);
         mountains = new TemperatureSet(builder.mountains, DefaultBiomes.MOUNTAIN, builder.context);
+        volcanoes = new TemperatureSet(builder.volcanoes, DefaultBiomes.VOLCANOES, builder.context);
         land = new BiomeTypeSet(builder.map, DefaultBiomes.LAND, builder.context);
         terrainBiomes = new BiomeSet[TerrainCategory.values().length];
         terrainBiomes[TerrainCategory.SHALLOW_OCEAN.ordinal()] = shallowOcean;
@@ -144,6 +146,12 @@ public class SimpleBiomeMap implements BiomeMap {
     @Override
     public Biome getMountain(Cell cell) {
         return mountains.getBiome(cell);
+    }
+
+    @Nullable
+    @Override
+    public Biome getVolcano(Cell cell) {
+        return volcanoes.getBiome(cell);
     }
 
     @Override

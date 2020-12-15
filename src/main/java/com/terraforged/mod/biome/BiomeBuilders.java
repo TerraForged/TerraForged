@@ -188,7 +188,7 @@ public class BiomeBuilders {
     public static BiomeBuilder stoneForest() {
         BiomeBuilder builder = BiomeUtils.getBuilder(Biomes.JUNGLE);
         builder.type(BiomeManager.BiomeType.WARM);
-        builder.weight(1);
+        builder.weight(2);
         return builder;
     }
 

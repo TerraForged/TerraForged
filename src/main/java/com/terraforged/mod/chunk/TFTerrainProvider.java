@@ -22,21 +22,23 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.chunk.test;
+package com.terraforged.mod.chunk;
 
-import com.terraforged.core.concurrent.task.LazySupplier;
-import com.terraforged.mod.chunk.TerraContext;
+import com.terraforged.core.cell.Populator;
+import com.terraforged.mod.util.setup.SetupHooks;
 import com.terraforged.world.GeneratorContext;
-import com.terraforged.world.WorldGeneratorFactory;
+import com.terraforged.world.heightmap.RegionConfig;
+import com.terraforged.world.terrain.provider.StandardTerrainProvider;
 
-public class TestTerraContext extends TerraContext {
+public class TFTerrainProvider extends StandardTerrainProvider {
 
-    public TestTerraContext(TerraContext context) {
-        super(context, context.gameContext);
+    public TFTerrainProvider(GeneratorContext context, RegionConfig config, Populator defaultPopulator) {
+        super(context, config, defaultPopulator);
     }
 
     @Override
-    protected LazySupplier<WorldGeneratorFactory> createFactory(GeneratorContext context) {
-        return LazySupplier.of(() -> new WorldGeneratorFactory(context, new TestHeightMap(context)));
+    public void init() {
+        super.init();
+        SetupHooks.setup(this, getContext().copy());
     }
 }

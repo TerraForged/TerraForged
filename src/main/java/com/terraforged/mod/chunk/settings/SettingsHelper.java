@@ -31,7 +31,6 @@ import com.google.gson.JsonParser;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.world.storage.ServerWorldInfo;
 
 import java.io.*;
 

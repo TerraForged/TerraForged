@@ -27,9 +27,9 @@ package com.terraforged.mod.client.gui.screen.preview;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
+import com.terraforged.mod.client.gui.element.TFButton;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
 import com.terraforged.mod.client.gui.screen.page.UpdatablePage;
-import com.terraforged.mod.client.gui.element.TFButton;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;
 

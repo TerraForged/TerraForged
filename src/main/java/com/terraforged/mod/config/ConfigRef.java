@@ -27,12 +27,13 @@ package com.terraforged.mod.config;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.terraforged.mod.Log;
 
+import java.util.concurrent.locks.StampedLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ConfigRef implements Supplier<CommentedFileConfig> {
 
-    private final Object lock = new Object();
+    private final StampedLock lock = new StampedLock();
     private final Supplier<CommentedFileConfig> factory;
 
     private CommentedFileConfig ref;
@@ -43,22 +44,39 @@ public class ConfigRef implements Supplier<CommentedFileConfig> {
 
     @Override
     public CommentedFileConfig get() {
-        synchronized (lock) {
+        long read = lock.readLock();
+        try {
             if (ref != null) {
                 Log.info("Loading config: {}", ref.getFile().getName());
                 ref.load();
                 return ref;
             }
+        } finally {
+            lock.unlockRead(read);
+        }
+
+        long write = lock.writeLock();
+        try {
+            if (ref != null) {
+                return ref;
+            }
             return ref = factory.get();
+        } finally {
+            lock.unlockWrite(write);
         }
     }
 
     public <T> void getValue(String name, T def, Consumer<T> consumer) {
-        synchronized (lock) {
-            CommentedFileConfig current = ref;
-            if (current != null) {
-                T value = current.getOrElse(name, def);
-                consumer.accept(value);
+        long read = lock.tryReadLock();
+        if (read != 0L) {
+            try {
+                CommentedFileConfig current = ref;
+                if (current != null) {
+                    T value = current.getOrElse(name, def);
+                    consumer.accept(value);
+                }
+            } finally {
+                lock.unlockRead(read);
             }
         }
     }

@@ -75,7 +75,7 @@ public class BiomeHelper {
                 builder.addBeach(biome, weight);
             } else if (BiomePredicate.COAST.test(data)) {
                 builder.addCoast(biome, weight);
-            } else if (biome.getCategory() == Biome.Category.OCEAN) {
+            } else if (BiomePredicate.OCEAN.test(data)) {
                 builder.addOcean(biome, weight);
             } else if (BiomePredicate.RIVER.test(data)) {
                 builder.addRiver(biome, weight);
@@ -83,6 +83,8 @@ public class BiomeHelper {
                 builder.addLake(biome, weight);
             } else if (BiomePredicate.WETLAND.test(data)) {
                 builder.addWetland(biome, weight);
+            } else if (BiomePredicate.VOLCANO.test(data)) {
+                builder.addVolcano(biome, weight);
             } else if (BiomePredicate.MOUNTAIN.test(data)) {
                 builder.addMountain(biome, weight);
             } else {

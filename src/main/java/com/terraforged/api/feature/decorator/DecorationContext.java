@@ -24,9 +24,9 @@
 
 package com.terraforged.api.feature.decorator;
 
+import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionDelegate;
-import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.world.heightmap.Levels;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ISeedReader;

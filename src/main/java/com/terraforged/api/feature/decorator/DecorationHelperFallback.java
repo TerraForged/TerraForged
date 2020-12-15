@@ -30,7 +30,6 @@ import net.minecraft.world.ISeedReader;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.feature.WorldDecoratingHelper;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 class DecorationHelperFallback {

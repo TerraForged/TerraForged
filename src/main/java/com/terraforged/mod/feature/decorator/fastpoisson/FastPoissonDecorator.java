@@ -24,10 +24,10 @@
 
 package com.terraforged.mod.feature.decorator.fastpoisson;
 
-import com.terraforged.mod.feature.decorator.ContextualDecorator;
 import com.terraforged.api.feature.decorator.DecorationContext;
 import com.terraforged.core.util.fastpoisson.FastPoisson;
 import com.terraforged.core.util.fastpoisson.FastPoissonContext;
+import com.terraforged.mod.feature.decorator.ContextualDecorator;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.feature.WorldDecoratingHelper;

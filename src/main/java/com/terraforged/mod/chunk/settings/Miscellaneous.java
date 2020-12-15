@@ -62,4 +62,11 @@ public class Miscellaneous {
     })
     @Range(min = 0F, max = 1F)
     public float mountainBiomeUsage = MountainModifier.MOUNTAIN_CHANCE;
+
+    @Comment({
+            "The probability that volcano terrain will be set to a volcano biome type.",
+            "This may help improve compatibility with mods that rely exclusively on volcano biomes."
+    })
+    @Range(min = 0F, max = 1F)
+    public float volcanoBiomeUsage = MountainModifier.MOUNTAIN_CHANCE;
 }

@@ -22,24 +22,47 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.chunk.test;
+package com.terraforged.mod.biome.modifier;
 
+import com.terraforged.api.biome.modifier.BiomeModifier;
+import com.terraforged.core.cell.Cell;
+import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
-import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
-import net.minecraft.world.gen.DimensionSettings;
+import net.minecraft.world.biome.Biome;
 
-public class TestChunkGenerator extends TFChunkGenerator {
+public class VolcanoModifier implements BiomeModifier {
 
-    private final TerraBiomeProvider biomeProvider;
+    // probability of mountain biome overriding others
+    private final float chance;
+    private final BiomeMap biomes;
 
-    public TestChunkGenerator(TerraContext context, TerraBiomeProvider biomeProvider, DimensionSettings settings) {
-        super(biomeProvider, settings);
-        this.biomeProvider = new TestBiomeProvider(context);
+    public VolcanoModifier(TerraContext context, BiomeMap biomes) {
+        this.biomes = biomes;
+        this.chance = context.terraSettings.miscellaneous.volcanoBiomeUsage;
     }
 
     @Override
-    public TerraBiomeProvider getBiomeProvider() {
-        return biomeProvider;
+    public int priority() {
+        return 0;
+    }
+
+    @Override
+    public boolean exitEarly() {
+        return true;
+    }
+
+    @Override
+    public boolean test(Biome biome, Cell cell) {
+        return cell.terrain.isVolcano() && cell.terrainRegionId < chance;
+    }
+
+    @Override
+    public Biome modify(Biome in, Cell cell, int x, int z) {
+        Biome volcano = biomes.getVolcano(cell);
+        if (TerraBiomeProvider.isValidBiome(volcano)) {
+            return volcano;
+        }
+        return in;
     }
 }

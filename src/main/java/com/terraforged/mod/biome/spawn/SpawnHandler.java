@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.biome.spawn;
 
-import com.terraforged.core.util.PosUtil;
+import com.terraforged.core.util.pos.PosUtil;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.world.continent.SpawnType;

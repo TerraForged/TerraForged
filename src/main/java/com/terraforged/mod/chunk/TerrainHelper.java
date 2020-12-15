@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.feature;
+package com.terraforged.mod.chunk;
 
 import com.google.common.collect.ImmutableSet;
 import com.terraforged.noise.util.NoiseUtil;
@@ -47,6 +47,7 @@ import java.util.Set;
 public class TerrainHelper {
 
     private static final List<Structure<?>> ILLAGER_STRUCTURES = Structure.field_236384_t_;
+
     private static final Set<IStructurePieceType> SURFACE_STRUCTURES = ImmutableSet.of(
             IStructurePieceType.field_242786_ad, // village
             IStructurePieceType.TEJP, // jungle temple
@@ -54,25 +55,24 @@ public class TerrainHelper {
             IStructurePieceType.TEDP // desert pyramid
     );
 
-    private final float radius;
+    private final float radiusScale;
     private final float overhang;
     private final float overhang2;
 
     // base - the size of the base built up around a piece as a percentage of its bounding box size
     // overhang - the amount of overhead overhang to be cut out
     public TerrainHelper(float base, float cutout) {
-        this.radius = base;
+        this.radiusScale = base;
         this.overhang = cutout;
         this.overhang2 = cutout * cutout;
     }
 
     public void flatten(IWorld world, IChunk chunk) {
-        ObjectList<StructurePiece> pieces = new ObjectArrayList<>(10);
+        ObjectList<StructurePiece> pieces = new ObjectArrayList<>(16);
         collectPieces(world, chunk, pieces);
         buildBases(chunk, pieces);
     }
 
-    // see NoiseChunkGenerator
     private void collectPieces(IWorld world, IChunk chunk, ObjectList<StructurePiece> pieces) {
         ChunkPos pos = chunk.getPos();
         for (Structure<?> structure : ILLAGER_STRUCTURES) {
@@ -103,8 +103,10 @@ public class TerrainHelper {
     private void buildBases(IChunk chunk, ObjectList<StructurePiece> pieces) {
         int chunkStartX = chunk.getPos().getXStart();
         int chunkStartZ = chunk.getPos().getZStart();
-        BlockPos.Mutable pos = new BlockPos.Mutable();
         ObjectListIterator<StructurePiece> iterator = pieces.iterator();
+
+        BlockPos.Mutable mutablePos = new BlockPos.Mutable();
+        MutableBoundingBox mutableBounds = new MutableBoundingBox();
         MutableBoundingBox chunkBounds = new MutableBoundingBox(chunkStartX, chunkStartZ, chunkStartX + 15, chunkStartZ + 15);
 
         for (int dz = 0; dz < 16; dz++) {
@@ -120,16 +122,16 @@ public class TerrainHelper {
                     StructurePiece piece = iterator.next();
                     MutableBoundingBox pieceBounds = piece.getBoundingBox();
                     int length = Math.min(pieceBounds.maxX - pieceBounds.minX, pieceBounds.maxZ - pieceBounds.minZ);
-                    int borderRadius = Math.min(5, Math.max(10, NoiseUtil.round(length * radius)));
-                    MutableBoundingBox expanded = expand(pieceBounds, borderRadius);
-                    if (!expanded.intersectsWith(chunkBounds)) {
+                    int borderRadius = Math.min(5, Math.max(15, NoiseUtil.round(length * radiusScale)));
+
+                    if (!intersects(chunkBounds, pieceBounds, mutableBounds, borderRadius)) {
                         continue;
                     }
 
                     int offset = getGroundLevelDelta(piece);
                     int level = pieceBounds.minY + offset;
                     if (level > y) {
-                        y = raise(pieceBounds, pos.setPos(x, surface, z), level, y, borderRadius);
+                        y = raise(pieceBounds, mutablePos.setPos(x, surface, z), level, y, borderRadius);
                     }
 
                     if (x > pieceBounds.minX && x < pieceBounds.maxX && z > pieceBounds.minZ && z < pieceBounds.maxZ) {
@@ -146,8 +148,8 @@ public class TerrainHelper {
                 if (y > surface) {
                     int delta = (int) y - surface;
                     for (int dy = 0; dy < delta; dy++) {
-                        pos.setPos(dx, surface + dy, dz);
-                        chunk.setBlockState(pos, Blocks.STONE.getDefaultState(), false);
+                        mutablePos.setPos(dx, surface + dy, dz);
+                        chunk.setBlockState(mutablePos, Blocks.STONE.getDefaultState(), false);
                     }
                 }
 
@@ -169,18 +171,32 @@ public class TerrainHelper {
                     }
 
                     for (int dy = minY; dy <= maxY; dy++) {
-                        pos.setPos(dx, dy, dz);
-                        chunk.setBlockState(pos, Blocks.AIR.getDefaultState(), false);
+                        mutablePos.setPos(dx, dy, dz);
+                        chunk.setBlockState(mutablePos, Blocks.AIR.getDefaultState(), false);
                     }
                 }
             }
         }
     }
 
+    private static boolean intersects(MutableBoundingBox chunk, MutableBoundingBox structure, MutableBoundingBox util, int radius) {
+        expand(chunk, util, radius);
+        return structure.intersectsWith(chunk);
+    }
+
+    private static void expand(MutableBoundingBox src, MutableBoundingBox dest, int radius) {
+        dest.minY = src.minY;
+        dest.maxY = src.maxY;
+        dest.minX = src.minX - radius;
+        dest.minZ = src.minZ - radius;
+        dest.maxX = src.maxX + radius;
+        dest.maxZ = src.maxZ + radius;
+    }
+
     private float raise(MutableBoundingBox bounds, BlockPos.Mutable pos, float level, float surface, int borderRadius) {
         float radius2 = Math.max(1, borderRadius * borderRadius);
-        float alpha = 1 - getDistAlpha(pos.getX(), pos.getZ(), bounds, radius2);
-        alpha = (float) Math.pow(alpha, 2F - alpha);
+        float distAlpha = 1 - getDistAlpha(pos.getX(), pos.getZ(), bounds, radius2);
+        float alpha = NoiseUtil.pow(distAlpha, 2F - distAlpha);
         return NoiseUtil.lerp(surface, level, alpha);
     }
 
@@ -209,17 +225,6 @@ public class TerrainHelper {
             return ((AbstractVillagePiece) piece).getGroundLevelDelta();
         }
         return 0;
-    }
-
-    private static MutableBoundingBox expand(MutableBoundingBox box, int radius) {
-        return new MutableBoundingBox(
-                box.minX - radius,
-                box.minY,
-                box.minZ - radius,
-                box.maxX + radius,
-                box.maxY,
-                box.maxZ + radius
-        );
     }
 
     private static float getDistAlpha(int x, int z, MutableBoundingBox box, float radius2) {

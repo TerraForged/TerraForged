@@ -34,8 +34,8 @@ import com.terraforged.core.tile.gen.TileCache;
 import com.terraforged.core.tile.gen.TileGenerator;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.Log;
-import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.biome.TFBiomeContainer;
+import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.config.PerfDefaults;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.world.GeneratorContext;
@@ -62,7 +62,7 @@ public class TerraContext extends GeneratorContext {
     }
 
     public TerraContext(TerraSettings settings, GameContext gameContext) {
-        super(settings, TerraTerrainProvider::new, TerraContext::createCache);
+        super(settings, TFTerrainProvider::new, TerraContext::createCache);
         this.worldSeed = settings.world.seed;
         this.gameContext = gameContext;
         this.terraSettings = settings;
