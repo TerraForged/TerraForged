@@ -146,8 +146,7 @@ static def getClassifier() {
     if (System.getenv("GIT_TAG_NAME") != null) {
         return ""
     }
-//    return "-SNAPSHOT"
-    return ""
+    return "-SNAPSHOT"
 }
 
 static def getBuildNumber() {
@@ -158,7 +157,7 @@ static def getBuildNumber() {
     // append build number on mod manifest
     def buildNumber = System.getenv("BUILD_NUMBER")
     if (buildNumber != null) {
-//        return "-${buildNumber}"
+        return "-${buildNumber}"
     }
     return ""
 }
