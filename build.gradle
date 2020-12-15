@@ -106,7 +106,7 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 processResources {
     filesMatching("**/mods.toml") {
         // replaces the version string in the mods.toml
-        expand("version": "${mod_version}${getClassifier()}", "mc_version": mc_version)
+        expand("version": "${mod_version}${getBuildNumber()}", "mc_version": mc_version)
     }
 }
 
@@ -131,21 +131,30 @@ publishing {
     if (System.getenv("MAVEN_USER") != null && System.getenv("MAVEN_PASS") != null) {
         repositories {
             maven {
+                url = "https://io.terraforged.com/repository/maven/"
                 credentials {
                     username System.getenv("MAVEN_USER")
                     password System.getenv("MAVEN_PASS")
                 }
-                name = "nexus"
-                url = "https://io.terraforged.com/repository/maven/"
             }
         }
     }
 }
 
 static def getClassifier() {
+    // not snapshot if building a release jar
     if (System.getenv("GIT_TAG_NAME") != null) {
         return ""
     }
+    return "SNAPSHOT"
+}
+
+static def getBuildNumber() {
+    // ignore build number if building a release jar
+    if (System.getenv("GIT_TAG_NAME") != null) {
+        return ""
+    }
+    // append build number on mod manifest
     def buildNumber = System.getenv("BUILD_NUMBER")
     if (buildNumber != null) {
         return "-${buildNumber}"
