@@ -146,7 +146,7 @@ static def getClassifier() {
     if (System.getenv("GIT_TAG_NAME") != null) {
         return ""
     }
-    return "SNAPSHOT"
+    return "-SNAPSHOT"
 }
 
 static def getBuildNumber() {
