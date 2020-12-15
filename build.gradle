@@ -35,7 +35,8 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
     lib(project(":FeatureManager")) { transitive false }
-    lib(project(":Engine"))
+//    lib(project(":Engine"))
+    lib "com.terraforged:Engine:0.1.0"
 }
 
 minecraft {
@@ -97,6 +98,11 @@ task collectLibs(type: Copy) {
     duplicatesStrategy = "EXCLUDE"
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
 processResources {
     filesMatching("**/mods.toml") {
         // replaces the version string in the mods.toml
@@ -118,6 +124,7 @@ publishing {
         // publish the mod jar & api jar
         mavenJava(MavenPublication) {
             artifact jar
+            artifact sourcesJar
         }
     }
 
