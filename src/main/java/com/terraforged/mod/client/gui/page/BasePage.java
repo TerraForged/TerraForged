@@ -32,6 +32,10 @@ public abstract class BasePage extends Page {
         super(4, 0, 0.7F, 0.3F);
     }
 
+    public BasePage(float... sizes) {
+        super(4, 0, sizes);
+    }
+
     public void callback(Runnable runnable) {
         changeListener = runnable;
     }

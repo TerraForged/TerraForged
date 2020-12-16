@@ -28,8 +28,10 @@ import com.terraforged.fm.data.FolderDataPackFinder;
 import com.terraforged.fm.data.ModDataPackFinder;
 import com.terraforged.mod.LevelType;
 import com.terraforged.mod.Log;
-import com.terraforged.mod.client.gui.screen.ConfigScreen;
+import com.terraforged.mod.client.gui.screen.DemoScreen;
+import com.terraforged.mod.util.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.BiomeGeneratorTypeScreens;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ForgeWorldTypeScreens;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -55,6 +57,13 @@ public class ClientEvents {
             minecraft.getResourcePackList().reloadPacksFromFinders();
         });
 
-        ForgeWorldTypeScreens.registerFactory(LevelType.TERRAFORGED, ConfigScreen::new);
+        ForgeWorldTypeScreens.registerFactory(LevelType.TERRAFORGED, DemoScreen::new);
+    }
+
+    private static BiomeGeneratorTypeScreens.IFactory getFactory() {
+        if (Environment.isDev()) {
+//            return ConfigScreen::new;
+        }
+        return DemoScreen::new;
     }
 }

@@ -24,8 +24,6 @@
 
 package com.terraforged.mod.util;
 
-import com.terraforged.mod.Log;
-
 public class Environment {
 
     private static final boolean dev = System.getProperty("dev") != null;
@@ -38,22 +36,10 @@ public class Environment {
     }
 
     public static boolean isVerbose() {
-        return dev || !verbose;
-    }
-
-    public static boolean profile() {
-        return true;
+        return dev || verbose;
     }
 
     public static boolean isVanillaBiomes() {
         return vanillaBiomes;
-    }
-
-    static {
-        if (dev) {
-            Log.info("Running in developer mode!");
-        } else {
-            throw new IllegalStateException();
-        }
     }
 }

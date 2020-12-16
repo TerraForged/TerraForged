@@ -53,7 +53,7 @@ minecraft {
             workingDirectory project.file("run/client")
             property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
             property "forge.logging.console.level", "debug"
-            jvmArgs "-Xmx8G", "-Xms6G", "-Ddev", "-DvanillaBiomes", "-Dfml.earlyprogresswindow=false"
+            jvmArgs "-Xmx8G", "-Xms6G", "-Ddev", "-Dfml.earlyprogresswindow=false"
             arg "-mixin.config=mixin.terraforged.json"
             mods {
                 terraforged {
@@ -65,7 +65,7 @@ minecraft {
             workingDirectory project.file("run/server")
             property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
             property "forge.logging.console.level", "debug"
-            jvmArgs "-Xmx8G", "-Xms6G", "-Ddev", "-DvanillaBiomes"
+            jvmArgs "-Xmx8G", "-Xms6G", "-Ddev"
             arg "-mixin.config=mixin.terraforged.json"
             mods {
                 terraforged {
@@ -114,7 +114,7 @@ task collectLibs(type: Copy) {
 processResources {
     filesMatching("**/mods.toml") {
         // replaces the version string in the mods.toml
-        expand("version": "${mod_version}${getBuildNumber()}", "mc_version": mc_version)
+        expand("version": "${mod_version}${getClassifier()}", "mc_version": mc_version)
     }
 }
 
@@ -169,11 +169,11 @@ publishing {
     }
 }
 
-static def getClassifier() {
+def getClassifier() {
     if (System.getenv("GIT_TAG_NAME") != null) {
         return ""
     }
-    return "-SNAPSHOT"
+    return "-${release_version}"
 }
 
 static def getBuildNumber() {

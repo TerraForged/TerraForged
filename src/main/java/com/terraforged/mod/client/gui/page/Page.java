@@ -117,10 +117,10 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
         int pageWidth = parent.width - (marginH * 2);
         int pageHeight = parent.height;
         for (int i = 0; i < columns.length; i++) {
-            int columnWidth = Math.round(sizes[i] * pageWidth) - (2 * hpad);
+            int columnWidth = Math.max(0, Math.round(sizes[i] * pageWidth) - (2 * hpad));
             Column column = new Column(left, top, columnWidth, pageHeight, hpad, vpad);
             columns[i] = column;
-            left += columnWidth + (2 * hpad);
+            left += columnWidth > 0 ? columnWidth + (2 * hpad) : 0;
         }
         init(parent);
     }

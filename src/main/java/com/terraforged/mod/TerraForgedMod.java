@@ -41,6 +41,7 @@ import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
@@ -72,7 +73,7 @@ public class TerraForgedMod {
         Log.info("Common setup");
         TerraCommand.init();
         ConfigManager.init();
-        SettingsHelper.init();
+//        SettingsHelper.init();
 
         event.enqueueWork(() -> {
             GameContext context = new GameContext(DynamicRegistries.func_239770_b_());
@@ -88,5 +89,11 @@ public class TerraForgedMod {
             Log.info("Tags Reloaded");
             WGTags.printTags();
         }
+    }
+
+    public static String getVersion() {
+        return ModList.get().getModContainerById(MODID)
+                .map(mod -> "TF-" + mod.getModInfo().getVersion().toString())
+                .orElse("TF-????");
     }
 }

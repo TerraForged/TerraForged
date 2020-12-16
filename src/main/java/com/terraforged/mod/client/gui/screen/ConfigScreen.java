@@ -255,7 +255,7 @@ public class ConfigScreen extends OverlayScreen {
         return pageIndex > 0;
     }
 
-    private static int getSeed(CreateWorldScreen screen) {
+    protected static int getSeed(CreateWorldScreen screen) {
         TextFieldWidget field = getWidget(screen);
         if (field != null && !field.getText().isEmpty()) {
             try {
@@ -268,7 +268,7 @@ public class ConfigScreen extends OverlayScreen {
         return -1;
     }
 
-    private static TerraSettings getInitialSettings(DimensionGeneratorSettings level) {
+    protected static TerraSettings getInitialSettings(DimensionGeneratorSettings level) {
         if (level.func_236225_f_() instanceof TFChunkGenerator) {
             TerraContext context = ((TFChunkGenerator) level.func_236225_f_()).getContext();
             return context.terraSettings;
@@ -276,7 +276,7 @@ public class ConfigScreen extends OverlayScreen {
         throw new IllegalStateException("Not a TerraForged generator :[");
     }
 
-    private static void setSeed(CreateWorldScreen screen, int seed) {
+    protected static void setSeed(CreateWorldScreen screen, int seed) {
         TextFieldWidget field = getWidget(screen);
         if (field != null) {
             field.setText("" + seed);

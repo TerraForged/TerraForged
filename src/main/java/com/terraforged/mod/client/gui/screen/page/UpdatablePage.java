@@ -32,6 +32,14 @@ import java.util.function.Consumer;
 
 public class UpdatablePage extends BasePage {
 
+    public UpdatablePage() {
+        super();
+    }
+
+    public UpdatablePage(float... sizes) {
+        super(sizes);
+    }
+
     @Override
     public void save() {
 

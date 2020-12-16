@@ -126,8 +126,6 @@ public class Preview extends Button {
         updateLegend(mx, my);
 
         renderLegend(matrixStack, mx, my, labels, values, x, y + width, 10, 0xFFFFFF);
-
-
     }
 
     public void update(Settings settings, CompoundNBT prevSettings) {

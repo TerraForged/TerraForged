@@ -37,6 +37,7 @@ import java.util.function.Consumer;
 
 public class PreviewPage extends UpdatablePage {
 
+    private final boolean demo;
     private final Preview preview;
     private final TerraSettings settings;
     private final CompoundNBT previewerSettings = NBTHelper.serialize("preview", new PreviewSettings());
@@ -44,6 +45,14 @@ public class PreviewPage extends UpdatablePage {
     public PreviewPage(TerraSettings settings, int seed) {
         this.preview = new Preview(seed);
         this.settings = settings;
+        this.demo = false;
+    }
+
+    public PreviewPage(TerraSettings settings, int seed, boolean demo) {
+        super(0, 1.0F, 0);
+        this.preview = new Preview(seed);
+        this.settings = settings;
+        this.demo = demo;
     }
 
     public Preview getPreviewWidget() {
@@ -73,7 +82,9 @@ public class PreviewPage extends UpdatablePage {
         preview.setWidth(Preview.SIZE);
         preview.setHeight(Preview.SIZE);
 
-        addElements(right.left, right.top, right, previewerSettings, right.scrollPane::addButton, this::update);
+        if (!demo) {
+            addElements(right.left, right.top, right, previewerSettings, right.scrollPane::addButton, this::update);
+        }
 
         right.scrollPane.addButton(new TFButton(GuiKeys.PREVIEW_SEED.get()) {
             @Override
