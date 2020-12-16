@@ -27,12 +27,12 @@ package com.terraforged.mod.biome.surface;
 import com.terraforged.api.biome.surface.MaskedSurface;
 import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.api.material.state.States;
-import com.terraforged.core.cell.Cell;
+import com.terraforged.engine.cell.Cell;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
 import com.terraforged.noise.util.NoiseUtil;
-import com.terraforged.world.heightmap.Levels;
+import com.terraforged.engine.world.heightmap.Levels;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 

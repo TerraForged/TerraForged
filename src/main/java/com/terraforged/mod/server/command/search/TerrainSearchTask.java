@@ -24,9 +24,9 @@
 
 package com.terraforged.mod.server.command.search;
 
-import com.terraforged.core.cell.Cell;
-import com.terraforged.world.WorldGenerator;
-import com.terraforged.world.terrain.Terrain;
+import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.world.WorldGenerator;
+import com.terraforged.engine.world.terrain.Terrain;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.ChunkGenerator;
 

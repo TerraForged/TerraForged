@@ -27,11 +27,11 @@ package com.terraforged.mod.biome.map.set;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.terraforged.core.cell.Cell;
+import com.terraforged.engine.cell.Cell;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.map.defaults.DefaultBiome;
 import com.terraforged.noise.util.NoiseUtil;
-import com.terraforged.world.biome.BiomeType;
+import com.terraforged.engine.world.climate.biome.BiomeType;
 import net.minecraft.world.biome.Biome;
 
 import java.util.List;

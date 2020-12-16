@@ -24,11 +24,11 @@
 
 package com.terraforged.mod.biome.modifier;
 
-import com.terraforged.core.Seed;
-import com.terraforged.core.cell.Cell;
+import com.terraforged.engine.Seed;
+import com.terraforged.engine.cell.Cell;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
-import com.terraforged.world.climate.Climate;
+import com.terraforged.engine.world.climate.Climate;
 import net.minecraft.world.biome.Biome;
 
 public abstract class AbstractMaxHeightModifier extends AbstractOffsetModifier {

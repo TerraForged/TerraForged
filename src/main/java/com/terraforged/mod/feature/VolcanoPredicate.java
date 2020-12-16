@@ -24,13 +24,13 @@
 
 package com.terraforged.mod.feature;
 
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.tile.chunk.ChunkReader;
+import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.fm.predicate.FeaturePredicate;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
-import com.terraforged.world.heightmap.Levels;
+import com.terraforged.engine.world.heightmap.Levels;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunk;
 

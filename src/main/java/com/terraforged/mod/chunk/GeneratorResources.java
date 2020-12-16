@@ -26,7 +26,7 @@ package com.terraforged.mod.chunk;
 
 import com.terraforged.api.biome.surface.SurfaceManager;
 import com.terraforged.api.chunk.column.ColumnDecorator;
-import com.terraforged.core.tile.gen.TileCache;
+import com.terraforged.engine.tile.gen.TileCache;
 import com.terraforged.fm.FeatureManager;
 import com.terraforged.fm.data.DataManager;
 import com.terraforged.fm.structure.FMStructureManager;

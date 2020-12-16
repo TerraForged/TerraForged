@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.feature.decorator.fastpoisson;
 
-import com.terraforged.core.concurrent.cache.SafeCloseable;
+import com.terraforged.engine.concurrent.cache.SafeCloseable;
 import com.terraforged.mod.feature.decorator.poisson.BiomeVariance;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.util.NoiseUtil;

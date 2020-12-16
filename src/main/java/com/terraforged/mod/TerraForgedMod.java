@@ -26,7 +26,7 @@ package com.terraforged.mod;
 
 import com.terraforged.api.material.WGTags;
 import com.terraforged.api.registry.Registries;
-import com.terraforged.core.Engine;
+import com.terraforged.engine.Engine;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;

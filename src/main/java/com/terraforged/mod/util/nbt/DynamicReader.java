@@ -30,8 +30,8 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
-import com.terraforged.core.serialization.serializer.Deserializer;
-import com.terraforged.core.serialization.serializer.Reader;
+import com.terraforged.engine.serialization.serializer.Deserializer;
+import com.terraforged.engine.serialization.serializer.Reader;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.NBTDynamicOps;
 

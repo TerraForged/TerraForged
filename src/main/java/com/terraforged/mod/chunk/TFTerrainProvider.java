@@ -24,11 +24,11 @@
 
 package com.terraforged.mod.chunk;
 
-import com.terraforged.core.cell.Populator;
+import com.terraforged.engine.cell.Populator;
 import com.terraforged.mod.util.setup.SetupHooks;
-import com.terraforged.world.GeneratorContext;
-import com.terraforged.world.heightmap.RegionConfig;
-import com.terraforged.world.terrain.provider.StandardTerrainProvider;
+import com.terraforged.engine.world.GeneratorContext;
+import com.terraforged.engine.world.heightmap.RegionConfig;
+import com.terraforged.engine.world.terrain.provider.StandardTerrainProvider;
 
 public class TFTerrainProvider extends StandardTerrainProvider {
 

@@ -24,7 +24,7 @@
 
 package com.terraforged.api.material.geology;
 
-import com.terraforged.world.geology.Strata;
+import com.terraforged.engine.world.geology.Strata;
 import net.minecraft.block.BlockState;
 
 public interface StrataGenerator {

@@ -26,7 +26,7 @@ package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.api.chunk.column.ColumnDecorator;
 import com.terraforged.api.chunk.column.DecoratorContext;
-import com.terraforged.core.tile.chunk.ChunkReader;
+import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.fm.biome.BiomeFeature;
 import com.terraforged.fm.biome.BiomeFeatures;
 import com.terraforged.fm.util.identity.Identity;

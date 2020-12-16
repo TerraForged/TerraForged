@@ -29,7 +29,7 @@ import com.terraforged.api.biome.surface.SurfaceContext;
 import com.terraforged.api.material.state.States;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
-import com.terraforged.world.GeneratorContext;
+import com.terraforged.engine.world.GeneratorContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.Heightmap;

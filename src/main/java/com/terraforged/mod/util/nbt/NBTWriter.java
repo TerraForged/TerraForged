@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.util.nbt;
 
-import com.terraforged.core.serialization.serializer.AbstractWriter;
+import com.terraforged.engine.serialization.serializer.AbstractWriter;
 import net.minecraft.nbt.*;
 import net.minecraftforge.common.util.Constants;
 

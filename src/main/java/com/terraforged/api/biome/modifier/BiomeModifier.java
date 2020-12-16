@@ -24,7 +24,7 @@
 
 package com.terraforged.api.biome.modifier;
 
-import com.terraforged.core.cell.Cell;
+import com.terraforged.engine.cell.Cell;
 import net.minecraft.world.biome.Biome;
 
 public interface BiomeModifier extends Comparable<BiomeModifier> {

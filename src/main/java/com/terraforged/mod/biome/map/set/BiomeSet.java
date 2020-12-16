@@ -25,7 +25,7 @@
 package com.terraforged.mod.biome.map.set;
 
 import com.google.gson.JsonElement;
-import com.terraforged.core.cell.Cell;
+import com.terraforged.engine.cell.Cell;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.map.defaults.DefaultBiome;
 import com.terraforged.mod.util.ListUtils;

@@ -25,13 +25,13 @@
 package com.terraforged.mod.biome.modifier;
 
 import com.terraforged.api.biome.modifier.BiomeModifier;
-import com.terraforged.core.cell.Cell;
+import com.terraforged.engine.cell.Cell;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
-import com.terraforged.world.biome.BiomeType;
-import com.terraforged.world.terrain.TerrainCategory;
+import com.terraforged.engine.world.climate.biome.BiomeType;
+import com.terraforged.engine.world.terrain.TerrainCategory;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 

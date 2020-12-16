@@ -25,9 +25,9 @@
 package com.terraforged.mod.feature.decorator.poisson;
 
 import com.terraforged.api.feature.decorator.DecorationContext;
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.concurrent.cache.SafeCloseable;
-import com.terraforged.core.tile.chunk.ChunkReader;
+import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.concurrent.cache.SafeCloseable;
+import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
 import net.minecraft.util.math.ChunkPos;

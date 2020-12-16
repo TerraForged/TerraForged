@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.chunk.generator;
 
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.tile.chunk.ChunkReader;
+import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.fm.template.StructureUtils;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.ChunkCarverFix;

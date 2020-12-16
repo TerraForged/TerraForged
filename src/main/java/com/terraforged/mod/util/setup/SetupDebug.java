@@ -25,11 +25,11 @@
 package com.terraforged.mod.util.setup;
 
 import com.terraforged.api.event.SetupEvent;
-import com.terraforged.core.Seed;
+import com.terraforged.engine.Seed;
 import com.terraforged.mod.Log;
 import com.terraforged.noise.Source;
 import com.terraforged.noise.source.Builder;
-import com.terraforged.world.geology.Strata;
+import com.terraforged.engine.world.geology.Strata;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.world.biome.Biomes;

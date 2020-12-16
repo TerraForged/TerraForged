@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.server.command.search;
 
-import com.terraforged.core.cell.Cell;
+import com.terraforged.engine.cell.Cell;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;

@@ -24,9 +24,9 @@
 
 package com.terraforged.mod.client.gui.screen.preview;
 
-import com.terraforged.core.cell.Cell;
+import com.terraforged.engine.cell.Cell;
 import com.terraforged.noise.util.NoiseUtil;
-import com.terraforged.world.heightmap.Levels;
+import com.terraforged.engine.world.heightmap.Levels;
 
 import java.awt.*;
 

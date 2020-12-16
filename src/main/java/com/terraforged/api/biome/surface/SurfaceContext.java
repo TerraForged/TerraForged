@@ -26,8 +26,8 @@ package com.terraforged.api.biome.surface;
 
 import com.terraforged.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.biome.TFBiomeContainer;
-import com.terraforged.world.climate.Climate;
-import com.terraforged.world.heightmap.Levels;
+import com.terraforged.engine.world.climate.Climate;
+import com.terraforged.engine.world.heightmap.Levels;
 import net.minecraft.block.BlockState;
 import net.minecraft.world.gen.DimensionSettings;
 

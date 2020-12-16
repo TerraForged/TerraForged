@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.biome.utils;
 
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.concurrent.Resource;
+import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.concurrent.Resource;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import net.minecraft.util.SharedSeedRandom;

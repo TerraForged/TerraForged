@@ -24,14 +24,14 @@
 
 package com.terraforged.mod.feature.context;
 
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.concurrent.Resource;
-import com.terraforged.core.concurrent.cache.SafeCloseable;
-import com.terraforged.core.concurrent.pool.ObjectPool;
-import com.terraforged.core.tile.chunk.ChunkReader;
+import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.concurrent.Resource;
+import com.terraforged.engine.concurrent.cache.SafeCloseable;
+import com.terraforged.engine.concurrent.pool.ObjectPool;
+import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionDelegate;
-import com.terraforged.world.heightmap.Levels;
+import com.terraforged.engine.world.heightmap.Levels;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;

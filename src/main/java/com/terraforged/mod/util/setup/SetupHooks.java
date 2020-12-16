@@ -33,8 +33,8 @@ import com.terraforged.api.material.geology.GeologyManager;
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.fm.modifier.FeatureModifiers;
 import com.terraforged.fm.structure.FMStructureManager;
-import com.terraforged.world.GeneratorContext;
-import com.terraforged.world.terrain.provider.TerrainProvider;
+import com.terraforged.engine.world.GeneratorContext;
+import com.terraforged.engine.world.terrain.provider.TerrainProvider;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.util.List;

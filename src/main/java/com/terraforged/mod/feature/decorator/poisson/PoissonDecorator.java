@@ -25,7 +25,7 @@
 package com.terraforged.mod.feature.decorator.poisson;
 
 import com.terraforged.api.feature.decorator.DecorationContext;
-import com.terraforged.core.util.poisson.Poisson;
+import com.terraforged.engine.util.poisson.Poisson;
 import com.terraforged.mod.feature.decorator.ContextualDecorator;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;

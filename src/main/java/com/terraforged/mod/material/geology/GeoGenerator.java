@@ -28,7 +28,7 @@ import com.terraforged.api.material.geology.StrataConfig;
 import com.terraforged.api.material.geology.StrataGenerator;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.noise.Source;
-import com.terraforged.world.geology.Strata;
+import com.terraforged.engine.world.geology.Strata;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 

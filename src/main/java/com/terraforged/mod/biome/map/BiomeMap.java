@@ -25,11 +25,11 @@
 package com.terraforged.mod.biome.map;
 
 import com.google.gson.JsonElement;
-import com.terraforged.core.cell.Cell;
+import com.terraforged.engine.cell.Cell;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.map.set.BiomeTypeSet;
-import com.terraforged.world.biome.BiomeType;
-import com.terraforged.world.heightmap.Levels;
+import com.terraforged.engine.world.climate.biome.BiomeType;
+import com.terraforged.engine.world.heightmap.Levels;
 import net.minecraft.world.biome.Biome;
 
 import javax.annotation.Nullable;

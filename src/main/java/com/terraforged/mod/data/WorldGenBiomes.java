@@ -30,7 +30,7 @@ import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.mod.biome.provider.BiomeWeights;
-import com.terraforged.world.biome.BiomeType;
+import com.terraforged.engine.world.climate.biome.BiomeType;
 import net.minecraft.util.ResourceLocation;
 
 import java.io.*;

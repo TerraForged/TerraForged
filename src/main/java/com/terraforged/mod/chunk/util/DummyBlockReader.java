@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.chunk.util;
 
-import com.terraforged.core.concurrent.Resource;
-import com.terraforged.core.concurrent.pool.ObjectPool;
+import com.terraforged.engine.concurrent.Resource;
+import com.terraforged.engine.concurrent.pool.ObjectPool;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.fluid.FluidState;

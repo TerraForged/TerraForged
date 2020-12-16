@@ -25,8 +25,8 @@
 package com.terraforged.mod.biome.modifier;
 
 import com.terraforged.api.biome.modifier.BiomeModifier;
-import com.terraforged.core.cell.Cell;
-import com.terraforged.world.climate.Climate;
+import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.world.climate.Climate;
 import net.minecraft.world.biome.Biome;
 
 public abstract class AbstractOffsetModifier implements BiomeModifier {

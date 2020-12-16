@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.biome.map;
 
-import com.terraforged.world.biome.BiomeData;
+import com.terraforged.engine.world.climate.biome.BiomeData;
 import net.minecraft.world.biome.Biome;
 
 import java.util.function.BiPredicate;

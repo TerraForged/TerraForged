@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.biome.map.defaults;
 
-import com.terraforged.core.cell.Cell;
+import com.terraforged.engine.cell.Cell;
 import com.terraforged.fm.GameContext;
 import net.minecraft.world.biome.Biome;
 

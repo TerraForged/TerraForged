@@ -25,11 +25,11 @@
 package com.terraforged.api.chunk.column;
 
 import com.terraforged.api.chunk.ChunkContext;
-import com.terraforged.core.cell.Cell;
-import com.terraforged.core.concurrent.Resource;
-import com.terraforged.world.climate.Climate;
-import com.terraforged.world.geology.DepthBuffer;
-import com.terraforged.world.heightmap.Levels;
+import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.concurrent.Resource;
+import com.terraforged.engine.world.climate.Climate;
+import com.terraforged.engine.world.geology.DepthBuffer;
+import com.terraforged.engine.world.heightmap.Levels;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunk;

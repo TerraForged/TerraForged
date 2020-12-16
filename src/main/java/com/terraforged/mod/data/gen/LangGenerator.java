@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.data.gen;
 
-import com.terraforged.core.util.NameUtil;
+import com.terraforged.engine.util.NameUtil;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.chunk.settings.TerraSettings;

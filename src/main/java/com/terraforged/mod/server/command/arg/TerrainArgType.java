@@ -31,8 +31,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import com.terraforged.world.terrain.Terrain;
-import com.terraforged.world.terrain.TerrainType;
+import com.terraforged.engine.world.terrain.Terrain;
+import com.terraforged.engine.world.terrain.TerrainType;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.text.StringTextComponent;
 

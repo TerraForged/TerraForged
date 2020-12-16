@@ -24,10 +24,10 @@
 
 package com.terraforged.mod.biome.spawn;
 
-import com.terraforged.core.util.pos.PosUtil;
+import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
-import com.terraforged.world.continent.SpawnType;
+import com.terraforged.engine.world.continent.SpawnType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.Heightmap;

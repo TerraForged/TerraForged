@@ -26,8 +26,8 @@ package com.terraforged.mod.biome.provider;
 
 import com.terraforged.api.material.layer.LayerManager;
 import com.terraforged.api.material.layer.LayerMaterial;
-import com.terraforged.core.concurrent.Resource;
-import com.terraforged.core.concurrent.task.LazySupplier;
+import com.terraforged.engine.concurrent.Resource;
+import com.terraforged.engine.concurrent.task.LazySupplier;
 import com.terraforged.fm.GameContext;
 import com.terraforged.mod.chunk.util.DummyBlockReader;
 import com.terraforged.mod.material.Materials;

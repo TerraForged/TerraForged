@@ -29,7 +29,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.terraforged.api.feature.decorator.DecorationContext;
-import com.terraforged.core.util.poisson.PoissonContext;
+import com.terraforged.engine.util.poisson.PoissonContext;
 import com.terraforged.fm.util.codec.Codecs;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;

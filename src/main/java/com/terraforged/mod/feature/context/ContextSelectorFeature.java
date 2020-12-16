@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.feature.context;
 
-import com.terraforged.core.concurrent.Resource;
+import com.terraforged.engine.concurrent.Resource;
 import com.terraforged.mod.TerraForgedMod;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ISeedReader;

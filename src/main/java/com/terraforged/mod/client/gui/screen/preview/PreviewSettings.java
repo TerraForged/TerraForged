@@ -24,10 +24,10 @@
 
 package com.terraforged.mod.client.gui.screen.preview;
 
-import com.terraforged.core.serialization.annotation.Comment;
-import com.terraforged.core.serialization.annotation.NoName;
-import com.terraforged.core.serialization.annotation.Range;
-import com.terraforged.core.serialization.annotation.Serializable;
+import com.terraforged.engine.serialization.annotation.Comment;
+import com.terraforged.engine.serialization.annotation.NoName;
+import com.terraforged.engine.serialization.annotation.Range;
+import com.terraforged.engine.serialization.annotation.Serializable;
 
 @Serializable
 public class PreviewSettings {

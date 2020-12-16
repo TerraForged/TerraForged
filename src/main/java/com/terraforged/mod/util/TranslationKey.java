@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.util;
 
-import com.terraforged.core.util.NameUtil;
+import com.terraforged.engine.util.NameUtil;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;

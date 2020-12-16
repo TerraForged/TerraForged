@@ -28,7 +28,7 @@ import com.terraforged.fm.GameContext;
 import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.mod.biome.utils.TempCategory;
-import com.terraforged.world.biome.BiomeType;
+import com.terraforged.engine.world.climate.biome.BiomeType;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;

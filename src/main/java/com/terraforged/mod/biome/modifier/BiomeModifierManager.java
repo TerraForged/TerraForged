@@ -26,12 +26,12 @@ package com.terraforged.mod.biome.modifier;
 
 import com.terraforged.api.biome.modifier.BiomeModifier;
 import com.terraforged.api.biome.modifier.ModifierManager;
-import com.terraforged.core.cell.Cell;
+import com.terraforged.engine.cell.Cell;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.provider.DesertBiomes;
 import com.terraforged.mod.chunk.TerraContext;
-import com.terraforged.world.biome.BiomeType;
-import com.terraforged.world.heightmap.Levels;
+import com.terraforged.engine.world.climate.biome.BiomeType;
+import com.terraforged.engine.world.heightmap.Levels;
 import net.minecraft.world.biome.Biome;
 
 import java.util.ArrayList;

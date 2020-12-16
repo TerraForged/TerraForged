@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.feature.decorator.poisson;
 
-import com.terraforged.core.util.poisson.Poisson;
-import com.terraforged.core.util.poisson.PoissonContext;
+import com.terraforged.engine.util.poisson.Poisson;
+import com.terraforged.engine.util.poisson.PoissonContext;
 import com.terraforged.mod.chunk.util.ChunkBitSet;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ISeedReader;

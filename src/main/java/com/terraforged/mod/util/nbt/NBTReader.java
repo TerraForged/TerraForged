@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.util.nbt;
 
-import com.terraforged.core.serialization.serializer.Reader;
+import com.terraforged.engine.serialization.serializer.Reader;
 import net.minecraft.nbt.*;
 
 import java.util.Collection;

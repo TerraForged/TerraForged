@@ -29,7 +29,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.terraforged.api.feature.decorator.DecorationContext;
-import com.terraforged.core.tile.chunk.ChunkReader;
+import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.fm.util.codec.Codecs;
 import com.terraforged.mod.feature.decorator.poisson.BiomeVariance;
 import com.terraforged.noise.Module;
