@@ -28,8 +28,8 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
-import com.terraforged.fm.util.codec.CodecException;
-import com.terraforged.fm.util.codec.Codecs;
+import com.terraforged.mod.featuremanager.util.codec.CodecException;
+import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import net.minecraft.world.gen.placement.ConfiguredPlacement;
 import net.minecraft.world.gen.placement.IPlacementConfig;
 

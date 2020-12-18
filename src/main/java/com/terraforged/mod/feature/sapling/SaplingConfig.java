@@ -26,9 +26,9 @@ package com.terraforged.mod.feature.sapling;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.terraforged.fm.template.feature.TemplateFeatureConfig;
-import com.terraforged.fm.template.template.TemplateManager;
-import com.terraforged.fm.util.Json;
+import com.terraforged.mod.featuremanager.template.feature.TemplateFeatureConfig;
+import com.terraforged.mod.featuremanager.template.template.TemplateManager;
+import com.terraforged.mod.featuremanager.util.Json;
 import com.terraforged.mod.feature.BlockDataConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;

@@ -24,9 +24,9 @@
 
 package com.terraforged.mod.biome.surface;
 
-import com.terraforged.api.biome.surface.Surface;
-import com.terraforged.api.biome.surface.SurfaceContext;
-import com.terraforged.api.material.state.States;
+import com.terraforged.mod.api.biome.surface.Surface;
+import com.terraforged.mod.api.biome.surface.SurfaceContext;
+import com.terraforged.mod.api.material.state.States;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
 import com.terraforged.noise.func.CellFunc;

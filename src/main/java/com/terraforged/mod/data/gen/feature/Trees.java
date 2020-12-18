@@ -25,14 +25,14 @@
 package com.terraforged.mod.data.gen.feature;
 
 import com.mojang.datafixers.util.Pair;
-import com.terraforged.fm.GameContext;
-import com.terraforged.fm.data.FeatureInjectorProvider;
-import com.terraforged.fm.matcher.biome.BiomeMatcher;
-import com.terraforged.fm.matcher.feature.FeatureMatcher;
-import com.terraforged.fm.modifier.Jsonifiable;
-import com.terraforged.fm.modifier.Modifier;
-import com.terraforged.fm.template.template.TemplateManager;
-import com.terraforged.fm.transformer.FeatureReplacer;
+import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.mod.featuremanager.data.FeatureInjectorProvider;
+import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
+import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
+import com.terraforged.mod.featuremanager.modifier.Jsonifiable;
+import com.terraforged.mod.featuremanager.modifier.Modifier;
+import com.terraforged.mod.featuremanager.template.template.TemplateManager;
+import com.terraforged.mod.featuremanager.transformer.FeatureReplacer;
 import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.feature.TerraFeatures;
 import com.terraforged.mod.feature.context.ContextSelectorConfig;

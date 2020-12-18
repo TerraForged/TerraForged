@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.feature.feature;
 
-import com.terraforged.fm.template.BlockUtils;
+import com.terraforged.mod.featuremanager.template.BlockUtils;
 import com.terraforged.mod.TerraForgedMod;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

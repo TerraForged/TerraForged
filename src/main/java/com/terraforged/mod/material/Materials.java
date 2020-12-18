@@ -24,9 +24,9 @@
 
 package com.terraforged.mod.material;
 
-import com.terraforged.api.material.WGTags;
-import com.terraforged.api.material.layer.LayerManager;
-import com.terraforged.api.material.state.States;
+import com.terraforged.mod.api.material.WGTags;
+import com.terraforged.mod.api.material.layer.LayerManager;
+import com.terraforged.mod.api.material.state.States;
 import com.terraforged.engine.concurrent.Resource;
 import com.terraforged.mod.chunk.util.DummyBlockReader;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;

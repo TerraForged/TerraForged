@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.chunk.fix;
 
-import com.terraforged.api.chunk.ChunkDelegate;
-import com.terraforged.api.material.state.States;
+import com.terraforged.mod.api.chunk.ChunkDelegate;
+import com.terraforged.mod.api.material.state.States;
 import com.terraforged.mod.material.Materials;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;

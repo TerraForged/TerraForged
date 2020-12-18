@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.server;
 
-import com.terraforged.fm.data.FolderDataPackFinder;
+import com.terraforged.mod.featuremanager.data.FolderDataPackFinder;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.profiler.Profiler;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

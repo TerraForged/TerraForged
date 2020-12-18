@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.feature.decorator.poisson;
 
-import com.terraforged.api.feature.decorator.DecorationContext;
+import com.terraforged.mod.api.feature.decorator.DecorationContext;
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.concurrent.cache.SafeCloseable;
 import com.terraforged.engine.tile.chunk.ChunkReader;

@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.biome.utils;
 
-import com.terraforged.fm.matcher.dynamic.DynamicMatcher;
+import com.terraforged.mod.featuremanager.matcher.dynamic.DynamicMatcher;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeGenerationSettings;

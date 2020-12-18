@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.chunk.generator;
 
-import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
-import com.terraforged.api.biome.surface.SurfaceContext;
+import com.terraforged.mod.api.biome.surface.ChunkSurfaceBuffer;
+import com.terraforged.mod.api.biome.surface.SurfaceContext;
 import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.chunk.TFChunkGenerator;

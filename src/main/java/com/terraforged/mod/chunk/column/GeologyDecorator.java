@@ -24,10 +24,10 @@
 
 package com.terraforged.mod.chunk.column;
 
-import com.terraforged.api.biome.surface.ChunkSurfaceBuffer;
-import com.terraforged.api.biome.surface.SurfaceContext;
-import com.terraforged.api.chunk.column.ColumnDecorator;
-import com.terraforged.api.chunk.column.DecoratorContext;
+import com.terraforged.mod.api.biome.surface.ChunkSurfaceBuffer;
+import com.terraforged.mod.api.biome.surface.SurfaceContext;
+import com.terraforged.mod.api.chunk.column.ColumnDecorator;
+import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.material.geology.GeoManager;
 import com.terraforged.engine.world.geology.Stratum;
 import net.minecraft.block.BlockState;

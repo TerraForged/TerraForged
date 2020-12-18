@@ -25,7 +25,7 @@
 package com.terraforged.mod.chunk.util;
 
 import com.google.common.collect.ImmutableSet;
-import com.terraforged.api.chunk.ChunkDelegate;
+import com.terraforged.mod.api.chunk.ChunkDelegate;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;

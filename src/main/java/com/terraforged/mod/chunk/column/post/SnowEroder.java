@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.chunk.column.post;
 
-import com.terraforged.api.chunk.column.ColumnDecorator;
-import com.terraforged.api.chunk.column.DecoratorContext;
+import com.terraforged.mod.api.chunk.column.ColumnDecorator;
+import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.column.ErosionDecorator;
 import com.terraforged.noise.source.Rand;

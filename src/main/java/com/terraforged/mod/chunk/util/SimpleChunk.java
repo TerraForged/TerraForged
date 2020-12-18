@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.chunk.util;
 
-import com.terraforged.api.material.state.States;
+import com.terraforged.mod.api.material.state.States;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;

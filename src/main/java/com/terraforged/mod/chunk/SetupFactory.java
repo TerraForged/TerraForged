@@ -24,16 +24,16 @@
 
 package com.terraforged.mod.chunk;
 
-import com.terraforged.api.biome.surface.SurfaceManager;
-import com.terraforged.api.chunk.column.ColumnDecorator;
-import com.terraforged.fm.FeatureManager;
-import com.terraforged.fm.data.DataManager;
-import com.terraforged.fm.matcher.biome.BiomeMatcher;
-import com.terraforged.fm.matcher.feature.FeatureMatcher;
-import com.terraforged.fm.modifier.FeatureModifiers;
-import com.terraforged.fm.predicate.*;
-import com.terraforged.fm.structure.FMStructureManager;
-import com.terraforged.fm.transformer.FeatureTransformer;
+import com.terraforged.mod.api.biome.surface.SurfaceManager;
+import com.terraforged.mod.api.chunk.column.ColumnDecorator;
+import com.terraforged.mod.featuremanager.FeatureManager;
+import com.terraforged.mod.featuremanager.data.DataManager;
+import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
+import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
+import com.terraforged.mod.featuremanager.modifier.FeatureModifiers;
+import com.terraforged.mod.featuremanager.predicate.*;
+import com.terraforged.mod.featuremanager.structure.FMStructureManager;
+import com.terraforged.mod.featuremanager.transformer.FeatureTransformer;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.surface.*;

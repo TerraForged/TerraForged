@@ -31,7 +31,7 @@ import com.mojang.serialization.ListBuilder;
 import com.mojang.serialization.RecordBuilder;
 import com.terraforged.engine.serialization.serializer.AbstractWriter;
 import com.terraforged.engine.serialization.serializer.Serializer;
-import com.terraforged.fm.util.codec.CodecException;
+import com.terraforged.mod.featuremanager.util.codec.CodecException;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.NBTDynamicOps;
 

@@ -24,13 +24,12 @@
 
 package com.terraforged.mod;
 
-import com.terraforged.api.material.WGTags;
-import com.terraforged.api.registry.Registries;
+import com.terraforged.mod.api.material.WGTags;
+import com.terraforged.mod.api.registry.Registries;
 import com.terraforged.engine.Engine;
-import com.terraforged.fm.GameContext;
+import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
-import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.data.WorldGenBiomes;
 import com.terraforged.mod.server.command.TerraCommand;

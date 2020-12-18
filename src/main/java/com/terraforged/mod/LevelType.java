@@ -24,7 +24,7 @@
 
 package com.terraforged.mod;
 
-import com.terraforged.fm.GameContext;
+import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;

@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.chunk.column;
 
-import com.terraforged.api.chunk.column.DecoratorContext;
+import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.engine.world.geology.Stratum;
 import net.minecraft.block.BlockState;

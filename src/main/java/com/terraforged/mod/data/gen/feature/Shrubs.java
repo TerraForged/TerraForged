@@ -25,14 +25,14 @@
 package com.terraforged.mod.data.gen.feature;
 
 import com.google.gson.JsonPrimitive;
-import com.terraforged.fm.FeatureSerializer;
-import com.terraforged.fm.data.FeatureInjectorProvider;
-import com.terraforged.fm.matcher.biome.BiomeMatcher;
-import com.terraforged.fm.matcher.feature.FeatureMatcher;
-import com.terraforged.fm.transformer.FeatureAppender;
-import com.terraforged.fm.transformer.FeatureInjector;
-import com.terraforged.fm.transformer.FeatureReplacer;
-import com.terraforged.fm.transformer.FeatureTransformer;
+import com.terraforged.mod.featuremanager.FeatureSerializer;
+import com.terraforged.mod.featuremanager.data.FeatureInjectorProvider;
+import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
+import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
+import com.terraforged.mod.featuremanager.transformer.FeatureAppender;
+import com.terraforged.mod.featuremanager.transformer.FeatureInjector;
+import com.terraforged.mod.featuremanager.transformer.FeatureReplacer;
+import com.terraforged.mod.featuremanager.transformer.FeatureTransformer;
 import com.terraforged.mod.feature.feature.BushFeature;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;

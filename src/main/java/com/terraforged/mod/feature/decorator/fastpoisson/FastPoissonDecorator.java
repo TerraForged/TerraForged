@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.feature.decorator.fastpoisson;
 
-import com.terraforged.api.feature.decorator.DecorationContext;
+import com.terraforged.mod.api.feature.decorator.DecorationContext;
 import com.terraforged.engine.util.fastpoisson.FastPoisson;
 import com.terraforged.engine.util.fastpoisson.FastPoissonContext;
 import com.terraforged.mod.feature.decorator.ContextualDecorator;

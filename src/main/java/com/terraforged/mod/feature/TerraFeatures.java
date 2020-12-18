@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.feature;
 
-import com.terraforged.fm.template.feature.TemplateFeature;
+import com.terraforged.mod.featuremanager.template.feature.TemplateFeature;
 import com.terraforged.mod.TerraForgedMod;
 
 public class TerraFeatures {

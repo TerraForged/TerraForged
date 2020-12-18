@@ -29,7 +29,7 @@ import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.terraforged.engine.serialization.annotation.Serializable;
 import com.terraforged.engine.settings.Settings;
-import com.terraforged.fm.util.codec.Codecs;
+import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import com.terraforged.mod.util.nbt.DynamicReader;
 import com.terraforged.mod.util.nbt.DynamicWriter;
 

@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.feature.decorator.fastpoisson;
 
-import com.terraforged.api.feature.decorator.DecorationContext;
+import com.terraforged.mod.api.feature.decorator.DecorationContext;
 import com.terraforged.engine.util.fastpoisson.FastPoisson;
 import com.terraforged.mod.TerraForgedMod;
 import net.minecraft.util.math.BlockPos;

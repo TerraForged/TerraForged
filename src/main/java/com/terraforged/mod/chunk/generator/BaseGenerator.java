@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.chunk.generator;
 
-import com.terraforged.api.chunk.column.ColumnDecorator;
-import com.terraforged.api.chunk.column.DecoratorContext;
+import com.terraforged.mod.api.chunk.column.ColumnDecorator;
+import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.engine.concurrent.task.LazySupplier;
 import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.mod.biome.TFBiomeContainer;

@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.mixin.common;
 
-import com.terraforged.api.feature.decorator.DecorationHelper;
+import com.terraforged.mod.api.feature.decorator.DecorationHelper;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.feature.WorldDecoratingHelper;

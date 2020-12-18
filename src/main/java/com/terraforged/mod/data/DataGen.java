@@ -26,7 +26,7 @@ package com.terraforged.mod.data;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.terraforged.fm.GameContext;
+import com.terraforged.mod.featuremanager.GameContext;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.DynamicRegistries;
 

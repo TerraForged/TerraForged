@@ -25,8 +25,8 @@
 package com.terraforged.mod.feature;
 
 import com.google.common.collect.ImmutableMap;
-import com.terraforged.fm.data.DataManager;
-import com.terraforged.fm.util.Json;
+import com.terraforged.mod.featuremanager.data.DataManager;
+import com.terraforged.mod.featuremanager.util.Json;
 import com.terraforged.mod.feature.sapling.SaplingConfig;
 import net.minecraft.block.Block;
 

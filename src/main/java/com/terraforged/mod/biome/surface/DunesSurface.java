@@ -24,10 +24,10 @@
 
 package com.terraforged.mod.biome.surface;
 
-import com.terraforged.api.biome.surface.MaskedSurface;
-import com.terraforged.api.biome.surface.Surface;
-import com.terraforged.api.biome.surface.SurfaceContext;
-import com.terraforged.api.material.layer.LayerMaterial;
+import com.terraforged.mod.api.biome.surface.MaskedSurface;
+import com.terraforged.mod.api.biome.surface.Surface;
+import com.terraforged.mod.api.biome.surface.SurfaceContext;
+import com.terraforged.mod.api.material.layer.LayerMaterial;
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.mod.biome.provider.DesertBiomes;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;

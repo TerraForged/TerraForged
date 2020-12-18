@@ -26,7 +26,7 @@ package com.terraforged.mod.biome.map;
 
 import com.google.gson.JsonElement;
 import com.terraforged.engine.cell.Cell;
-import com.terraforged.fm.GameContext;
+import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.biome.map.set.BiomeTypeSet;
 import com.terraforged.engine.world.climate.biome.BiomeType;
 import com.terraforged.engine.world.heightmap.Levels;

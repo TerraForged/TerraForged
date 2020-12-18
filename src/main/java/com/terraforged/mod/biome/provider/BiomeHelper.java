@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.biome.provider;
 
-import com.terraforged.fm.GameContext;
+import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.map.BiomeMapBuilder;

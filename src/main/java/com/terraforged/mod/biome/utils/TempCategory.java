@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.biome.utils;
 
-import com.terraforged.fm.GameContext;
+import com.terraforged.mod.featuremanager.GameContext;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.structure.OceanRuinConfig;
 import net.minecraft.world.gen.feature.structure.OceanRuinStructure;

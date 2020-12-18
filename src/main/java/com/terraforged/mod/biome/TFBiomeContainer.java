@@ -27,7 +27,7 @@ package com.terraforged.mod.biome;
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.engine.util.pos.PosIterator;
-import com.terraforged.fm.GameContext;
+import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.util.FastChunk;
 import com.terraforged.noise.source.Line;

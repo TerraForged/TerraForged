@@ -24,15 +24,15 @@
 
 package com.terraforged.mod.util.setup;
 
-import com.terraforged.api.biome.modifier.ModifierManager;
-import com.terraforged.api.biome.surface.SurfaceManager;
-import com.terraforged.api.chunk.column.ColumnDecorator;
-import com.terraforged.api.chunk.column.DecoratorManager;
-import com.terraforged.api.event.SetupEvent;
-import com.terraforged.api.material.geology.GeologyManager;
-import com.terraforged.api.material.layer.LayerManager;
-import com.terraforged.fm.modifier.FeatureModifiers;
-import com.terraforged.fm.structure.FMStructureManager;
+import com.terraforged.mod.api.biome.modifier.ModifierManager;
+import com.terraforged.mod.api.biome.surface.SurfaceManager;
+import com.terraforged.mod.api.chunk.column.ColumnDecorator;
+import com.terraforged.mod.api.chunk.column.DecoratorManager;
+import com.terraforged.mod.api.event.SetupEvent;
+import com.terraforged.mod.api.material.geology.GeologyManager;
+import com.terraforged.mod.api.material.layer.LayerManager;
+import com.terraforged.mod.featuremanager.modifier.FeatureModifiers;
+import com.terraforged.mod.featuremanager.structure.FMStructureManager;
 import com.terraforged.engine.world.GeneratorContext;
 import com.terraforged.engine.world.terrain.provider.TerrainProvider;
 import net.minecraftforge.common.MinecraftForge;

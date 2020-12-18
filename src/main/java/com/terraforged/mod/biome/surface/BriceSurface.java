@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.biome.surface;
 
-import com.terraforged.api.biome.surface.MaskedSurface;
-import com.terraforged.api.biome.surface.SurfaceContext;
+import com.terraforged.mod.api.biome.surface.MaskedSurface;
+import com.terraforged.mod.api.biome.surface.SurfaceContext;
 import com.terraforged.engine.Seed;
 import com.terraforged.engine.util.Variance;
 import com.terraforged.noise.Module;

@@ -26,7 +26,7 @@ package com.terraforged.mod.feature;
 
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.tile.chunk.ChunkReader;
-import com.terraforged.fm.predicate.FeaturePredicate;
+import com.terraforged.mod.featuremanager.predicate.FeaturePredicate;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;

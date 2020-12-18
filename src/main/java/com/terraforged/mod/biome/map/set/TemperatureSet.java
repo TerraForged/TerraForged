@@ -28,7 +28,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.terraforged.engine.cell.Cell;
-import com.terraforged.fm.GameContext;
+import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.biome.map.defaults.BiomeTemps;
 import com.terraforged.mod.biome.map.defaults.DefaultBiome;
 import com.terraforged.mod.biome.utils.TempCategory;

@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.client;
 
-import com.terraforged.fm.data.FolderDataPackFinder;
-import com.terraforged.fm.data.ModDataPackFinder;
+import com.terraforged.mod.featuremanager.data.FolderDataPackFinder;
+import com.terraforged.mod.featuremanager.data.ModDataPackFinder;
 import com.terraforged.mod.LevelType;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.client.gui.screen.ConfigScreen;

@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.biome.modifier;
 
-import com.terraforged.api.biome.modifier.BiomeModifier;
+import com.terraforged.mod.api.biome.modifier.BiomeModifier;
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.engine.world.climate.biome.BiomeType;

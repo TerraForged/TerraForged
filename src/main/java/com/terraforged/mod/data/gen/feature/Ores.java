@@ -24,10 +24,10 @@
 
 package com.terraforged.mod.data.gen.feature;
 
-import com.terraforged.fm.data.FeatureInjectorProvider;
-import com.terraforged.fm.matcher.biome.BiomeMatcher;
-import com.terraforged.fm.matcher.feature.FeatureMatcher;
-import com.terraforged.fm.transformer.FeatureTransformer;
+import com.terraforged.mod.featuremanager.data.FeatureInjectorProvider;
+import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
+import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
+import com.terraforged.mod.featuremanager.transformer.FeatureTransformer;
 import net.minecraft.block.Blocks;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.Feature;

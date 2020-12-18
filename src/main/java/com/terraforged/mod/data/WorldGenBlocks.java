@@ -26,7 +26,7 @@ package com.terraforged.mod.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.terraforged.api.material.WGTags;
+import com.terraforged.mod.api.material.WGTags;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 

@@ -25,7 +25,7 @@
 package com.terraforged.mod.data;
 
 import com.google.gson.GsonBuilder;
-import com.terraforged.fm.GameContext;
+import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.provider.BiomeHelper;

@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.util.setup;
 
-import com.terraforged.api.event.SetupEvent;
+import com.terraforged.mod.api.event.SetupEvent;
 import com.terraforged.engine.Seed;
 import com.terraforged.mod.Log;
 import com.terraforged.noise.Source;
