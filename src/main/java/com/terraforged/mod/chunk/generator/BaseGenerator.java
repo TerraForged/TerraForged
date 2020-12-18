@@ -29,6 +29,7 @@ import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.engine.world.WorldGeneratorFactory;
 import com.terraforged.engine.world.climate.Climate;
 import com.terraforged.engine.world.heightmap.Levels;
+import com.terraforged.mod.Log;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.biome.TFBiomeContainer;
@@ -82,8 +83,10 @@ public class BaseGenerator implements Generator.Terrain {
 
     private static ColumnDecorator getBaseDecorator(TFChunkGenerator generator) {
         if (generator.getContext().terraSettings.miscellaneous.strataDecorator) {
+            Log.info("Loading strata base decorator");
             return new BaseGeoDecorator(generator);
         }
+        Log.info("Loading vanilla base decorator");
         return BaseDecorator.INSTANCE;
     }
 }

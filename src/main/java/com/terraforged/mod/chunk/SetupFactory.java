@@ -128,9 +128,7 @@ public class SetupFactory {
         modifiers.getTransformers().add(
                 BiomeMatcher.of(context.gameContext, Biome.Category.MESA, Biome.Category.DESERT),
                 Matchers.deadBush(),
-                FeatureTransformer.builder()
-                        .key("tries", 1)
-                        .build()
+                FeatureTransformer.builder().key("tries", 1).build()
         );
 
         // block ugly features
