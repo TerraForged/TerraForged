@@ -28,6 +28,7 @@ import com.terraforged.fm.data.FolderDataPackFinder;
 import com.terraforged.fm.data.ModDataPackFinder;
 import com.terraforged.mod.LevelType;
 import com.terraforged.mod.Log;
+import com.terraforged.mod.client.gui.screen.ConfigScreen;
 import com.terraforged.mod.client.gui.screen.DemoScreen;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.client.Minecraft;
@@ -62,7 +63,7 @@ public class ClientEvents {
 
     private static BiomeGeneratorTypeScreens.IFactory getFactory() {
         if (Environment.isDev()) {
-//            return ConfigScreen::new;
+            return ConfigScreen::new;
         }
         return DemoScreen::new;
     }
