@@ -10,8 +10,9 @@ mod jar just use the gradle build task. The jar will output to the `build/libs` 
 
 #### Commands
 ```shell script
-git clone --recursive https://github.com/TerraForged/TerraForged.git
-
+git clone https://github.com/TerraForged/TerraForged.git
+cd TerraForged
+git clone https://github.com/TerraForged/FeatureManager.git
 ./gradlew build
 ```
 
@@ -31,7 +32,7 @@ dependencies {
 ```
 
 Obtain a `${version}` from the [repository tags](https://github.com/TerraForged/TerraForged/releases) 
-(versions 0.1.0 to 0.1.2 inclusive were not published).
+(versions 0.0.1 to 0.1.2 inclusive are currently unavailable).
 
 #### Usage
 
