@@ -24,14 +24,14 @@
 
 package com.terraforged.mod.biome.surface;
 
-import com.terraforged.mod.api.biome.surface.MaskedSurface;
-import com.terraforged.mod.api.biome.surface.SurfaceContext;
 import com.terraforged.engine.Seed;
 import com.terraforged.engine.util.Variance;
-import com.terraforged.noise.Module;
-import com.terraforged.noise.Source;
 import com.terraforged.engine.world.geology.Strata;
 import com.terraforged.engine.world.geology.Stratum;
+import com.terraforged.mod.api.biome.surface.MaskedSurface;
+import com.terraforged.mod.api.biome.surface.SurfaceContext;
+import com.terraforged.noise.Module;
+import com.terraforged.noise.Source;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 

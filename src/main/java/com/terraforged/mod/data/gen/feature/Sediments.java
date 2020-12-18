@@ -24,10 +24,10 @@
 
 package com.terraforged.mod.data.gen.feature;
 
+import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.mod.featuremanager.data.FeatureInjectorProvider;
 import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
 import com.terraforged.mod.featuremanager.transformer.FeatureTransformer;
-import com.terraforged.mod.feature.feature.DiskFeature;
 import net.minecraft.block.Blocks;
 import net.minecraft.world.gen.feature.Feature;
 

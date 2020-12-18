@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.chunk.column;
 
-import com.terraforged.mod.api.chunk.column.BlockColumn;
 import com.terraforged.engine.world.geology.DepthBuffer;
+import com.terraforged.mod.api.chunk.column.BlockColumn;
 
 public class ColumnResource {
 

@@ -24,16 +24,16 @@
 
 package com.terraforged.mod.material.geology;
 
+import com.terraforged.engine.Seed;
+import com.terraforged.engine.world.geology.Geology;
+import com.terraforged.engine.world.geology.Strata;
 import com.terraforged.mod.api.material.geology.GeologyManager;
 import com.terraforged.mod.api.material.geology.StrataConfig;
-import com.terraforged.engine.Seed;
-import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.chunk.TerraContext;
+import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
-import com.terraforged.engine.world.geology.Geology;
-import com.terraforged.engine.world.geology.Strata;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;

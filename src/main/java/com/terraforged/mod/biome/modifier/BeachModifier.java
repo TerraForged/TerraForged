@@ -24,14 +24,14 @@
 
 package com.terraforged.mod.biome.modifier;
 
-import com.terraforged.mod.api.biome.modifier.BiomeModifier;
 import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.world.climate.biome.BiomeType;
+import com.terraforged.engine.world.terrain.TerrainCategory;
+import com.terraforged.mod.api.biome.modifier.BiomeModifier;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
-import com.terraforged.engine.world.climate.biome.BiomeType;
-import com.terraforged.engine.world.terrain.TerrainCategory;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 
@@ -45,8 +45,8 @@ public class BeachModifier implements BiomeModifier {
 
     public BeachModifier(BiomeMap biomeMap, TerraContext context) {
         this.biomes = biomeMap;
-        this.height = context.levels.water(6);
-        this.noise = Source.perlin(context.seed.next(), 15, 1).scale(context.levels.scale(5));
+        this.height = context.levels.water(5);
+        this.noise = Source.build(context.seed.next(), 20, 1).perlin2().scale(context.levels.scale(5));
         this.mushroomFields = context.gameContext.biomes.get(Biomes.MUSHROOM_FIELDS);
         this.mushroomFieldShore = context.gameContext.biomes.get(Biomes.MUSHROOM_FIELD_SHORE);
     }

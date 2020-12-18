@@ -24,10 +24,10 @@
 
 package com.terraforged.mod.chunk.column;
 
+import com.terraforged.engine.world.terrain.TerrainType;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.api.material.state.States;
-import com.terraforged.engine.world.terrain.TerrainType;
 import net.minecraft.world.chunk.IChunk;
 
 public class BaseDecorator implements ColumnDecorator {

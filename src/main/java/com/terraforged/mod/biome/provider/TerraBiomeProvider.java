@@ -32,13 +32,14 @@ import com.mojang.serialization.DynamicOps;
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.concurrent.Resource;
 import com.terraforged.engine.concurrent.task.LazySupplier;
-import com.terraforged.mod.featuremanager.GameContext;
-import com.terraforged.mod.featuremanager.util.codec.Codecs;
+import com.terraforged.engine.world.heightmap.WorldLookup;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.modifier.BiomeModifierManager;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
-import com.terraforged.engine.world.heightmap.WorldLookup;
+import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.mod.featuremanager.util.codec.Codecs;
+import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
@@ -93,7 +94,7 @@ public class TerraBiomeProvider extends BiomeProvider {
     @Override
     public Set<Biome> getBiomes(int centerX, int centerY, int centerZ, int radius) {
         // search smaller radius to encourage more attempts to generate structures like mansions
-        radius /= 2;
+        radius = NoiseUtil.round(0.75F * radius);
         int minX = centerX - radius;
         int minZ = centerZ - radius;
         int maxX = centerX + radius;

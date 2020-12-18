@@ -36,6 +36,4 @@ public interface FeaturePredicate extends BiPredicate<IChunk, Biome> {
 
     @Override
     boolean test(IChunk chunk, Biome biome);
-
-
 }

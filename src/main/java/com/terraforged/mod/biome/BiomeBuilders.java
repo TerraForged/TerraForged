@@ -24,9 +24,9 @@
 
 package com.terraforged.mod.biome;
 
-import com.terraforged.mod.featuremanager.matcher.dynamic.DynamicMatcher;
 import com.terraforged.mod.biome.utils.BiomeBuilder;
 import com.terraforged.mod.biome.utils.BiomeUtils;
+import com.terraforged.mod.featuremanager.matcher.dynamic.DynamicMatcher;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.DefaultBiomeFeatures;

@@ -24,10 +24,13 @@
 
 package com.terraforged.mod.chunk.generator;
 
-import com.terraforged.mod.api.chunk.column.ColumnDecorator;
-import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.engine.concurrent.task.LazySupplier;
 import com.terraforged.engine.tile.chunk.ChunkReader;
+import com.terraforged.engine.world.WorldGeneratorFactory;
+import com.terraforged.engine.world.climate.Climate;
+import com.terraforged.engine.world.heightmap.Levels;
+import com.terraforged.mod.api.chunk.column.ColumnDecorator;
+import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerrainHelper;
@@ -35,9 +38,6 @@ import com.terraforged.mod.chunk.column.BaseDecorator;
 import com.terraforged.mod.chunk.column.BaseGeoDecorator;
 import com.terraforged.mod.chunk.column.BedrockDecorator;
 import com.terraforged.mod.chunk.util.FastChunk;
-import com.terraforged.engine.world.WorldGeneratorFactory;
-import com.terraforged.engine.world.climate.Climate;
-import com.terraforged.engine.world.heightmap.Levels;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.feature.structure.StructureManager;

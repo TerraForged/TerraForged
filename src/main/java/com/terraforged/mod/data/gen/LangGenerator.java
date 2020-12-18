@@ -25,11 +25,11 @@
 package com.terraforged.mod.data.gen;
 
 import com.terraforged.engine.util.NameUtil;
-import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.screen.preview.PreviewSettings;
+import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.util.TranslationKey;
 import com.terraforged.mod.util.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundNBT;

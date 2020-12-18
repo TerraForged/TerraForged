@@ -39,11 +39,10 @@ import com.terraforged.mod.featuremanager.util.identity.FeatureIdentity;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraftforge.eventbus.api.Event;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class FeatureModifiers extends Event {
 
@@ -52,8 +51,8 @@ public class FeatureModifiers extends Event {
     private final ModifierList<FeatureInjector> injectors = new ModifierList<>();
     private final ModifierList<FeatureAppender> appenders = new ModifierList<>();
     private final ModifierList<FeatureTransformer> transformers = new ModifierList<>();
-
     private final ModifierList<FeaturePredicate> predicates = new ModifierList<>();
+    private final Map<Object, FeaturePredicate> structurePredicates = new IdentityHashMap<>();
 
     private final GameContext context;
 
@@ -67,6 +66,10 @@ public class FeatureModifiers extends Event {
 
     public DynamicList getDynamic() {
         return dynamics;
+    }
+
+    public void add(Structure<?> structure, FeaturePredicate predicate) {
+        structurePredicates.put(structure, predicate);
     }
 
     public ModifierList<FeatureReplacer> getReplacers() {
@@ -89,6 +92,10 @@ public class FeatureModifiers extends Event {
         return transformers;
     }
 
+    public Map<Object, FeaturePredicate> getStructurePredicates() {
+        return structurePredicates;
+    }
+
     public void sort() {
         replacers.sort();
         predicates.sort();
@@ -102,6 +109,11 @@ public class FeatureModifiers extends Event {
     public ModifierSet getFeature(GenerationStage.Decoration stage, Biome biome, ConfiguredFeature<?, ?> feature) {
         try {
             JsonElement element = FeatureSerializer.serialize(feature);
+            String s = element.toString();
+            if (s.contains("")) {
+
+            }
+
             ConfiguredFeature<?, ?> result = getFeature(biome, feature, element);
             if (result != feature) {
                 // re-serialize if feature has been changed
@@ -171,7 +183,7 @@ public class FeatureModifiers extends Event {
                 if (result.isEmpty()) {
                     result = new ArrayList<>();
                 }
-                ConfiguredFeature<? ,?> feature = modifier.getModifier().getFeature();
+                ConfiguredFeature<?, ?> feature = modifier.getModifier().getFeature();
                 FeatureIdentity identity = FeatureIdentity.getIdentity(feature);
                 result.add(new BiomeFeature(predicate, feature, identity));
             }
@@ -192,7 +204,7 @@ public class FeatureModifiers extends Event {
                 if (result.isEmpty()) {
                     result = new ArrayList<>();
                 }
-                ConfiguredFeature<? ,?> feature = modifier.getModifier().getFeature();
+                ConfiguredFeature<?, ?> feature = modifier.getModifier().getFeature();
                 FeatureIdentity identity = FeatureIdentity.getIdentity(feature);
                 result.add(new BiomeFeature(BiomePredicate.ALLOW, feature, identity));
             }

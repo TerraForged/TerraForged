@@ -24,9 +24,9 @@
 
 package com.terraforged.mod.biome;
 
-import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.biome.utils.BiomeBuilder;
+import com.terraforged.mod.featuremanager.GameContext;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;

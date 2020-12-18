@@ -24,17 +24,18 @@
 
 package com.terraforged.mod.chunk.generator;
 
+import com.terraforged.engine.tile.chunk.ChunkReader;
+import com.terraforged.mod.Log;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.api.chunk.column.DecoratorContext;
-import com.terraforged.engine.tile.chunk.ChunkReader;
-import com.terraforged.mod.featuremanager.biome.BiomeFeature;
-import com.terraforged.mod.featuremanager.biome.BiomeFeatures;
-import com.terraforged.mod.featuremanager.util.identity.Identity;
-import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionFix;
 import com.terraforged.mod.chunk.util.DecoratorException;
+import com.terraforged.mod.featuremanager.biome.BiomeFeature;
+import com.terraforged.mod.featuremanager.biome.BiomeFeatures;
+import com.terraforged.mod.featuremanager.predicate.FeaturePredicate;
+import com.terraforged.mod.featuremanager.util.identity.Identity;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
@@ -127,6 +128,13 @@ public class FeatureGenerator implements Generator.Features {
                 for (int structureIndex = 0; structureIndex < structures.size(); structureIndex++) {
                     Structure<?> structure = structures.get(structureIndex);
                     random.setFeatureSeed(decorationSeed, featureSeed++, stageIndex);
+
+                    FeaturePredicate predicate = generator.getFeatureManager().getStructurePredicate(structure);
+
+                    if (!predicate.test(chunk, biome)) {
+                        continue;
+                    }
+
                     try {
                         timeStamp = System.currentTimeMillis();
                         manager.func_235011_a_(SectionPos.from(pos), structure).forEach(start -> start.func_230366_a_(
@@ -149,14 +157,17 @@ public class FeatureGenerator implements Generator.Features {
                 for (int featureIndex = 0; featureIndex < features.size(); featureIndex++) {
                     BiomeFeature feature = features.get(featureIndex);
                     random.setFeatureSeed(decorationSeed, featureSeed++, stageIndex);
-                    if (feature.getPredicate().test(chunk, biome)) {
-                        try {
-                            timeStamp = System.currentTimeMillis();
-                            feature.getFeature().generate(region, generator, random, pos);
-                            checkTime(FEATURE, feature.getIdentity(), timeStamp);
-                        } catch (Throwable t) {
-                            throw new DecoratorException(FEATURE, feature.getIdentity().getIdentity(), t);
-                        }
+
+                    if (!feature.getPredicate().test(chunk, biome)) {
+                        continue;
+                    }
+
+                    try {
+                        timeStamp = System.currentTimeMillis();
+                        feature.getFeature().generate(region, generator, random, pos);
+                        checkTime(FEATURE, feature.getIdentity(), timeStamp);
+                    } catch (Throwable t) {
+                        throw new DecoratorException(FEATURE, feature.getIdentity().getIdentity(), t);
                     }
                 }
             }

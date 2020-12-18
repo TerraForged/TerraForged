@@ -24,6 +24,8 @@
 
 package com.terraforged.mod.util.setup;
 
+import com.terraforged.engine.world.GeneratorContext;
+import com.terraforged.engine.world.terrain.provider.TerrainProvider;
 import com.terraforged.mod.api.biome.modifier.ModifierManager;
 import com.terraforged.mod.api.biome.surface.SurfaceManager;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
@@ -33,8 +35,6 @@ import com.terraforged.mod.api.material.geology.GeologyManager;
 import com.terraforged.mod.api.material.layer.LayerManager;
 import com.terraforged.mod.featuremanager.modifier.FeatureModifiers;
 import com.terraforged.mod.featuremanager.structure.FMStructureManager;
-import com.terraforged.engine.world.GeneratorContext;
-import com.terraforged.engine.world.terrain.provider.TerrainProvider;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.util.List;

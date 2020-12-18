@@ -25,10 +25,10 @@
 package com.terraforged.mod.biome.map.set;
 
 import com.terraforged.engine.cell.Cell;
-import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.map.defaults.DefaultBiomes;
 import com.terraforged.mod.biome.utils.TempCategory;
+import com.terraforged.mod.featuremanager.GameContext;
 import net.minecraft.world.biome.Biome;
 
 import java.util.List;

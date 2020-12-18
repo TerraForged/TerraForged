@@ -24,14 +24,14 @@
 
 package com.terraforged.mod.data.gen;
 
-import com.terraforged.mod.featuremanager.FeatureManager;
-import com.terraforged.mod.featuremanager.data.DataManager;
-import com.terraforged.mod.featuremanager.data.FeatureInjectorProvider;
 import com.terraforged.mod.chunk.SetupFactory;
 import com.terraforged.mod.data.gen.feature.Ores;
 import com.terraforged.mod.data.gen.feature.Sediments;
 import com.terraforged.mod.data.gen.feature.Shrubs;
 import com.terraforged.mod.data.gen.feature.Trees;
+import com.terraforged.mod.featuremanager.FeatureManager;
+import com.terraforged.mod.featuremanager.data.DataManager;
+import com.terraforged.mod.featuremanager.data.FeatureInjectorProvider;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;

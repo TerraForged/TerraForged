@@ -24,16 +24,18 @@
 
 package com.terraforged.mod.featuremanager;
 
-import com.terraforged.mod.featuremanager.data.DataManager;
 import com.terraforged.mod.featuremanager.biome.BiomeFeatures;
+import com.terraforged.mod.featuremanager.data.DataManager;
 import com.terraforged.mod.featuremanager.modifier.FeatureModifierLoader;
 import com.terraforged.mod.featuremanager.modifier.FeatureModifiers;
 import com.terraforged.mod.featuremanager.modifier.ModifierSet;
+import com.terraforged.mod.featuremanager.predicate.FeaturePredicate;
 import com.terraforged.mod.featuremanager.template.template.TemplateManager;
 import com.terraforged.mod.featuremanager.transformer.InjectionPosition;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.structure.Structure;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -41,6 +43,7 @@ import org.apache.logging.log4j.MarkerManager;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -51,14 +54,20 @@ public class FeatureManager implements FeatureDecorator {
     public static final Marker INIT = MarkerManager.getMarker("INIT");
 
     private final Map<Biome, BiomeFeatures> biomes;
+    private final Map<Object, FeaturePredicate> structures;
 
-    public FeatureManager(Map<Biome, BiomeFeatures> biomes) {
+    public FeatureManager(Map<Biome, BiomeFeatures> biomes, Map<Object, FeaturePredicate> structures) {
         this.biomes = biomes;
+        this.structures = new IdentityHashMap<>(structures);
     }
 
     @Override
     public FeatureManager getFeatureManager() {
         return this;
+    }
+
+    public FeaturePredicate getStructurePredicate(Structure<?> structure) {
+        return structures.getOrDefault(structure, FeaturePredicate.ALLOW);
     }
 
     public BiomeFeatures getFeatures(Biome biome) {
@@ -108,7 +117,7 @@ public class FeatureManager implements FeatureDecorator {
         }
 
         LOG.debug(INIT, " Initialization complete");
-        return new FeatureManager(biomes);
+        return new FeatureManager(biomes, modifiers.getStructurePredicates());
     }
 
     private static BiomeFeatures compute(Biome biome, FeatureModifiers modifiers) {

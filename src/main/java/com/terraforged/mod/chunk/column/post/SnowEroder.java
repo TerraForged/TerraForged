@@ -24,12 +24,12 @@
 
 package com.terraforged.mod.chunk.column.post;
 
+import com.terraforged.engine.world.terrain.TerrainType;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.column.ErosionDecorator;
 import com.terraforged.noise.source.Rand;
-import com.terraforged.engine.world.terrain.TerrainType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.GrassBlock;

@@ -24,11 +24,11 @@
 
 package com.terraforged.mod;
 
-import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.biome.provider.TerraBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
+import com.terraforged.mod.featuremanager.GameContext;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.DimensionType;

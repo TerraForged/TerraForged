@@ -24,11 +24,11 @@
 
 package com.terraforged.mod.biome.provider;
 
+import com.terraforged.engine.world.heightmap.WorldLookup;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.modifier.BiomeModifierManager;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.util.setup.SetupHooks;
-import com.terraforged.engine.world.heightmap.WorldLookup;
 
 public class BiomeProviderResources {
 

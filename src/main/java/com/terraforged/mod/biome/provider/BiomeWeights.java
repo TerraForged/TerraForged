@@ -25,9 +25,9 @@
 package com.terraforged.mod.biome.provider;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
-import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.config.ConfigManager;
+import com.terraforged.mod.featuremanager.GameContext;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;

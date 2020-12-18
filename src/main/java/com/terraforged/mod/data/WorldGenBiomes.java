@@ -25,12 +25,12 @@
 package com.terraforged.mod.data;
 
 import com.google.gson.GsonBuilder;
-import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.engine.world.climate.biome.BiomeType;
 import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.mod.biome.provider.BiomeWeights;
-import com.terraforged.engine.world.climate.biome.BiomeType;
+import com.terraforged.mod.featuremanager.GameContext;
 import net.minecraft.util.ResourceLocation;
 
 import java.io.*;

@@ -24,12 +24,12 @@
 
 package com.terraforged.mod.biome.provider;
 
-import com.terraforged.mod.api.material.layer.LayerManager;
-import com.terraforged.mod.api.material.layer.LayerMaterial;
 import com.terraforged.engine.concurrent.Resource;
 import com.terraforged.engine.concurrent.task.LazySupplier;
-import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.mod.api.material.layer.LayerManager;
+import com.terraforged.mod.api.material.layer.LayerMaterial;
 import com.terraforged.mod.chunk.util.DummyBlockReader;
+import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.util.ListUtils;
 import net.minecraft.block.BlockState;

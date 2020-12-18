@@ -24,9 +24,9 @@
 
 package com.terraforged.mod.server;
 
-import com.terraforged.mod.featuremanager.data.FolderDataPackFinder;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.profiler.Profiler;
+import com.terraforged.mod.featuremanager.data.FolderDataPackFinder;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;

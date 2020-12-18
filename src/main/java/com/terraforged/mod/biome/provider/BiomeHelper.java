@@ -24,16 +24,16 @@
 
 package com.terraforged.mod.biome.provider;
 
-import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.engine.world.climate.biome.BiomeData;
+import com.terraforged.engine.world.climate.biome.BiomeType;
 import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.map.BiomeMapBuilder;
 import com.terraforged.mod.biome.map.BiomePredicate;
 import com.terraforged.mod.biome.map.defaults.BiomeTemps;
 import com.terraforged.mod.biome.utils.TempCategory;
+import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.noise.util.Vec2f;
-import com.terraforged.engine.world.climate.biome.BiomeData;
-import com.terraforged.engine.world.climate.biome.BiomeType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeGenerationSettings;
 import net.minecraft.world.biome.Biomes;

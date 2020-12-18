@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.feature.feature;
 
-import com.terraforged.mod.featuremanager.template.BlockUtils;
 import com.terraforged.mod.TerraForgedMod;
+import com.terraforged.mod.featuremanager.template.BlockUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SnowyDirtBlock;

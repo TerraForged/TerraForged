@@ -27,10 +27,10 @@ package com.terraforged.mod.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.terraforged.mod.Log;
 import com.terraforged.mod.featuremanager.FeatureSerializer;
 import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.featuremanager.util.FeatureDebugger;
-import com.terraforged.mod.Log;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
@@ -56,7 +56,7 @@ public class WorldGenFeatures extends DataGen {
     private static void genBiomeFeatures(File dir, Biome biome, GameContext context) {
         write(new File(dir, getJsonPath("features", context.biomes.getRegistryName(biome))), writer -> {
             JsonObject root = new JsonObject();
-            List<List<Supplier<ConfiguredFeature<?, ?>>>> stageFeatures = biome.getGenerationSettings().getFeatures();
+            List<List<Supplier<ConfiguredFeature<?, ?>>>> stageFeatures = biome.getGenerationSettings().getFeatures();;
 
             for (GenerationStage.Decoration type : GenerationStage.Decoration.values()) {
                 if (type.ordinal() >= stageFeatures.size()) {

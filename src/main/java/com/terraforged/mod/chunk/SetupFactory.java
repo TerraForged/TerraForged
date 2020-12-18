@@ -24,17 +24,9 @@
 
 package com.terraforged.mod.chunk;
 
+import com.terraforged.mod.Log;
 import com.terraforged.mod.api.biome.surface.SurfaceManager;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
-import com.terraforged.mod.featuremanager.FeatureManager;
-import com.terraforged.mod.featuremanager.data.DataManager;
-import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
-import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
-import com.terraforged.mod.featuremanager.modifier.FeatureModifiers;
-import com.terraforged.mod.featuremanager.predicate.*;
-import com.terraforged.mod.featuremanager.structure.FMStructureManager;
-import com.terraforged.mod.featuremanager.transformer.FeatureTransformer;
-import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.surface.*;
 import com.terraforged.mod.biome.utils.Structures;
@@ -45,6 +37,14 @@ import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.feature.Matchers;
 import com.terraforged.mod.feature.VolcanoPredicate;
 import com.terraforged.mod.feature.feature.FreezeLayer;
+import com.terraforged.mod.featuremanager.FeatureManager;
+import com.terraforged.mod.featuremanager.data.DataManager;
+import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
+import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
+import com.terraforged.mod.featuremanager.modifier.FeatureModifiers;
+import com.terraforged.mod.featuremanager.predicate.*;
+import com.terraforged.mod.featuremanager.structure.FMStructureManager;
+import com.terraforged.mod.featuremanager.transformer.FeatureTransformer;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.material.geology.GeoManager;
 import com.terraforged.mod.util.setup.SetupHooks;
@@ -135,8 +135,14 @@ public class SetupFactory {
 
         // block ugly features
         modifiers.getPredicates().add(Matchers.sedimentDisks(context.gameContext), FeaturePredicate.DENY);
-        modifiers.getPredicates().add(FeatureMatcher.of(Structures.mineshaft()), new MinHeight(context.levels.waterY + 20));
-        modifiers.getPredicates().add(FeatureMatcher.of(Structures.mansion()), new MaxHeight(context.levels.waterY + 64));
+
+        // prevent structures in weird places
+        modifiers.add(Structures.shipwreck(), MinDepth.DEPTH55);
+        modifiers.add(Structures.oceanRuin(), MinDepth.DEPTH45);
+        modifiers.add(Structures.oceanMonument(), DeepWater.INSTANCE);
+
+        modifiers.add(Structures.mansion(), new MaxHeight(context.levels.waterY + 64));
+        modifiers.add(Structures.mineshaft(), new MinHeight(context.levels.waterY + 16));
 
         return FeatureManager.create(SetupHooks.setup(modifiers, context.copy()));
     }
