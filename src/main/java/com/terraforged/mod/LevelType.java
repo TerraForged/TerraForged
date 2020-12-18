@@ -24,7 +24,7 @@
 
 package com.terraforged.mod;
 
-import com.terraforged.mod.biome.provider.TerraBiomeProvider;
+import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
@@ -45,15 +45,15 @@ public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
     public static final ForgeWorldType TERRAFORGED = new ForgeWorldType(new LevelType(TFChunkGenerator::new))
             .setRegistryName(TerraForgedMod.MODID, "terraforged");
 
-    private final BiFunction<TerraBiomeProvider, DimensionSettings, ChunkGenerator> constructor;
+    private final BiFunction<TFBiomeProvider, DimensionSettings, ChunkGenerator> constructor;
 
-    private LevelType(BiFunction<TerraBiomeProvider, DimensionSettings, ChunkGenerator> constructor) {
+    private LevelType(BiFunction<TFBiomeProvider, DimensionSettings, ChunkGenerator> constructor) {
         this.constructor = constructor;
     }
 
     @Override
     public ChunkGenerator createChunkGenerator(Registry<Biome> biomes, Registry<DimensionSettings> settings, long seed, String options) {
-        TerraBiomeProvider biomeProvider = TerraBiomeProvider.create(seed, biomes);
+        TFBiomeProvider biomeProvider = TFBiomeProvider.create(seed, biomes);
         DimensionSettings dimensionSettings = settings.getOrThrow(DimensionSettings.field_242734_c);
         return constructor.apply(biomeProvider, dimensionSettings);
     }
@@ -76,7 +76,7 @@ public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
         DimensionSettings overworldSettings = dimSettings.getOrThrow(DimensionSettings.field_242734_c);
         GameContext game = new GameContext(registries.getRegistry(Registry.BIOME_KEY));
         TerraContext context = new TerraContext(settings, game);
-        TerraBiomeProvider biomeProvider = new TerraBiomeProvider(context);
+        TFBiomeProvider biomeProvider = new TFBiomeProvider(context);
         return new TFChunkGenerator(biomeProvider, overworldSettings);
     }
 }

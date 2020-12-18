@@ -27,7 +27,7 @@ package com.terraforged.mod.biome.modifier;
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.mod.api.biome.modifier.BiomeModifier;
 import com.terraforged.mod.biome.map.BiomeMap;
-import com.terraforged.mod.biome.provider.TerraBiomeProvider;
+import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
@@ -78,7 +78,7 @@ public class MountainModifier implements BiomeModifier {
     public Biome modify(Biome in, Cell cell, int x, int z) {
         if (canModify(cell, x, z)) {
             Biome mountain = biomes.getMountain(cell);
-            if (TerraBiomeProvider.isValidBiome(mountain)) {
+            if (TFBiomeProvider.isValidBiome(mountain)) {
                 return mountain;
             }
         }

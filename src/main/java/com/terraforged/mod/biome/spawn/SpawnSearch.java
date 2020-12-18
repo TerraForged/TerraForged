@@ -26,16 +26,16 @@ package com.terraforged.mod.biome.spawn;
 
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.mod.Log;
-import com.terraforged.mod.biome.provider.TerraBiomeProvider;
+import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.server.command.search.Search;
 import net.minecraft.util.math.BlockPos;
 
 public class SpawnSearch extends Search {
 
-    private final TerraBiomeProvider biomeProvider;
+    private final TFBiomeProvider biomeProvider;
     private final Cell cell = new Cell();
 
-    public SpawnSearch(BlockPos center, TerraBiomeProvider biomeProvider) {
+    public SpawnSearch(BlockPos center, TFBiomeProvider biomeProvider) {
         super(center, 0, 2048);
         this.biomeProvider = biomeProvider;
     }

@@ -27,7 +27,7 @@ package com.terraforged.mod.biome;
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.engine.util.pos.PosIterator;
-import com.terraforged.mod.biome.provider.TerraBiomeProvider;
+import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.util.FastChunk;
 import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.noise.source.Line;
@@ -80,7 +80,7 @@ public class TFBiomeContainer extends BiomeContainer {
         return new BiomeContainer(context.biomes.getRegistry(), biomes);
     }
 
-    public static TFBiomeContainer getOrCreate(IChunk chunk, ChunkReader reader, TerraBiomeProvider biomeProvider) {
+    public static TFBiomeContainer getOrCreate(IChunk chunk, ChunkReader reader, TFBiomeProvider biomeProvider) {
         BiomeContainer biomes = chunk.getBiomes();
         if (biomes instanceof TFBiomeContainer) {
             return (TFBiomeContainer) biomes;
@@ -97,7 +97,7 @@ public class TFBiomeContainer extends BiomeContainer {
         return container;
     }
 
-    public static TFBiomeContainer create(ChunkReader chunkReader, TerraBiomeProvider biomeProvider) {
+    public static TFBiomeContainer create(ChunkReader chunkReader, TFBiomeProvider biomeProvider) {
         Biome feature = null;
         float featureDist2 = Integer.MAX_VALUE;
         Biome[] biomes2D = new Biome[BIOMES_2D_SIZE];

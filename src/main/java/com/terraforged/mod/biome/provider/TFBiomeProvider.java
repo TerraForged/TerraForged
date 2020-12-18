@@ -52,15 +52,15 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public class TerraBiomeProvider extends BiomeProvider {
+public class TFBiomeProvider extends BiomeProvider {
 
-    public static final Codec<TerraBiomeProvider> CODEC = Codecs.create(TerraBiomeProvider::encode, TerraBiomeProvider::decode);
+    public static final Codec<TFBiomeProvider> CODEC = Codecs.create(TFBiomeProvider::encode, TFBiomeProvider::decode);
 
     private final long seed;
     private final TerraContext context;
     private final LazySupplier<BiomeProviderResources> resources;
 
-    public TerraBiomeProvider(TerraContext context) {
+    public TFBiomeProvider(TerraContext context) {
         super(BiomeHelper.getAllBiomes(context.gameContext));
         this.context = context;
         this.seed = context.terraSettings.world.seed;
@@ -72,7 +72,7 @@ public class TerraBiomeProvider extends BiomeProvider {
     }
 
     @Override
-    protected Codec<TerraBiomeProvider> getBiomeProviderCodec() {
+    protected Codec<TFBiomeProvider> getBiomeProviderCodec() {
         return CODEC;
     }
 
@@ -86,7 +86,7 @@ public class TerraBiomeProvider extends BiomeProvider {
     }
 
     @Override
-    public TerraBiomeProvider getBiomeProvider(long seed) {
+    public TFBiomeProvider getBiomeProvider(long seed) {
         Log.debug("Creating seeded biome provider: {}", seed);
         return create(seed, context);
     }
@@ -207,7 +207,7 @@ public class TerraBiomeProvider extends BiomeProvider {
         Biome biome = resources.biomeMap.provideBiome(cell, context.levels);
         if (resources.modifierManager.hasModifiers(cell, context.levels)) {
             Biome modified = resources.modifierManager.modify(biome, cell, x, z);
-            if (TerraBiomeProvider.isValidBiome(modified)) {
+            if (TFBiomeProvider.isValidBiome(modified)) {
                 return modified;
             }
         }
@@ -218,26 +218,26 @@ public class TerraBiomeProvider extends BiomeProvider {
         return !cell.terrain.isSubmerged();
     }
 
-    public static TerraBiomeProvider create(long seed, Registry<Biome> registry) {
+    public static TFBiomeProvider create(long seed, Registry<Biome> registry) {
         TerraSettings settings = new TerraSettings(seed);
         GameContext gameContext = new GameContext(registry);
-        return new TerraBiomeProvider(new TerraContext(settings, gameContext));
+        return new TFBiomeProvider(new TerraContext(settings, gameContext));
     }
 
-    public static TerraBiomeProvider create(long seed, TerraContext currentContext) {
+    public static TFBiomeProvider create(long seed, TerraContext currentContext) {
         TerraSettings settings = currentContext.terraSettings;
         settings.world.seed = seed;
 
         TerraContext context = new TerraContext(settings, currentContext.gameContext);
 
-        return new TerraBiomeProvider(context);
+        return new TFBiomeProvider(context);
     }
 
     public static boolean isValidBiome(Biome biome) {
         return biome != null && biome.getCategory() != Biome.Category.NONE;
     }
 
-    private static <T> Dynamic<T> encode(TerraBiomeProvider provider, DynamicOps<T> ops) {
+    private static <T> Dynamic<T> encode(TFBiomeProvider provider, DynamicOps<T> ops) {
         T seed = Codecs.encodeAndGet(Codec.LONG, provider.seed, ops);
         T gameContext = Codecs.encodeAndGet(GameContext.CODEC, provider.getContext().gameContext, ops);
         T settings = Codecs.encodeAndGet(TerraSettings.CODEC, provider.getContext().terraSettings, ops);
@@ -248,11 +248,11 @@ public class TerraBiomeProvider extends BiomeProvider {
         ));
     }
 
-    private static <T> TerraBiomeProvider decode(Dynamic<T> dynamic) {
+    private static <T> TFBiomeProvider decode(Dynamic<T> dynamic) {
         long seed = Codecs.decodeAndGet(Codec.LONG, dynamic.get("seed"));
         GameContext gameContext = Codecs.decodeAndGet(GameContext.CODEC, dynamic.get("game_data"));
         TerraSettings settings = Codecs.decodeAndGet(TerraSettings.CODEC, dynamic.get("generator_settings"));
         settings.world.seed = seed;
-        return new TerraBiomeProvider(new TerraContext(settings, gameContext));
+        return new TFBiomeProvider(new TerraContext(settings, gameContext));
     }
 }

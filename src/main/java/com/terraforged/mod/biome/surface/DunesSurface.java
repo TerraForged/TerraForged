@@ -31,7 +31,7 @@ import com.terraforged.mod.api.biome.surface.Surface;
 import com.terraforged.mod.api.biome.surface.SurfaceContext;
 import com.terraforged.mod.api.material.layer.LayerMaterial;
 import com.terraforged.mod.biome.provider.DesertBiomes;
-import com.terraforged.mod.biome.provider.TerraBiomeProvider;
+import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
@@ -89,7 +89,7 @@ public class DunesSurface implements MaskedSurface {
         ctx.chunk.setBlockState(pos.setPos(x, duneTop, z), top, false);
     }
 
-    public static Surface create(TerraContext context, TerraBiomeProvider provider) {
+    public static Surface create(TerraContext context, TFBiomeProvider provider) {
         return create(context, provider.getModifierManager().getDesertBiomes());
     }
 

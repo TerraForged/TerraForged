@@ -27,7 +27,7 @@ package com.terraforged.mod.biome.modifier;
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.mod.api.biome.modifier.BiomeModifier;
 import com.terraforged.mod.biome.map.BiomeMap;
-import com.terraforged.mod.biome.provider.TerraBiomeProvider;
+import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TerraContext;
 import net.minecraft.world.biome.Biome;
 
@@ -60,7 +60,7 @@ public class VolcanoModifier implements BiomeModifier {
     @Override
     public Biome modify(Biome in, Cell cell, int x, int z) {
         Biome volcano = biomes.getVolcano(cell);
-        if (TerraBiomeProvider.isValidBiome(volcano)) {
+        if (TFBiomeProvider.isValidBiome(volcano)) {
             return volcano;
         }
         return in;

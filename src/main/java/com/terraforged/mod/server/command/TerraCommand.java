@@ -35,7 +35,7 @@ import com.terraforged.engine.concurrent.Resource;
 import com.terraforged.engine.world.WorldGenerator;
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.mod.Log;
-import com.terraforged.mod.biome.provider.TerraBiomeProvider;
+import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.profiler.Profiler;
@@ -132,7 +132,7 @@ public class TerraCommand {
     private static int query(CommandContext<CommandSource> context) throws CommandSyntaxException {
         getContext(context);
         BlockPos pos = context.getSource().asPlayer().getPosition();
-        TerraBiomeProvider biomeProvider = getBiomeProvider(context);
+        TFBiomeProvider biomeProvider = getBiomeProvider(context);
         try (Resource<Cell> cell = biomeProvider.lookupPos(pos.getX(), pos.getZ())) {
             Biome biome = biomeProvider.getBiome(cell.get(), pos.getX(), pos.getZ());
             context.getSource().sendFeedback(new StringTextComponent("At ")
@@ -318,8 +318,8 @@ public class TerraCommand {
         return context.getSource().getWorld().getChunkProvider().getChunkGenerator();
     }
 
-    private static TerraBiomeProvider getBiomeProvider(CommandContext<CommandSource> context) {
-        return (TerraBiomeProvider) context.getSource().getWorld().getChunkProvider().getChunkGenerator().getBiomeProvider();
+    private static TFBiomeProvider getBiomeProvider(CommandContext<CommandSource> context) {
+        return (TFBiomeProvider) context.getSource().getWorld().getChunkProvider().getChunkGenerator().getBiomeProvider();
     }
 
     private static CommandSyntaxException createException(String type, String message, Object... args) {

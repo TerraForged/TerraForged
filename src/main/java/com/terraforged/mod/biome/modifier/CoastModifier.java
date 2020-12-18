@@ -27,7 +27,7 @@ package com.terraforged.mod.biome.modifier;
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.mod.api.biome.modifier.BiomeModifier;
 import com.terraforged.mod.biome.map.BiomeMap;
-import com.terraforged.mod.biome.provider.TerraBiomeProvider;
+import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TerraContext;
 import net.minecraft.world.biome.Biome;
 
@@ -53,7 +53,7 @@ public class CoastModifier implements BiomeModifier {
     public Biome modify(Biome in, Cell cell, int x, int z) {
         if (cell.terrain.isCoast()) {
             Biome coast = biomeMap.getCoast(cell);
-            if (TerraBiomeProvider.isValidBiome(coast)) {
+            if (TFBiomeProvider.isValidBiome(coast)) {
                 return coast;
             }
         }

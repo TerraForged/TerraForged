@@ -27,7 +27,7 @@ package com.terraforged.mod.biome.spawn;
 import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.continent.SpawnType;
 import com.terraforged.mod.Log;
-import com.terraforged.mod.biome.provider.TerraBiomeProvider;
+import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.Heightmap;
@@ -48,9 +48,9 @@ public class SpawnHandler {
         if (event.getWorld() instanceof ServerWorld) {
             ServerWorld world =(ServerWorld) event.getWorld();
             ChunkGenerator generator = world.getChunkProvider().getChunkGenerator();
-            if (generator.getBiomeProvider() instanceof TerraBiomeProvider) {
+            if (generator.getBiomeProvider() instanceof TFBiomeProvider) {
                 Log.info("Searching for world spawn position");
-                TerraBiomeProvider provider = (TerraBiomeProvider) generator.getBiomeProvider();
+                TFBiomeProvider provider = (TFBiomeProvider) generator.getBiomeProvider();
                 BlockPos center = getSearchCenter(provider);
                 SpawnSearch search = new SpawnSearch(center, provider);
 
@@ -74,7 +74,7 @@ public class SpawnHandler {
         }
     }
 
-    private static BlockPos getSearchCenter(TerraBiomeProvider provider) {
+    private static BlockPos getSearchCenter(TFBiomeProvider provider) {
         SpawnType spawnType = provider.getContext().terraSettings.world.properties.spawnType;
         if (spawnType == SpawnType.WORLD_ORIGIN) {
             return BlockPos.ZERO;

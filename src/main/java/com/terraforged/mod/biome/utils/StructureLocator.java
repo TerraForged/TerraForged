@@ -26,7 +26,7 @@ package com.terraforged.mod.biome.utils;
 
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.concurrent.Resource;
-import com.terraforged.mod.biome.provider.TerraBiomeProvider;
+import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
@@ -50,7 +50,7 @@ public class StructureLocator {
         int chunkZ = center.getZ() >> 4;
 
         SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
-        TerraBiomeProvider biomeProvider = generator.getBiomeProvider();
+        TFBiomeProvider biomeProvider = generator.getBiomeProvider();
 
         try (Resource<Cell> cell = Cell.pooled()) {
             for (int radius = 0; radius <= attempts; ++radius) {
