@@ -161,22 +161,22 @@ public class TFChunkGenerator extends ChunkGenerator {
         return column;
     }
 
-    @Nullable // findStructure
-    public BlockPos func_235956_a_(ServerWorld world, Structure<?> structure, BlockPos pos, int attempts, boolean flag) {
-        try (Section section = Profiler.FIND_STRUCTURE.punchIn()) {
-            if (!this.biomeProvider.hasStructure(structure)) {
-                return null;
-            }
-            if (structure == Structure.STRONGHOLD) {
-                return super.func_235956_a_(world, structure, pos, attempts, flag);
-            }
-            StructureSeparationSettings settings = this.settings.getStructures().func_236197_a_(structure);
-            if (settings == null) {
-                return null;
-            }
-            return StructureLocator.findStructure(this, world, world.func_241112_a_(), structure, pos, attempts, flag, settings);
-        }
-    }
+//    @Nullable // findStructure
+//    public BlockPos func_235956_a_(ServerWorld world, Structure<?> structure, BlockPos pos, int attempts, boolean flag) {
+//        try (Section section = Profiler.FIND_STRUCTURE.punchIn()) {
+//            if (!this.biomeProvider.hasStructure(structure)) {
+//                return null;
+//            }
+//            if (structure == Structure.STRONGHOLD) {
+//                return super.func_235956_a_(world, structure, pos, attempts, flag);
+//            }
+//            StructureSeparationSettings settings = this.settings.getStructures().func_236197_a_(structure);
+//            if (settings == null) {
+//                return null;
+//            }
+//            return StructureLocator.findStructure(this, world, world.func_241112_a_(), structure, pos, attempts, flag, settings);
+//        }
+//    }
 
     @Override
     public final void func_242707_a(DynamicRegistries registries, StructureManager structures, IChunk chunk, TemplateManager templates, long seed) {

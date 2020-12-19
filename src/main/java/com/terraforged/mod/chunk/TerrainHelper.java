@@ -90,7 +90,7 @@ public class TerrainHelper {
                 if (structureStart != null && structureStart.isValid()) {
                     for (StructurePiece structurepiece : structureStart.getComponents()) {
                         // collect if piece is within radius of the chunk
-                        if (structurepiece.func_214810_a(pos, 12)) {
+                        if (structurepiece.func_214810_a(pos, 16)) {
                             collectPiece(structurepiece, pieces);
                         }
                     }
@@ -122,7 +122,7 @@ public class TerrainHelper {
                     StructurePiece piece = iterator.next();
                     MutableBoundingBox pieceBounds = piece.getBoundingBox();
                     int length = Math.min(pieceBounds.maxX - pieceBounds.minX, pieceBounds.maxZ - pieceBounds.minZ);
-                    int borderRadius = Math.min(5, Math.max(15, NoiseUtil.round(length * radiusScale)));
+                    int borderRadius = Math.min(5, Math.max(12, NoiseUtil.round(length * radiusScale)));
 
                     if (!intersects(chunkBounds, pieceBounds, mutableBounds, borderRadius)) {
                         continue;
