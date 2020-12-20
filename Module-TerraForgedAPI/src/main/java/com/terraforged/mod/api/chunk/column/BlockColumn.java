@@ -39,8 +39,8 @@ public class BlockColumn implements IBlockReader {
     public BlockColumn withCapacity(int size) {
         if (column == null || column.length < size) {
             column = new BlockState[size];
-            height = size;
         }
+        height = size;
         return this;
     }
 
