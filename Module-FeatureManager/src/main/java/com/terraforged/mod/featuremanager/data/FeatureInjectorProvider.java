@@ -56,8 +56,11 @@ public class FeatureInjectorProvider implements IDataProvider {
     private final Map<String, Modifier<Jsonifiable>> modifiers = new HashMap<>();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
+    private final BiomeMatcher vanillaAndTF;
+
     public FeatureInjectorProvider(DataGenerator gen, String namespace) {
         dir = gen.getOutputFolder().resolve(Paths.get("data", namespace, "features"));
+        vanillaAndTF = BiomeMatcher.of(getContext(), "minecraft:*", "terraforged:*");
     }
 
     public GameContext getContext() {
@@ -66,6 +69,10 @@ public class FeatureInjectorProvider implements IDataProvider {
 
     public void add(String path, FeatureMatcher featureMatcher, Jsonifiable modifier) {
         add(path, BiomeMatcher.ANY, featureMatcher, modifier);
+    }
+
+    public void addTFVanilla(String path, FeatureMatcher featureMatcher, Jsonifiable modifier) {
+        add(path, vanillaAndTF, featureMatcher, modifier);
     }
 
     public void add(String path, BiomeMatcher biomeMatcher, FeatureMatcher featureMatcher, Jsonifiable modifier) {

@@ -42,6 +42,7 @@ public class FeatureGenerator {
     @SubscribeEvent
     public static void gather(GatherDataEvent event) {
         FeatureInjectorProvider provider = new FeatureInjectorProvider(event.getGenerator(), "terraforged");
+
         try (DataManager dataManager = SetupFactory.createDataManager()) {
             FeatureManager.initData(dataManager);
             Ores.addInjectors(provider);

@@ -34,8 +34,8 @@ import net.minecraft.world.gen.feature.Feature;
 public class Sediments {
 
     public static void addInjectors(FeatureInjectorProvider provider) {
-        provider.add("sediments/clay", FeatureMatcher.and(Blocks.CLAY, Feature.DISK), FeatureTransformer.replace(Feature.DISK,  DiskFeature.INSTANCE));
-        provider.add("sediments/dirt", FeatureMatcher.and(Blocks.DIRT, Feature.DISK), FeatureTransformer.replace(Feature.DISK, DiskFeature.INSTANCE));
-        provider.add("sediments/gravel", FeatureMatcher.and(Blocks.GRAVEL, Feature.DISK), FeatureTransformer.replace(Feature.DISK, DiskFeature.INSTANCE));
+        provider.addTFVanilla("sediments/clay", FeatureMatcher.and(Blocks.CLAY, Feature.DISK), FeatureTransformer.replace(Feature.DISK,  DiskFeature.INSTANCE));
+        provider.addTFVanilla("sediments/dirt", FeatureMatcher.and(Blocks.DIRT, Feature.DISK), FeatureTransformer.replace(Feature.DISK, DiskFeature.INSTANCE));
+        provider.addTFVanilla("sediments/gravel", FeatureMatcher.and(Blocks.GRAVEL, Feature.DISK), FeatureTransformer.replace(Feature.DISK, DiskFeature.INSTANCE));
     }
 }

@@ -35,6 +35,7 @@ import net.minecraft.world.biome.Biome;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -57,10 +58,7 @@ public class BiomeMatcher implements Predicate<Biome>, Comparable<BiomeMatcher>,
     public JsonElement toJson(GameContext context) {
         if (!biomes.isEmpty()) {
             JsonArray array = new JsonArray();
-            for (Biome biome : biomes) {
-                ResourceLocation name = context.biomes.getRegistryName(biome);
-                array.add(name.toString());
-            }
+            biomes.stream().map(context.biomes::getRegistryName).map(Objects::toString).sorted().forEach(array::add);
             return array;
         }
         return JsonNull.INSTANCE;
@@ -82,6 +80,10 @@ public class BiomeMatcher implements Predicate<Biome>, Comparable<BiomeMatcher>,
         combined.addAll(biomes);
         combined.addAll(other.biomes);
         return new BiomeMatcher(combined);
+    }
+
+    public static BiomeMatcher vanilla(GameContext context) {
+        return of(context, "minecraft:*");
     }
 
     public static BiomeMatcher of(GameContext context, Biome.Category... types) {

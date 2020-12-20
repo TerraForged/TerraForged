@@ -131,9 +131,6 @@ public class SetupFactory {
                 FeatureTransformer.builder().key("tries", 1).build()
         );
 
-        // block ugly features
-        modifiers.getPredicates().add(Matchers.sedimentDisks(context.gameContext), FeaturePredicate.DENY);
-
         return FeatureManager.create(SetupHooks.setup(modifiers, context.copy()));
     }
 

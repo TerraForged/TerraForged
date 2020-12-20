@@ -35,11 +35,11 @@ import net.minecraft.world.gen.feature.Feature;
 public class Ores {
 
     public static void addInjectors(FeatureInjectorProvider provider) {
-        provider.add("ores/coal", FeatureMatcher.and(Blocks.COAL_ORE, Feature.ORE), scaledOre(140, 128, 20));
-        provider.add("ores/iron", FeatureMatcher.and(Blocks.IRON_ORE, Feature.ORE), scaledOre(100, 64, 24));
-        provider.add("ores/gold", FeatureMatcher.and(Blocks.GOLD_ORE, Feature.ORE, 2), scaledOre(35, 32, 2));
-        provider.add("ores/redstone", FeatureMatcher.and(Blocks.REDSTONE_ORE, Feature.ORE), scaledOre(18, 16, 8));
-        provider.add("ores/diamond", FeatureMatcher.and(Blocks.DIAMOND_ORE, Feature.ORE), FeatureTransformer.key("maximum", 18));
+        provider.addTFVanilla("ores/coal", FeatureMatcher.and(Blocks.COAL_ORE, Feature.ORE), scaledOre(140, 128, 20));
+        provider.addTFVanilla("ores/iron", FeatureMatcher.and(Blocks.IRON_ORE, Feature.ORE), scaledOre(100, 64, 24));
+        provider.addTFVanilla("ores/gold", FeatureMatcher.and(Blocks.GOLD_ORE, Feature.ORE, 2), scaledOre(35, 32, 2));
+        provider.addTFVanilla("ores/redstone", FeatureMatcher.and(Blocks.REDSTONE_ORE, Feature.ORE), scaledOre(18, 16, 8));
+        provider.addTFVanilla("ores/diamond", FeatureMatcher.and(Blocks.DIAMOND_ORE, Feature.ORE), FeatureTransformer.key("maximum", 18));
         provider.add(
                 "ores/gold_extra",
                 BiomeMatcher.of(provider.getContext(), Biome.Category.MESA),
