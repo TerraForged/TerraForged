@@ -26,10 +26,14 @@ package com.terraforged.mod.featuremanager.template.type.tree;
 
 
 import com.terraforged.mod.featuremanager.template.decorator.Decorator;
+import com.terraforged.mod.featuremanager.util.DummySet;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.Random;
 
 public class TreeDecorator implements Decorator<TreeDecoratorBuffer> {
+
+    private static final DummySet<BlockPos> DUMMY_SET = DummySet.get();
 
     private final net.minecraft.world.gen.treedecorator.TreeDecorator decorator;
 
@@ -48,7 +52,8 @@ public class TreeDecorator implements Decorator<TreeDecoratorBuffer> {
                 random,
                 buffer.getLogs(),
                 buffer.getLeaves(),
-                buffer.getAllPositions(),
+                // used to track blocks added by the decorator - TF doesn't need it
+                TreeDecorator.DUMMY_SET,
                 buffer.getBounds()
         );
     }

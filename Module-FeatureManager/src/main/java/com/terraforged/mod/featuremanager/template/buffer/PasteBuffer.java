@@ -25,9 +25,6 @@
 package com.terraforged.mod.featuremanager.template.buffer;
 
 import java.util.BitSet;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class PasteBuffer implements BufferIterator {
 
@@ -79,34 +76,6 @@ public class PasteBuffer implements BufferIterator {
         if (recordPlaced) {
             if (placed != null) {
                 placed.set(i, false);
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        BitSet bitSet = new BitSet();
-        for (int i = 0; i < 50; i++) {
-            bitSet.set(i, true);
-        }
-
-        int index = -1;
-        Set<Integer> visited = new HashSet<>();
-        while (true) {
-            index = bitSet.nextSetBit(index + 1);
-            if (index == -1) {
-                System.out.println("Done");
-                return;
-            }
-
-            if (!visited.add(index)) {
-                throw new RuntimeException("Duplicate " + index);
-            }
-
-            System.out.println(index);
-
-            if (ThreadLocalRandom.current().nextInt(10) < 4) {
-                bitSet.set(index, false);
-                System.out.println("Removed: " + index);
             }
         }
     }

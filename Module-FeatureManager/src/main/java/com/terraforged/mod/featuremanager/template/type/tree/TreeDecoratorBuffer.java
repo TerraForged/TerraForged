@@ -33,12 +33,11 @@ import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.ISeedReader;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class TreeDecoratorBuffer extends BoundsRecorder implements DecoratorBuffer {
 
-    private Set<BlockPos> logs = null;
-    private Set<BlockPos> leaves = null;
+    private static final List<BlockPos> EMPTY_LIST = Collections.emptyList();
+    private static final Comparator<BlockPos> HIGHEST_FIRST = Comparator.comparingInt(Vector3i::getY);
 
     private List<BlockPos> logList = null;
     private List<BlockPos> leafList = null;
@@ -67,55 +66,54 @@ public class TreeDecoratorBuffer extends BoundsRecorder implements DecoratorBuff
     public void translate(BlockPos offset) {
         super.translate(offset);
 
-        logList = getLogPositions().stream()
-                .map(pos -> pos.add(offset))
-                .sorted(Comparator.comparingInt(Vector3i::getY))
-                .collect(Collectors.toList());
+        if (logList != null) {
+            logList.replaceAll(pos -> pos.add(offset));
+        }
 
-        leafList = getLeafPositions().stream()
-                .map(pos -> pos.add(offset))
-                .sorted(Comparator.comparingInt(Vector3i::getY))
-                .collect(Collectors.toList());
-    }
-
-    private Set<BlockPos> getLogPositions() {
-        return logs == null ? Collections.emptySet() : logs;
-    }
-
-    private Set<BlockPos> getLeafPositions() {
-        return leaves == null ? Collections.emptySet() : leaves;
+        if (leafList != null) {
+            leafList.replaceAll(pos -> pos.add(offset));
+        }
     }
 
     public List<BlockPos> getLogs() {
-        if (logList == null) {
-            logList = getLogPositions().stream().sorted(Comparator.comparingInt(Vector3i::getY)).collect(Collectors.toList());
+        if (logList != null) {
+            logList.sort(HIGHEST_FIRST);
+            return logList;
         }
-        return logList;
+        return EMPTY_LIST;
     }
 
     public List<BlockPos> getLeaves() {
-        if (leafList == null) {
-            leafList = getLeafPositions().stream().sorted(Comparator.comparingInt(Vector3i::getY)).collect(Collectors.toList());
+        if (leafList != null) {
+            leafList.sort(HIGHEST_FIRST);
+            return leafList;
         }
-        return leafList;
+        return EMPTY_LIST;
     }
 
     private void recordState(BlockPos pos, BlockState state) {
         if (BlockTags.LEAVES.contains(state.getBlock())) {
-            leaves = add(leaves, pos);
+            leafList = safeAdd(leafList, pos);
             return;
         }
 
         if (BlockTags.LOGS.contains(state.getBlock())) {
-            logs = add(logs, pos);
+            logList = safeAdd(logList, pos);
         }
     }
 
-    private Set<BlockPos> add(Set<BlockPos> set, BlockPos pos) {
-        if (set == null) {
-            set = new HashSet<>();
+    private static List<BlockPos> safeAdd(List<BlockPos> list, BlockPos pos) {
+        if (list == null) {
+            list = new ArrayList<>();
         }
-        set.add(pos);
-        return set;
+        list.add(finalize(pos));
+        return list;
+    }
+
+    private static BlockPos finalize(BlockPos pos) {
+        if (pos instanceof BlockPos.Mutable) {
+            return pos.toImmutable();
+        }
+        return pos;
     }
 }

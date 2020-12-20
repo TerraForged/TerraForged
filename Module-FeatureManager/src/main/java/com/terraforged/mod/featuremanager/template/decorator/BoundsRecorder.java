@@ -30,16 +30,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.ISeedReader;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 public abstract class BoundsRecorder extends SeedWorldDelegate {
 
     private BlockPos.Mutable min = null;
     private BlockPos.Mutable max = null;
-    private Set<BlockPos> allPositions = null;
 
     public BoundsRecorder(ISeedReader delegate) {
         super(delegate);
@@ -47,23 +41,18 @@ public abstract class BoundsRecorder extends SeedWorldDelegate {
 
     @Override
     public boolean setBlockState(BlockPos pos, BlockState newState, int flags) {
-        recordPos(pos);
         recordMin(pos.getX(), pos.getY(), pos.getZ());
         recordMax(pos.getX(), pos.getY(), pos.getZ());
         return super.setBlockState(pos, newState, flags);
     }
 
     public void translate(BlockPos offset) {
-        allPositions = getAllPositions().stream()
-                .map(pos -> pos.add(offset))
-                .collect(Collectors.toSet());
-    }
-
-    public Set<BlockPos> getAllPositions() {
-        if (allPositions == null) {
-            return Collections.emptySet();
+        if (min != null) {
+            min.move(offset.getX(), offset.getY(), offset.getZ());
         }
-        return allPositions;
+        if (max != null) {
+            max.move(offset.getX(), offset.getY(), offset.getZ());
+        }
     }
 
     public MutableBoundingBox getBounds() {
@@ -71,13 +60,6 @@ public abstract class BoundsRecorder extends SeedWorldDelegate {
             return MutableBoundingBox.getNewBoundingBox();
         }
         return MutableBoundingBox.createProper(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ());
-    }
-
-    private void recordPos(BlockPos pos) {
-        if (allPositions == null) {
-            allPositions = new HashSet<>();
-        }
-        allPositions.add(pos);
     }
 
     private void recordMin(int x, int y, int z) {
