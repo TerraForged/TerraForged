@@ -32,9 +32,9 @@ import net.minecraft.world.chunk.IChunk;
 
 public class BaseDecorator implements ColumnDecorator {
 
-    private static final float RIVER_MASK_THRESHOLD = 0.85F;
-    private static final float CONTINENT_MASK_THRESHOLD = 0.75F;
     public static final BaseDecorator INSTANCE = new BaseDecorator();
+    private static final float RIVER_MASK_THRESHOLD = 0.85F;
+    private static final int VOLCANO_PIPE_DEPTH_THRESHOLD = 8;
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
@@ -44,18 +44,17 @@ public class BaseDecorator implements ColumnDecorator {
     }
 
     protected int decorateFluid(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        if (context.cell.terrain == TerrainType.VOLCANO_PIPE
-                && context.cell.riverMask > RIVER_MASK_THRESHOLD
-                && context.cell.continentEdge > CONTINENT_MASK_THRESHOLD) {
-
+        if (context.cell.terrain == TerrainType.VOLCANO_PIPE && context.cell.riverMask > RIVER_MASK_THRESHOLD) {
             int lavaStart = Math.max(context.levels.waterY + 10, y - 30);
 
-            if (lavaStart >= y) {
+            // ie lavaStart must +8 lower than surface level
+            if (lavaStart >= y - VOLCANO_PIPE_DEPTH_THRESHOLD) {
                 return y;
             }
 
             int lavaEnd = Math.max(5, context.levels.waterY - 10);
             fillDown(context, chunk, x, z, lavaStart, lavaEnd, States.LAVA.get());
+
             return lavaEnd;
         }
 
