@@ -109,7 +109,6 @@ public class SetupFactory {
             modifiers.getPredicates().add(FeatureMatcher.of(Feature.SPRING_FEATURE), FeaturePredicate.DENY);
         }
 
-
         if (test("Custom features", context.terraSettings.miscellaneous.customBiomeFeatures)) {
             // remove default trees from river biomes since forests can go up to the edge of rivers
             modifiers.getPredicates().add(BiomeMatcher.of(context.gameContext, Biome.Category.RIVER), Matchers.tree(), FeaturePredicate.DENY);
