@@ -78,7 +78,7 @@ minecraft {
             property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
             property "forge.logging.console.level", "debug"
             property "fml.earlyprogresswindow", "false"
-            args "--mod", "terraforged", "--server", "--output", file("generated/resources/")
+            args "--mod", "terraforged", "--server", "--output", file("Module-Data/resources/")
             jvmArgs "-Xmx4G", "-Xms2G"
             mods {
                 terraforged {
@@ -96,7 +96,7 @@ sourceSets {
     }
     // add resources for the runData task to path
     main.resources {
-        srcDirs += "generated/resources/"
+        srcDirs += "Module-Data/resources/"
         srcDirs += "Module-TerraForgedAPI/src/main/resources"
         srcDirs += "Module-FeatureManager/src/main/resources"
         exclude ".cache"
