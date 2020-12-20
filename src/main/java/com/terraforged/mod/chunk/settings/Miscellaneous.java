@@ -41,6 +41,9 @@ public class Miscellaneous {
     @Comment("Replace surface materials where erosion has occurred")
     public boolean erosionDecorator = true;
 
+    @Comment("Only places regular stone on eroded surfaces")
+    public boolean plainStoneErosion = true; // todo: default = false
+
     @Comment("Removes snow from the terrain where it shouldn't naturally settle")
     public boolean naturalSnowDecorator = true;
 

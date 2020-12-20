@@ -26,6 +26,7 @@ package com.terraforged.mod.chunk.column;
 
 import com.terraforged.engine.concurrent.task.LazySupplier;
 import com.terraforged.engine.world.terrain.TerrainType;
+import com.terraforged.mod.api.biome.surface.SurfaceChunk;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.api.material.state.States;
@@ -62,6 +63,7 @@ public class ErosionDecorator implements ColumnDecorator {
     private final int seed2;
     private final int seed3;
     private final float minY;
+    private final boolean plainStone;
     private final LazySupplier<Materials> materials;
 
     public ErosionDecorator(TerraContext context) {
@@ -70,10 +72,16 @@ public class ErosionDecorator implements ColumnDecorator {
         this.seed3 = context.seed.next();
         this.minY = context.levels.water;
         this.materials = context.materials;
+        this.plainStone = context.terraSettings.miscellaneous.plainStoneErosion;
     }
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
+
+    }
+
+    @Override
+    public void decorate(SurfaceChunk buffer, DecoratorContext context, int x, int y, int z) {
         if (context.cell.value < minY || context.cell.terrain.isRiver() || context.cell.terrain.isWetland()) {
             return;
         }
@@ -81,6 +89,8 @@ public class ErosionDecorator implements ColumnDecorator {
         if (context.cell.terrain == TerrainType.VOLCANO_PIPE) {
             return;
         }
+
+        IChunk chunk = plainStone ? buffer : buffer.getDelegate();
 
         y = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
 
