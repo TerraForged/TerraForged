@@ -109,6 +109,7 @@ public class SetupFactory {
             modifiers.getPredicates().add(FeatureMatcher.of(Feature.SPRING_FEATURE), FeaturePredicate.DENY);
         }
 
+
         if (test("Custom features", context.terraSettings.miscellaneous.customBiomeFeatures)) {
             // remove default trees from river biomes since forests can go up to the edge of rivers
             modifiers.getPredicates().add(BiomeMatcher.of(context.gameContext, Biome.Category.RIVER), Matchers.tree(), FeaturePredicate.DENY);
@@ -132,9 +133,6 @@ public class SetupFactory {
 
         // block ugly features
         modifiers.getPredicates().add(Matchers.sedimentDisks(context.gameContext), FeaturePredicate.DENY);
-
-
-        modifiers.getPredicates().add(FeatureMatcher.of("biomesoplenty:bone_spine"), FeaturePredicate.DENY);
 
         return FeatureManager.create(SetupHooks.setup(modifiers, context.copy()));
     }
