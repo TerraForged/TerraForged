@@ -44,10 +44,6 @@ public class FastChunk extends ChunkDelegate {
 
     private static final Set<Heightmap.Type> HEIGHT_MAPS = ImmutableSet.of(Heightmap.Type.OCEAN_FLOOR_WG, Heightmap.Type.WORLD_SURFACE_WG);
 
-    private static final int arraySize = 256;
-    private static final int bitsPerEntry = 9;
-    private static final long maxEntryValue = (1L << bitsPerEntry) - 1L;
-
     private final int blockX;
     private final int blockZ;
     private final ChunkPrimer primer;

@@ -25,19 +25,33 @@
 package com.terraforged.mod.api.biome.surface;
 
 import com.terraforged.mod.api.chunk.ChunkDelegate;
+import com.terraforged.mod.api.material.state.States;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.IChunk;
 
 import javax.annotation.Nullable;
 
-public class ChunkSurfaceBuffer extends ChunkDelegate {
+public class SurfaceChunk extends ChunkDelegate {
 
     private int surfaceTop;
     private int surfaceBottom;
 
-    public ChunkSurfaceBuffer(IChunk chunk) {
+    public SurfaceChunk(IChunk chunk) {
         super(chunk);
+    }
+
+    @Override
+    public BlockState getBlockState(BlockPos pos) {
+        BlockState state = super.getBlockState(pos);
+        if (state.getBlock() == Blocks.WATER) {
+            return state;
+        }
+        if (state.isSolid()) {
+            return States.STONE.get();
+        }
+        return Blocks.AIR.getDefaultState();
     }
 
     @Nullable

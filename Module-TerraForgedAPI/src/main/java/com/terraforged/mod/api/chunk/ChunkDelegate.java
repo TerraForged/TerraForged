@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.api.chunk;
 
+import com.terraforged.mod.chunk.util.FastChunk;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.shorts.ShortList;
 import net.minecraft.block.Block;
@@ -338,5 +339,12 @@ public class ChunkDelegate implements IChunk {
     @Override
     public void setStructureReferences(Map<Structure<?>, LongSet> structureReferences) {
         delegate.setStructureReferences(structureReferences);
+    }
+
+    public static IChunk unwrap(IChunk chunk) {
+        if (chunk instanceof ChunkDelegate) {
+            return unwrap(((ChunkDelegate) chunk).getDelegate());
+        }
+        return chunk;
     }
 }

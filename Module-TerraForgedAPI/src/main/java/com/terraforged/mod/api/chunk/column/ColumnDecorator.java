@@ -24,8 +24,7 @@
 
 package com.terraforged.mod.api.chunk.column;
 
-import com.terraforged.mod.api.biome.surface.ChunkSurfaceBuffer;
-import com.terraforged.mod.api.biome.surface.SurfaceContext;
+import com.terraforged.mod.api.biome.surface.SurfaceChunk;
 import com.terraforged.noise.Source;
 import com.terraforged.noise.source.NoiseSource;
 import net.minecraft.block.BlockState;
@@ -38,7 +37,7 @@ public interface ColumnDecorator {
 
     void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z);
 
-    default void decorate(ChunkSurfaceBuffer buffer, SurfaceContext context, int x, int y, int z) {
+    default void decorate(SurfaceChunk buffer, DecoratorContext context, int x, int y, int z) {
         decorate(buffer.getDelegate(), context, x, y, z);
     }
 

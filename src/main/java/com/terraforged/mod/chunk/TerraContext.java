@@ -33,7 +33,7 @@ import com.terraforged.engine.world.GeneratorContext;
 import com.terraforged.engine.world.WorldGeneratorFactory;
 import com.terraforged.engine.world.heightmap.Heightmap;
 import com.terraforged.mod.Log;
-import com.terraforged.mod.api.biome.surface.ChunkSurfaceBuffer;
+import com.terraforged.mod.api.biome.surface.SurfaceChunk;
 import com.terraforged.mod.api.biome.surface.SurfaceContext;
 import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.biome.TFBiomeContainer;
@@ -73,7 +73,7 @@ public class TerraContext extends GeneratorContext {
         return new DecoratorContext(chunk, levels, factory.get().getClimate(), false);
     }
 
-    public SurfaceContext surface(ChunkSurfaceBuffer buffer, TFBiomeContainer biomes, DimensionSettings settings) {
+    public SurfaceContext surface(SurfaceChunk buffer, TFBiomeContainer biomes, DimensionSettings settings) {
         return new SurfaceContext(buffer, biomes, levels, factory.get().getClimate(), settings, seed.get());
     }
 

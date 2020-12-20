@@ -37,12 +37,12 @@ public class SurfaceContext extends DecoratorContext implements AutoCloseable {
     public final BlockState solid;
     public final BlockState fluid;
     public final TFBiomeContainer biomes;
-    public final ChunkSurfaceBuffer buffer;
+    public final SurfaceChunk buffer;
     public final CachedSurface cached = new CachedSurface();
 
     public double noise;
 
-    public SurfaceContext(ChunkSurfaceBuffer buffer, TFBiomeContainer biomes, Levels levels, Climate climate, DimensionSettings settings, long seed) {
+    public SurfaceContext(SurfaceChunk buffer, TFBiomeContainer biomes, Levels levels, Climate climate, DimensionSettings settings, long seed) {
         super(buffer, levels, climate);
         this.solid = settings.getDefaultBlock();
         this.fluid = settings.getDefaultFluid();

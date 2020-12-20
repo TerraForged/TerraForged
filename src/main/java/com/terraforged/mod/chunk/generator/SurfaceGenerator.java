@@ -25,12 +25,11 @@
 package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.engine.tile.chunk.ChunkReader;
-import com.terraforged.mod.api.biome.surface.ChunkSurfaceBuffer;
+import com.terraforged.mod.api.biome.surface.SurfaceChunk;
 import com.terraforged.mod.api.biome.surface.SurfaceContext;
 import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.util.FastChunk;
-import com.terraforged.mod.chunk.util.SimpleChunk;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
@@ -54,7 +53,7 @@ public class SurfaceGenerator implements Generator.Surfaces {
     public final void generateSurface(WorldGenRegion world, IChunk chunk) {
         try (ChunkReader reader = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z)) {
             TFBiomeContainer container = TFBiomeContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
-            ChunkSurfaceBuffer buffer = new ChunkSurfaceBuffer(SimpleChunk.wrap(chunk));
+            SurfaceChunk buffer = new SurfaceChunk(chunk);
 
             try (SurfaceContext context = generator.getContext().surface(buffer, container, generator.getSettings())) {
                 reader.iterate(context, (cell, dx, dz, ctx) -> {
@@ -71,7 +70,7 @@ public class SurfaceGenerator implements Generator.Surfaces {
                     int py = ctx.levels.scale(cell.value);
 
                     for (int i = 0; i < generator.getSurfaceDecorators().size(); i++) {
-                        generator.getSurfaceDecorators().get(i).decorate(ctx.buffer, ctx, px, py, pz);
+                        generator.getSurfaceDecorators().get(i).decorate(buffer, ctx, px, py, pz);
                     }
                 });
                 FastChunk.updateWGHeightmaps(chunk);
