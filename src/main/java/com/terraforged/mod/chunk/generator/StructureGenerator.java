@@ -25,6 +25,7 @@
 package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.mod.chunk.TFChunkGenerator;
+import com.terraforged.mod.featuremanager.predicate.FeaturePredicate;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.crash.ReportedException;
@@ -66,6 +67,10 @@ public class StructureGenerator implements Generator.Structures {
     }
 
     private void generate(IChunk chunk, ChunkPos pos, Biome biome, StructureFeature<?, ?> structure, DynamicRegistries registries, StructureManager structures, TemplateManager templates, long seed) {
+        FeaturePredicate predicate = generator.getStructureManager().getPredicate(structure.field_236268_b_);
+        if (!predicate.test(chunk, biome)) {
+            return;
+        }
         StructureStart<?> start = structures.getStructureStart(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, chunk);
         int i = start != null ? start.getRefCount() : 0;
         StructureSeparationSettings settings = generator.func_235957_b_().func_236197_a_(structure.field_236268_b_);

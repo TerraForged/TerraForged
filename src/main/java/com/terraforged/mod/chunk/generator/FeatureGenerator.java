@@ -34,7 +34,6 @@ import com.terraforged.mod.chunk.fix.RegionFix;
 import com.terraforged.mod.chunk.util.DecoratorException;
 import com.terraforged.mod.featuremanager.biome.BiomeFeature;
 import com.terraforged.mod.featuremanager.biome.BiomeFeatures;
-import com.terraforged.mod.featuremanager.predicate.FeaturePredicate;
 import com.terraforged.mod.featuremanager.util.identity.Identity;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.util.SharedSeedRandom;
@@ -128,13 +127,6 @@ public class FeatureGenerator implements Generator.Features {
                 for (int structureIndex = 0; structureIndex < structures.size(); structureIndex++) {
                     Structure<?> structure = structures.get(structureIndex);
                     random.setFeatureSeed(decorationSeed, featureSeed++, stageIndex);
-
-                    FeaturePredicate predicate = generator.getFeatureManager().getStructurePredicate(structure);
-
-                    if (!predicate.test(chunk, biome)) {
-                        continue;
-                    }
-
                     try {
                         timeStamp = System.currentTimeMillis();
                         manager.func_235011_a_(SectionPos.from(pos), structure).forEach(start -> start.func_230366_a_(

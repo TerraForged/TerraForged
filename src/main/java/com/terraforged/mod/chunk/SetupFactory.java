@@ -134,14 +134,6 @@ public class SetupFactory {
         // block ugly features
         modifiers.getPredicates().add(Matchers.sedimentDisks(context.gameContext), FeaturePredicate.DENY);
 
-        // prevent structures in weird places
-        modifiers.add(Structures.shipwreck(), MinDepth.DEPTH55);
-        modifiers.add(Structures.oceanRuin(), MinDepth.DEPTH45);
-        modifiers.add(Structures.oceanMonument(), DeepWater.INSTANCE);
-
-        modifiers.add(Structures.mansion(), new MaxHeight(context.levels.waterY + 64));
-        modifiers.add(Structures.mineshaft(), new MinHeight(context.levels.waterY + 16));
-
         return FeatureManager.create(SetupHooks.setup(modifiers, context.copy()));
     }
 
@@ -177,6 +169,8 @@ public class SetupFactory {
         manager.register(Structures.oceanMonument(), DeepWater.INSTANCE);
         manager.register(Structures.oceanRuin(), DeepWater.INSTANCE);
         manager.register(Structures.shipwreck(), new MinDepth(context.levels.waterLevel - 8));
+        manager.register(Structures.mineshaft(), new MinHeight(context.levels.waterY + 16));
+        manager.register(Structures.mansion(), new MaxHeight(context.levels.waterY + 64));
         return SetupHooks.setup(manager, context);
     }
 

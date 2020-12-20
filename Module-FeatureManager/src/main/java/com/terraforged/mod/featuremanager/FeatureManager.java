@@ -54,20 +54,14 @@ public class FeatureManager implements FeatureDecorator {
     public static final Marker INIT = MarkerManager.getMarker("INIT");
 
     private final Map<Biome, BiomeFeatures> biomes;
-    private final Map<Object, FeaturePredicate> structures;
 
-    public FeatureManager(Map<Biome, BiomeFeatures> biomes, Map<Object, FeaturePredicate> structures) {
+    public FeatureManager(Map<Biome, BiomeFeatures> biomes) {
         this.biomes = biomes;
-        this.structures = new IdentityHashMap<>(structures);
     }
 
     @Override
     public FeatureManager getFeatureManager() {
         return this;
-    }
-
-    public FeaturePredicate getStructurePredicate(Structure<?> structure) {
-        return structures.getOrDefault(structure, FeaturePredicate.ALLOW);
     }
 
     public BiomeFeatures getFeatures(Biome biome) {
@@ -117,7 +111,7 @@ public class FeatureManager implements FeatureDecorator {
         }
 
         LOG.debug(INIT, " Initialization complete");
-        return new FeatureManager(biomes, modifiers.getStructurePredicates());
+        return new FeatureManager(biomes);
     }
 
     private static BiomeFeatures compute(Biome biome, FeatureModifiers modifiers) {

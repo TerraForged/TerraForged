@@ -52,7 +52,6 @@ public class FeatureModifiers extends Event {
     private final ModifierList<FeatureAppender> appenders = new ModifierList<>();
     private final ModifierList<FeatureTransformer> transformers = new ModifierList<>();
     private final ModifierList<FeaturePredicate> predicates = new ModifierList<>();
-    private final Map<Object, FeaturePredicate> structurePredicates = new IdentityHashMap<>();
 
     private final GameContext context;
 
@@ -66,10 +65,6 @@ public class FeatureModifiers extends Event {
 
     public DynamicList getDynamic() {
         return dynamics;
-    }
-
-    public void add(Structure<?> structure, FeaturePredicate predicate) {
-        structurePredicates.put(structure, predicate);
     }
 
     public ModifierList<FeatureReplacer> getReplacers() {
@@ -90,10 +85,6 @@ public class FeatureModifiers extends Event {
 
     public ModifierList<FeatureTransformer> getTransformers() {
         return transformers;
-    }
-
-    public Map<Object, FeaturePredicate> getStructurePredicates() {
-        return structurePredicates;
     }
 
     public void sort() {
