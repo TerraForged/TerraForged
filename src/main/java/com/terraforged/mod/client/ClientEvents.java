@@ -48,6 +48,7 @@ public class ClientEvents {
     @SubscribeEvent
     public static void setup(FMLClientSetupEvent event) {
         Log.info("Client setup");
+        CrashHandler.INSTANCE.set(new ClientCrashHandler());
 
         event.enqueueWork(() -> {
             Log.info("Adding DataPackFinder");
@@ -60,8 +61,6 @@ public class ClientEvents {
         });
 
         ForgeWorldTypeScreens.registerFactory(LevelType.TERRAFORGED, DemoScreen::new);
-
-        CrashHandler.INSTANCE.set(new ClientCrashHandler());
     }
 
     private static BiomeGeneratorTypeScreens.IFactory getFactory() {

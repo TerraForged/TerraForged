@@ -52,6 +52,7 @@ import com.terraforged.mod.featuremanager.util.codec.DecoderFunc;
 import com.terraforged.mod.featuremanager.util.codec.EncoderFunc;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.material.geology.GeoManager;
+import com.terraforged.mod.util.crash.CrashHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.math.BlockPos;
@@ -178,7 +179,7 @@ public class TFChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.STRUCTURE_START.punchIn()) {
             structureGenerator.generateStructureStarts(chunk, registries, structures, templates);
         } catch (Throwable t) {
-            ChunkGenException.handle(t);
+            CrashHandler.handle(chunk, this, t);
         }
     }
 
@@ -187,7 +188,7 @@ public class TFChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.STRUCTURE_SPREAD.punchIn()) {
             structureGenerator.generateStructureReferences(world, chunk, structures);
         } catch (Throwable t) {
-            ChunkGenException.handle(t);
+            CrashHandler.handle(chunk, this, t);
         }
     }
 
@@ -196,7 +197,7 @@ public class TFChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.BIOMES.punchIn()) {
             biomeGenerator.generateBiomes(chunk);
         } catch (Throwable t) {
-            ChunkGenException.handle(t);
+            CrashHandler.handle(chunk, this, t);
         }
     }
 
@@ -205,16 +206,16 @@ public class TFChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.TERRAIN.punchIn()) {
             terrainGenerator.generateTerrain(world, chunk, structures);
         } catch (Throwable t) {
-            ChunkGenException.handle(t);
+            CrashHandler.handle(chunk, this, t);
         }
     }
 
     @Override
-    public final void generateSurface(WorldGenRegion world, IChunk chunk) {
+    public final void generateSurface(WorldGenRegion region, IChunk chunk) {
         try (Section section = Profiler.SURFACE.punchIn()) {
-            surfaceGenerator.generateSurface(world, chunk);
+            surfaceGenerator.generateSurface(region, chunk);
         } catch (Throwable t) {
-            ChunkGenException.handle(t);
+            CrashHandler.handle(chunk, this, t);
         }
     }
 
@@ -223,7 +224,7 @@ public class TFChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.CARVING.punchIn()) {
             terrainCarver.carveTerrain(biomes, chunk, carver);
         } catch (Throwable t) {
-            ChunkGenException.handle(t);
+            CrashHandler.handle(chunk, this, t);
         }
     }
 
@@ -232,7 +233,7 @@ public class TFChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.DECORATION.punchIn()) {
             featureGenerator.generateFeatures(region, structures);
         } catch (Throwable t) {
-            ChunkGenException.handle(t);
+            CrashHandler.handle(region, this, t);
         }
     }
 
@@ -241,7 +242,7 @@ public class TFChunkGenerator extends ChunkGenerator {
         try (Section section = Profiler.MOB_SPAWNS.punchIn()) {
             mobGenerator.generateMobs(region);
         } catch (Throwable t) {
-            ChunkGenException.handle(t);
+            CrashHandler.handle(region, this, t);
         }
     }
 

@@ -32,6 +32,10 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
+/**
+ * Non-essential but nicer than reflection.
+ * Provides decorators access to useful contextual info int WorldDecoratingHelper.
+ */
 @Mixin(WorldDecoratingHelper.class)
 public class MixinWorldDecorationHelper implements DecorationHelper {
 

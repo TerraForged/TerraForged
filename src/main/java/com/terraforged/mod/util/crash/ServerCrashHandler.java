@@ -22,22 +22,25 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.chunk;
+package com.terraforged.mod.util.crash;
 
-import com.terraforged.mod.util.Environment;
+import com.terraforged.mod.chunk.TFChunkGenerator;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.ReportedException;
+import net.minecraft.world.chunk.IChunk;
 
-public class ChunkGenException extends RuntimeException {
+import java.util.concurrent.locks.StampedLock;
 
-    public ChunkGenException(Throwable cause) {
-        super(cause);
-    }
+public class ServerCrashHandler implements CrashHandler {
 
-    public static void handle(Throwable t) throws ChunkGenException {
-        if (Environment.isVerbose()) {
-            // ChunkGen exceptions get lost in CompletableFuture land so print them here
-            // so we can find out what went wrong.
-            t.printStackTrace();
-        }
-        throw new ChunkGenException(t);
+    private final StampedLock lock = new StampedLock();
+
+    @Override
+    public void crash(IChunk chunk, TFChunkGenerator generator, Throwable t) {
+        // lock without release to prevent spamming
+        lock.writeLock();
+
+        CrashReport report = CrashReportBuilder.buildCrashReport(chunk, generator, t);
+        throw new ReportedException(report);
     }
 }

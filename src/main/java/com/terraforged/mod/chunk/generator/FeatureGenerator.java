@@ -35,7 +35,6 @@ import com.terraforged.mod.featuremanager.biome.BiomeFeature;
 import com.terraforged.mod.featuremanager.biome.BiomeFeatures;
 import com.terraforged.mod.featuremanager.util.identity.Identifier;
 import com.terraforged.mod.util.Environment;
-import com.terraforged.mod.util.crash.CrashHandler;
 import com.terraforged.mod.util.crash.WorldGenException;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
@@ -97,8 +96,6 @@ public class FeatureGenerator implements Generator.Features {
 
             // mark chunk disposed as this is the last usage of the reader
             reader.dispose();
-        } catch (WorldGenException e) {
-            CrashHandler.INSTANCE.get().crash(chunk, generator, e);
         }
     }
 

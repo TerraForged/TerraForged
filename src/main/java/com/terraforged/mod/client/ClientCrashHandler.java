@@ -27,7 +27,6 @@ package com.terraforged.mod.client;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.util.crash.CrashHandler;
 import com.terraforged.mod.util.crash.CrashReportBuilder;
-import com.terraforged.mod.util.crash.WorldGenException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.world.chunk.IChunk;
@@ -39,14 +38,14 @@ public class ClientCrashHandler implements CrashHandler {
     private final StampedLock lock = new StampedLock();
 
     @Override
-    public void crash(IChunk chunk, TFChunkGenerator generator, WorldGenException e) {
+    public void crash(IChunk chunk, TFChunkGenerator generator, Throwable t) {
         final long stamp = lock.tryWriteLock();
         if (!lock.validate(stamp)) {
             return;
         }
 
         try {
-            CrashReport report = CrashReportBuilder.buildCrashReport(chunk, generator, e);
+            CrashReport report = CrashReportBuilder.buildCrashReport(chunk, generator, t);
             Minecraft.getInstance().crashed(report);
         } finally {
             lock.unlockWrite(stamp);

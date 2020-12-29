@@ -31,6 +31,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+/**
+ * Non-essential.
+ * Modifies the client-side cloud height.
+ */
 @Mixin(DimensionRenderInfo.class)
 public class MixinDimensionRenderInfo {
 

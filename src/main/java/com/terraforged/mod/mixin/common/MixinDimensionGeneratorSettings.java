@@ -22,25 +22,29 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash;
+package com.terraforged.mod.mixin.common;
 
-public class WorldGenException extends RuntimeException {
+import com.terraforged.mod.LevelType;
+import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-    public WorldGenException(String message, Throwable cause) {
-        super(message, cause);
-    }
+import java.util.Properties;
 
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-        return this;
-    }
+/**
+ * Non-essential.
+ * Allows users to define the TF world type without a namespace
+ */
+@Mixin(DimensionGeneratorSettings.class)
+public class MixinDimensionGeneratorSettings {
 
-    public static WorldGenException decoration(String type, String identifier, Throwable cause) {
-        String message = "World-gen encountered a critical error whilst generating " + type + " " + identifier;
-        return new WorldGenException(message, cause);
-    }
-
-    public static void handle(Throwable t) {
-
+    @Inject(method = "func_242753_a", at = @At("HEAD"))
+    private static void onLoadLevel(DynamicRegistries registries, Properties properties, CallbackInfoReturnable<DimensionGeneratorSettings> ci) {
+        if (properties.getProperty("level-type").equalsIgnoreCase("terraforged")) {
+            properties.setProperty("level-type", LevelType.TERRAFORGED.getRegistryName() + "");
+        }
     }
 }

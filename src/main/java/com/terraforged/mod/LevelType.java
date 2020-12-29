@@ -44,8 +44,6 @@ public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
 
     public static final ForgeWorldType TERRAFORGED = new ForgeWorldType(new LevelType(TFChunkGenerator::new))
             .setRegistryName(TerraForgedMod.MODID, "terraforged");
-    public static final ForgeWorldType TERRAFORGED_FALLBACK = new ForgeWorldType(new LevelType(TFChunkGenerator::new))
-            .setRegistryName("minecraft", "terraforged");
 
     private final BiFunction<TFBiomeProvider, DimensionSettings, ChunkGenerator> constructor;
 

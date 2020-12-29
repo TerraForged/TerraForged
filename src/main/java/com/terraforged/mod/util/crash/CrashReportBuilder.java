@@ -49,14 +49,14 @@ public class CrashReportBuilder {
 
     private static final FieldAccessor<CrashReport, ?> ACCESSOR = Accessor.field(CrashReport.class, boolean.class);
 
-    public static CrashReport buildCrashReport(IChunk chunk, TFChunkGenerator generator, WorldGenException e) {
-        CrashReport report = new CrashReport(e.getMessage(), e.getCause());
+    public static CrashReport buildCrashReport(IChunk chunk, TFChunkGenerator generator, Throwable t) {
+        CrashReport report = new CrashReport(t.getMessage(), t.getCause());
         // prevents pollution of the report with duplicate stack-traces
         ACCESSOR.setUnchecked(report, false);
         try {
             addContext(chunk, generator, report);
-        } catch (Throwable t) {
-            report.makeCategory("Reporting Exception").addCrashSectionThrowable("Uh Oh", t);
+        } catch (Throwable ctx) {
+            report.makeCategory("Reporting Exception").addCrashSectionThrowable("Uh Oh", ctx);
         }
         return report;
     }

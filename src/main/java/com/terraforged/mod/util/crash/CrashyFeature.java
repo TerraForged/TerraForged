@@ -24,12 +24,19 @@
 
 package com.terraforged.mod.util.crash;
 
+import com.terraforged.mod.Log;
 import com.terraforged.mod.TerraForgedMod;
+import com.terraforged.mod.api.event.SetupEvent;
+import com.terraforged.mod.featuremanager.matcher.BiomeFeatureMatcher;
+import com.terraforged.mod.featuremanager.transformer.FeatureAppender;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -50,5 +57,26 @@ public class CrashyFeature extends Feature<NoFeatureConfig> {
             throw new NullPointerException("Crash time baby!");
         }
         return true;
+    }
+
+//    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+    public static class Init {
+        @SubscribeEvent
+        public static void registerFeatures(RegistryEvent.Register<Feature<?>> event) {
+            Log.info("Registering crash-test feature");
+            event.getRegistry().register(CrashyFeature.INSTANCE);
+        }
+    }
+
+    //@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+    public static class Setup {
+        @SubscribeEvent
+        public static void setup(SetupEvent.Features event) {
+            Log.info("Adding crash-test");
+            event.getManager().getAppenders().add(BiomeFeatureMatcher.ANY, FeatureAppender.tail(
+                    GenerationStage.Decoration.VEGETAL_DECORATION,
+                    CrashyFeature.INSTANCE.withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG)
+            ));
+        }
     }
 }
