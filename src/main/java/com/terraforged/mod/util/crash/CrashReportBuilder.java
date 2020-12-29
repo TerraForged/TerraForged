@@ -83,7 +83,7 @@ public class CrashReportBuilder {
     }
 
     private static void addContext(TFBiomeProvider biomes, CrashReportCategory report) {
-        report.addDetail("Biome Map", biomes.getResources().biomeMap.toJson(biomes.getContext().gameContext));
+        report.addDetail("Biome Map", biomes.getBiomeMap().toJson(biomes.getContext().gameContext));
     }
 
     private static void addContext(ConfigRef ref, CrashReportCategory report) {

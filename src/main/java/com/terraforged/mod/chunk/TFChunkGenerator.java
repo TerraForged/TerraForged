@@ -40,6 +40,7 @@ import com.terraforged.mod.api.chunk.column.BlockColumn;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.api.material.layer.LayerManager;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
+import com.terraforged.mod.biome.utils.StructureLocator;
 import com.terraforged.mod.chunk.column.ColumnResource;
 import com.terraforged.mod.chunk.generator.*;
 import com.terraforged.mod.chunk.profiler.Profiler;
@@ -67,9 +68,13 @@ import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.*;
+import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.world.gen.settings.StructureSeparationSettings;
+import net.minecraft.world.server.ServerWorld;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -157,22 +162,22 @@ public class TFChunkGenerator extends ChunkGenerator {
         return column;
     }
 
-//    @Nullable // findStructure
-//    public BlockPos func_235956_a_(ServerWorld world, Structure<?> structure, BlockPos pos, int attempts, boolean flag) {
-//        try (Section section = Profiler.FIND_STRUCTURE.punchIn()) {
-//            if (!this.biomeProvider.hasStructure(structure)) {
-//                return null;
-//            }
-//            if (structure == Structure.STRONGHOLD) {
-//                return super.func_235956_a_(world, structure, pos, attempts, flag);
-//            }
-//            StructureSeparationSettings settings = this.settings.getStructures().func_236197_a_(structure);
-//            if (settings == null) {
-//                return null;
-//            }
-//            return StructureLocator.findStructure(this, world, world.func_241112_a_(), structure, pos, attempts, flag, settings);
-//        }
-//    }
+    @Nullable // findStructure
+    public BlockPos func_235956_a_(ServerWorld world, Structure<?> structure, BlockPos pos, int radius, boolean flag) {
+        try (Section section = Profiler.FIND_STRUCTURE.punchIn()) {
+            if (!this.biomeProvider.hasStructure(structure)) {
+                return null;
+            }
+            if (structure == Structure.STRONGHOLD) {
+                return super.func_235956_a_(world, structure, pos, radius, flag);
+            }
+            StructureSeparationSettings settings = this.settings.getStructures().func_236197_a_(structure);
+            if (settings == null) {
+                return null;
+            }
+            return StructureLocator.findStructure(this, world, world.func_241112_a_(), structure, pos, radius, flag, settings);
+        }
+    }
 
     @Override
     public final void func_242707_a(DynamicRegistries registries, StructureManager structures, IChunk chunk, TemplateManager templates, long seed) {

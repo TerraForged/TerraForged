@@ -34,6 +34,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class BiomeMapBuilder implements BiomeMap.Builder {
@@ -158,6 +159,10 @@ public class BiomeMapBuilder implements BiomeMap.Builder {
         if (list.isEmpty()) {
             list.add(biome);
         }
+    }
+
+    private void all(Map<?, List<Biome>> map, Consumer<List<Biome>> consumer) {
+        map.values().forEach(consumer);
     }
 
     public static BiomeMap.Builder create(GameContext context) {

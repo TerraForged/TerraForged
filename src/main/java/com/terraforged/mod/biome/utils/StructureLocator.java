@@ -26,6 +26,7 @@ package com.terraforged.mod.biome.utils;
 
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.concurrent.Resource;
+import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import net.minecraft.util.SharedSeedRandom;
@@ -43,7 +44,13 @@ import net.minecraft.world.gen.settings.StructureSeparationSettings;
 
 public class StructureLocator {
 
+    private static final int SEARCH_BATCH_SIZE = 100;
+
     public static BlockPos findStructure(TFChunkGenerator generator, IWorld world, StructureManager manager, Structure<?> structure, BlockPos center, int attempts, boolean first, StructureSeparationSettings settings) {
+        return findStructure(generator, world, manager, structure, center, attempts, first, settings, 10_000L);
+    }
+
+    public static BlockPos findStructure(TFChunkGenerator generator, IWorld world, StructureManager manager, Structure<?> structure, BlockPos center, int radius, boolean first, StructureSeparationSettings settings, long timeout) {
         long seed = generator.getSeed();
         int separation = settings.func_236668_a_();
         int chunkX = center.getX() >> 4;
@@ -52,23 +59,39 @@ public class StructureLocator {
         SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
         TFBiomeProvider biomeProvider = generator.getBiomeProvider();
 
-        try (Resource<Cell> cell = Cell.pooled()) {
-            for (int radius = 0; radius <= attempts; ++radius) {
-                for (int dx = -radius; dx <= radius; ++dx) {
-                    boolean flag = dx == -radius || dx == radius;
+        int searchCount = 0;
+        long searchTimeout = System.currentTimeMillis() + timeout;
 
-                    for (int dz = -radius; dz <= radius; ++dz) {
-                        boolean flag1 = dz == -radius || dz == radius;
+        try (Resource<Cell> resource = Cell.pooled()) {
+            Cell cell = resource.get();
+
+            for (int dr = 0; dr <= radius; ++dr) {
+                for (int dx = -dr; dx <= dr; ++dx) {
+                    boolean flag = dx == -dr || dx == dr;
+
+                    for (int dz = -dr; dz <= dr; ++dz) {
+                        boolean flag1 = dz == -dr || dz == dr;
                         if (flag || flag1) {
-                            int x = chunkX + separation * dx;
-                            int z = chunkZ + separation * dz;
+                            int cx = chunkX + separation * dx;
+                            int cz = chunkZ + separation * dz;
 
-                            Biome biome = biomeProvider.lookupBiome(cell.get(), x, z);
+                            if (searchCount++ > SEARCH_BATCH_SIZE) {
+                                searchCount = 0;
+                                long now = System.currentTimeMillis();
+                                if (now > searchTimeout) {
+                                    Log.err("Structure search took too long! {}", structure.getRegistryName());
+                                    return null;
+                                }
+                            }
+
+                            int x = cx << 4;
+                            int z = cz << 4;
+                            Biome biome = biomeProvider.fastLookupBiome(cell, x, z);
                             if (!biome.getGenerationSettings().hasStructure(structure)) {
                                 continue;
                             }
 
-                            ChunkPos chunkpos = structure.getChunkPosForStructure(settings, seed, sharedseedrandom, x, z);
+                            ChunkPos chunkpos = structure.getChunkPosForStructure(settings, seed, sharedseedrandom, cx, cz);
                             IChunk ichunk = world.getChunk(chunkpos.x, chunkpos.z, ChunkStatus.STRUCTURE_STARTS);
                             StructureStart<?> start = manager.getStructureStart(SectionPos.from(ichunk.getPos(), 0), structure, ichunk);
                             if (start != null && start.isValid()) {
@@ -82,13 +105,13 @@ public class StructureLocator {
                                 }
                             }
 
-                            if (radius == 0) {
+                            if (dr == 0) {
                                 break;
                             }
                         }
                     }
 
-                    if (radius == 0) {
+                    if (dr == 0) {
                         break;
                     }
                 }

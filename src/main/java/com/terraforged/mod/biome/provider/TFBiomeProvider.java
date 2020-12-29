@@ -34,6 +34,7 @@ import com.terraforged.engine.concurrent.Resource;
 import com.terraforged.engine.concurrent.task.LazySupplier;
 import com.terraforged.engine.world.heightmap.WorldLookup;
 import com.terraforged.mod.Log;
+import com.terraforged.mod.biome.map.BiomeMap;
 import com.terraforged.mod.biome.modifier.BiomeModifierManager;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
@@ -61,14 +62,10 @@ public class TFBiomeProvider extends BiomeProvider {
     private final LazySupplier<BiomeProviderResources> resources;
 
     public TFBiomeProvider(TerraContext context) {
-        super(BiomeHelper.getAllBiomes(context.gameContext));
+        super(BiomeHelper.getOverworldBiomes(context.gameContext));
         this.context = context;
         this.seed = context.terraSettings.world.seed;
         this.resources = LazySupplier.factory(context, BiomeProviderResources::new);
-    }
-
-    public BiomeProviderResources getResources() {
-        return resources.get();
     }
 
     @Override
@@ -171,6 +168,10 @@ public class TFBiomeProvider extends BiomeProvider {
         return pos;
     }
 
+    public BiomeMap getBiomeMap() {
+        return getResources().biomeMap;
+    }
+
     public Resource<Cell> lookupPos(int x, int z) {
         return getWorldLookup().getCell(x, z);
     }
@@ -183,6 +184,11 @@ public class TFBiomeProvider extends BiomeProvider {
 
     public Biome lookupBiome(Cell cell, int x, int z) {
         getWorldLookup().applyCell(cell, x, z, true);
+        return getBiome(cell, x, z);
+    }
+
+    public Biome fastLookupBiome(Cell cell, int x, int z) {
+        getWorldLookup().applyCell(cell, x, z, false);
         return getBiome(cell, x, z);
     }
 
@@ -216,6 +222,10 @@ public class TFBiomeProvider extends BiomeProvider {
 
     public boolean canSpawnAt(Cell cell) {
         return !cell.terrain.isSubmerged();
+    }
+
+    private BiomeProviderResources getResources() {
+        return resources.get();
     }
 
     public static TFBiomeProvider create(long seed, Registry<Biome> registry) {

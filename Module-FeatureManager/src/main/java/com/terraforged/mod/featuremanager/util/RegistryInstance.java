@@ -30,12 +30,9 @@ import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import org.jline.utils.Log;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
-public class RegistryInstance<T> implements Iterable<T> {
+public class RegistryInstance<T> implements Iterable<T>, Comparator<T> {
 
     private final Registry<T> registry;
     private final Map<T, T> remaps = new HashMap<>();
@@ -94,5 +91,15 @@ public class RegistryInstance<T> implements Iterable<T> {
     @Override
     public Iterator<T> iterator() {
         return registry.iterator();
+    }
+
+    @Override
+    public int compare(T o1, T o2) {
+        ResourceLocation k1 = registry.getKey(o1);
+        ResourceLocation k2 = registry.getKey(o2);
+        if (k1 == null || k2 == null) {
+            return 0;
+        }
+        return k1.compareTo(k2);
     }
 }

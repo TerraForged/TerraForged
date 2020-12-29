@@ -34,13 +34,16 @@ import com.terraforged.mod.biome.map.defaults.BiomeTemps;
 import com.terraforged.mod.biome.utils.TempCategory;
 import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.noise.util.Vec2f;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeGenerationSettings;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
 import net.minecraft.world.gen.surfacebuilders.ISurfaceBuilderConfig;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
+import net.minecraftforge.common.BiomeDictionary;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 
@@ -66,10 +69,6 @@ public class BiomeHelper {
         BiomeMap.Builder builder = BiomeMapBuilder.create(context);
         for (BiomeData data : biomes) {
             Biome biome = (Biome) data.reference;
-            if (context.biomes.getName(biome).contains("hills")) {
-                continue;
-            }
-
             int weight = weights.getWeight(biome);
             if (BiomePredicate.BEACH.test(data)) {
                 builder.addBeach(biome, weight);
@@ -108,7 +107,35 @@ public class BiomeHelper {
         return builder.build();
     }
 
-//        Biomes.MOUNTAINS 0.2F
+    public static List<Biome> getOverworldBiomes(GameContext context) {
+        List<BiomeData> biomes = getAllBiomeData(context);
+        Set<Biome> result = new HashSet<>(biomes.size());
+        for (BiomeData data : biomes) {
+            Biome biome = (Biome) data.reference;
+            if (BiomePredicate.BEACH.test(data)) {
+                result.add(biome);
+            } else if (BiomePredicate.COAST.test(data)) {
+                result.add(biome);
+            } else if (BiomePredicate.OCEAN.test(data)) {
+                result.add(biome);
+            } else if (BiomePredicate.RIVER.test(data)) {
+                result.add(biome);
+            } else if (BiomePredicate.LAKE.test(data)) {
+                result.add(biome);
+            } else if (BiomePredicate.WETLAND.test(data)) {
+                result.add(biome);
+            } else if (BiomePredicate.VOLCANO.test(data)) {
+                result.add(biome);
+            } else if (BiomePredicate.MOUNTAIN.test(data)) {
+                result.add(biome);
+            } else if (getTypes(data, biome).size() > 0) {
+                result.add(biome);
+            }
+        }
+        return new ArrayList<>(result);
+    }
+
+    //        Biomes.MOUNTAINS 0.2F
 //        Biomes.GRAVELLY_MOUNTAINS 0.2F
 //        Biomes.SNOWY_MOUNTAINS 0.0F
 //        Biomes.SNOWY_TAIGA_MOUNTAINS -0.5F
@@ -151,10 +178,6 @@ public class BiomeHelper {
         return biome.getGenerationSettings();
     }
 
-    public static void test(Biome biome) {
-
-    }
-
     public static Collection<BiomeType> getTypes(BiomeData data, Biome biome) {
         Set<BiomeType> types = new HashSet<>();
         for (Map.Entry<BiomeType, BiomePredicate> entry : PREDICATES.entrySet()) {
@@ -166,7 +189,7 @@ public class BiomeHelper {
     }
 
     public static List<BiomeData> getAllBiomeData(GameContext context) {
-        Collection<Biome> biomes = getAllBiomes(context);
+        Collection<Biome> biomes = getAllOverworldBiomes(context);
         Vec2f tempRange = getRange(biomes, BiomeHelper::getDefaultTemperature);
         Vec2f moistRange = getRange(biomes, Biome::getDownfall);
         List<BiomeData> list = new LinkedList<>();
@@ -180,7 +203,7 @@ public class BiomeHelper {
         return list;
     }
 
-    public static List<Biome> getAllBiomes(GameContext context) {
+    public static List<Biome> getAllOverworldBiomes(GameContext context) {
         List<Biome> biomes = new ArrayList<>(200);
         for (Biome biome : context.biomes) {
             if (filter(biome, context)) {
@@ -204,8 +227,22 @@ public class BiomeHelper {
         if (biome == context.biomes.get(Biomes.MUSHROOM_FIELD_SHORE) || biome == context.biomes.get(Biomes.MOUNTAIN_EDGE)) {
             return true;
         }
-//        return !BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.OVERWORLD);
-        return false;
+        if (context.biomes.getName(biome).contains("hills")) {
+            return true;
+        }
+        // exclude non-overworld biomes
+        return !isOverworldBiome(biome, context);
+    }
+
+    private static boolean isOverworldBiome(Biome biome, GameContext context) {
+        return isOverworldBiome(context.biomes.getKey(biome));
+    }
+
+    public static boolean isOverworldBiome(@Nullable RegistryKey<Biome> key) {
+        if (key == null) {
+            return false;
+        }
+        return BiomeDictionary.getTypes(key).contains(BiomeDictionary.Type.OVERWORLD);
     }
 
     private static Vec2f getRange(Collection<Biome> biomes, Function<Biome, Float> getter) {
