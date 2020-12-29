@@ -104,6 +104,14 @@ public class ConfigManager {
                 120F,
                 "Set the height of clouds."
         );
+        set(
+                cfg,
+                "feature_warn_time",
+                50,
+                "The number of milliseconds a single feature/structure can generate for before a warning",
+                "is printed to the logs. This may help track down mods that are causing world-gen to run slow.",
+                "Set to -1 to disable."
+        );
     }));
 
     public static void init() {

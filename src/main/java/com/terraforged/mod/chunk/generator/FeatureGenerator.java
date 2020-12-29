@@ -31,6 +31,8 @@ import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionFix;
+import com.terraforged.mod.chunk.profiler.WarnTimer;
+import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.featuremanager.biome.BiomeFeature;
 import com.terraforged.mod.featuremanager.biome.BiomeFeatures;
 import com.terraforged.mod.featuremanager.util.identity.Identifier;
@@ -58,12 +60,14 @@ public class FeatureGenerator implements Generator.Features {
     private static final int FEATURE_STAGES = GenerationStage.Decoration.values().length;
     private static final String STRUCTURE = "structure";
     private static final String FEATURE = "feature";
-    private static final long WARN_TIME = 100;
+    private static final long WARN_TIME = 50;
 
+    private final WarnTimer timer;
     private final TFChunkGenerator generator;
 
     public FeatureGenerator(TFChunkGenerator generator) {
         this.generator = generator;
+        this.timer = new WarnTimer(ConfigManager.GENERAL.get().getLongOrElse("feature_warn_time", WARN_TIME));
     }
 
     @Override
@@ -107,15 +111,16 @@ public class FeatureGenerator implements Generator.Features {
         List<List<BiomeFeature>> stagedFeatures = biomeFeatures.getFeatures();
         List<List<Structure<?>>> stagedStructures = biomeFeatures.getStructures();
 
-        int chunkX = pos.getX() >> 4;
-        int chunkZ = pos.getZ() >> 4;
-        ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
+        final WarnTimer timer = this.timer;
 
-        int startX = chunkPos.getXStart();
-        int startZ = chunkPos.getZStart();
+        final int chunkX = pos.getX() >> 4;
+        final int chunkZ = pos.getZ() >> 4;
+        final ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
+
+        final int startX = chunkPos.getXStart();
+        final int startZ = chunkPos.getZStart();
         MutableBoundingBox chunkBounds = new MutableBoundingBox(startX, startZ, startX + 15, startZ + 15);
 
-        long timeStamp = 0L;
         for (int stageIndex = 0; stageIndex < FEATURE_STAGES; stageIndex++) {
             int featureSeed = 0;
 
@@ -125,7 +130,7 @@ public class FeatureGenerator implements Generator.Features {
                     Structure<?> structure = structures.get(structureIndex);
                     random.setFeatureSeed(decorationSeed, featureSeed++, stageIndex);
                     try {
-                        timeStamp = System.currentTimeMillis();
+                        long timeStamp = timer.now();
                         manager.func_235011_a_(SectionPos.from(pos), structure).forEach(start -> start.func_230366_a_(
                                 region,
                                 manager,
@@ -134,7 +139,7 @@ public class FeatureGenerator implements Generator.Features {
                                 chunkBounds,
                                 chunkPos
                         ));
-                        checkTime(STRUCTURE, structure.getStructureName(), timeStamp);
+                        checkTime(STRUCTURE, structure.getStructureName(), timer, timeStamp);
                     } catch (Throwable t) {
                         throw WorldGenException.decoration(STRUCTURE, structure.getStructureName(), t);
                     }
@@ -152,9 +157,9 @@ public class FeatureGenerator implements Generator.Features {
                     }
 
                     try {
-                        timeStamp = System.currentTimeMillis();
+                        long timeStamp = timer.now();
                         feature.getFeature().generate(region, generator, random, pos);
-                        checkTime(FEATURE, feature.getIdentity(), timeStamp);
+                        checkTime(FEATURE, feature.getIdentity(), timer, timeStamp);
                     } catch (Throwable t) {
                         throw WorldGenException.decoration(FEATURE, feature.getIdentity().getComponents(), t);
                     }
@@ -177,17 +182,17 @@ public class FeatureGenerator implements Generator.Features {
         });
     }
 
-    private static void checkTime(String type, String identity, long timestamp) {
-        long duration = System.currentTimeMillis() - timestamp;
-        if (duration > WARN_TIME) {
-            Log.err("{} took {}ms to generate!. Identity: {}", type, duration, identity);
+    private static void checkTime(String type, String identity, WarnTimer timer, long timestamp) {
+        long duration = timer.since(timestamp);
+        if (timer.warn(duration)) {
+            Log.warn("{} took {}ms to generate: {}", type, duration, identity);
         }
     }
 
-    private static void checkTime(String type, Identifier identifier, long timestamp) {
-        long duration = System.currentTimeMillis() - timestamp;
-        if (duration > WARN_TIME) {
-            Log.err("{} took {}ms to generate!. Identity: {}", type, duration, identifier.getComponents());
+    private void checkTime(String type, Identifier identifier, WarnTimer timer, long timestamp) {
+        long duration = timer.since(timestamp);
+        if (timer.warn(duration)) {
+            Log.warn("{} took {}ms to generate: {}", type, duration, identifier.getComponents());
         }
     }
 }

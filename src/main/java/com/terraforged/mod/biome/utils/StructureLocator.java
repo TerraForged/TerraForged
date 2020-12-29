@@ -79,7 +79,7 @@ public class StructureLocator {
                                 searchCount = 0;
                                 long now = System.currentTimeMillis();
                                 if (now > searchTimeout) {
-                                    Log.err("Structure search took too long! {}", structure.getRegistryName());
+                                    Log.warn("Structure search took too long! {}", structure.getRegistryName());
                                     return null;
                                 }
                             }

@@ -22,28 +22,25 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod;
+package com.terraforged.mod.chunk.profiler;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+public class WarnTimer {
 
-public class Log {
+    private final long warnTime;
 
-    private static final Logger logger = LogManager.getLogger("TerraForged");
-
-    public static void info(String message, Object... args) {
-        logger.info(message, args);
+    public WarnTimer(long warnTime) {
+        this.warnTime = warnTime;
     }
 
-    public static void debug(String message, Object... args) {
-        logger.debug(message, args);
+    public long now() {
+        return warnTime > 0 ? System.currentTimeMillis() : 0L;
     }
 
-    public static void err(String message, Object... args) {
-        logger.error(message, args);
+    public long since(long timestamp) {
+        return warnTime > 0 ? System.currentTimeMillis() - timestamp : 0L;
     }
 
-    public static void warn(String message, Object... args) {
-        logger.warn(message, args);
+    public boolean warn(long duration) {
+        return duration > warnTime;
     }
 }
