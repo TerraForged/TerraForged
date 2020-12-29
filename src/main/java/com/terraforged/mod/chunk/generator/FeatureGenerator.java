@@ -58,8 +58,8 @@ import java.util.List;
 public class FeatureGenerator implements Generator.Features {
 
     private static final int FEATURE_STAGES = GenerationStage.Decoration.values().length;
-    private static final String STRUCTURE = "structure";
-    private static final String FEATURE = "feature";
+    private static final String STRUCTURE = "Structure";
+    private static final String FEATURE = "Feature";
     private static final long WARN_TIME = 50;
 
     private final WarnTimer timer;
@@ -185,14 +185,14 @@ public class FeatureGenerator implements Generator.Features {
     private static void checkTime(String type, String identity, WarnTimer timer, long timestamp) {
         long duration = timer.since(timestamp);
         if (timer.warn(duration)) {
-            Log.warn("{} took {}ms to generate: {}", type, duration, identity);
+            Log.warn("{} was slow to generate! ({}ms): {}", type, duration, identity);
         }
     }
 
     private void checkTime(String type, Identifier identifier, WarnTimer timer, long timestamp) {
         long duration = timer.since(timestamp);
         if (timer.warn(duration)) {
-            Log.warn("{} took {}ms to generate: {}", type, duration, identifier.getComponents());
+            Log.warn("{} was slow to generate! ({}ms): {}", type, duration, identifier.getComponents());
         }
     }
 }
