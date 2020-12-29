@@ -28,6 +28,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.terraforged.mod.Log;
 
 import java.util.concurrent.locks.StampedLock;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -63,6 +64,20 @@ public class ConfigRef implements Supplier<CommentedFileConfig> {
             return ref = factory.get();
         } finally {
             lock.unlockWrite(write);
+        }
+    }
+
+    public void forEach(BiConsumer<String, Object> consumer) {
+        long read = lock.tryReadLock();
+        if (read != 0L) {
+            try {
+                CommentedFileConfig current = ref;
+                if (current != null) {
+                    current.entrySet().forEach(entry -> consumer.accept(entry.getKey(), entry.getValue()));
+                }
+            } finally {
+                lock.unlockRead(read);
+            }
         }
     }
 

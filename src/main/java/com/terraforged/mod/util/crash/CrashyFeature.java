@@ -22,9 +22,33 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.featuremanager.util.identity;
+package com.terraforged.mod.util.crash;
 
-public interface Identity {
+import com.terraforged.mod.TerraForgedMod;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.NoFeatureConfig;
 
-    String getIdentity();
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
+public class CrashyFeature extends Feature<NoFeatureConfig> {
+
+    public static final CrashyFeature INSTANCE = new CrashyFeature();
+    private static final int CRASH_CHANCE_PERCENTAGE = 5;
+
+    private CrashyFeature() {
+        super(NoFeatureConfig.field_236558_a_);
+        setRegistryName(TerraForgedMod.MODID, "crashy_mccrashface");
+    }
+
+    @Override
+    public boolean generate(ISeedReader reader, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
+        if (ThreadLocalRandom.current().nextInt(100) < CRASH_CHANCE_PERCENTAGE) {
+            throw new NullPointerException("Crash time baby!");
+        }
+        return true;
+    }
 }

@@ -22,33 +22,21 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.featuremanager.biome;
+package com.terraforged.mod.util.crash;
 
-import com.terraforged.mod.featuremanager.predicate.FeaturePredicate;
-import com.terraforged.mod.featuremanager.util.identity.FeatureIdentifier;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
+public class WorldGenException extends Throwable {
 
-public class BiomeFeature {
-
-    private final FeatureIdentifier identity;
-    private final FeaturePredicate predicate;
-    private final ConfiguredFeature<?, ?> feature;
-
-    public BiomeFeature(FeaturePredicate predicate, ConfiguredFeature<?, ?> feature, FeatureIdentifier identity) {
-        this.predicate = predicate;
-        this.feature = feature;
-        this.identity = identity;
+    public WorldGenException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public FeatureIdentifier getIdentity() {
-        return identity;
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this;
     }
 
-    public FeaturePredicate getPredicate() {
-        return predicate;
-    }
-
-    public ConfiguredFeature<?, ?> getFeature() {
-        return feature;
+    public static WorldGenException decoration(String type, String identifier, Throwable cause) {
+        String message = "World-gen encountered a critical error whilst generating " + type + " " + identifier;
+        return new WorldGenException(message, cause);
     }
 }

@@ -22,33 +22,16 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.featuremanager.biome;
+package com.terraforged.mod.util.crash;
 
-import com.terraforged.mod.featuremanager.predicate.FeaturePredicate;
-import com.terraforged.mod.featuremanager.util.identity.FeatureIdentifier;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
+import com.terraforged.mod.chunk.TFChunkGenerator;
+import net.minecraft.world.chunk.IChunk;
 
-public class BiomeFeature {
+import java.util.concurrent.atomic.AtomicReference;
 
-    private final FeatureIdentifier identity;
-    private final FeaturePredicate predicate;
-    private final ConfiguredFeature<?, ?> feature;
+public interface CrashHandler {
 
-    public BiomeFeature(FeaturePredicate predicate, ConfiguredFeature<?, ?> feature, FeatureIdentifier identity) {
-        this.predicate = predicate;
-        this.feature = feature;
-        this.identity = identity;
-    }
+    AtomicReference<CrashHandler> INSTANCE = new AtomicReference<>((chunk, generator, e) -> e.printStackTrace());
 
-    public FeatureIdentifier getIdentity() {
-        return identity;
-    }
-
-    public FeaturePredicate getPredicate() {
-        return predicate;
-    }
-
-    public ConfiguredFeature<?, ?> getFeature() {
-        return feature;
-    }
+    void crash(IChunk chunk, TFChunkGenerator generator, WorldGenException e);
 }

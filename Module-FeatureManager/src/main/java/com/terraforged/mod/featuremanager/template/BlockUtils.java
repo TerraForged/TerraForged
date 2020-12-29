@@ -29,8 +29,14 @@ import net.minecraft.pathfinding.PathType;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldReader;
+import net.minecraft.world.gen.IWorldGenerationBaseReader;
+import net.minecraft.world.gen.feature.TreeFeature;
 
 public class BlockUtils {
+
+    public static boolean canTreeReplace(IWorldGenerationBaseReader reader, BlockPos pos) {
+        return TreeFeature.isReplaceableAt(reader, pos);
+    }
 
     public static boolean isSolid(IWorldReader reader, BlockPos pos) {
         BlockState state = reader.getBlockState(pos);

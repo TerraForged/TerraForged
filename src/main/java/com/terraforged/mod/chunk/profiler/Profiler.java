@@ -117,49 +117,7 @@ public enum Profiler {
             }
 
             try (BufferedWriter writer = Files.newBufferedWriter(dir.resolve("dump-" + System.currentTimeMillis() + ".txt"))) {
-                writer.write("Section");
-                writer.write("\t");
-                writer.write("Time MS");
-                writer.write("\t");
-                writer.write("Count");
-                writer.write("\t");
-                writer.write("Min MS");
-                writer.write("\t");
-                writer.write("Max MS");
-                writer.write("\t");
-                writer.write("Average MS");
-                writer.write("\n");
-
-                double averageSum = 0.0;
-                for (Profiler profiler : Profiler.values()) {
-                    writer.write(profiler.name().toLowerCase());
-                    writer.write("\t");
-                    writer.write(String.valueOf(profiler.timeMS()));
-                    writer.write("\t");
-                    writer.write(String.valueOf(profiler.hits()));
-                    writer.write("\t");
-                    writer.write(String.valueOf(profiler.minMS()));
-                    writer.write("\t");
-                    writer.write(String.valueOf(profiler.maxMS()));
-                    writer.write("\t");
-                    double average = profiler.averageMS();
-                    averageSum += average;
-                    writer.write(String.valueOf(average));
-                    writer.write("\n");
-                }
-
-                writer.write("Sum");
-                writer.write("\t");
-                writer.write("\t");
-                writer.write("\t");
-                writer.write("\t");
-                writer.write("\t");
-                writer.write("\t");
-                writer.write("\t");
-                writer.write("\t");
-                writer.write("\t");
-                writer.write(String.valueOf(averageSum));
-                writer.write("\n");
+                ProfilerPrinter.print(writer);
             }
         } catch (IOException e) {
             e.printStackTrace();

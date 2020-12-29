@@ -67,7 +67,7 @@ public class TFBiomeProvider extends BiomeProvider {
         this.resources = LazySupplier.factory(context, BiomeProviderResources::new);
     }
 
-    private BiomeProviderResources getResources() {
+    public BiomeProviderResources getResources() {
         return resources.get();
     }
 

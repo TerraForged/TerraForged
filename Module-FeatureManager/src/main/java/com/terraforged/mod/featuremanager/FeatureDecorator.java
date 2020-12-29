@@ -95,7 +95,7 @@ public interface FeatureDecorator {
                         try {
                             feature.getFeature().generate(region, generator, random, pos);
                         } catch (Throwable t) {
-                            handle("feature", feature.getIdentity().getIdentity(), t);
+                            handle("feature", feature.getIdentity().getComponents(), t);
                         }
                     }
                 }

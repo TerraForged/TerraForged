@@ -37,32 +37,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class FeatureIdentity implements Identity {
+public class FeatureIdentifier implements Identifier {
 
-    public static final FeatureIdentity NONE = new FeatureIdentity(Collections.emptyList());
+    public static final FeatureIdentifier NONE = new FeatureIdentifier(Collections.emptyList());
 
     private final List<String> identity;
     private final Supplier<String> ownerString;
-    private final Supplier<String> identityString;
+    private final Supplier<String> components;
 
-    public FeatureIdentity(List<String> identity) {
+    public FeatureIdentifier(List<String> identity) {
         this.identity = identity;
 
         this.ownerString = Suppliers.memoize(() -> {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("Owners[");
+            sb.append('[');
             for (int i = 0; i < identity.size(); i++) {
                 String id = identity.get(i);
                 int namespaceEnd = id.indexOf(':');
                 sb.append(i > 0 ? "," : "").append(id, 0, namespaceEnd);
             }
-            sb.append("]");
+            sb.append(']');
             return sb.toString();
         });
 
-        this.identityString = Suppliers.memoize(() -> {
+        this.components = Suppliers.memoize(() -> {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("Identities[");
+            sb.append('[');
             for (int i = 0; i < identity.size(); i++) {
                 sb.append(i > 0 ? "," : "").append(identity.get(i));
             }
@@ -71,46 +71,45 @@ public class FeatureIdentity implements Identity {
         });
     }
 
-    public String getOwners() {
+    @Override
+    public String getNameSpaces() {
         return ownerString.get();
     }
 
     @Override
-    public String getIdentity() {
-        return identityString.get();
+    public String getComponents() {
+        return components.get();
     }
 
     @Override
     public String toString() {
-        return "FeatureIdentity{" +
-                "identity=" + identity +
-                '}';
+        return "FeatureIdentifier{" + "identity=" + identity + '}';
     }
 
-    public static FeatureIdentity getIdentity(ConfiguredFeature<?, ?> feature) {
+    public static FeatureIdentifier getIdentity(ConfiguredFeature<?, ?> feature) {
         try {
             JsonElement jsonElement = FeatureSerializer.serialize(feature);
             return getIdentity(feature, jsonElement);
         } catch (Throwable t) {
-            return FeatureIdentity.NONE;
+            return FeatureIdentifier.NONE;
         }
     }
 
-    public static FeatureIdentity getIdentity(ConfiguredFeature<?, ?> feature, JsonElement jsonElement) {
+    public static FeatureIdentifier getIdentity(ConfiguredFeature<?, ?> feature, JsonElement jsonElement) {
         ResourceLocation name = WorldGenRegistries.CONFIGURED_FEATURE.getKey(feature);
         if (name != null) {
-            return new FeatureIdentity(Collections.singletonList(name.toString()));
+            return new FeatureIdentifier(Collections.singletonList(name.toString()));
         }
         try {
             List<String> list = new ArrayList<>(4);
             collectIdentifiers(jsonElement, list);
             if (list.size() == 0) {
-                return FeatureIdentity.NONE;
+                return FeatureIdentifier.NONE;
             }
             Collections.sort(list);
-            return new FeatureIdentity(list);
+            return new FeatureIdentifier(list);
         } catch (Throwable t) {
-            return FeatureIdentity.NONE;
+            return FeatureIdentifier.NONE;
         }
     }
 

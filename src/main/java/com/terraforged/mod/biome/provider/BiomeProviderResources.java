@@ -32,9 +32,9 @@ import com.terraforged.mod.util.setup.SetupHooks;
 
 public class BiomeProviderResources {
 
-    final BiomeMap biomeMap;
-    final WorldLookup worldLookup;
-    final BiomeModifierManager modifierManager;
+    public final BiomeMap biomeMap;
+    public final WorldLookup worldLookup;
+    public final BiomeModifierManager modifierManager;
 
     public BiomeProviderResources(TerraContext context) {
         this.biomeMap = BiomeHelper.createBiomeMap(context.gameContext);

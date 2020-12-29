@@ -22,11 +22,11 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.chunk.util;
+package com.terraforged.mod.featuremanager.util.identity;
 
-public class DecoratorException extends Exception {
+public interface Identifier {
 
-    public DecoratorException(String type, String identity, Throwable t) {
-        super(type + "@" + identity, t);
-    }
+    String getNameSpaces();
+
+    String getComponents();
 }

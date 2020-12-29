@@ -98,7 +98,7 @@ public class BushFeature extends Feature<BushFeature.Config> {
         center.setY(world.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, center.getX(), center.getZ()));
 
         // don't replace solid blocks
-        if (BlockUtils.isSolid(world, center)) {
+        if (BlockUtils.canTreeReplace(world, center)) {
             return false;
         }
 
@@ -120,13 +120,13 @@ public class BushFeature extends Feature<BushFeature.Config> {
             pos.setPos(center);
             add(pos, neighbour);
 
-            if (!BlockUtils.isSolid(world, pos)) {
+            if (!BlockUtils.canTreeReplace(world, pos)) {
                 world.setBlockState(pos, config.leaves, 2);
 
                 // randomly place extra leaves below if non-solid
                 if (neighbour.getY() == 0 && random.nextFloat() < config.leafChance) {
                     pos.move(Direction.DOWN, 1);
-                    if (!BlockUtils.isSolid(world, pos)) {
+                    if (!BlockUtils.canTreeReplace(world, pos)) {
                         world.setBlockState(pos, config.leaves, 2);
                     }
                     pos.move(Direction.UP, 1);
@@ -135,7 +135,7 @@ public class BushFeature extends Feature<BushFeature.Config> {
                 // randomly place extra leaves above
                 if (neighbour.getY() == 0 && random.nextFloat() < config.leafChance) {
                     pos.move(Direction.UP, 1);
-                    if (!BlockUtils.isSolid(world, pos)) {
+                    if (!BlockUtils.canTreeReplace(world, pos)) {
                         world.setBlockState(pos, config.leaves, 2);
                     }
                 }

@@ -26,6 +26,7 @@ package com.terraforged.mod.featuremanager.template.buffer;
 
 import com.terraforged.mod.featuremanager.template.BlockUtils;
 import com.terraforged.mod.featuremanager.template.PasteConfig;
+import com.terraforged.mod.featuremanager.template.feature.Placement;
 import com.terraforged.mod.featuremanager.template.template.BlockInfo;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.block.Blocks;
@@ -52,8 +53,8 @@ public class TemplateBuffer extends PasteBuffer {
         return this;
     }
 
-    public void record(int i, BlockInfo block, BlockPos pastePos, PasteConfig config) {
-        if (!config.replaceSolid && BlockUtils.isSolid(world, pastePos)) {
+    public void record(int i, BlockInfo block, BlockPos pastePos, Placement placement, PasteConfig config) {
+        if (!config.replaceSolid && !placement.canReplaceAt(world, pastePos)) {
             placementMask.set(block.pos.getX(), block.pos.getY(), block.pos.getZ());
             return;
         }

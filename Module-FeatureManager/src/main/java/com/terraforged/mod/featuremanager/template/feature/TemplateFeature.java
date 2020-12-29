@@ -68,8 +68,9 @@ public class TemplateFeature extends Feature<TemplateFeatureConfig> {
             return false;
         }
         Template template = nextTemplate(config.templates, rand);
+        Placement placement = config.type.getPlacement();
         T buffer = decorator.createBuffer(world);
-        if (template.paste(buffer, pos, mirror, rotation, config.paste)) {
+        if (template.paste(buffer, pos, mirror, rotation, placement, config.paste)) {
             ResourceLocation biome = world.func_242406_i(pos).map(RegistryKey::getRegistryName).orElse(null);
             for (Decorator<T> d : decorator.getDecorators(biome)) {
                 d.apply(buffer, rand);
@@ -85,8 +86,9 @@ public class TemplateFeature extends Feature<TemplateFeatureConfig> {
             return false;
         }
         Template template = nextTemplate(config.templates, rand);
+        Placement placement = config.type.getPlacement();
         T buffer = decorator.createBuffer(world);
-        if (template.pasteWithBoundsCheck(buffer, pos, mirror, rotation, config.paste)) {
+        if (template.pasteWithBoundsCheck(buffer, pos, mirror, rotation, placement, config.paste)) {
             ResourceLocation biome = world.func_242406_i(pos).map(RegistryKey::getRegistryName).orElse(null);
             for (Decorator<T> d : decorator.getDecorators(biome)) {
                 d.apply(buffer, rand);

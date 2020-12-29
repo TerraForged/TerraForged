@@ -24,12 +24,12 @@
 
 package com.terraforged.mod.featuremanager.template.template;
 
-import com.terraforged.mod.featuremanager.template.BlockUtils;
 import com.terraforged.mod.featuremanager.template.PasteConfig;
 import com.terraforged.mod.featuremanager.template.StructureUtils;
 import com.terraforged.mod.featuremanager.template.buffer.BufferIterator;
 import com.terraforged.mod.featuremanager.template.buffer.PasteBuffer;
 import com.terraforged.mod.featuremanager.template.buffer.TemplateBuffer;
+import com.terraforged.mod.featuremanager.template.feature.Placement;
 import com.terraforged.mod.featuremanager.util.BlockReader;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -54,7 +54,7 @@ import java.util.Optional;
 
 public class Template {
 
-    private static final int PASTE_FLAY = 3 | 16;
+    private static final int PASTE_FLAG = 3 | 16;
     private static final Direction[] directions = Direction.values();
     private static final ThreadLocal<PasteBuffer> PASTE_BUFFER = ThreadLocal.withInitial(PasteBuffer::new);
     private static final ThreadLocal<TemplateBuffer> TEMPLATE_BUFFER = ThreadLocal.withInitial(TemplateBuffer::new);
@@ -83,17 +83,17 @@ public class Template {
         this.dimensions = new BakedDimensions(dimensions);
     }
 
-    public boolean paste(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, PasteConfig config) {
+    public boolean paste(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, Placement placement, PasteConfig config) {
         if (config.checkBounds) {
             IChunk chunk = world.getChunk(origin);
             if (StructureUtils.hasOvergroundStructure(chunk)) {
-                return pasteWithBoundsCheck(world, origin, mirror, rotation, config);
+                return pasteWithBoundsCheck(world, origin, mirror, rotation, placement, config);
             }
         }
-        return pasteNormal(world, origin, mirror, rotation, config);
+        return pasteNormal(world, origin, mirror, rotation, placement, config);
     }
 
-    public boolean pasteNormal(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, PasteConfig config) {
+    public boolean pasteNormal(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, Placement placement, PasteConfig config) {
         boolean placed = false;
         BlockReader reader = new BlockReader();
         PasteBuffer buffer = PASTE_BUFFER.get();
@@ -118,7 +118,7 @@ public class Template {
             }
 
             // don't replace existing solids
-            if (!config.replaceSolid && BlockUtils.isSolid(world, pos1)) {
+            if (!config.replaceSolid && !placement.canReplaceAt(world, pos1)) {
                 continue;
             }
 
@@ -142,7 +142,7 @@ public class Template {
         return placed;
     }
 
-    public boolean pasteWithBoundsCheck(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, PasteConfig config) {
+    public boolean pasteWithBoundsCheck(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, Placement placement, PasteConfig config) {
         Dimensions dimensions = this.dimensions.get(mirror, rotation);
         TemplateBuffer buffer = TEMPLATE_BUFFER.get().init(world, origin, dimensions.min, dimensions.max);
 
@@ -160,7 +160,7 @@ public class Template {
                 continue;
             }
 
-            buffer.record(i, block, pos1, config);
+            buffer.record(i, block, pos1, placement, config);
         }
 
         boolean placed = false;
@@ -221,13 +221,13 @@ public class Template {
         // update state at pos1 - the input position
         BlockState result1 = state1.updatePostPlacement(direction, state2, world, pos1, pos2);
         if (result1 != state1) {
-            world.setBlockState(pos1, result1, PASTE_FLAY);
+            world.setBlockState(pos1, result1, PASTE_FLAG);
         }
 
         // update state at pos2 - the neighbour
         BlockState result2 = state2.updatePostPlacement(direction.getOpposite(), result1, world, pos2, pos1);
         if (result2 != state2) {
-            world.setBlockState(pos2, result2, PASTE_FLAY);
+            world.setBlockState(pos2, result2, PASTE_FLAG);
         }
     }
 

@@ -31,6 +31,7 @@ import com.terraforged.mod.client.gui.screen.DemoScreen;
 import com.terraforged.mod.featuremanager.data.FolderDataPackFinder;
 import com.terraforged.mod.featuremanager.data.ModDataPackFinder;
 import com.terraforged.mod.util.Environment;
+import com.terraforged.mod.util.crash.CrashHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.BiomeGeneratorTypeScreens;
 import net.minecraftforge.api.distmarker.Dist;
@@ -59,6 +60,8 @@ public class ClientEvents {
         });
 
         ForgeWorldTypeScreens.registerFactory(LevelType.TERRAFORGED, DemoScreen::new);
+
+        CrashHandler.INSTANCE.set(new ClientCrashHandler());
     }
 
     private static BiomeGeneratorTypeScreens.IFactory getFactory() {

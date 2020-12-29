@@ -46,6 +46,7 @@ public class RegistrationEvents {
     public static void registerLevels(RegistryEvent.Register<ForgeWorldType> event) {
         Log.info("Registering level types");
         event.getRegistry().register(LevelType.TERRAFORGED);
+        event.getRegistry().register(LevelType.TERRAFORGED_FALLBACK);
     }
 
     @SubscribeEvent

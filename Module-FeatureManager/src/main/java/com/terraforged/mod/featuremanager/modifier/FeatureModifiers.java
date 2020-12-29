@@ -35,11 +35,10 @@ import com.terraforged.mod.featuremanager.predicate.BiomePredicate;
 import com.terraforged.mod.featuremanager.predicate.FeaturePredicate;
 import com.terraforged.mod.featuremanager.transformer.*;
 import com.terraforged.mod.featuremanager.util.FeatureDebugger;
-import com.terraforged.mod.featuremanager.util.identity.FeatureIdentity;
+import com.terraforged.mod.featuremanager.util.identity.FeatureIdentifier;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraftforge.eventbus.api.Event;
 
 import java.util.*;
@@ -119,7 +118,7 @@ public class FeatureModifiers extends Event {
             List<BiomeFeature> before = getInjectors(biome, predicate, element, InjectionPosition.BEFORE);
             List<BiomeFeature> after = getInjectors(biome, predicate, element, InjectionPosition.AFTER);
 
-            FeatureIdentity identity = FeatureIdentity.getIdentity(feature, element);
+            FeatureIdentifier identity = FeatureIdentifier.getIdentity(feature, element);
             return new ModifierSet(new BiomeFeature(predicate, result, identity), before, after);
         } catch (Throwable t) {
             String name = context.biomes.getName(biome);
@@ -133,7 +132,7 @@ public class FeatureModifiers extends Event {
                 }
             }
         }
-        return new ModifierSet(new BiomeFeature(FeaturePredicate.ALLOW, feature, FeatureIdentity.getIdentity(feature)));
+        return new ModifierSet(new BiomeFeature(FeaturePredicate.ALLOW, feature, FeatureIdentifier.getIdentity(feature)));
     }
 
     private ConfiguredFeature<?, ?> getFeature(Biome biome, ConfiguredFeature<?, ?> feature, JsonElement element) {
@@ -175,7 +174,7 @@ public class FeatureModifiers extends Event {
                     result = new ArrayList<>();
                 }
                 ConfiguredFeature<?, ?> feature = modifier.getModifier().getFeature();
-                FeatureIdentity identity = FeatureIdentity.getIdentity(feature);
+                FeatureIdentifier identity = FeatureIdentifier.getIdentity(feature);
                 result.add(new BiomeFeature(predicate, feature, identity));
             }
         }
@@ -196,7 +195,7 @@ public class FeatureModifiers extends Event {
                     result = new ArrayList<>();
                 }
                 ConfiguredFeature<?, ?> feature = modifier.getModifier().getFeature();
-                FeatureIdentity identity = FeatureIdentity.getIdentity(feature);
+                FeatureIdentifier identity = FeatureIdentifier.getIdentity(feature);
                 result.add(new BiomeFeature(BiomePredicate.ALLOW, feature, identity));
             }
         }

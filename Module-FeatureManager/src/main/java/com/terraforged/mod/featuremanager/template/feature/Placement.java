@@ -24,12 +24,25 @@
 
 package com.terraforged.mod.featuremanager.template.feature;
 
+import com.terraforged.mod.featuremanager.template.BlockUtils;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
 public interface Placement {
 
-    Placement ANY = (r, p) -> true;
+    Placement ANY = new Placement() {
+        @Override
+        public boolean canPlaceAt(IWorld world, BlockPos pos) {
+            return true;
+        }
+
+        @Override
+        public boolean canReplaceAt(IWorld world, BlockPos pos) {
+            return !BlockUtils.isSolid(world, pos);
+        }
+    };
 
     boolean canPlaceAt(IWorld world, BlockPos pos);
+
+    boolean canReplaceAt(IWorld world,BlockPos pos);
 }

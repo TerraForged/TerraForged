@@ -40,6 +40,18 @@ public class FieldAccessor<O, T> extends Accessor<O, Field> {
         return fieldType.cast(value);
     }
 
+    public void set(O owner, Object value) throws IllegalAccessException {
+        super.access.set(owner, value);
+    }
+
+    public void setUnchecked(O owner, Object value) {
+        try {
+            access.set(owner, value);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static <O, T> FieldAccessor<O, T> byType(Class<O> owner, Class<T> type) {
         for (Field field : owner.getDeclaredFields()) {
             if (field.getType() == type) {

@@ -31,11 +31,12 @@ import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionFix;
-import com.terraforged.mod.chunk.util.DecoratorException;
 import com.terraforged.mod.featuremanager.biome.BiomeFeature;
 import com.terraforged.mod.featuremanager.biome.BiomeFeatures;
-import com.terraforged.mod.featuremanager.util.identity.Identity;
+import com.terraforged.mod.featuremanager.util.identity.Identifier;
 import com.terraforged.mod.util.Environment;
+import com.terraforged.mod.util.crash.CrashHandler;
+import com.terraforged.mod.util.crash.WorldGenException;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -96,13 +97,12 @@ public class FeatureGenerator implements Generator.Features {
 
             // mark chunk disposed as this is the last usage of the reader
             reader.dispose();
-        } catch (DecoratorException e) {
-            // TODO: crash
-            e.printStackTrace();
+        } catch (WorldGenException e) {
+            CrashHandler.INSTANCE.get().crash(chunk, generator, e);
         }
     }
 
-    private void decorate(StructureManager manager, ISeedReader region, IChunk chunk, Biome biome, BlockPos pos) throws DecoratorException {
+    private void decorate(StructureManager manager, ISeedReader region, IChunk chunk, Biome biome, BlockPos pos) throws WorldGenException {
         SharedSeedRandom random = new SharedSeedRandom();
         long decorationSeed = random.setDecorationSeed(region.getSeed(), pos.getX(), pos.getZ());
 
@@ -139,7 +139,7 @@ public class FeatureGenerator implements Generator.Features {
                         ));
                         checkTime(STRUCTURE, structure.getStructureName(), timeStamp);
                     } catch (Throwable t) {
-                        throw new DecoratorException(STRUCTURE, structure.getStructureName(), t);
+                        throw WorldGenException.decoration(STRUCTURE, structure.getStructureName(), t);
                     }
                 }
             }
@@ -159,7 +159,7 @@ public class FeatureGenerator implements Generator.Features {
                         feature.getFeature().generate(region, generator, random, pos);
                         checkTime(FEATURE, feature.getIdentity(), timeStamp);
                     } catch (Throwable t) {
-                        throw new DecoratorException(FEATURE, feature.getIdentity().getIdentity(), t);
+                        throw WorldGenException.decoration(FEATURE, feature.getIdentity().getComponents(), t);
                     }
                 }
             }
@@ -187,10 +187,10 @@ public class FeatureGenerator implements Generator.Features {
         }
     }
 
-    private static void checkTime(String type, Identity identity, long timestamp) {
+    private static void checkTime(String type, Identifier identifier, long timestamp) {
         long duration = System.currentTimeMillis() - timestamp;
         if (duration > WARN_TIME) {
-            Log.err("{} took {}ms to generate!. Identity: {}", type, duration, identity.getIdentity());
+            Log.err("{} took {}ms to generate!. Identity: {}", type, duration, identifier.getComponents());
         }
     }
 }

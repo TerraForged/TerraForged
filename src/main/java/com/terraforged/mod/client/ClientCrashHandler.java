@@ -22,33 +22,34 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.featuremanager.biome;
+package com.terraforged.mod.client;
 
-import com.terraforged.mod.featuremanager.predicate.FeaturePredicate;
-import com.terraforged.mod.featuremanager.util.identity.FeatureIdentifier;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
+import com.terraforged.mod.chunk.TFChunkGenerator;
+import com.terraforged.mod.util.crash.CrashHandler;
+import com.terraforged.mod.util.crash.CrashReportBuilder;
+import com.terraforged.mod.util.crash.WorldGenException;
+import net.minecraft.client.Minecraft;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.world.chunk.IChunk;
 
-public class BiomeFeature {
+import java.util.concurrent.locks.StampedLock;
 
-    private final FeatureIdentifier identity;
-    private final FeaturePredicate predicate;
-    private final ConfiguredFeature<?, ?> feature;
+public class ClientCrashHandler implements CrashHandler {
 
-    public BiomeFeature(FeaturePredicate predicate, ConfiguredFeature<?, ?> feature, FeatureIdentifier identity) {
-        this.predicate = predicate;
-        this.feature = feature;
-        this.identity = identity;
-    }
+    private final StampedLock lock = new StampedLock();
 
-    public FeatureIdentifier getIdentity() {
-        return identity;
-    }
+    @Override
+    public void crash(IChunk chunk, TFChunkGenerator generator, WorldGenException e) {
+        final long stamp = lock.tryWriteLock();
+        if (!lock.validate(stamp)) {
+            return;
+        }
 
-    public FeaturePredicate getPredicate() {
-        return predicate;
-    }
-
-    public ConfiguredFeature<?, ?> getFeature() {
-        return feature;
+        try {
+            CrashReport report = CrashReportBuilder.buildCrashReport(chunk, generator, e);
+            Minecraft.getInstance().crashed(report);
+        } finally {
+            lock.unlockWrite(stamp);
+        }
     }
 }
