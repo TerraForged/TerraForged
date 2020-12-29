@@ -47,7 +47,7 @@ public class StructureLocator {
     private static final int SEARCH_BATCH_SIZE = 100;
 
     public static BlockPos findStructure(TFChunkGenerator generator, IWorld world, StructureManager manager, Structure<?> structure, BlockPos center, int attempts, boolean first, StructureSeparationSettings settings) {
-        return findStructure(generator, world, manager, structure, center, attempts, first, settings, 10_000L);
+        return findStructure(generator, world, manager, structure, center, attempts, first, settings, 5_000L);
     }
 
     public static BlockPos findStructure(TFChunkGenerator generator, IWorld world, StructureManager manager, Structure<?> structure, BlockPos center, int radius, boolean first, StructureSeparationSettings settings, long timeout) {
