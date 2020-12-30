@@ -40,6 +40,9 @@ public class MixinDimensionRenderInfo {
 
     @Inject(method = "func_239213_a_", at = @At("HEAD"), cancellable = true)
     private void getCloudHeight(CallbackInfoReturnable<Float> ci) {
-        ConfigManager.GENERAL.getValue("cloud_height", 220F, ci::setReturnValue);
+        float value = ConfigManager.GENERAL.getFloat("cloud_height", 220F);
+        if (value > 0) {
+            ci.setReturnValue(value);
+        }
     }
 }

@@ -101,8 +101,8 @@ public class ConfigManager {
         set(
                 cfg,
                 "cloud_height",
-                120F,
-                "Set the height of clouds."
+                220F,
+                "Set the height of clouds. Set to -1 to disable."
         );
         set(
                 cfg,

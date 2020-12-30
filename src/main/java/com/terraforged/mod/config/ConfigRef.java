@@ -29,7 +29,6 @@ import com.terraforged.mod.Log;
 
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ConfigRef implements Supplier<CommentedFileConfig> {
@@ -67,6 +66,45 @@ public class ConfigRef implements Supplier<CommentedFileConfig> {
         }
     }
 
+    public int getInt(String name, int def) {
+        return getValue(name, def);
+    }
+
+    public long getLong(String name, long def) {
+        return getValue(name, def);
+    }
+
+    public float getFloat(String name, float def) {
+        // because nightconfig...
+        return (float) getDouble(name, def);
+    }
+
+    public double getDouble(String name, double def) {
+        return getValue(name, def);
+    }
+
+    public boolean getBool(String name, boolean def) {
+        return getValue(name, def);
+    }
+
+    public <T> T getValue(String name, T def) {
+        long read = lock.tryReadLock();
+        if (read != 0L) {
+            try {
+                CommentedFileConfig current = ref;
+                if (current == null) {
+                    return def;
+                }
+                return current.getOrElse(name, def);
+            } catch (Throwable t) {
+                return def;
+            } finally {
+                lock.unlockRead(read);
+            }
+        }
+        return def;
+    }
+
     public void forEach(BiConsumer<String, Object> consumer) {
         long read = lock.tryReadLock();
         if (read != 0L) {
@@ -74,21 +112,6 @@ public class ConfigRef implements Supplier<CommentedFileConfig> {
                 CommentedFileConfig current = ref;
                 if (current != null) {
                     current.entrySet().forEach(entry -> consumer.accept(entry.getKey(), entry.getValue()));
-                }
-            } finally {
-                lock.unlockRead(read);
-            }
-        }
-    }
-
-    public <T> void getValue(String name, T def, Consumer<T> consumer) {
-        long read = lock.tryReadLock();
-        if (read != 0L) {
-            try {
-                CommentedFileConfig current = ref;
-                if (current != null) {
-                    T value = current.getOrElse(name, def);
-                    consumer.accept(value);
                 }
             } finally {
                 lock.unlockRead(read);
