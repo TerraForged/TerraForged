@@ -51,7 +51,7 @@ public class TerraSettings extends Settings {
 
     public Miscellaneous miscellaneous = new Miscellaneous();
 
-    public DimesionSettings dimensions = new DimesionSettings();
+    public DimensionSettings dimensions = new DimensionSettings();
 
     private static <T> Dynamic<T> encode(TerraSettings settings, DynamicOps<T> ops) {
         return new Dynamic<>(ops, DynamicWriter.serialize(settings, ops, false));
@@ -59,5 +59,16 @@ public class TerraSettings extends Settings {
 
     private static <T> TerraSettings decode(Dynamic<T> dynamic) {
         return DynamicReader.deserialize(new TerraSettings(), dynamic);
+    }
+
+    public static TerraSettings defaults() {
+        // TODO: load from file
+        return new TerraSettings();
+    }
+
+    public static TerraSettings defaults(long seed) {
+        TerraSettings settings = defaults();
+        settings.world.seed = seed;
+        return settings;
     }
 }

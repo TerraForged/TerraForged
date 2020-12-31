@@ -29,7 +29,7 @@ import com.terraforged.engine.serialization.annotation.Range;
 import com.terraforged.engine.serialization.annotation.Serializable;
 
 @Serializable
-public class DimesionSettings {
+public class DimensionSettings {
 
     public BaseDecorator bedrockLayer = new BaseDecorator();
 
@@ -59,33 +59,7 @@ public class DimesionSettings {
         @Comment("Select the end generator")
         public String end = "default";
 
-//        public void apply(WorldInfo info) {
-//            set(info, DimensionType.THE_NETHER, nether);
-//            set(info, DimensionType.THE_END, end);
-//        }
+        @Comment("Find extra mod-provided dimensions to generate (ie non overworld/nether/end dimensions)")
+        public boolean includeExtraDimensions = true;
     }
-
-//    public static WorldType getWorldType(WorldInfo info, DimensionType type) {
-//        String generator = info.getDimensionData(type).getString("TerraDelegateGenerator");
-//        return getWorldType(generator);
-//    }
-//
-//    private static void set(WorldInfo info, DimensionType type, String value) {
-//        CompoundNBT data = info.getDimensionData(type);
-//        data.put("TerraDelegateGenerator", StringNBT.valueOf(getWorldType(value).getName()));
-//        info.setDimensionData(type, data);
-//    }
-//
-//    private static WorldType getWorldType(String name) {
-//        WorldType type = WorldType.byName(name);
-//        if (type == null) {
-//            Log.warn("WorldType {} does not exist. Reverting to default", name);
-//            return WorldType.DEFAULT;
-//        }
-//        if (TerraWorld.isTerraType(type)) {
-//            Log.warn("Cannot set TerraForged as world type for {}", name);
-//            return WorldType.DEFAULT;
-//        }
-//        return type;
-//    }
 }

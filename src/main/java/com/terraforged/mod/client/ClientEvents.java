@@ -60,7 +60,7 @@ public class ClientEvents {
             minecraft.getResourcePackList().reloadPacksFromFinders();
         });
 
-        ForgeWorldTypeScreens.registerFactory(LevelType.TERRAFORGED, DemoScreen::new);
+        ForgeWorldTypeScreens.registerFactory(LevelType.TERRAFORGED, ConfigScreen::new);
     }
 
     private static BiomeGeneratorTypeScreens.IFactory getFactory() {

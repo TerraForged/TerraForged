@@ -53,8 +53,9 @@ public class TFToggle extends TFButton {
         this.value = value;
         this.prefix = Element.getDisplayName(name, value) + ": ";
         this.tooltip = Element.getToolTip(name, value);
-        CompoundNBT meta = value.getCompound("#" + name);
+
         INBT selected = value.get("selected");
+        CompoundNBT meta = value.getCompound("#" + name);
         this.noname = meta.contains("noname");
         this.options = (ListNBT) meta.get("options");
         Objects.requireNonNull(options, "Missing options list");
@@ -86,7 +87,7 @@ public class TFToggle extends TFButton {
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
-        if (super.isValidClickButton(button)) {
+        if (isValidClickButton(button)) {
             int direction = button == 0 ? 1 : -1;
             this.playDownSound(Minecraft.getInstance().getSoundHandler());
             this.onClick(mx, my, direction);
@@ -95,22 +96,36 @@ public class TFToggle extends TFButton {
         return false;
     }
 
+    @Override
+    protected boolean isValidClickButton(int button) {
+        return button == 0 || button == 1;
+    }
+
     private void onClick(double mouseX, double mouseY, int direction) {
         super.onClick(mouseX, mouseY);
-        index += direction;
-        if (index >= options.size()) {
-            index = 0;
-        } else if (index < 0) {
-            index = options.size() - 1;
-        }
-        INBT option = options.get(index);
+
+        INBT option = options.get(increment(direction));
         value.put(name, option);
+
         if (noname) {
             setMessage(new StringTextComponent(toString(option)));
         } else {
             setMessage(new StringTextComponent(prefix + toString(option)));
         }
+
         callback.run();
+    }
+
+    private int increment(int direction) {
+        index += direction;
+
+        if (index >= options.size()) {
+            index = 0;
+        } else if (index < 0) {
+            index = options.size() - 1;
+        }
+
+        return index;
     }
 
     private static String toString(INBT nbt) {

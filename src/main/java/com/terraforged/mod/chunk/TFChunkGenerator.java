@@ -115,12 +115,6 @@ public class TFChunkGenerator extends ChunkGenerator {
         Profiler.reset();
     }
 
-    protected TFChunkGenerator create(long seed) {
-        Log.debug("Creating seeded generator: {}", seed);
-        TFBiomeProvider biomes = getBiomeProvider().getBiomeProvider(seed);
-        return new TFChunkGenerator(biomes, getSettings());
-    }
-
     public long getSeed() {
         return seed;
     }
@@ -136,7 +130,9 @@ public class TFChunkGenerator extends ChunkGenerator {
 
     @Override
     public ChunkGenerator func_230349_a_(long seed) {
-        return create(seed);
+        Log.debug("Creating seeded generator: {}", seed);
+        TFBiomeProvider biomes = getBiomeProvider().getBiomeProvider(seed);
+        return new TFChunkGenerator(biomes, getSettings());
     }
 
     @Override // getBlockColumn

@@ -42,7 +42,6 @@ import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
@@ -85,7 +84,9 @@ public class TFBiomeProvider extends BiomeProvider {
     @Override
     public TFBiomeProvider getBiomeProvider(long seed) {
         Log.debug("Creating seeded biome provider: {}", seed);
-        return create(seed, context);
+        TerraSettings settings = context.terraSettings;
+        settings.world.seed = seed;
+        return new TFBiomeProvider(new TerraContext(settings, context.gameContext));
     }
 
     @Override
@@ -226,21 +227,6 @@ public class TFBiomeProvider extends BiomeProvider {
 
     private BiomeProviderResources getResources() {
         return resources.get();
-    }
-
-    public static TFBiomeProvider create(long seed, Registry<Biome> registry) {
-        TerraSettings settings = new TerraSettings(seed);
-        GameContext gameContext = new GameContext(registry);
-        return new TFBiomeProvider(new TerraContext(settings, gameContext));
-    }
-
-    public static TFBiomeProvider create(long seed, TerraContext currentContext) {
-        TerraSettings settings = currentContext.terraSettings;
-        settings.world.seed = seed;
-
-        TerraContext context = new TerraContext(settings, currentContext.gameContext);
-
-        return new TFBiomeProvider(context);
     }
 
     public static boolean isValidBiome(Biome biome) {
