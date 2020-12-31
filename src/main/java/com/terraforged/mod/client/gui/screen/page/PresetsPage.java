@@ -37,7 +37,7 @@ import com.terraforged.mod.client.gui.page.BasePage;
 import com.terraforged.mod.client.gui.screen.Instance;
 import com.terraforged.mod.client.gui.screen.ScrollPane;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
-import com.terraforged.mod.util.nbt.NBTHelper;
+import com.terraforged.mod.util.DataUtils;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.nbt.CompoundNBT;
 
@@ -81,7 +81,7 @@ public class PresetsPage extends BasePage {
     }
 
     protected void update() {
-        preview.apply(settings -> NBTHelper.deserialize(instance.settingsData, settings));
+        preview.apply(settings -> DataUtils.fromNBT(instance.settingsData, settings));
     }
 
     @Override

@@ -28,7 +28,7 @@ import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.page.SimplePage;
 import com.terraforged.mod.client.gui.screen.Instance;
 import com.terraforged.mod.util.TranslationKey;
-import com.terraforged.mod.util.nbt.NBTHelper;
+import com.terraforged.mod.util.DataUtils;
 
 import java.util.function.Function;
 
@@ -44,6 +44,6 @@ public class SimplePreviewPage extends SimplePage {
     @Override
     protected void update() {
         super.update();
-        preview.apply(settings -> NBTHelper.deserialize(sectionSettings, section.apply(settings)));
+        preview.apply(settings -> DataUtils.fromNBT(sectionSettings, section.apply(settings)));
     }
 }

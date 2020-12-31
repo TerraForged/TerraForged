@@ -34,7 +34,7 @@ import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.util.function.IOFunction;
 import com.terraforged.mod.util.function.IOSupplier;
-import com.terraforged.mod.util.nbt.NBTHelper;
+import com.terraforged.mod.util.DataUtils;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.ModList;
 
@@ -113,7 +113,7 @@ public class PresetManager implements Iterable<Preset> {
             }
 
             Log.debug("Saving preset: {}", preset.getName());
-            JsonElement json = NBTHelper.toJson(preset.getSettings());
+            JsonElement json = DataUtils.toJson(preset.getSettings());
             try (Writer writer = new BufferedWriter(new FileWriter(preset.getFile()))) {
                 gson.toJson(json, writer);
             } catch (IOException e) {
@@ -233,8 +233,8 @@ public class PresetManager implements Iterable<Preset> {
         try (Reader reader = new BufferedReader(new InputStreamReader(in))) {
             TerraSettings settings = new TerraSettings();
             JsonElement data = new JsonParser().parse(reader);
-            CompoundNBT nbt = NBTHelper.fromJson(data);
-            if (NBTHelper.deserialize(nbt, settings)) {
+            CompoundNBT nbt = DataUtils.fromJson(data);
+            if (DataUtils.fromNBT(nbt, settings)) {
                 String name = parseName(path);
                 String description = getDescription(data);
                 Preset preset = new Preset(name, description, settings, true);

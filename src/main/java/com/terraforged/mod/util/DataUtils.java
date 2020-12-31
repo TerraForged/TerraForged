@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.nbt;
+package com.terraforged.mod.util;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -30,6 +30,10 @@ import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import com.terraforged.engine.serialization.serializer.Deserializer;
 import com.terraforged.engine.serialization.serializer.Serializer;
+import com.terraforged.mod.util.nbt.DynamicReader;
+import com.terraforged.mod.util.nbt.DynamicWriter;
+import com.terraforged.mod.util.nbt.NBTReader;
+import com.terraforged.mod.util.nbt.NBTWriter;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
@@ -40,7 +44,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class NBTHelper {
+public class DataUtils {
 
     public static JsonElement toJson(CompoundNBT tag) {
         Dynamic<INBT> input = new Dynamic<>(NBTDynamicOps.INSTANCE, tag);
@@ -74,11 +78,11 @@ public class NBTHelper {
         }
     }
 
-    public static CompoundNBT serialize(Object object) {
-        return serialize("", object);
+    public static CompoundNBT toNBT(Object object) {
+        return toNBT("", object);
     }
 
-    public static CompoundNBT serialize(String owner, Object object) {
+    public static CompoundNBT toNBT(String owner, Object object) {
         try {
             NBTWriter writer = new NBTWriter();
             Serializer.serialize(object, writer, owner, true);
@@ -88,7 +92,7 @@ public class NBTHelper {
         }
     }
 
-    public static CompoundNBT serializeCompact(Object object) {
+    public static CompoundNBT toCompactNBT(Object object) {
         try {
             NBTWriter writer = new NBTWriter();
             writer.readFrom(object);
@@ -98,18 +102,7 @@ public class NBTHelper {
         }
     }
 
-    public static CompoundNBT readCompact(Object object) {
-        try {
-            NBTWriter writer = new NBTWriter();
-            writer.readFrom(object);
-            new Serializer().serialize(object, writer);
-            return writer.compound();
-        } catch (IllegalAccessException e) {
-            return new CompoundNBT();
-        }
-    }
-
-    public static Stream<String> streamkeys(CompoundNBT compound) {
+    public static Stream<String> streamKeys(CompoundNBT compound) {
         return compound.keySet().stream()
                 .filter(name -> !name.startsWith("#"))
                 .sorted(Comparator.comparing(name -> compound.getCompound("#" + name).getInt("order")));
@@ -135,7 +128,7 @@ public class NBTHelper {
         return tag;
     }
 
-    public static boolean deserialize(CompoundNBT settings, Object object) {
+    public static boolean fromNBT(CompoundNBT settings, Object object) {
         try {
             NBTReader reader = new NBTReader(settings);
             return reader.writeTo(object);

@@ -31,7 +31,7 @@ import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.screen.preview.PreviewSettings;
 import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.util.TranslationKey;
-import com.terraforged.mod.util.nbt.NBTHelper;
+import com.terraforged.mod.util.DataUtils;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.ResourceLocation;
@@ -91,7 +91,7 @@ public class LangGenerator {
     }
 
     private static void settings(LanguageProvider provider) {
-        visit(NBTHelper.serialize(new DataGenSettings()), provider);
+        visit(DataUtils.toNBT(new DataGenSettings()), provider);
     }
 
     private static void visit(CompoundNBT tag, LanguageProvider lang) {

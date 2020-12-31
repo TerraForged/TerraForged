@@ -29,7 +29,7 @@ import com.terraforged.mod.client.gui.element.*;
 import com.terraforged.mod.client.gui.screen.ScrollPane;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayRenderer;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
-import com.terraforged.mod.util.nbt.NBTHelper;
+import com.terraforged.mod.util.DataUtils;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
@@ -132,7 +132,7 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
     public void addElements(int x, int y, Column column, CompoundNBT settings, boolean deep, Consumer<Widget> consumer, Runnable callback) {
         AtomicInteger top = new AtomicInteger(y);
 
-        NBTHelper.streamkeys(settings).forEach(name -> {
+        DataUtils.streamKeys(settings).forEach(name -> {
             Widget button = createButton(name, settings, callback);
             if (button != null) {
                 button.setWidth(column.width);

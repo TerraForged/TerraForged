@@ -30,7 +30,7 @@ import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.element.TFButton;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
 import com.terraforged.mod.client.gui.screen.page.UpdatablePage;
-import com.terraforged.mod.util.nbt.NBTHelper;
+import com.terraforged.mod.util.DataUtils;
 import net.minecraft.nbt.CompoundNBT;
 
 import java.util.function.Consumer;
@@ -40,7 +40,7 @@ public class PreviewPage extends UpdatablePage {
     private final boolean demo;
     private final Preview preview;
     private final TerraSettings settings;
-    private final CompoundNBT previewerSettings = NBTHelper.serialize("preview", new PreviewSettings());
+    private final CompoundNBT previewerSettings = DataUtils.toNBT("preview", new PreviewSettings());
 
     public PreviewPage(TerraSettings settings, int seed) {
         this.preview = new Preview(seed);

@@ -30,17 +30,14 @@ import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.util.DimUtils;
-import com.terraforged.mod.util.nbt.NBTHelper;
+import com.terraforged.mod.util.DataUtils;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 import net.minecraftforge.common.world.ForgeWorldType;
-
-import java.util.function.BiFunction;
 
 public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
 
@@ -94,7 +91,7 @@ public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
     }
 
     private static TFChunkGenerator createOverworld(TerraSettings settings, Registry<Biome> biomes, Registry<DimensionSettings> dimSettings) {
-        Log.info("Creating TerraForged chunk-generator with settings {}", NBTHelper.toJson(settings));
+        Log.info("Creating TerraForged chunk-generator with settings {}", DataUtils.toJson(settings));
         DimensionSettings overworldSettings = dimSettings.getOrThrow(DimensionSettings.field_242734_c);
         GameContext game = new GameContext(biomes);
         TerraContext context = new TerraContext(settings, game);

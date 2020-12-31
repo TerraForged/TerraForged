@@ -25,7 +25,7 @@
 package com.terraforged.mod.client.gui.screen;
 
 import com.terraforged.mod.chunk.settings.TerraSettings;
-import com.terraforged.mod.util.nbt.NBTHelper;
+import com.terraforged.mod.util.DataUtils;
 import net.minecraft.nbt.CompoundNBT;
 
 public class Instance {
@@ -39,12 +39,12 @@ public class Instance {
 
     public void sync(TerraSettings settings) {
         this.settings = settings;
-        this.settingsData = NBTHelper.serialize(settings);
+        this.settingsData = DataUtils.toNBT(settings);
     }
 
     public TerraSettings createCopy() {
         TerraSettings settings = new TerraSettings();
-        NBTHelper.deserialize(settingsData, settings);
+        DataUtils.fromNBT(settingsData, settings);
         return settings;
     }
 }

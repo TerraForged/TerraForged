@@ -41,7 +41,7 @@ import com.terraforged.engine.world.continent.MutableVeci;
 import com.terraforged.engine.world.continent.SpawnType;
 import com.terraforged.engine.world.heightmap.Levels;
 import com.terraforged.mod.client.gui.GuiKeys;
-import com.terraforged.mod.util.nbt.NBTHelper;
+import com.terraforged.mod.util.DataUtils;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
@@ -135,7 +135,7 @@ public class Preview extends Button {
         }
         lastUpdate = time;
 
-        NBTHelper.deserialize(prevSettings, previewSettings);
+        DataUtils.fromNBT(prevSettings, previewSettings);
         settings.world.seed = seed;
 
         task = generate(settings, prevSettings);
@@ -182,7 +182,7 @@ public class Preview extends Button {
     }
 
     private CacheEntry<Tile> generate(Settings settings, CompoundNBT prevSettings) {
-        NBTHelper.deserialize(prevSettings, previewSettings);
+        DataUtils.fromNBT(prevSettings, previewSettings);
         settings.world.seed = seed;
         this.settings = settings;
 

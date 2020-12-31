@@ -30,7 +30,7 @@ import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.profiler.ProfilerPrinter;
 import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.config.ConfigRef;
-import com.terraforged.mod.util.nbt.NBTHelper;
+import com.terraforged.mod.util.DataUtils;
 import com.terraforged.mod.util.reflect.Accessor;
 import com.terraforged.mod.util.reflect.FieldAccessor;
 import net.minecraft.crash.CrashReport;
@@ -79,7 +79,7 @@ public class CrashReportBuilder {
 
     private static void addContext(TFChunkGenerator generator, CrashReportCategory report) {
         report.addDetail("Seed", generator.getSeed());
-        report.addDetail("Settings", NBTHelper.toJson(generator.getContext().terraSettings));
+        report.addDetail("Settings", DataUtils.toJson(generator.getContext().terraSettings));
     }
 
     private static void addContext(TFBiomeProvider biomes, CrashReportCategory report) {

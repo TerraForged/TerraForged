@@ -29,7 +29,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.terraforged.mod.Log;
-import com.terraforged.mod.util.nbt.NBTHelper;
+import com.terraforged.mod.util.DataUtils;
 import net.minecraft.nbt.CompoundNBT;
 
 import java.io.*;
@@ -51,7 +51,7 @@ public class SettingsHelper {
         TerraSettings settings = new TerraSettings();
         try (Reader reader = new BufferedReader(new FileReader(file))) {
             JsonElement data = new JsonParser().parse(reader);
-            if (NBTHelper.fromJson(data, settings)) {
+            if (DataUtils.fromJson(data, settings)) {
                 return settings;
             }
         } catch (IOException e) {
@@ -59,7 +59,7 @@ public class SettingsHelper {
         }
 
         try (Writer writer = new BufferedWriter(new FileWriter(file))) {
-            JsonElement json = NBTHelper.toJson(settings);
+            JsonElement json = DataUtils.toJson(settings);
             GSON.toJson(json, writer);
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,7 +68,7 @@ public class SettingsHelper {
     }
 
     public static void exportDefaults(TerraSettings settings) {
-        JsonElement json = NBTHelper.toJson(settings);
+        JsonElement json = DataUtils.toJson(settings);
         try (Writer writer = new BufferedWriter(new FileWriter(DEFAULTS_FILE))) {
             GSON.toJson(json, writer);
         } catch (IOException e) {
@@ -79,9 +79,9 @@ public class SettingsHelper {
     public static CompoundNBT applyDefaults(CompoundNBT options, TerraSettings dest) {
         if (options.isEmpty()) {
             TerraSettings defaults = readDefaults();
-            options = NBTHelper.serialize(defaults);
+            options = DataUtils.toNBT(defaults);
         }
-        NBTHelper.deserialize(options, dest);
+        DataUtils.fromNBT(options, dest);
         return options;
     }
 

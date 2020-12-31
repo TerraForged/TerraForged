@@ -30,7 +30,7 @@ import com.terraforged.mod.client.gui.page.BasePage;
 import com.terraforged.mod.client.gui.screen.Instance;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
 import com.terraforged.mod.util.DimUtils;
-import com.terraforged.mod.util.nbt.NBTHelper;
+import com.terraforged.mod.util.DataUtils;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -86,8 +86,8 @@ public class WorldPage extends BasePage {
     protected void update() {
         super.update();
         preview.apply(settings -> {
-            NBTHelper.deserialize(worldSettings, settings.world);
-            NBTHelper.deserialize(dimSettings, settings.dimensions);
+            DataUtils.fromNBT(worldSettings, settings.world);
+            DataUtils.fromNBT(dimSettings, settings.dimensions);
         });
     }
 
