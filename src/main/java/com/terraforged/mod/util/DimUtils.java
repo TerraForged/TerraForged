@@ -25,6 +25,8 @@
 package com.terraforged.mod.util;
 
 import com.mojang.serialization.Lifecycle;
+import com.terraforged.engine.concurrent.Resource;
+import com.terraforged.engine.concurrent.ThreadLocalResource;
 import com.terraforged.mod.LevelType;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.settings.DimensionSettings;
@@ -44,16 +46,18 @@ import java.util.OptionalInt;
 
 public class DimUtils {
 
-    private static final ThreadLocal<Map<ForgeWorldType, SimpleRegistry<Dimension>>> CACHE = ThreadLocal.withInitial(HashMap::new);
+    private static final ThreadLocalResource<Map<ForgeWorldType, SimpleRegistry<Dimension>>> CACHE = ThreadLocalResource.withInitial(HashMap::new, Map::clear);
 
     public static DimensionGeneratorSettings populateDimensions(DimensionGeneratorSettings level, DynamicRegistries registries, DimensionSettings settings) {
-        // replace nether with custom dimension if present
-        overrideDimension(Dimension.THE_NETHER, settings.dimensions.nether, level, registries);
-        // replace end with custom dimension if present
-        overrideDimension(Dimension.THE_END, settings.dimensions.end, level, registries);
-        // scan forge registry for other level-types and add their extra (ie not overworld,nether,end) dimensions
-        if (settings.dimensions.includeExtraDimensions) {
-            addExtraDimensions(level, registries);
+        try (Resource<?> ignored = CACHE.get()) {
+            // replace nether with custom dimension if present
+            overrideDimension(Dimension.THE_NETHER, settings.dimensions.nether, level, registries);
+            // replace end with custom dimension if present
+            overrideDimension(Dimension.THE_END, settings.dimensions.end, level, registries);
+            // scan forge registry for other level-types and add their extra (ie not overworld,nether,end) dimensions
+            if (settings.dimensions.includeExtraDimensions) {
+                addExtraDimensions(level, registries);
+            }
         }
         return level;
     }
@@ -109,7 +113,7 @@ public class DimUtils {
             return null;
         }
 
-        return CACHE.get().computeIfAbsent(type, t -> {
+        return CACHE.open().computeIfAbsent(type, t -> {
             long seed = level.getSeed();
             boolean chest = level.hasBonusChest();
             boolean structures = level.doesGenerateFeatures();

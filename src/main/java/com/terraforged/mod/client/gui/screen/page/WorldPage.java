@@ -100,8 +100,11 @@ public class WorldPage extends BasePage {
         CompoundNBT generators = dimSettings.getCompound("dimensions");
         for (String name : generators.keySet()) {
             if (name.startsWith("#")) {
-                CompoundNBT metadata = generators.getCompound(name);
-                metadata.put("options", getWorldTypes());
+                INBT value = generators.get(name.substring(1));
+                if (value instanceof StringNBT) {
+                    CompoundNBT metadata = generators.getCompound(name);
+                    metadata.put("options", getWorldTypes());
+                }
             }
         }
         return dimSettings;
