@@ -35,10 +35,9 @@ public class BaseDecorator implements ColumnDecorator {
 
     public static final BaseDecorator INSTANCE = new BaseDecorator();
 
-    private static final int LAVA_OFFSET = 16;
-    private static final int LAVA_LEVEL_MIN = 24;
+    private static final int LAVA_OFFSET = 12;
+    private static final int LAVA_LEVEL_MIN = 16;
     private static final int LAVA_LEVEL_RESOLUTION = 4;
-    private static final float RIVER_MASK_THRESHOLD = 0.85F;
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
@@ -52,7 +51,7 @@ public class BaseDecorator implements ColumnDecorator {
             return fillDown(context, chunk, x, z, context.levels.waterY, y, States.WATER.get());
         }
 
-        if (context.cell.terrain == TerrainType.VOLCANO_PIPE && context.cell.riverMask > RIVER_MASK_THRESHOLD) {
+        if (context.cell.terrain == TerrainType.VOLCANO_PIPE) {
             int lavaLevel = getLavaLevel(y, context.levels);
 
             if (lavaLevel > 0) {
