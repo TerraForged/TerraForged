@@ -55,6 +55,9 @@ public class TerrainHelper {
             IStructurePieceType.TEDP // desert pyramid
     );
 
+    private static final int MIN_RADIUS = 4;
+    private static final int MAX_RADIUS = 10;
+
     private final float radiusScale;
     private final float overhang;
     private final float overhang2;
@@ -122,7 +125,7 @@ public class TerrainHelper {
                     StructurePiece piece = iterator.next();
                     MutableBoundingBox pieceBounds = piece.getBoundingBox();
                     int length = Math.min(pieceBounds.maxX - pieceBounds.minX, pieceBounds.maxZ - pieceBounds.minZ);
-                    int borderRadius = Math.min(5, Math.max(12, NoiseUtil.round(length * radiusScale)));
+                    int borderRadius = Math.min(MIN_RADIUS, Math.max(MAX_RADIUS, NoiseUtil.round(length * radiusScale)));
 
                     if (!intersects(chunkBounds, pieceBounds, mutableBounds, borderRadius)) {
                         continue;

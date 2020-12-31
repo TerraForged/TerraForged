@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.chunk.column;
 
+import com.terraforged.engine.world.heightmap.Levels;
 import com.terraforged.engine.world.terrain.TerrainType;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.api.chunk.column.DecoratorContext;
@@ -33,8 +34,11 @@ import net.minecraft.world.chunk.IChunk;
 public class BaseDecorator implements ColumnDecorator {
 
     public static final BaseDecorator INSTANCE = new BaseDecorator();
+
+    private static final int LAVA_OFFSET = 16;
+    private static final int LAVA_LEVEL_MIN = 24;
+    private static final int LAVA_LEVEL_RESOLUTION = 4;
     private static final float RIVER_MASK_THRESHOLD = 0.85F;
-    private static final int VOLCANO_PIPE_DEPTH_THRESHOLD = 8;
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
@@ -45,15 +49,17 @@ public class BaseDecorator implements ColumnDecorator {
 
     protected int decorateFluid(IChunk chunk, DecoratorContext context, int x, int y, int z) {
         if (context.cell.terrain == TerrainType.VOLCANO_PIPE && context.cell.riverMask > RIVER_MASK_THRESHOLD) {
-            int lavaStart = Math.max(context.levels.waterY + 10, y - 30);
-
-            // ie lavaStart must +8 lower than surface level
-            if (lavaStart >= y - VOLCANO_PIPE_DEPTH_THRESHOLD) {
+            int lavaLevel = getLavaLevel(y, context.levels);
+            if (lavaLevel == 0) {
                 return y;
             }
 
-            int lavaEnd = Math.max(5, context.levels.waterY - 10);
-            fillDown(context, chunk, x, z, lavaStart, lavaEnd, States.LAVA.get());
+            int lavaEnd = Math.max(5, context.levels.waterY - LAVA_OFFSET);
+            if (lavaLevel < lavaEnd) {
+                return y;
+            }
+
+            fillDown(context, chunk, x, z, lavaLevel, lavaEnd, States.LAVA.get());
 
             return lavaEnd;
         }
@@ -63,5 +69,27 @@ public class BaseDecorator implements ColumnDecorator {
         }
 
         return y;
+    }
+
+    private static int getLavaLevel(int y, Levels levels) {
+        int dy = y - levels.waterLevel;
+
+        // surface must be at-least LAVA_OFFSET above water level
+        if (dy <= LAVA_OFFSET) {
+            return 0;
+        }
+
+        // lava must start at-least LAVA_OFFSET below surface
+        dy -= LAVA_OFFSET;
+
+        // round dy to nearest lava level
+        int level = (dy >> LAVA_LEVEL_RESOLUTION) << LAVA_LEVEL_RESOLUTION;
+
+        // lava level must be at least LAVA_LEVEL_MIN (otherwise it indicates the surface is tool close to sea level)
+        if (level <= LAVA_LEVEL_MIN) {
+            return 0;
+        }
+
+        return levels.waterLevel + level;
     }
 }
