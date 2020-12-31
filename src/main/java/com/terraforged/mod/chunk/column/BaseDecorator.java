@@ -48,24 +48,20 @@ public class BaseDecorator implements ColumnDecorator {
     }
 
     protected int decorateFluid(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        if (context.cell.terrain == TerrainType.VOLCANO_PIPE && context.cell.riverMask > RIVER_MASK_THRESHOLD) {
-            int lavaLevel = getLavaLevel(y, context.levels);
-            if (lavaLevel == 0) {
-                return y;
-            }
-
-            int lavaEnd = Math.max(5, context.levels.waterY - LAVA_OFFSET);
-            if (lavaLevel < lavaEnd) {
-                return y;
-            }
-
-            fillDown(context, chunk, x, z, lavaLevel, lavaEnd, States.LAVA.get());
-
-            return lavaEnd;
+        if (y < context.levels.waterLevel) {
+            return fillDown(context, chunk, x, z, context.levels.waterY, y, States.WATER.get());
         }
 
-        if (y < context.levels.waterLevel) {
-            fillDown(context, chunk, x, z, context.levels.waterY, y, States.WATER.get());
+        if (context.cell.terrain == TerrainType.VOLCANO_PIPE && context.cell.riverMask > RIVER_MASK_THRESHOLD) {
+            int lavaLevel = getLavaLevel(y, context.levels);
+
+            if (lavaLevel > 0) {
+                int lavaEnd = Math.max(5, context.levels.waterY - LAVA_OFFSET);
+
+                if (lavaLevel > lavaEnd) {
+                    return fillDown(context, chunk, x, z, lavaLevel, lavaEnd, States.LAVA.get());
+                }
+            }
         }
 
         return y;

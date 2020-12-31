@@ -45,16 +45,18 @@ public interface ColumnDecorator {
         chunk.setBlockState(new BlockPos(x, y, z), state, moving);
     }
 
-    default void fillDown(DecoratorContext context, IChunk chunk, int x, int z, int from, int to, BlockState state) {
+    default int fillDown(DecoratorContext context, IChunk chunk, int x, int z, int from, int to, BlockState state) {
         for (int dy = from; dy > to; dy--) {
             chunk.setBlockState(context.pos.setPos(x, dy, z), state, false);
         }
+        return to;
     }
 
-    default void fillDownSolid(DecoratorContext context, IChunk chunk, int x, int z, int from, int to, BlockState state) {
+    default int fillDownSolid(DecoratorContext context, IChunk chunk, int x, int z, int from, int to, BlockState state) {
         for (int dy = from; dy > to; dy--) { ;
             replaceSolid(chunk, context.pos.setPos(x, dy, z), state);
         }
+        return to;
     }
 
     static void replaceSolid(IChunk chunk, BlockPos pos, BlockState state) {
