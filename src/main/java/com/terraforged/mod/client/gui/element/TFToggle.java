@@ -54,7 +54,7 @@ public class TFToggle extends TFButton {
         this.prefix = Element.getDisplayName(name, value) + ": ";
         this.tooltip = Element.getToolTip(name, value);
 
-        INBT selected = value.get("selected");
+        INBT selected = value.get(name);
         CompoundNBT meta = value.getCompound("#" + name);
         this.noname = meta.contains("noname");
         this.options = (ListNBT) meta.get("options");

@@ -34,6 +34,7 @@ public final class Splashes {
             "Remember to back up your worlds!",
             "Try the different map render-modes!",
             "Provide your logs when reporting issues!",
+            "Right-click to cycle an option backwards!",
             "Turn off the 'Strata Decorator' to get plain stone everywhere!",
             "Turn on 'Vanilla Lakes' if you need more water sources!",
             "Rivers flatten terrain, don't add too many if you like mountains!",
