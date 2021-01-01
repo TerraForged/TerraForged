@@ -42,7 +42,7 @@ public class Miscellaneous {
     public boolean erosionDecorator = true;
 
     @Comment("Only places regular stone on eroded surfaces")
-    public boolean plainStoneErosion = true; // todo: default = false
+    public boolean plainStoneErosion = false;
 
     @Comment("Removes snow from the terrain where it shouldn't naturally settle")
     public boolean naturalSnowDecorator = true;

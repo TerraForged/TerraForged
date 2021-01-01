@@ -40,13 +40,14 @@ import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 public class DemoScreen extends OverlayScreen {
 
     private static final int MESSAGE_COLOR = 0x00DDAA;
+    public static final String LOGS = "";
 
     private final CreateWorldScreen parent;
     private final DimensionGeneratorSettings inputSettings;
 
     private final Instance instance;
     private final PreviewPage preview;
-    private final String message = TerraForgedMod.getVersion() + " | Settings not available in this version!";
+    private final String message = "TF-" + TerraForgedMod.getVersion() + " | Settings not available in this version!";
 
     private DimensionGeneratorSettings outputSettings;
 

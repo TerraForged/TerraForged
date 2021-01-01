@@ -41,6 +41,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 @Mod(TerraForgedMod.MODID)
@@ -73,6 +74,12 @@ public class TerraForgedMod {
 //        SettingsHelper.init();
     }
 
+    @SubscribeEvent
+    public static void complete(FMLLoadCompleteEvent event) {
+        // log version because people do dumb stuff like renaming jars
+        Log.info("## Loaded TerraForged version {}", getVersion());
+    }
+
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class ForgeEvents {
         @SubscribeEvent
@@ -84,7 +91,7 @@ public class TerraForgedMod {
 
     public static String getVersion() {
         return ModList.get().getModContainerById(MODID)
-                .map(mod -> "TF-" + mod.getModInfo().getVersion().toString())
-                .orElse("TF-????");
+                .map(mod -> mod.getModInfo().getVersion().toString())
+                .orElse("unknown");
     }
 }

@@ -24,9 +24,11 @@
 
 package com.terraforged.mod.client.gui.screen;
 
+import com.google.gson.JsonElement;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.mod.LevelType;
 import com.terraforged.mod.Log;
+import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
@@ -39,6 +41,7 @@ import com.terraforged.mod.client.gui.screen.page.PresetsPage;
 import com.terraforged.mod.client.gui.screen.page.SimplePreviewPage;
 import com.terraforged.mod.client.gui.screen.page.WorldPage;
 import com.terraforged.mod.client.gui.screen.preview.PreviewPage;
+import com.terraforged.mod.util.DataUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
@@ -52,6 +55,9 @@ import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 
 public class ConfigScreen extends OverlayScreen {
 
+    private static final int MESSAGE_COLOR = 0x00DDAA;
+    private static final String MESSAGE_PREFIX = "TF-" + TerraForgedMod.getVersion();
+
     private static final Button.IPressable NO_ACTION = b -> {
     };
 
@@ -64,6 +70,9 @@ public class ConfigScreen extends OverlayScreen {
     private int pageIndex = 0;
     private DimensionGeneratorSettings outputSettings;
 
+    // TODO: remove after alpha/beta
+    private String splashMessage = "";
+
     public ConfigScreen(CreateWorldScreen parent, DimensionGeneratorSettings settings) {
         this.inputSettings = settings;
         this.outputSettings = settings;
@@ -71,7 +80,8 @@ public class ConfigScreen extends OverlayScreen {
         this.instance = new Instance(getInitialSettings(settings));
         this.preview = new PreviewPage(instance.settings, getSeed(parent));
         this.pages = new Page[]{
-                new PresetsPage(instance, preview, preview.getPreviewWidget()),
+                // TODO: reinstate
+//                new PresetsPage(instance, preview, preview.getPreviewWidget()),
                 new WorldPage(instance, preview),
                 new SimplePreviewPage(GuiKeys.CLIMATE_SETTINGS, "climate", preview, instance, s -> s.climate),
                 new SimplePreviewPage(GuiKeys.TERRAIN_SETTINGS, "terrain", preview, instance, s -> s.terrain),
@@ -95,6 +105,8 @@ public class ConfigScreen extends OverlayScreen {
         int buttonHeight = 20;
         int buttonPad = 2;
         int buttonsRow = height - 25;
+
+        splashMessage = MESSAGE_PREFIX + Splashes.next();
 
         if (pageIndex < pages.length) {
             Page page = pages[pageIndex];
@@ -124,6 +136,7 @@ public class ConfigScreen extends OverlayScreen {
             Log.debug("Updating generator settings...");
             DynamicRegistries registries = parent.field_238934_c_.func_239055_b_();
             outputSettings = LevelType.updateOverworld(inputSettings, registries, instance.settings);
+
             Log.debug("Updating seed...");
             ConfigScreen.setSeed(parent, preview.getSeed());
             closeScreen();
@@ -172,10 +185,20 @@ public class ConfigScreen extends OverlayScreen {
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         super.renderBackground(matrixStack);
         pages[pageIndex].visit(pane -> pane.render(matrixStack, mouseX, mouseY, partialTicks));
-        if (pageIndex > 0) {
+        // TODO: restore to "> 0" when presets page added back in
+        if (pageIndex >= 0) {
             preview.visit(pane -> pane.render(matrixStack, mouseX, mouseY, partialTicks));
         }
         super.render(matrixStack, mouseX, mouseY, partialTicks);
+
+        if (minecraft != null) {
+            int len = minecraft.fontRenderer.getStringWidth(splashMessage);
+            if (len < pages[pageIndex].getColumn(0).width) {
+                minecraft.fontRenderer.drawString(matrixStack, splashMessage, 5, 10, MESSAGE_COLOR);
+            } else {
+                minecraft.fontRenderer.drawString(matrixStack, MESSAGE_PREFIX, 5, 10, MESSAGE_COLOR);
+            }
+        }
     }
 
     @Override
@@ -271,7 +294,11 @@ public class ConfigScreen extends OverlayScreen {
     protected static TerraSettings getInitialSettings(DimensionGeneratorSettings level) {
         if (level.func_236225_f_() instanceof TFChunkGenerator) {
             TerraContext context = ((TFChunkGenerator) level.func_236225_f_()).getContext();
-            return context.terraSettings;
+            TerraSettings settings = context.terraSettings;
+            TerraSettings copy = new TerraSettings(settings.world.seed);
+            JsonElement dataCopy = DataUtils.toJson(settings);
+            DataUtils.fromJson(dataCopy, copy);
+            return copy;
         }
         throw new IllegalStateException("Not a TerraForged generator :[");
     }
