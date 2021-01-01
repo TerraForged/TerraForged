@@ -35,8 +35,8 @@ public class BaseDecorator implements ColumnDecorator {
 
     public static final BaseDecorator INSTANCE = new BaseDecorator();
 
-    private static final int LAVA_OFFSET = 12;
-    private static final int LAVA_LEVEL_MIN = 16;
+    private static final int LAVA_OFFSET = 10;
+    private static final int LAVA_LEVEL_MIN = 24;
     private static final int LAVA_LEVEL_RESOLUTION = 4;
 
     @Override
@@ -67,15 +67,12 @@ public class BaseDecorator implements ColumnDecorator {
     }
 
     private static int getLavaLevel(int y, Levels levels) {
-        int dy = y - levels.waterLevel;
+        int dy = y - LAVA_OFFSET - levels.waterLevel;
 
         // surface must be at-least LAVA_OFFSET above water level
-        if (dy <= LAVA_OFFSET) {
+        if (dy <= 0) {
             return 0;
         }
-
-        // lava must start at-least LAVA_OFFSET below surface
-        dy -= LAVA_OFFSET;
 
         // round dy to nearest lava level
         int level = (dy >> LAVA_LEVEL_RESOLUTION) << LAVA_LEVEL_RESOLUTION;

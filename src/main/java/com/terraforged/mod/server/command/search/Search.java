@@ -82,7 +82,7 @@ public abstract class Search implements Supplier<BlockPos> {
 
             if ((-radius <= x) && (x <= radius) && (-radius <= z) && (z <= radius)) {
                 pos.setPos(center.getX() + (x * getSpacing()), center.getY(), center.getZ() + (z * getSpacing()));
-                if (center.distanceSq(pos) >= minRadius2) {
+                if (minRadius2 == 0 || center.distanceSq(pos) >= minRadius2) {
                     if (test(pos)) {
                         return success(pos);
                     }
