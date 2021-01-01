@@ -42,7 +42,7 @@ public class Instance {
         this.settingsData = DataUtils.toNBT(settings);
     }
 
-    public TerraSettings createCopy() {
+    public TerraSettings copySettings() {
         TerraSettings settings = new TerraSettings();
         DataUtils.fromNBT(settingsData, settings);
         return settings;

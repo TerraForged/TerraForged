@@ -104,7 +104,7 @@ public class PresetsPage extends BasePage {
             public void onClick(double x, double y) {
                 super.onClick(x, y);
                 // create new preset with current settings
-                Preset preset = new Preset(nameInput.getValue(), instance.createCopy());
+                Preset preset = new Preset(nameInput.getValue(), instance.copySettings());
 
                 // register with the manager & reset the text field
                 manager.add(preset);
@@ -151,7 +151,7 @@ public class PresetsPage extends BasePage {
                     }
 
                     // create a copy of the settings
-                    TerraSettings settings = instance.createCopy();
+                    TerraSettings settings = instance.copySettings();
 
                     // replace the current preset with the updated version
                     manager.add(new Preset(preset.getName(), settings));
@@ -222,7 +222,7 @@ public class PresetsPage extends BasePage {
                 if (selected.isPresent()) {
                     SettingsHelper.exportDefaults(selected.get().getSettings());
                 } else {
-                    SettingsHelper.exportDefaults(instance.createCopy());
+                    SettingsHelper.exportDefaults(instance.copySettings());
                 }
             }
         });

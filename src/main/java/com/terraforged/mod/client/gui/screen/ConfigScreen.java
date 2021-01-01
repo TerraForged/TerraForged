@@ -136,8 +136,9 @@ public class ConfigScreen extends OverlayScreen {
             }
 
             Log.debug("Updating generator settings...");
+            TerraSettings settings = instance.copySettings();
             DynamicRegistries registries = parent.field_238934_c_.func_239055_b_();
-            outputSettings = LevelType.updateOverworld(inputSettings, registries, instance.settings);
+            outputSettings = LevelType.updateOverworld(inputSettings, registries, settings);
 
             Log.debug("Updating seed...");
             ConfigScreen.setSeed(parent, preview.getSeed());
