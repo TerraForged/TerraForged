@@ -198,6 +198,13 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
             return this;
         }
 
+        public Builder or(Collection<Object> collection) {
+            for (Object o : collection) {
+                or(o);
+            }
+            return this;
+        }
+
         public Builder or(Object value) {
             JsonElement element = FeatureMatcher.arg(value);
             if (element.isJsonPrimitive()) {

@@ -37,36 +37,30 @@ public class VolcanoMatch implements SearchCondition {
     private final Heightmap heightmap;
     private final LocalSearch search;
 
-    private BlockPos result = BlockPos.ZERO;
-
     public VolcanoMatch(Terrain terrain, Heightmap heightmap) {
         this.heightmap = heightmap;
         this.search = new LocalSearch(new BlockPos.Mutable(), heightmap);
     }
 
     @Override
-    public BlockPos.Mutable complete(BlockPos.Mutable pos) {
-        return pos.setPos(result.getX(), pos.getY(), result.getZ());
-    }
-
-    @Override
-    public boolean test(Cell cell, int x, int z) {
+    public long test(Cell cell, int x, int z) {
         int centerX = PosUtil.unpackLeft(cell.terrainRegionCenter);
         int centerY = PosUtil.unpackRight(cell.terrainRegionCenter);
         heightmap.apply(cell, centerX, centerY);
 
         if (cell.terrain == TerrainType.VOLCANO_PIPE) {
-            result = new BlockPos(centerX, 0, centerY);
-            return true;
+            return cell.terrainRegionCenter;
         }
 
         if (cell.terrain == TerrainType.VOLCANO) {
             search.center.setPos(centerX, 0, centerY);
-            result = search.get();
-            return result != BlockPos.ZERO;
+            BlockPos result = search.get();
+            if (result != BlockPos.ZERO) {
+                return PosUtil.pack(result.getX(), result.getZ());
+            }
         }
 
-        return false;
+        return SearchCondition.NO_MATCH;
     }
 
     private static class LocalSearch extends Search {

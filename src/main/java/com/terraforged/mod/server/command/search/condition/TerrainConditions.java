@@ -36,7 +36,6 @@ public final class TerrainConditions {
     private static final Map<Terrain, SearchCondition.Factory> CONDITIONS = new ConcurrentHashMap<>();
 
     static {
-        register(TerrainType.VOLCANO, VolcanoMatch::new);
         register(TerrainType.VOLCANO_PIPE, VolcanoMatch::new);
     }
 

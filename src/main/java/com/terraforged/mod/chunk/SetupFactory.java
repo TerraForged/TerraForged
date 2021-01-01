@@ -121,7 +121,7 @@ public class SetupFactory {
             );
         }
         // prevent trees growing at high elevation on volcanoes
-        modifiers.getPredicates().add(Matchers.trees(), new VolcanoPredicate(generator));
+        modifiers.getPredicates().add(Matchers.allTrees(), new VolcanoPredicate(generator));
 
         // reduce dead bushes in deserts/badlands
         modifiers.getTransformers().add(

@@ -24,12 +24,13 @@
 
 package com.terraforged.mod.server.command.search;
 
+import com.terraforged.engine.concurrent.cache.SafeCloseable;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-public abstract class Search implements Supplier<BlockPos> {
+public abstract class Search implements Supplier<BlockPos>, SafeCloseable {
 
     protected static final int MIN_RADIUS = 128;
     protected static final int MAX_RADIUS = 24000;
@@ -60,6 +61,11 @@ public abstract class Search implements Supplier<BlockPos> {
 
     public int getSpacing() {
         return 16;
+    }
+
+    @Override
+    public void close() {
+
     }
 
     @Override

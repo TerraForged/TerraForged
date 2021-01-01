@@ -25,8 +25,10 @@
 package com.terraforged.mod.server.command.search.condition;
 
 import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.heightmap.Heightmap;
 import com.terraforged.engine.world.terrain.Terrain;
+import com.terraforged.engine.world.terrain.TerrainType;
 
 public class TerrainMatch implements SearchCondition {
 
@@ -39,8 +41,14 @@ public class TerrainMatch implements SearchCondition {
     }
 
     @Override
-    public boolean test(Cell cell, int x, int z) {
+    public long test(Cell cell, int x, int z) {
         heightmap.apply(cell, x, z);
-        return cell.terrain == terrain;
+        if (cell.terrain == terrain) {
+            if (cell.terrain != TerrainType.MOUNTAIN_CHAIN) {
+                return cell.terrainRegionCenter;
+            }
+            return PosUtil.pack(x, z);
+        }
+        return SearchCondition.NO_MATCH;
     }
 }

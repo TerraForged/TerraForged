@@ -30,8 +30,10 @@ import com.terraforged.mod.featuremanager.matcher.BiomeFeatureMatcher;
 import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
 import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
 import net.minecraft.block.Blocks;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.TreeFeature;
 
 public class Matchers {
 
@@ -55,7 +57,7 @@ public class Matchers {
                 .build();
     }
 
-    public static FeatureMatcher trees() {
+    public static FeatureMatcher terraTrees() {
         return FeatureMatcher.builder()
                 .or(TerraFeatures.INSTANCE)
                 .or(Blocks.OAK_LOG).and(Blocks.OAK_LEAVES)
@@ -65,6 +67,14 @@ public class Matchers {
                 .or(Blocks.JUNGLE_LOG).and(Blocks.JUNGLE_LEAVES)
                 .or(Blocks.SPRUCE_LOG).and(Blocks.SPRUCE_LEAVES)
                 .build();
+    }
+
+    public static FeatureMatcher allTrees() {
+        return FeatureMatcher.builder()
+                // is tree
+                .or(TerraFeatures.INSTANCE).newRule()
+                // has trunk & foliage placers & places logs & leaves
+                .or("minecraft:trunk_placer").and("minecraft:foliage_placer").and(BlockTags.LOGS).and(BlockTags.LEAVES).build();
     }
 
     public static BiomeFeatureMatcher sedimentDisks(GameContext context) {

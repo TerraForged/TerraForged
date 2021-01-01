@@ -25,6 +25,9 @@
 package com.terraforged.mod.server.command.search;
 
 import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.concurrent.Resource;
+import com.terraforged.engine.concurrent.pool.ObjectPool;
+import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.WorldGenerator;
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.mod.server.command.search.condition.SearchCondition;
@@ -36,20 +39,25 @@ import net.minecraft.world.gen.ChunkGenerator;
 
 public class TerrainSearchTask extends ChunkGeneratorSearch {
 
+    private static final ObjectPool<LongSet> CACHE_POOL = new ObjectPool<>(8, () -> new LongArraySet(1024));
+
     private final SearchCondition condition;
     private final WorldGenerator worldGenerator;
 
     private final Cell cell = new Cell();
-    private final LongSet visited = new LongArraySet(2048);
+    private final Resource<LongSet> cache;
+
+    private long result = Long.MAX_VALUE;
 
     public TerrainSearchTask(BlockPos center, Terrain type, ChunkGenerator chunkGenerator, WorldGenerator worldGenerator) {
         super(center, 256, chunkGenerator);
         this.worldGenerator = worldGenerator;
         this.condition = TerrainConditions.get(type, worldGenerator.getHeightmap());
+        this.cache = CACHE_POOL.get();
 
         // exclude current terrain region
         worldGenerator.getHeightmap().getRegionModule().apply(cell, center.getX(), center.getZ());
-        visited.add(cell.terrainRegionCenter);
+        cache.get().add(cell.terrainRegionCenter);
     }
 
     @Override
@@ -61,14 +69,26 @@ public class TerrainSearchTask extends ChunkGeneratorSearch {
     public boolean test(BlockPos pos) {
         worldGenerator.getHeightmap().getRegionModule().apply(cell, pos.getX(), pos.getZ());
         // avoid searching same terrain region twice
-        if (visited.add(cell.terrainRegionCenter)) {
-            return condition.test(cell, pos.getX(), pos.getZ());
+        if (cache.get().add(cell.terrainRegionCenter)) {
+            long result = condition.test(cell, pos.getX(), pos.getZ());
+            if (result != SearchCondition.NO_MATCH) {
+                this.result = result;
+                return true;
+            }
         }
         return false;
     }
 
     @Override
     public BlockPos success(BlockPos.Mutable pos) {
-        return super.success(condition.complete(pos));
+        int x = PosUtil.unpackLeft(result);
+        int z = PosUtil.unpackRight(result);
+        return super.success(pos.setPos(x, pos.getY(), z));
+    }
+
+    @Override
+    public void close() {
+        cache.get().clear();
+        cache.close();
     }
 }

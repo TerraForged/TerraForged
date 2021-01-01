@@ -27,15 +27,12 @@ package com.terraforged.mod.server.command.search.condition;
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.world.heightmap.Heightmap;
 import com.terraforged.engine.world.terrain.Terrain;
-import net.minecraft.util.math.BlockPos;
 
 public interface SearchCondition {
 
-    boolean test(Cell cell, int x, int z);
+    long NO_MATCH = Long.MAX_VALUE;
 
-    default BlockPos.Mutable complete(BlockPos.Mutable pos) {
-        return pos;
-    }
+    long test(Cell cell, int x, int z);
 
     interface Factory {
 
