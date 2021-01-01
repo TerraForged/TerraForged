@@ -55,6 +55,8 @@ import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 
 public class ConfigScreen extends OverlayScreen {
 
+    private static final int MESSAGE_PAD_X = 15;
+    private static final int MESSAGE_PAD_Y = 6;
     private static final int MESSAGE_COLOR = 0x00DDAA;
     private static final String MESSAGE_PREFIX = "TF-" + TerraForgedMod.getVersion();
 
@@ -185,20 +187,15 @@ public class ConfigScreen extends OverlayScreen {
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         super.renderBackground(matrixStack);
         pages[pageIndex].visit(pane -> pane.render(matrixStack, mouseX, mouseY, partialTicks));
+
         // TODO: restore to "> 0" when presets page added back in
         if (pageIndex >= 0) {
             preview.visit(pane -> pane.render(matrixStack, mouseX, mouseY, partialTicks));
         }
+
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
-        if (minecraft != null) {
-            int len = minecraft.fontRenderer.getStringWidth(splashMessage);
-            if (len < pages[pageIndex].getColumn(0).width) {
-                minecraft.fontRenderer.drawString(matrixStack, splashMessage, 5, 10, MESSAGE_COLOR);
-            } else {
-                minecraft.fontRenderer.drawString(matrixStack, MESSAGE_PREFIX, 5, 10, MESSAGE_COLOR);
-            }
-        }
+        renderSplash(matrixStack);
     }
 
     @Override
@@ -268,6 +265,22 @@ public class ConfigScreen extends OverlayScreen {
         preview.close();
         Minecraft.getInstance().displayGuiScreen(parent);
         parent.field_238934_c_.func_239043_a_(outputSettings);
+    }
+
+    private void renderSplash(MatrixStack matrix) {
+        if (minecraft != null) {
+            String message = splashMessage;
+            int width = pages[pageIndex].getColumn(0).width;
+            int length = MESSAGE_PAD_X + minecraft.fontRenderer.getStringWidth(message);
+            if (length > width) {
+                message = MESSAGE_PREFIX;
+                length = MESSAGE_PAD_X + minecraft.fontRenderer.getStringWidth(message);
+                if (length > width) {
+                    return;
+                }
+            }
+            minecraft.fontRenderer.drawString(matrix, message, MESSAGE_PAD_X, MESSAGE_PAD_Y, MESSAGE_COLOR);
+        }
     }
 
     private boolean hasNext() {
