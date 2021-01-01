@@ -91,7 +91,7 @@ public class DimUtils {
 
             for (Map.Entry<RegistryKey<Dimension>, Dimension> entry : dimensions.getEntries()) {
                 // skip existing dims
-                if (level.func_236224_e_().getOptionalValue(entry.getKey()).isPresent()) {
+                if (level.func_236224_e_().getValueForKey(entry.getKey()) != null) {
                     continue;
                 }
                 Log.info("Adding extra dimension {} dimension from {}", entry.getKey().getLocation(), type.getRegistryName());
