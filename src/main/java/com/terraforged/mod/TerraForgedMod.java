@@ -31,6 +31,7 @@ import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.server.command.TerraCommand;
+import com.terraforged.mod.util.Environment;
 import com.terraforged.mod.util.version.VersionChecker;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biomes;
@@ -40,6 +41,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 @Mod(TerraForgedMod.MODID)
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -49,6 +51,7 @@ public class TerraForgedMod {
 
     public TerraForgedMod() {
         VersionChecker.require("forge", 35, 1, 5);
+        Environment.log();
 
         Engine.init();
         WGTags.init();

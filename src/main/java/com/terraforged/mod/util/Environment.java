@@ -24,11 +24,13 @@
 
 package com.terraforged.mod.util;
 
+import com.terraforged.engine.Engine;
+import com.terraforged.mod.Log;
+
 public class Environment {
 
     private static final boolean dev = System.getProperty("dev") != null;
     private static final boolean verbose = System.getProperty("notVerbose") == null;
-    private static final boolean profile = System.getProperty("profiler") != null;
     private static final boolean vanillaBiomes = System.getProperty("vanillaBiomes") != null;
 
     public static boolean isDev() {
@@ -41,5 +43,9 @@ public class Environment {
 
     public static boolean isVanillaBiomes() {
         return vanillaBiomes;
+    }
+
+    public static void log() {
+        Log.info("### Environment: dev={}, stable={}, vanilla={} ###", dev, Engine.STABLE, vanillaBiomes);
     }
 }

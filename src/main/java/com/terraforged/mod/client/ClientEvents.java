@@ -60,13 +60,10 @@ public class ClientEvents {
             minecraft.getResourcePackList().reloadPacksFromFinders();
         });
 
-        ForgeWorldTypeScreens.registerFactory(LevelType.TERRAFORGED, ConfigScreen::new);
+        ForgeWorldTypeScreens.registerFactory(LevelType.TERRAFORGED, getOptionsScreen());
     }
 
-    private static BiomeGeneratorTypeScreens.IFactory getFactory() {
-        if (Environment.isDev()) {
-            return ConfigScreen::new;
-        }
-        return DemoScreen::new;
+    private static BiomeGeneratorTypeScreens.IFactory getOptionsScreen() {
+        return Environment.isDev() ? ConfigScreen::new : DemoScreen::new;
     }
 }
