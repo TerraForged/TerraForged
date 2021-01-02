@@ -25,9 +25,9 @@
 package com.terraforged.mod.data.gen.feature;
 
 import com.google.gson.JsonPrimitive;
+import com.terraforged.mod.data.gen.FeatureInjectorProvider;
 import com.terraforged.mod.feature.feature.BushFeature;
 import com.terraforged.mod.featuremanager.FeatureSerializer;
-import com.terraforged.mod.featuremanager.data.FeatureInjectorProvider;
 import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
 import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
 import com.terraforged.mod.featuremanager.transformer.FeatureAppender;

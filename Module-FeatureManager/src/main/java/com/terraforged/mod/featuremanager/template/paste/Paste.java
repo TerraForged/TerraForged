@@ -22,38 +22,15 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.featuremanager.data;
+package com.terraforged.mod.featuremanager.template.paste;
 
-import com.terraforged.mod.Log;
-import net.minecraft.resources.FolderPackFinder;
-import net.minecraft.resources.IPackNameDecorator;
-import net.minecraft.resources.ResourcePackInfo;
+import com.terraforged.mod.featuremanager.template.feature.Placement;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 
-import java.io.File;
-import java.util.function.Consumer;
+public interface Paste {
 
-public class FolderDataPackFinder extends FolderPackFinder {
-
-    public static final IPackNameDecorator TF_FOLDER = IPackNameDecorator.create("pack.source.folder");
-
-    public FolderDataPackFinder(File folderIn) {
-        this(folderIn, TF_FOLDER);
-    }
-
-    public FolderDataPackFinder(File folderIn, IPackNameDecorator decorator) {
-        super(folderIn, decorator);
-    }
-
-    @Override
-    public void findPacks(Consumer<ResourcePackInfo> consumer, ResourcePackInfo.IFactory factory) {
-        Log.debug("Searching for DataPacks...");
-        super.findPacks(packLogger(consumer), factory);
-    }
-
-    private static Consumer<ResourcePackInfo> packLogger(Consumer<ResourcePackInfo> consumer) {
-        return packInfo -> {
-            Log.debug("Adding datapack: {}", packInfo.getName());
-            consumer.accept(packInfo);
-        };
-    }
+    boolean apply(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, Placement placement, PasteConfig config);
 }

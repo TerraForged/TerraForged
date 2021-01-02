@@ -25,9 +25,9 @@
 package com.terraforged.mod.featuremanager.modifier;
 
 import com.google.gson.JsonObject;
-import com.terraforged.mod.featuremanager.data.DataManager;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.featuremanager.FeatureManager;
-import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.mod.featuremanager.data.DataManager;
 import com.terraforged.mod.featuremanager.matcher.BiomeFeatureMatcher;
 import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
 import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcherParser;
@@ -44,7 +44,7 @@ public class FeatureModifierLoader {
 
     public static final Marker LOAD = MarkerManager.getMarker("MODIFIERS");
 
-    public static FeatureModifiers load(DataManager data, GameContext context) {
+    public static FeatureModifiers load(DataManager data, TFBiomeContext context) {
         FeatureManager.LOG.debug(LOAD, "Loading feature modifier configs");
         FeatureModifiers modifiers = new FeatureModifiers(context);
         data.forEachJson("features", (location, element) -> {

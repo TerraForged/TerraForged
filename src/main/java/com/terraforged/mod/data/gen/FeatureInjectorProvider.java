@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.featuremanager.data;
+package com.terraforged.mod.data.gen;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.featuremanager.matcher.BiomeFeatureMatcher;
 import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
 import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
@@ -52,7 +52,7 @@ import java.util.Objects;
 public class FeatureInjectorProvider implements IDataProvider {
 
     private final Path dir;
-    private final GameContext context = GameContext.dynamic();
+    private final TFBiomeContext context = TFBiomeContext.dynamic();
     private final Map<String, Modifier<Jsonifiable>> modifiers = new HashMap<>();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
@@ -63,7 +63,7 @@ public class FeatureInjectorProvider implements IDataProvider {
         vanillaAndTF = BiomeMatcher.of(getContext(), "minecraft:*", "terraforged:*");
     }
 
-    public GameContext getContext() {
+    public TFBiomeContext getContext() {
         return context;
     }
 

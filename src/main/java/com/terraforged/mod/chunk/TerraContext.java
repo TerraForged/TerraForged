@@ -37,9 +37,9 @@ import com.terraforged.mod.api.biome.surface.SurfaceChunk;
 import com.terraforged.mod.api.biome.surface.SurfaceContext;
 import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.biome.TFBiomeContainer;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.config.PerfDefaults;
-import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.material.Materials;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.DimensionSettings;
@@ -51,20 +51,20 @@ public class TerraContext extends GeneratorContext {
     public final TerraSettings terraSettings;
     public final LazySupplier<Materials> materials = LazySupplier.of(Materials::create);
 
-    public final GameContext gameContext;
+    public final TFBiomeContext biomeContext;
 
-    public TerraContext(TerraContext other, GameContext gameContext) {
+    public TerraContext(TerraContext other, TFBiomeContext biomeContext) {
         super(other.settings, other.terrainFactory, TerraContext::createCache);
         this.worldSeed = other.worldSeed;
         this.terraSettings = other.terraSettings;
-        this.gameContext = gameContext;
+        this.biomeContext = biomeContext;
         this.heightmap = factory.then(WorldGeneratorFactory::getHeightmap);
     }
 
-    public TerraContext(TerraSettings settings, GameContext gameContext) {
+    public TerraContext(TerraSettings settings, TFBiomeContext biomeContext) {
         super(settings, TFTerrainProvider::new, TerraContext::createCache);
         this.worldSeed = settings.world.seed;
-        this.gameContext = gameContext;
+        this.biomeContext = biomeContext;
         this.terraSettings = settings;
         this.heightmap = factory.then(WorldGeneratorFactory::getHeightmap);
     }

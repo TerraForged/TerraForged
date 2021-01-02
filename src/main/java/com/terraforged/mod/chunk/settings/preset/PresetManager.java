@@ -32,9 +32,9 @@ import com.terraforged.mod.Log;
 import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.chunk.settings.TerraSettings;
+import com.terraforged.mod.util.DataUtils;
 import com.terraforged.mod.util.function.IOFunction;
 import com.terraforged.mod.util.function.IOSupplier;
-import com.terraforged.mod.util.DataUtils;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.ModList;
 

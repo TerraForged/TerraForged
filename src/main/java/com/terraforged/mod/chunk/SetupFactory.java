@@ -87,7 +87,7 @@ public class SetupFactory {
     }
 
     public static FeatureManager createFeatureManager(DataManager data, TerraContext context, TFChunkGenerator generator) {
-        FeatureModifiers modifiers = FeatureManager.modifiers(data, context.terraSettings.miscellaneous.customBiomeFeatures, context.gameContext);
+        FeatureModifiers modifiers = FeatureManager.modifiers(data, context.terraSettings.miscellaneous.customBiomeFeatures, context.biomeContext);
 
         if (context.terraSettings.miscellaneous.strataDecorator) {
             // block stone blobs if strata enabled
@@ -111,7 +111,7 @@ public class SetupFactory {
 
         if (test("Custom features", context.terraSettings.miscellaneous.customBiomeFeatures)) {
             // remove default trees from river biomes since forests can go up to the edge of rivers
-            modifiers.getPredicates().add(BiomeMatcher.of(context.gameContext, Biome.Category.RIVER), Matchers.tree(), FeaturePredicate.DENY);
+            modifiers.getPredicates().add(BiomeMatcher.of(context.biomeContext, Biome.Category.RIVER), Matchers.tree(), FeaturePredicate.DENY);
 
             // places snow layers below and on top of trees
             modifiers.getTransformers().add(
@@ -125,7 +125,7 @@ public class SetupFactory {
 
         // reduce dead bushes in deserts/badlands
         modifiers.getTransformers().add(
-                BiomeMatcher.of(context.gameContext, Biome.Category.MESA, Biome.Category.DESERT),
+                BiomeMatcher.of(context.biomeContext, Biome.Category.MESA, Biome.Category.DESERT),
                 Matchers.deadBush(),
                 FeatureTransformer.builder().key("tries", 1).build()
         );
@@ -134,7 +134,7 @@ public class SetupFactory {
     }
 
     public static SurfaceManager createSurfaceManager(TerraContext context) {
-        SurfaceManager manager = new SurfaceManager(context.gameContext);
+        SurfaceManager manager = new SurfaceManager(context.biomeContext);
         manager.replace(Biomes.DEEP_FROZEN_OCEAN, new IcebergsSurface(context, 30, 30));
         manager.replace(Biomes.FROZEN_OCEAN, new IcebergsSurface(context, 20, 15));
         manager.append(ModBiomes.BRYCE, new BriceSurface(context.seed));

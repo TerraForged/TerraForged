@@ -25,8 +25,8 @@
 package com.terraforged.mod.featuremanager.transformer;
 
 import com.google.gson.JsonElement;
+import com.terraforged.engine.world.biome.map.BiomeContext;
 import com.terraforged.mod.featuremanager.FeatureSerializer;
-import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.featuremanager.modifier.Jsonifiable;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 
@@ -50,7 +50,7 @@ public abstract class AbstractFeatureInjector implements Jsonifiable, Supplier<C
     }
 
     @Override
-    public JsonElement toJson(GameContext context) {
+    public JsonElement toJson(BiomeContext<?> context) {
         return FeatureSerializer.serialize(feature);
     }
 }

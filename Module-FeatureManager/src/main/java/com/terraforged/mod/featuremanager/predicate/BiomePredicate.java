@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.featuremanager.predicate;
 
-import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeContainer;
 import net.minecraft.world.chunk.IChunk;
@@ -57,11 +57,11 @@ public class BiomePredicate implements FeaturePredicate {
         return true;
     }
 
-    public static BiomePredicate oceans(GameContext context) {
+    public static BiomePredicate oceans(TFBiomeContext context) {
         return BiomePredicate.of(context, Biome.Category.OCEAN);
     }
 
-    public static BiomePredicate of(GameContext context, Biome.Category... categories) {
+    public static BiomePredicate of(TFBiomeContext context, Biome.Category... categories) {
         Set<Biome> set = new HashSet<>();
         for (Biome biome : context.biomes) {
             for (Biome.Category category : categories) {

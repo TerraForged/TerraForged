@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.data.gen.feature;
 
-import com.terraforged.mod.featuremanager.data.FeatureInjectorProvider;
+import com.terraforged.mod.data.gen.FeatureInjectorProvider;
 import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
 import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
 import com.terraforged.mod.featuremanager.transformer.FeatureTransformer;

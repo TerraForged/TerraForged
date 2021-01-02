@@ -22,37 +22,48 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.featuremanager.transformer;
+package com.terraforged.mod.biome.context;
 
-import com.google.gson.JsonObject;
+import com.terraforged.engine.world.biome.TempCategory;
 import com.terraforged.engine.world.biome.map.BiomeContext;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
+import com.terraforged.mod.biome.provider.BiomeHelper;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.world.biome.Biome;
 
-public class FeatureAppender extends FeatureInjector {
+public class BiomeProperties implements BiomeContext.Properties<RegistryKey<Biome>> {
 
-    private final GenerationStage.Decoration stage;
+    private final TFBiomeContext context;
 
-    public FeatureAppender(ConfiguredFeature<?, ?> feature, InjectionPosition type, GenerationStage.Decoration stage) {
-        super(feature, type);
-        this.stage = stage;
-    }
-
-    public GenerationStage.Decoration getStage() {
-        return stage;
+    public BiomeProperties(TFBiomeContext context) {
+        this.context = context;
     }
 
     @Override
-    public void append(JsonObject parent, BiomeContext<?> context) {
-        parent.addProperty("stage", getStage().name());
-        parent.add(getType(), toJson(context));
+    public BiomeContext<RegistryKey<Biome>> getContext() {
+        return context;
     }
 
-    public static FeatureAppender head(GenerationStage.Decoration stage, ConfiguredFeature<?, ?> feature) {
-        return new FeatureAppender(feature, InjectionPosition.HEAD, stage);
+    @Override
+    public float getDepth(RegistryKey<Biome> key) {
+        Biome biome = context.biomes.get(key);
+        return biome.getDepth();
     }
 
-    public static FeatureAppender tail(GenerationStage.Decoration stage, ConfiguredFeature<?, ?> feature) {
-        return new FeatureAppender(feature, InjectionPosition.TAIL, stage);
+    @Override
+    public float getMoisture(RegistryKey<Biome> key) {
+        Biome biome = context.biomes.get(key);
+        return biome.getDownfall();
+    }
+
+    @Override
+    public TempCategory getTempCategory(RegistryKey<Biome> key) {
+        Biome biome = context.biomes.get(key);
+        return BiomeHelper.getTempCategory(biome, context);
+    }
+
+    @Override
+    public TempCategory getMountainCategory(RegistryKey<Biome> key) {
+        Biome biome = context.biomes.get(key);
+        return BiomeHelper.getMountainCategory(biome);
     }
 }

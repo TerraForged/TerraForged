@@ -22,38 +22,58 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.featuremanager.data;
+package com.terraforged.mod.util;
 
-import com.terraforged.mod.Log;
-import net.minecraft.resources.FolderPackFinder;
-import net.minecraft.resources.IPackNameDecorator;
-import net.minecraft.resources.ResourcePackInfo;
-
-import java.io.File;
+import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
-public class FolderDataPackFinder extends FolderPackFinder {
+public class ListView<T> implements Iterable<T> {
 
-    public static final IPackNameDecorator TF_FOLDER = IPackNameDecorator.create("pack.source.folder");
+    private final Iterable<T> collection;
+    private final Predicate<T> filter;
 
-    public FolderDataPackFinder(File folderIn) {
-        this(folderIn, TF_FOLDER);
+    public ListView(Iterable<T> collection, Predicate<T> filter) {
+        this.collection = collection;
+        this.filter = filter;
     }
 
-    public FolderDataPackFinder(File folderIn, IPackNameDecorator decorator) {
-        super(folderIn, decorator);
+    public void iterate(Consumer<T> consumer) {
+        for (T t : collection) {
+            if (filter.test(t)) {
+                continue;
+            }
+            consumer.accept(t);
+        }
     }
 
     @Override
-    public void findPacks(Consumer<ResourcePackInfo> consumer, ResourcePackInfo.IFactory factory) {
-        Log.debug("Searching for DataPacks...");
-        super.findPacks(packLogger(consumer), factory);
+    public Iterator<T> iterator() {
+        return new FilterIterator();
     }
 
-    private static Consumer<ResourcePackInfo> packLogger(Consumer<ResourcePackInfo> consumer) {
-        return packInfo -> {
-            Log.debug("Adding datapack: {}", packInfo.getName());
-            consumer.accept(packInfo);
-        };
+    private class FilterIterator implements Iterator<T> {
+
+        private final Iterator<T> iterator = collection.iterator();
+        private T next = null;
+
+        @Override
+        public boolean hasNext() {
+            if (iterator.hasNext()) {
+                this.next = iterator.next();
+
+                if (filter.test(next)) {
+                    return hasNext();
+                }
+
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public T next() {
+            return next;
+        }
     }
 }

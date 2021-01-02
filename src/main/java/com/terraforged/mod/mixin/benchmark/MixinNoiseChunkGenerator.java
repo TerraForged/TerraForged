@@ -26,7 +26,6 @@ package com.terraforged.mod.mixin.benchmark;
 
 import com.terraforged.mod.chunk.profiler.Profiler;
 import com.terraforged.mod.chunk.profiler.Section;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;
@@ -39,11 +38,9 @@ import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.NoiseChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
-import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 import net.minecraft.world.gen.settings.DimensionStructuresSettings;
-import net.minecraft.world.server.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -87,22 +84,15 @@ public abstract class MixinNoiseChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public BlockPos func_235956_a_(ServerWorld world, Structure<?> structure, BlockPos pos, int radius, boolean flag) {
-        try (Section section = Profiler.FIND_STRUCTURE.punchIn()) {
-            return super.func_235956_a_(world, structure, pos, radius, flag);
-        }
-    }
-
-    @Override
     public void func_242707_a(DynamicRegistries registries, StructureManager structures, IChunk chunk, TemplateManager templates, long seed) {
-        try (Section section = Profiler.STRUCTURE_START.punchIn()) {
+        try (Section section = Profiler.STRUCTURE_STARTS.punchIn()) {
             super.func_242707_a(registries, structures, chunk, templates, seed);
         }
     }
 
     @Override
     public void func_235953_a_(ISeedReader world, StructureManager structures, IChunk chunk) {
-        try (Section section = Profiler.STRUCTURE_SPREAD.punchIn()) {
+        try (Section section = Profiler.STRUCTURE_REFS.punchIn()) {
             super.func_235953_a_(world, structures, chunk);
         }
     }

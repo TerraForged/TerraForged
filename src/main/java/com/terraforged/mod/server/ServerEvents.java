@@ -26,10 +26,11 @@ package com.terraforged.mod.server;
 
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.profiler.Profiler;
+import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.featuremanager.data.FolderDataPackFinder;
+import net.minecraft.resources.ResourcePackList;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 
 import java.io.File;
@@ -38,16 +39,14 @@ import java.io.File;
 public class ServerEvents {
 
     @SubscribeEvent
-    public static void serverStart(FMLServerAboutToStartEvent event) {
-        Log.info("Adding DataPackFinder");
-        File dir = event.getServer().getFile("config/terraforged/datapacks");
-        FolderDataPackFinder dataPackFinder = new FolderDataPackFinder(dir);
-        event.getServer().getResourcePacks().addPackFinder(dataPackFinder);
-    }
-
-    @SubscribeEvent
     public static void serverStop(FMLServerStoppedEvent event) {
         File dir = event.getServer().getFile("dumps");
         Profiler.dump(dir);
+    }
+
+    public static void addPackFinder(ResourcePackList packList) {
+        Log.info("Adding DataPackFinder");
+        File dir = new File(SettingsHelper.SETTINGS_DIR, "datapacks");
+        packList.addPackFinder(new FolderDataPackFinder(dir));
     }
 }

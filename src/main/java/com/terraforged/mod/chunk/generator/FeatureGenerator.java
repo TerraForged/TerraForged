@@ -93,7 +93,7 @@ public class FeatureGenerator implements Generator.Features {
             postProcess(reader, container, context);
 
             // bake biome array
-            ((ChunkPrimer) chunk).setBiomes(container.bakeBiomes(Environment.isVanillaBiomes(), generator.getContext().gameContext));
+            ((ChunkPrimer) chunk).setBiomes(container.bakeBiomes(Environment.isVanillaBiomes(), generator.getContext().biomeContext));
 
             // close the current chunk reader
             reader.close();

@@ -26,6 +26,8 @@ package com.terraforged.mod.data.gen.feature;
 
 import com.mojang.datafixers.util.Pair;
 import com.terraforged.mod.biome.ModBiomes;
+import com.terraforged.mod.biome.context.TFBiomeContext;
+import com.terraforged.mod.data.gen.FeatureInjectorProvider;
 import com.terraforged.mod.feature.TerraFeatures;
 import com.terraforged.mod.feature.context.ContextSelectorConfig;
 import com.terraforged.mod.feature.context.ContextSelectorFeature;
@@ -38,8 +40,6 @@ import com.terraforged.mod.feature.decorator.fastpoisson.FastPoissonAtSurface;
 import com.terraforged.mod.feature.decorator.fastpoisson.FastPoissonConfig;
 import com.terraforged.mod.feature.decorator.filter.FilterDecoratorConfig;
 import com.terraforged.mod.feature.decorator.filter.PlacementFilter;
-import com.terraforged.mod.featuremanager.GameContext;
-import com.terraforged.mod.featuremanager.data.FeatureInjectorProvider;
 import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
 import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
 import com.terraforged.mod.featuremanager.modifier.Jsonifiable;
@@ -84,7 +84,7 @@ public class Trees {
         provider.add("trees/willow", willow(provider.getContext()));
     }
 
-    private static Modifier<Jsonifiable> acacia(GameContext context) {
+    private static Modifier<Jsonifiable> acacia(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, Biome.Category.SAVANNA),
                 FeatureMatcher.and(Blocks.ACACIA_LOG, Blocks.ACACIA_LEAVES),
@@ -97,7 +97,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> oakBadlands(GameContext context) {
+    private static Modifier<Jsonifiable> oakBadlands(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(
                         context,
@@ -116,7 +116,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> oakForest(GameContext context) {
+    private static Modifier<Jsonifiable> oakForest(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:forest"),
                 FeatureMatcher.and(Blocks.OAK_LOG, Blocks.OAK_LEAVES),
@@ -129,7 +129,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> oakPlains(GameContext context) {
+    private static Modifier<Jsonifiable> oakPlains(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:river", "minecraft:plains", "minecraft:sunflower_plains", "minecraft:mountains"),
                 FeatureMatcher.and(Blocks.OAK_LOG, Blocks.OAK_LEAVES),
@@ -142,7 +142,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> firForest(GameContext context) {
+    private static Modifier<Jsonifiable> firForest(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:snowy_mountains", "minecraft:wooded_mountains", "terraforged:fir_forest", "terraforged:snowy_fir_forest"),
                 FeatureMatcher.and(Blocks.SPRUCE_LOG, Blocks.SPRUCE_LEAVES),
@@ -153,7 +153,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> flowerForest(GameContext context) {
+    private static Modifier<Jsonifiable> flowerForest(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, Biomes.FLOWER_FOREST, ModBiomes.FLOWER_PLAINS),
                 FeatureMatcher.and(Blocks.BIRCH_LOG, Blocks.BIRCH_LEAVES, Blocks.OAK_LOG, Blocks.OAK_LEAVES),
@@ -168,7 +168,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> birch(GameContext context) {
+    private static Modifier<Jsonifiable> birch(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:birch*", "minecraft:tall_birch*"),
                 FeatureMatcher.and(Blocks.BIRCH_LOG, Blocks.BIRCH_LEAVES),
@@ -181,7 +181,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> birchOak(GameContext context) {
+    private static Modifier<Jsonifiable> birchOak(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:wooded_hills"),
                 FeatureMatcher.and(Blocks.BIRCH_LOG, Blocks.BIRCH_LEAVES, Blocks.OAK_LOG, Blocks.OAK_LEAVES),
@@ -196,7 +196,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> darkForest(GameContext context) {
+    private static Modifier<Jsonifiable> darkForest(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:dark_forest", "minecraft:dark_forest_hills"),
                 FeatureMatcher.and(Blocks.DARK_OAK_LOG, Blocks.DARK_OAK_LEAVES),
@@ -213,7 +213,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> jungle(GameContext context) {
+    private static Modifier<Jsonifiable> jungle(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:jungle", "minecraft:modified_jungle", "minecraft:bamboo_jungle"),
                 FeatureMatcher.and("minecraft:tree"),
@@ -228,7 +228,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> jungleEdge(GameContext context) {
+    private static Modifier<Jsonifiable> jungleEdge(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:jungle_edge", "minecraft:modified_jungle_edge", "terraforged:stone_forest"),
                 FeatureMatcher.and("minecraft:tree"),
@@ -242,7 +242,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> jungleHills(GameContext context) {
+    private static Modifier<Jsonifiable> jungleHills(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:jungle_hills", "minecraft:bamboo_jungle_hills"),
                 FeatureMatcher.or("minecraft:tree"),
@@ -257,7 +257,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> pine(GameContext context) {
+    private static Modifier<Jsonifiable> pine(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:taiga", "minecraft:taiga_hills", "minecraft:taiga_mountains"),
                 FeatureMatcher.and(Blocks.SPRUCE_LOG, Blocks.SPRUCE_LEAVES),
@@ -268,7 +268,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> redwood(GameContext context) {
+    private static Modifier<Jsonifiable> redwood(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:giant_spruce_taiga*", "minecraft:giant_tree_taiga*"),
                 FeatureMatcher.and("minecraft:giant_trunk_placer", Blocks.SPRUCE_LOG, Blocks.SPRUCE_LEAVES),
@@ -281,7 +281,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> spruce(GameContext context) {
+    private static Modifier<Jsonifiable> spruce(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:snowy_taiga", "minecraft:snowy_taiga_hills", "minecraft:taiga_mountains"),
                 FeatureMatcher.and("minecraft:tree", Blocks.SPRUCE_LOG, Blocks.SPRUCE_LEAVES),
@@ -289,7 +289,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> spruceTundra(GameContext context) {
+    private static Modifier<Jsonifiable> spruceTundra(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:snowy_tundra", "minecraft:snowy_taiga_mountains", "minecraft:gravelly_mountains", "minecraft:modified_gravelly_mountains"),
                 FeatureMatcher.and("minecraft:tree", Blocks.SPRUCE_LOG, Blocks.SPRUCE_LEAVES),
@@ -297,7 +297,7 @@ public class Trees {
         );
     }
 
-    private static Modifier<Jsonifiable> willow(GameContext context) {
+    private static Modifier<Jsonifiable> willow(TFBiomeContext context) {
         return new Modifier<>(
                 BiomeMatcher.of(context, Biomes.SWAMP, Biomes.SWAMP_HILLS),
                 FeatureMatcher.and("minecraft:tree", Blocks.OAK_LEAVES, Blocks.OAK_LOG),

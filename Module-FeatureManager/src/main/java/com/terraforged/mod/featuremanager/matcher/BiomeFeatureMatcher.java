@@ -27,7 +27,7 @@ package com.terraforged.mod.featuremanager.matcher;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.engine.world.biome.map.BiomeContext;
 import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
 import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
 import com.terraforged.mod.featuremanager.modifier.Jsonifiable;
@@ -71,12 +71,12 @@ public class BiomeFeatureMatcher implements BiPredicate<Biome, JsonElement>, Com
     }
 
     @Override
-    public JsonElement toJson(GameContext context) {
+    public JsonElement toJson(BiomeContext<?> context) {
         return JsonNull.INSTANCE;
     }
 
     @Override
-    public void append(JsonObject parent, GameContext context) {
+    public void append(JsonObject parent, BiomeContext<?> context) {
         biomeMatcher.append(parent, context);
         featureMatcher.append(parent, context);
     }

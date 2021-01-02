@@ -22,38 +22,27 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.featuremanager.data;
+package com.terraforged.mod.mixin.common;
 
-import com.terraforged.mod.Log;
-import net.minecraft.resources.FolderPackFinder;
-import net.minecraft.resources.IPackNameDecorator;
-import net.minecraft.resources.ResourcePackInfo;
+import com.terraforged.mod.server.ServerEvents;
+import net.minecraft.resources.ResourcePackList;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.datafix.codec.DatapackCodec;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.io.File;
-import java.util.function.Consumer;
+/**
+ * Non-essential.
+ * Injects our custom PackFinder into the ResourcePackList so that we can
+ * load datapacks from ./config/terraforged/datapacks.
+ */
+@Mixin(MinecraftServer.class)
+public class MixinMinecraftServer {
 
-public class FolderDataPackFinder extends FolderPackFinder {
-
-    public static final IPackNameDecorator TF_FOLDER = IPackNameDecorator.create("pack.source.folder");
-
-    public FolderDataPackFinder(File folderIn) {
-        this(folderIn, TF_FOLDER);
-    }
-
-    public FolderDataPackFinder(File folderIn, IPackNameDecorator decorator) {
-        super(folderIn, decorator);
-    }
-
-    @Override
-    public void findPacks(Consumer<ResourcePackInfo> consumer, ResourcePackInfo.IFactory factory) {
-        Log.debug("Searching for DataPacks...");
-        super.findPacks(packLogger(consumer), factory);
-    }
-
-    private static Consumer<ResourcePackInfo> packLogger(Consumer<ResourcePackInfo> consumer) {
-        return packInfo -> {
-            Log.debug("Adding datapack: {}", packInfo.getName());
-            consumer.accept(packInfo);
-        };
+    @Inject(method = "func_240772_a_", at = @At("HEAD"))
+    private static void onBuildDataPacks(ResourcePackList packList, DatapackCodec codec, boolean vanillaOnly, CallbackInfoReturnable<DatapackCodec> cir) {
+        ServerEvents.addPackFinder(packList);
     }
 }

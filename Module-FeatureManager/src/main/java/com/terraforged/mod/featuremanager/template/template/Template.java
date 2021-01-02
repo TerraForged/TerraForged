@@ -24,12 +24,14 @@
 
 package com.terraforged.mod.featuremanager.template.template;
 
-import com.terraforged.mod.featuremanager.template.PasteConfig;
 import com.terraforged.mod.featuremanager.template.StructureUtils;
 import com.terraforged.mod.featuremanager.template.buffer.BufferIterator;
 import com.terraforged.mod.featuremanager.template.buffer.PasteBuffer;
 import com.terraforged.mod.featuremanager.template.buffer.TemplateBuffer;
 import com.terraforged.mod.featuremanager.template.feature.Placement;
+import com.terraforged.mod.featuremanager.template.paste.Paste;
+import com.terraforged.mod.featuremanager.template.paste.PasteConfig;
+import com.terraforged.mod.featuremanager.template.paste.PasteType;
 import com.terraforged.mod.featuremanager.util.BlockReader;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -54,6 +56,10 @@ import java.util.Optional;
 
 public class Template {
 
+    public static final PasteType WORLD_GEN = Template::getWorldGenPaste;
+    public static final PasteType CHECKED = Template::getCheckedPaste;
+    public static final PasteType UNCHECKED = Template::getCheckedPaste;
+
     private static final int PASTE_FLAG = 3 | 16;
     private static final Direction[] directions = Direction.values();
     private static final ThreadLocal<PasteBuffer> PASTE_BUFFER = ThreadLocal.withInitial(PasteBuffer::new);
@@ -61,6 +67,9 @@ public class Template {
 
     private final BakedTemplate template;
     private final BakedDimensions dimensions;
+    private final Paste normal = this::paste;
+    private final Paste unchecked = this::pasteUnChecked;
+    private final Paste checked = this::pasteChecked;
 
     public Template(List<BlockInfo> blocks) {
         int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
@@ -87,13 +96,13 @@ public class Template {
         if (config.checkBounds) {
             IChunk chunk = world.getChunk(origin);
             if (StructureUtils.hasOvergroundStructure(chunk)) {
-                return pasteWithBoundsCheck(world, origin, mirror, rotation, placement, config);
+                return pasteChecked(world, origin, mirror, rotation, placement, config);
             }
         }
-        return pasteNormal(world, origin, mirror, rotation, placement, config);
+        return pasteUnChecked(world, origin, mirror, rotation, placement, config);
     }
 
-    public boolean pasteNormal(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, Placement placement, PasteConfig config) {
+    private boolean pasteUnChecked(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, Placement placement, PasteConfig config) {
         boolean placed = false;
         BlockReader reader = new BlockReader();
         PasteBuffer buffer = PASTE_BUFFER.get();
@@ -142,7 +151,7 @@ public class Template {
         return placed;
     }
 
-    public boolean pasteWithBoundsCheck(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, Placement placement, PasteConfig config) {
+    private boolean pasteChecked(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, Placement placement, PasteConfig config) {
         Dimensions dimensions = this.dimensions.get(mirror, rotation);
         TemplateBuffer buffer = TEMPLATE_BUFFER.get().init(world, origin, dimensions.min, dimensions.max);
 
@@ -192,6 +201,22 @@ public class Template {
         }
 
         return placed;
+    }
+
+    public Dimensions getDimensions(Mirror mirror, Rotation rotation) {
+        return dimensions.get(mirror, rotation);
+    }
+
+    private Paste getWorldGenPaste() {
+        return normal;
+    }
+
+    private Paste getCheckedPaste() {
+        return checked;
+    }
+
+    private Paste getUnCheckedPaste() {
+        return unchecked;
     }
 
     private static void updatePostPlacement(IWorld world, BufferIterator iterator, BlockInfo[] blocks, BlockPos origin, BlockPos.Mutable pos1, BlockPos.Mutable pos2) {
@@ -342,5 +367,15 @@ public class Template {
         int y = list.getInt(1);
         int z = list.getInt(2);
         return new BlockPos(x, y, z);
+    }
+
+    public interface PasteProvider {
+
+        PasteFunc get(Template template);
+    }
+
+    public interface PasteFunc {
+
+        boolean paste(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, Placement placement, PasteConfig config);
     }
 }

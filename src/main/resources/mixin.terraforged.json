@@ -8,8 +8,11 @@
     "client.MixinDimensionRenderInfo"
   ],
   "mixins": [
-    "benchmark.MixinNoiseChunkGenerator",
     "common.MixinDimensionGeneratorSettings",
+    "common.MixinMinecraftServer",
     "common.MixinWorldDecorationHelper"
+  ],
+  "_disabled": [
+    "benchmark.MixinNoiseChunkGenerator"
   ]
 }

@@ -25,9 +25,9 @@
 package com.terraforged.mod.featuremanager.modifier;
 
 import com.google.gson.JsonElement;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.featuremanager.FeatureManager;
 import com.terraforged.mod.featuremanager.FeatureSerializer;
-import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.featuremanager.biome.BiomeFeature;
 import com.terraforged.mod.featuremanager.matcher.dynamic.DynamicList;
 import com.terraforged.mod.featuremanager.matcher.dynamic.DynamicPredicate;
@@ -41,7 +41,9 @@ import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraftforge.eventbus.api.Event;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class FeatureModifiers extends Event {
 
@@ -52,13 +54,13 @@ public class FeatureModifiers extends Event {
     private final ModifierList<FeatureTransformer> transformers = new ModifierList<>();
     private final ModifierList<FeaturePredicate> predicates = new ModifierList<>();
 
-    private final GameContext context;
+    private final TFBiomeContext context;
 
-    public GameContext getContext() {
+    public TFBiomeContext getContext() {
         return context;
     }
 
-    public FeatureModifiers(GameContext context) {
+    public FeatureModifiers(TFBiomeContext context) {
         this.context = context;
     }
 

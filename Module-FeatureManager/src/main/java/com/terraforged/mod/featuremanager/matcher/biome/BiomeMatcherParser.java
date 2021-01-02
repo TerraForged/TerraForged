@@ -26,7 +26,7 @@ package com.terraforged.mod.featuremanager.matcher.biome;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 
@@ -38,14 +38,14 @@ import java.util.function.Consumer;
 
 public class BiomeMatcherParser {
 
-    public static Optional<BiomeMatcher> parse(JsonObject root, GameContext context) {
+    public static Optional<BiomeMatcher> parse(JsonObject root, TFBiomeContext context) {
         if (root.has("biomes")) {
             return parse(root.get("biomes"), context);
         }
         return Optional.of(BiomeMatcher.ANY);
     }
 
-    public static Optional<BiomeMatcher> parse(JsonElement element, GameContext context) {
+    public static Optional<BiomeMatcher> parse(JsonElement element, TFBiomeContext context) {
         Collector collector = new Collector();
         if (element.isJsonPrimitive()) {
             String biome = element.getAsString();
@@ -67,7 +67,7 @@ public class BiomeMatcherParser {
         return Optional.of(BiomeMatcher.of(collector.all));
     }
 
-    public static void collectBiomes(String biome, Collector collector, GameContext context) {
+    public static void collectBiomes(String biome, Collector collector, TFBiomeContext context) {
         if (biome.endsWith("*")) {
             biome = biome.substring(0, biome.length() - 1);
             for (Biome b : context.biomes) {

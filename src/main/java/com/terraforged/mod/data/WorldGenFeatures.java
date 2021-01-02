@@ -28,8 +28,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.terraforged.mod.Log;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.featuremanager.FeatureSerializer;
-import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.featuremanager.util.FeatureDebugger;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
@@ -41,7 +41,7 @@ import java.util.function.Supplier;
 
 public class WorldGenFeatures extends DataGen {
 
-    public static void genBiomeFeatures(File dataDir, GameContext context) {
+    public static void genBiomeFeatures(File dataDir, TFBiomeContext context) {
         if (dataDir.exists() || dataDir.mkdirs()) {
             for (Biome biome : context.biomes) {
                 try {
@@ -53,7 +53,7 @@ public class WorldGenFeatures extends DataGen {
         }
     }
 
-    private static void genBiomeFeatures(File dir, Biome biome, GameContext context) {
+    private static void genBiomeFeatures(File dir, Biome biome, TFBiomeContext context) {
         write(new File(dir, getJsonPath("features", context.biomes.getRegistryName(biome))), writer -> {
             JsonObject root = new JsonObject();
             List<List<Supplier<ConfiguredFeature<?, ?>>>> stageFeatures = biome.getGenerationSettings().getFeatures();;

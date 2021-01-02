@@ -103,12 +103,10 @@ public class TerraCommand {
         return Commands.literal("terra")
                 .requires(source -> source.hasPermissionLevel(2))
                 .then(Commands.literal("benchmark")
-                        .then(Commands.literal("start")
+                        .then(Commands.literal("reset")
                                 .executes(TerraCommand::benchmarkStart))
                         .then(Commands.literal("stats")
                                 .executes(TerraCommand::benchmarkStats)))
-                .then(Commands.literal("stats")
-                        .executes(TerraCommand::stats))
                 .then(Commands.literal("query")
                         .executes(TerraCommand::query))
                 .then(Commands.literal("data")
@@ -154,7 +152,7 @@ public class TerraCommand {
 
     private static int benchmarkStart(CommandContext<CommandSource> context) throws CommandSyntaxException {
         Profiler.reset();
-        context.getSource().sendFeedback(createText("Restarted profiler"), false);
+        context.getSource().sendFeedback(createText("Reset profiler"), false);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -162,29 +160,7 @@ public class TerraCommand {
         long fastest = 0L;
         long slowest = 0L;
         double average = 0.0;
-        for (Profiler profiler : Profiler.values()) {
-            average += profiler.averageMS();
-            slowest += profiler.maxMS();
-            fastest += profiler.minMS();
-            context.getSource().sendFeedback(profiler.toText(), false);
-        }
 
-        long min = fastest;
-        long max = slowest;
-        context.getSource().sendFeedback(createText("Chunk Average", PREFIX_FORMAT)
-                .appendString(String.format(": %.3fms", average))
-                .modifyStyle(style -> style.setHoverEvent(Profiler.createHoverStats(min, max))),false);
-
-        return Command.SINGLE_SUCCESS;
-    }
-
-    private static int stats(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        getContext(context);
-        context.getSource().sendFeedback(createText("===== Profiler Stats =====", PREFIX_FORMAT), false);
-
-        long fastest = 0L;
-        long slowest = 0L;
-        double average = 0.0;
         for (Profiler profiler : Profiler.values()) {
             average += profiler.averageMS();
             slowest += profiler.maxMS();

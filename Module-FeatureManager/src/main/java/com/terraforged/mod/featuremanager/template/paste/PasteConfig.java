@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.featuremanager.template;
+package com.terraforged.mod.featuremanager.template.paste;
 
 import com.google.gson.JsonObject;
 import com.terraforged.mod.featuremanager.util.Json;

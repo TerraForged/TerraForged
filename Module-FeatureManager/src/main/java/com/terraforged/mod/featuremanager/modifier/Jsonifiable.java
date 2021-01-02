@@ -26,15 +26,15 @@ package com.terraforged.mod.featuremanager.modifier;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.engine.world.biome.map.BiomeContext;
 
 public interface Jsonifiable {
 
     String getType();
 
-    JsonElement toJson(GameContext context);
+    JsonElement toJson(BiomeContext<?> context);
 
-    default void append(JsonObject parent, GameContext context) {
+    default void append(JsonObject parent, BiomeContext<?> context) {
         JsonElement value = toJson(context);
         if (value.isJsonNull()) {
             return;

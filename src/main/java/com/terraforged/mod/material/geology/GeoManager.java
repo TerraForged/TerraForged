@@ -29,8 +29,8 @@ import com.terraforged.engine.world.geology.Geology;
 import com.terraforged.engine.world.geology.Strata;
 import com.terraforged.mod.api.material.geology.GeologyManager;
 import com.terraforged.mod.api.material.geology.StrataConfig;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.chunk.TerraContext;
-import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
@@ -45,7 +45,7 @@ public class GeoManager implements GeologyManager {
 
     private final Module selector;
     private final Materials materials;
-    private final GameContext context;
+    private final TFBiomeContext context;
     private final GeoGenerator builder;
     private final Geology<BlockState> general;
     private final Map<Biome, Geology<BlockState>> specific = new HashMap<>();
@@ -58,7 +58,7 @@ public class GeoManager implements GeologyManager {
         this.materials = context.materials.get();
         this.general = new Geology<>(selector);
         this.builder = new GeoGenerator(materials);
-        this.context = context.gameContext;
+        this.context = context.biomeContext;
         init(context.seed);
     }
 

@@ -24,26 +24,23 @@
 
 package com.terraforged.mod.featuremanager;
 
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.featuremanager.biome.BiomeFeatures;
 import com.terraforged.mod.featuremanager.data.DataManager;
 import com.terraforged.mod.featuremanager.modifier.FeatureModifierLoader;
 import com.terraforged.mod.featuremanager.modifier.FeatureModifiers;
 import com.terraforged.mod.featuremanager.modifier.ModifierSet;
-import com.terraforged.mod.featuremanager.predicate.FeaturePredicate;
 import com.terraforged.mod.featuremanager.template.template.TemplateManager;
 import com.terraforged.mod.featuremanager.transformer.InjectionPosition;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.structure.Structure;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import java.io.File;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -68,7 +65,7 @@ public class FeatureManager implements FeatureDecorator {
         return biomes.getOrDefault(biome, BiomeFeatures.NONE);
     }
 
-    public static FeatureModifiers modifiers(DataManager data, boolean load, GameContext context) {
+    public static FeatureModifiers modifiers(DataManager data, boolean load, TFBiomeContext context) {
         if (load) {
             return FeatureModifierLoader.load(data, context);
         }

@@ -27,8 +27,8 @@ package com.terraforged.mod.client.gui.screen.page;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.page.SimplePage;
 import com.terraforged.mod.client.gui.screen.Instance;
-import com.terraforged.mod.util.TranslationKey;
 import com.terraforged.mod.util.DataUtils;
+import com.terraforged.mod.util.TranslationKey;
 
 import java.util.function.Function;
 

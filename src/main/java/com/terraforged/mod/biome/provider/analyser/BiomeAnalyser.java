@@ -29,10 +29,10 @@ import com.terraforged.engine.world.biome.map.BiomeMap;
 import com.terraforged.engine.world.biome.map.BiomeMapBuilder;
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.mod.biome.ModBiomes;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.mod.biome.provider.BiomeWeights;
-import com.terraforged.mod.biome.provider.TFBiomeContext;
-import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.mod.util.ListView;
 import com.terraforged.noise.util.Vec2f;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
@@ -57,34 +57,32 @@ public class BiomeAnalyser {
         put(BiomeType.ALPINE, BiomePredicate.MOUNTAIN);
     }};
 
-    public static BiomeMap createBiomeMap(GameContext context) {
+    public static BiomeMap createBiomeMap(TFBiomeContext context) {
         List<BiomeData> biomes = getAllBiomeData(context);
         BiomeWeights weights = new BiomeWeights(context);
 
-        TFBiomeContext biomeContext = new TFBiomeContext(context);
-        BiomeMap.Builder<RegistryKey<Biome>> builder = BiomeMapBuilder.create(biomeContext);
+        BiomeMap.Builder<RegistryKey<Biome>> builder = BiomeMapBuilder.create(context);
         for (BiomeData data : biomes) {
-            Biome biome = (Biome) data.reference;
-            RegistryKey<Biome> key = context.biomes.getKey(biome);
-            int weight = weights.getWeight(biome);
-            if (BiomePredicate.BEACH.test(data)) {
+            RegistryKey<Biome> key = context.getValue(data.id);
+            int weight = weights.getWeight(data.id);
+            if (BiomePredicate.BEACH.test(data, context)) {
                 builder.addBeach(key, weight);
-            } else if (BiomePredicate.COAST.test(data)) {
+            } else if (BiomePredicate.COAST.test(data, context)) {
                 builder.addCoast(key, weight);
-            } else if (BiomePredicate.OCEAN.test(data)) {
+            } else if (BiomePredicate.OCEAN.test(data, context)) {
                 builder.addOcean(key, weight);
-            } else if (BiomePredicate.RIVER.test(data)) {
+            } else if (BiomePredicate.RIVER.test(data, context)) {
                 builder.addRiver(key, weight);
-            } else if (BiomePredicate.LAKE.test(data)) {
+            } else if (BiomePredicate.LAKE.test(data, context)) {
                 builder.addLake(key, weight);
-            } else if (BiomePredicate.WETLAND.test(data)) {
+            } else if (BiomePredicate.WETLAND.test(data, context)) {
                 builder.addWetland(key, weight);
-            } else if (BiomePredicate.VOLCANO.test(data)) {
+            } else if (BiomePredicate.VOLCANO.test(data, context)) {
                 builder.addVolcano(key, weight);
-            } else if (BiomePredicate.MOUNTAIN.test(data)) {
+            } else if (BiomePredicate.MOUNTAIN.test(data, context)) {
                 builder.addMountain(key, weight);
             } else {
-                Collection<BiomeType> types = getTypes(data, biome);
+                Collection<BiomeType> types = getTypes(data, context);
                 for (BiomeType type : types) {
                     // shouldn't happen
                     if (type == BiomeType.ALPINE) {
@@ -104,71 +102,63 @@ public class BiomeAnalyser {
         return builder.build();
     }
 
-    public static List<Biome> getOverworldBiomes(GameContext context) {
+    public static List<Biome> getOverworldBiomes(TFBiomeContext context) {
         List<BiomeData> biomes = getAllBiomeData(context);
         Set<Biome> result = new HashSet<>(biomes.size());
         for (BiomeData data : biomes) {
-            Biome biome = (Biome) data.reference;
-            if (BiomePredicate.BEACH.test(data)) {
+            Biome biome = context.biomes.get(data.id);
+            if (BiomePredicate.BEACH.test(data, context)) {
                 result.add(biome);
-            } else if (BiomePredicate.COAST.test(data)) {
+            } else if (BiomePredicate.COAST.test(data, context)) {
                 result.add(biome);
-            } else if (BiomePredicate.OCEAN.test(data)) {
+            } else if (BiomePredicate.OCEAN.test(data, context)) {
                 result.add(biome);
-            } else if (BiomePredicate.RIVER.test(data)) {
+            } else if (BiomePredicate.RIVER.test(data, context)) {
                 result.add(biome);
-            } else if (BiomePredicate.LAKE.test(data)) {
+            } else if (BiomePredicate.LAKE.test(data, context)) {
                 result.add(biome);
-            } else if (BiomePredicate.WETLAND.test(data)) {
+            } else if (BiomePredicate.WETLAND.test(data, context)) {
                 result.add(biome);
-            } else if (BiomePredicate.VOLCANO.test(data)) {
+            } else if (BiomePredicate.VOLCANO.test(data, context)) {
                 result.add(biome);
-            } else if (BiomePredicate.MOUNTAIN.test(data)) {
+            } else if (BiomePredicate.MOUNTAIN.test(data, context)) {
                 result.add(biome);
-            } else if (getTypes(data, biome).size() > 0) {
+            } else if (getTypes(data, context).size() > 0) {
                 result.add(biome);
             }
         }
         return new ArrayList<>(result);
     }
 
-    public static Collection<BiomeType> getTypes(BiomeData data, Biome biome) {
+    public static Collection<BiomeType> getTypes(BiomeData data, TFBiomeContext context) {
         Set<BiomeType> types = new HashSet<>();
         for (Map.Entry<BiomeType, BiomePredicate> entry : PREDICATES.entrySet()) {
-            if (entry.getValue().test(data, biome)) {
+            if (entry.getValue().test(data, context)) {
                 types.add(entry.getKey());
             }
         }
         return types;
     }
 
-    public static List<BiomeData> getAllBiomeData(GameContext context) {
-        Collection<Biome> biomes = getAllOverworldBiomes(context);
-        Vec2f tempRange = getRange(biomes, BiomeHelper::getDefaultTemperature);
+    public static List<BiomeData> getAllBiomeData(TFBiomeContext context) {
+        ListView<Biome> biomes = new ListView<>(context.biomes, biome -> filter(biome, context));
+
         Vec2f moistRange = getRange(biomes, Biome::getDownfall);
-        List<BiomeData> list = new LinkedList<>();
+        Vec2f tempRange = getRange(biomes, BiomeHelper::getDefaultTemperature);
+
+        List<BiomeData> list = new ArrayList<>();
         for (Biome biome : biomes) {
             String name = context.biomes.getName(biome);
             float moisture = (biome.getDownfall() - moistRange.x) / (moistRange.y - moistRange.x);
             float temperature = (BiomeHelper.getDefaultTemperature(biome) - tempRange.x) / (tempRange.y - tempRange.x);
             int color = BiomeHelper.getSurface(biome).getTop().getMaterial().getColor().colorValue;
-            list.add(new BiomeData(name, biome, color, moisture, temperature));
+            list.add(new BiomeData(name, context.biomes.getId(biome), color, moisture, temperature));
         }
+
         return list;
     }
 
-    private static List<Biome> getAllOverworldBiomes(GameContext context) {
-        List<Biome> biomes = new ArrayList<>(200);
-        for (Biome biome : context.biomes) {
-            if (filter(biome, context)) {
-                continue;
-            }
-            biomes.add(biome);
-        }
-        return biomes;
-    }
-
-    private static boolean filter(Biome biome, GameContext context) {
+    private static boolean filter(Biome biome, TFBiomeContext context) {
         if (biome.getCategory() == Biome.Category.NONE) {
             return true;
         }
@@ -188,7 +178,7 @@ public class BiomeAnalyser {
         return !BiomeHelper.isOverworldBiome(biome, context);
     }
 
-    private static Vec2f getRange(Collection<Biome> biomes, Function<Biome, Float> getter) {
+    private static Vec2f getRange(ListView<Biome> biomes, Function<Biome, Float> getter) {
         float min = Float.MAX_VALUE;
         float max = Float.MIN_VALUE;
         for (Biome biome : biomes) {

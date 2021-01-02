@@ -25,8 +25,8 @@
 package com.terraforged.mod.biome;
 
 import com.terraforged.mod.TerraForgedMod;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.utils.BiomeBuilder;
-import com.terraforged.mod.featuremanager.GameContext;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
@@ -82,7 +82,7 @@ public class ModBiomes {
         register(event, WARM_BEACH, BiomeBuilders.warmBeach());
     }
 
-    public static Biome remap(Biome biome, GameContext context) {
+    public static Biome remap(Biome biome, TFBiomeContext context) {
         RegistryKey<Biome> keyIn = context.biomes.getKey(biome);
         if (keyIn != null) {
             RegistryKey<Biome> keyOut = remaps.get(keyIn);

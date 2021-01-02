@@ -24,9 +24,8 @@
 
 package com.terraforged.mod.featuremanager.template.buffer;
 
-import com.terraforged.mod.featuremanager.template.BlockUtils;
-import com.terraforged.mod.featuremanager.template.PasteConfig;
 import com.terraforged.mod.featuremanager.template.feature.Placement;
+import com.terraforged.mod.featuremanager.template.paste.PasteConfig;
 import com.terraforged.mod.featuremanager.template.template.BlockInfo;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.block.Blocks;

@@ -24,21 +24,19 @@
 
 package com.terraforged.mod.data;
 
-import com.google.gson.GsonBuilder;
+import com.terraforged.engine.world.biome.map.BiomeMap;
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.mod.TerraForgedMod;
-import com.terraforged.engine.world.biome.map.BiomeMap;
-import com.terraforged.mod.biome.provider.BiomeHelper;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.BiomeWeights;
 import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
-import com.terraforged.mod.featuremanager.GameContext;
 import net.minecraft.util.ResourceLocation;
 
 import java.io.*;
 
 public class WorldGenBiomes extends DataGen {
 
-    public static void genBiomeMap(File dataDir, GameContext context) {
+    public static void genBiomeMap(File dataDir, TFBiomeContext context) {
         if (dataDir.exists() || dataDir.mkdirs()) {
             BiomeMap map = BiomeAnalyser.createBiomeMap(context);
             try (Writer writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_map.json")))) {
@@ -49,7 +47,7 @@ public class WorldGenBiomes extends DataGen {
         }
     }
 
-    public static void genBiomeWeights(File dataDir, GameContext context) {
+    public static void genBiomeWeights(File dataDir, TFBiomeContext context) {
         if (dataDir.exists() || dataDir.mkdirs()) {
             BiomeWeights weights = new BiomeWeights(context);
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_weights.txt")))) {

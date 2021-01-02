@@ -160,24 +160,22 @@ public class TFChunkGenerator extends ChunkGenerator {
 
     @Nullable // findStructure
     public BlockPos func_235956_a_(ServerWorld world, Structure<?> structure, BlockPos pos, int radius, boolean flag) {
-        try (Section section = Profiler.FIND_STRUCTURE.punchIn()) {
-            if (!this.biomeProvider.hasStructure(structure)) {
-                return null;
-            }
-            if (structure == Structure.STRONGHOLD) {
-                return super.func_235956_a_(world, structure, pos, radius, flag);
-            }
-            StructureSeparationSettings settings = this.settings.getStructures().func_236197_a_(structure);
-            if (settings == null) {
-                return null;
-            }
-            return StructureLocator.findStructure(this, world, world.func_241112_a_(), structure, pos, radius, flag, settings);
+        if (!this.biomeProvider.hasStructure(structure)) {
+            return null;
         }
+        if (structure == Structure.STRONGHOLD) {
+            return super.func_235956_a_(world, structure, pos, radius, flag);
+        }
+        StructureSeparationSettings settings = this.settings.getStructures().func_236197_a_(structure);
+        if (settings == null) {
+            return null;
+        }
+        return StructureLocator.findStructure(this, world, world.func_241112_a_(), structure, pos, radius, flag, settings);
     }
 
     @Override
     public final void func_242707_a(DynamicRegistries registries, StructureManager structures, IChunk chunk, TemplateManager templates, long seed) {
-        try (Section section = Profiler.STRUCTURE_START.punchIn()) {
+        try (Section section = Profiler.STRUCTURE_STARTS.punchIn()) {
             structureGenerator.generateStructureStarts(chunk, registries, structures, templates);
         } catch (Throwable t) {
             CrashHandler.handle(chunk, this, t);
@@ -186,7 +184,7 @@ public class TFChunkGenerator extends ChunkGenerator {
 
     @Override
     public final void func_235953_a_(ISeedReader world, StructureManager structures, IChunk chunk) {
-        try (Section section = Profiler.STRUCTURE_SPREAD.punchIn()) {
+        try (Section section = Profiler.STRUCTURE_REFS.punchIn()) {
             structureGenerator.generateStructureReferences(world, chunk, structures);
         } catch (Throwable t) {
             CrashHandler.handle(chunk, this, t);

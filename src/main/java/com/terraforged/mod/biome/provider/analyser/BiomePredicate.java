@@ -25,6 +25,7 @@
 package com.terraforged.mod.biome.provider.analyser;
 
 import com.terraforged.engine.world.biome.BiomeData;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import net.minecraft.world.biome.Biome;
 
 import java.util.function.BiPredicate;
@@ -33,8 +34,8 @@ public interface BiomePredicate {
 
     boolean test(BiomeData data, Biome biome);
 
-    default boolean test(BiomeData data) {
-        return test(data, (Biome) data.reference);
+    default boolean test(BiomeData data, TFBiomeContext context) {
+        return test(data, context.biomes.get(data.id));
     }
 
     default BiomePredicate and(BiomePredicate other) {

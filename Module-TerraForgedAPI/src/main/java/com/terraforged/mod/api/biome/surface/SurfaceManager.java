@@ -25,7 +25,7 @@
 package com.terraforged.mod.api.biome.surface;
 
 import com.terraforged.mod.api.biome.surface.builder.Delegate;
-import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 
@@ -36,11 +36,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class SurfaceManager {
 
-    private final GameContext context;
+    private final TFBiomeContext context;
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Map<Biome, Surface> surfaces = new HashMap<>();
 
-    public SurfaceManager(GameContext context) {
+    public SurfaceManager(TFBiomeContext context) {
         this.context = context;
     }
 

@@ -92,15 +92,11 @@ public class SaplingListener {
         Vector3i translation = getTranslation(directions, mirror, rotation);
         BlockPos origin = pos.subtract(translation);
 
-        // require that directly above the sapling(s) is open air
-        if (!isClearOverhead(world, origin, directions)) {
-            event.setResult(Event.Result.DENY);
-            return;
-        }
+        // prevent vanilla tree growing
+        event.setResult(Event.Result.DENY);
 
         // attempt to paste the tree & then clear up any remaining saplings
-        if (TemplateFeature.pasteChecked(world, event.getRand(), origin, mirror, rotation, feature, feature.decorator)) {
-            event.setResult(Event.Result.DENY);
+        if (TemplateFeature.paste(world, event.getRand(), origin, mirror, rotation, feature, feature.decorator, Template.CHECKED)) {
             for (Vector3i dir : directions) {
                 BlockPos neighbour = origin.add(dir);
                 BlockState state = world.getBlockState(neighbour);

@@ -36,10 +36,10 @@ import com.terraforged.engine.concurrent.task.LazySupplier;
 import com.terraforged.engine.world.biome.map.BiomeMap;
 import com.terraforged.engine.world.heightmap.WorldLookup;
 import com.terraforged.mod.Log;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
-import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.util.math.BlockPos;
@@ -62,7 +62,7 @@ public class TFBiomeProvider extends BiomeProvider {
     private final LazySupplier<BiomeResources> resources;
 
     public TFBiomeProvider(TerraContext context) {
-        super(BiomeAnalyser.getOverworldBiomes(context.gameContext));
+        super(BiomeAnalyser.getOverworldBiomes(context.biomeContext));
         this.context = context;
         this.seed = context.terraSettings.world.seed;
         this.resources = LazySupplier.factory(context, BiomeResources::new);
@@ -87,7 +87,7 @@ public class TFBiomeProvider extends BiomeProvider {
         Log.debug("Creating seeded biome provider: {}", seed);
         TerraSettings settings = context.terraSettings;
         settings.world.seed = seed;
-        return new TFBiomeProvider(new TerraContext(settings, context.gameContext));
+        return new TFBiomeProvider(new TerraContext(settings, context.biomeContext));
     }
 
     @Override
@@ -219,7 +219,7 @@ public class TFBiomeProvider extends BiomeProvider {
                 biome = modified;
             }
         }
-        Biome result = context.gameContext.biomes.get(biome);
+        Biome result = context.biomeContext.biomes.get(biome);
         Preconditions.checkNotNull(result, "NULL BIOME D:");
         return result;
     }
@@ -234,7 +234,7 @@ public class TFBiomeProvider extends BiomeProvider {
 
     private static <T> Dynamic<T> encode(TFBiomeProvider provider, DynamicOps<T> ops) {
         T seed = Codecs.encodeAndGet(Codec.LONG, provider.seed, ops);
-        T gameContext = Codecs.encodeAndGet(GameContext.CODEC, provider.getContext().gameContext, ops);
+        T gameContext = Codecs.encodeAndGet(TFBiomeContext.CODEC, provider.getContext().biomeContext, ops);
         T settings = Codecs.encodeAndGet(TerraSettings.CODEC, provider.getContext().terraSettings, ops);
         return new Dynamic<>(ops, ops.createMap(ImmutableMap.of(
                 ops.createString("seed"), seed,
@@ -245,7 +245,7 @@ public class TFBiomeProvider extends BiomeProvider {
 
     private static <T> TFBiomeProvider decode(Dynamic<T> dynamic) {
         long seed = Codecs.decodeAndGet(Codec.LONG, dynamic.get("seed"));
-        GameContext gameContext = Codecs.decodeAndGet(GameContext.CODEC, dynamic.get("game_data"));
+        TFBiomeContext gameContext = Codecs.decodeAndGet(TFBiomeContext.CODEC, dynamic.get("game_data"));
         TerraSettings settings = Codecs.decodeAndGet(TerraSettings.CODEC, dynamic.get("generator_settings"));
         settings.world.seed = seed;
         return new TFBiomeProvider(new TerraContext(settings, gameContext));

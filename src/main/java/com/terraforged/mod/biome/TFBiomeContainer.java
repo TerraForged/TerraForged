@@ -27,9 +27,9 @@ package com.terraforged.mod.biome;
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.engine.util.pos.PosIterator;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.util.FastChunk;
-import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.noise.source.Line;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
@@ -50,7 +50,7 @@ public class TFBiomeContainer extends BiomeContainer {
     private final Biome[] surface;
     private final Biome featureBiome;
 
-    public TFBiomeContainer(Biome[] biomes, Biome[] surface, Biome feature, GameContext context) {
+    public TFBiomeContainer(Biome[] biomes, Biome[] surface, Biome feature, TFBiomeContext context) {
         super(context.biomes.getRegistry(), biomes);
         this.biomes = biomes;
         this.surface = surface;
@@ -67,7 +67,7 @@ public class TFBiomeContainer extends BiomeContainer {
         return featureBiome;
     }
 
-    public BiomeContainer bakeBiomes(boolean convertToVanilla, GameContext context) {
+    public BiomeContainer bakeBiomes(boolean convertToVanilla, TFBiomeContext context) {
         if (convertToVanilla) {
             Biome[] biomeArray = new Biome[biomes.length];
             for (int i = 0; i < biomes.length; i++) {
@@ -129,7 +129,7 @@ public class TFBiomeContainer extends BiomeContainer {
         if (feature == null) {
             feature = biomes2D[indexOf(8, 8)];
         }
-        return new TFBiomeContainer(biomes3D, biomes2D, feature, biomeProvider.getContext().gameContext);
+        return new TFBiomeContainer(biomes3D, biomes2D, feature, biomeProvider.getContext().biomeContext);
     }
 
     private static int indexOf(int x, int z) {

@@ -28,7 +28,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
-import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.engine.world.biome.map.BiomeContext;
 import com.terraforged.mod.featuremanager.modifier.Jsonifiable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistryEntry;
@@ -54,7 +54,7 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
     }
 
     @Override
-    public JsonElement toJson(GameContext context) {
+    public JsonElement toJson(BiomeContext<?> context) {
         JsonArray rules = new JsonArray();
         for (Rule rule : this.rules) {
             rules.add(rule.toJson());

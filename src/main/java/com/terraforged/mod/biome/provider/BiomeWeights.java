@@ -26,14 +26,13 @@ package com.terraforged.mod.biome.provider;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.terraforged.mod.Log;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.config.ConfigManager;
-import com.terraforged.mod.featuremanager.GameContext;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,14 +43,14 @@ public class BiomeWeights {
     private final int standardWeight;
     private final int forestWeight;
     private final int rareWeight;
-    private final GameContext context;
-    private final Map<ResourceLocation, Integer> biomes = new HashMap<>();
+    private final TFBiomeContext context;
+    private final Map<String, Integer> biomes = new HashMap<>();
 
-    public BiomeWeights(GameContext context) {
+    public BiomeWeights(TFBiomeContext context) {
         this(10, 5, 2, context);
     }
 
-    public BiomeWeights(int standard, int forest, int rare, GameContext context) {
+    public BiomeWeights(int standard, int forest, int rare, TFBiomeContext context) {
         this.standardWeight = standard;
         this.forestWeight = forest;
         this.rareWeight = rare;
@@ -64,7 +63,7 @@ public class BiomeWeights {
                 continue;
             }
             for (BiomeManager.BiomeEntry entry : entries) {
-                biomes.put(entry.getKey().getLocation(), entry.itemWeight);
+                biomes.put(entry.getKey().getLocation().toString(), entry.itemWeight);
             }
         }
 
@@ -72,31 +71,33 @@ public class BiomeWeights {
         readWeights();
     }
 
-    public int getWeight(Biome biome) {
-        Integer value = biomes.get(context.biomes.getRegistryName(biome));
+    public int getWeight(int biome) {
+        String name = context.getName(biome);
+        Integer value = biomes.get(name);
         if (value != null) {
             return value;
         }
-        if (BiomeDictionary.getTypes(context.biomes.getKey(biome)).contains(BiomeDictionary.Type.RARE)) {
+        if (BiomeDictionary.getTypes(context.getValue(biome)).contains(BiomeDictionary.Type.RARE)) {
             return rareWeight;
         }
-        if (biome.getCategory() == Biome.Category.FOREST) {
+        if (context.biomes.get(biome).getCategory() == Biome.Category.FOREST) {
             return forestWeight;
         }
         return standardWeight;
     }
 
-    public void forEachEntry(BiConsumer<ResourceLocation, Integer> consumer) {
+    public void forEachEntry(BiConsumer<String, Integer> consumer) {
         biomes.entrySet().stream()
-                .sorted(Comparator.comparing(e -> e.getKey().toString()))
+                .sorted(Map.Entry.comparingByKey())
                 .forEach(e -> consumer.accept(e.getKey(), e.getValue()));
     }
 
-    public void forEachUnregistered(BiConsumer<ResourceLocation, Integer> consumer) {
+    public void forEachUnregistered(BiConsumer<String, Integer> consumer) {
         for (Biome biome : context.biomes) {
-            ResourceLocation name = context.biomes.getRegistryName(biome);
+            int id = context.biomes.getId(biome);
+            String name = context.getName(id);
             if (!biomes.containsKey(name)) {
-                int weight = getWeight(biome);
+                int weight = getWeight(id);
                 consumer.accept(name, weight);
             }
         }
@@ -119,7 +120,7 @@ public class BiomeWeights {
                 continue;
             }
 
-            biomes.put(name, weight);
+            biomes.put(key, weight);
             Log.debug("Loaded custom biome weight: {}={}", name, weight);
         }
     }

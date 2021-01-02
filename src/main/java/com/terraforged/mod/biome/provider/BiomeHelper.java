@@ -26,8 +26,8 @@ package com.terraforged.mod.biome.provider;
 
 import com.terraforged.engine.world.biome.TempCategory;
 import com.terraforged.engine.world.biome.map.defaults.BiomeTemps;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.utils.Structures;
-import com.terraforged.mod.featuremanager.GameContext;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeGenerationSettings;
@@ -43,7 +43,7 @@ import java.util.Optional;
 
 public class BiomeHelper {
 
-    public static TempCategory getTempCategory(Biome biome, GameContext context) {
+    public static TempCategory getTempCategory(Biome biome, TFBiomeContext context) {
         // vanilla ocean biome properties are not at all helpful for determining temperature
         if (biome.getCategory() == Biome.Category.OCEAN) {
             // warm & luke_warm oceans get OceanRuinStructure.Type.WARM
@@ -117,7 +117,7 @@ public class BiomeHelper {
         return biome.getGenerationSettings();
     }
 
-    public static boolean isOverworldBiome(Biome biome, GameContext context) {
+    public static boolean isOverworldBiome(Biome biome, TFBiomeContext context) {
         return isOverworldBiome(context.biomes.getKey(biome));
     }
 

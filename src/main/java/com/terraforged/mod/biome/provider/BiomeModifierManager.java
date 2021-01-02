@@ -31,9 +31,9 @@ import com.terraforged.engine.world.biome.map.BiomeMap;
 import com.terraforged.engine.world.biome.modifier.*;
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.engine.world.heightmap.Levels;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.util.DummyBlockReader;
-import com.terraforged.mod.featuremanager.GameContext;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.BlockState;
@@ -55,7 +55,7 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
     private final List<BiomeModifier> modifiers = new ArrayList<>();
 
     public BiomeModifierManager(TerraContext context, BiomeMap biomes) {
-        desertBiomes = getDesertBiomes(context.gameContext, biomes);
+        desertBiomes = getDesertBiomes(context.biomeContext, biomes);
         modifiers.add(getBeachModifier(context, biomes));
         modifiers.add(new CoastModifier(biomes));
         modifiers.add(new DesertColorModifier(desertBiomes));
@@ -110,12 +110,12 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
         return new BeachModifier(
                 biomes,
                 context,
-                context.gameContext.biomes.getId(Biomes.MUSHROOM_FIELDS),
-                context.gameContext.biomes.getId(Biomes.MUSHROOM_FIELD_SHORE)
+                context.biomeContext.biomes.getId(Biomes.MUSHROOM_FIELDS),
+                context.biomeContext.biomes.getId(Biomes.MUSHROOM_FIELD_SHORE)
         );
     }
 
-    private static DesertBiomes getDesertBiomes(GameContext context, BiomeMap biomes) {
+    private static DesertBiomes getDesertBiomes(TFBiomeContext context, BiomeMap biomes) {
         IntList redSand = new IntArrayList();
         IntList whiteSand = new IntArrayList();
         IntList deserts = biomes.getAllBiomes(BiomeType.DESERT);
@@ -146,7 +146,7 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
                 }
             }
         }
-        return new DesertBiomes(deserts, redSand, whiteSand, defaultRed, defaultWhite);
+        return new DesertBiomes(deserts, redSand, whiteSand, defaultRed, defaultWhite, biomes.getContext());
     }
 
     private static int distance2(MaterialColor mc1, MaterialColor mc2) {

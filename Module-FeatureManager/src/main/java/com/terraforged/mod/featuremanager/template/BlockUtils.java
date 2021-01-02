@@ -33,7 +33,13 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.gen.feature.TreeFeature;
 
+import java.util.function.BiPredicate;
+
 public class BlockUtils {
+
+    public static boolean isSoil(IWorld world, BlockPos pos) {
+        return TreeFeature.isDirt(world.getBlockState(pos).getBlock());
+    }
 
     public static boolean isVegetation(IWorld world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
@@ -56,5 +62,18 @@ public class BlockUtils {
     public static boolean isSolidNoIce(IWorldReader reader, BlockPos pos) {
         BlockState state = reader.getBlockState(pos);
         return isSolid(state, reader, pos) && !BlockTags.ICE.contains(state.getBlock());
+    }
+
+    public static boolean isClearOverhead(IWorld world, BlockPos pos, int height, BiPredicate<IWorld, BlockPos> predicate) {
+        BlockPos.Mutable mutable = new BlockPos.Mutable();
+        // world.getMaxHeight ?
+        int max = Math.min(world.func_234938_ad_() - 1, pos.getY() + height);
+        for (int y = pos.getY(); y < max; y++) {
+            mutable.setPos(pos.getX(), y, pos.getZ());
+            if (!predicate.test(world, mutable)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

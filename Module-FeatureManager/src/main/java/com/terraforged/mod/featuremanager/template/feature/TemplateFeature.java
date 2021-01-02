@@ -25,9 +25,12 @@
 package com.terraforged.mod.featuremanager.template.feature;
 
 import com.terraforged.mod.featuremanager.FeatureManager;
-import com.terraforged.mod.featuremanager.template.template.Template;
 import com.terraforged.mod.featuremanager.template.decorator.Decorator;
 import com.terraforged.mod.featuremanager.template.decorator.DecoratorConfig;
+import com.terraforged.mod.featuremanager.template.paste.Paste;
+import com.terraforged.mod.featuremanager.template.paste.PasteType;
+import com.terraforged.mod.featuremanager.template.template.Dimensions;
+import com.terraforged.mod.featuremanager.template.template.Template;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
@@ -50,52 +53,9 @@ public class TemplateFeature extends Feature<TemplateFeatureConfig> {
 
     @Override
     public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, TemplateFeatureConfig config) {
-        if (config.type.getPlacement().canPlaceAt(world, pos)) {
-            return paste(world, rand, pos, config, config.decorator);
-        }
-        return false;
-    }
-
-    public static <T extends IWorld> boolean paste(ISeedReader world, Random rand, BlockPos pos, TemplateFeatureConfig config, DecoratorConfig<T> decorator) {
         Mirror mirror = nextMirror(rand);
         Rotation rotation = nextRotation(rand);
-        return paste(world, rand, pos, mirror, rotation, config, decorator);
-    }
-
-    public static <T extends IWorld> boolean paste(ISeedReader world, Random rand, BlockPos pos, Mirror mirror, Rotation rotation, TemplateFeatureConfig config, DecoratorConfig<T> decorator) {
-        if (config.templates.isEmpty()) {
-            FeatureManager.LOG.warn("Empty template list for config: {}", config.name);
-            return false;
-        }
-        Template template = nextTemplate(config.templates, rand);
-        Placement placement = config.type.getPlacement();
-        T buffer = decorator.createBuffer(world);
-        if (template.paste(buffer, pos, mirror, rotation, placement, config.paste)) {
-            ResourceLocation biome = world.func_242406_i(pos).map(RegistryKey::getRegistryName).orElse(null);
-            for (Decorator<T> d : decorator.getDecorators(biome)) {
-                d.apply(buffer, rand);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public static <T extends IWorld> boolean pasteChecked(ISeedReader world, Random rand, BlockPos pos, Mirror mirror, Rotation rotation, TemplateFeatureConfig config, DecoratorConfig<T> decorator) {
-        if (config.templates.isEmpty()) {
-            FeatureManager.LOG.warn("Empty template list for config: {}", config.name);
-            return false;
-        }
-        Template template = nextTemplate(config.templates, rand);
-        Placement placement = config.type.getPlacement();
-        T buffer = decorator.createBuffer(world);
-        if (template.pasteWithBoundsCheck(buffer, pos, mirror, rotation, placement, config.paste)) {
-            ResourceLocation biome = world.func_242406_i(pos).map(RegistryKey::getRegistryName).orElse(null);
-            for (Decorator<T> d : decorator.getDecorators(biome)) {
-                d.apply(buffer, rand);
-            }
-            return true;
-        }
-        return false;
+        return paste(world, rand, pos, mirror, rotation, config, config.decorator, Template.WORLD_GEN);
     }
 
     public static Template nextTemplate(List<Template> templates, Random random) {
@@ -108,5 +68,31 @@ public class TemplateFeature extends Feature<TemplateFeatureConfig> {
 
     public static Rotation nextRotation(Random random) {
         return Rotation.values()[random.nextInt(Rotation.values().length)];
+    }
+
+    public static <T extends IWorld> boolean paste(ISeedReader world, Random rand, BlockPos pos, Mirror mirror, Rotation rotation, TemplateFeatureConfig config, DecoratorConfig<T> decorator, PasteType pasteType) {
+        if (config.templates.isEmpty()) {
+            FeatureManager.LOG.warn("Empty template list for config: {}", config.name);
+            return false;
+        }
+
+        Template template = nextTemplate(config.templates, rand);
+        Dimensions dimensions = template.getDimensions(mirror, rotation);
+        if (!config.type.getPlacement().canPlaceAt(world, pos, dimensions)) {
+            return false;
+        }
+
+        Paste paste = pasteType.get(template);
+        Placement placement = config.type.getPlacement();
+        T buffer = decorator.createBuffer(world);
+        if (paste.apply(buffer, pos, mirror, rotation, placement, config.paste)) {
+            ResourceLocation biome = world.func_242406_i(pos).map(RegistryKey::getRegistryName).orElse(null);
+            for (Decorator<T> d : decorator.getDecorators(biome)) {
+                d.apply(buffer, rand);
+            }
+            return true;
+        }
+
+        return false;
     }
 }

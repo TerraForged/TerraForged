@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.feature;
 
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.feature.feature.DiskFeature;
-import com.terraforged.mod.featuremanager.GameContext;
 import com.terraforged.mod.featuremanager.matcher.BiomeFeatureMatcher;
 import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
 import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
@@ -33,7 +33,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.TreeFeature;
 
 public class Matchers {
 
@@ -77,7 +76,7 @@ public class Matchers {
                 .or("minecraft:trunk_placer").and("minecraft:foliage_placer").and(BlockTags.LOGS).and(BlockTags.LEAVES).build();
     }
 
-    public static BiomeFeatureMatcher sedimentDisks(GameContext context) {
+    public static BiomeFeatureMatcher sedimentDisks(TFBiomeContext context) {
         return new BiomeFeatureMatcher(
                 BiomeMatcher.of(context, Biome.Category.RIVER, Biome.Category.SWAMP),
                 FeatureMatcher.builder()

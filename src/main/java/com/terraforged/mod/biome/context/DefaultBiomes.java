@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.biome.provider;
+package com.terraforged.mod.biome.context;
 
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.world.biome.map.BiomeMap;
@@ -34,15 +34,7 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 
-public class TFDefaultBiomes {
-
-    public static final DefaultBiome.Factory<RegistryKey<Biome>> NONE = context -> new DefaultBiomeSelector(
-            context.getId(Biomes.THE_VOID),
-            context.getId(Biomes.THE_VOID),
-            context.getId(Biomes.THE_VOID),
-            0.25F,
-            0.75F
-    );
+public class DefaultBiomes {
 
     public static final DefaultBiome.Factory<RegistryKey<Biome>> BEACH = context -> new DefaultBiomeSelector(
             context.getId(Biomes.SNOWY_BEACH),
@@ -107,8 +99,8 @@ public class TFDefaultBiomes {
 
     public static final DefaultBiome.Factory<RegistryKey<Biome>> MOUNTAIN = context -> new DefaultBiomeSelector(
             context.getId(Biomes.SNOWY_MOUNTAINS),
-            context.getId(Biomes.THE_VOID),
-            context.getId(Biomes.THE_VOID),
+            BiomeMap.NULL_BIOME,
+            BiomeMap.NULL_BIOME,
             0.25F,
             1F
     );

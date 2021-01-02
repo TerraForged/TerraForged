@@ -35,4 +35,16 @@ public class Dimensions {
         this.min = min;
         this.max = max;
     }
+
+    public int getSizeX() {
+        return max.getX() - min.getX();
+    }
+
+    public int getSizeY() {
+        return max.getY() - min.getY();
+    }
+
+    public int getSizeZ() {
+        return max.getY() - min.getY();
+    }
 }

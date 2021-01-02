@@ -28,7 +28,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.terraforged.mod.featuremanager.GameContext;
+import com.terraforged.engine.world.biome.map.BiomeContext;
 import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
 import com.terraforged.mod.featuremanager.modifier.Jsonifiable;
 
@@ -58,7 +58,7 @@ public class FeatureTransformer implements Function<JsonElement, JsonElement>, J
     }
 
     @Override
-    public JsonElement toJson(GameContext context) {
+    public JsonElement toJson(BiomeContext<?> context) {
         JsonObject root = new JsonObject();
         for (Map.Entry<JsonPrimitive, JsonPrimitive> entry : valueTransformers.entrySet()) {
             root.add(entry.getKey().getAsString(), entry.getValue());

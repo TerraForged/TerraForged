@@ -24,48 +24,31 @@
 
 package com.terraforged.mod.featuremanager.template.type.tree;
 
+import com.terraforged.mod.featuremanager.template.BlockUtils;
 import com.terraforged.mod.featuremanager.template.feature.Placement;
+import com.terraforged.mod.featuremanager.template.template.Dimensions;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.gen.IWorldGenerationBaseReader;
-import net.minecraft.world.gen.feature.TreeFeature;
+
+import java.util.function.BiPredicate;
 
 public class TreePlacement implements Placement {
 
     public static final Placement PLACEMENT = new TreePlacement();
+    private static final BiPredicate<IWorld, BlockPos> OVERHEAD = BlockUtils::canTreeReplace;
 
     private TreePlacement() {
 
     }
 
     @Override
-    public boolean canPlaceAt(IWorld world, BlockPos pos) {
-        return isSoil(world, pos.down()) && clearOverhead(world, pos);
+    public boolean canPlaceAt(IWorld world, BlockPos pos, Dimensions dimensions) {
+        return BlockUtils.isSoil(world, pos.down())
+                && BlockUtils.isClearOverhead(world, pos, dimensions.getSizeY(), TreePlacement.OVERHEAD);
     }
 
     @Override
     public boolean canReplaceAt(IWorld world, BlockPos pos) {
-        return TreeFeature.isReplaceableAt(world, pos);
-    }
-
-    private static boolean isSoil(IWorld world, BlockPos pos) {
-        return TreeFeature.isDirt(world.getBlockState(pos).getBlock());
-    }
-
-    private static boolean isReplaceableAt(IWorld world, BlockPos pos) {
-        return TreeFeature.isReplaceableAt(world, pos);
-    }
-
-    private static boolean clearOverhead(IWorld world, BlockPos pos) {
-        BlockPos.Mutable mutable = new BlockPos.Mutable();
-        // world.getMaxHeight ?
-        int max = Math.min(world.func_234938_ad_(), pos.getY() + 20);
-        for (int y = pos.getY(); y < max; y++) {
-            mutable.setPos(pos.getX(), y, pos.getZ());
-            if (!isReplaceableAt(world, mutable)) {
-                return false;
-            }
-        }
-        return true;
+        return BlockUtils.canTreeReplace(world, pos);
     }
 }

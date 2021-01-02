@@ -25,6 +25,7 @@
 package com.terraforged.mod.featuremanager.template.feature;
 
 import com.terraforged.mod.featuremanager.template.BlockUtils;
+import com.terraforged.mod.featuremanager.template.template.Dimensions;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
@@ -32,7 +33,7 @@ public interface Placement {
 
     Placement ANY = new Placement() {
         @Override
-        public boolean canPlaceAt(IWorld world, BlockPos pos) {
+        public boolean canPlaceAt(IWorld world, BlockPos pos, Dimensions dimensions) {
             return true;
         }
 
@@ -42,7 +43,7 @@ public interface Placement {
         }
     };
 
-    boolean canPlaceAt(IWorld world, BlockPos pos);
+    boolean canPlaceAt(IWorld world, BlockPos pos, Dimensions dimensions);
 
-    boolean canReplaceAt(IWorld world,BlockPos pos);
+    boolean canReplaceAt(IWorld world, BlockPos pos);
 }

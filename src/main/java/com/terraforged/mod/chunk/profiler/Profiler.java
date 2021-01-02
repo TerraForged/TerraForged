@@ -38,9 +38,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public enum Profiler {
-    FIND_STRUCTURE,
-    STRUCTURE_START,
-    STRUCTURE_SPREAD,
+    STRUCTURE_STARTS,
+    STRUCTURE_REFS,
     BIOMES,
     TERRAIN,
     SURFACE,

@@ -26,12 +26,12 @@ package com.terraforged.mod.data.gen;
 
 import com.terraforged.engine.util.NameUtil;
 import com.terraforged.mod.TerraForgedMod;
+import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.screen.preview.PreviewSettings;
-import com.terraforged.mod.featuremanager.GameContext;
-import com.terraforged.mod.util.TranslationKey;
 import com.terraforged.mod.util.DataUtils;
+import com.terraforged.mod.util.TranslationKey;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.ResourceLocation;
@@ -51,7 +51,7 @@ public class LangGenerator {
     @SubscribeEvent
     public static void gather(GatherDataEvent event) {
         GuiKeys.init();
-        GameContext context = GameContext.dynamic();
+        TFBiomeContext context = TFBiomeContext.dynamic();
 
         LanguageProvider langProvider = new LanguageProvider(event.getGenerator(), "terraforged", "en_us") {
             @Override
@@ -77,7 +77,7 @@ public class LangGenerator {
         }
     }
 
-    private static void biomes(LanguageProvider provider, GameContext context) {
+    private static void biomes(LanguageProvider provider, TFBiomeContext context) {
         for (Biome biome : context.biomes) {
             ResourceLocation name = context.biomes.getRegistryName(biome);
             if (name != null && name.getNamespace().equals(TerraForgedMod.MODID)) {
