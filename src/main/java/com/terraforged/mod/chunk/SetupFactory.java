@@ -60,7 +60,7 @@ import java.util.List;
 public class SetupFactory {
 
     public static DataManager createDataManager() {
-        return FeatureManager.data(new File("config/terraforged/datapacks"));
+        return DataManager.of(new File("config/terraforged/datapacks"));
     }
 
     public static List<ColumnDecorator> createSurfaceDecorators(TerraContext context) {

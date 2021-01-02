@@ -59,6 +59,10 @@ public enum Profiler {
         return section.get().punchIn();
     }
 
+    public void punchOut() {
+        section.get().close();
+    }
+
     public long timeMS() {
         return TimeUnit.NANOSECONDS.toMillis(time.get());
     }

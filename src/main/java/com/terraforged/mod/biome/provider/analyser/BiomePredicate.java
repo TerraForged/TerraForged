@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.biome.map;
+package com.terraforged.mod.biome.provider.analyser;
 
-import com.terraforged.engine.world.climate.biome.BiomeData;
+import com.terraforged.engine.world.biome.BiomeData;
 import net.minecraft.world.biome.Biome;
 
 import java.util.function.BiPredicate;

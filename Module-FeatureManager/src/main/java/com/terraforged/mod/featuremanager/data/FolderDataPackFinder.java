@@ -26,11 +26,15 @@ package com.terraforged.mod.featuremanager.data;
 
 import net.minecraft.resources.FolderPackFinder;
 import net.minecraft.resources.IPackNameDecorator;
+import net.minecraft.resources.IResourcePack;
 import net.minecraft.resources.ResourcePackInfo;
+import net.minecraft.resources.data.PackMetadataSection;
 import org.jline.utils.Log;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class FolderDataPackFinder extends FolderPackFinder {
 
@@ -47,13 +51,27 @@ public class FolderDataPackFinder extends FolderPackFinder {
     @Override
     public void findPacks(Consumer<ResourcePackInfo> consumer, ResourcePackInfo.IFactory factory) {
         Log.debug("Searching for DataPacks...");
-        super.findPacks(resourceTracker(consumer), factory);
+        super.findPacks(consumer, new PackFactory(factory));
     }
 
-    private static Consumer<ResourcePackInfo> resourceTracker(Consumer<ResourcePackInfo> delegate) {
-        return info -> {
-            Log.debug("Adding datapack: {}", info.getName());
-            delegate.accept(info);
-        };
+    public static ResourcePackInfo.IFactory factory() {
+        return (name, enabled, packRef, pack, metadata, priority, nameDecorator) ->
+                new ResourcePackInfo(name, true, packRef, pack, metadata, priority, nameDecorator, false);
+    }
+
+    private static class PackFactory implements ResourcePackInfo.IFactory {
+
+        private final ResourcePackInfo.IFactory delegate;
+
+        private PackFactory(ResourcePackInfo.IFactory delegate) {
+            this.delegate = delegate;
+        }
+
+        @Nullable
+        @Override
+        public ResourcePackInfo create(String name, boolean enabled, Supplier<IResourcePack> packRef, IResourcePack pack, PackMetadataSection metadata, ResourcePackInfo.Priority priority, IPackNameDecorator nameDecorator) {
+            Log.debug("Adding datapack: {}", name);
+            return delegate.create(name, true, packRef, pack, metadata, priority, nameDecorator);
+        }
     }
 }

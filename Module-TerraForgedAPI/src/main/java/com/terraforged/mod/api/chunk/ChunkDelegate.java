@@ -24,7 +24,6 @@
 
 package com.terraforged.mod.api.chunk;
 
-import com.terraforged.mod.chunk.util.FastChunk;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.shorts.ShortList;
 import net.minecraft.block.Block;

@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.biome.provider;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.mojang.serialization.Codec;
@@ -32,10 +33,10 @@ import com.mojang.serialization.DynamicOps;
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.concurrent.Resource;
 import com.terraforged.engine.concurrent.task.LazySupplier;
+import com.terraforged.engine.world.biome.map.BiomeMap;
 import com.terraforged.engine.world.heightmap.WorldLookup;
 import com.terraforged.mod.Log;
-import com.terraforged.mod.biome.map.BiomeMap;
-import com.terraforged.mod.biome.modifier.BiomeModifierManager;
+import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.featuremanager.GameContext;
@@ -58,13 +59,13 @@ public class TFBiomeProvider extends BiomeProvider {
 
     private final long seed;
     private final TerraContext context;
-    private final LazySupplier<BiomeProviderResources> resources;
+    private final LazySupplier<BiomeResources> resources;
 
     public TFBiomeProvider(TerraContext context) {
-        super(BiomeHelper.getOverworldBiomes(context.gameContext));
+        super(BiomeAnalyser.getOverworldBiomes(context.gameContext));
         this.context = context;
         this.seed = context.terraSettings.world.seed;
-        this.resources = LazySupplier.factory(context, BiomeProviderResources::new);
+        this.resources = LazySupplier.factory(context, BiomeResources::new);
     }
 
     @Override
@@ -210,27 +211,25 @@ public class TFBiomeProvider extends BiomeProvider {
     }
 
     public Biome getBiome(Cell cell, int x, int z) {
-        BiomeProviderResources resources = this.getResources();
-        Biome biome = resources.biomeMap.provideBiome(cell, context.levels);
+        BiomeResources resources = this.getResources();
+        int biome = resources.biomeMap.provideBiome(cell, context.levels);
         if (resources.modifierManager.hasModifiers(cell, context.levels)) {
-            Biome modified = resources.modifierManager.modify(biome, cell, x, z);
-            if (TFBiomeProvider.isValidBiome(modified)) {
-                return modified;
+            int modified = resources.modifierManager.modify(biome, cell, x, z);
+            if (BiomeMap.isValid(modified)) {
+                biome = modified;
             }
         }
-        return biome;
+        Biome result = context.gameContext.biomes.get(biome);
+        Preconditions.checkNotNull(result, "NULL BIOME D:");
+        return result;
     }
 
     public boolean canSpawnAt(Cell cell) {
         return !cell.terrain.isSubmerged();
     }
 
-    private BiomeProviderResources getResources() {
+    private BiomeResources getResources() {
         return resources.get();
-    }
-
-    public static boolean isValidBiome(Biome biome) {
-        return biome != null && biome.getCategory() != Biome.Category.NONE;
     }
 
     private static <T> Dynamic<T> encode(TFBiomeProvider provider, DynamicOps<T> ops) {

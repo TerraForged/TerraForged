@@ -64,6 +64,10 @@ public class RegistryInstance<T> implements Iterable<T>, Comparator<T> {
         return registry.getOptional(name);
     }
 
+    public T get(int id) {
+        return registry.getByValue(id);
+    }
+
     public T get(RegistryKey<T> key) {
         return registry.getValueForKey(key);
     }
@@ -80,8 +84,20 @@ public class RegistryInstance<T> implements Iterable<T>, Comparator<T> {
         return registry.getKey(t);
     }
 
+    public int getId(T t) {
+        return registry.getId(t);
+    }
+
+    public int getId(RegistryKey<T> key) {
+        return registry.getId(get(key));
+    }
+
     public String getName(T t) {
         return String.valueOf(registry.getKey(t));
+    }
+
+    public String getName(int id) {
+        return String.valueOf(registry.getKey(get(id)));
     }
 
     public boolean contains(ResourceLocation name) {

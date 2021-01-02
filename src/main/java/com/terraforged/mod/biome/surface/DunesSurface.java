@@ -25,12 +25,13 @@
 package com.terraforged.mod.biome.surface;
 
 import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.world.biome.DesertBiomes;
 import com.terraforged.engine.world.heightmap.Levels;
 import com.terraforged.mod.api.biome.surface.MaskedSurface;
 import com.terraforged.mod.api.biome.surface.Surface;
 import com.terraforged.mod.api.biome.surface.SurfaceContext;
+import com.terraforged.mod.api.material.layer.LayerManager;
 import com.terraforged.mod.api.material.layer.LayerMaterial;
-import com.terraforged.mod.biome.provider.DesertBiomes;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.noise.Module;
@@ -47,15 +48,15 @@ public class DunesSurface implements MaskedSurface {
     private final int maxHeight;
     private final Levels levels;
     private final Module module;
-    private final DesertBiomes deserts;
+    private final LayerManager layers;
     private final BlockPos.Mutable pos = new BlockPos.Mutable();
 
-    public DunesSurface(TerraContext context, int maxHeight, DesertBiomes deserts) {
+    public DunesSurface(TerraContext context, int maxHeight, LayerManager deserts) {
         Module dunes = Source.cell(context.seed.next(), 80, CellFunc.DISTANCE)
                 .warp(context.seed.next(), 70, 1, 70);
         this.levels = context.levels;
         this.maxHeight = maxHeight;
-        this.deserts = deserts;
+        this.layers = deserts;
         this.module = dunes;
     }
 
@@ -75,7 +76,7 @@ public class DunesSurface implements MaskedSurface {
             return;
         }
 
-        LayerMaterial material = deserts.getSandLayers(ctx.biome);
+        LayerMaterial material = null;//deserts.getSandLayers(ctx.biome);
         if (material == null) {
             fill(x, z, duneBase - 4, duneTop, ctx, ctx.chunk, Blocks.SAND.getDefaultState());
             return;
@@ -94,6 +95,6 @@ public class DunesSurface implements MaskedSurface {
     }
 
     public static Surface create(TerraContext context, DesertBiomes desertBiomes) {
-        return new DunesSurface(context, 25, desertBiomes);
+        return new DunesSurface(context, 25, null);
     }
 }

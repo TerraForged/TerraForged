@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.api.event;
 
-import com.terraforged.mod.api.biome.modifier.ModifierManager;
+import com.terraforged.engine.world.biome.modifier.ModifierManager;
 import com.terraforged.mod.api.biome.surface.SurfaceManager;
 import com.terraforged.mod.api.chunk.column.DecoratorManager;
 import com.terraforged.mod.api.material.geology.GeologyManager;

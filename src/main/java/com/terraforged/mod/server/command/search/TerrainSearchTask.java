@@ -33,13 +33,14 @@ import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.mod.server.command.search.condition.SearchCondition;
 import com.terraforged.mod.server.command.search.condition.TerrainConditions;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.ChunkGenerator;
 
 public class TerrainSearchTask extends ChunkGeneratorSearch {
 
-    private static final ObjectPool<LongSet> CACHE_POOL = new ObjectPool<>(8, () -> new LongArraySet(1024));
+    private static final ObjectPool<LongSet> CACHE_POOL = new ObjectPool<>(8, () -> new LongOpenHashSet(1024));
 
     private final SearchCondition condition;
     private final WorldGenerator worldGenerator;

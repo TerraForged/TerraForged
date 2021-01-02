@@ -22,30 +22,23 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.biome.map.defaults;
+package com.terraforged.mod.biome.provider;
 
-import com.terraforged.engine.cell.Cell;
-import com.terraforged.mod.featuremanager.GameContext;
-import net.minecraft.world.biome.Biome;
+import com.terraforged.engine.world.biome.map.BiomeMap;
+import com.terraforged.engine.world.heightmap.WorldLookup;
+import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
+import com.terraforged.mod.chunk.TerraContext;
+import com.terraforged.mod.util.setup.SetupHooks;
 
-public interface DefaultBiome {
+public class BiomeResources {
 
-    Biome getBiome(float temperature);
+    public final BiomeMap biomeMap;
+    public final WorldLookup worldLookup;
+    public final BiomeModifierManager modifierManager;
 
-    default Biome getNone() {
-        return null;
-    }
-
-    default Biome getDefaultBiome(Cell cell) {
-        return getBiome(cell.temperature);
-    }
-
-    default Biome getDefaultBiome(float temperature) {
-        return getBiome(temperature);
-    }
-
-    interface Factory {
-
-        DefaultBiome create(GameContext context);
+    public BiomeResources(TerraContext context) {
+        this.biomeMap = BiomeAnalyser.createBiomeMap(context.gameContext);
+        this.worldLookup = new WorldLookup(context);
+        this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomeMap), context.copy());
     }
 }

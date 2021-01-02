@@ -50,15 +50,15 @@ public class ClientEvents {
         Log.info("Client setup");
         CrashHandler.INSTANCE.set(new ClientCrashHandler());
 
-        event.enqueueWork(() -> {
-            Log.info("Adding DataPackFinder");
-            Minecraft minecraft = event.getMinecraftSupplier().get();
-            File dir = new File(minecraft.gameDir, "config/terraforged/datapacks");
-            FolderDataPackFinder dataPackFinder = new FolderDataPackFinder(dir);
-            minecraft.getResourcePackList().addPackFinder(dataPackFinder);
-            minecraft.getResourcePackList().addPackFinder(new ModDataPackFinder());
-            minecraft.getResourcePackList().reloadPacksFromFinders();
-        });
+//        event.enqueueWork(() -> {
+//            Log.info("Adding DataPackFinder");
+//            Minecraft minecraft = event.getMinecraftSupplier().get();
+//            File dir = new File(minecraft.gameDir, "config/terraforged/datapacks");
+//            FolderDataPackFinder dataPackFinder = new FolderDataPackFinder(dir);
+//            minecraft.getResourcePackList().addPackFinder(dataPackFinder);
+//            minecraft.getResourcePackList().addPackFinder(new ModDataPackFinder());
+//            minecraft.getResourcePackList().reloadPacksFromFinders();
+//        });
 
         ForgeWorldTypeScreens.registerFactory(LevelType.TERRAFORGED, ConfigScreen::new);
     }

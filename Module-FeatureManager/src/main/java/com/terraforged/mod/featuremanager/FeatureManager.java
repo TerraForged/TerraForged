@@ -51,7 +51,7 @@ import java.util.function.Supplier;
 public class FeatureManager implements FeatureDecorator {
 
     public static final Logger LOG = LogManager.getLogger("FeatureManager");
-    public static final Marker INIT = MarkerManager.getMarker("INIT");
+    public static final Marker INIT = MarkerManager.getMarker("Init");
 
     private final Map<Biome, BiomeFeatures> biomes;
 
@@ -66,10 +66,6 @@ public class FeatureManager implements FeatureDecorator {
 
     public BiomeFeatures getFeatures(Biome biome) {
         return biomes.getOrDefault(biome, BiomeFeatures.NONE);
-    }
-
-    public static DataManager data(File dir) {
-        return DataManager.of(dir);
     }
 
     public static FeatureModifiers modifiers(DataManager data, boolean load, GameContext context) {
