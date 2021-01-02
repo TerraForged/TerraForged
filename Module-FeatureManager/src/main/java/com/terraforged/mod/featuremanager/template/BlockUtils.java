@@ -25,17 +25,23 @@
 package com.terraforged.mod.featuremanager.template;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
-import net.minecraft.world.gen.IWorldGenerationBaseReader;
 import net.minecraft.world.gen.feature.TreeFeature;
 
 public class BlockUtils {
 
-    public static boolean canTreeReplace(IWorldGenerationBaseReader reader, BlockPos pos) {
-        return TreeFeature.isReplaceableAt(reader, pos);
+    public static boolean isVegetation(IWorld world, BlockPos pos) {
+        BlockState state = world.getBlockState(pos);
+        return state.isIn(BlockTags.SAPLINGS) || state.isIn(BlockTags.FLOWERS) || state.isIn(Blocks.VINE.delegate.get());
+    }
+
+    public static boolean canTreeReplace(IWorld world, BlockPos pos) {
+        return TreeFeature.isReplaceableAt(world, pos) || isVegetation(world, pos);
     }
 
     public static boolean isSolid(IWorldReader reader, BlockPos pos) {
