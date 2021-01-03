@@ -33,7 +33,6 @@ import com.terraforged.mod.util.DataUtils;
 import com.terraforged.mod.util.DimUtils;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
@@ -51,23 +50,18 @@ public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
     }
 
     @Override
-    public DimensionGeneratorSettings createSettings(DynamicRegistries dynamicRegistries, long seed, boolean generateStructures, boolean bonusChest, String options) {
+    public DimensionGeneratorSettings createSettings(DynamicRegistries registries, long seed, boolean generateStructures, boolean bonusChest, String options) {
         Log.info("Creating TerraForged level settings");
-        Registry<Biome> biomes = dynamicRegistries.getRegistry(Registry.BIOME_KEY);
-        Registry<DimensionType> dimensions = dynamicRegistries.getRegistry(Registry.DIMENSION_TYPE_KEY);
-        Registry<DimensionSettings> settings = dynamicRegistries.getRegistry(Registry.NOISE_SETTINGS_KEY);
+        Registry<Biome> biomes = registries.getRegistry(Registry.BIOME_KEY);
+        Registry<DimensionSettings> settings = registries.getRegistry(Registry.NOISE_SETTINGS_KEY);
         TFChunkGenerator chunkGenerator = createChunkGenerator(biomes, settings, seed, options);
         DimensionGeneratorSettings level = new DimensionGeneratorSettings(
                 seed,
                 generateStructures,
                 bonusChest,
-                DimensionGeneratorSettings.func_242749_a(
-                        dimensions,
-                        DimensionType.getDefaultSimpleRegistry(dimensions, biomes, settings, seed),
-                        chunkGenerator
-                )
+                DimUtils.createDimensionRegistry(seed, registries, chunkGenerator)
         );
-        return DimUtils.populateDimensions(level, dynamicRegistries, chunkGenerator.getContext().terraSettings.dimensions);
+        return DimUtils.populateDimensions(level, registries, chunkGenerator.getContext().terraSettings);
     }
 
     public static DimensionGeneratorSettings updateOverworld(DimensionGeneratorSettings level, DynamicRegistries registries, TerraSettings settings) {
@@ -77,13 +71,9 @@ public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
                 level.getSeed(),
                 level.doesGenerateFeatures(),
                 level.hasBonusChest(),
-                DimensionGeneratorSettings.func_241520_a_(
-                        level.func_236224_e_(),
-                        () -> registries.func_230520_a_().getOrThrow(DimensionType.OVERWORLD),
-                        updatedGenerator
-                )
+                DimUtils.updateDimensionRegistry(level.func_236224_e_(), registries, updatedGenerator)
         );
-        return DimUtils.populateDimensions(updatedLevel, registries, settings.dimensions);
+        return DimUtils.populateDimensions(updatedLevel, registries, settings);
     }
 
     private static TFChunkGenerator createOverworld(TerraSettings settings, DynamicRegistries registries) {
