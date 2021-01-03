@@ -95,6 +95,11 @@ public class DynamicReader<T> implements Reader {
     }
 
     @Override
+    public boolean has(String key) {
+        return ops.get(value, key).result().isPresent();
+    }
+
+    @Override
     public String getString() {
         return ops.getStringValue(value).result().orElse("");
     }

@@ -234,11 +234,11 @@ public class TFBiomeProvider extends BiomeProvider {
 
     private static <T> Dynamic<T> encode(TFBiomeProvider provider, DynamicOps<T> ops) {
         T seed = Codecs.encodeAndGet(Codec.LONG, provider.seed, ops);
-        T gameContext = Codecs.encodeAndGet(TFBiomeContext.CODEC, provider.getContext().biomeContext, ops);
+        T context = Codecs.encodeAndGet(TFBiomeContext.CODEC, provider.getContext().biomeContext, ops);
         T settings = Codecs.encodeAndGet(TerraSettings.CODEC, provider.getContext().terraSettings, ops);
         return new Dynamic<>(ops, ops.createMap(ImmutableMap.of(
                 ops.createString("seed"), seed,
-                ops.createString("game_data"), gameContext,
+                ops.createString("game_data"), context,
                 ops.createString("generator_settings"), settings)
         ));
     }

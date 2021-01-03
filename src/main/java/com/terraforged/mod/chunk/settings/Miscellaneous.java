@@ -27,6 +27,7 @@ package com.terraforged.mod.chunk.settings;
 import com.terraforged.engine.serialization.annotation.Comment;
 import com.terraforged.engine.serialization.annotation.Range;
 import com.terraforged.engine.serialization.annotation.Serializable;
+import com.terraforged.engine.serialization.annotation.legacy.LegacyInt;
 import com.terraforged.engine.world.biome.modifier.MountainModifier;
 
 @Serializable
@@ -38,10 +39,14 @@ public class Miscellaneous {
     @Comment("Generates strata (rock layers) instead of just stone")
     public boolean strataDecorator = true;
 
+    @Range(min = 50, max = 1000)
+    @Comment("Controls the size of strata regions")
+    public int strataRegionSize = 600;
+
     @Comment("Replace surface materials where erosion has occurred")
     public boolean erosionDecorator = true;
 
-    @Comment("Only places regular stone on eroded surfaces")
+    @Comment("Changes most exposed rock surfaces to plain stone")
     public boolean plainStoneErosion = false;
 
     @Comment("Removes snow from the terrain where it shouldn't naturally settle")

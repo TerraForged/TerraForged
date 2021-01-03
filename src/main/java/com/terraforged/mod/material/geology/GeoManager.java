@@ -51,7 +51,7 @@ public class GeoManager implements GeologyManager {
     private final Map<Biome, Geology<BlockState>> specific = new HashMap<>();
 
     public GeoManager(TerraContext context) {
-        int scale = context.settings.terrain.general.terrainRegionSize / 2;
+        int scale = context.terraSettings.miscellaneous.strataRegionSize;
         this.selector = Source.cell(context.seed.next(), scale)
                 .warp(context.seed.next(), scale / 4, 2, scale / 2D)
                 .warp(context.seed.next(), 15, 2, 30);
