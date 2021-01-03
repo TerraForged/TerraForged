@@ -30,13 +30,12 @@ import net.minecraft.block.BlockState;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class WGTags {
-
-    private static final Map<ITag<?>, Set<Block>> SETS = new ConcurrentHashMap<>();
 
     public static final ITag.INamedTag<Block> STONE = tag("forge:wg_stone");
     public static final ITag.INamedTag<Block> DIRT = tag("forge:wg_dirt");
@@ -50,13 +49,7 @@ public class WGTags {
     }
 
     private static ITag.INamedTag<Block> tag(String name) {
-        ITag.INamedTag<Block> tag = BlockTags.makeWrapperTag(name);
-        SETS.put(tag, new HashSet<>());
-        return tag;
-    }
-
-    public static void set(ITag<Block> tag, Set<Block> set) {
-        SETS.put(tag, set);
+        return BlockTags.makeWrapperTag(name);
     }
 
     public static Predicate<BlockState> stone() {
@@ -69,13 +62,10 @@ public class WGTags {
 
     public static void printTags() {
         for (ITag.INamedTag<Block> tag : WG_TAGS) {
-            Set<Block> set = new HashSet<>();
             Log.debug("World-Gen Tag: {}", tag.getName());
             for (Block block : tag.getAllElements()) {
                 Log.debug(" - {}", block.getRegistryName());
-                set.add(block);
             }
-            SETS.put(tag, set);
         }
     }
 }
