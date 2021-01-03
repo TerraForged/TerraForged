@@ -44,7 +44,7 @@ public class MixinDimensionGeneratorSettings {
     @Inject(method = "func_242753_a", at = @At("HEAD"))
     private static void onLoadLevel(DynamicRegistries registries, Properties properties, CallbackInfoReturnable<DimensionGeneratorSettings> ci) {
         if (properties.getProperty("level-type").equalsIgnoreCase("terraforged")) {
-            properties.setProperty("level-type", LevelType.TERRAFORGED.getRegistryName() + "");
+            properties.setProperty("level-type", String.valueOf(LevelType.TERRAFORGED.getRegistryName()));
         }
     }
 }

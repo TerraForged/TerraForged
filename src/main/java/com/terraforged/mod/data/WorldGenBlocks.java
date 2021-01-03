@@ -53,7 +53,7 @@ public class WorldGenBlocks extends DataGen {
             root.addProperty("replace", false);
             root.add("values", values);
             for (Block block : blocks) {
-                values.add("" + block.getRegistryName());
+                values.add(String.valueOf(block.getRegistryName()));
             }
             write(root, writer);
         });

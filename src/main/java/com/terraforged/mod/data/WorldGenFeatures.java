@@ -70,7 +70,7 @@ public class WorldGenFeatures extends DataGen {
                         features.add(element);
                     } catch (Throwable t) {
                         t.printStackTrace();
-                        String name = context.biomes.getName(biome) + "";
+                        String name = context.biomes.getName(biome);
                         List<String> errors = FeatureDebugger.getErrors(feature.get());
                         Log.debug("Unable to serialize feature in biome: {}", name);
                         if (errors.isEmpty()) {

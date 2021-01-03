@@ -320,7 +320,7 @@ public class ConfigScreen extends OverlayScreen {
     protected static void setSeed(CreateWorldScreen screen, int seed) {
         TextFieldWidget field = getWidget(screen);
         if (field != null) {
-            field.setText("" + seed);
+            field.setText(String.valueOf(seed));
         }
     }
 

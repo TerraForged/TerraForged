@@ -69,7 +69,7 @@ public class TFToggle extends TFButton {
         }
 
         if (noname) {
-            setMessage(new StringTextComponent(toString(value.get(name)) + ""));
+            setMessage(new StringTextComponent(toString(value.get(name))));
         } else {
             setMessage(new StringTextComponent(prefix + toString(value.get(name))));
         }

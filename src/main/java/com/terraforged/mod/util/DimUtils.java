@@ -190,7 +190,7 @@ public class DimUtils {
         if (type == LevelType.TERRAFORGED) {
             return "default";
         }
-        return "" + type.getRegistryName();
+        return String.valueOf(type.getRegistryName());
     }
 
     public static ForgeWorldType getLevelType(String name) {
