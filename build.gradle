@@ -146,8 +146,21 @@ jar {
     }
 }
 
+import net.minecraftforge.gradle.common.task.SignJar
+task signJar(type: SignJar, dependsOn: "reobfJar") {
+    onlyIf {
+        project.hasProperty("signing.keystore.path")
+    }
+    keyStore = project.findProperty("signing.keystore.path")
+    storePass = project.findProperty("signing.keystore.pass")
+    alias = project.findProperty("signing.key.name")
+    keyPass = project.findProperty("signing.key.pass")
+    inputFile = jar.archivePath
+    outputFile = jar.archivePath
+}
+
 build {
-    dependsOn("reobfJar")
+    dependsOn("signJar")
 }
 
 publishing {
