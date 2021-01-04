@@ -25,7 +25,6 @@
 package com.terraforged.mod.config;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.terraforged.mod.Log;
 
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.BiConsumer;
@@ -47,7 +46,6 @@ public class ConfigRef implements Supplier<CommentedFileConfig> {
         long read = lock.readLock();
         try {
             if (ref != null) {
-                Log.info("Loading config: {}", ref.getFile().getName());
                 ref.load();
                 return ref;
             }
@@ -64,6 +62,11 @@ public class ConfigRef implements Supplier<CommentedFileConfig> {
         } finally {
             lock.unlockWrite(write);
         }
+    }
+
+    public ConfigRef save() {
+        get().save();
+        return this;
     }
 
     public int getInt(String name, int def) {

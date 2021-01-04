@@ -48,6 +48,10 @@ public class Codecs {
         return Codec.of(encoder, decoder).stable();
     }
 
+    public static <V> Codec<V> create(EncoderFunc.Simple<V> encoder, DecoderFunc.Simple<V> decoder) {
+        return Codec.of(encoder, decoder).stable();
+    }
+
     public static <V, T> V decodeAndGet(Codec<V> codec, OptionalDynamic<T> dynamic) {
         return dynamic.result().flatMap(d -> decode(codec, d)).orElseThrow(CodecException.SUPPLIER);
     }

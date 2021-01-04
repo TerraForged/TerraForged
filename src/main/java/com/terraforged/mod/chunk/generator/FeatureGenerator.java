@@ -31,13 +31,14 @@ import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionFix;
-import com.terraforged.mod.chunk.profiler.WarnTimer;
-import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.featuremanager.biome.BiomeFeature;
 import com.terraforged.mod.featuremanager.biome.BiomeFeatures;
 import com.terraforged.mod.featuremanager.util.identity.Identifier;
 import com.terraforged.mod.util.Environment;
-import com.terraforged.mod.util.crash.WorldGenException;
+import com.terraforged.mod.util.crash.watchdog.UncheckedException;
+import com.terraforged.mod.util.crash.watchdog.WarnTimer;
+import com.terraforged.mod.util.crash.watchdog.Watchdog;
+import com.terraforged.mod.util.crash.watchdog.WatchdogContext;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -60,14 +61,15 @@ public class FeatureGenerator implements Generator.Features {
     private static final int FEATURE_STAGES = GenerationStage.Decoration.values().length;
     private static final String STRUCTURE = "Structure";
     private static final String FEATURE = "Feature";
-    private static final long WARN_TIME = 50;
 
+    private final long hangTime;
     private final WarnTimer timer;
     private final TFChunkGenerator generator;
 
     public FeatureGenerator(TFChunkGenerator generator) {
         this.generator = generator;
-        this.timer = new WarnTimer(ConfigManager.GENERAL.get().getLongOrElse("feature_warn_time", WARN_TIME));
+        this.timer = Watchdog.getWarnTimer();
+        this.hangTime = Watchdog.getWatchdogHangTime();
     }
 
     @Override
@@ -87,7 +89,7 @@ public class FeatureGenerator implements Generator.Features {
             BlockPos pos = new BlockPos(context.blockX, 0, context.blockZ);
 
             // place biome features
-            decorate(manager, regionFix, chunk, biome, pos);
+            checkedDecorate(manager, regionFix, chunk, biome, pos);
 
             // run post processes on chunk
             postProcess(reader, container, context);
@@ -103,7 +105,13 @@ public class FeatureGenerator implements Generator.Features {
         }
     }
 
-    private void decorate(StructureManager manager, ISeedReader region, IChunk chunk, Biome biome, BlockPos pos) throws WorldGenException {
+    private void checkedDecorate(StructureManager manager, ISeedReader region, IChunk chunk, Biome biome, BlockPos pos) {
+        try (WatchdogContext context = Watchdog.punchIn(chunk, generator, hangTime)) {
+            decorate(manager, region, chunk, biome, pos, context);
+        }
+    }
+
+    private void decorate(StructureManager manager, ISeedReader region, IChunk chunk, Biome biome, BlockPos pos, WatchdogContext context) {
         SharedSeedRandom random = new SharedSeedRandom();
         long decorationSeed = random.setDecorationSeed(region.getSeed(), pos.getX(), pos.getZ());
 
@@ -125,12 +133,14 @@ public class FeatureGenerator implements Generator.Features {
             int featureSeed = 0;
 
             if (stageIndex < stagedStructures.size()) {
+                context.pushPhase(STRUCTURE);
                 List<Structure<?>> structures = stagedStructures.get(stageIndex);
                 for (int structureIndex = 0; structureIndex < structures.size(); structureIndex++) {
                     Structure<?> structure = structures.get(structureIndex);
                     random.setFeatureSeed(decorationSeed, featureSeed++, stageIndex);
                     try {
                         long timeStamp = timer.now();
+                        context.pushIdentifier(structure.getStructureName());
                         manager.func_235011_a_(SectionPos.from(pos), structure).forEach(start -> start.func_230366_a_(
                                 region,
                                 manager,
@@ -141,12 +151,13 @@ public class FeatureGenerator implements Generator.Features {
                         ));
                         checkTime(STRUCTURE, structure.getStructureName(), timer, timeStamp);
                     } catch (Throwable t) {
-                        throw WorldGenException.decoration(STRUCTURE, structure.getStructureName(), t);
+                        throw new UncheckedException(STRUCTURE, structure.getStructureName(), t);
                     }
                 }
             }
 
             if (stageIndex < stagedFeatures.size()) {
+                context.pushPhase(FEATURE);
                 List<BiomeFeature> features = stagedFeatures.get(stageIndex);
                 for (int featureIndex = 0; featureIndex < features.size(); featureIndex++) {
                     BiomeFeature feature = features.get(featureIndex);
@@ -158,10 +169,11 @@ public class FeatureGenerator implements Generator.Features {
 
                     try {
                         long timeStamp = timer.now();
+                        context.pushIdentifier(feature.getIdentity());
                         feature.getFeature().generate(region, generator, random, pos);
                         checkTime(FEATURE, feature.getIdentity(), timer, timeStamp);
                     } catch (Throwable t) {
-                        throw WorldGenException.decoration(FEATURE, feature.getIdentity().getComponents(), t);
+                        throw new UncheckedException(FEATURE, feature.getIdentity(), t);
                     }
                 }
             }

@@ -22,34 +22,41 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.featuremanager.util.codec;
+package com.terraforged.mod.util.crash.feature;
 
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.Decoder;
-import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.DynamicOps;
+import com.terraforged.mod.featuremanager.util.codec.Codecs;
+import net.minecraft.world.gen.feature.IFeatureConfig;
 
-public interface DecoderFunc<V> extends Decoder<V> {
+import java.util.Collections;
 
-    <T> V _decode(Dynamic<T> dynamic);
+public class CrashyConfig implements IFeatureConfig {
 
-    default <T> DataResult<Pair<V, T>> decode(DynamicOps<T> ops, T input) {
-        try {
-            V v = _decode(new Dynamic<>(ops, input));
-            return DataResult.success(Pair.of(v, input));
-        } catch (Throwable t) {
-            return DataResult.error(t.getMessage());
-        }
+    public static final Codec<CrashyConfig> CODEC = Codecs.create(CrashyConfig::encode, CrashyConfig::decode);
+
+    public final CrashType crashType;
+
+    public CrashyConfig(CrashType crashType) {
+        this.crashType = crashType;
     }
 
-    interface Simple<V> extends DecoderFunc<V> {
+    public enum CrashType {
+        UNCHECKED_EXCEPTION,
+        SERVER_DEADLOCK,
+        ;
+    }
 
-        <T> V simpleDecode(T t, DynamicOps<T> ops);
+    private static <T> T encode(CrashyConfig config, DynamicOps<T> ops) {
+        return ops.createMap(Collections.singletonMap(
+                ops.createString("type"),
+                ops.createString(config.crashType.name())
+        ));
+    }
 
-        @Override
-        default <T> V _decode(Dynamic<T> dynamic) {
-            return simpleDecode(dynamic.getValue(), dynamic.getOps());
-        }
+    private static <T> CrashyConfig decode(T t, DynamicOps<T> ops) {
+        return new CrashyConfig(CrashType.valueOf(
+                ops.getStringValue(t).result().orElse(CrashType.UNCHECKED_EXCEPTION.name())
+        ));
     }
 }

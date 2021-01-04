@@ -83,7 +83,7 @@ public class FeatureIdentifier implements Identifier {
 
     @Override
     public String toString() {
-        return "FeatureIdentifier{" + "identity=" + identity + '}';
+        return getComponents();
     }
 
     public static FeatureIdentifier getIdentity(ConfiguredFeature<?, ?> feature) {

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash;
+package com.terraforged.mod.util.crash.feature;
 
 import com.terraforged.mod.Log;
 import com.terraforged.mod.TerraForgedMod;
@@ -34,29 +34,50 @@ import net.minecraft.world.ISeedReader;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class CrashyFeature extends Feature<NoFeatureConfig> {
+public class CrashyFeature extends Feature<CrashyConfig> {
 
     public static final CrashyFeature INSTANCE = new CrashyFeature();
-    private static final int CRASH_CHANCE_PERCENTAGE = 5;
+    private static final int CRASH_CHANCE_PERCENTAGE = 2;
 
     private CrashyFeature() {
-        super(NoFeatureConfig.field_236558_a_);
+        super(CrashyConfig.CODEC);
         setRegistryName(TerraForgedMod.MODID, "crashy_mccrashface");
     }
 
     @Override
-    public boolean generate(ISeedReader reader, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
+    public boolean generate(ISeedReader region, ChunkGenerator generator, Random rand, BlockPos pos, CrashyConfig config) {
         if (ThreadLocalRandom.current().nextInt(100) < CRASH_CHANCE_PERCENTAGE) {
-            throw new NullPointerException("Crash time baby!");
+            switch (config.crashType) {
+                case SERVER_DEADLOCK:
+                    serverDeadlock(region, pos);
+                    break;
+                case UNCHECKED_EXCEPTION:
+                    uncheckedException();
+                    break;
+            }
         }
         return true;
+    }
+
+    private void uncheckedException() {
+        // Simulate some random unchecked exception being thrown during feature gen
+        throw new NullPointerException("Crash time baby!");
+    }
+
+    private void serverDeadlock(ISeedReader region, BlockPos pos) {
+        // Simulate a third-party mod requesting chunks via the ServerWorld rather than the
+        // WorldGenRegion. This may be an indirect offense such as spawning an Entity but
+        // then using unsafe methods on the Entity (ie setLocationAndRotation)
+        int x = 50 + pos.getX() >> 4;
+        int z = 124 + pos.getZ() >> 4;
+        region.getWorld().getChunk(x, z);
     }
 
 //    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -68,14 +89,14 @@ public class CrashyFeature extends Feature<NoFeatureConfig> {
         }
     }
 
-    //@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+//    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class Setup {
         @SubscribeEvent
         public static void setup(SetupEvent.Features event) {
             Log.info("Adding crash-test");
             event.getManager().getAppenders().add(BiomeFeatureMatcher.ANY, FeatureAppender.tail(
                     GenerationStage.Decoration.VEGETAL_DECORATION,
-                    CrashyFeature.INSTANCE.withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG)
+                    CrashyFeature.INSTANCE.withConfiguration(new CrashyConfig(CrashyConfig.CrashType.UNCHECKED_EXCEPTION))
             ));
         }
     }

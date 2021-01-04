@@ -29,8 +29,12 @@ import com.terraforged.mod.util.crash.CrashHandler;
 import com.terraforged.mod.util.crash.CrashReportBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.crash.CrashReport;
+import net.minecraft.util.registry.Bootstrap;
 import net.minecraft.world.chunk.IChunk;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.locks.StampedLock;
 
 public class ClientCrashHandler implements CrashHandler {
@@ -46,9 +50,24 @@ public class ClientCrashHandler implements CrashHandler {
 
         try {
             CrashReport report = CrashReportBuilder.buildCrashReport(chunk, generator, t);
-            Minecraft.getInstance().crashed(report);
+            ClientCrashHandler.displayCrashReport(report);
         } finally {
             lock.unlockWrite(stamp);
+        }
+    }
+    private static void displayCrashReport(CrashReport report) {
+        File file1 = new File(Minecraft.getInstance().gameDir, "crash-reports");
+        File file2 = new File(file1, "crash-" + (new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss")).format(new Date()) + "-client.txt");
+        Bootstrap.printToSYSOUT(report.getCompleteReport());
+        if (report.getFile() != null) {
+            Bootstrap.printToSYSOUT("#@!@# Game crashed! Crash report saved to: #@!@# " + report.getFile());
+            Runtime.getRuntime().halt(-1);
+        } else if (report.saveToFile(file2)) {
+            Bootstrap.printToSYSOUT("#@!@# Game crashed! Crash report saved to: #@!@# " + file2.getAbsolutePath());
+            Runtime.getRuntime().halt(-1);
+        } else {
+            Bootstrap.printToSYSOUT("#@?@# Game crashed! Crash report could not be saved. #@?@#");
+            Runtime.getRuntime().halt(-2);
         }
     }
 }

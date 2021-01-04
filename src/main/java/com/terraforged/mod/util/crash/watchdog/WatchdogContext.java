@@ -22,34 +22,38 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.featuremanager.util.codec;
+package com.terraforged.mod.util.crash.watchdog;
 
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.Decoder;
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.DynamicOps;
+import com.terraforged.engine.concurrent.cache.SafeCloseable;
+import com.terraforged.mod.featuremanager.util.identity.Identifier;
 
-public interface DecoderFunc<V> extends Decoder<V> {
+public interface WatchdogContext extends SafeCloseable {
 
-    <T> V _decode(Dynamic<T> dynamic);
+    WatchdogContext NONE = new WatchdogContext() {
+        @Override
+        public void pushPhase(String phase) {
 
-    default <T> DataResult<Pair<V, T>> decode(DynamicOps<T> ops, T input) {
-        try {
-            V v = _decode(new Dynamic<>(ops, input));
-            return DataResult.success(Pair.of(v, input));
-        } catch (Throwable t) {
-            return DataResult.error(t.getMessage());
         }
-    }
-
-    interface Simple<V> extends DecoderFunc<V> {
-
-        <T> V simpleDecode(T t, DynamicOps<T> ops);
 
         @Override
-        default <T> V _decode(Dynamic<T> dynamic) {
-            return simpleDecode(dynamic.getValue(), dynamic.getOps());
+        public void pushIdentifier(String identifier) {
+
         }
-    }
+
+        @Override
+        public void pushIdentifier(Identifier identifier) {
+
+        }
+
+        @Override
+        public void close() {
+
+        }
+    };
+
+    void pushPhase(String phase);
+
+    void pushIdentifier(String identifier);
+
+    void pushIdentifier(Identifier identifier);
 }

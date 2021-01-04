@@ -27,7 +27,6 @@ package com.terraforged.mod.chunk.settings;
 import com.terraforged.engine.serialization.annotation.Comment;
 import com.terraforged.engine.serialization.annotation.Range;
 import com.terraforged.engine.serialization.annotation.Serializable;
-import com.terraforged.engine.serialization.annotation.legacy.LegacyInt;
 import com.terraforged.engine.world.biome.modifier.MountainModifier;
 
 @Serializable

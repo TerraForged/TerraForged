@@ -42,4 +42,14 @@ public interface EncoderFunc<V> extends Encoder<V> {
             return DataResult.error(t.getMessage());
         }
     }
+
+    interface Simple<V> extends EncoderFunc<V> {
+
+        <T> T simpleEncode(V v, DynamicOps<T> ops);
+
+        @Override
+        default <T> Dynamic<T> _encode(V v, DynamicOps<T> ops) {
+            return new Dynamic<>(ops, simpleEncode(v, ops));
+        }
+    }
 }

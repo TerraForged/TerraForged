@@ -112,6 +112,14 @@ public class ConfigManager {
                 "is printed to the logs. This may help track down mods that are causing world-gen to run slow.",
                 "Set to -1 to disable."
         );
+        set(
+                cfg,
+                "server_deadlock_timeout",
+                20_000,
+                "The number of milliseconds after which the server will be considered 'deadlocked' (when it",
+                "gets stuck trying to generate a feature/structure). This is usually caused by third-party mods.",
+                "Set to -1 to disable deadlock detection & reporting."
+        );
     }));
 
     public static void init() {
@@ -131,17 +139,19 @@ public class ConfigManager {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            CommentedFileConfig config = CommentedFileConfig.of(path, TomlFormat.instance());
-            defaulter.accept(config);
-            config.save();
-            return config;
-        } else {
-            return CommentedFileConfig.of(path, TomlFormat.instance());
         }
+
+        CommentedFileConfig config = CommentedFileConfig.of(path, TomlFormat.instance());
+        defaulter.accept(config);
+        config.save();
+
+        return config;
     }
 
     private static <T> void set(CommentedConfig config, String path, T value, String... lines) {
         config.setComment(path, Strings.join(lines, "\n"));
-        config.set(path, value);
+        if (!config.contains(path)) {
+            config.set(path, value);
+        }
     }
 }

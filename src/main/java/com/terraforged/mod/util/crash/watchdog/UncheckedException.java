@@ -22,18 +22,36 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash;
+package com.terraforged.mod.util.crash.watchdog;
 
-import com.terraforged.mod.chunk.profiler.Profiler;
+import java.util.function.Supplier;
 
-public class WorldGenException extends RuntimeException {
+public class UncheckedException extends RuntimeException {
 
-    public WorldGenException(Profiler section, Throwable cause) {
-        super("generating " + section.getReportDescription() + " (TerraForged World-Gen)", cause);
+    protected static final String UNCHECKED = "Critical error detected whilst generating ";
+    protected static final String DEADLOCK = "Server deadlock detected whilst generating ";
+
+    public UncheckedException(String prefix, String phase, Object identity, Supplier<StackTraceElement[]> stacktrace) {
+        super(createMessage(prefix, phase, identity));
+        super.setStackTrace(stacktrace.get());
+    }
+
+    public UncheckedException(String phase, Object identity, Throwable cause) {
+        this(UNCHECKED, phase, identity, cause::getStackTrace);
     }
 
     @Override
     public synchronized Throwable fillInStackTrace() {
         return this;
+    }
+
+    protected static String createMessage(String prefix, String phase, Object identity) {
+        String phaseName = nonNullStringValue(phase, "unknown");
+        String identName = nonNullStringValue(identity, "unknown");
+        return prefix + phaseName + " " + identName;
+    }
+
+    private static String nonNullStringValue(Object o, String def) {
+        return o != null ? o.toString() : def;
     }
 }

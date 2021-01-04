@@ -38,14 +38,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public enum Profiler {
-    STRUCTURE_STARTS,
-    STRUCTURE_REFS,
-    BIOMES,
-    TERRAIN,
-    SURFACE,
-    CARVING,
-    DECORATION,
-    MOB_SPAWNS,
+    STRUCTURE_STARTS("structure starts"),
+    STRUCTURE_REFS("structure references"),
+    BIOMES("biomes"),
+    TERRAIN("base terrain"),
+    SURFACE("biome surfaces"),
+    CARVING("caves"),
+    DECORATION("features & structures"),
+    MOB_SPAWNS("mob spawns"),
     ;
 
     private final AtomicLong time = new AtomicLong();
@@ -53,6 +53,16 @@ public enum Profiler {
     private final AtomicLong longest = new AtomicLong();
     private final AtomicLong shortest = new AtomicLong(Long.MAX_VALUE);
     private final ThreadLocal<Section> section = ThreadLocal.withInitial(ProfilerSection::new);
+
+    private final String reportDescription;
+
+    Profiler(String reportDescription) {
+        this.reportDescription = reportDescription;
+    }
+
+    public String getReportDescription() {
+        return reportDescription;
+    }
 
     public Section punchIn() {
         return section.get().punchIn();

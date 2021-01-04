@@ -22,25 +22,33 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.chunk.profiler;
+package com.terraforged.mod.util.crash.watchdog;
 
-public class WarnTimer {
+import com.terraforged.mod.chunk.TFChunkGenerator;
+import net.minecraft.world.chunk.IChunk;
 
-    private final long warnTime;
+public class DeadlockException extends UncheckedException {
 
-    public WarnTimer(long warnTime) {
-        this.warnTime = warnTime;
+    private final IChunk chunk;
+    private final TFChunkGenerator generator;
+
+    protected DeadlockException(String phase, Object identity, IChunk chunk, TFChunkGenerator generator, Thread thread) {
+        super(DEADLOCK, phase, identity, thread::getStackTrace);
+        this.chunk = chunk;
+        this.generator = generator;
+        setStackTrace(thread.getStackTrace());
     }
 
-    public long now() {
-        return warnTime > 0 ? System.currentTimeMillis() : 0L;
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this;
     }
 
-    public long since(long timestamp) {
-        return warnTime > 0 ? System.currentTimeMillis() - timestamp : 0L;
+    public IChunk getChunk() {
+        return chunk;
     }
 
-    public boolean warn(long duration) {
-        return duration > warnTime;
+    public TFChunkGenerator getGenerator() {
+        return generator;
     }
 }

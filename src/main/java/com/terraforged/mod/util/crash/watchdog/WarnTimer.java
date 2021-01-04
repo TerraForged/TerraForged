@@ -22,34 +22,25 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.featuremanager.util.codec;
+package com.terraforged.mod.util.crash.watchdog;
 
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.Decoder;
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.DynamicOps;
+public class WarnTimer {
 
-public interface DecoderFunc<V> extends Decoder<V> {
+    private final long warnTime;
 
-    <T> V _decode(Dynamic<T> dynamic);
-
-    default <T> DataResult<Pair<V, T>> decode(DynamicOps<T> ops, T input) {
-        try {
-            V v = _decode(new Dynamic<>(ops, input));
-            return DataResult.success(Pair.of(v, input));
-        } catch (Throwable t) {
-            return DataResult.error(t.getMessage());
-        }
+    public WarnTimer(long warnTime) {
+        this.warnTime = warnTime;
     }
 
-    interface Simple<V> extends DecoderFunc<V> {
+    public long now() {
+        return warnTime > 0 ? System.currentTimeMillis() : 0L;
+    }
 
-        <T> V simpleDecode(T t, DynamicOps<T> ops);
+    public long since(long timestamp) {
+        return warnTime > 0 ? System.currentTimeMillis() - timestamp : 0L;
+    }
 
-        @Override
-        default <T> V _decode(Dynamic<T> dynamic) {
-            return simpleDecode(dynamic.getValue(), dynamic.getOps());
-        }
+    public boolean warn(long duration) {
+        return duration > warnTime;
     }
 }
