@@ -115,7 +115,7 @@ public class ConfigManager {
         set(
                 cfg,
                 "server_deadlock_timeout",
-                20_000,
+                25_000,
                 "The number of milliseconds after which the server will be considered 'deadlocked' (when it",
                 "gets stuck trying to generate a feature/structure). This is usually caused by third-party mods.",
                 "Set to -1 to disable deadlock detection & reporting."
