@@ -33,15 +33,10 @@ public class DeadlockException extends UncheckedException {
     private final TFChunkGenerator generator;
 
     protected DeadlockException(String phase, Object identity, IChunk chunk, TFChunkGenerator generator, Thread thread) {
-        super(DEADLOCK, phase, identity, thread::getStackTrace);
+        super(DEADLOCK, phase, identity, thread.getStackTrace());
         this.chunk = chunk;
         this.generator = generator;
         setStackTrace(thread.getStackTrace());
-    }
-
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-        return this;
     }
 
     public IChunk getChunk() {

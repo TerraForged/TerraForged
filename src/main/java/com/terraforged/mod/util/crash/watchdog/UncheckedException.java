@@ -24,20 +24,18 @@
 
 package com.terraforged.mod.util.crash.watchdog;
 
-import java.util.function.Supplier;
-
 public class UncheckedException extends RuntimeException {
 
     protected static final String UNCHECKED = "Critical error detected whilst generating ";
     protected static final String DEADLOCK = "Server deadlock detected whilst generating ";
 
-    public UncheckedException(String prefix, String phase, Object identity, Supplier<StackTraceElement[]> stacktrace) {
+    public UncheckedException(String prefix, String phase, Object identity, StackTraceElement[] stacktrace) {
         super(createMessage(prefix, phase, identity));
-        super.setStackTrace(stacktrace.get());
+        super.setStackTrace(stacktrace);
     }
 
     public UncheckedException(String phase, Object identity, Throwable cause) {
-        this(UNCHECKED, phase, identity, cause::getStackTrace);
+        super(createMessage(UNCHECKED, phase, identity), cause);
     }
 
     @Override
