@@ -36,6 +36,7 @@ import com.terraforged.mod.util.reflect.FieldAccessor;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.feature.structure.Structure;
 
@@ -83,6 +84,7 @@ public class CrashReportBuilder {
     }
 
     private static void addContext(TFBiomeProvider biomes, CrashReportCategory report) {
+        report.addDetail("Overworld Biomes", biomes.getBiomes().stream().map(Biome::getRegistryName).collect(Collectors.toList()));
 //        report.addDetail("Biome Map", biomes.getBiomeMap().toJson(biomes.getContext().gameContext));
     }
 
