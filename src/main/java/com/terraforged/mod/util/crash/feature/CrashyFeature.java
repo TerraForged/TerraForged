@@ -36,7 +36,6 @@ import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -55,10 +54,10 @@ public class CrashyFeature extends Feature<CrashyConfig> {
     public boolean generate(ISeedReader region, ChunkGenerator generator, Random rand, BlockPos pos, CrashyConfig config) {
         if (ThreadLocalRandom.current().nextInt(100) < CRASH_CHANCE_PERCENTAGE) {
             switch (config.crashType) {
-                case SERVER_DEADLOCK:
+                case DEADLOCK:
                     serverDeadlock(region, pos);
                     break;
-                case UNCHECKED_EXCEPTION:
+                case EXCEPTION:
                     uncheckedException();
                     break;
             }
@@ -96,7 +95,7 @@ public class CrashyFeature extends Feature<CrashyConfig> {
             Log.info("Adding crash-test");
             event.getManager().getAppenders().add(BiomeFeatureMatcher.ANY, FeatureAppender.tail(
                     GenerationStage.Decoration.VEGETAL_DECORATION,
-                    CrashyFeature.INSTANCE.withConfiguration(new CrashyConfig(CrashyConfig.CrashType.UNCHECKED_EXCEPTION))
+                    CrashyFeature.INSTANCE.withConfiguration(new CrashyConfig(CrashyConfig.CrashType.DEADLOCK))
             ));
         }
     }

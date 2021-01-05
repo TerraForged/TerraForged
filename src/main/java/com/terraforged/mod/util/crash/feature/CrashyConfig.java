@@ -42,8 +42,8 @@ public class CrashyConfig implements IFeatureConfig {
     }
 
     public enum CrashType {
-        UNCHECKED_EXCEPTION,
-        SERVER_DEADLOCK,
+        EXCEPTION,
+        DEADLOCK,
         ;
     }
 
@@ -56,7 +56,7 @@ public class CrashyConfig implements IFeatureConfig {
 
     private static <T> CrashyConfig decode(T t, DynamicOps<T> ops) {
         return new CrashyConfig(CrashType.valueOf(
-                ops.getStringValue(t).result().orElse(CrashType.UNCHECKED_EXCEPTION.name())
+                ops.getStringValue(t).result().orElse(CrashType.EXCEPTION.name())
         ));
     }
 }

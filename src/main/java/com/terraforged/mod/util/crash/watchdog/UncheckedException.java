@@ -26,16 +26,15 @@ package com.terraforged.mod.util.crash.watchdog;
 
 public class UncheckedException extends RuntimeException {
 
-    protected static final String UNCHECKED = "Critical error detected whilst generating ";
-    protected static final String DEADLOCK = "Server deadlock detected whilst generating ";
+    private static final String MESSAGE = "Critical error detected whilst generating %s %s";
 
-    public UncheckedException(String prefix, String phase, Object identity, StackTraceElement[] stacktrace) {
-        super(createMessage(prefix, phase, identity));
+    public UncheckedException(String message, StackTraceElement[] stacktrace) {
+        super(message);
         super.setStackTrace(stacktrace);
     }
 
     public UncheckedException(String phase, Object identity, Throwable cause) {
-        super(createMessage(UNCHECKED, phase, identity), cause);
+        super(createMessage(phase, identity), cause);
     }
 
     @Override
@@ -43,13 +42,13 @@ public class UncheckedException extends RuntimeException {
         return this;
     }
 
-    protected static String createMessage(String prefix, String phase, Object identity) {
+    private static String createMessage(String phase, Object identity) {
         String phaseName = nonNullStringValue(phase, "unknown");
         String identName = nonNullStringValue(identity, "unknown");
-        return prefix + phaseName + " " + identName;
+        return String.format(MESSAGE, phaseName, identName);
     }
 
-    private static String nonNullStringValue(Object o, String def) {
+    protected static String nonNullStringValue(Object o, String def) {
         return o != null ? o.toString() : def;
     }
 }

@@ -29,11 +29,13 @@ import net.minecraft.world.chunk.IChunk;
 
 public class DeadlockException extends UncheckedException {
 
+    private static final String MESSAGE = "Server deadlock detected! A single chunk took over %s to generate. Last visited %s %s";
+
     private final IChunk chunk;
     private final TFChunkGenerator generator;
 
-    protected DeadlockException(String phase, Object identity, IChunk chunk, TFChunkGenerator generator, Thread thread) {
-        super(DEADLOCK, phase, identity, thread.getStackTrace());
+    protected DeadlockException(String phase, Object identity, long timeMS, IChunk chunk, TFChunkGenerator generator, Thread thread) {
+        super(createMessage(phase, identity, timeMS), thread.getStackTrace());
         this.chunk = chunk;
         this.generator = generator;
         setStackTrace(thread.getStackTrace());
@@ -45,5 +47,12 @@ public class DeadlockException extends UncheckedException {
 
     public TFChunkGenerator getGenerator() {
         return generator;
+    }
+
+    private static String createMessage(String phase, Object identity, long timeMS) {
+        String phaseName = nonNullStringValue(phase, "unknown");
+        String identName = nonNullStringValue(identity, "unknown");
+        String time = timeMS > 1000L ? (timeMS / 1000L) + "s" : timeMS + "ms";
+        return String.format(MESSAGE, time, phaseName, identName);
     }
 }

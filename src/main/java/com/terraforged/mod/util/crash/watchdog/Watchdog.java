@@ -95,9 +95,9 @@ public class Watchdog implements Runnable {
 
     public static WatchdogContext punchIn(IChunk chunk, TFChunkGenerator generator, long duration) {
         if (duration > 0) {
-            long timeout = System.currentTimeMillis() + duration;
+            long now = System.currentTimeMillis();
             WatchdogCtx context = TASKS.get();
-            context.set(chunk, generator, timeout);
+            context.set(chunk, generator, now, duration);
             return context;
         }
         return WatchdogContext.NONE;

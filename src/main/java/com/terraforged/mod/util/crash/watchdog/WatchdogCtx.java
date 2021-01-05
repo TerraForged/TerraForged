@@ -41,6 +41,7 @@ class WatchdogCtx implements WatchdogContext {
     private volatile IChunk chunk = null;
     private volatile TFChunkGenerator generator = null;
 
+    private volatile long start = 0L;
     private volatile long timeout = 0L;
     private final AtomicReference<Thread> threadRef = new AtomicReference<>();
 
@@ -48,13 +49,14 @@ class WatchdogCtx implements WatchdogContext {
         CONTEXTS.add(this);
     }
 
-    protected boolean set(IChunk chunk, TFChunkGenerator generator, long timeout) {
+    protected boolean set(IChunk chunk, TFChunkGenerator generator, long now, long duration) {
         if (threadRef.compareAndSet(null, Thread.currentThread())) {
             this.phase = "";
             this.identifier = null;
             this.chunk = chunk;
             this.generator = generator;
-            this.timeout = timeout;
+            this.start = now;
+            this.timeout = now + duration;
             return true;
         }
         return false;
@@ -77,7 +79,8 @@ class WatchdogCtx implements WatchdogContext {
             Object identity = this.identifier;
             IChunk chunk = this.chunk;
             TFChunkGenerator generator = this.generator;
-            throw new DeadlockException(phase, identity, chunk, generator, thread);
+            long time = now - this.start;
+            throw new DeadlockException(phase, identity, time, chunk, generator, thread);
         } finally {
             close();
         }
