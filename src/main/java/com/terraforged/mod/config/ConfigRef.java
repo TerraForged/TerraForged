@@ -70,23 +70,27 @@ public class ConfigRef implements Supplier<CommentedFileConfig> {
     }
 
     public int getInt(String name, int def) {
-        return getValue(name, def);
+        return getNumber(name, def).intValue();
     }
 
     public long getLong(String name, long def) {
-        return getValue(name, def);
+        return getNumber(name, def).longValue();
     }
 
     public float getFloat(String name, float def) {
         // because nightconfig...
-        return (float) getDouble(name, def);
+        return getNumber(name, def).floatValue();
     }
 
     public double getDouble(String name, double def) {
-        return getValue(name, def);
+        return getNumber(name, def).doubleValue();
     }
 
     public boolean getBool(String name, boolean def) {
+        return getValue(name, def);
+    }
+
+    public <T extends Number> Number getNumber(String name, T def) {
         return getValue(name, def);
     }
 
