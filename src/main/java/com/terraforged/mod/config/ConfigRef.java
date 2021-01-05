@@ -25,20 +25,28 @@
 package com.terraforged.mod.config;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.terraforged.mod.TerraForgedMod;
 
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ConfigRef implements Supplier<CommentedFileConfig> {
 
+    private final String configVersion;
     private final StampedLock lock = new StampedLock();
-    private final Supplier<CommentedFileConfig> factory;
+    private final Function<String, CommentedFileConfig> factory;
 
     private CommentedFileConfig ref;
 
     public ConfigRef(Supplier<CommentedFileConfig> factory) {
+        this("", v -> factory.get());
+    }
+
+    public ConfigRef(String configVersion, Function<String, CommentedFileConfig> factory) {
         this.factory = factory;
+        this.configVersion = configVersion;
     }
 
     @Override
@@ -58,7 +66,7 @@ public class ConfigRef implements Supplier<CommentedFileConfig> {
             if (ref != null) {
                 return ref;
             }
-            return ref = factory.get();
+            return ref = factory.apply(configVersion);
         } finally {
             lock.unlockWrite(write);
         }

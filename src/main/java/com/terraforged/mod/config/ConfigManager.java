@@ -29,6 +29,7 @@ import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.terraforged.mod.Log;
+import com.terraforged.mod.TerraForgedMod;
 import joptsimple.internal.Strings;
 
 import java.io.IOException;
@@ -38,6 +39,9 @@ import java.nio.file.Paths;
 import java.util.function.Consumer;
 
 public class ConfigManager {
+
+    private static final String PERF_VERSION = "0.1";
+    private static final String GENERAL_VERSION = "0.1";
 
     private static final Path COMMON_DIR = Paths.get("config", "terraforged").toAbsolutePath();
 
@@ -49,7 +53,7 @@ public class ConfigManager {
             "This config will override the weights configured or provided by other mods for TerraForged worlds only."
     )));
 
-    public static final ConfigRef PERFORMANCE = new ConfigRef(() -> create("performance", cfg -> {
+    public static final ConfigRef PERFORMANCE = new ConfigRef(PERF_VERSION, version -> create("performance", version, cfg -> {
         set (
                 cfg,
                 "thread_count",
@@ -85,7 +89,7 @@ public class ConfigManager {
         );
     }));
 
-    public static final ConfigRef GENERAL = new ConfigRef(() -> create("general", cfg -> {
+    public static final ConfigRef GENERAL = new ConfigRef(GENERAL_VERSION, version -> create("general", version, cfg -> {
         set(
                 cfg,
                 "tooltips",
@@ -115,7 +119,7 @@ public class ConfigManager {
         set(
                 cfg,
                 "server_deadlock_timeout",
-                25_000,
+                30_000,
                 "The number of milliseconds after which the server will be considered 'deadlocked' (when it",
                 "gets stuck trying to generate a feature/structure). This is usually caused by third-party mods.",
                 "Set to -1 to disable deadlock detection & reporting."
@@ -131,7 +135,12 @@ public class ConfigManager {
     }
 
     private static CommentedFileConfig create(String name, Consumer<CommentedFileConfig> defaulter) {
+        return create(name, "", defaulter);
+    }
+
+    private static CommentedFileConfig create(String name, String version, Consumer<CommentedFileConfig> defaulter) {
         Path path = COMMON_DIR.resolve(name + ".conf");
+
         if (!Files.exists(path)) {
             Log.info("Creating default config: {}", name);
             try {
@@ -142,14 +151,34 @@ public class ConfigManager {
         }
 
         CommentedFileConfig config = CommentedFileConfig.of(path, TomlFormat.instance());
+        config.load();
+
+        update(config, version);
         defaulter.accept(config);
         config.save();
 
         return config;
     }
 
+    private static void update(CommentedFileConfig config, String version) {
+        if (version.isEmpty()) {
+            return;
+        }
+
+        String currentVersion = config.getOrElse("version", "unversioned");
+        if (currentVersion != null && currentVersion.equals(version)) {
+            return;
+        }
+
+        Log.info("Updating config: {} -> {}", currentVersion, version);
+        config.clear();
+        config.setComment("version", " The version of this config. Do not edit (it'll wipe your settings!)");
+        config.set("version", version);
+    }
+
     private static <T> void set(CommentedConfig config, String path, T value, String... lines) {
-        config.setComment(path, Strings.join(lines, "\n"));
+        config.setComment(path, " " + Strings.join(lines, "\n "));
+
         if (!config.contains(path)) {
             config.set(path, value);
         }
