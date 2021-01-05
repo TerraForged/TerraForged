@@ -29,6 +29,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag;
+import net.minecraft.tags.TagRegistry;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.ForgeTagHandler;
+import net.minecraftforge.common.Tags;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,8 +53,8 @@ public class WGTags {
         Log.info("Initializing tags");
     }
 
-    private static ITag.INamedTag<Block> tag(String name) {
-        return BlockTags.makeWrapperTag(name);
+    private static Tags.IOptionalNamedTag<Block> tag(String name) {
+        return BlockTags.createOptional(new ResourceLocation(name));
     }
 
     public static Predicate<BlockState> stone() {
