@@ -22,27 +22,24 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.mixin.client;
+package com.terraforged.mod.client.render;
 
-import com.terraforged.mod.client.render.TFDimensionRenderInfo;
+import com.terraforged.mod.config.ConfigManager;
 import net.minecraft.client.world.DimensionRenderInfo;
-import net.minecraft.world.DimensionType;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/**
- * Non-essential.
- * Modifies the client-side cloud height.
- */
-@Mixin(DimensionRenderInfo.class)
-public class MixinDimensionRenderInfo {
+public class TFDimensionRenderInfo extends DimensionRenderInfo.Overworld {
 
-    @Inject(method = "func_243495_a", at = @At("HEAD"), cancellable = true)
-    private static void getRenderType(DimensionType dimType, CallbackInfoReturnable<DimensionRenderInfo> cir) {
-        if (dimType.getEffects().equals(DimensionType.OVERWORLD_ID)) {
-            cir.setReturnValue(TFDimensionRenderInfo.INSTANCE.init());
-        }
+    public static final TFDimensionRenderInfo INSTANCE = new TFDimensionRenderInfo();
+
+    private float cloudHeight = 128F;
+
+    public TFDimensionRenderInfo init() {
+        cloudHeight = ConfigManager.GENERAL.getFloat("cloud_height", 220F);
+        return this;
+    }
+
+    @Override
+    public float func_239213_a_() {
+        return cloudHeight;
     }
 }
