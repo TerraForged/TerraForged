@@ -29,7 +29,7 @@ import net.minecraft.world.chunk.IChunk;
 
 public class DeadlockException extends UncheckedException {
 
-    private static final String MESSAGE = "Server deadlock detected! A single chunk took over %s to generate. Last visited %s %s";
+    private static final String MESSAGE = "Server deadlock detected! A single chunk took over %s to generate. Last visited: %s %s";
 
     private final IChunk chunk;
     private final TFChunkGenerator generator;

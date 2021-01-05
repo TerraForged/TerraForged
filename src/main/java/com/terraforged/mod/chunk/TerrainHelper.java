@@ -46,7 +46,7 @@ import java.util.Set;
 
 public class TerrainHelper {
 
-    private static final List<Structure<?>> ILLAGER_STRUCTURES = Structure.field_236384_t_;
+    private static final Structure<?>[] EMPTY_ARRAY = new Structure[0];
 
     private static final Set<IStructurePieceType> SURFACE_STRUCTURES = ImmutableSet.of(
             IStructurePieceType.field_242786_ad, // village
@@ -61,6 +61,7 @@ public class TerrainHelper {
     private final float radiusScale;
     private final float overhang;
     private final float overhang2;
+    private final Structure<?>[] structures = getVillageStructures().toArray(EMPTY_ARRAY);
 
     // base - the size of the base built up around a piece as a percentage of its bounding box size
     // overhang - the amount of overhead overhang to be cut out
@@ -78,7 +79,7 @@ public class TerrainHelper {
 
     private void collectPieces(IWorld world, IChunk chunk, ObjectList<StructurePiece> pieces) {
         ChunkPos pos = chunk.getPos();
-        for (Structure<?> structure : ILLAGER_STRUCTURES) {
+        for (Structure<?> structure : structures) {
             LongSet set = chunk.getStructureReferences().get(structure);
             if (set == null) {
                 continue;
@@ -241,5 +242,9 @@ public class TerrainHelper {
             return 1F;
         }
         return d2 / radius2;
+    }
+
+    private static List<Structure<?>> getVillageStructures() {
+        return Structure.field_236384_t_;
     }
 }
