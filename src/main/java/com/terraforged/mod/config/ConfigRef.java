@@ -78,7 +78,6 @@ public class ConfigRef implements Supplier<CommentedFileConfig> {
     }
 
     public float getFloat(String name, float def) {
-        // because nightconfig...
         return getNumber(name, def).floatValue();
     }
 
