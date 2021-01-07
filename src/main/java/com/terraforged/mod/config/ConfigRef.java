@@ -25,7 +25,6 @@
 package com.terraforged.mod.config;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.terraforged.mod.TerraForgedMod;
 
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.BiConsumer;
@@ -70,6 +69,11 @@ public class ConfigRef implements Supplier<CommentedFileConfig> {
         } finally {
             lock.unlockWrite(write);
         }
+    }
+
+    public ConfigRef load() {
+        get();
+        return this;
     }
 
     public ConfigRef save() {

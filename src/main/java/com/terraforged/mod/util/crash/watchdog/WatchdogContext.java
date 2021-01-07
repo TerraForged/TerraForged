@@ -25,7 +25,6 @@
 package com.terraforged.mod.util.crash.watchdog;
 
 import com.terraforged.engine.concurrent.cache.SafeCloseable;
-import com.terraforged.mod.featuremanager.util.identity.Identifier;
 
 public interface WatchdogContext extends SafeCloseable {
 
@@ -36,12 +35,12 @@ public interface WatchdogContext extends SafeCloseable {
         }
 
         @Override
-        public void pushIdentifier(String identifier) {
+        public void pushIdentifier(Object identifier) {
 
         }
 
         @Override
-        public void pushIdentifier(Identifier identifier) {
+        public void pushTime(String type, Object o, long time) {
 
         }
 
@@ -53,7 +52,7 @@ public interface WatchdogContext extends SafeCloseable {
 
     void pushPhase(String phase);
 
-    void pushIdentifier(String identifier);
+    void pushIdentifier(Object identifier);
 
-    void pushIdentifier(Identifier identifier);
+    void pushTime(String type, Object o, long time);
 }

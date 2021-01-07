@@ -49,7 +49,7 @@ public class TerraContext extends GeneratorContext {
     public final long worldSeed;
     public final LazySupplier<Heightmap> heightmap;
     public final TerraSettings terraSettings;
-    public final LazySupplier<Materials> materials = LazySupplier.of(Materials::create);
+    public final LazySupplier<Materials> materials = LazySupplier.factory(this, Materials::create);
 
     public final TFBiomeContext biomeContext;
 

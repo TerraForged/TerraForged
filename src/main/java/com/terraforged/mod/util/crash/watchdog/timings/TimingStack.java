@@ -22,24 +22,22 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.client.render;
+package com.terraforged.mod.util.crash.watchdog.timings;
 
-import com.terraforged.mod.config.ConfigManager;
-import net.minecraft.client.world.DimensionRenderInfo;
+public interface TimingStack {
 
-public class TFDimensionRenderInfo extends DimensionRenderInfo.Overworld {
+    TimingStack copy();
 
-    public static final TFDimensionRenderInfo INSTANCE = new TFDimensionRenderInfo();
+    TimingStack reset();
 
-    private float cloudHeight = 128F;
+    int getSize();
 
-    public TFDimensionRenderInfo init() {
-        cloudHeight = ConfigManager.GENERAL.getFloat("cloud_height", 220F);
-        return this;
-    }
+    void push(String type, Object identifier, long time);
 
-    @Override
-    public float func_239213_a_() {
-        return cloudHeight;
+    <T> void iterate(T ctx, Visitor<T> visitor);
+
+    interface Visitor<T> {
+
+        void visit(String type, Object identity, long time, T ctx);
     }
 }

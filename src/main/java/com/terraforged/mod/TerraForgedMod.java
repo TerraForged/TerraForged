@@ -26,7 +26,6 @@ package com.terraforged.mod;
 
 import com.terraforged.engine.Engine;
 import com.terraforged.mod.api.material.WGTags;
-import com.terraforged.mod.api.registry.Registries;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.config.ConfigManager;
@@ -60,7 +59,6 @@ public class TerraForgedMod {
 
         Engine.init();
         WGTags.init();
-        Registries.init();
 
         Registry.register(Registry.BIOME_PROVIDER_CODEC, "terraforged:climate", TFBiomeProvider.CODEC);
         Registry.register(Registry.CHUNK_GENERATOR_CODEC, "terraforged:generator", TFChunkGenerator.CODEC);

@@ -25,88 +25,151 @@
 package com.terraforged.mod.util.crash.watchdog;
 
 import com.terraforged.mod.chunk.TFChunkGenerator;
-import com.terraforged.mod.featuremanager.util.identity.Identifier;
+import com.terraforged.mod.util.crash.watchdog.timings.TimingStack;
+import com.terraforged.mod.util.crash.watchdog.timings.Top3TimingStack;
 import net.minecraft.world.chunk.IChunk;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.StampedLock;
 
 class WatchdogCtx implements WatchdogContext {
 
     protected static final List<WatchdogCtx> CONTEXTS = new CopyOnWriteArrayList<>();
 
-    private volatile String phase = "";
-    private volatile Object identifier = null;
-    private volatile IChunk chunk = null;
-    private volatile TFChunkGenerator generator = null;
+    private String phase = "";
+    private IChunk chunk = null;
+    private Object identifier = null;
+    private TFChunkGenerator generator = null;
 
-    private volatile long start = 0L;
-    private volatile long timeout = 0L;
-    private final AtomicReference<Thread> threadRef = new AtomicReference<>();
+    private long start = 0L;
+    private long timeout = 0L;
+    private Thread thread = null;
+    private final StampedLock lock = new StampedLock();
+    private final TimingStack stack = new Top3TimingStack();
 
     protected WatchdogCtx() {
         CONTEXTS.add(this);
     }
 
-    protected boolean set(IChunk chunk, TFChunkGenerator generator, long now, long duration) {
-        if (threadRef.compareAndSet(null, Thread.currentThread())) {
-            this.phase = "";
-            this.identifier = null;
-            this.chunk = chunk;
-            this.generator = generator;
-            this.start = now;
-            this.timeout = now + duration;
-            return true;
-        }
-        return false;
-    }
-
-    protected void check(long now) throws DeadlockException {
-        Thread thread = threadRef.getAndSet(null);
-        if (thread == null) {
-            return;
-        }
-
-        long timeout = this.timeout;
-        if (timeout == 0L || now < timeout) {
-            threadRef.compareAndSet(null, thread);
-            return;
-        }
-
-        try {
-            String phase = this.phase;
-            Object identity = this.identifier;
-            IChunk chunk = this.chunk;
-            TFChunkGenerator generator = this.generator;
-            long time = now - this.start;
-            throw new DeadlockException(phase, identity, time, chunk, generator, thread);
-        } finally {
-            close();
-        }
-    }
-
     @Override
     public void pushPhase(String phase) {
-        this.phase = phase;
+        long stamp = lock.writeLock();
+        try {
+            this.phase = phase;
+        } finally {
+            lock.unlockWrite(stamp);
+        }
     }
 
     @Override
-    public void pushIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void pushIdentifier(Object identifier) {
+        long stamp = lock.writeLock();
+        try {
+            this.identifier = identifier;
+        } finally {
+            lock.unlockWrite(stamp);
+        }
     }
 
     @Override
-    public void pushIdentifier(Identifier identifier) {
-        this.identifier = identifier;
+    public void pushTime(String type, Object o, long time) {
+        this.stack.push(type, o, time);
     }
 
     @Override
     public void close() {
-        threadRef.set(null);
-        phase = "";
-        identifier = null;
-        chunk = null;
-        generator = null;
+        long read = lock.tryOptimisticRead();
+        boolean closed = thread == null;
+        if (lock.validate(read) && closed) {
+            return;
+        }
+
+        long stamp = lock.writeLock();
+        try {
+            phase = "";
+            start = 0L;
+            timeout = 0L;
+            chunk = null;
+            thread = null;
+            generator = null;
+            identifier = null;
+        } finally {
+            lock.unlockWrite(stamp);
+        }
+    }
+
+    boolean set(IChunk chunk, TFChunkGenerator generator, long duration) {
+        long stamp = lock.writeLock();
+        try {
+            if (thread != null) {
+                return false;
+            }
+            long now = System.currentTimeMillis();
+            this.phase = "Start";
+            this.start = now;
+            this.chunk = chunk;
+            this.identifier = null;
+            this.generator = generator;
+            this.timeout = now + duration;
+            this.thread = Thread.currentThread();
+            this.stack.reset();
+            return true;
+        } finally {
+            lock.unlockWrite(stamp);
+        }
+    }
+
+    void check(long now) throws DeadlockException {
+        if (optimisticCheck(now)) {
+            return;
+        }
+        // fall back to a full read lock if optimistic failed
+        lockedCheck(now);
+    }
+
+    /**
+     * Attempts to optimistically perform a deadlock check.
+     * This has slightly less overhead than simply acquiring the read lock.
+     *
+     * Returns false if data was invalidated after read
+     * Returns true if data was validated after read & no deadlock detected
+     * Throws a DeadlockException if the data was valid & a deadlock was detected
+     */
+    private boolean optimisticCheck(long now) throws DeadlockException {
+        long stamp = lock.tryOptimisticRead();
+        DeadlockException deadlock = getDeadlock(now);
+        if (lock.validate(stamp)) {
+            if (deadlock == null) {
+                return true;
+            }
+            throw deadlock;
+        }
+        return false;
+    }
+
+    private void lockedCheck(long now) throws DeadlockException {
+        long stamp = lock.readLock();
+        try {
+            DeadlockException deadlock = getDeadlock(now);
+            if (deadlock == null) {
+                return;
+            }
+            throw deadlock;
+        } finally {
+            lock.unlockRead(stamp);
+        }
+    }
+
+    private DeadlockException getDeadlock(long now) {
+        if (thread == null) {
+            return null;
+        }
+
+        if (timeout == 0L || now <= timeout) {
+            return null;
+        }
+
+        return new DeadlockException(phase, identifier, now - start, stack.copy(), chunk, generator, thread);
     }
 }

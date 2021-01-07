@@ -59,16 +59,20 @@ public class DimUtils {
 
     private static final ThreadLocalResource<Map<ForgeWorldType, SimpleRegistry<Dimension>>> CACHE = ThreadLocalResource.withInitial(HashMap::new, Map::clear);
 
+    public static RegistryKey<DimensionType> getOverworldType() {
+        return DimensionType.OVERWORLD;
+    }
+
     public static SimpleRegistry<Dimension> createDimensionRegistry(long seed, DynamicRegistries registries, ChunkGenerator generator) {
         SimpleRegistry<Dimension> registry = new SimpleRegistry<>(Registry.DIMENSION_KEY, Lifecycle.stable());
-        registry.register(Dimension.OVERWORLD, createDimension(DimensionType.OVERWORLD, registries, generator), Lifecycle.stable());
+        registry.register(Dimension.OVERWORLD, createDimension(getOverworldType(), registries, generator), Lifecycle.stable());
         registry.register(Dimension.THE_NETHER, createDefaultNether(seed, registries), Lifecycle.stable());
         registry.register(Dimension.THE_END, createDefaultEnd(seed, registries), Lifecycle.stable());
         return registry;
     }
 
     public static SimpleRegistry<Dimension> updateDimensionRegistry(SimpleRegistry<Dimension> registry, DynamicRegistries registries, ChunkGenerator generator) {
-        Dimension dimension = createDimension(DimensionType.OVERWORLD, registries, generator);
+        Dimension dimension = createDimension(getOverworldType(), registries, generator);
         registry.validateAndRegister(OptionalInt.empty(), Dimension.OVERWORLD, dimension, Lifecycle.stable());
         return registry;
     }

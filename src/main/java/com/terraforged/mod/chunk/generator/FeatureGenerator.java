@@ -149,7 +149,7 @@ public class FeatureGenerator implements Generator.Features {
                                 chunkBounds,
                                 chunkPos
                         ));
-                        checkTime(STRUCTURE, structure.getStructureName(), timer, timeStamp);
+                        checkTime(STRUCTURE, structure.getStructureName(), timer, timeStamp, context);
                     } catch (Throwable t) {
                         throw new UncheckedException(STRUCTURE, structure.getStructureName(), t);
                     }
@@ -171,7 +171,7 @@ public class FeatureGenerator implements Generator.Features {
                         long timeStamp = timer.now();
                         context.pushIdentifier(feature.getIdentity());
                         feature.getFeature().generate(region, generator, random, pos);
-                        checkTime(FEATURE, feature.getIdentity(), timer, timeStamp);
+                        checkTime(FEATURE, feature.getIdentity(), timer, timeStamp, context);
                     } catch (Throwable t) {
                         throw new UncheckedException(FEATURE, feature.getIdentity(), t);
                     }
@@ -194,17 +194,19 @@ public class FeatureGenerator implements Generator.Features {
         });
     }
 
-    private static void checkTime(String type, String identity, WarnTimer timer, long timestamp) {
+    private static void checkTime(String type, String identity, WarnTimer timer, long timestamp, WatchdogContext context) {
         long duration = timer.since(timestamp);
+        context.pushTime(type, identity, duration);
         if (timer.warn(duration)) {
             Log.warn("{} was slow to generate! ({}ms): {}", type, duration, identity);
         }
     }
 
-    private void checkTime(String type, Identifier identifier, WarnTimer timer, long timestamp) {
+    private void checkTime(String type, Identifier identity, WarnTimer timer, long timestamp, WatchdogContext context) {
         long duration = timer.since(timestamp);
+        context.pushTime(type, identity, duration);
         if (timer.warn(duration)) {
-            Log.warn("{} was slow to generate! ({}ms): {}", type, duration, identifier.getComponents());
+            Log.warn("{} was slow to generate! ({}ms): {}", type, duration, identity.getComponents());
         }
     }
 }

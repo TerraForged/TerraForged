@@ -29,8 +29,6 @@ import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.terraforged.mod.Log;
-import com.terraforged.mod.TerraForgedMod;
-import joptsimple.internal.Strings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,7 +39,7 @@ import java.util.function.Consumer;
 public class ConfigManager {
 
     private static final String PERF_VERSION = "0.1";
-    private static final String GENERAL_VERSION = "0.1";
+    private static final String GENERAL_VERSION = "0.2";
 
     private static final Path COMMON_DIR = Paths.get("config", "terraforged").toAbsolutePath();
 
@@ -104,12 +102,6 @@ public class ConfigManager {
         );
         set(
                 cfg,
-                "cloud_height",
-                220F,
-                "Set the height of clouds. Set to -1 to disable."
-        );
-        set(
-                cfg,
                 "feature_warn_time",
                 50,
                 "The number of milliseconds a single feature/structure can generate for before a warning",
@@ -119,7 +111,7 @@ public class ConfigManager {
         set(
                 cfg,
                 "server_deadlock_timeout",
-                30_000,
+                45_000,
                 "The number of milliseconds after which the server will be considered 'deadlocked' (when it",
                 "gets stuck trying to generate a feature/structure). This is usually caused by third-party mods.",
                 "Set to -1 to disable deadlock detection & reporting."
@@ -177,7 +169,7 @@ public class ConfigManager {
     }
 
     private static <T> void set(CommentedConfig config, String path, T value, String... lines) {
-        config.setComment(path, " " + Strings.join(lines, "\n "));
+        config.setComment(path, " " + String.join( "\n ", lines));
 
         if (!config.contains(path)) {
             config.set(path, value);

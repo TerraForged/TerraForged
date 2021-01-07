@@ -35,12 +35,15 @@ public class Miscellaneous {
     @Comment("Modifies layer block levels (ie snow) to fit the terrain")
     public boolean smoothLayerDecorator = true;
 
-    @Comment("Generates strata (rock layers) instead of just stone")
-    public boolean strataDecorator = true;
-
     @Range(min = 50, max = 1000)
     @Comment("Controls the size of strata regions")
     public int strataRegionSize = 600;
+
+    @Comment("Generates strata (rock layers) instead of just stone")
+    public boolean strataDecorator = true;
+
+    @Comment("Only use stone types that ores can generate in")
+    public boolean oreCompatibleStoneOnly = true;
 
     @Comment("Replace surface materials where erosion has occurred")
     public boolean erosionDecorator = true;

@@ -4,9 +4,6 @@
   "compatibilityLevel": "JAVA_8",
   "package": "com.terraforged.mod.mixin",
   "refmap": "mixin.terraforged.refmap.json",
-  "client": [
-    "client.MixinDimensionRenderInfo"
-  ],
   "mixins": [
     "common.MixinDimensionGeneratorSettings",
     "common.MixinMinecraftServer",

@@ -52,10 +52,10 @@ public class PerfDefaults {
         CommentedConfig config = ConfigManager.PERFORMANCE.get();
         boolean defaults = isUsingDefaultPerfSettings(config);
         Log.info("Performance Settings [default={}]", defaults);
-        Log.info(" - Thread Count: {}", config.getInt("thread_count"));
-        Log.info(" - Tile Size: {}", config.getInt("tile_size"));
-        Log.info(" - Batching: {}", config.getOrElse("batching", BATCHING));
-        Log.info(" - Batch Count: {}", config.getInt("batch_count"));
+        Log.info(" - Thread Count: {} (default: {})", config.getInt("thread_count"), THREAD_COUNT);
+        Log.info(" - Tile Size: {} (default: {})", config.getInt("tile_size"), TILE_SIZE);
+        Log.info(" - Batching: {} (default: {})", config.getOrElse("batching", BATCHING), BATCHING);
+        Log.info(" - Batch Count: {} (default: {})", config.getInt("batch_count"), BATCH_COUNT);
         return config;
     }
 }
