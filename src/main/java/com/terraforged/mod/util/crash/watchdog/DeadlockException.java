@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DeadlockException extends UncheckedException {
 
-    private static final String MESSAGE = "Server deadlock detected! A single chunk is taking over %s to generate.\n\t\t\tCrashed whilst generating: %s %s";
+    private static final String MESSAGE = "Server deadlock detected! A single chunk has taken over %s to generate. Crashed whilst generating: %s %s";
 
     private final IChunk chunk;
     private final TFChunkGenerator generator;
