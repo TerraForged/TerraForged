@@ -35,10 +35,10 @@ import com.terraforged.mod.featuremanager.biome.BiomeFeature;
 import com.terraforged.mod.featuremanager.biome.BiomeFeatures;
 import com.terraforged.mod.featuremanager.util.identity.Identifier;
 import com.terraforged.mod.util.Environment;
-import com.terraforged.mod.util.crash.watchdog.UncheckedException;
-import com.terraforged.mod.util.crash.watchdog.WarnTimer;
-import com.terraforged.mod.util.crash.watchdog.Watchdog;
-import com.terraforged.mod.util.crash.watchdog.WatchdogContext;
+import com.terraforged.mod.profiler.watchdog.UncheckedException;
+import com.terraforged.mod.profiler.watchdog.WarnTimer;
+import com.terraforged.mod.profiler.watchdog.Watchdog;
+import com.terraforged.mod.profiler.watchdog.WatchdogContext;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -89,7 +89,7 @@ public class FeatureGenerator implements Generator.Features {
             BlockPos pos = new BlockPos(context.blockX, 0, context.blockZ);
 
             // place biome features
-            checkedDecorate(manager, regionFix, chunk, biome, pos);
+            decorate(manager, regionFix, chunk, biome, pos);
 
             // run post processes on chunk
             postProcess(reader, container, context);
@@ -105,7 +105,7 @@ public class FeatureGenerator implements Generator.Features {
         }
     }
 
-    private void checkedDecorate(StructureManager manager, ISeedReader region, IChunk chunk, Biome biome, BlockPos pos) {
+    private void decorate(StructureManager manager, ISeedReader region, IChunk chunk, Biome biome, BlockPos pos) {
         try (WatchdogContext context = Watchdog.punchIn(chunk, generator, hangTime)) {
             decorate(manager, region, chunk, biome, pos, context);
         }
@@ -196,16 +196,16 @@ public class FeatureGenerator implements Generator.Features {
 
     private static void checkTime(String type, String identity, WarnTimer timer, long timestamp, WatchdogContext context) {
         long duration = timer.since(timestamp);
-        context.pushTime(type, identity, duration);
         if (timer.warn(duration)) {
+            context.pushTime(type, identity, duration);
             Log.warn("{} was slow to generate! ({}ms): {}", type, duration, identity);
         }
     }
 
     private void checkTime(String type, Identifier identity, WarnTimer timer, long timestamp, WatchdogContext context) {
         long duration = timer.since(timestamp);
-        context.pushTime(type, identity, duration);
         if (timer.warn(duration)) {
+            context.pushTime(type, identity, duration);
             Log.warn("{} was slow to generate! ({}ms): {}", type, duration, identity.getComponents());
         }
     }

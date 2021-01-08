@@ -22,12 +22,37 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.chunk.profiler;
+package com.terraforged.mod.profiler.watchdog;
 
-public interface Section extends AutoCloseable {
+import com.terraforged.engine.concurrent.cache.SafeCloseable;
 
-    Section punchIn();
+public interface WatchdogContext extends SafeCloseable {
 
-    @Override
-    void close();
+    WatchdogContext NONE = new WatchdogContext() {
+        @Override
+        public void pushPhase(String phase) {
+
+        }
+
+        @Override
+        public void pushIdentifier(Object identifier, long time) {
+
+        }
+
+        @Override
+        public void pushTime(String type, Object o, long time) {
+
+        }
+
+        @Override
+        public void close() {
+
+        }
+    };
+
+    void pushPhase(String phase);
+
+    void pushIdentifier(Object identifier, long time);
+
+    void pushTime(String type, Object o, long time);
 }

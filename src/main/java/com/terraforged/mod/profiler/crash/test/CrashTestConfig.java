@@ -22,33 +22,42 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash.watchdog;
+package com.terraforged.mod.profiler.crash.test;
 
-public class UncheckedException extends RuntimeException {
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DynamicOps;
+import com.terraforged.mod.featuremanager.util.codec.Codecs;
+import net.minecraft.world.gen.feature.IFeatureConfig;
 
-    private static final String MESSAGE = "Critical error detected whilst generating %s %s";
+import java.util.Collections;
 
-    public UncheckedException(String message, StackTraceElement[] stacktrace) {
-        super(message);
-        super.setStackTrace(stacktrace);
+public class CrashTestConfig implements IFeatureConfig {
+
+    public static final Codec<CrashTestConfig> CODEC = Codecs.create(CrashTestConfig::encode, CrashTestConfig::decode);
+
+    public final CrashType crashType;
+
+    public CrashTestConfig(CrashType crashType) {
+        this.crashType = crashType;
     }
 
-    public UncheckedException(String phase, Object identity, Throwable cause) {
-        super(createMessage(phase, identity), cause);
+    public enum CrashType {
+        EXCEPTION,
+        DEADLOCK,
+        SLOW,
+        ;
     }
 
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-        return this;
+    private static <T> T encode(CrashTestConfig config, DynamicOps<T> ops) {
+        return ops.createMap(Collections.singletonMap(
+                ops.createString("type"),
+                ops.createString(config.crashType.name())
+        ));
     }
 
-    private static String createMessage(String phase, Object identity) {
-        String phaseName = nonNullStringValue(phase, "unknown");
-        String identName = nonNullStringValue(identity, "unknown");
-        return String.format(MESSAGE, phaseName, identName);
-    }
-
-    protected static String nonNullStringValue(Object o, String def) {
-        return o != null ? o.toString() : def;
+    private static <T> CrashTestConfig decode(T t, DynamicOps<T> ops) {
+        return new CrashTestConfig(CrashType.valueOf(
+                ops.getStringValue(t).result().orElse(CrashType.EXCEPTION.name())
+        ));
     }
 }

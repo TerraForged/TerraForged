@@ -22,25 +22,26 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash;
+package com.terraforged.mod.profiler.crash;
 
 import com.terraforged.mod.chunk.TFChunkGenerator;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.ReportedException;
 import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.WorldGenRegion;
 
-import java.util.concurrent.locks.StampedLock;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class ServerCrashHandler implements CrashHandler {
+public interface CrashHandler {
 
-    private final StampedLock lock = new StampedLock();
+    AtomicReference<CrashHandler> INSTANCE = new AtomicReference<>(new ServerCrashHandler());
 
-    @Override
-    public void crash(IChunk chunk, TFChunkGenerator generator, Throwable t) {
-        // lock without release to prevent spamming
-        lock.writeLock();
+    void crash(IChunk chunk, TFChunkGenerator generator, Throwable t);
 
-        CrashReport report = CrashReportBuilder.buildCrashReport(chunk, generator, t);
-        throw new ReportedException(report);
+    static void handle(IChunk chunk, TFChunkGenerator generator, Throwable t) {
+        INSTANCE.get().crash(chunk, generator, t);
+    }
+
+    static void handle(WorldGenRegion region, TFChunkGenerator generator, Throwable t) {
+        IChunk chunk = region.getChunk(region.getMainChunkX(), region.getMainChunkZ());
+        INSTANCE.get().crash(chunk, generator, t);
     }
 }

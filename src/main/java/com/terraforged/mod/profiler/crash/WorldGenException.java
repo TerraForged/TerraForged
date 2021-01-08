@@ -22,26 +22,18 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash;
+package com.terraforged.mod.profiler.crash;
 
-import com.terraforged.mod.chunk.TFChunkGenerator;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.WorldGenRegion;
+import com.terraforged.mod.profiler.Profiler;
 
-import java.util.concurrent.atomic.AtomicReference;
+public class WorldGenException extends RuntimeException {
 
-public interface CrashHandler {
-
-    AtomicReference<CrashHandler> INSTANCE = new AtomicReference<>(new ServerCrashHandler());
-
-    void crash(IChunk chunk, TFChunkGenerator generator, Throwable t);
-
-    static void handle(IChunk chunk, TFChunkGenerator generator, Throwable t) {
-        INSTANCE.get().crash(chunk, generator, t);
+    public WorldGenException(Profiler section, Throwable cause) {
+        super("generating " + section.getReportDescription() + " (TerraForged World-Gen)", cause);
     }
 
-    static void handle(WorldGenRegion region, TFChunkGenerator generator, Throwable t) {
-        IChunk chunk = region.getChunk(region.getMainChunkX(), region.getMainChunkZ());
-        INSTANCE.get().crash(chunk, generator, t);
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this;
     }
 }

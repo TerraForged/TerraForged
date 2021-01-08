@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash.feature;
+package com.terraforged.mod.profiler.crash.test;
 
 import com.terraforged.mod.Log;
 import com.terraforged.mod.TerraForgedMod;
@@ -40,18 +40,18 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class CrashyFeature extends Feature<CrashyConfig> {
+public class CrashTestFeature extends Feature<CrashTestConfig> {
 
-    public static final CrashyFeature INSTANCE = new CrashyFeature();
+    public static final CrashTestFeature INSTANCE = new CrashTestFeature();
     private static final int CRASH_CHANCE_PERCENTAGE = 2;
 
-    private CrashyFeature() {
-        super(CrashyConfig.CODEC);
+    private CrashTestFeature() {
+        super(CrashTestConfig.CODEC);
         setRegistryName(TerraForgedMod.MODID, "crashy_mccrashface");
     }
 
     @Override
-    public boolean generate(ISeedReader region, ChunkGenerator generator, Random rand, BlockPos pos, CrashyConfig config) {
+    public boolean generate(ISeedReader region, ChunkGenerator generator, Random rand, BlockPos pos, CrashTestConfig config) {
         if (ThreadLocalRandom.current().nextInt(100) < CRASH_CHANCE_PERCENTAGE) {
             switch (config.crashType) {
                 case DEADLOCK:
@@ -95,7 +95,7 @@ public class CrashyFeature extends Feature<CrashyConfig> {
         @SubscribeEvent
         public static void registerFeatures(RegistryEvent.Register<Feature<?>> event) {
             Log.info("Registering crash-test feature");
-            event.getRegistry().register(CrashyFeature.INSTANCE);
+            event.getRegistry().register(CrashTestFeature.INSTANCE);
         }
     }
 
@@ -106,12 +106,12 @@ public class CrashyFeature extends Feature<CrashyConfig> {
             Log.info("Adding crash-test");
             event.getManager().getAppenders().add(BiomeFeatureMatcher.ANY, FeatureAppender.head(
                     GenerationStage.Decoration.VEGETAL_DECORATION,
-                    CrashyFeature.INSTANCE.withConfiguration(new CrashyConfig(CrashyConfig.CrashType.SLOW))
+                    CrashTestFeature.INSTANCE.withConfiguration(new CrashTestConfig(CrashTestConfig.CrashType.SLOW))
             ));
 
             event.getManager().getAppenders().add(BiomeFeatureMatcher.ANY, FeatureAppender.tail(
                     GenerationStage.Decoration.VEGETAL_DECORATION,
-                    CrashyFeature.INSTANCE.withConfiguration(new CrashyConfig(CrashyConfig.CrashType.DEADLOCK))
+                    CrashTestFeature.INSTANCE.withConfiguration(new CrashTestConfig(CrashTestConfig.CrashType.DEADLOCK))
             ));
         }
     }

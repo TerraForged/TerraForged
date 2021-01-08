@@ -22,18 +22,25 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash;
+package com.terraforged.mod.profiler.watchdog;
 
-import com.terraforged.mod.chunk.profiler.Profiler;
+public class WarnTimer {
 
-public class WorldGenException extends RuntimeException {
+    private final long warnTime;
 
-    public WorldGenException(Profiler section, Throwable cause) {
-        super("generating " + section.getReportDescription() + " (TerraForged World-Gen)", cause);
+    public WarnTimer(long warnTime) {
+        this.warnTime = warnTime;
     }
 
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-        return this;
+    public long now() {
+        return warnTime > 0 ? System.currentTimeMillis() : 0L;
+    }
+
+    public long since(long timestamp) {
+        return warnTime > 0 ? System.currentTimeMillis() - timestamp : 0L;
+    }
+
+    public boolean warn(long duration) {
+        return duration > warnTime;
     }
 }

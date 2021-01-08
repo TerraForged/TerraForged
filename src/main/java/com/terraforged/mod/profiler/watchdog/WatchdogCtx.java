@@ -22,11 +22,11 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash.watchdog;
+package com.terraforged.mod.profiler.watchdog;
 
 import com.terraforged.mod.chunk.TFChunkGenerator;
-import com.terraforged.mod.util.crash.watchdog.timings.TimingStack;
-import com.terraforged.mod.util.crash.watchdog.timings.Top3TimingStack;
+import com.terraforged.mod.profiler.timings.TimingStack;
+import com.terraforged.mod.profiler.timings.Top3TimingStack;
 import net.minecraft.world.chunk.IChunk;
 
 import java.util.List;

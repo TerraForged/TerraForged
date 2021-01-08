@@ -25,7 +25,7 @@
 package com.terraforged.mod.server;
 
 import com.terraforged.mod.Log;
-import com.terraforged.mod.chunk.profiler.Profiler;
+import com.terraforged.mod.profiler.Profiler;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.featuremanager.data.FolderDataPackFinder;
 import net.minecraft.resources.ResourcePackList;

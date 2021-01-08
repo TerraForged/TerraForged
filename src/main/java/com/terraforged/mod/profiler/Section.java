@@ -22,22 +22,12 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash.watchdog.timings;
+package com.terraforged.mod.profiler;
 
-public interface TimingStack {
+public interface Section extends AutoCloseable {
 
-    TimingStack copy();
+    Section punchIn();
 
-    TimingStack reset();
-
-    int getSize();
-
-    void push(String type, Object identifier, long time);
-
-    <T> void iterate(T ctx, Visitor<T> visitor);
-
-    interface Visitor<T> {
-
-        void visit(String type, Object identity, long time, T ctx);
-    }
+    @Override
+    void close();
 }

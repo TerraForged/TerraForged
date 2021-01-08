@@ -22,37 +22,25 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash.watchdog;
+package com.terraforged.mod.profiler.crash;
 
-import com.terraforged.engine.concurrent.cache.SafeCloseable;
+import com.terraforged.mod.chunk.TFChunkGenerator;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.ReportedException;
+import net.minecraft.world.chunk.IChunk;
 
-public interface WatchdogContext extends SafeCloseable {
+import java.util.concurrent.locks.StampedLock;
 
-    WatchdogContext NONE = new WatchdogContext() {
-        @Override
-        public void pushPhase(String phase) {
+public class ServerCrashHandler implements CrashHandler {
 
-        }
+    private final StampedLock lock = new StampedLock();
 
-        @Override
-        public void pushIdentifier(Object identifier, long time) {
+    @Override
+    public void crash(IChunk chunk, TFChunkGenerator generator, Throwable t) {
+        // lock without release to prevent spamming
+        lock.writeLock();
 
-        }
-
-        @Override
-        public void pushTime(String type, Object o, long time) {
-
-        }
-
-        @Override
-        public void close() {
-
-        }
-    };
-
-    void pushPhase(String phase);
-
-    void pushIdentifier(Object identifier, long time);
-
-    void pushTime(String type, Object o, long time);
+        CrashReport report = CrashReportBuilder.buildCrashReport(chunk, generator, t);
+        throw new ReportedException(report);
+    }
 }

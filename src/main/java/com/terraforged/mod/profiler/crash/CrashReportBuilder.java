@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash;
+package com.terraforged.mod.profiler.crash;
 
 import com.google.gson.JsonElement;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
-import com.terraforged.mod.chunk.profiler.ProfilerPrinter;
+import com.terraforged.mod.profiler.ProfilerPrinter;
 import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.config.ConfigRef;
 import com.terraforged.mod.util.DataUtils;

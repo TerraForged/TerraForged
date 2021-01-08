@@ -27,7 +27,7 @@ package com.terraforged.mod.client;
 import com.terraforged.mod.LevelType;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.client.gui.screen.ConfigScreen;
-import com.terraforged.mod.util.crash.CrashHandler;
+import com.terraforged.mod.profiler.crash.CrashHandler;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ForgeWorldTypeScreens;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

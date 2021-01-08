@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.mixin.benchmark;
 
-import com.terraforged.mod.chunk.profiler.Profiler;
-import com.terraforged.mod.chunk.profiler.Section;
+import com.terraforged.mod.profiler.Profiler;
+import com.terraforged.mod.profiler.Section;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;

@@ -22,8 +22,9 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash.watchdog.timings;
+package com.terraforged.mod.profiler.timings;
 
+// Tracks the three largest timings
 public class Top3TimingStack implements TimingStack {
 
     private final Entry entry0 = new Entry();
@@ -48,7 +49,7 @@ public class Top3TimingStack implements TimingStack {
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         if (entry0.identifier == null) {
             return 0;
         }
@@ -87,9 +88,9 @@ public class Top3TimingStack implements TimingStack {
 
     private static class Entry {
 
+        private long time = 0L;
         private String type = null;
         private Object identifier = null;
-        private long time = 0L;
 
         private void reset() {
             type = null;

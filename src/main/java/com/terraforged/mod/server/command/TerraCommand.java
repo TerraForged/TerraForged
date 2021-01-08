@@ -38,7 +38,7 @@ import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
-import com.terraforged.mod.chunk.profiler.Profiler;
+import com.terraforged.mod.profiler.Profiler;
 import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.data.DataGen;
 import com.terraforged.mod.server.command.arg.TerrainArgType;

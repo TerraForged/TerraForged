@@ -25,8 +25,8 @@
 package com.terraforged.mod.client;
 
 import com.terraforged.mod.chunk.TFChunkGenerator;
-import com.terraforged.mod.util.crash.CrashHandler;
-import com.terraforged.mod.util.crash.CrashReportBuilder;
+import com.terraforged.mod.profiler.crash.CrashHandler;
+import com.terraforged.mod.profiler.crash.CrashReportBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.util.registry.Bootstrap;

@@ -22,42 +22,22 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash.feature;
+package com.terraforged.mod.profiler.timings;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DynamicOps;
-import com.terraforged.mod.featuremanager.util.codec.Codecs;
-import net.minecraft.world.gen.feature.IFeatureConfig;
+public interface TimingStack {
 
-import java.util.Collections;
+    int size();
 
-public class CrashyConfig implements IFeatureConfig {
+    TimingStack copy();
 
-    public static final Codec<CrashyConfig> CODEC = Codecs.create(CrashyConfig::encode, CrashyConfig::decode);
+    TimingStack reset();
 
-    public final CrashType crashType;
+    void push(String type, Object identifier, long time);
 
-    public CrashyConfig(CrashType crashType) {
-        this.crashType = crashType;
-    }
+    <T> void iterate(T ctx, Visitor<T> visitor);
 
-    public enum CrashType {
-        EXCEPTION,
-        DEADLOCK,
-        SLOW,
-        ;
-    }
+    interface Visitor<T> {
 
-    private static <T> T encode(CrashyConfig config, DynamicOps<T> ops) {
-        return ops.createMap(Collections.singletonMap(
-                ops.createString("type"),
-                ops.createString(config.crashType.name())
-        ));
-    }
-
-    private static <T> CrashyConfig decode(T t, DynamicOps<T> ops) {
-        return new CrashyConfig(CrashType.valueOf(
-                ops.getStringValue(t).result().orElse(CrashType.EXCEPTION.name())
-        ));
+        void visit(String type, Object identity, long time, T ctx);
     }
 }

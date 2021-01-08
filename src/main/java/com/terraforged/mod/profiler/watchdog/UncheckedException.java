@@ -22,25 +22,33 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash.watchdog;
+package com.terraforged.mod.profiler.watchdog;
 
-public class WarnTimer {
+public class UncheckedException extends RuntimeException {
 
-    private final long warnTime;
+    private static final String MESSAGE = "Critical error detected whilst generating %s %s";
 
-    public WarnTimer(long warnTime) {
-        this.warnTime = warnTime;
+    public UncheckedException(String message, StackTraceElement[] stacktrace) {
+        super(message);
+        super.setStackTrace(stacktrace);
     }
 
-    public long now() {
-        return warnTime > 0 ? System.currentTimeMillis() : 0L;
+    public UncheckedException(String phase, Object identity, Throwable cause) {
+        super(createMessage(phase, identity), cause);
     }
 
-    public long since(long timestamp) {
-        return warnTime > 0 ? System.currentTimeMillis() - timestamp : 0L;
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this;
     }
 
-    public boolean warn(long duration) {
-        return duration > warnTime;
+    private static String createMessage(String phase, Object identity) {
+        String phaseName = nonNullStringValue(phase, "unknown");
+        String identName = nonNullStringValue(identity, "unknown");
+        return String.format(MESSAGE, phaseName, identName);
+    }
+
+    protected static String nonNullStringValue(Object o, String def) {
+        return o != null ? o.toString() : def;
     }
 }

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.chunk.profiler;
+package com.terraforged.mod.profiler;
 
 import java.io.IOException;
 import java.io.Writer;

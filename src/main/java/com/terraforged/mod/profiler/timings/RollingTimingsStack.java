@@ -22,22 +22,23 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash.watchdog.timings;
+package com.terraforged.mod.profiler.timings;
 
-public class ArrayTimingsStack implements TimingStack {
+// Fixed size queue of entries which overwrites the oldest value when at capacity
+public class RollingTimingsStack implements TimingStack {
 
     private final Entry[] entries = new Entry[16];
 
     private int index = -1;
     private int size = 0;
 
-    public ArrayTimingsStack() {
+    public RollingTimingsStack() {
         for (int i = 0; i < entries.length; i++) {
             entries[i] = new Entry();
         }
     }
 
-    private ArrayTimingsStack(ArrayTimingsStack other) {
+    private RollingTimingsStack(RollingTimingsStack other) {
         this.index = other.index;
         this.size = other.size;
         for (int i = 0; i < entries.length; i++) {
@@ -46,17 +47,17 @@ public class ArrayTimingsStack implements TimingStack {
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         return size;
     }
 
     @Override
-    public ArrayTimingsStack copy() {
-        return new ArrayTimingsStack(this);
+    public RollingTimingsStack copy() {
+        return new RollingTimingsStack(this);
     }
 
     @Override
-    public ArrayTimingsStack reset() {
+    public RollingTimingsStack reset() {
         index = -1;
         size = 0;
         for (Entry entry : entries) {

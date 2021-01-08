@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash.watchdog;
+package com.terraforged.mod.profiler.watchdog;
 
 import com.terraforged.mod.chunk.TFChunkGenerator;
-import com.terraforged.mod.util.crash.watchdog.timings.TimingStack;
+import com.terraforged.mod.profiler.timings.TimingStack;
 import net.minecraft.world.chunk.IChunk;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -75,7 +75,7 @@ public class DeadlockException extends UncheckedException {
     }
 
     private static String createTable(TimingStack stack, long totalTime) {
-        if (stack.getSize() > 0) {
+        if (stack.size() > 0) {
             StringBuilder sb = new StringBuilder(2048);
             sb.append(getTableTitle(stack));
             sb.append(String.format(TABLE_FORMAT, "Index", "Type", "Time", "Impact", "Identity"));
@@ -94,7 +94,7 @@ public class DeadlockException extends UncheckedException {
     }
 
     private static String getTableTitle(TimingStack stack) {
-        int size = stack.getSize();
+        int size = stack.size();
         if (size == 0) {
             return TABLE_HEADER_ONE;
         }

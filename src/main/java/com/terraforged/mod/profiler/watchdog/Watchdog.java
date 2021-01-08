@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.crash.watchdog;
+package com.terraforged.mod.profiler.watchdog;
 
 import com.terraforged.mod.chunk.TFChunkGenerator;
-import com.terraforged.mod.chunk.profiler.Profiler;
+import com.terraforged.mod.profiler.Profiler;
 import com.terraforged.mod.config.ConfigManager;
-import com.terraforged.mod.util.crash.CrashHandler;
-import com.terraforged.mod.util.crash.WorldGenException;
+import com.terraforged.mod.profiler.crash.CrashHandler;
+import com.terraforged.mod.profiler.crash.WorldGenException;
 import net.minecraft.world.chunk.IChunk;
 
 import java.util.Iterator;
@@ -105,11 +105,11 @@ public class Watchdog implements Runnable {
     }
 
     public static WarnTimer getWarnTimer() {
-        return new WarnTimer(ConfigManager.GENERAL.get().getLongOrElse("feature_warn_time", WARN_TIME));
+        return new WarnTimer(ConfigManager.GENERAL.load().getLong("feature_warn_time", WARN_TIME));
     }
 
     public static long getWatchdogHangTime() {
-        long time = ConfigManager.GENERAL.get().getLongOrElse("server_deadlock_timeout", CRASH_TIME);
+        long time = ConfigManager.GENERAL.load().getLong("server_deadlock_timeout", CRASH_TIME);
         if (time <= 0) {
             return -1L;
         }
