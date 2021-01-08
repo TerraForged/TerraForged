@@ -35,7 +35,7 @@ public interface WatchdogContext extends SafeCloseable {
         }
 
         @Override
-        public void pushIdentifier(Object identifier) {
+        public void pushIdentifier(Object identifier, long time) {
 
         }
 
@@ -52,7 +52,7 @@ public interface WatchdogContext extends SafeCloseable {
 
     void pushPhase(String phase);
 
-    void pushIdentifier(Object identifier);
+    void pushIdentifier(Object identifier, long time);
 
     void pushTime(String type, Object o, long time);
 }

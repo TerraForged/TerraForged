@@ -140,7 +140,7 @@ public class FeatureGenerator implements Generator.Features {
                     random.setFeatureSeed(decorationSeed, featureSeed++, stageIndex);
                     try {
                         long timeStamp = timer.now();
-                        context.pushIdentifier(structure.getStructureName());
+                        context.pushIdentifier(structure.getStructureName(), timeStamp);
                         manager.func_235011_a_(SectionPos.from(pos), structure).forEach(start -> start.func_230366_a_(
                                 region,
                                 manager,
@@ -169,7 +169,7 @@ public class FeatureGenerator implements Generator.Features {
 
                     try {
                         long timeStamp = timer.now();
-                        context.pushIdentifier(feature.getIdentity());
+                        context.pushIdentifier(feature.getIdentity(), timeStamp);
                         feature.getFeature().generate(region, generator, random, pos);
                         checkTime(FEATURE, feature.getIdentity(), timer, timeStamp, context);
                     } catch (Throwable t) {

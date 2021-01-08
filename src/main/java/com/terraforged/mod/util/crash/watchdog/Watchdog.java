@@ -39,6 +39,7 @@ public class Watchdog implements Runnable {
     private static final long WARN_TIME = 50;
     private static final long CRASH_TIME = 30_000L;
     private static final long MIN_CRASH_TIME = 5_000L;
+    private static final long CHECK_INTERVAL = 5_250L;
     private static final ThreadLocal<WatchdogCtx> TASKS = ThreadLocal.withInitial(WatchdogCtx::new);
 
     static {
@@ -85,7 +86,7 @@ public class Watchdog implements Runnable {
 
     private boolean running() {
         try {
-            Thread.sleep(1_000L);
+            Thread.sleep(CHECK_INTERVAL);
         } catch (Throwable t) {
             t.printStackTrace();
             return true;

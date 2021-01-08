@@ -60,6 +60,9 @@ public class CrashyFeature extends Feature<CrashyConfig> {
                 case EXCEPTION:
                     uncheckedException();
                     break;
+                case SLOW:
+                    generateSlowly(rand);
+                    break;
             }
         }
         return true;
@@ -68,6 +71,14 @@ public class CrashyFeature extends Feature<CrashyConfig> {
     private void uncheckedException() {
         // Simulate some random unchecked exception being thrown during feature gen
         throw new NullPointerException("Crash time baby!");
+    }
+
+    private void generateSlowly(Random rand) {
+        try {
+            Thread.sleep(500 + rand.nextInt(500));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void serverDeadlock(ISeedReader region, BlockPos pos) {
@@ -93,6 +104,11 @@ public class CrashyFeature extends Feature<CrashyConfig> {
         @SubscribeEvent
         public static void setup(SetupEvent.Features event) {
             Log.info("Adding crash-test");
+            event.getManager().getAppenders().add(BiomeFeatureMatcher.ANY, FeatureAppender.head(
+                    GenerationStage.Decoration.VEGETAL_DECORATION,
+                    CrashyFeature.INSTANCE.withConfiguration(new CrashyConfig(CrashyConfig.CrashType.SLOW))
+            ));
+
             event.getManager().getAppenders().add(BiomeFeatureMatcher.ANY, FeatureAppender.tail(
                     GenerationStage.Decoration.VEGETAL_DECORATION,
                     CrashyFeature.INSTANCE.withConfiguration(new CrashyConfig(CrashyConfig.CrashType.DEADLOCK))

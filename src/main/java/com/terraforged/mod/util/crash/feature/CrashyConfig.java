@@ -44,6 +44,7 @@ public class CrashyConfig implements IFeatureConfig {
     public enum CrashType {
         EXCEPTION,
         DEADLOCK,
+        SLOW,
         ;
     }
 

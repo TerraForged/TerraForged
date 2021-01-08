@@ -30,88 +30,33 @@ import java.util.Locale;
 
 public class ProfilerPrinter {
 
-    private static final int TAB_WIDTH = 4;
-    private static final String[] HEADERS = {"Section", "Count", "Time MS", "Min MS", "Max MS", "Average MS"};
-    private static final int[] WIDTHS = new int[HEADERS.length];
-
-    static {
-        int widest = tabWidth(HEADERS[0]);
-        for (Profiler profiler : Profiler.values()) {
-            widest = Math.max(widest, tabWidth(profiler.name()));
-        }
-
-        WIDTHS[0] = widest;
-
-        for (int i = 1; i < WIDTHS.length; i++) {
-            WIDTHS[i] = tabWidth(HEADERS[i]);
-        }
-    }
+    private static final String FORMAT = "%1$-20s%2$-11s%3$-11s%4$-11s%5$-11s%6$-1s";
 
     public static void print(Writer writer) throws IOException {
         print(writer, "");
     }
 
     public static void print(Writer writer, String indent) throws IOException {
-        // headers
-        writer.write(indent);
-        for (int i = 0; i < HEADERS.length; i++) {
-            append(i, HEADERS[i], writer);
-        }
+        writer.append(indent).append(String.format(FORMAT, "Section", "Count", "Time MS", "Min MS", "Max MS", "Average MS"));
 
         // table contents
         double averageSum = 0.0;
         for (Profiler profiler : Profiler.values()) {
+            String name = profiler.name().toLowerCase(Locale.ROOT);
+            long hits = profiler.hits();
+            long time = profiler.timeMS();
+            long min = profiler.minMS();
+            long max = profiler.maxMS();
             double average = profiler.averageMS();
+            writer.append("\n").append(indent).append(String.format(FORMAT, name, hits, time, min, max, fmt(average)));
             averageSum += average;
-
-            writer.write("\n");
-            writer.write(indent);
-            append(0, profiler.name().toLowerCase(Locale.ROOT), writer);
-            append(1, fmt(profiler.hits()), writer);
-            append(2, fmt(profiler.timeMS()), writer);
-            append(3, fmt(profiler.minMS()), writer);
-            append(4, fmt(profiler.maxMS()), writer);
-            append(5, fmt(average), writer);
         }
 
-        // footer
-        writer.write("\n");
-        writer.write(indent);
-        append(0, "Sum", writer);
-        for (int i = 1; i < WIDTHS.length; i++) {
-            append(i, "", writer);
-        }
-        append(5, fmt(averageSum), writer);
+        writer.append("\n").append(indent).append(String.format(FORMAT, "Sum", "", "", "", "", fmt(averageSum)));
     }
 
-    private static void append(int col, String text, Writer writer) throws IOException {
-        writer.write(text);
-
-        if (col == WIDTHS.length - 1) {
-            return;
-        }
-
-        int padding = WIDTHS[col] - text.length();
-        int tabs = padding / TAB_WIDTH;
-        if (tabs * TAB_WIDTH == padding) {
-            tabs--;
-        }
-
-        for (int i = 0; i <= tabs; i++) {
-            writer.write("\t");
-        }
-    }
-
-    private static String fmt(long value) {
-        return Long.toString(value);
-    }
 
     private static String fmt(double value) {
         return String.format("%.2f", value);
-    }
-
-    private static int tabWidth(String input) {
-        int tabs = 1 + input.length() / TAB_WIDTH;
-        return tabs * TAB_WIDTH;
     }
 }

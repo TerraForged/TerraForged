@@ -44,6 +44,7 @@ class WatchdogCtx implements WatchdogContext {
 
     private long start = 0L;
     private long timeout = 0L;
+    private long itemStart = 0L;
     private Thread thread = null;
     private final StampedLock lock = new StampedLock();
     private final TimingStack stack = new Top3TimingStack();
@@ -63,10 +64,11 @@ class WatchdogCtx implements WatchdogContext {
     }
 
     @Override
-    public void pushIdentifier(Object identifier) {
+    public void pushIdentifier(Object identifier, long timeStamp) {
         long stamp = lock.writeLock();
         try {
             this.identifier = identifier;
+            this.itemStart = timeStamp;
         } finally {
             lock.unlockWrite(stamp);
         }
@@ -90,6 +92,7 @@ class WatchdogCtx implements WatchdogContext {
             phase = "";
             start = 0L;
             timeout = 0L;
+            itemStart = 0L;
             chunk = null;
             thread = null;
             generator = null;
@@ -112,6 +115,7 @@ class WatchdogCtx implements WatchdogContext {
             this.identifier = null;
             this.generator = generator;
             this.timeout = now + duration;
+            this.itemStart = 0L;
             this.thread = Thread.currentThread();
             this.stack.reset();
             return true;
@@ -170,6 +174,8 @@ class WatchdogCtx implements WatchdogContext {
             return null;
         }
 
-        return new DeadlockException(phase, identifier, now - start, stack.copy(), chunk, generator, thread);
+        long totalTime = now - start;
+        long itemTime = now - itemStart;
+        return new DeadlockException(phase, identifier, totalTime, itemTime, stack.copy(), chunk, generator, thread);
     }
 }
