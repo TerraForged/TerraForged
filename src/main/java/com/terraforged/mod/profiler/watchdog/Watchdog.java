@@ -25,8 +25,8 @@
 package com.terraforged.mod.profiler.watchdog;
 
 import com.terraforged.mod.chunk.TFChunkGenerator;
-import com.terraforged.mod.profiler.Profiler;
 import com.terraforged.mod.config.ConfigManager;
+import com.terraforged.mod.profiler.Profiler;
 import com.terraforged.mod.profiler.crash.CrashHandler;
 import com.terraforged.mod.profiler.crash.WorldGenException;
 import net.minecraft.world.chunk.IChunk;

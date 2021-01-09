@@ -28,6 +28,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -79,6 +80,12 @@ public class ConfigRef implements Supplier<CommentedFileConfig> {
     public ConfigRef save() {
         get().save();
         return this;
+    }
+
+    public void set(Consumer<CommentedFileConfig> setter) {
+        CommentedFileConfig config = get();
+        setter.accept(config);
+        config.save();
     }
 
     public int getInt(String name, int def) {

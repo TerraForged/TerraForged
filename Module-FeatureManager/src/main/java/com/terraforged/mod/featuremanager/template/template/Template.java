@@ -64,6 +64,7 @@ public class Template {
     private static final Direction[] directions = Direction.values();
     private static final ThreadLocal<PasteBuffer> PASTE_BUFFER = ThreadLocal.withInitial(PasteBuffer::new);
     private static final ThreadLocal<TemplateBuffer> TEMPLATE_BUFFER = ThreadLocal.withInitial(TemplateBuffer::new);
+    private static final ThreadLocal<TemplateRegion> TEMPLATE_REGION = ThreadLocal.withInitial(TemplateRegion::new);
 
     private final BakedTemplate template;
     private final BakedDimensions dimensions;
@@ -106,6 +107,7 @@ public class Template {
         boolean placed = false;
         BlockReader reader = new BlockReader();
         PasteBuffer buffer = PASTE_BUFFER.get();
+        TemplateRegion region = TEMPLATE_REGION.get().init(origin);
         buffer.setRecording(config.updatePostPaste);
 
         BlockPos.Mutable pos1 = new BlockPos.Mutable();
@@ -117,7 +119,7 @@ public class Template {
             addPos(pos1, origin, block.pos);
 
             // make sure we don't leak outside the region
-            if (!hasChunk(pos1, world)) {
+            if (!region.containsBlock(world, pos1)) {
                 continue;
             }
 
@@ -153,6 +155,7 @@ public class Template {
 
     private boolean pasteChecked(IWorld world, BlockPos origin, Mirror mirror, Rotation rotation, Placement placement, PasteConfig config) {
         Dimensions dimensions = this.dimensions.get(mirror, rotation);
+        TemplateRegion region = TEMPLATE_REGION.get().init(origin);
         TemplateBuffer buffer = TEMPLATE_BUFFER.get().init(world, origin, dimensions.min, dimensions.max);
 
         BlockPos.Mutable pos1 = new BlockPos.Mutable();
@@ -165,7 +168,7 @@ public class Template {
             addPos(pos1, origin, block.pos);
 
             // make sure we don't leak outside the region
-            if (!hasChunk(pos1, world)) {
+            if (!region.containsBlock(world, pos1)) {
                 continue;
             }
 

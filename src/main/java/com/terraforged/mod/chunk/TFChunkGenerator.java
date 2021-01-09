@@ -43,8 +43,6 @@ import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.biome.utils.StructureLocator;
 import com.terraforged.mod.chunk.column.ColumnResource;
 import com.terraforged.mod.chunk.generator.*;
-import com.terraforged.mod.profiler.Profiler;
-import com.terraforged.mod.profiler.Section;
 import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.featuremanager.FeatureManager;
 import com.terraforged.mod.featuremanager.structure.FMStructureManager;
@@ -53,8 +51,11 @@ import com.terraforged.mod.featuremanager.util.codec.DecoderFunc;
 import com.terraforged.mod.featuremanager.util.codec.EncoderFunc;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.material.geology.GeoManager;
+import com.terraforged.mod.profiler.Profiler;
+import com.terraforged.mod.profiler.Section;
 import com.terraforged.mod.profiler.crash.CrashHandler;
 import com.terraforged.mod.profiler.crash.WorldGenException;
+import com.terraforged.mod.util.DataUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.math.BlockPos;
@@ -114,6 +115,7 @@ public class TFChunkGenerator extends ChunkGenerator {
         this.structureGenerator = new StructureGenerator(this);
         this.resources = LazySupplier.factory(context, GeneratorResources.factory(this));
         Profiler.reset();
+        Log.info("Created TerraForged chunk-generator with settings {}", DataUtils.toJson(context.terraSettings));
     }
 
     public long getSeed() {

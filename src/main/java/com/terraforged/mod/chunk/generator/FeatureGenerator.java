@@ -31,18 +31,18 @@ import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.RegionFix;
+import com.terraforged.mod.chunk.util.ChunkRegionBoundingBox;
 import com.terraforged.mod.featuremanager.biome.BiomeFeature;
 import com.terraforged.mod.featuremanager.biome.BiomeFeatures;
 import com.terraforged.mod.featuremanager.util.identity.Identifier;
-import com.terraforged.mod.util.Environment;
 import com.terraforged.mod.profiler.watchdog.UncheckedException;
 import com.terraforged.mod.profiler.watchdog.WarnTimer;
 import com.terraforged.mod.profiler.watchdog.Watchdog;
 import com.terraforged.mod.profiler.watchdog.WatchdogContext;
+import com.terraforged.mod.util.Environment;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.SectionPos;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
@@ -124,10 +124,7 @@ public class FeatureGenerator implements Generator.Features {
         final int chunkX = pos.getX() >> 4;
         final int chunkZ = pos.getZ() >> 4;
         final ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
-
-        final int startX = chunkPos.getXStart();
-        final int startZ = chunkPos.getZStart();
-        MutableBoundingBox chunkBounds = new MutableBoundingBox(startX, startZ, startX + 15, startZ + 15);
+        final ChunkRegionBoundingBox chunkBounds = new ChunkRegionBoundingBox(chunkX, chunkZ, 1);
 
         for (int stageIndex = 0; stageIndex < FEATURE_STAGES; stageIndex++) {
             int featureSeed = 0;
@@ -146,7 +143,7 @@ public class FeatureGenerator implements Generator.Features {
                                 manager,
                                 generator,
                                 random,
-                                chunkBounds,
+                                chunkBounds.reset(),
                                 chunkPos
                         ));
                         checkTime(STRUCTURE, structure.getStructureName(), timer, timeStamp, context);

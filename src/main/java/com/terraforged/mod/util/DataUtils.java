@@ -30,6 +30,7 @@ import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import com.terraforged.engine.serialization.serializer.Deserializer;
 import com.terraforged.engine.serialization.serializer.Serializer;
+import com.terraforged.mod.Log;
 import com.terraforged.mod.util.nbt.DynamicReader;
 import com.terraforged.mod.util.nbt.DynamicWriter;
 import com.terraforged.mod.util.nbt.NBTReader;
@@ -39,12 +40,21 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTDynamicOps;
 
+import java.io.File;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
 public class DataUtils {
+
+    public static void initDirs(File... dirs) {
+        for (File dir : dirs) {
+            if (!dir.exists() && !dir.mkdirs()) {
+                Log.err("Unable to make directory {}", dir);
+            }
+        }
+    }
 
     public static JsonElement toJson(CompoundNBT tag) {
         Dynamic<INBT> input = new Dynamic<>(NBTDynamicOps.INSTANCE, tag);

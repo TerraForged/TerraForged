@@ -29,7 +29,8 @@ import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
-import com.terraforged.mod.util.DataUtils;
+import com.terraforged.mod.chunk.settings.preset.Preset;
+import com.terraforged.mod.chunk.settings.preset.PresetManager;
 import com.terraforged.mod.util.DimUtils;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
@@ -38,6 +39,8 @@ import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 import net.minecraftforge.common.world.ForgeWorldType;
 
+import java.util.Optional;
+
 public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
 
     public static final ForgeWorldType TERRAFORGED = new ForgeWorldType(new LevelType())
@@ -45,8 +48,16 @@ public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
 
     @Override
     public TFChunkGenerator createChunkGenerator(Registry<Biome> biomes, Registry<DimensionSettings> settings, long seed, String options) {
-        Log.info("Creating default TerraForged chunk-generator");
-        return createOverworld(TerraSettings.defaults(seed), biomes, settings);
+        // server.properties >> generator-settings: <preset_name>
+        Optional<Preset> preset = PresetManager.getPreset(options);
+        if (preset.isPresent()) {
+            Log.info("Creating TerraForged chunk-generator from preset {}", preset.get().getName());
+            TerraSettings terraSettings = preset.get().getSettings(seed);
+            return createOverworld(terraSettings, biomes, settings);
+        } else {
+            Log.info("Creating default TerraForged chunk-generator");
+            return createOverworld(TerraSettings.defaults(seed), biomes, settings);
+        }
     }
 
     @Override
@@ -81,7 +92,6 @@ public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
     }
 
     private static TFChunkGenerator createOverworld(TerraSettings settings, Registry<Biome> biomes, Registry<DimensionSettings> dimSettings) {
-        Log.info("Creating TerraForged chunk-generator with settings {}", DataUtils.toJson(settings));
         DimensionSettings overworldSettings = dimSettings.getOrThrow(DimensionSettings.field_242734_c);
         TFBiomeContext game = new TFBiomeContext(biomes);
         TerraContext context = new TerraContext(settings, game);

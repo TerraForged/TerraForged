@@ -25,7 +25,6 @@
 package com.terraforged.mod.client.gui.screen.page;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.terraforged.mod.chunk.settings.SettingsHelper;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.chunk.settings.preset.Preset;
 import com.terraforged.mod.chunk.settings.preset.PresetManager;
@@ -37,6 +36,7 @@ import com.terraforged.mod.client.gui.page.BasePage;
 import com.terraforged.mod.client.gui.screen.Instance;
 import com.terraforged.mod.client.gui.screen.ScrollPane;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
+import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.util.DataUtils;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.nbt.CompoundNBT;
@@ -214,26 +214,10 @@ public class PresetsPage extends BasePage {
         });
 
         right.scrollPane.addButton(new TFButton(GuiKeys.PRESET_SET_DEFAULTS.get()) {
-
             @Override
             public void onClick(double x, double y) {
                 super.onClick(x, y);
-                Optional<Preset> selected = getSelected();
-                if (selected.isPresent()) {
-                    SettingsHelper.exportDefaults(selected.get().getSettings());
-                } else {
-                    SettingsHelper.exportDefaults(instance.copySettings());
-                }
-            }
-        });
-
-        right.scrollPane.addButton(new TFButton(GuiKeys.PRESET_CLEAR_DEFAULTS.get()) {
-
-            @Override
-            public void onClick(double x, double y) {
-                super.onClick(x, y);
-                TerraSettings settings = new TerraSettings();
-                SettingsHelper.exportDefaults(settings);
+                getSelected().ifPresent(preset -> ConfigManager.GENERAL.set(cfg -> cfg.set("default_preset", preset.getName())));
             }
         });
 

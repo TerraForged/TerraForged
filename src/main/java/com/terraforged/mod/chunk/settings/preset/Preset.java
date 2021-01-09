@@ -24,11 +24,15 @@
 
 package com.terraforged.mod.chunk.settings.preset;
 
+import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 
 import java.io.File;
 
 public class Preset implements Comparable<Preset> {
+
+    public static final String DEFAULT_NAME = "Default";
+    public static final String DEFAULT_KEY = "default_preset";
 
     private final boolean changed;
     private final boolean internal;
@@ -69,7 +73,7 @@ public class Preset implements Comparable<Preset> {
         this.settings = settings;
         this.id = name.toLowerCase();
         this.description = description;
-        this.file = new File(PresetManager.PRESETS_DIR, name + ".json");
+        this.file = new File(TerraForgedMod.PRESETS_DIR, name + ".json");
     }
 
     public boolean changed() {
@@ -97,6 +101,11 @@ public class Preset implements Comparable<Preset> {
     }
 
     public TerraSettings getSettings() {
+        return settings;
+    }
+
+    public TerraSettings getSettings(long seed) {
+        settings.world.seed = seed;
         return settings;
     }
 

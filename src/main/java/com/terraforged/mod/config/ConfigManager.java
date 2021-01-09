@@ -29,6 +29,7 @@ import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.terraforged.mod.Log;
+import com.terraforged.mod.chunk.settings.preset.Preset;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,7 +40,7 @@ import java.util.function.Consumer;
 public class ConfigManager {
 
     private static final String PERF_VERSION = "0.1";
-    private static final String GENERAL_VERSION = "0.2";
+    private static final String GENERAL_VERSION = "0.3";
 
     private static final Path COMMON_DIR = Paths.get("config", "terraforged").toAbsolutePath();
 
@@ -88,6 +89,12 @@ public class ConfigManager {
     }));
 
     public static final ConfigRef GENERAL = new ConfigRef(GENERAL_VERSION, version -> create("general", version, cfg -> {
+        set(
+                cfg,
+                Preset.DEFAULT_KEY,
+                "default",
+                "Set the preset to use when creating a new world"
+        );
         set(
                 cfg,
                 "tooltips",

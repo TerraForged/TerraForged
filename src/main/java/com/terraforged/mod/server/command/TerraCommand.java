@@ -26,6 +26,7 @@ package com.terraforged.mod.server.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -38,9 +39,10 @@ import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
-import com.terraforged.mod.profiler.Profiler;
-import com.terraforged.mod.chunk.settings.SettingsHelper;
+import com.terraforged.mod.chunk.settings.preset.Preset;
+import com.terraforged.mod.chunk.settings.preset.PresetManager;
 import com.terraforged.mod.data.DataGen;
+import com.terraforged.mod.profiler.Profiler;
 import com.terraforged.mod.server.command.arg.TerrainArgType;
 import com.terraforged.mod.server.command.search.BiomeSearchTask;
 import com.terraforged.mod.server.command.search.BothSearchTask;
@@ -112,9 +114,10 @@ public class TerraCommand {
                 .then(Commands.literal("data")
                         .then(Commands.literal("dump")
                                 .executes(TerraCommand::dump)))
-                .then(Commands.literal("defaults")
-                        .then(Commands.literal("set")
-                                .executes(TerraCommand::setDefaults)))
+                .then(Commands.literal("preset")
+                        .then(Commands.literal("save")
+                                .then(Commands.argument("name", StringArgumentType.greedyString())
+                                        .executes(TerraCommand::savePreset))))
                 .then(Commands.literal("debug")
                         .executes(TerraCommand::debugBiome))
                 .then(Commands.literal("locate")
@@ -190,10 +193,16 @@ public class TerraCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int setDefaults(CommandContext<CommandSource> context) throws CommandSyntaxException {
+    private static int savePreset(CommandContext<CommandSource> context) throws CommandSyntaxException {
         TerraContext terraContext = getContext(context);
-        context.getSource().sendFeedback(new StringTextComponent("Setting generator defaults"), true);
-        SettingsHelper.exportDefaults(terraContext.terraSettings);
+        String name = StringArgumentType.getString(context, "name");
+        Preset preset = new Preset(name, terraContext.terraSettings);
+        context.getSource().sendFeedback(new StringTextComponent("Saving preset: " + preset.getName()), true);
+
+        PresetManager presets = PresetManager.load();
+        presets.add(preset);
+        presets.saveAll();
+
         return Command.SINGLE_SUCCESS;
     }
 

@@ -24,10 +24,12 @@
 
 package com.terraforged.mod.biome.provider;
 
+import com.terraforged.engine.settings.ClimateSettings;
 import com.terraforged.engine.world.biome.TempCategory;
 import com.terraforged.engine.world.biome.map.defaults.BiomeTemps;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.utils.Structures;
+import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeGenerationSettings;
@@ -79,6 +81,12 @@ public class BiomeHelper {
         }
         // hopefully biomes otherwise have a sensible category
         return TempCategory.MEDIUM;
+    }
+
+    public static float getBiomeSizeSearchModifier(ClimateSettings settings) {
+        float defaultSize = ClimateSettings.BiomeShape.DEFAULT_BIOME_SIZE;
+        float scale = settings.biomeShape.biomeSize / defaultSize;
+        return NoiseUtil.clamp(scale * 0.75F, 0F, 1.25F);
     }
 
     public static TempCategory getMountainCategory(Biome biome) {

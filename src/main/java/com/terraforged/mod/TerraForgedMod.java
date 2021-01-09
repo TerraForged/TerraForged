@@ -30,6 +30,7 @@ import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.server.command.TerraCommand;
+import com.terraforged.mod.util.DataUtils;
 import com.terraforged.mod.util.Environment;
 import com.terraforged.mod.util.version.VersionChecker;
 import net.minecraft.util.registry.Registry;
@@ -43,11 +44,16 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
 
+import java.io.File;
+
 @Mod(TerraForgedMod.MODID)
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class TerraForgedMod {
 
     public static final String MODID = "terraforged";
+    public static final File CONFIG_DIR = new File("config", MODID).getAbsoluteFile();
+    public static final File PRESETS_DIR = new File(CONFIG_DIR, "presets");
+    public static final File DATAPACK_DIR = new File(CONFIG_DIR, "datapacks");
 
     public TerraForgedMod() {
         VersionChecker.require("forge", 35, 1, 5);
@@ -71,9 +77,9 @@ public class TerraForgedMod {
     @SubscribeEvent
     public static void setup(FMLCommonSetupEvent event) {
         Log.info("Common setup");
+        DataUtils.initDirs(PRESETS_DIR, DATAPACK_DIR);
         TerraCommand.init();
         ConfigManager.init();
-//        SettingsHelper.init();
     }
 
     @SubscribeEvent

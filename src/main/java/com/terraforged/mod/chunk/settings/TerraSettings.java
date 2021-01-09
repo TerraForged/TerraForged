@@ -24,14 +24,20 @@
 
 package com.terraforged.mod.chunk.settings;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.terraforged.engine.serialization.annotation.Serializable;
 import com.terraforged.engine.settings.Settings;
+import com.terraforged.mod.Log;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
+import com.terraforged.mod.util.DataUtils;
 import com.terraforged.mod.util.nbt.DynamicReader;
 import com.terraforged.mod.util.nbt.DynamicWriter;
+
+import java.io.*;
 
 @Serializable
 public class TerraSettings extends Settings {
@@ -61,14 +67,23 @@ public class TerraSettings extends Settings {
         return DynamicReader.deserialize(new TerraSettings(), dynamic);
     }
 
-    public static TerraSettings defaults() {
-        // TODO: load from file
-        return new TerraSettings();
-    }
-
     public static TerraSettings defaults(long seed) {
-        TerraSettings settings = defaults();
+        TerraSettings settings = new TerraSettings();
         settings.world.seed = seed;
         return settings;
+    }
+
+    public static TerraSettings read(InputStream inputStream) {
+        try (Reader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            TerraSettings settings = new TerraSettings();
+            JsonElement data = new JsonParser().parse(reader);
+            if (!DataUtils.fromJson(data, settings)) {
+                Log.warn("Error parsing settings json {}", data);
+            }
+            return settings;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -22,30 +22,34 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.server;
+package com.terraforged.mod.featuremanager.template.template;
 
-import com.terraforged.mod.Log;
-import com.terraforged.mod.TerraForgedMod;
-import com.terraforged.mod.featuremanager.data.FolderDataPackFinder;
-import com.terraforged.mod.profiler.Profiler;
-import net.minecraft.resources.ResourcePackList;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 
-import java.io.File;
+public class TemplateRegion {
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class ServerEvents {
+    private static final int SIZE = 1;
 
-    @SubscribeEvent
-    public static void serverStop(FMLServerStoppedEvent event) {
-        File dir = event.getServer().getFile("dumps");
-        Profiler.dump(dir);
+    private int centerX, centerZ;
+    private int minX, minZ;
+    private int maxX, maxZ;
+
+    public TemplateRegion init(BlockPos pos) {
+        centerX = pos.getX() >> 4;
+        centerZ = pos.getZ() >> 4;
+        minX = centerX - SIZE;
+        minZ = centerZ - SIZE;
+        maxX = centerX + SIZE;
+        maxZ = centerZ + SIZE;
+        return this;
     }
 
-    public static void addPackFinder(ResourcePackList packList) {
-        Log.info("Adding DataPackFinder");
-        packList.addPackFinder(new FolderDataPackFinder(TerraForgedMod.DATAPACK_DIR));
+    public boolean containsBlock(IWorld world, BlockPos pos) {
+        return containsChunk(world, pos.getX() >> 4, pos.getZ() >> 4);
+    }
+
+    public boolean containsChunk(IWorld world, int cx, int cz) {
+        return cx >= minX && cx <= maxX && cz >= minZ && cz <= maxZ;
     }
 }

@@ -60,11 +60,14 @@ public class Miscellaneous {
     @Comment("Allow vanilla lakes to generate")
     public boolean vanillaLakes = false;
 
+    @Comment("Allow vanilla springs (water source blocks) to generate")
+    public boolean vanillaSprings = true;
+
     @Comment("Allow vanilla lava-lakes to generate")
     public boolean vanillaLavaLakes = true;
 
-    @Comment("Allow vanilla springs (water source blocks) to generate")
-    public boolean vanillaSprings = true;
+    @Comment("Allow vanilla springs (lava source blocks) to generate")
+    public boolean vanillaLavaSprings = true;
 
     @Comment({
             "The probability that mountainous terrain will be set to a mountain biome type.",

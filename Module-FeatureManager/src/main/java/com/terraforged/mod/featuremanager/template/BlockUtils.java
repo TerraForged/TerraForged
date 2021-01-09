@@ -29,8 +29,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.gen.feature.TreeFeature;
 
 import java.util.function.BiPredicate;
@@ -50,16 +50,16 @@ public class BlockUtils {
         return TreeFeature.isReplaceableAt(world, pos) || isVegetation(world, pos);
     }
 
-    public static boolean isSolid(IWorldReader reader, BlockPos pos) {
+    public static boolean isSolid(IBlockReader reader, BlockPos pos) {
         BlockState state = reader.getBlockState(pos);
         return isSolid(state, reader, pos);
     }
 
-    public static boolean isSolid(BlockState state, IWorldReader reader, BlockPos pos) {
+    public static boolean isSolid(BlockState state, IBlockReader reader, BlockPos pos) {
         return state.isSolid() || !state.allowsMovement(reader, pos, PathType.LAND);
     }
 
-    public static boolean isSolidNoIce(IWorldReader reader, BlockPos pos) {
+    public static boolean isSolidNoIce(IBlockReader reader, BlockPos pos) {
         BlockState state = reader.getBlockState(pos);
         return isSolid(state, reader, pos) && !BlockTags.ICE.contains(state.getBlock());
     }

@@ -104,9 +104,14 @@ public class SetupFactory {
             modifiers.getPredicates().add(FeatureMatcher.and(Feature.LAKE, Blocks.LAVA), FeaturePredicate.DENY);
         }
 
-        if (testInv("Vanilla springs", !context.terraSettings.miscellaneous.vanillaSprings)) {
+        if (testInv("Vanilla water springs", !context.terraSettings.miscellaneous.vanillaSprings)) {
             // block springs if not enabled
-            modifiers.getPredicates().add(FeatureMatcher.of(Feature.SPRING_FEATURE), FeaturePredicate.DENY);
+            modifiers.getPredicates().add(FeatureMatcher.and(Feature.SPRING_FEATURE, Blocks.WATER), FeaturePredicate.DENY);
+        }
+
+        if (testInv("Vanilla lava springs", !context.terraSettings.miscellaneous.vanillaLavaSprings)) {
+            // block springs if not enabled
+            modifiers.getPredicates().add(FeatureMatcher.and(Feature.SPRING_FEATURE, Blocks.LAVA), FeaturePredicate.DENY);
         }
 
         if (test("Custom features", context.terraSettings.miscellaneous.customBiomeFeatures)) {
@@ -119,16 +124,16 @@ public class SetupFactory {
                     FeatureMatcher.of(Feature.FREEZE_TOP_LAYER),
                     FeatureTransformer.replace(Feature.FREEZE_TOP_LAYER, FreezeLayer.INSTANCE)
             );
+
+            // reduce dead bushes in deserts/badlands
+            modifiers.getTransformers().add(
+                    BiomeMatcher.of(context.biomeContext, Biome.Category.MESA, Biome.Category.DESERT),
+                    Matchers.deadBush(),
+                    FeatureTransformer.builder().key("tries", 1).build()
+            );
         }
         // prevent trees growing at high elevation on volcanoes
         modifiers.getPredicates().add(Matchers.allTrees(), new VolcanoPredicate(generator));
-
-        // reduce dead bushes in deserts/badlands
-        modifiers.getTransformers().add(
-                BiomeMatcher.of(context.biomeContext, Biome.Category.MESA, Biome.Category.DESERT),
-                Matchers.deadBush(),
-                FeatureTransformer.builder().key("tries", 1).build()
-        );
 
         return FeatureManager.create(SetupHooks.setup(modifiers, context.copy()));
     }

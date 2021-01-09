@@ -61,11 +61,14 @@ public class TFBiomeProvider extends BiomeProvider {
     private final TerraContext context;
     private final LazySupplier<BiomeResources> resources;
 
+    private final float biomeSearchModifier;
+
     public TFBiomeProvider(TerraContext context) {
         super(BiomeAnalyser.getOverworldBiomes(context.biomeContext));
         this.context = context;
         this.seed = context.terraSettings.world.seed;
         this.resources = LazySupplier.factory(context, BiomeResources::new);
+        this.biomeSearchModifier = BiomeHelper.getBiomeSizeSearchModifier(context.settings.climate);
     }
 
     @Override
@@ -93,7 +96,7 @@ public class TFBiomeProvider extends BiomeProvider {
     @Override
     public Set<Biome> getBiomes(int centerX, int centerY, int centerZ, int radius) {
         // search smaller radius to encourage more attempts to generate structures like mansions
-        radius = NoiseUtil.round(0.75F * radius);
+        radius = Math.max(8, NoiseUtil.round(biomeSearchModifier * radius));
         int minX = centerX - radius;
         int minZ = centerZ - radius;
         int maxX = centerX + radius;

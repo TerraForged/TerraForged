@@ -82,8 +82,7 @@ public class ConfigScreen extends OverlayScreen {
         this.instance = new Instance(getInitialSettings(settings));
         this.preview = new PreviewPage(instance.settings, getSeed(parent));
         this.pages = new Page[]{
-                // TODO: reinstate
-//                new PresetsPage(instance, preview, preview.getPreviewWidget()),
+                new PresetsPage(instance, preview, preview.getPreviewWidget()),
                 new WorldPage(instance, preview),
                 new SimplePreviewPage(GuiKeys.CLIMATE_SETTINGS, "climate", preview, instance, s -> s.climate),
                 new SimplePreviewPage(GuiKeys.TERRAIN_SETTINGS, "terrain", preview, instance, s -> s.terrain),
@@ -189,8 +188,7 @@ public class ConfigScreen extends OverlayScreen {
         super.renderBackground(matrixStack);
         pages[pageIndex].visit(pane -> pane.render(matrixStack, mouseX, mouseY, partialTicks));
 
-        // TODO: restore to "> 0" when presets page added back in
-        if (pageIndex >= 0) {
+        if (pageIndex > 0) {
             preview.visit(pane -> pane.render(matrixStack, mouseX, mouseY, partialTicks));
         }
 
