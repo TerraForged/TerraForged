@@ -42,7 +42,7 @@
       "inland": 0.5
     },
     "properties": {
-      "spawnType": "WORLD_ORIGIN",
+      "spawnType": "CONTINENT_CENTER",
       "worldHeight": 255,
       "seaLevel": 63
     }

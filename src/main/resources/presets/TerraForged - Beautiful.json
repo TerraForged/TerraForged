@@ -66,7 +66,7 @@
       "bias": 0.0
     },
     "biomeShape": {
-      "biomeSize": 180,
+      "biomeSize": 185,
       "macroNoiseSize": 8,
       "biomeWarpScale": 150,
       "biomeWarpStrength": 80
