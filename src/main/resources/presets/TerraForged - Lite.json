@@ -94,49 +94,49 @@
       "horizontalScale": 1.0
     },
     "plains": {
-      "weight": 1.597,
+      "weight": 1.25,
       "baseScale": 1.0,
       "verticalScale": 1.0,
       "horizontalScale": 1.0
     },
     "hills": {
-      "weight": 2.292,
-      "baseScale": 1.0,
-      "verticalScale": 1.0,
-      "horizontalScale": 1.0
-    },
-    "dales": {
-      "weight": 1.5,
-      "baseScale": 1.0,
-      "verticalScale": 1.0,
-      "horizontalScale": 1.0
-    },
-    "plateau": {
-      "weight": 1.5,
-      "baseScale": 1.0,
-      "verticalScale": 1.0,
-      "horizontalScale": 1.0
-    },
-    "badlands": {
-      "weight": 1.0,
-      "baseScale": 1.0,
-      "verticalScale": 1.0,
-      "horizontalScale": 1.0
-    },
-    "torridonian": {
-      "weight": 2.421,
-      "baseScale": 1.0,
-      "verticalScale": 1.0,
-      "horizontalScale": 1.0
-    },
-    "mountains": {
       "weight": 2.5,
       "baseScale": 1.0,
       "verticalScale": 1.0,
       "horizontalScale": 1.0
     },
+    "dales": {
+      "weight": 2.0,
+      "baseScale": 1.0,
+      "verticalScale": 1.0,
+      "horizontalScale": 1.0
+    },
+    "plateau": {
+      "weight": 2.5,
+      "baseScale": 1.0,
+      "verticalScale": 1.0,
+      "horizontalScale": 1.0
+    },
+    "badlands": {
+      "weight": 1.5,
+      "baseScale": 1.0,
+      "verticalScale": 1.0,
+      "horizontalScale": 1.0
+    },
+    "torridonian": {
+      "weight": 3.0,
+      "baseScale": 1.0,
+      "verticalScale": 1.0,
+      "horizontalScale": 1.0
+    },
+    "mountains": {
+      "weight": 3.5,
+      "baseScale": 1.0,
+      "verticalScale": 1.0,
+      "horizontalScale": 1.0
+    },
     "volcano": {
-      "weight": 6.005,
+      "weight": 6.0,
       "baseScale": 1.0,
       "verticalScale": 1.0,
       "horizontalScale": 1.0
