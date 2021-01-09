@@ -184,8 +184,8 @@ public class TerrainHelper {
     }
 
     private static boolean intersects(MutableBoundingBox chunk, MutableBoundingBox structure, MutableBoundingBox util, int radius) {
-        expand(chunk, util, radius);
-        return structure.intersectsWith(chunk);
+        expand(structure, util, radius);
+        return chunk.intersectsWith(util);
     }
 
     private static void expand(MutableBoundingBox src, MutableBoundingBox dest, int radius) {
