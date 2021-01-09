@@ -24,16 +24,20 @@
 
 package com.terraforged.mod.chunk.util;
 
+import com.terraforged.mod.Log;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.vector.Vector3i;
+import net.minecraft.world.gen.feature.structure.StructureStart;
 
 public class ChunkRegionBoundingBox extends MutableBoundingBox {
 
     private static final int INCLUSIVE_SIZE = 15;
-    private static final String ERROR_MESSAGE = "Attempted to set the world-gen region to an unsafe size! Chunks: ";
+    private static final String ERROR_MESSAGE = "Structure {} attempted to change the world-gen region bounds to an unsafe location/size. Original: {}, Altered: {}";
 
     private final int x1, z1, x2, z2;
     private final int rx1, rz1, rx2, rz2;
+
+    private String structure = "unknown";
 
     public ChunkRegionBoundingBox(int chunkX, int chunkZ, int chunkRadius) {
         super(chunkX << 4, chunkZ << 4, (chunkX << 4) + INCLUSIVE_SIZE, (chunkZ << 4) + INCLUSIVE_SIZE);
@@ -47,13 +51,18 @@ public class ChunkRegionBoundingBox extends MutableBoundingBox {
         this.rz2 = ((chunkZ + chunkRadius) << 4) + INCLUSIVE_SIZE;
     }
 
-    public ChunkRegionBoundingBox reset() {
+    public ChunkRegionBoundingBox init(StructureStart<?> start) {
+        return init(start.getStructure().getStructureName());
+    }
+
+    public ChunkRegionBoundingBox init(String name) {
         minX = x1;
         minZ = z1;
         maxX = x2;
         maxZ = z2;
         minY = 1;
         maxY = 512;
+        structure = name;
         return this;
     }
 
@@ -91,7 +100,9 @@ public class ChunkRegionBoundingBox extends MutableBoundingBox {
 
     private void validate() {
         if (!contains(minX, minZ, rx1, rz1, rx2, rz2) || !contains(maxX, maxZ, rx1, rz1, rx2, rz2)) {
-            throw new UnsupportedOperationException(ERROR_MESSAGE + getSizeChunks());
+            String from = toString(rx1, rz1, rx2, rz2);
+            String to = toString(minX, minZ, maxX, maxZ);
+            Log.warn(ERROR_MESSAGE, structure, from, to);
         }
     }
 
@@ -101,5 +112,9 @@ public class ChunkRegionBoundingBox extends MutableBoundingBox {
 
     public static boolean contains(int x, int z, int minX, int minZ, int maxX, int maxZ) {
         return x >= minX && x <= maxX && z >= minZ && z <= maxZ;
+    }
+
+    public static String toString(int minX, int minZ, int maxX, int maxZ) {
+        return "Bounds{minX=" + minX + ",minZ=" + minZ + ",maxX=" + maxX + ",maxZ=" + maxZ + "}";
     }
 }

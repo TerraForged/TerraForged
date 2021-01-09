@@ -143,7 +143,7 @@ public class FeatureGenerator implements Generator.Features {
                                 manager,
                                 generator,
                                 random,
-                                chunkBounds.reset(),
+                                chunkBounds.init(start),
                                 chunkPos
                         ));
                         checkTime(STRUCTURE, structure.getStructureName(), timer, timeStamp, context);

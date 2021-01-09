@@ -153,6 +153,10 @@ public enum Profiler {
             time.addAndGet(duration);
             hits.incrementAndGet();
 
+            if (duration <= 0) {
+                return;
+            }
+
             long max = longest.get();
             if (duration > max) {
                 longest.compareAndSet(max, duration);
