@@ -32,6 +32,7 @@ import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.chunk.settings.preset.Preset;
 import com.terraforged.mod.chunk.settings.preset.PresetManager;
 import com.terraforged.mod.util.DimUtils;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
@@ -43,8 +44,8 @@ import java.util.Optional;
 
 public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
 
-    public static final ForgeWorldType TERRAFORGED = new ForgeWorldType(new LevelType())
-            .setRegistryName(TerraForgedMod.MODID, "terraforged");
+    public static final ResourceLocation LEVEL_NAME = new ResourceLocation(TerraForgedMod.MODID, "terraforged");
+    public static final ForgeWorldType TERRAFORGED = new ForgeWorldType(new LevelType()).setRegistryName(LEVEL_NAME);
 
     @Override
     public TFChunkGenerator createChunkGenerator(Registry<Biome> biomes, Registry<DimensionSettings> settings, long seed, String options) {
