@@ -26,6 +26,7 @@ package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.tile.chunk.ChunkReader;
+import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.ChunkCarverFix;
 import com.terraforged.mod.featuremanager.template.StructureUtils;
@@ -39,6 +40,7 @@ import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
 
+import javax.annotation.Nullable;
 import java.util.BitSet;
 import java.util.ListIterator;
 import java.util.function.Function;
@@ -64,7 +66,8 @@ public class TerrainCarver implements Generator.Carvers {
         int chunkZ = chunkpos.z;
 
         int seaLevel = generator.getSeaLevel();
-        BiomeLookup lookup = new BiomeLookup();
+        TFBiomeContainer biomeContainer = TFBiomeContainer.getOrNull(chunk);
+        BiomeLookup lookup = new BiomeLookup(chunkpos, biomeContainer);
         BitSet mask = carverChunk.getCarvingMask(type);
         Biome biome = generator.getBiomeProvider().getBiome(chunkpos.getXStart(), chunkpos.getZStart());
         BiomeGenerationSettings settings = biome.getGenerationSettings();
@@ -91,10 +94,21 @@ public class TerrainCarver implements Generator.Carvers {
 
     private class BiomeLookup implements Function<BlockPos, Biome> {
 
+        private final ChunkPos chunkPos;
+        private final TFBiomeContainer biomes;
         private final Cell cell = new Cell();
+
+        private BiomeLookup(ChunkPos chunkPos, @Nullable TFBiomeContainer biomes) {
+            this.chunkPos = chunkPos;
+            this.biomes = biomes;
+        }
 
         @Override
         public Biome apply(BlockPos pos) {
+            if (biomes != null && (pos.getX() >> 4) == chunkPos.x && (pos.getZ() >> 4) == chunkPos.z) {
+                // Method masks to chunk-local coordinates
+                return biomes.getBiome(pos.getX(), pos.getZ());
+            }
             return generator.getBiomeProvider().lookupBiome(cell, pos.getX(), pos.getZ());
         }
     }
