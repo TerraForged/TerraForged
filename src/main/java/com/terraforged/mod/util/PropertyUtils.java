@@ -22,27 +22,22 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.mixin.common;
+package com.terraforged.mod.util;
 
-import com.terraforged.mod.util.PropertyUtils;
-import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import com.terraforged.mod.LevelType;
 
 import java.util.Properties;
 
-/**
- * Non-essential.
- * Allows users to define the TF world type without a namespace
- */
-@Mixin(DimensionGeneratorSettings.class)
-public class MixinDimensionGeneratorSettings {
+public class PropertyUtils {
 
-    @Inject(method = "func_242753_a", at = @At("HEAD"))
-    private static void onLoadLevel(DynamicRegistries registries, Properties properties, CallbackInfoReturnable<DimensionGeneratorSettings> ci) {
-        PropertyUtils.fixTFLevelType(properties);
+    private static final String LEVEL_TYPE_KEY = "level-type";
+
+    public static void fixTFLevelType(Properties properties) {
+        if (properties.containsKey(LEVEL_TYPE_KEY)) {
+            String levelType = properties.getProperty(LEVEL_TYPE_KEY, "");
+            if (levelType.equalsIgnoreCase(LevelType.LEVEL_NAME.getPath())) {
+                properties.setProperty(LEVEL_TYPE_KEY, LevelType.LEVEL_NAME.toString());
+            }
+        }
     }
 }
