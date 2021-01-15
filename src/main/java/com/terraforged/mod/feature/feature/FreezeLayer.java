@@ -27,6 +27,7 @@ package com.terraforged.mod.feature.feature;
 import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.featuremanager.template.BlockUtils;
+import com.terraforged.mod.util.Flags;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SnowyDirtBlock;
@@ -50,6 +51,10 @@ import java.util.Random;
 public class FreezeLayer extends Feature<NoFeatureConfig> {
 
     public static final FreezeLayer INSTANCE = new FreezeLayer();
+
+    private static final int AIR_FLAG = Flags.OPTION_1;
+    private static final int LOG_OR_LEAVES_FLAG = Flags.OPTION_2;
+
     private static final BiomeAccessor WORLD_BIOME_ACCESSOR = (world, container, pos) -> world.getBiome(pos);
     private static final BiomeAccessor CONTAINER_BIOME_ACCESSOR = (world, container, pos) -> container.getBiome(pos.getX(), pos.getZ());
 
@@ -141,35 +146,43 @@ public class FreezeLayer extends Feature<NoFeatureConfig> {
     }
 
     // Chunk::getBlockState & Chunk::setBlockState masks coords so need to relativize
-    private void freezeGround(IWorld world, IChunk chunk, Biome biome, BlockPos.Mutable pos, BlockPos.Mutable below) {
-        if (biome.doesWaterFreeze(world, below, false)) {
-            chunk.setBlockState(below, Blocks.ICE.getDefaultState(), false);
+    private void freezeGround(IWorld world, IChunk chunk, Biome biome, BlockPos.Mutable snowPos, BlockPos.Mutable underPos) {
+        if (biome.doesWaterFreeze(world, underPos, false)) {
+            chunk.setBlockState(underPos, Blocks.ICE.getDefaultState(), false);
         }
 
-        if (biome.doesSnowGenerate(world, pos)) {
-            BlockState stateUnder = chunk.getBlockState(below);
-
-            if (stateUnder.getBlock() == Blocks.AIR) {
+        if (biome.doesSnowGenerate(world, snowPos)) {
+            BlockState stateUnder = chunk.getBlockState(underPos);
+            if (BlockUtils.isAir(stateUnder, chunk, underPos)) {
                 return;
             }
 
+            // don't place on logs
             if (BlockTags.LOGS.contains(stateUnder.getBlock())) {
                 return;
             }
 
-            pos.move(Direction.UP, 1);
-            BlockState above = chunk.getBlockState(pos);
-            if (BlockTags.LOGS.contains(above.getBlock()) || BlockTags.LEAVES.contains(above.getBlock())) {
+            // don't place if log/leaves directly above
+            int stateAbove = getAboveStateFlags(chunk, snowPos);
+            if (Flags.has(stateAbove, LOG_OR_LEAVES_FLAG)) {
                 return;
             }
 
-            pos.move(Direction.DOWN, 1);
-            if (setSnow(chunk, pos, below, stateUnder)) {
-                if (above.getBlock() != Blocks.AIR) {
-                    chunk.setBlockState(pos, Blocks.AIR.getDefaultState(), false);
+            if (setSnow(chunk, snowPos, underPos, stateUnder)) {
+                if (!Flags.has(stateAbove, AIR_FLAG)) {
+                    chunk.setBlockState(snowPos.move(Direction.UP, 1), Blocks.AIR.getDefaultState(), false);
                 }
             }
         }
+    }
+
+    private int getAboveStateFlags(IChunk chunk, BlockPos.Mutable pos) {
+        pos.move(Direction.UP, 1);
+        BlockState state = chunk.getBlockState(pos);
+        boolean air = BlockUtils.isAir(state, chunk, pos);
+        boolean tree = !air && BlockUtils.isLeavesOrLogs(state);
+        pos.move(Direction.DOWN, 1);
+        return Flags.get(air, tree);
     }
 
     // Chunk::setBlockState masks coords so need to relativize
@@ -179,7 +192,6 @@ public class FreezeLayer extends Feature<NoFeatureConfig> {
         }
 
         chunk.setBlockState(pos1, Blocks.SNOW.getDefaultState(), false);
-
         if (below.hasProperty(SnowyDirtBlock.SNOWY)) {
             chunk.setBlockState(pos2, below.with(SnowyDirtBlock.SNOWY, true), false);
         }

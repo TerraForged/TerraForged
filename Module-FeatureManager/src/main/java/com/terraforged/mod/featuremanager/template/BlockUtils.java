@@ -31,14 +31,27 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.gen.feature.TreeFeature;
 
 import java.util.function.BiPredicate;
 
 public class BlockUtils {
 
+    public static boolean isAir(IBlockReader world, BlockPos pos) {
+        return isAir(world.getBlockState(pos), world, pos);
+    }
+
+    public static boolean isAir(BlockState state, IBlockReader world, BlockPos pos) {
+        return state.getBlock().isAir(state, world, pos);
+    }
+
     public static boolean isSoil(IWorld world, BlockPos pos) {
         return TreeFeature.isDirt(world.getBlockState(pos).getBlock());
+    }
+
+    public static boolean isLeavesOrLogs(BlockState state) {
+        return BlockTags.LOGS.contains(state.getBlock()) || BlockTags.LEAVES.contains(state.getBlock());
     }
 
     public static boolean isVegetation(IWorld world, BlockPos pos) {
