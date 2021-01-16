@@ -85,7 +85,7 @@
       "terrainSeedOffset": 0,
       "terrainRegionSize": 690,
       "globalVerticalScale": 0.629,
-      "globalHorizontalScale": 1.61,
+      "globalHorizontalScale": 0.629,
       "fancyMountains": false
     },
     "steppe": {
