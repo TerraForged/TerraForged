@@ -1,16 +1,23 @@
 modLoader="javafml"
 license="MIT"
 loaderVersion="[35.1,)"
+
 [[mods]]
 modId="terraforged"
 displayName="TerraForged"
 version="${version}"
 authors="dags,Won-Ton"
-credits="dags,Won-Ton"
+credits="Devs:dags,Won-Ton|Artist/Builder:monsterfish_"
 logoFile="terraforged.png"
 displayURL="https://terraforged.com"
-issueTrackerURL="https://github.com/TerraForged/TerraForged/issues"
+issueTrackerURL="https://github.com/TerraForged/tracker/issues"
 description='''
 Description:
  A terrain generator!
 '''
+
+[[dependencies.terraforged]]
+    modId="forge"
+    side="BOTH"
+    mandatory=true
+    versionRange="[35.1.5,)"

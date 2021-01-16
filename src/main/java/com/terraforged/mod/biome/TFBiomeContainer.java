@@ -80,6 +80,14 @@ public class TFBiomeContainer extends BiomeContainer {
         return new BiomeContainer(context.biomes.getRegistry(), biomes);
     }
 
+    public static TFBiomeContainer getOrNull(IChunk chunk) {
+        BiomeContainer biomes = chunk.getBiomes();
+        if (biomes instanceof TFBiomeContainer) {
+            return (TFBiomeContainer) biomes;
+        }
+        return null;
+    }
+
     public static TFBiomeContainer getOrCreate(IChunk chunk, ChunkReader reader, TFBiomeProvider biomeProvider) {
         BiomeContainer biomes = chunk.getBiomes();
         if (biomes instanceof TFBiomeContainer) {

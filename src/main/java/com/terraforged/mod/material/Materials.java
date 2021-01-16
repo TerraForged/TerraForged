@@ -29,7 +29,6 @@ import com.terraforged.mod.Log;
 import com.terraforged.mod.api.material.WGTags;
 import com.terraforged.mod.api.material.layer.LayerManager;
 import com.terraforged.mod.api.material.state.States;
-import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.chunk.util.DummyBlockReader;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -48,16 +47,16 @@ public class Materials {
 
     public final LayerManager layerManager = new LayerManager();
     public final Set<Block> stone;
-    public final Set<Block> dirt = create(WGTags.DIRT, States.DIRT.getBlock());
-    public final Set<Block> clay = create(WGTags.CLAY, States.CLAY.getBlock());
-    public final Set<Block> sediment = create(WGTags.SEDIMENT, States.GRAVEL.getBlock());
-    public final Set<Block> erodible = create(WGTags.ERODIBLE, null);
+    public final Set<Block> dirt = createSet(WGTags.DIRT, States.DIRT.getBlock());
+    public final Set<Block> clay = createSet(WGTags.CLAY, States.CLAY.getBlock());
+    public final Set<Block> sediment = createSet(WGTags.SEDIMENT, States.GRAVEL.getBlock());
+    public final Set<Block> erodible = createSet(WGTags.ERODIBLE, null);
 
     private Materials(TerraSettings settings) {
         if (settings.miscellaneous.oreCompatibleStoneOnly) {
-            stone = create(WGTags.STONE, States.STONE.getBlock(), BlockTags.BASE_STONE_OVERWORLD);
+            stone = createSet(WGTags.STONE, States.STONE.getBlock(), BlockTags.BASE_STONE_OVERWORLD);
         } else {
-            stone = create(WGTags.STONE, States.STONE.getBlock());
+            stone = createSet(WGTags.STONE, States.STONE.getBlock());
         }
     }
 
@@ -93,7 +92,7 @@ public class Materials {
         return block instanceof GrassBlock || block instanceof MyceliumBlock;
     }
 
-    private static Set<Block> create(ITag<Block> tag, Block def) {
+    private static Set<Block> createSet(ITag<Block> tag, Block def) {
         try {
             ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(tag.getAllElements());
             if (set.isEmpty() && def != null) {
@@ -105,7 +104,7 @@ public class Materials {
         }
     }
 
-    private static Set<Block> create(ITag.INamedTag<Block> tag, Block def, ITag.INamedTag<Block> required) {
+    private static Set<Block> createSet(ITag.INamedTag<Block> tag, Block def, ITag.INamedTag<Block> required) {
         try {
             ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(tag.getAllElements());
             set.removeIf(block -> isAbsent(block, tag, required));
@@ -140,7 +139,7 @@ public class Materials {
         return Collections.unmodifiableList(list);
     }
 
-    public static Materials create(TerraContext context) {
-        return new Materials(context.terraSettings);
+    public static Materials create(TerraSettings settings) {
+        return new Materials(settings);
     }
 }

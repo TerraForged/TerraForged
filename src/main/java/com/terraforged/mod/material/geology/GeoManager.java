@@ -43,6 +43,8 @@ import java.util.Map;
 
 public class GeoManager implements GeologyManager {
 
+    private static final int SEED_OFFSET = -34678;
+
     private final Module selector;
     private final Materials materials;
     private final TFBiomeContext context;
@@ -51,17 +53,19 @@ public class GeoManager implements GeologyManager {
     private final Map<Biome, Geology<BlockState>> specific = new HashMap<>();
 
     public GeoManager(TerraContext context) {
+        Seed seed = context.seed.offset(SEED_OFFSET);
         int scale = context.terraSettings.miscellaneous.strataRegionSize;
-        this.selector = Source.cell(context.seed.next(), scale)
-                .warp(context.seed.next(), scale / 4, 2, scale / 2D)
-                .warp(context.seed.next(), 15, 2, 30);
+        this.selector = Source.cell(seed.next(), scale)
+                .warp(seed.next(), scale / 4, 2, scale / 2D)
+                .warp(seed.next(), 15, 2, 30);
         this.materials = context.materials.get();
         this.general = new Geology<>(selector);
         this.builder = new GeoGenerator(materials);
         this.context = context.biomeContext;
-        init(context.seed);
+        init(seed);
     }
 
+    @Override
     public GeoGenerator getStrataGenerator() {
         return builder;
     }
@@ -81,6 +85,7 @@ public class GeoManager implements GeologyManager {
      * If a specific geology doesn't exist for a given biome, the global geology can optionally be added using
      * the 'inheritGlobal' flag.
      */
+    @Override
     public void register(RegistryKey<Biome> biome, Strata<BlockState> strata, boolean inheritGlobal) {
         Geology<BlockState> geology = specific.get(biome);
         if (geology == null) {
@@ -96,6 +101,7 @@ public class GeoManager implements GeologyManager {
     /**
      * Register/replace a biome-specific geology group
      */
+    @Override
     public void register(RegistryKey<Biome> biome, Geology<BlockState> geology) {
         specific.put(context.biomes.get(biome), geology);
     }
@@ -111,7 +117,7 @@ public class GeoManager implements GeologyManager {
     private void init(Seed seed) {
         StrataConfig config = new StrataConfig();
         GeoGenerator generator = new GeoGenerator(materials);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             Strata<BlockState> strata = generator.generate(seed.next(), 128, config);
             general.add(strata);
         }

@@ -39,7 +39,6 @@ public class ServerCrashHandler implements CrashHandler {
     public void crash(IChunk chunk, TFChunkGenerator generator, Throwable t) {
         // lock without release to prevent spamming
         lock.writeLock();
-
         CrashReport report = CrashReportBuilder.buildCrashReport(chunk, generator, t);
         throw new ReportedException(report);
     }

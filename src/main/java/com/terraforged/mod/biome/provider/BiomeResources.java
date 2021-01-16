@@ -29,16 +29,20 @@ import com.terraforged.engine.world.heightmap.WorldLookup;
 import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.util.setup.SetupHooks;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.world.biome.Biome;
 
 public class BiomeResources {
 
-    public final BiomeMap biomeMap;
+    public static final int SEED_OFFSET = 35768;
+
+    public final BiomeMap<RegistryKey<Biome>> biomemap;
     public final WorldLookup worldLookup;
     public final BiomeModifierManager modifierManager;
 
     public BiomeResources(TerraContext context) {
-        this.biomeMap = BiomeAnalyser.createBiomeMap(context.biomeContext);
+        this.biomemap = BiomeAnalyser.createBiomeMap(context.biomeContext);
         this.worldLookup = new WorldLookup(context);
-        this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomeMap), context.copy());
+        this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomemap), context);
     }
 }

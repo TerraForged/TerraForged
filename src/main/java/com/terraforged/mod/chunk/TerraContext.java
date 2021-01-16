@@ -49,7 +49,7 @@ public class TerraContext extends GeneratorContext {
     public final long worldSeed;
     public final LazySupplier<Heightmap> heightmap;
     public final TerraSettings terraSettings;
-    public final LazySupplier<Materials> materials = LazySupplier.factory(this, Materials::create);
+    public final LazySupplier<Materials> materials = LazySupplier.supplied(this::getTerraSettings, Materials::create);
 
     public final TFBiomeContext biomeContext;
 
@@ -69,12 +69,34 @@ public class TerraContext extends GeneratorContext {
         this.heightmap = factory.then(WorldGeneratorFactory::getHeightmap);
     }
 
+    protected TerraContext(TerraContext other, int seedOffset) {
+        super(other, seedOffset);
+        worldSeed = other.worldSeed;
+        heightmap = other.heightmap;
+        terraSettings = other.terraSettings;
+        biomeContext = other.biomeContext;
+    }
+
+    @Override
+    public TerraContext copy() {
+        return new TerraContext(this, 0);
+    }
+
+    @Override
+    public TerraContext split(int offset) {
+        return new TerraContext(this, offset);
+    }
+
     public DecoratorContext decorator(IChunk chunk) {
         return new DecoratorContext(chunk, levels, factory.get().getClimate(), false);
     }
 
     public SurfaceContext surface(SurfaceChunk buffer, TFBiomeContainer biomes, DimensionSettings settings) {
-        return new SurfaceContext(buffer, biomes, levels, factory.get().getClimate(), settings, seed.get());
+        return new SurfaceContext(buffer, biomes, levels, factory.get().getClimate(), settings, worldSeed);
+    }
+
+    protected TerraSettings getTerraSettings() {
+        return terraSettings;
     }
 
     public static TileCache createCache(WorldGeneratorFactory factory) {
@@ -86,7 +108,7 @@ public class TerraContext extends GeneratorContext {
         int threadCount = Math.min(PerfDefaults.MAX_THREAD_COUNT, Math.max(1, config.getInt("thread_count")));
         return TileGenerator.builder()
                 .pool(ThreadPools.create(threadCount, batching))
-                .size(tileSize, 1)
+                .size(tileSize, PerfDefaults.TILE_BORDER)
                 .batch(batchCount)
                 .factory(factory)
                 .build()

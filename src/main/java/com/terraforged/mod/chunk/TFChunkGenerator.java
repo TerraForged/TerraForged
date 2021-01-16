@@ -29,6 +29,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.concurrent.cache.CacheManager;
 import com.terraforged.engine.concurrent.task.LazySupplier;
 import com.terraforged.engine.tile.Size;
 import com.terraforged.engine.tile.Tile;
@@ -101,6 +102,7 @@ public class TFChunkGenerator extends ChunkGenerator {
 
     public TFChunkGenerator(TFBiomeProvider biomeProvider, DimensionSettings settings) {
         super(biomeProvider, settings.getStructures());
+        CacheManager.get().clear();
         TerraContext context = biomeProvider.getContext();
         this.seed = context.terraSettings.world.seed;
         this.context = context;
@@ -113,7 +115,7 @@ public class TFChunkGenerator extends ChunkGenerator {
         this.surfaceGenerator = new SurfaceGenerator(this);
         this.featureGenerator = new FeatureGenerator(this);
         this.structureGenerator = new StructureGenerator(this);
-        this.resources = LazySupplier.factory(context, GeneratorResources.factory(this));
+        this.resources = LazySupplier.factory(context.split(GeneratorResources.SEED_OFFSET), GeneratorResources.factory(this));
         Profiler.reset();
         Log.info("Created TerraForged chunk-generator with settings {}", DataUtils.toJson(context.terraSettings));
     }

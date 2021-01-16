@@ -42,6 +42,7 @@ import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import com.terraforged.noise.util.NoiseUtil;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
@@ -67,7 +68,7 @@ public class TFBiomeProvider extends BiomeProvider {
         super(BiomeAnalyser.getOverworldBiomes(context.biomeContext));
         this.context = context;
         this.seed = context.terraSettings.world.seed;
-        this.resources = LazySupplier.factory(context, BiomeResources::new);
+        this.resources = LazySupplier.factory(context.split(BiomeResources.SEED_OFFSET), BiomeResources::new);
         this.biomeSearchModifier = BiomeHelper.getBiomeSizeSearchModifier(context.settings.climate);
     }
 
@@ -173,8 +174,8 @@ public class TFBiomeProvider extends BiomeProvider {
         return pos;
     }
 
-    public BiomeMap getBiomeMap() {
-        return getResources().biomeMap;
+    public BiomeMap<RegistryKey<Biome>> getBiomeMap() {
+        return getResources().biomemap;
     }
 
     public Resource<Cell> lookupPos(int x, int z) {
@@ -215,7 +216,7 @@ public class TFBiomeProvider extends BiomeProvider {
 
     public Biome getBiome(Cell cell, int x, int z) {
         BiomeResources resources = this.getResources();
-        int biome = resources.biomeMap.provideBiome(cell, context.levels);
+        int biome = resources.biomemap.provideBiome(cell, context.levels);
         if (resources.modifierManager.hasModifiers(cell, context.levels)) {
             int modified = resources.modifierManager.modify(biome, cell, x, z);
             if (BiomeMap.isValid(modified)) {

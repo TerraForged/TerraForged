@@ -22,11 +22,44 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util.version;
+package com.terraforged.mod.profiler.watchdog;
 
-public class VersionError extends RuntimeException {
+import java.util.concurrent.locks.StampedLock;
 
-    public VersionError(String modid, int major, int minor, int patch, String version) {
-        super(String.format("Please install %s %s.%s.%s or newer. (You are running version %s)", modid, major, minor, patch, version));
+public class ContextQueue {
+
+    private static final WatchdogContext[] EMPTY = new WatchdogContext[0];
+
+    private volatile WatchdogContext[] queue = EMPTY;
+    private final StampedLock lock = new StampedLock();
+
+    public void add(WatchdogContext context) {
+        long stamp = lock.writeLock();
+        try {
+            WatchdogContext[] queue = this.queue;
+            int size = queue.length;
+
+            WatchdogContext[] next = new WatchdogContext[size + 1];
+            System.arraycopy(queue, 0, next, 0, size);
+            next[size] = context;
+
+            this.queue = next;
+        } finally {
+            lock.unlockWrite(stamp);
+        }
+    }
+
+    public WatchdogContext[] get() {
+        long opt = lock.tryOptimisticRead();
+        WatchdogContext[] queue = this.queue;
+        if (!lock.validate(opt)) {
+            long stamp = lock.readLock();
+            try {
+                queue = this.queue;
+            } finally {
+                lock.unlockRead(stamp);
+            }
+        }
+        return queue;
     }
 }

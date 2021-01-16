@@ -29,13 +29,11 @@ import com.terraforged.mod.profiler.timings.TimingStack;
 import com.terraforged.mod.profiler.timings.Top3TimingStack;
 import net.minecraft.world.chunk.IChunk;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.StampedLock;
 
 class WatchdogCtx implements WatchdogContext {
 
-    protected static final List<WatchdogCtx> CONTEXTS = new CopyOnWriteArrayList<>();
+    protected static final ContextQueue QUEUE = new ContextQueue();
 
     private String phase = "";
     private IChunk chunk = null;
@@ -50,7 +48,7 @@ class WatchdogCtx implements WatchdogContext {
     private final TimingStack stack = new Top3TimingStack();
 
     protected WatchdogCtx() {
-        CONTEXTS.add(this);
+        Watchdog.addContext(this);
     }
 
     @Override
@@ -102,7 +100,8 @@ class WatchdogCtx implements WatchdogContext {
         }
     }
 
-    boolean set(IChunk chunk, TFChunkGenerator generator, long duration) {
+    @Override
+    public boolean set(IChunk chunk, TFChunkGenerator generator, long duration) {
         long stamp = lock.writeLock();
         try {
             if (thread != null) {
@@ -124,7 +123,8 @@ class WatchdogCtx implements WatchdogContext {
         }
     }
 
-    void check(long now) throws DeadlockException {
+    @Override
+    public void check(long now) throws ChunkTimeoutException {
         if (optimisticCheck(now)) {
             return;
         }
@@ -140,9 +140,9 @@ class WatchdogCtx implements WatchdogContext {
      * Returns true if data was validated after read & no deadlock detected
      * Throws a DeadlockException if the data was valid & a deadlock was detected
      */
-    private boolean optimisticCheck(long now) throws DeadlockException {
+    private boolean optimisticCheck(long now) throws ChunkTimeoutException {
         long stamp = lock.tryOptimisticRead();
-        DeadlockException deadlock = getDeadlock(now);
+        ChunkTimeoutException deadlock = getDeadlock(now);
         if (lock.validate(stamp)) {
             if (deadlock == null) {
                 return true;
@@ -152,10 +152,10 @@ class WatchdogCtx implements WatchdogContext {
         return false;
     }
 
-    private void lockedCheck(long now) throws DeadlockException {
+    private void lockedCheck(long now) throws ChunkTimeoutException {
         long stamp = lock.readLock();
         try {
-            DeadlockException deadlock = getDeadlock(now);
+            ChunkTimeoutException deadlock = getDeadlock(now);
             if (deadlock == null) {
                 return;
             }
@@ -165,7 +165,7 @@ class WatchdogCtx implements WatchdogContext {
         }
     }
 
-    private DeadlockException getDeadlock(long now) {
+    private ChunkTimeoutException getDeadlock(long now) {
         if (thread == null) {
             return null;
         }
@@ -176,6 +176,6 @@ class WatchdogCtx implements WatchdogContext {
 
         long totalTime = now - start;
         long itemTime = now - itemStart;
-        return new DeadlockException(phase, identifier, totalTime, itemTime, stack.copy(), chunk, generator, thread);
+        return new ChunkTimeoutException(phase, identifier, totalTime, itemTime, stack.copy(), chunk, generator, thread);
     }
 }

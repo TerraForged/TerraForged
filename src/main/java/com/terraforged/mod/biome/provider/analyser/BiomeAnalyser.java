@@ -57,7 +57,7 @@ public class BiomeAnalyser {
         put(BiomeType.ALPINE, BiomePredicate.MOUNTAIN);
     }};
 
-    public static BiomeMap createBiomeMap(TFBiomeContext context) {
+    public static BiomeMap<RegistryKey<Biome>> createBiomeMap(TFBiomeContext context) {
         List<BiomeData> biomes = getAllBiomeData(context);
         BiomeWeights weights = new BiomeWeights(context);
 

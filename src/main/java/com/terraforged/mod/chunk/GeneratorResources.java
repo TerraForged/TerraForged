@@ -39,6 +39,8 @@ import java.util.function.Function;
 
 public class GeneratorResources {
 
+    public static final int SEED_OFFSET = 746382634;
+
     final TileCache tileCache;
     final FeatureManager featureManager;
     final BlockDataManager blockDataManager;
@@ -64,8 +66,8 @@ public class GeneratorResources {
 
         this.tileCache = context.cache.get();
 
-        SetupHooks.setup(context.materials.get().layerManager, context.copy());
-        SetupHooks.setup(surfaceDecorators, postProcessors, context.copy());
+        SetupHooks.setup(context.materials.get().layerManager, context);
+        SetupHooks.setup(surfaceDecorators, postProcessors, context);
     }
 
     public static Function<TerraContext, GeneratorResources> factory(TFChunkGenerator generator) {

@@ -42,7 +42,7 @@ import java.util.stream.Stream;
 public class Codecs {
 
     public static final Marker MARKER = MarkerManager.getMarker("Codecs");
-    public static final Level LOG_LEVEL = Level.DEBUG;
+    public static final Level ERROR_LOG_LEVEL = Level.TRACE;
 
     public static <V> Codec<V> create(EncoderFunc<V> encoder, DecoderFunc<V> decoder) {
         return Codec.of(encoder, decoder).stable();
@@ -102,7 +102,7 @@ public class Codecs {
 
     public static <T> Optional<T> getResult(DataResult<T> result) {
         if (result.error().isPresent()) {
-            FeatureManager.LOG.log(LOG_LEVEL, MARKER, result.error().get().message());
+            FeatureManager.LOG.log(ERROR_LOG_LEVEL, MARKER, result.error().get().message());
         }
         return result.result();
     }

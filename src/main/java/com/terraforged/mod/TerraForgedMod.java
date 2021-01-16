@@ -25,6 +25,7 @@
 package com.terraforged.mod;
 
 import com.terraforged.engine.Engine;
+import com.terraforged.engine.concurrent.task.LazySupplier;
 import com.terraforged.mod.api.material.WGTags;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
@@ -32,7 +33,6 @@ import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.server.command.TerraCommand;
 import com.terraforged.mod.util.DataUtils;
 import com.terraforged.mod.util.Environment;
-import com.terraforged.mod.util.version.VersionChecker;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeManager;
@@ -45,6 +45,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
 
 import java.io.File;
+import java.util.function.Supplier;
 
 @Mod(TerraForgedMod.MODID)
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -54,9 +55,11 @@ public class TerraForgedMod {
     public static final File CONFIG_DIR = new File("config", MODID).getAbsoluteFile();
     public static final File PRESETS_DIR = new File(CONFIG_DIR, "presets");
     public static final File DATAPACK_DIR = new File(CONFIG_DIR, "datapacks");
+    private static final Supplier<String> VERSION = LazySupplier.of(() -> ModList.get().getModContainerById(MODID)
+            .map(mod -> mod.getModInfo().getVersion().toString())
+            .orElse("unknown"));
 
     public TerraForgedMod() {
-        VersionChecker.require("forge", 35, 1, 5);
         Environment.log();
 
         ModFileInfo modInfo = ModList.get().getModFileById(MODID);
@@ -85,7 +88,7 @@ public class TerraForgedMod {
     @SubscribeEvent
     public static void complete(FMLLoadCompleteEvent event) {
         // log version because people do dumb stuff like renaming jars
-        Log.info("## Loaded TerraForged version {}", getVersion());
+        Log.info("Loaded TerraForged version {}", getVersion());
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -98,8 +101,6 @@ public class TerraForgedMod {
     }
 
     public static String getVersion() {
-        return ModList.get().getModContainerById(MODID)
-                .map(mod -> mod.getModInfo().getVersion().toString())
-                .orElse("unknown");
+        return VERSION.get();
     }
 }

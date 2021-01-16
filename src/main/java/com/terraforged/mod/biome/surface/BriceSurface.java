@@ -43,6 +43,8 @@ public class BriceSurface implements MaskedSurface, Stratum.Visitor<BlockState, 
     private final Strata<BlockState> stackStrata;
 
     public BriceSurface(Seed seed) {
+//        seed.skip(4907532);
+
         Random random = new Random(seed.next());
         Variance variance = Variance.of(0.1, 0.2);
 

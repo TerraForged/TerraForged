@@ -30,13 +30,14 @@ import net.minecraft.world.chunk.IChunk;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class DeadlockException extends UncheckedException {
+public class ChunkTimeoutException extends UncheckedException {
 
-    private static final String MESSAGE = "World-gen deadlock detected!"
+    private static final String MESSAGE = "Chunk-generation timed-out! Possible deadlock detected!"
             + "\n"
             + "\n\t\t\tA single chunk has taken over %s to generate!"
             + "\n\t\t\tWe crashed whilst generating: %s %s"
-            + "\n\t\t\tIt had been generating for: %s (%s)";
+            + "\n\t\t\tIt had been generating for: %s (%s)"
+            + "\n";
 
     private static final String TABLE_HEADER_ONE = "\n\t\t\tThe slowest performing feature/structure before that was:";
     private static final String TABLE_HEADER_MULT = "\n\t\t\tThe %s slowest performing features/structures before that were:";
@@ -46,7 +47,7 @@ public class DeadlockException extends UncheckedException {
     private final IChunk chunk;
     private final TFChunkGenerator generator;
 
-    protected DeadlockException(String phase, Object identity, long totalTime, long itemTime, TimingStack stack, IChunk chunk, TFChunkGenerator generator, Thread thread) {
+    protected ChunkTimeoutException(String phase, Object identity, long totalTime, long itemTime, TimingStack stack, IChunk chunk, TFChunkGenerator generator, Thread thread) {
         super(createMessage(phase, identity, totalTime, itemTime, stack), thread.getStackTrace());
         this.chunk = chunk;
         this.generator = generator;

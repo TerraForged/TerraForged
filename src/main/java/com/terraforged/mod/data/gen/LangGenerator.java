@@ -81,7 +81,8 @@ public class LangGenerator {
         for (Biome biome : context.biomes) {
             ResourceLocation name = context.biomes.getRegistryName(biome);
             if (name != null && name.getNamespace().equals(TerraForgedMod.MODID)) {
-//                provider.add(name.toString(), NameUtil.toDisplayName(name.getPath()));
+                String key = getBiomeTranslationKey(name);
+                provider.add(key, NameUtil.toDisplayName(name.getPath()));
             }
         }
     }
@@ -127,6 +128,10 @@ public class LangGenerator {
         }
 
         lang.add(key, value);
+    }
+
+    private static String getBiomeTranslationKey(ResourceLocation name) {
+        return "biome." + name.getNamespace() + "." + name.getPath();
     }
 
     public static class DataGenSettings extends TerraSettings {

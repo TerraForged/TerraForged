@@ -28,7 +28,6 @@ import com.google.gson.JsonElement;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.mod.LevelType;
 import com.terraforged.mod.Log;
-import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
@@ -55,13 +54,7 @@ import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 
 public class ConfigScreen extends OverlayScreen {
 
-    private static final int MESSAGE_PAD_X = 15;
-    private static final int MESSAGE_PAD_Y = 6;
-    private static final int MESSAGE_COLOR = 0x00DDAA;
-    private static final String MESSAGE_PREFIX = "TF-" + TerraForgedMod.getVersion();
-
-    private static final Button.IPressable NO_ACTION = b -> {
-    };
+    private static final Button.IPressable NO_ACTION = b -> {};
 
     private final Page[] pages;
     private final PreviewPage preview;
@@ -71,9 +64,6 @@ public class ConfigScreen extends OverlayScreen {
 
     private int pageIndex = 0;
     private DimensionGeneratorSettings outputSettings;
-
-    // TODO: remove after alpha/beta
-    private String splashMessage = "";
 
     public ConfigScreen(CreateWorldScreen parent, DimensionGeneratorSettings settings) {
         this.inputSettings = settings;
@@ -106,8 +96,6 @@ public class ConfigScreen extends OverlayScreen {
         int buttonHeight = 20;
         int buttonPad = 2;
         int buttonsRow = height - 25;
-
-        splashMessage = MESSAGE_PREFIX + Splashes.next();
 
         if (pageIndex < pages.length) {
             Page page = pages[pageIndex];
@@ -192,10 +180,7 @@ public class ConfigScreen extends OverlayScreen {
             preview.visit(pane -> pane.render(matrixStack, mouseX, mouseY, partialTicks));
         }
 
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-
-        renderSplash(matrixStack);
-    }
+        super.render(matrixStack, mouseX, mouseY, partialTicks); }
 
     @Override
     public void renderOverlays(MatrixStack matrixStack, Screen screen, int mouseX, int mouseY) {
@@ -264,22 +249,6 @@ public class ConfigScreen extends OverlayScreen {
         preview.close();
         Minecraft.getInstance().displayGuiScreen(parent);
         parent.field_238934_c_.func_239043_a_(outputSettings);
-    }
-
-    private void renderSplash(MatrixStack matrix) {
-        if (minecraft != null) {
-            String message = splashMessage;
-            int width = pages[pageIndex].getColumn(0).width;
-            int length = MESSAGE_PAD_X + minecraft.fontRenderer.getStringWidth(message);
-            if (length > width) {
-                message = MESSAGE_PREFIX;
-                length = MESSAGE_PAD_X + minecraft.fontRenderer.getStringWidth(message);
-                if (length > width) {
-                    return;
-                }
-            }
-            minecraft.fontRenderer.drawString(matrix, message, MESSAGE_PAD_X, MESSAGE_PAD_Y, MESSAGE_COLOR);
-        }
     }
 
     private boolean hasNext() {

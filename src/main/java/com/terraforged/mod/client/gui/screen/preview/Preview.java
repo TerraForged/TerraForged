@@ -29,6 +29,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.concurrent.cache.CacheEntry;
+import com.terraforged.engine.concurrent.cache.CacheManager;
 import com.terraforged.engine.concurrent.thread.ThreadPool;
 import com.terraforged.engine.concurrent.thread.ThreadPools;
 import com.terraforged.engine.settings.Settings;
@@ -53,6 +54,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.StringTextComponent;
 
 import java.awt.*;
+import java.util.Objects;
 import java.util.Random;
 
 public class Preview extends Button {
@@ -70,10 +72,13 @@ public class Preview extends Button {
 
     private int seed;
     private long lastUpdate = 0L;
-    private MutableVeci center = new MutableVeci();
-    private Settings settings = new Settings();
-    private CacheEntry<Tile> task = null;
     private Tile tile = null;
+    private CacheEntry<Tile> task = null;
+    private CompoundNBT lastWorldSettings = null;
+    private CompoundNBT lastPreviewSettings = null;
+
+    private Settings settings = new Settings();
+    private MutableVeci center = new MutableVeci();
 
     private String hoveredCoords = "";
     private String[] values = {"", "", ""};
@@ -97,6 +102,7 @@ public class Preview extends Button {
     public void close() {
         texture.close();
         threadPool.shutdown();
+        CacheManager.get().clear();
     }
 
     public boolean click(double mx, double my) {
@@ -130,10 +136,20 @@ public class Preview extends Button {
 
     public void update(Settings settings, CompoundNBT prevSettings) {
         long time = System.currentTimeMillis();
-        if (time - lastUpdate < 50) {
+        if (time - lastUpdate < 20) {
             return;
         }
+
+        // Dumb way of preventing the image repainting when nothing has changed
+        CompoundNBT previewSettings = prevSettings.copy();
+        CompoundNBT worldSettings = DataUtils.toCompactNBT(settings);
+        if (Objects.equals(lastWorldSettings, worldSettings) && Objects.equals(lastPreviewSettings, previewSettings)) {
+            return;
+        }
+
         lastUpdate = time;
+        lastWorldSettings = worldSettings;
+        lastPreviewSettings = previewSettings;
 
         DataUtils.fromNBT(prevSettings, previewSettings);
         settings.world.seed = seed;
@@ -186,8 +202,8 @@ public class Preview extends Button {
         settings.world.seed = seed;
         this.settings = settings;
 
+        CacheManager.get().clear();
         GeneratorContext context = GeneratorContext.createNoCache(settings);
-
         if (settings.world.properties.spawnType == SpawnType.CONTINENT_CENTER) {
             long center = context.factory.get().getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ);
             this.center.x = PosUtil.unpackLeft(center);

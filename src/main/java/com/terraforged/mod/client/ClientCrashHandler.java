@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.client;
 
+import com.terraforged.engine.concurrent.thread.ThreadPools;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.profiler.crash.CrashHandler;
 import com.terraforged.mod.profiler.crash.CrashReportBuilder;
@@ -49,6 +50,7 @@ public class ClientCrashHandler implements CrashHandler {
         }
 
         try {
+            ThreadPools.shutdownAll();
             CrashReport report = CrashReportBuilder.buildCrashReport(chunk, generator, t);
             ClientCrashHandler.displayCrashReport(report);
         } finally {

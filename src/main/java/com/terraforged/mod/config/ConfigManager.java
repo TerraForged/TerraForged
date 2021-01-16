@@ -30,6 +30,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.settings.preset.Preset;
+import com.terraforged.mod.profiler.watchdog.Watchdog;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,8 +41,7 @@ import java.util.function.Consumer;
 public class ConfigManager {
 
     private static final String PERF_VERSION = "0.1";
-    private static final String GENERAL_VERSION = "0.3";
-
+    private static final String GENERAL_VERSION = "0.4";
     private static final Path COMMON_DIR = Paths.get("config", "terraforged").toAbsolutePath();
 
     public static final ConfigRef BIOME_WEIGHTS = new ConfigRef(() -> create("biome_weights", cfg -> set(
@@ -52,7 +52,7 @@ public class ConfigManager {
             "This config will override the weights configured or provided by other mods for TerraForged worlds only."
     )));
 
-    public static final ConfigRef PERFORMANCE = new ConfigRef(PERF_VERSION, version -> create("performance", version, cfg -> {
+    public static final ConfigRef PERFORMANCE = new ConfigRef(PERF_VERSION, version -> create("performance_internal", version, cfg -> {
         set (
                 cfg,
                 "thread_count",
@@ -109,19 +109,19 @@ public class ConfigManager {
         );
         set(
                 cfg,
-                "feature_warn_time",
-                50,
+                Watchdog.FEATURE_WARN_KEY,
+                100,
                 "The number of milliseconds a single feature/structure can generate for before a warning",
                 "is printed to the logs. This may help track down mods that are causing world-gen to run slow.",
                 "Set to -1 to disable."
         );
         set(
                 cfg,
-                "server_deadlock_timeout",
-                45_000,
+                Watchdog.CHUNK_TIMEOUT_KEY,
+                60_000,
                 "The number of milliseconds after which the server will be considered 'deadlocked' (when it",
                 "gets stuck trying to generate a feature/structure). This is usually caused by third-party mods.",
-                "Set to -1 to disable deadlock detection & reporting."
+                "Set to -1 to disable deadlock detection & reporting (the game may freeze indefinitely without it)."
         );
     }));
 

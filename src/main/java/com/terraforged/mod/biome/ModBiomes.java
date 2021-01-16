@@ -60,6 +60,7 @@ public class ModBiomes {
     public static final RegistryKey<Biome> STONE_FOREST = createKey("stone_forest");
     public static final RegistryKey<Biome> TAIGA_SCRUB = createKey("taiga_scrub");
     public static final RegistryKey<Biome> WARM_BEACH = createKey("warm_beach");
+    public static final RegistryKey<Biome> WARM_LAKE = createKey("warm_lake");
 
     @SubscribeEvent
     public static void register(RegistryEvent.Register<Biome> event) {
@@ -80,6 +81,7 @@ public class ModBiomes {
         register(event, STONE_FOREST, BiomeBuilders.stoneForest());
         register(event, TAIGA_SCRUB, BiomeBuilders.taigaScrub());
         register(event, WARM_BEACH, BiomeBuilders.warmBeach());
+        register(event, WARM_LAKE, BiomeBuilders.warmLake());
     }
 
     public static Biome remap(Biome biome, TFBiomeContext context) {

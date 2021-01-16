@@ -135,15 +135,15 @@ public class SetupFactory {
         // prevent trees growing at high elevation on volcanoes
         modifiers.getPredicates().add(Matchers.allTrees(), new VolcanoPredicate(generator));
 
-        return FeatureManager.create(SetupHooks.setup(modifiers, context.copy()));
+        return FeatureManager.create(SetupHooks.setup(modifiers, context));
     }
 
     public static SurfaceManager createSurfaceManager(TerraContext context) {
         SurfaceManager manager = new SurfaceManager(context.biomeContext);
         manager.replace(Biomes.DEEP_FROZEN_OCEAN, new IcebergsSurface(context, 30, 30));
         manager.replace(Biomes.FROZEN_OCEAN, new IcebergsSurface(context, 20, 15));
-        manager.append(ModBiomes.BRYCE, new BriceSurface(context.seed));
-        manager.append(ModBiomes.STONE_FOREST, new StoneForestSurface(context.seed));
+        manager.append(ModBiomes.BRYCE, new BriceSurface(context.seed()));
+        manager.append(ModBiomes.STONE_FOREST, new StoneForestSurface(context.seed()));
         manager.append(
                 new DesertSurface(context),
                 Biomes.DESERT,

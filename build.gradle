@@ -17,7 +17,7 @@ apply plugin: "maven-publish"
 apply plugin: "eclipse"
 
 group = "com.terraforged"
-version = "${mc_version}-${mod_version}${getClassifier()}"
+version = "${minecraft_version}-${mod_version}${getClassifier()}"
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
 allprojects {
@@ -41,7 +41,7 @@ repositories {
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     lib(project(":Engine"))
 }
 
@@ -116,7 +116,7 @@ task collectLibs(type: Copy) {
 processResources {
     filesMatching("**/mods.toml") {
         // replaces the version string in the mods.toml
-        expand("version": "${mod_version}${getClassifier()}", "mc_version": mc_version)
+        expand("version": "${mod_version}${getClassifier()}", "mc_version": minecraft_version)
     }
 }
 

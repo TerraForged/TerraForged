@@ -31,6 +31,7 @@ import com.terraforged.engine.world.biome.map.BiomeMap;
 import com.terraforged.engine.world.biome.modifier.*;
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.engine.world.heightmap.Levels;
+import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.util.DummyBlockReader;
@@ -38,6 +39,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeGenerationSettings;
@@ -54,12 +56,13 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
     private final DesertBiomes desertBiomes;
     private final List<BiomeModifier> modifiers = new ArrayList<>();
 
-    public BiomeModifierManager(TerraContext context, BiomeMap biomes) {
+    public BiomeModifierManager(TerraContext context, BiomeMap<RegistryKey<Biome>> biomes) {
         desertBiomes = getDesertBiomes(context.biomeContext, biomes);
         modifiers.add(getBeachModifier(context, biomes));
         modifiers.add(new CoastModifier(biomes));
         modifiers.add(new DesertColorModifier(desertBiomes));
         modifiers.add(new DesertWetlandModifier(biomes));
+        modifiers.add(new WarmLakeModifier(biomes.getContext().getId(ModBiomes.WARM_LAKE)));
         modifiers.add(new MountainModifier(context, biomes, context.terraSettings.miscellaneous.mountainBiomeUsage));
         modifiers.add(new VolcanoModifier(biomes, context.terraSettings.miscellaneous.volcanoBiomeUsage));
         Collections.sort(modifiers);

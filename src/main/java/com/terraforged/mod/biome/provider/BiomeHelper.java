@@ -28,59 +28,57 @@ import com.terraforged.engine.settings.ClimateSettings;
 import com.terraforged.engine.world.biome.TempCategory;
 import com.terraforged.engine.world.biome.map.defaults.BiomeTemps;
 import com.terraforged.mod.biome.context.TFBiomeContext;
-import com.terraforged.mod.biome.utils.Structures;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeGenerationSettings;
-import net.minecraft.world.gen.feature.structure.OceanRuinConfig;
-import net.minecraft.world.gen.feature.structure.OceanRuinStructure;
 import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
 import net.minecraft.world.gen.surfacebuilders.ISurfaceBuilderConfig;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
 import net.minecraftforge.common.BiomeDictionary;
 
 import javax.annotation.Nullable;
-import java.util.Optional;
 
 public class BiomeHelper {
+
+    private static final String[] COLD_KEYWORDS = {"cold", "frozen", "ice", "chill", "tundra", "taiga", "arctic"};
+    private static final String[] WARM_KEYWORDS = {"hot", "warm", "tropical", "desert", "savanna", "jungle"};
 
     public static TempCategory getTempCategory(Biome biome, TFBiomeContext context) {
         // vanilla ocean biome properties are not at all helpful for determining temperature
         if (biome.getCategory() == Biome.Category.OCEAN) {
-            // warm & luke_warm oceans get OceanRuinStructure.Type.WARM
-            Optional<OceanRuinConfig> config = Structures.getConfig(biome, Structures.oceanRuin(), OceanRuinConfig.class);
-            if (config.isPresent()) {
-                if (config.get().field_204031_a == OceanRuinStructure.Type.WARM) {
-                    return TempCategory.WARM;
-                }
-
-                if (config.get().field_204031_a == OceanRuinStructure.Type.COLD) {
-                    return TempCategory.COLD;
-                }
-            }
-
-            // if the id contains the world cold or frozen, assume it's cold
-            if (context.biomes.getName(biome).contains("cold") || context.biomes.getName(biome).contains("frozen")) {
+            return tempFromName(context.biomes.getName(biome));
+        } else {
+            // snowy = 0.0F, plains = 0.8F, desert = 2.0F
+            float temp = biome.getTemperature();
+            if (temp <= 0.3F) {
                 return TempCategory.COLD;
             }
-
-            // the rest we categorize as medium
-            return TempCategory.MEDIUM;
+            if (temp > 0.8) {
+                return TempCategory.WARM;
+            }
+            // hopefully biomes otherwise have a sensible category
+            return tempFromName(context.biomes.getName(biome));
         }
+    }
 
-        // snowy = 0.0F
-        // plains = 0.8F
-        // desert = 2.0F
-        float temp = biome.getTemperature();
-        if (temp <= 0.3F) {
+    public static TempCategory tempFromName(String name) {
+        if (containsKeyword(name, COLD_KEYWORDS)) {
             return TempCategory.COLD;
         }
-        if (temp > 0.8) {
+        if (containsKeyword(name, WARM_KEYWORDS)) {
             return TempCategory.WARM;
         }
-        // hopefully biomes otherwise have a sensible category
         return TempCategory.MEDIUM;
+    }
+
+    public static boolean containsKeyword(String name, String[] keywords) {
+        for (String keyword : keywords) {
+            if (name.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static float getBiomeSizeSearchModifier(ClimateSettings settings) {

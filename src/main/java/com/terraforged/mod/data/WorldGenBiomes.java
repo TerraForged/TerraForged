@@ -24,6 +24,9 @@
 
 package com.terraforged.mod.data;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.terraforged.engine.world.biome.map.BiomeMap;
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.mod.TerraForgedMod;
@@ -33,14 +36,32 @@ import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
 import net.minecraft.util.ResourceLocation;
 
 import java.io.*;
+import java.util.stream.IntStream;
 
 public class WorldGenBiomes extends DataGen {
 
     public static void genBiomeMap(File dataDir, TFBiomeContext context) {
         if (dataDir.exists() || dataDir.mkdirs()) {
-            BiomeMap map = BiomeAnalyser.createBiomeMap(context);
+            BiomeMap<?> map = BiomeAnalyser.createBiomeMap(context);
+            JsonObject rootJson = new JsonObject();
+
+            map.forEach((terrain, biomeSet) -> {
+                JsonObject biomeGroups = new JsonObject();
+                rootJson.add(terrain, biomeGroups);
+
+                biomeSet.forEach((type, biomes) -> {
+                    JsonArray biomesArray = new JsonArray();
+                    biomeGroups.add(type, biomesArray);
+
+                    IntStream.of(biomes).distinct()
+                            .mapToObj(map.getContext()::getName)
+                            .sorted()
+                            .forEach(biomesArray::add);
+                });
+            });
+
             try (Writer writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_map.json")))) {
-//                new GsonBuilder().setPrettyPrinting().create().toJson(map.toJson(context), writer);
+                new GsonBuilder().setPrettyPrinting().create().toJson(rootJson, writer);
             } catch (IOException e) {
                 e.printStackTrace();
             }

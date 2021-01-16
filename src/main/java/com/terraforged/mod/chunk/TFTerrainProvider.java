@@ -39,6 +39,6 @@ public class TFTerrainProvider extends StandardTerrainProvider {
     @Override
     protected void init(GeneratorContext context) {
         super.init(context);
-        SetupHooks.setup(this, context.copy());
+        SetupHooks.setup(this, context);
     }
 }

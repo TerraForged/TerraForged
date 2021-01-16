@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.profiler.watchdog;
 
+import com.terraforged.engine.concurrent.thread.ThreadPools;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.profiler.Profiler;
@@ -31,72 +32,46 @@ import com.terraforged.mod.profiler.crash.CrashHandler;
 import com.terraforged.mod.profiler.crash.WorldGenException;
 import net.minecraft.world.chunk.IChunk;
 
-import java.util.Iterator;
-import java.util.ListIterator;
-
 public class Watchdog implements Runnable {
+
+    public static final String FEATURE_WARN_KEY = "feature_warn_time";
+    public static final String CHUNK_TIMEOUT_KEY = "chunkgen_timeout";
 
     private static final long WARN_TIME = 50;
     private static final long CRASH_TIME = 30_000L;
     private static final long MIN_CRASH_TIME = 5_000L;
-    private static final long CHECK_INTERVAL = 5_250L;
-    private static final ThreadLocal<WatchdogCtx> TASKS = ThreadLocal.withInitial(WatchdogCtx::new);
+    private static final long CHECK_INTERVAL = 5_251L;
+
+    private static final Watchdog INSTANCE = new Watchdog();
+
+    private final ContextQueue contextQueue = new ContextQueue();
+    private final ThreadLocal<WatchdogContext> contextPool = ThreadLocal.withInitial(WatchdogCtx::new);
 
     static {
-        Thread thread = new Thread(new Watchdog());
-        thread.setName("TF-Watchdog");
-        thread.start();
+        ThreadPools.scheduleFixed(INSTANCE, CHECK_INTERVAL);
     }
-
-    private int lastSize = 0;
-    private ListIterator<WatchdogCtx> lastIterator;
 
     @Override
     public void run() {
         try {
-            while (running()) {
-                Iterator<WatchdogCtx> iterator = nextIterator();
-
-                if (iterator.hasNext()) {
-                    long now = System.currentTimeMillis();
-                    while (iterator.hasNext()) {
-                        WatchdogCtx next = iterator.next();
-                        next.check(now);
-                    }
+            WatchdogContext[] queue = contextQueue.get();
+            if (queue.length > 0) {
+                long now = System.currentTimeMillis();
+                for (WatchdogContext context : queue) {
+                    context.check(now);
                 }
             }
-        } catch (DeadlockException e) {
+        } catch (ChunkTimeoutException e) {
             e.printStackTrace();
             CrashHandler.handle(e.getChunk(), e.getGenerator(), new WorldGenException(Profiler.DECORATION, e));
-        }
-    }
-
-    private Iterator<WatchdogCtx> nextIterator() {
-        int size = WatchdogCtx.CONTEXTS.size();
-        if (lastSize != size || lastIterator == null) {
-            lastSize = size;
-            lastIterator = WatchdogCtx.CONTEXTS.listIterator();
-        } else {
-            while (lastIterator.hasPrevious()) {
-                lastIterator.previous();
-            }
-        }
-        return lastIterator;
-    }
-
-    private boolean running() {
-        try {
-            Thread.sleep(CHECK_INTERVAL);
         } catch (Throwable t) {
             t.printStackTrace();
-            return true;
         }
-        return true;
     }
 
     public static WatchdogContext punchIn(IChunk chunk, TFChunkGenerator generator, long duration) {
         if (duration > 0) {
-            WatchdogCtx context = TASKS.get();
+            WatchdogContext context = INSTANCE.contextPool.get();
             if (context.set(chunk, generator, duration)) {
                 return context;
             }
@@ -104,12 +79,16 @@ public class Watchdog implements Runnable {
         return WatchdogContext.NONE;
     }
 
+    protected static void addContext(WatchdogContext context) {
+        INSTANCE.contextQueue.add(context);
+    }
+
     public static WarnTimer getWarnTimer() {
-        return new WarnTimer(ConfigManager.GENERAL.load().getLong("feature_warn_time", WARN_TIME));
+        return new WarnTimer(ConfigManager.GENERAL.load().getLong(FEATURE_WARN_KEY, WARN_TIME));
     }
 
     public static long getWatchdogHangTime() {
-        long time = ConfigManager.GENERAL.load().getLong("server_deadlock_timeout", CRASH_TIME);
+        long time = ConfigManager.GENERAL.load().getLong(CHUNK_TIMEOUT_KEY, CRASH_TIME);
         if (time <= 0) {
             return -1L;
         }

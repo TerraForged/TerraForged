@@ -45,7 +45,6 @@ public class ChunkCarverFix extends ChunkDelegate {
         super(chunk);
         this.materials = materials;
         this.maskDepth = nearRiver ? 15 : nearStructure ? 5 : -1;
-
     }
 
     public BitSet getCarvingMask(GenerationStage.Carving type) {

@@ -46,6 +46,6 @@ public class Environment {
     }
 
     public static void log() {
-        Log.info("### Environment: dev={}, stable={}, vanilla={} ###", dev, Engine.ENFORCE_STABLE_OPTIONS, vanillaBiomes);
+        Log.info("Environment: dev={}, stable={}, vanilla={}", dev, Engine.ENFORCE_STABLE_OPTIONS, vanillaBiomes);
     }
 }
