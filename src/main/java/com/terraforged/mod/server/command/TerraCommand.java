@@ -233,7 +233,7 @@ public class TerraCommand {
         BlockPos pos = context.getSource().asPlayer().getPosition();
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
-        WorldGenerator generator = terraContext.factory.get().get();
+        WorldGenerator generator = terraContext.worldGenerator.get().get();
         Search search = new TerrainSearchTask(pos, type, getChunkGenerator(context), generator);
         int identifier = doSearch(server, playerID, search);
         context.getSource().sendFeedback(createPrefix(identifier)
@@ -266,7 +266,7 @@ public class TerraCommand {
         BlockPos pos = context.getSource().asPlayer().getPosition();
         UUID playerID = context.getSource().asPlayer().getUniqueID();
         MinecraftServer server = context.getSource().getServer();
-        WorldGenerator generator = terraContext.factory.get().get();
+        WorldGenerator generator = terraContext.worldGenerator.get().get();
         Search biomeSearch = new BiomeSearchTask(pos, biome, getChunkGenerator(context), getBiomeProvider(context));
         Search terrainSearch = new TerrainSearchTask(pos, target, getChunkGenerator(context), generator);
         Search search = new BothSearchTask(pos, biomeSearch, terrainSearch);

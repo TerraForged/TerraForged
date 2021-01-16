@@ -68,7 +68,7 @@ public class TFBiomeProvider extends BiomeProvider {
         super(BiomeAnalyser.getOverworldBiomes(context.biomeContext));
         this.context = context;
         this.seed = context.terraSettings.world.seed;
-        this.resources = LazySupplier.factory(context.split(BiomeResources.SEED_OFFSET), BiomeResources::new);
+        this.resources = LazySupplier.factory(context.copy(), BiomeResources::new);
         this.biomeSearchModifier = BiomeHelper.getBiomeSizeSearchModifier(context.settings.climate);
     }
 

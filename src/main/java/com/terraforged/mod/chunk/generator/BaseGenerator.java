@@ -55,7 +55,7 @@ public class BaseGenerator implements Generator.Terrain {
     public BaseGenerator(TFChunkGenerator generator) {
         this.generator = generator;
         this.levels = generator.getContext().levels;
-        this.climate = generator.getContext().factory.then(WorldGeneratorFactory::getClimate);
+        this.climate = generator.getContext().worldGenerator.then(WorldGeneratorFactory::getClimate);
         this.terrainHelper = new TerrainHelper(0.8F, 4F);
         this.baseDecorator = getBaseDecorator(generator);
         this.bedrockDecorator = new BedrockDecorator(generator.getContext());

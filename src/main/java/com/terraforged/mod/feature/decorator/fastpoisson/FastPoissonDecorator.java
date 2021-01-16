@@ -47,7 +47,7 @@ public abstract class FastPoissonDecorator extends ContextualDecorator<FastPoiss
     @Override
     protected Stream<BlockPos> getPositions(WorldDecoratingHelper helper, DecorationContext context, Random random, FastPoissonConfig config, BlockPos pos) {
         IChunk chunk = context.getChunk();
-        int seed = context.getGenerator().getContext().seed.get() + SEED_OFFSET;
+        int seed = context.getGenerator().getContext().seed.root() + SEED_OFFSET;
         int chunkX = chunk.getPos().x;
         int chunkZ = chunk.getPos().z;
         FastPoisson poisson = FastPoisson.LOCAL_POISSON.get();

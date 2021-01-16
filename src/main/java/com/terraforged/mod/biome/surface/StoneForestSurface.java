@@ -37,6 +37,8 @@ import java.util.function.IntFunction;
 
 public class StoneForestSurface implements MaskedSurface {
 
+    public static final int SEED_OFFSET = -2345768;
+
     private final Module module;
     private final BlockState dirt;
     private final BlockState grass;

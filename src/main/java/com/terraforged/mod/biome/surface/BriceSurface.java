@@ -39,12 +39,12 @@ import java.util.Random;
 
 public class BriceSurface implements MaskedSurface, Stratum.Visitor<BlockState, SurfaceContext> {
 
+    public static final int SEED_OFFSET = 12341341;
+
     private final Module module;
     private final Strata<BlockState> stackStrata;
 
     public BriceSurface(Seed seed) {
-//        seed.skip(4907532);
-
         Random random = new Random(seed.next());
         Variance variance = Variance.of(0.1, 0.2);
 

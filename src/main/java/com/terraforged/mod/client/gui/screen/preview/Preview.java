@@ -97,6 +97,8 @@ public class Preview extends Button {
 
     public void regenerate() {
         this.seed = random.nextInt();
+        this.lastWorldSettings = null;
+        this.lastPreviewSettings = null;
     }
 
     public void close() {
@@ -139,6 +141,7 @@ public class Preview extends Button {
         if (time - lastUpdate < 20) {
             return;
         }
+
 
         // Dumb way of preventing the image repainting when nothing has changed
         CompoundNBT previewSettings = prevSettings.copy();
@@ -205,7 +208,7 @@ public class Preview extends Button {
         CacheManager.get().clear();
         GeneratorContext context = GeneratorContext.createNoCache(settings);
         if (settings.world.properties.spawnType == SpawnType.CONTINENT_CENTER) {
-            long center = context.factory.get().getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ);
+            long center = context.worldGenerator.get().getHeightmap().getContinent().getNearestCenter(offsetX, offsetZ);
             this.center.x = PosUtil.unpackLeft(center);
             this.center.z = PosUtil.unpackRight(center);
         } else {
@@ -216,7 +219,7 @@ public class Preview extends Button {
         TileGenerator renderer = TileGenerator.builder()
                 .pool(threadPool)
                 .size(FACTOR, 0)
-                .factory(context.factory.get())
+                .factory(context.worldGenerator.get())
                 .batch(6)
                 .build();
 

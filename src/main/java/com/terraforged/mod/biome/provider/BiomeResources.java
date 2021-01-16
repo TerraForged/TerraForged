@@ -34,15 +34,13 @@ import net.minecraft.world.biome.Biome;
 
 public class BiomeResources {
 
-    public static final int SEED_OFFSET = 35768;
-
-    public final BiomeMap<RegistryKey<Biome>> biomemap;
     public final WorldLookup worldLookup;
     public final BiomeModifierManager modifierManager;
+    public final BiomeMap<RegistryKey<Biome>> biomemap;
 
     public BiomeResources(TerraContext context) {
-        this.biomemap = BiomeAnalyser.createBiomeMap(context.biomeContext);
         this.worldLookup = new WorldLookup(context);
+        this.biomemap = BiomeAnalyser.createBiomeMap(context.biomeContext);
         this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomemap), context);
     }
 }

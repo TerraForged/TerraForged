@@ -64,10 +64,10 @@ public class GeneratorResources {
             FeatureManager.clearData();
         }
 
-        this.tileCache = context.cache.get();
-
         SetupHooks.setup(context.materials.get().layerManager, context);
         SetupHooks.setup(surfaceDecorators, postProcessors, context);
+
+        this.tileCache = context.cache.get();
     }
 
     public static Function<TerraContext, GeneratorResources> factory(TFChunkGenerator generator) {

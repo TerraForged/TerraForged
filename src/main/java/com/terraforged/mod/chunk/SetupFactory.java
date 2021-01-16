@@ -142,8 +142,8 @@ public class SetupFactory {
         SurfaceManager manager = new SurfaceManager(context.biomeContext);
         manager.replace(Biomes.DEEP_FROZEN_OCEAN, new IcebergsSurface(context, 30, 30));
         manager.replace(Biomes.FROZEN_OCEAN, new IcebergsSurface(context, 20, 15));
-        manager.append(ModBiomes.BRYCE, new BriceSurface(context.seed()));
-        manager.append(ModBiomes.STONE_FOREST, new StoneForestSurface(context.seed()));
+        manager.append(ModBiomes.BRYCE, new BriceSurface(context.seed(BriceSurface.SEED_OFFSET)));
+        manager.append(ModBiomes.STONE_FOREST, new StoneForestSurface(context.seed(StoneForestSurface.SEED_OFFSET)));
         manager.append(
                 new DesertSurface(context),
                 Biomes.DESERT,

@@ -58,7 +58,7 @@ public class TerraContext extends GeneratorContext {
         this.worldSeed = other.worldSeed;
         this.terraSettings = other.terraSettings;
         this.biomeContext = biomeContext;
-        this.heightmap = factory.then(WorldGeneratorFactory::getHeightmap);
+        this.heightmap = worldGenerator.then(WorldGeneratorFactory::getHeightmap);
     }
 
     public TerraContext(TerraSettings settings, TFBiomeContext biomeContext) {
@@ -66,7 +66,7 @@ public class TerraContext extends GeneratorContext {
         this.worldSeed = settings.world.seed;
         this.biomeContext = biomeContext;
         this.terraSettings = settings;
-        this.heightmap = factory.then(WorldGeneratorFactory::getHeightmap);
+        this.heightmap = worldGenerator.then(WorldGeneratorFactory::getHeightmap);
     }
 
     protected TerraContext(TerraContext other, int seedOffset) {
@@ -88,11 +88,11 @@ public class TerraContext extends GeneratorContext {
     }
 
     public DecoratorContext decorator(IChunk chunk) {
-        return new DecoratorContext(chunk, levels, factory.get().getClimate(), false);
+        return new DecoratorContext(chunk, levels, worldGenerator.get().getClimate(), false);
     }
 
     public SurfaceContext surface(SurfaceChunk buffer, TFBiomeContainer biomes, DimensionSettings settings) {
-        return new SurfaceContext(buffer, biomes, levels, factory.get().getClimate(), settings, worldSeed);
+        return new SurfaceContext(buffer, biomes, levels, worldGenerator.get().getClimate(), settings, worldSeed);
     }
 
     protected TerraSettings getTerraSettings() {
