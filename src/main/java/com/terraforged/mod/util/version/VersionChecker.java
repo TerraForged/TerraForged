@@ -34,9 +34,16 @@ public class VersionChecker {
         for (ModInfo mod : ModList.get().getMods()) {
             if (mod.getModId().equals(modid)) {
                 ArtifactVersion version = mod.getVersion();
-                if (version.getMajorVersion() < major || version.getMinorVersion() < minor || version.getIncrementalVersion() < patch) {
-                    throw new VersionError(modid, major, minor, patch, toString(version));
+                if (version.getMajorVersion() > major) {
+                    return;
                 }
+                if (version.getMajorVersion() == major && version.getMinorVersion() > minor) {
+                    return;
+                }
+                if (version.getMajorVersion() == major && version.getMinorVersion() == minor && version.getIncrementalVersion() >= patch) {
+                    return;
+                }
+                throw new VersionError(modid, major, minor, patch, toString(version));
             }
         }
     }
