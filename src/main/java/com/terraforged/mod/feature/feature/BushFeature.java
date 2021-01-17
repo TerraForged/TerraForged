@@ -33,6 +33,7 @@ import com.terraforged.mod.featuremanager.template.BlockUtils;
 import com.terraforged.mod.featuremanager.util.codec.CodecHelper;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.LeavesBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3i;
@@ -85,7 +86,7 @@ public class BushFeature extends Feature<BushFeature.Config> {
         BlockPos.Mutable leaf = new BlockPos.Mutable();
         place(world, log.setPos(pos), leaf, rand, config);
         for (float chance = rand.nextFloat(); chance < config.size_chance; chance += rand.nextFloat()) {
-            add(log, logs[rand.nextInt(logs.length)]);
+            addToMutable(log, logs[rand.nextInt(logs.length)]);
 
             if (!place(world, log, leaf, rand, config)) {
                 break;
@@ -111,23 +112,25 @@ public class BushFeature extends Feature<BushFeature.Config> {
         center.move(Direction.UP, 1);
         world.setBlockState(center, config.trunk, 2);
 
-        for (Vector3i neighbour : leaves) {
+        BlockState leaves = config.leavesWithDistance(1);
+        BlockState leavesExtra = config.leavesWithDistance(2);
+        for (Vector3i neighbour : BushFeature.leaves) {
             // randomly skip NESW neighbours
             if (neighbour.getY() == 0 && random.nextFloat() < config.airChance) {
                 continue;
             }
 
             pos.setPos(center);
-            add(pos, neighbour);
+            addToMutable(pos, neighbour);
 
             if (BlockUtils.canTreeReplace(world, pos)) {
-                world.setBlockState(pos, config.leaves, 2);
+                world.setBlockState(pos, leaves, 2);
 
                 // randomly place extra leaves below if non-solid
                 if (neighbour.getY() == 0 && random.nextFloat() < config.leafChance) {
                     pos.move(Direction.DOWN, 1);
                     if (BlockUtils.canTreeReplace(world, pos)) {
-                        world.setBlockState(pos, config.leaves, 2);
+                        world.setBlockState(pos, leavesExtra, 2);
                     }
                     pos.move(Direction.UP, 1);
                 }
@@ -136,7 +139,7 @@ public class BushFeature extends Feature<BushFeature.Config> {
                 if (neighbour.getY() == 0 && random.nextFloat() < config.leafChance) {
                     pos.move(Direction.UP, 1);
                     if (BlockUtils.canTreeReplace(world, pos)) {
-                        world.setBlockState(pos, config.leaves, 2);
+                        world.setBlockState(pos, leavesExtra, 2);
                     }
                 }
             }
@@ -145,7 +148,7 @@ public class BushFeature extends Feature<BushFeature.Config> {
         return true;
     }
 
-    private static void add(BlockPos.Mutable pos, Vector3i add) {
+    private static void addToMutable(BlockPos.Mutable pos, Vector3i add) {
         pos.setPos(pos.getX() + add.getX(), pos.getY() + add.getY(), pos.getZ() + add.getZ());
     }
 
@@ -190,6 +193,13 @@ public class BushFeature extends Feature<BushFeature.Config> {
             this.airChance = airChance;
             this.leafChance = leafChance;
             this.size_chance = size_chance;
+        }
+
+        public BlockState leavesWithDistance(int distance) {
+            if (leaves.hasProperty(LeavesBlock.DISTANCE)) {
+                return leaves.with(LeavesBlock.DISTANCE, distance);
+            }
+            return leaves;
         }
     }
 }
