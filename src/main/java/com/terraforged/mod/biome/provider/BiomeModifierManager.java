@@ -48,7 +48,6 @@ import net.minecraft.world.gen.surfacebuilders.ISurfaceBuilderConfig;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class BiomeModifierManager implements BiomeModifier {
