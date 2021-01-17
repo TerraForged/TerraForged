@@ -178,7 +178,7 @@ public class ErosionDecorator implements ColumnDecorator {
 
     private static BlockState ground(BlockState state) {
         if (state.getMaterial() == Material.ORGANIC) {
-            return States.DIRT.get();
+            return States.COARSE_DIRT.get();
         }
         if (state.getMaterial() == Material.ROCK) {
             return States.GRAVEL.get();

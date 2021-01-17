@@ -48,24 +48,17 @@ import net.minecraft.world.gen.surfacebuilders.ISurfaceBuilderConfig;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
-public class BiomeModifierManager implements BiomeModifier, ModifierManager {
+public class BiomeModifierManager implements BiomeModifier {
 
     private final DesertBiomes desertBiomes;
-    private final List<BiomeModifier> modifiers = new ArrayList<>();
+    private final BiomeModifier[] modifiers;
 
-    public BiomeModifierManager(TerraContext context, BiomeMap<RegistryKey<Biome>> biomes) {
-        desertBiomes = getDesertBiomes(context.biomeContext, biomes);
-        modifiers.add(getBeachModifier(context, biomes));
-        modifiers.add(new CoastModifier(biomes));
-        modifiers.add(new DesertColorModifier(desertBiomes));
-        modifiers.add(new DesertWetlandModifier(biomes));
-        modifiers.add(new WarmLakeModifier(biomes.getContext(), Biomes.DESERT_LAKES, ModBiomes.LAKE));
-        modifiers.add(new MountainModifier(context, biomes, context.terraSettings.miscellaneous.mountainBiomeUsage));
-        modifiers.add(new VolcanoModifier(biomes, context.terraSettings.miscellaneous.volcanoBiomeUsage));
-        Collections.sort(modifiers);
+    private BiomeModifierManager(Builder builder) {
+        desertBiomes = builder.desertBiomes;
+        modifiers = builder.modifiers.stream().sorted().toArray(BiomeModifier[]::new);
     }
 
     public boolean hasModifiers(Cell cell, Levels levels) {
@@ -74,12 +67,6 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
 
     public DesertBiomes getDesertBiomes() {
         return desertBiomes;
-    }
-
-    @Override
-    public void register(BiomeModifier modifier) {
-        modifiers.add(modifier);
-        Collections.sort(modifiers);
     }
 
     @Override
@@ -159,5 +146,35 @@ public class BiomeModifierManager implements BiomeModifier, ModifierManager {
         int dg = c1.getGreen() - c2.getGreen();
         int db = c1.getBlue() - c2.getBlue();
         return (dr * dr) + (dg * dg) + (db * db);
+    }
+
+    public static Builder builder(TerraContext context, BiomeMap<RegistryKey<Biome>> biomes) {
+        return new Builder(context, biomes);
+    }
+
+    public static class Builder implements ModifierManager {
+
+        private final DesertBiomes desertBiomes;
+        private final List<BiomeModifier> modifiers = new ArrayList<>();
+
+        private Builder(TerraContext context, BiomeMap<RegistryKey<Biome>> biomes) {
+            desertBiomes = getDesertBiomes(context.biomeContext, biomes);
+            modifiers.add(getBeachModifier(context, biomes));
+            modifiers.add(new CoastModifier(biomes));
+            modifiers.add(new DesertColorModifier(desertBiomes));
+            modifiers.add(new DesertWetlandModifier(biomes));
+            modifiers.add(new WarmLakeModifier(biomes.getContext(), Biomes.DESERT_LAKES, ModBiomes.LAKE));
+            modifiers.add(new MountainModifier(context, biomes, context.terraSettings.miscellaneous.mountainBiomeUsage));
+            modifiers.add(new VolcanoModifier(biomes, context.terraSettings.miscellaneous.volcanoBiomeUsage));
+        }
+
+        @Override
+        public void register(BiomeModifier modifier) {
+            modifiers.add(modifier);
+        }
+
+        public BiomeModifierManager build() {
+            return new BiomeModifierManager(this);
+        }
     }
 }

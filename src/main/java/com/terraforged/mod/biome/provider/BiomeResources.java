@@ -41,6 +41,6 @@ public class BiomeResources {
     public BiomeResources(TerraContext context) {
         this.worldLookup = new WorldLookup(context);
         this.biomemap = BiomeAnalyser.createBiomeMap(context.biomeContext);
-        this.modifierManager = SetupHooks.setup(new BiomeModifierManager(context, biomemap), context);
+        this.modifierManager = SetupHooks.setup(BiomeModifierManager.builder(context, biomemap), context).build();
     }
 }
