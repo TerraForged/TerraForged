@@ -46,7 +46,6 @@ import com.terraforged.mod.chunk.column.ColumnResource;
 import com.terraforged.mod.chunk.generator.*;
 import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.featuremanager.FeatureManager;
-import com.terraforged.mod.featuremanager.structure.FMStructureManager;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import com.terraforged.mod.featuremanager.util.codec.DecoderFunc;
 import com.terraforged.mod.featuremanager.util.codec.EncoderFunc;
@@ -300,10 +299,6 @@ public class TFChunkGenerator extends ChunkGenerator {
 
     public final FeatureManager getFeatureManager() {
         return resources.get().featureManager;
-    }
-
-    public final FMStructureManager getStructureManager() {
-        return resources.get().structureManager;
     }
 
     public final GeoManager getGeologyManager() {

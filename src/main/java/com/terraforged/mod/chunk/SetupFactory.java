@@ -29,7 +29,6 @@ import com.terraforged.mod.api.biome.surface.SurfaceManager;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.surface.*;
-import com.terraforged.mod.biome.utils.Structures;
 import com.terraforged.mod.chunk.column.ErosionDecorator;
 import com.terraforged.mod.chunk.column.post.LayerDecorator;
 import com.terraforged.mod.chunk.column.post.SnowEroder;
@@ -42,8 +41,7 @@ import com.terraforged.mod.featuremanager.data.DataManager;
 import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
 import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
 import com.terraforged.mod.featuremanager.modifier.FeatureModifiers;
-import com.terraforged.mod.featuremanager.predicate.*;
-import com.terraforged.mod.featuremanager.structure.FMStructureManager;
+import com.terraforged.mod.featuremanager.predicate.FeaturePredicate;
 import com.terraforged.mod.featuremanager.transformer.FeatureTransformer;
 import com.terraforged.mod.material.Materials;
 import com.terraforged.mod.material.geology.GeoManager;
@@ -162,16 +160,6 @@ public class SetupFactory {
                 Biomes.DARK_FOREST,
                 Biomes.DARK_FOREST_HILLS
         );
-        return SetupHooks.setup(manager, context);
-    }
-
-    public static FMStructureManager createStructureManager(TerraContext context) {
-        FMStructureManager manager = new FMStructureManager();
-        manager.register(Structures.oceanMonument(), DeepWater.INSTANCE);
-        manager.register(Structures.oceanRuin(), DeepWater.INSTANCE);
-        manager.register(Structures.shipwreck(), new MinDepth(context.levels.waterLevel - 8));
-        manager.register(Structures.mineshaft(), new MinHeight(context.levels.waterY + 16));
-        manager.register(Structures.mansion(), new MaxHeight(context.levels.waterY + 64));
         return SetupHooks.setup(manager, context);
     }
 

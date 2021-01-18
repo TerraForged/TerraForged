@@ -34,7 +34,6 @@ import com.terraforged.mod.api.event.SetupEvent;
 import com.terraforged.mod.api.material.geology.GeologyManager;
 import com.terraforged.mod.api.material.layer.LayerManager;
 import com.terraforged.mod.featuremanager.modifier.FeatureModifiers;
-import com.terraforged.mod.featuremanager.structure.FMStructureManager;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.util.List;
@@ -68,11 +67,6 @@ public class SetupHooks {
 
     public static <T extends FeatureModifiers> T setup(T manager, GeneratorContext context) {
         MinecraftForge.EVENT_BUS.post(new SetupEvent.Features(manager, context));
-        return manager;
-    }
-
-    public static <T extends FMStructureManager> T setup(T manager, GeneratorContext context) {
-        MinecraftForge.EVENT_BUS.post(new SetupEvent.Structures(manager, context));
         return manager;
     }
 

@@ -30,7 +30,6 @@ import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.featuremanager.FeatureManager;
 import com.terraforged.mod.featuremanager.data.DataManager;
-import com.terraforged.mod.featuremanager.structure.FMStructureManager;
 import com.terraforged.mod.material.geology.GeoManager;
 import com.terraforged.mod.util.setup.SetupHooks;
 
@@ -45,14 +44,12 @@ public class GeneratorResources {
     final FeatureManager featureManager;
     final BlockDataManager blockDataManager;
     final GeoManager geologyManager;
-    final FMStructureManager structureManager;
     final SurfaceManager surfaceManager;
     final List<ColumnDecorator> surfaceDecorators;
     final List<ColumnDecorator> postProcessors;
 
     public GeneratorResources(TFChunkGenerator generator, TerraContext context) {
         this.surfaceManager = SetupFactory.createSurfaceManager(context);
-        this.structureManager = SetupFactory.createStructureManager(context);
         this.geologyManager = SetupFactory.createGeologyManager(context);
         this.surfaceDecorators = SetupFactory.createSurfaceDecorators(context);
         this.postProcessors = SetupFactory.createFeatureDecorators(context);
