@@ -42,7 +42,7 @@ import java.util.stream.Stream;
 public class Codecs {
 
     public static final Marker MARKER = MarkerManager.getMarker("Codecs");
-    public static final Level ERROR_LOG_LEVEL = Level.TRACE;
+    private static final String[] FILTERS = {"tag", "Tag"};
 
     public static <V> Codec<V> create(EncoderFunc<V> encoder, DecoderFunc<V> decoder) {
         return Codec.of(encoder, decoder).stable();
@@ -100,13 +100,6 @@ public class Codecs {
         return getResult(codec.listOf().encodeStart(ops, list)).orElseGet(() -> ops.createList(Stream.empty()));
     }
 
-    public static <T> Optional<T> getResult(DataResult<T> result) {
-        if (result.error().isPresent()) {
-            FeatureManager.LOG.log(ERROR_LOG_LEVEL, MARKER, result.error().get().message());
-        }
-        return result.result();
-    }
-
     public static <T> T getOrThrow(DataResult<T> result) {
         String error = null;
         if (result.error().isPresent()) {
@@ -116,8 +109,26 @@ public class Codecs {
     }
 
     public static <T> T modify(T value, Codec<T> codec, UnaryOperator<JsonElement> modifier) {
-        JsonElement input = encode(codec, value);
-        JsonElement output = modifier.apply(input);
-        return decodeAndGet(codec, output, JsonOps.INSTANCE);
+        try {
+            JsonElement input = encode(codec, value);
+            JsonElement output = modifier.apply(input);
+            return decodeAndGet(codec, output, JsonOps.INSTANCE);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return value;
+        }
+    }
+
+    public static <T> Optional<T> getResult(DataResult<T> result) {
+        if (result.error().isPresent()) {
+            String message = result.error().get().message();
+            for (String filter : FILTERS) {
+                if (message.contains(filter)) {
+                    return result.result();
+                }
+            }
+            FeatureManager.LOG.log(Level.ERROR, MARKER, message);
+        }
+        return result.result();
     }
 }

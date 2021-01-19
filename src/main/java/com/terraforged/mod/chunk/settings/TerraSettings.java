@@ -36,6 +36,7 @@ import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import com.terraforged.mod.util.DataUtils;
 import com.terraforged.mod.util.nbt.DynamicReader;
 import com.terraforged.mod.util.nbt.DynamicWriter;
+import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 
 import java.io.*;
 
@@ -58,6 +59,8 @@ public class TerraSettings extends Settings {
     public Miscellaneous miscellaneous = new Miscellaneous();
 
     public DimensionSettings dimensions = new DimensionSettings();
+
+    public StructureSettings structures = new StructureSettings();
 
     private static <T> Dynamic<T> encode(TerraSettings settings, DynamicOps<T> ops) {
         return new Dynamic<>(ops, DynamicWriter.serialize(settings, ops, false));

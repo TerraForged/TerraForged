@@ -36,6 +36,8 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.DimensionSettings;
+import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.common.world.ForgeWorldType;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -43,6 +45,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -59,7 +63,7 @@ public class LangGenerator {
                 worlds(this);
                 biomes(this, context);
                 translationKeys(this);
-                settings(this);
+                settings(this, context);
             }
         };
 
@@ -91,11 +95,17 @@ public class LangGenerator {
         TranslationKey.each(key -> provider.add(key.getKey(), key.getDefaultValue()));
     }
 
-    private static void settings(LanguageProvider provider) {
-        visit(DataUtils.toNBT(new DataGenSettings()), provider);
+    private static void settings(LanguageProvider provider, TFBiomeContext context) {
+        DataGenSettings settings = new DataGenSettings();
+
+        // Default overworld structure settings
+        DimensionStructuresSettings structuresSettings = DimensionSettings.func_242746_i().getStructures();
+        settings.structures.read(structuresSettings, context);
+
+        visit(DataUtils.toNBT(settings), provider, new HashSet<>());
     }
 
-    private static void visit(CompoundNBT tag, LanguageProvider lang) {
+    private static void visit(CompoundNBT tag, LanguageProvider lang, Set<String> visited) {
         tag.keySet().forEach(name -> {
             if (name.startsWith("#")) {
                 return;
@@ -103,7 +113,7 @@ public class LangGenerator {
 
             INBT value = tag.get(name);
             if (value instanceof CompoundNBT) {
-                visit((CompoundNBT) value, lang);
+                visit((CompoundNBT) value, lang, visited);
             }
 
             CompoundNBT meta = tag.getCompound("#" + name);
@@ -111,14 +121,14 @@ public class LangGenerator {
                 return;
             }
 
-            add(meta, "key", "display", NameUtil::toDisplayNameKey, lang);
-            add(meta, "key", "comment", NameUtil::toTooltipKey, lang);
+            add(meta, "key", "display", NameUtil::toDisplayNameKey, lang, visited);
+            add(meta, "key", "comment", NameUtil::toTooltipKey, lang, visited);
         });
     }
 
-    private static void add(CompoundNBT tag, String keyName, String valName, UnaryOperator<String> keyFunc, LanguageProvider lang) {
+    private static void add(CompoundNBT tag, String keyName, String valName, UnaryOperator<String> keyFunc, LanguageProvider lang, Set<String> visited) {
         String key = keyFunc.apply(tag.getString(keyName));
-        if (key.isEmpty()) {
+        if (key.isEmpty() || !visited.add(key)) {
             return;
         }
 
@@ -137,5 +147,9 @@ public class LangGenerator {
     public static class DataGenSettings extends TerraSettings {
 
         public PreviewSettings preview = new PreviewSettings();
+
+        public DataGenSettings() {
+            super();
+        }
     }
 }

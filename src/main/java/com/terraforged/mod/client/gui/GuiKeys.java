@@ -45,6 +45,7 @@ public class GuiKeys {
     public static final TranslationKey RIVER_SETTINGS = TranslationKey.gui("river.title", "River Settings");
     public static final TranslationKey FILTER_SETTINGS = TranslationKey.gui("filters.title", "Filter Settings");
     public static final TranslationKey MISC_SETTINGS = TranslationKey.gui("miscellaneous.title", "Miscellaneous Settings");
+    public static final TranslationKey STRUCTURE_SETTINGS = TranslationKey.gui("structures.title", "Structure Settings");
 
     public static final TranslationKey PRESET_CREATE = TranslationKey.gui("preset.create", "Create");
     public static final TranslationKey PRESET_LOAD = TranslationKey.gui("preset.load", "Load");

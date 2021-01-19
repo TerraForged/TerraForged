@@ -38,6 +38,8 @@ public class TFRandButton extends TFButton {
     private final CompoundNBT container;
 
     private int value;
+    private final int min;
+    private final int max;
     private Runnable callback = () -> {};
 
     public TFRandButton(String name, CompoundNBT value) {
@@ -47,6 +49,8 @@ public class TFRandButton extends TFButton {
         this.value = value.getInt(name);
         this.prefix = Element.getDisplayName(name, value) + ": ";
         this.tooltip = Element.getToolTip(name, value);
+        this.min = getLimit(value, name, "limit_lower", Integer.MIN_VALUE);
+        this.max = getLimit(value, name, "limit_upper", Integer.MAX_VALUE);
         setMessage(new StringTextComponent(prefix + this.value));
     }
 
@@ -62,9 +66,24 @@ public class TFRandButton extends TFButton {
 
     @Override
     public void onPress() {
-        value = ThreadLocalRandom.current().nextInt();
+        value = ThreadLocalRandom.current().nextInt(min, max);
         container.putInt(name, value);
         setMessage(new StringTextComponent(prefix + this.value));
         callback.run();
+    }
+
+    private static int getLimit(CompoundNBT value, String name, String limitType, int defaultLimit) {
+        CompoundNBT meta = value.getCompound("#" + name);
+        if (meta.contains(limitType)) {
+            return meta.getInt(limitType);
+        }
+        return defaultLimit;
+    }
+
+    private static int clamp(int value, int min, int max) {
+        if (value < min) {
+            return min;
+        }
+        return Math.min(value, max);
     }
 }

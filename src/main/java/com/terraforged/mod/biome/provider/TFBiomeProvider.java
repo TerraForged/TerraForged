@@ -65,7 +65,7 @@ public class TFBiomeProvider extends BiomeProvider {
     private final float biomeSearchModifier;
 
     public TFBiomeProvider(TerraContext context) {
-        super(BiomeAnalyser.getOverworldBiomes(context.biomeContext));
+        super(BiomeAnalyser.getOverworldBiomesList(context.biomeContext));
         this.context = context;
         this.seed = context.terraSettings.world.seed;
         this.resources = LazySupplier.factory(context.copy(), BiomeResources::new);
@@ -208,6 +208,10 @@ public class TFBiomeProvider extends BiomeProvider {
 
     public TerraContext getContext() {
         return context;
+    }
+
+    public TerraSettings getSettings() {
+        return context.terraSettings;
     }
 
     public BiomeModifierManager getModifierManager() {

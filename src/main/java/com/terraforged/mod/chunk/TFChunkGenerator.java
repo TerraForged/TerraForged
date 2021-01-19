@@ -100,7 +100,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     private final Supplier<GeneratorResources> resources;
 
     public TFChunkGenerator(TFBiomeProvider biomeProvider, DimensionSettings settings) {
-        super(biomeProvider, settings.getStructures());
+        super(biomeProvider, biomeProvider.getSettings().structures.write(settings.getStructures()));
         CacheManager.get().clear();
         TerraContext context = biomeProvider.getContext();
         this.seed = context.terraSettings.world.seed;
@@ -373,7 +373,7 @@ public class TFChunkGenerator extends ChunkGenerator {
 
     private static <TF extends TFChunkGenerator, T> Dynamic<T> encodeGenerator(TF generator, DynamicOps<T> ops) {
         T biomeProvider = Codecs.encodeAndGet(TFBiomeProvider.CODEC, generator.getBiomeProvider(), ops);
-        T dimensionSettings = Codecs.encodeAndGet(DimensionSettings.field_236097_a_, generator.getSettings(), ops);
+        T dimensionSettings = Codecs.encodeAndGet(DimensionSettings.field_236098_b_, generator::getSettings, ops);
         return new Dynamic<>(ops, ops.createMap(ImmutableMap.of(
                 ops.createString("biome_provider"), biomeProvider,
                 ops.createString("dimension_settings"), dimensionSettings
@@ -382,7 +382,7 @@ public class TFChunkGenerator extends ChunkGenerator {
 
     private static <TF extends TFChunkGenerator, T> TF decodeGenerator(Dynamic<T> dynamic, BiFunction<TFBiomeProvider, DimensionSettings, TF> constructor) {
         TFBiomeProvider biomes = Codecs.decodeAndGet(TFBiomeProvider.CODEC, dynamic.get("biome_provider"));
-        DimensionSettings settings = Codecs.decodeAndGet(DimensionSettings.field_236097_a_, dynamic.get("dimension_settings"));
+        DimensionSettings settings = Codecs.decodeAndGet(DimensionSettings.field_236098_b_, dynamic.get("dimension_settings")).get();
         return constructor.apply(biomes, settings);
     }
 

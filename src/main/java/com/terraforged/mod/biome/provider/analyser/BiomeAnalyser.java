@@ -102,7 +102,7 @@ public class BiomeAnalyser {
         return builder.build();
     }
 
-    public static List<Biome> getOverworldBiomes(TFBiomeContext context) {
+    public static Biome[] getOverworldBiomes(TFBiomeContext context) {
         List<BiomeData> biomes = getAllBiomeData(context);
         Set<Biome> result = new HashSet<>(biomes.size());
         for (BiomeData data : biomes) {
@@ -127,7 +127,13 @@ public class BiomeAnalyser {
                 result.add(biome);
             }
         }
-        return new ArrayList<>(result);
+        return result.toArray(new Biome[0]);
+    }
+
+    public static List<Biome> getOverworldBiomesList(TFBiomeContext context) {
+        List<Biome> biomes = Arrays.asList(getOverworldBiomes(context));
+        biomes.sort(Comparator.comparing(Biome::getRegistryName));
+        return biomes;
     }
 
     public static Collection<BiomeType> getTypes(BiomeData data, TFBiomeContext context) {

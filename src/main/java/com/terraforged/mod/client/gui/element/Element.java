@@ -55,6 +55,9 @@ public interface Element {
     }
 
     static String getDisplayName(String name, CompoundNBT value) {
+        if (name.contains(":")) {
+            return name;
+        }
         String key = getDisplayKey(name, value);
         if (key.endsWith(".")) {
             return "";

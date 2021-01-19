@@ -150,7 +150,7 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
                 label.x = x;
                 label.y = top.getAndAdd(SLIDER_HEIGHT + SLIDER_PAD);
                 consumer.accept(label);
-                addElements(x, label.y, column, (CompoundNBT) child, consumer, callback);
+                addElements(x, label.y, column, (CompoundNBT) child, true, consumer, callback);
             }
         });
     }
@@ -163,11 +163,11 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
 
         byte type = tag.getId();
         if (type == Constants.NBT.TAG_INT) {
-            if (hasLimit(name, value)) {
-                return new TFSlider.BoundInt(name, value).callback(callback);
-            }
             if (isRand(name, value)) {
                 return new TFRandButton(name, value).callback(callback);
+            }
+            if (hasLimit(name, value)) {
+                return new TFSlider.BoundInt(name, value).callback(callback);
             }
             return new TFSlider.Int(name, value).callback(callback);
         } else if (type == Constants.NBT.TAG_FLOAT) {
