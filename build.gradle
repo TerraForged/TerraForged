@@ -148,9 +148,7 @@ jar {
 
 import net.minecraftforge.gradle.common.task.SignJar
 task signJar(type: SignJar, dependsOn: "reobfJar") {
-    onlyIf {
-        project.hasProperty("signing.keystore.path")
-    }
+    onlyIf { project.hasProperty("signing.keystore.path") }
     keyStore = project.findProperty("signing.keystore.path")
     storePass = project.findProperty("signing.keystore.pass")
     alias = project.findProperty("signing.key.name")
@@ -185,16 +183,19 @@ publishing {
 }
 
 def getClassifier() {
-    if (System.getenv("GIT_TAG_NAME") != null) {
-        return ""
-    }
-    return "-${release_version}"
-}
+    def classifier = ""
+    if (System.getenv("GIT_TAG_NAME") == null) {
+        // Append development version (ALPHA/BETA/RC-#)
+        def dev = "${dev_version}"
+        if (!dev.isEmpty()) {
+            classifier += "-${dev_version}"
+        }
 
-static def getBuildNumber() {
-    def buildNumber = System.getenv("BUILD_NUMBER")
-    if (buildNumber != null) {
-        return "-${buildNumber}"
+        // Append build number if on CI server
+        def buildNumber = System.getenv("BUILD_NUMBER")
+        if (buildNumber != null) {
+            classifier += "-${buildNumber}"
+        }
     }
-    return ""
+    return classifier
 }
