@@ -28,6 +28,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.HoverEvent;
+import net.minecraft.world.gen.GenerationStage;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -43,7 +44,8 @@ public enum Profiler {
     BIOMES("biomes"),
     TERRAIN("base terrain"),
     SURFACE("biome surfaces"),
-    CARVING("caves"),
+    AIR_CARVERS("air carvers"),
+    FLUID_CARVERS("fluid carvers"),
     DECORATION("features & structures"),
     MOB_SPAWNS("mob spawns"),
     ;
@@ -102,6 +104,10 @@ public enum Profiler {
                         .modifyStyle(style -> style.forceFormatting(TextFormatting.WHITE)))
                 .modifyStyle(style -> style.applyFormatting(TextFormatting.YELLOW)
                         .setHoverEvent(createHoverStats(minMS(), maxMS())));
+    }
+
+    public static Profiler get(GenerationStage.Carving stage) {
+        return stage == GenerationStage.Carving.AIR ? AIR_CARVERS : FLUID_CARVERS;
     }
 
     public static HoverEvent createHoverStats(long min, long max) {

@@ -106,7 +106,7 @@ public abstract class MixinNoiseChunkGenerator extends ChunkGenerator {
 
     @Override
     public void func_230350_a_(long seed, BiomeManager biomes, IChunk chunk, GenerationStage.Carving carver) {
-        try (Section section = Profiler.CARVING.punchIn()) {
+        try (Section section = Profiler.get(carver).punchIn()) {
             super.func_230350_a_(seed, biomes, chunk, carver);
         }
     }

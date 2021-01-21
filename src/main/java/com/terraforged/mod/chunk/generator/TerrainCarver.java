@@ -30,6 +30,9 @@ import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.ChunkCarverFix;
 import com.terraforged.mod.featuremanager.template.StructureUtils;
+import com.terraforged.mod.profiler.watchdog.WarnTimer;
+import com.terraforged.mod.profiler.watchdog.Watchdog;
+import com.terraforged.mod.profiler.watchdog.WatchdogContext;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -48,14 +51,24 @@ import java.util.function.Supplier;
 
 public class TerrainCarver implements Generator.Carvers {
 
+    private static final String TYPE = "Carver";
+
     private final TFChunkGenerator generator;
+    private final long timeout;
 
     public TerrainCarver(TFChunkGenerator generator) {
         this.generator = generator;
+        this.timeout = Watchdog.getWatchdogHangTime();
     }
 
     @Override
     public void carveTerrain(BiomeManager biomes, IChunk chunk, GenerationStage.Carving type) {
+        try (WatchdogContext context = Watchdog.punchIn(chunk, generator, timeout)) {
+            carve(chunk, type, context);
+        }
+    }
+
+    private void carve(IChunk chunk, GenerationStage.Carving type, WatchdogContext context) {
         boolean nearRiver = nearRiver(chunk.getPos());
         boolean nearStructure = StructureUtils.hasOvergroundStructure(chunk);
         ChunkCarverFix carverChunk = new ChunkCarverFix(chunk, generator.getMaterials(), nearStructure, nearRiver);
@@ -72,6 +85,8 @@ public class TerrainCarver implements Generator.Carvers {
         Biome biome = generator.getBiomeProvider().getBiome(chunkpos.getXStart(), chunkpos.getZStart());
         BiomeGenerationSettings settings = biome.getGenerationSettings();
 
+        WarnTimer timer = Watchdog.getWarnTimer();
+
         ListIterator<Supplier<ConfiguredCarver<?>>> iterator = settings.getCarvers(type).listIterator();
         for (int cx = chunkX - 8; cx <= chunkX + 8; ++cx) {
             for (int cz = chunkZ - 8; cz <= chunkZ + 8; ++cz) {
@@ -80,7 +95,9 @@ public class TerrainCarver implements Generator.Carvers {
                     ConfiguredCarver<?> carver = iterator.next().get();
                     random.setLargeFeatureSeed(generator.getSeed() + index, cx, cz);
                     if (carver.shouldCarve(random, cx, cz)) {
+                        long timestamp = timer.now();
                         carver.carveRegion(carverChunk, lookup, random, seaLevel, cx, cz, chunkX, chunkZ, mask);
+                        Generator.checkTime(TYPE, carver, timer, timestamp, context);
                     }
                 }
 

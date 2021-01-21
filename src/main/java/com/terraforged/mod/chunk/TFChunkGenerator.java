@@ -224,10 +224,10 @@ public class TFChunkGenerator extends ChunkGenerator {
 
     @Override
     public final void func_230350_a_(long seed, BiomeManager biomes, IChunk chunk, GenerationStage.Carving carver) {
-        try (Section section = Profiler.CARVING.punchIn()) {
+        try (Section section = Profiler.get(carver).punchIn()) {
             terrainCarver.carveTerrain(biomes, chunk, carver);
         } catch (Throwable t) {
-            CrashHandler.handle(chunk, this, new WorldGenException(Profiler.CARVING, t));
+            CrashHandler.handle(chunk, this, new WorldGenException(Profiler.AIR_CARVERS, t));
         }
     }
 

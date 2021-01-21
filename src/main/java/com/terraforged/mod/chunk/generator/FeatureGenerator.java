@@ -25,7 +25,6 @@
 package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.engine.tile.chunk.ChunkReader;
-import com.terraforged.mod.Log;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.biome.TFBiomeContainer;
@@ -34,7 +33,6 @@ import com.terraforged.mod.chunk.fix.RegionFix;
 import com.terraforged.mod.chunk.util.ChunkRegionBoundingBox;
 import com.terraforged.mod.featuremanager.biome.BiomeFeature;
 import com.terraforged.mod.featuremanager.biome.BiomeFeatures;
-import com.terraforged.mod.featuremanager.util.identity.Identifier;
 import com.terraforged.mod.profiler.watchdog.UncheckedException;
 import com.terraforged.mod.profiler.watchdog.WarnTimer;
 import com.terraforged.mod.profiler.watchdog.Watchdog;
@@ -63,12 +61,10 @@ public class FeatureGenerator implements Generator.Features {
     private static final String FEATURE = "Feature";
 
     private final long hangTime;
-    private final WarnTimer timer;
     private final TFChunkGenerator generator;
 
     public FeatureGenerator(TFChunkGenerator generator) {
         this.generator = generator;
-        this.timer = Watchdog.getWarnTimer();
         this.hangTime = Watchdog.getWatchdogHangTime();
     }
 
@@ -112,14 +108,14 @@ public class FeatureGenerator implements Generator.Features {
     }
 
     private void decorate(StructureManager manager, ISeedReader region, IChunk chunk, Biome biome, BlockPos pos, WatchdogContext context) {
-        SharedSeedRandom random = new SharedSeedRandom();
-        long decorationSeed = random.setDecorationSeed(region.getSeed(), pos.getX(), pos.getZ());
+        final SharedSeedRandom random = new SharedSeedRandom();
+        final long decorationSeed = random.setDecorationSeed(region.getSeed(), pos.getX(), pos.getZ());
 
-        BiomeFeatures biomeFeatures = generator.getFeatureManager().getFeatures(biome);
-        List<List<BiomeFeature>> stagedFeatures = biomeFeatures.getFeatures();
-        List<List<Structure<?>>> stagedStructures = biomeFeatures.getStructures();
+        final BiomeFeatures biomeFeatures = generator.getFeatureManager().getFeatures(biome);
+        final List<List<BiomeFeature>> stagedFeatures = biomeFeatures.getFeatures();
+        final List<List<Structure<?>>> stagedStructures = biomeFeatures.getStructures();
 
-        final WarnTimer timer = this.timer;
+        final WarnTimer timer = Watchdog.getWarnTimer();
 
         final int chunkX = pos.getX() >> 4;
         final int chunkZ = pos.getZ() >> 4;
@@ -146,7 +142,7 @@ public class FeatureGenerator implements Generator.Features {
                                 chunkBounds.init(start),
                                 chunkPos
                         ));
-                        checkTime(STRUCTURE, structure.getStructureName(), timer, timeStamp, context);
+                        Generator.checkTime(STRUCTURE, structure.getStructureName(), timer, timeStamp, context);
                     } catch (Throwable t) {
                         throw new UncheckedException(STRUCTURE, structure.getStructureName(), t);
                     }
@@ -168,7 +164,7 @@ public class FeatureGenerator implements Generator.Features {
                         long timeStamp = timer.now();
                         context.pushIdentifier(feature.getIdentity(), timeStamp);
                         feature.getFeature().generate(region, generator, random, pos);
-                        checkTime(FEATURE, feature.getIdentity(), timer, timeStamp, context);
+                        Generator.checkTime(FEATURE, feature.getIdentity(), timer, timeStamp, context);
                     } catch (Throwable t) {
                         throw new UncheckedException(FEATURE, feature.getIdentity(), t);
                     }
@@ -189,21 +185,5 @@ public class FeatureGenerator implements Generator.Features {
                 decorator.decorate(ctx.chunk, ctx, px, py, pz);
             }
         });
-    }
-
-    private static void checkTime(String type, String identity, WarnTimer timer, long timestamp, WatchdogContext context) {
-        long duration = timer.since(timestamp);
-        if (timer.warn(duration)) {
-            context.pushTime(type, identity, duration);
-            Log.warn("{} was slow to generate! ({}ms): {}", type, duration, identity);
-        }
-    }
-
-    private void checkTime(String type, Identifier identity, WarnTimer timer, long timestamp, WatchdogContext context) {
-        long duration = timer.since(timestamp);
-        if (timer.warn(duration)) {
-            context.pushTime(type, identity, duration);
-            Log.warn("{} was slow to generate! ({}ms): {}", type, duration, identity.getComponents());
-        }
     }
 }

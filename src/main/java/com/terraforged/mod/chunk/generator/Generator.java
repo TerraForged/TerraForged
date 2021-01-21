@@ -24,6 +24,10 @@
 
 package com.terraforged.mod.chunk.generator;
 
+import com.terraforged.mod.Log;
+import com.terraforged.mod.featuremanager.util.identity.Identifier;
+import com.terraforged.mod.profiler.watchdog.WarnTimer;
+import com.terraforged.mod.profiler.watchdog.WatchdogContext;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.DynamicRegistries;
@@ -113,5 +117,21 @@ public interface Generator {
          * Gets a list of possible spawns at the given position
          */
         List<MobSpawnInfo.Spawners> getSpawns(Biome biome, StructureManager structures, EntityClassification type, BlockPos pos);
+    }
+
+    static void checkTime(String type, Object identity, WarnTimer timer, long timestamp, WatchdogContext context) {
+        long duration = timer.since(timestamp);
+        if (timer.warn(duration)) {
+            context.pushTime(type, identity, duration);
+            Log.warn("{} was slow to generate! ({}ms): {}", type, duration, identity);
+        }
+    }
+
+    static void checkTime(String type, Identifier identity, WarnTimer timer, long timestamp, WatchdogContext context) {
+        long duration = timer.since(timestamp);
+        if (timer.warn(duration)) {
+            context.pushTime(type, identity, duration);
+            Log.warn("{} was slow to generate! ({}ms): {}", type, duration, identity.getComponents());
+        }
     }
 }

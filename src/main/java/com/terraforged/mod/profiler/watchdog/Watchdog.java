@@ -45,6 +45,7 @@ public class Watchdog implements Runnable {
     private static final Watchdog INSTANCE = new Watchdog();
 
     private final ContextQueue contextQueue = new ContextQueue();
+    private final ThreadLocal<WarnTimer> timerPool = ThreadLocal.withInitial(Watchdog::getWarnTimer);
     private final ThreadLocal<WatchdogContext> contextPool = ThreadLocal.withInitial(WatchdogCtx::new);
 
     static {
@@ -79,12 +80,8 @@ public class Watchdog implements Runnable {
         return WatchdogContext.NONE;
     }
 
-    protected static void addContext(WatchdogContext context) {
-        INSTANCE.contextQueue.add(context);
-    }
-
     public static WarnTimer getWarnTimer() {
-        return new WarnTimer(ConfigManager.GENERAL.load().getLong(FEATURE_WARN_KEY, WARN_TIME));
+        return INSTANCE.timerPool.get();
     }
 
     public static long getWatchdogHangTime() {
@@ -93,5 +90,13 @@ public class Watchdog implements Runnable {
             return -1L;
         }
         return Math.max(time, MIN_CRASH_TIME);
+    }
+
+    protected static void addContext(WatchdogContext context) {
+        INSTANCE.contextQueue.add(context);
+    }
+
+    protected static WarnTimer createWarnTimer() {
+        return new WarnTimer(ConfigManager.GENERAL.load().getLong(FEATURE_WARN_KEY, WARN_TIME));
     }
 }
