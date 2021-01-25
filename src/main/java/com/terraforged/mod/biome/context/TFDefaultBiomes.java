@@ -34,12 +34,20 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 
-public class DefaultBiomes {
+public class TFDefaultBiomes {
 
     public static final DefaultBiome.Factory<RegistryKey<Biome>> BEACH = context -> new DefaultBiomeSelector(
             context.getId(Biomes.SNOWY_BEACH),
             context.getId(Biomes.BEACH),
             context.getId(ModBiomes.WARM_BEACH),
+            0.25F,
+            0.75F
+    );
+
+    public static final DefaultBiome.Factory<RegistryKey<Biome>> COAST = context -> new DefaultBiomeSelector(
+            BiomeMap.NULL_BIOME,
+            BiomeMap.NULL_BIOME,
+            BiomeMap.NULL_BIOME,
             0.25F,
             0.75F
     );

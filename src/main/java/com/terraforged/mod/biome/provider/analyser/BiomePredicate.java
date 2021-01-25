@@ -84,7 +84,7 @@ public interface BiomePredicate {
     }
 
     BiomePredicate OCEAN = type(Biome.Category.OCEAN);
-    BiomePredicate BEACH = type(Biome.Category.BEACH).or(name("beach"));
+    BiomePredicate BEACH = type(Biome.Category.BEACH).or(name("beach", "shore"));
     BiomePredicate COAST = type(Biome.Category.MUSHROOM).or(name("coast"));
     BiomePredicate COLD_STEPPE = name("steppe").and(temp(-1, 0.3));
     BiomePredicate DESERT = type(Biome.Category.DESERT).or(temp(0.9, 2).and(rain(-1, 0.2)));

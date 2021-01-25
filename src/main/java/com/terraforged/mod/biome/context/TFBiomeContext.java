@@ -75,7 +75,7 @@ public class TFBiomeContext implements BiomeContext<RegistryKey<Biome>> {
     public IntSet getRiverOverrides() {
         IntSet set = new IntOpenHashSet();
         for (Biome biome : biomes) {
-            if (DefaultBiomes.overridesRiver(biome)) {
+            if (TFDefaultBiomes.overridesRiver(biome)) {
                 set.add(biomes.getId(biome));
             }
         }

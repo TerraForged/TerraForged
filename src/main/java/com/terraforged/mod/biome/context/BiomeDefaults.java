@@ -25,6 +25,7 @@
 package com.terraforged.mod.biome.context;
 
 import com.terraforged.engine.world.biome.map.BiomeContext;
+import com.terraforged.engine.world.biome.map.defaults.DefaultBiomes;
 import com.terraforged.engine.world.biome.map.defaults.FallbackBiomes;
 import com.terraforged.mod.biome.ModBiomes;
 import net.minecraft.util.RegistryKey;
@@ -40,17 +41,18 @@ public class BiomeDefaults implements BiomeContext.Defaults<RegistryKey<Biome>> 
     }
 
     @Override
-    public com.terraforged.engine.world.biome.map.defaults.DefaultBiomes getDefaults() {
-        return new com.terraforged.engine.world.biome.map.defaults.DefaultBiomes(
-                DefaultBiomes.BEACH.create(context),
-                DefaultBiomes.RIVER.create(context),
-                DefaultBiomes.LAKE.create(context),
-                DefaultBiomes.WETLAND.create(context),
-                DefaultBiomes.OCEAN.create(context),
-                DefaultBiomes.DEEP_OCEAN.create(context),
-                DefaultBiomes.MOUNTAIN.create(context),
-                DefaultBiomes.VOLCANOES.create(context),
-                DefaultBiomes.LAND.create(context)
+    public DefaultBiomes getDefaults() {
+        return new DefaultBiomes(
+                TFDefaultBiomes.BEACH.create(context),
+                TFDefaultBiomes.COAST.create(context),
+                TFDefaultBiomes.RIVER.create(context),
+                TFDefaultBiomes.LAKE.create(context),
+                TFDefaultBiomes.WETLAND.create(context),
+                TFDefaultBiomes.OCEAN.create(context),
+                TFDefaultBiomes.DEEP_OCEAN.create(context),
+                TFDefaultBiomes.MOUNTAIN.create(context),
+                TFDefaultBiomes.VOLCANOES.create(context),
+                TFDefaultBiomes.LAND.create(context)
         );
     }
 
@@ -59,7 +61,6 @@ public class BiomeDefaults implements BiomeContext.Defaults<RegistryKey<Biome>> 
         return new FallbackBiomes<>(
                 Biomes.RIVER,
                 ModBiomes.LAKE,
-                Biomes.STONE_SHORE,
                 Biomes.BEACH,
                 Biomes.OCEAN,
                 Biomes.DEEP_OCEAN,

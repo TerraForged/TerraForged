@@ -166,7 +166,8 @@ public class BiomeAnalyser {
 
     private static boolean filter(Biome biome, TFBiomeContext context) {
         if (biome.getCategory() == Biome.Category.NONE) {
-            return true;
+            // Void and stone shore both use the NONE category. Stone shore is valid, void is not
+            return biome != context.biomes.get(Biomes.STONE_SHORE);
         }
         if (biome.getCategory() == Biome.Category.THEEND) {
             return true;
@@ -174,7 +175,7 @@ public class BiomeAnalyser {
         if (biome.getCategory() == Biome.Category.NETHER) {
             return true;
         }
-        if (biome == context.biomes.get(Biomes.MUSHROOM_FIELD_SHORE) || biome == context.biomes.get(Biomes.MOUNTAIN_EDGE)) {
+        if (biome == context.biomes.get(Biomes.MOUNTAIN_EDGE)) {
             return true;
         }
         if (context.biomes.getName(biome).contains("hills")) {
