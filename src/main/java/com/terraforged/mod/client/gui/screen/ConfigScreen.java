@@ -74,7 +74,7 @@ public class ConfigScreen extends OverlayScreen {
         this.instance = new Instance(getInitialSettings(settings));
         this.preview = new PreviewPage(instance.settings, getSeed(parent));
         this.pages = new Page[]{
-                new PresetsPage(instance, preview, preview.getPreviewWidget()),
+                new PresetsPage(this, instance, preview, preview.getPreviewWidget()),
                 new WorldPage(instance, preview),
                 new SimplePreviewPage(GuiKeys.CLIMATE_SETTINGS, "climate", preview, instance, s -> s.climate),
                 new SimplePreviewPage(GuiKeys.TERRAIN_SETTINGS, "terrain", preview, instance, s -> s.terrain),
@@ -252,6 +252,15 @@ public class ConfigScreen extends OverlayScreen {
         preview.close();
         Minecraft.getInstance().displayGuiScreen(parent);
         parent.field_238934_c_.func_239043_a_(outputSettings);
+    }
+
+    public void syncStructureSettings(TerraSettings settings) {
+        DimensionGeneratorSettings level = inputSettings;
+        if (level.func_236225_f_() instanceof TFChunkGenerator) {
+            TerraContext context = ((TFChunkGenerator) level.func_236225_f_()).getContext();
+            DimensionStructuresSettings structuresSettings = level.func_236225_f_().func_235957_b_();
+            settings.structures.read(structuresSettings, context.biomeContext);
+        }
     }
 
     private boolean hasNext() {

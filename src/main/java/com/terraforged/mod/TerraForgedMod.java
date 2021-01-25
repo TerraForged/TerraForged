@@ -27,15 +27,10 @@ package com.terraforged.mod;
 import com.terraforged.engine.Engine;
 import com.terraforged.engine.concurrent.task.LazySupplier;
 import com.terraforged.mod.api.material.WGTags;
-import com.terraforged.mod.biome.provider.TFBiomeProvider;
-import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.server.command.TerraCommand;
 import com.terraforged.mod.util.DataUtils;
 import com.terraforged.mod.util.Environment;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.biome.Biomes;
-import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -61,20 +56,11 @@ public class TerraForgedMod {
 
     public TerraForgedMod() {
         Environment.log();
-
         ModFileInfo modInfo = ModList.get().getModFileById(MODID);
         Log.info("Signature:  {}", modInfo.getCodeSigningFingerprint().orElse("UNSIGNED"));
         Log.info("Trust Data: {}", modInfo.getTrustData().orElse("UNTRUSTED"));
-
         Engine.init();
         WGTags.init();
-
-        Registry.register(Registry.BIOME_PROVIDER_CODEC, "terraforged:climate", TFBiomeProvider.CODEC);
-        Registry.register(Registry.CHUNK_GENERATOR_CODEC, "terraforged:generator", TFChunkGenerator.CODEC);
-
-        BiomeManager.addBiome(BiomeManager.BiomeType.ICY, new BiomeManager.BiomeEntry(Biomes.ICE_SPIKES, 2));
-        BiomeManager.addBiome(BiomeManager.BiomeType.WARM, new BiomeManager.BiomeEntry(Biomes.MUSHROOM_FIELDS, 2));
-        BiomeManager.addBiome(BiomeManager.BiomeType.WARM, new BiomeManager.BiomeEntry(Biomes.MUSHROOM_FIELD_SHORE, 2));
     }
 
     @SubscribeEvent
@@ -83,6 +69,10 @@ public class TerraForgedMod {
         DataUtils.initDirs(PRESETS_DIR, DATAPACK_DIR);
         TerraCommand.init();
         ConfigManager.init();
+        event.enqueueWork(() -> {
+            RegistrationEvents.registerCodecs();
+            RegistrationEvents.registerMissingBiomeTypes();
+        });
     }
 
     @SubscribeEvent

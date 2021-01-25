@@ -33,6 +33,7 @@ import com.terraforged.mod.client.gui.element.TFButton;
 import com.terraforged.mod.client.gui.element.TFLabel;
 import com.terraforged.mod.client.gui.element.TFTextBox;
 import com.terraforged.mod.client.gui.page.BasePage;
+import com.terraforged.mod.client.gui.screen.ConfigScreen;
 import com.terraforged.mod.client.gui.screen.Instance;
 import com.terraforged.mod.client.gui.screen.ScrollPane;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
@@ -53,11 +54,13 @@ public class PresetsPage extends BasePage {
     private final UpdatablePage preview;
     private final Widget previewWidget;
     private final TFTextBox nameInput;
+    private final ConfigScreen parent;
     private final PresetManager manager = PresetManager.load();
 
-    public PresetsPage(Instance instance, UpdatablePage preview, Widget widget) {
+    public PresetsPage(ConfigScreen parent, Instance instance, UpdatablePage preview, Widget widget) {
         CompoundNBT value = new CompoundNBT();
         value.putString("name", "");
+        this.parent = parent;
         this.preview = preview;
         this.previewWidget = widget;
         this.instance = instance;
@@ -235,8 +238,9 @@ public class PresetsPage extends BasePage {
     }
 
     private void load(Preset preset) {
-        instance.sync(preset.getSettings());
-
+        TerraSettings settings = preset.getSettings();
+        parent.syncStructureSettings(settings);
+        instance.sync(settings);
         update();
     }
 

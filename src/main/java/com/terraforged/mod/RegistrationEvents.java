@@ -24,6 +24,8 @@
 
 package com.terraforged.mod;
 
+import com.terraforged.mod.biome.provider.TFBiomeProvider;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.feature.TerraFeatures;
 import com.terraforged.mod.feature.context.ContextSelectorFeature;
 import com.terraforged.mod.feature.decorator.FilterDecorator;
@@ -32,8 +34,11 @@ import com.terraforged.mod.feature.decorator.poisson.PoissonAtSurface;
 import com.terraforged.mod.feature.feature.BushFeature;
 import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.mod.feature.feature.FreezeLayer;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.placement.Placement;
+import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.common.world.ForgeWorldType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -41,6 +46,17 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class RegistrationEvents {
+
+    static void registerCodecs() {
+        Registry.register(Registry.BIOME_PROVIDER_CODEC, TerraForgedMod.MODID + ":climate", TFBiomeProvider.CODEC);
+        Registry.register(Registry.CHUNK_GENERATOR_CODEC, TerraForgedMod.MODID + ":generator", TFChunkGenerator.CODEC);
+    }
+
+    static void registerMissingBiomeTypes() {
+        BiomeManager.addBiome(BiomeManager.BiomeType.ICY, new BiomeManager.BiomeEntry(Biomes.ICE_SPIKES, 2));
+        BiomeManager.addBiome(BiomeManager.BiomeType.WARM, new BiomeManager.BiomeEntry(Biomes.MUSHROOM_FIELDS, 2));
+        BiomeManager.addBiome(BiomeManager.BiomeType.WARM, new BiomeManager.BiomeEntry(Biomes.MUSHROOM_FIELD_SHORE, 2));
+    }
 
     @SubscribeEvent
     public static void registerLevels(RegistryEvent.Register<ForgeWorldType> event) {

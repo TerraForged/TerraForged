@@ -148,7 +148,7 @@ public class PresetManager implements Iterable<Preset> {
         if (!ensureDir()) {
             return new PresetManager(new ArrayList<>());
         }
-
+        
         File[] files = TerraForgedMod.PRESETS_DIR.listFiles();
         if (files == null) {
             return new PresetManager(new ArrayList<>());
@@ -216,9 +216,9 @@ public class PresetManager implements Iterable<Preset> {
         try {
             supplier.get().filter(e -> filter(name.apply(e))).forEach(e -> {
                 try (InputStream in = data.apply(e)) {
-                    loadPreset(name.apply(e), in, consumer);
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
+                    loadInternalPreset(name.apply(e), in, consumer);
+                } catch (Throwable t) {
+                    t.printStackTrace();
                 }
             });
         } catch (IOException e) {
@@ -270,17 +270,15 @@ public class PresetManager implements Iterable<Preset> {
         return settings;
     }
 
-    private static void loadPreset(String path, InputStream in, Consumer<Preset> presets) {
+    private static void loadInternalPreset(String path, InputStream in, Consumer<Preset> presets) {
         try (Reader reader = new BufferedReader(new InputStreamReader(in))) {
             TerraSettings settings = new TerraSettings();
             JsonElement data = new JsonParser().parse(reader);
-            CompoundNBT nbt = DataUtils.fromJson(data);
-            if (DataUtils.fromNBT(nbt, settings)) {
-                String name = parseName(path);
-                String description = getDescription(data);
-                Preset preset = new Preset(name, description, settings, true);
-                presets.accept(preset);
-            }
+            DataUtils.fromJson(data, settings);
+            String name = parseName(path);
+            String description = getDescription(data);
+            Preset preset = new Preset(name, description, settings, true);
+            presets.accept(preset);
         } catch (IOException e) {
             e.printStackTrace();
         }

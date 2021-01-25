@@ -51,9 +51,17 @@ public class StructureSettings {
     }
 
     public void read(DimensionStructuresSettings settings, TFBiomeContext context) {
+        // Copy valid structure configs to a new instance
+        StructureSettings defaults = new StructureSettings();
         JsonElement json = Codecs.encodeAndGet(DimensionStructuresSettings.field_236190_a_, settings, JsonOps.INSTANCE);
-        DataUtils.fromJson(json, this);
-        StructureUtils.retainOverworldStructures(structures, settings, context);
+        DataUtils.fromJson(json, defaults);
+        StructureUtils.retainOverworldStructures(defaults.structures, settings, context);
+
+        // Replace default values in the new instance with any contained on this instance
+        this.structures.forEach((name, setting) -> defaults.structures.replace(name, setting));
+
+        // Replace this structures map with the updated defaults
+        this.structures = defaults.structures;
     }
 
     public DimensionStructuresSettings write(DimensionStructuresSettings original) {
