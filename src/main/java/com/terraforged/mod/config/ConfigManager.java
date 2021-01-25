@@ -40,13 +40,13 @@ import java.util.function.Consumer;
 
 public class ConfigManager {
 
-    private static final String PERF_VERSION = "0.2";
-    private static final String GENERAL_VERSION = "0.4";
+    private static final String PERF_VERSION = "1.0";
+    private static final String GENERAL_VERSION = "1.0";
     private static final Path COMMON_DIR = Paths.get("config", "terraforged").toAbsolutePath();
 
     public static final ConfigRef BIOME_WEIGHTS = new ConfigRef(() -> create("biome_weights", cfg -> set(
             cfg,
-            "terraforged:example_biome",
+            "#terraforged:example_biome",
             10,
             "Configure biome weights by entering their id and an integer value for their weight (default weight is 10)",
             "This config will override the weights configured or provided by other mods for TerraForged worlds only."
@@ -176,9 +176,15 @@ public class ConfigManager {
     }
 
     private static <T> void set(CommentedConfig config, String path, T value, String... lines) {
-        config.setComment(path, " " + String.join( "\n ", lines));
-
-        if (!config.contains(path)) {
+        // # denotes an example/non-required entry - only add it if no other values exist
+        if (path.startsWith("#")) {
+            if (config.isEmpty()) {
+                path = path.substring(1);
+                config.setComment(path, " " + String.join( "\n ", lines));
+                config.set(path, value);
+            }
+        } else if (!config.contains(path)) {
+            config.setComment(path, " " + String.join( "\n ", lines));
             config.set(path, value);
         }
     }
