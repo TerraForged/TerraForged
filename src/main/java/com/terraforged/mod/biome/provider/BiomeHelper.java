@@ -42,11 +42,21 @@ import javax.annotation.Nullable;
 public class BiomeHelper {
 
     private static final String[] COLD_KEYWORDS = {"cold", "frozen", "ice", "chill", "tundra", "taiga", "arctic"};
-    private static final String[] WARM_KEYWORDS = {"hot", "warm", "tropical", "desert", "savanna", "jungle"};
+    private static final String[] WARM_KEYWORDS = {"hot", "warm", "tropic", "desert", "savanna", "jungle"};
 
     public static TempCategory getTempCategory(Biome biome, TFBiomeContext context) {
         // vanilla ocean biome properties are not at all helpful for determining temperature
         if (biome.getCategory() == Biome.Category.OCEAN) {
+            return tempFromName(context.biomes.getName(biome));
+        } else if (biome.getCategory() == Biome.Category.BEACH) {
+            // Beaches have slightly modified temps
+            float temp = biome.getTemperature();
+            if (temp <= 0.4F) {
+                return TempCategory.COLD;
+            }
+            if (temp >= 1.0) {
+                return TempCategory.WARM;
+            }
             return tempFromName(context.biomes.getName(biome));
         } else {
             // snowy = 0.0F, plains = 0.8F, desert = 2.0F
