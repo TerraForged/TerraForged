@@ -45,7 +45,7 @@ public class Watchdog implements Runnable {
     private static final Watchdog INSTANCE = new Watchdog();
 
     private final ContextQueue contextQueue = new ContextQueue();
-    private final ThreadLocal<WarnTimer> timerPool = ThreadLocal.withInitial(Watchdog::getWarnTimer);
+    private final ThreadLocal<WarnTimer> timerPool = ThreadLocal.withInitial(Watchdog::createWarnTimer);
     private final ThreadLocal<WatchdogContext> contextPool = ThreadLocal.withInitial(WatchdogCtx::new);
 
     static {

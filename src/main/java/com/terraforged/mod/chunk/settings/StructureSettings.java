@@ -42,6 +42,7 @@ public class StructureSettings {
 
     public StructureSpread stronghold = new StructureSpread();
 
+    @NoName
     @Sorted
     public Map<String, StructureSeparation> structures = new LinkedHashMap<>();
 
@@ -52,7 +53,6 @@ public class StructureSettings {
     public void read(DimensionStructuresSettings settings, TFBiomeContext context) {
         JsonElement json = Codecs.encodeAndGet(DimensionStructuresSettings.field_236190_a_, settings, JsonOps.INSTANCE);
         DataUtils.fromJson(json, this);
-
         StructureUtils.retainOverworldStructures(structures, settings, context);
     }
 

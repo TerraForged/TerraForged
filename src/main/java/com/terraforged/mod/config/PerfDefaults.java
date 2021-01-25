@@ -26,13 +26,13 @@ package com.terraforged.mod.config;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.terraforged.engine.concurrent.thread.ThreadPools;
+import com.terraforged.engine.settings.FilterSettings;
 import com.terraforged.mod.Log;
 
 public class PerfDefaults {
 
     public static final boolean BATCHING = true;
     public static final int TILE_SIZE = 3;
-    public static final int TILE_BORDER = 1;
     public static final int BATCH_COUNT = 6;
     public static final int THREAD_COUNT = ThreadPools.defaultPoolSize();
 
@@ -58,5 +58,10 @@ public class PerfDefaults {
         Log.info(" - Batching: {} (default: {})", config.getOrElse("batching", BATCHING), BATCHING);
         Log.info(" - Batch Count: {} (default: {})", config.getInt("batch_count"), BATCH_COUNT);
         return config;
+    }
+
+    public static int getTileBorderSize(FilterSettings settings) {
+        // Scale tile border size with droplet lifetime
+        return Math.min(2, Math.max(1, settings.erosion.dropletLifetime / 16));
     }
 }

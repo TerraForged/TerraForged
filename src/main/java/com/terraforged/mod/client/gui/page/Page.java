@@ -146,11 +146,13 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
                 if (child == null || child.getId() != Constants.NBT.TAG_COMPOUND) {
                     return;
                 }
-                TFLabel label = new TFLabel(Element.getDisplayName(name, settings));
-                label.x = x;
-                label.y = top.getAndAdd(SLIDER_HEIGHT + SLIDER_PAD);
-                consumer.accept(label);
-                addElements(x, label.y, column, (CompoundNBT) child, true, consumer, callback);
+                Widget label = createLabel(name, settings);
+                if (label != null) {
+                    label.x = x;
+                    label.y = top.getAndAdd(SLIDER_HEIGHT + SLIDER_PAD);
+                    consumer.accept(label);
+                }
+                addElements(x, top.get(), column, (CompoundNBT) child, true, consumer, callback);
             }
         });
     }
@@ -182,6 +184,13 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
         } else {
             return null;
         }
+    }
+
+    public Widget createLabel(String name, CompoundNBT settings) {
+        if (settings.getCompound("#" + name).contains("noname")) {
+            return null;
+        }
+        return new TFLabel(Element.getDisplayName(name, settings));
     }
 
     public void onAddWidget(Widget widget) {

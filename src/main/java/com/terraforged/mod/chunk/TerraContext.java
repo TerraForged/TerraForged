@@ -104,11 +104,12 @@ public class TerraContext extends GeneratorContext {
         CommentedConfig config = PerfDefaults.getAndPrintPerfSettings();
         boolean batching = config.getOrElse("batching", false);
         int tileSize = Math.min(PerfDefaults.MAX_TILE_SIZE, Math.max(2, config.getInt("tile_size")));
+        int tileBorder = PerfDefaults.getTileBorderSize(factory.getFilters().getSettings());
         int batchCount = Math.min(PerfDefaults.MAX_BATCH_COUNT, Math.max(1, config.getInt("batch_count")));
         int threadCount = Math.min(PerfDefaults.MAX_THREAD_COUNT, Math.max(1, config.getInt("thread_count")));
         return TileGenerator.builder()
                 .pool(ThreadPools.create(threadCount, batching))
-                .size(tileSize, PerfDefaults.TILE_BORDER)
+                .size(tileSize, tileBorder)
                 .batch(batchCount)
                 .factory(factory)
                 .build()
