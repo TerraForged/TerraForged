@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.biome.provider.analyser;
 
+import com.google.common.collect.ImmutableList;
 import com.terraforged.engine.world.biome.BiomeData;
 import com.terraforged.engine.world.biome.map.BiomeMap;
 import com.terraforged.engine.world.biome.map.BiomeMapBuilder;
@@ -40,6 +41,7 @@ import net.minecraft.world.biome.Biomes;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
 
 public class BiomeAnalyser {
 
@@ -58,13 +60,32 @@ public class BiomeAnalyser {
     }};
 
     public static BiomeMap<RegistryKey<Biome>> createBiomeMap(TFBiomeContext context) {
-        List<BiomeData> biomes = getAllBiomeData(context);
-        BiomeWeights weights = new BiomeWeights(context);
-
         BiomeMap.Builder<RegistryKey<Biome>> builder = BiomeMapBuilder.create(context);
+        BiomeWeights weights = new BiomeWeights(context);
+        collectOverworldBiomes(context, weights, builder);
+        builder.addLand(BiomeType.TEMPERATE_RAINFOREST, Biomes.PLAINS, 5);
+        builder.addLand(BiomeType.TEMPERATE_FOREST, Biomes.FLOWER_FOREST, 2);
+        builder.addLand(BiomeType.TEMPERATE_FOREST, Biomes.PLAINS, 5);
+        builder.addLand(BiomeType.TUNDRA, ModBiomes.SNOWY_TAIGA_SCRUB, 2);
+        builder.addLand(BiomeType.TAIGA, ModBiomes.TAIGA_SCRUB, 2);
+        return builder.build();
+    }
+
+    public static List<Biome> getOverworldBiomesList(TFBiomeContext context) {
+        return ImmutableList.copyOf(getOverworldBiomes(context));
+    }
+
+    public static Biome[] getOverworldBiomes(TFBiomeContext context) {
+        TFBiomeCollector collector = new TFBiomeCollector(context);
+        collectOverworldBiomes(context, i -> 0, collector);
+        return collector.getBiomes();
+    }
+
+    private static void collectOverworldBiomes(TFBiomeContext context, IntUnaryOperator weightFunc, BiomeMap.Builder<RegistryKey<Biome>> builder) {
+        List<BiomeData> biomes = getAllBiomeData(context);
         for (BiomeData data : biomes) {
             RegistryKey<Biome> key = context.getValue(data.id);
-            int weight = weights.getWeight(data.id);
+            int weight = weightFunc.applyAsInt(data.id);
             if (BiomePredicate.BEACH.test(data, context)) {
                 builder.addBeach(key, weight);
             } else if (BiomePredicate.COAST.test(data, context)) {
@@ -92,48 +113,6 @@ public class BiomeAnalyser {
                 }
             }
         }
-
-        builder.addLand(BiomeType.TEMPERATE_RAINFOREST, Biomes.PLAINS, 5);
-        builder.addLand(BiomeType.TEMPERATE_FOREST, Biomes.FLOWER_FOREST, 2);
-        builder.addLand(BiomeType.TEMPERATE_FOREST, Biomes.PLAINS, 5);
-        builder.addLand(BiomeType.TUNDRA, ModBiomes.SNOWY_TAIGA_SCRUB, 2);
-        builder.addLand(BiomeType.TAIGA, ModBiomes.TAIGA_SCRUB, 2);
-
-        return builder.build();
-    }
-
-    public static Biome[] getOverworldBiomes(TFBiomeContext context) {
-        List<BiomeData> biomes = getAllBiomeData(context);
-        Set<Biome> result = new HashSet<>(biomes.size());
-        for (BiomeData data : biomes) {
-            Biome biome = context.biomes.get(data.id);
-            if (BiomePredicate.BEACH.test(data, context)) {
-                result.add(biome);
-            } else if (BiomePredicate.COAST.test(data, context)) {
-                result.add(biome);
-            } else if (BiomePredicate.OCEAN.test(data, context)) {
-                result.add(biome);
-            } else if (BiomePredicate.RIVER.test(data, context)) {
-                result.add(biome);
-            } else if (BiomePredicate.LAKE.test(data, context)) {
-                result.add(biome);
-            } else if (BiomePredicate.WETLAND.test(data, context)) {
-                result.add(biome);
-            } else if (BiomePredicate.VOLCANO.test(data, context)) {
-                result.add(biome);
-            } else if (BiomePredicate.MOUNTAIN.test(data, context)) {
-                result.add(biome);
-            } else if (getTypes(data, context).size() > 0) {
-                result.add(biome);
-            }
-        }
-        return result.toArray(new Biome[0]);
-    }
-
-    public static List<Biome> getOverworldBiomesList(TFBiomeContext context) {
-        List<Biome> biomes = Arrays.asList(getOverworldBiomes(context));
-        biomes.sort(Comparator.comparing(Biome::getRegistryName));
-        return biomes;
     }
 
     public static Collection<BiomeType> getTypes(BiomeData data, TFBiomeContext context) {
@@ -166,8 +145,7 @@ public class BiomeAnalyser {
 
     private static boolean filter(Biome biome, TFBiomeContext context) {
         if (biome.getCategory() == Biome.Category.NONE) {
-            // Void and stone shore both use the NONE category. Stone shore is valid, void is not
-            return biome != context.biomes.get(Biomes.STONE_SHORE);
+            return biome == context.biomes.get(Biomes.THE_VOID);
         }
         if (biome.getCategory() == Biome.Category.THEEND) {
             return true;

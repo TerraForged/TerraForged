@@ -37,8 +37,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.IntUnaryOperator;
 
-public class BiomeWeights {
+public class BiomeWeights implements IntUnaryOperator {
 
     private final int standardWeight;
     private final int forestWeight;
@@ -69,6 +70,11 @@ public class BiomeWeights {
 
         // TF config gets final say
         readWeights();
+    }
+
+    @Override
+    public int applyAsInt(int biome) {
+        return getWeight(biome);
     }
 
     public int getWeight(int biome) {
