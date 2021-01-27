@@ -26,19 +26,32 @@ package com.terraforged.mod.data;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.JsonOps;
 import com.terraforged.engine.world.biome.map.BiomeMap;
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.BiomeWeights;
 import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
+import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biome;
 
 import java.io.*;
 import java.util.stream.IntStream;
 
 public class WorldGenBiomes extends DataGen {
+
+    private static final String[] PROPERTIES = {
+            "category",
+            "downfall",
+            "temperature",
+            "precipitation",
+            "temperature_modifier",
+            "effects",
+    };
 
     public static void genBiomeMap(File dataDir, TFBiomeContext context) {
         if (dataDir.exists() || dataDir.mkdirs()) {
@@ -64,6 +77,24 @@ public class WorldGenBiomes extends DataGen {
                 new GsonBuilder().setPrettyPrinting().create().toJson(rootJson, writer);
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    public static void genBiomeProperties(File dataDir, TFBiomeContext context) {
+        if (dataDir.exists() || dataDir.mkdirs()) {
+            for (Biome biome : context.biomes) {
+                write(new File(dataDir, getJsonPath("worldgen/biome", context.biomes.getRegistryName(biome))), writer -> {
+                    JsonElement json = Codecs.encodeAndGet(Biome.CODEC, biome, JsonOps.INSTANCE);
+                    if (json.isJsonObject()) {
+                        JsonObject properties = json.getAsJsonObject();;
+                        JsonObject result = new JsonObject();
+                        for (String name : PROPERTIES) {
+                            result.add(name, properties.get(name));
+                        }
+                        write(result, writer);
+                    }
+                });
             }
         }
     }

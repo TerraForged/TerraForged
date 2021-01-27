@@ -39,6 +39,7 @@ public class DataGen {
         File dataDir = new File("data").getAbsoluteFile();
         WorldGenBiomes.genBiomeMap(dataDir, context);
         WorldGenBiomes.genBiomeWeights(dataDir, context);
+        WorldGenBiomes.genBiomeProperties(dataDir, context);
         WorldGenBlocks.genBlockTags(dataDir);
         WorldGenFeatures.genBiomeFeatures(dataDir, context);
     }
