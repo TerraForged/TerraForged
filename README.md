@@ -5,15 +5,22 @@ The primary outlet of which is a Forge mod for the popular game Minecraft (Java 
 
 ### Building From Source
 
-Firstly you must recursively git-clone this repository and its submodules (Engine & FeatureManager). To build the
-mod jar just use the gradle build task. The jar will output to the `build/libs` directory.
-
-#### Commands
+#### Steps
+1. Clone the TerraForged repo:
+```shell
+git clone https://github.com/TerraForged/TerraForged.git
+```
+2. Modify the build-script to uncomment line#46 and comment-out line#47 (ie the Engine dependency)
+3. Generate the TerraForged resources & then build the mod jar:
 ```shell script
-git clone --recursive https://github.com/TerraForged/TerraForged.git
-
+cd TerraForged
+./gradlew runData
 ./gradlew build
 ```
+
+Notes:
+- The runData task will say it failed despite it having completed successfully (bug in forge gradle)
+- You may need to set the '[org.gradle.java.home](https://docs.gradle.org/current/userguide/build_environment.html)' variable in gradle.properties to point to your jdk8 installation if you have more modern java versions installed
 
 ### Developing With TerraForged's API
 
@@ -26,9 +33,12 @@ repositories {
 }
 
 dependencies {
-    implementation fg.deobf("com.terraforged:TerraForged:1.15.2-0.1.0")
+    implementation fg.deobf("com.terraforged:TerraForged:1.64.4-${version}")
 }
 ```
+
+Obtain a `${version}` from the [repository tags](https://github.com/TerraForged/TerraForged/releases)
+(versions 0.0.1 to 0.1.2 inclusive are currently unavailable).
 
 #### Usage
 
