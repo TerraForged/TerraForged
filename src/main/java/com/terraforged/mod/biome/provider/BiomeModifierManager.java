@@ -162,6 +162,7 @@ public class BiomeModifierManager implements BiomeModifier {
             modifiers.add(new CoastModifier(biomes));
             modifiers.add(new DesertColorModifier(desertBiomes));
             modifiers.add(new DesertWetlandModifier(biomes));
+            modifiers.add(new WetlandModifier(biomes.getContext(), ModBiomes.MARSHLAND, ModBiomes.COLD_MARSHLAND, ModBiomes.FROZEN_MARSH));
             modifiers.add(new WarmLakeModifier(biomes.getContext(), Biomes.DESERT_LAKES, ModBiomes.LAKE));
             modifiers.add(new MountainModifier(context, biomes, context.terraSettings.miscellaneous.mountainBiomeUsage));
             modifiers.add(new VolcanoModifier(biomes, context.terraSettings.miscellaneous.volcanoBiomeUsage));

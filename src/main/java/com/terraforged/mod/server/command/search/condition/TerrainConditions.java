@@ -36,6 +36,13 @@ public final class TerrainConditions {
     private static final Map<Terrain, SearchCondition.Factory> CONDITIONS = new ConcurrentHashMap<>();
 
     static {
+        register(TerrainType.DEEP_OCEAN, ExactTerrainMatch::new);
+        register(TerrainType.SHALLOW_OCEAN, ExactTerrainMatch::new);
+        register(TerrainType.BEACH, ExactTerrainMatch::new);
+        register(TerrainType.RIVER, ExactTerrainMatch::new);
+        register(TerrainType.LAKE, ExactTerrainMatch::new);
+        register(TerrainType.WETLAND, ExactTerrainMatch::new);
+        register(TerrainType.MOUNTAIN_CHAIN, ExactTerrainMatch::new);
         register(TerrainType.VOLCANO_PIPE, VolcanoMatch::new);
     }
 

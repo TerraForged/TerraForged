@@ -25,15 +25,16 @@
 package com.terraforged.mod.server.command.search.condition;
 
 import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.heightmap.Heightmap;
 import com.terraforged.engine.world.terrain.Terrain;
 
-public class TerrainMatch implements SearchCondition {
+public class ExactTerrainMatch implements SearchCondition {
 
     private final Terrain terrain;
     private final Heightmap heightmap;
 
-    public TerrainMatch(Terrain terrain, Heightmap heightmap) {
+    public ExactTerrainMatch(Terrain terrain, Heightmap heightmap) {
         this.terrain = terrain;
         this.heightmap = heightmap;
     }
@@ -42,7 +43,7 @@ public class TerrainMatch implements SearchCondition {
     public long test(Cell cell, int x, int z) {
         heightmap.apply(cell, x, z);
         if (cell.terrain == terrain) {
-            return cell.terrainRegionCenter;
+            return PosUtil.pack(x, z);
         }
         return SearchCondition.NO_MATCH;
     }

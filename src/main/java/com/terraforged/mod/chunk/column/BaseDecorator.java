@@ -24,20 +24,22 @@
 
 package com.terraforged.mod.chunk.column;
 
+import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.util.Variance;
 import com.terraforged.engine.world.heightmap.Levels;
 import com.terraforged.engine.world.terrain.TerrainType;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.api.material.state.States;
+import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.world.chunk.IChunk;
 
 public class BaseDecorator implements ColumnDecorator {
 
     public static final BaseDecorator INSTANCE = new BaseDecorator();
 
-    private static final int LAVA_OFFSET = 10;
-    private static final int LAVA_LEVEL_MIN = 24;
-    private static final int LAVA_LEVEL_RESOLUTION = 4;
+    private static final int LAVA_DEPTH = 10;
+    private static final Variance LAVA_LEVEL = Variance.of(32, 64);
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
@@ -52,10 +54,10 @@ public class BaseDecorator implements ColumnDecorator {
         }
 
         if (context.cell.terrain == TerrainType.VOLCANO_PIPE) {
-            int lavaLevel = getLavaLevel(y, context.levels);
+            int lavaLevel = getLavaLevel(y, context.cell, context.levels);
 
             if (lavaLevel > 0) {
-                int lavaEnd = Math.max(5, context.levels.waterY - LAVA_OFFSET);
+                int lavaEnd = Math.max(5, context.levels.waterY - LAVA_DEPTH);
 
                 if (lavaLevel > lavaEnd) {
                     return fillDown(context, chunk, x, z, lavaLevel, lavaEnd, States.LAVA.get());
@@ -66,22 +68,12 @@ public class BaseDecorator implements ColumnDecorator {
         return y;
     }
 
-    private static int getLavaLevel(int y, Levels levels) {
-        int dy = y - LAVA_OFFSET - levels.waterLevel;
-
-        // surface must be at-least LAVA_OFFSET above water level
-        if (dy <= 0) {
+    private static int getLavaLevel(int y, Cell cell, Levels levels) {
+        int regionLavaHeight = NoiseUtil.floor(LAVA_LEVEL.apply(cell.terrainRegionId));
+        int lavaLevel = levels.waterLevel + regionLavaHeight;
+        if (y < lavaLevel) {
             return 0;
         }
-
-        // round dy to nearest lava level
-        int level = (dy >> LAVA_LEVEL_RESOLUTION) << LAVA_LEVEL_RESOLUTION;
-
-        // lava level must be at least LAVA_LEVEL_MIN (otherwise it indicates the surface is tool close to sea level)
-        if (level <= LAVA_LEVEL_MIN) {
-            return 0;
-        }
-
-        return levels.waterLevel + level;
+        return lavaLevel;
     }
 }
