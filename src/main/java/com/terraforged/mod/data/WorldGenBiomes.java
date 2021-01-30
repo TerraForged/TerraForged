@@ -42,6 +42,8 @@ import java.util.stream.IntStream;
 
 public class WorldGenBiomes extends DataGen {
 
+    private static final String FORGE_REG_NAME_KEY = "forge:registry_name";
+
     public static void genBiomeMap(File dataDir, TFBiomeContext context) {
         if (dataDir.exists() || dataDir.mkdirs()) {
             BiomeMap<?> map = BiomeAnalyser.createBiomeMap(context);
@@ -80,6 +82,11 @@ public class WorldGenBiomes extends DataGen {
                     }
 
                     JsonElement json = Codecs.encodeAndGet(Biome.CODEC, biome, JsonOps.INSTANCE);
+
+                    if (json.isJsonObject()) {
+                        json.getAsJsonObject().remove(FORGE_REG_NAME_KEY);
+                    }
+
                     write(json, dataDir, getJsonPath("worldgen/biome", name));
                 } catch (Throwable t){
                     t.printStackTrace();
