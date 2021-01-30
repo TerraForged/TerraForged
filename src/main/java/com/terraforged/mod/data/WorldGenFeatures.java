@@ -41,9 +41,9 @@ import java.util.function.Supplier;
 
 public class WorldGenFeatures extends DataGen {
 
-    public static void genBiomeFeatures(File dataDir, TFBiomeContext context) {
+    public static void genBiomeFeatures(File dataDir, Biome[] biomes, TFBiomeContext context) {
         if (dataDir.exists() || dataDir.mkdirs()) {
-            for (Biome biome : context.biomes) {
+            for (Biome biome : biomes) {
                 try {
                     genBiomeFeatures(dataDir, biome, context);
                 } catch (Throwable t) {

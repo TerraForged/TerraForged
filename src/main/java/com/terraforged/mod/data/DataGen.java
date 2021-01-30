@@ -24,23 +24,30 @@
 
 package com.terraforged.mod.data;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.terraforged.mod.biome.context.TFBiomeContext;
+import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.world.biome.Biome;
 
 import java.io.*;
 
 public class DataGen {
 
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+
     public static void dumpData() {
-        TFBiomeContext context = new TFBiomeContext(DynamicRegistries.func_239770_b_());
         File dataDir = new File("data").getAbsoluteFile();
+        TFBiomeContext context = new TFBiomeContext(DynamicRegistries.func_239770_b_());
+        Biome[] biomes = BiomeAnalyser.getOverworldBiomes(context);
         WorldGenBiomes.genBiomeMap(dataDir, context);
+        WorldGenBiomes.genBiomeData(dataDir, biomes, context);
         WorldGenBiomes.genBiomeWeights(dataDir, context);
         WorldGenBlocks.genBlockTags(dataDir);
-        WorldGenFeatures.genBiomeFeatures(dataDir, context);
+        WorldGenFeatures.genBiomeFeatures(dataDir, biomes, context);
     }
 
     protected static void write(File file, IOConsumer consumer) {
@@ -53,8 +60,21 @@ public class DataGen {
         }
     }
 
+    protected static void write(JsonElement json, File dataDir, String path) {
+        File file = new File(dataDir, path).getAbsoluteFile();
+        File dir = file.getParentFile();
+        if (!dir.exists() && !dir.mkdirs()) {
+            return;
+        }
+        try (Writer writer = new BufferedWriter(new FileWriter(file))) {
+            write(json, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     protected static void write(JsonElement json, Writer writer) {
-        new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(json, writer);
+        GSON.toJson(json, writer);
     }
 
     protected static String getJsonPath(String type, ResourceLocation location) {

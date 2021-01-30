@@ -26,14 +26,16 @@ package com.terraforged.mod.data;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.JsonOps;
 import com.terraforged.engine.world.biome.map.BiomeMap;
-import com.terraforged.engine.world.biome.type.BiomeType;
-import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.BiomeWeights;
 import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
+import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biome;
 
 import java.io.*;
 import java.util.stream.IntStream;
@@ -68,6 +70,24 @@ public class WorldGenBiomes extends DataGen {
         }
     }
 
+    public static void genBiomeData(File dataDir, Biome[] biomes, TFBiomeContext context) {
+        if (dataDir.exists() || dataDir.mkdirs()) {
+            for (Biome biome : biomes) {
+                try {
+                    ResourceLocation name = context.biomes.getRegistryName(biome);
+                    if (name == null) {
+                        continue;
+                    }
+
+                    JsonElement json = Codecs.encodeAndGet(Biome.CODEC, biome, JsonOps.INSTANCE);
+                    write(json, dataDir, getJsonPath("worldgen/biome", name));
+                } catch (Throwable t){
+                    t.printStackTrace();
+                }
+            }
+        }
+    }
+
     public static void genBiomeWeights(File dataDir, TFBiomeContext context) {
         if (dataDir.exists() || dataDir.mkdirs()) {
             BiomeWeights weights = new BiomeWeights(context);
@@ -94,9 +114,5 @@ public class WorldGenBiomes extends DataGen {
                 e.printStackTrace();
             }
         }
-    }
-
-    private static ResourceLocation getName(BiomeType type) {
-        return new ResourceLocation(TerraForgedMod.MODID, type.name().toLowerCase());
     }
 }

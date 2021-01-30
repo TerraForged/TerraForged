@@ -27,15 +27,17 @@ package com.terraforged.mod.biome.provider;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.context.TFBiomeContext;
+import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
 import com.terraforged.mod.config.ConfigManager;
-import net.minecraft.util.ResourceLocation;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.IntUnaryOperator;
 
@@ -45,7 +47,7 @@ public class BiomeWeights implements IntUnaryOperator {
     private final int forestWeight;
     private final int rareWeight;
     private final TFBiomeContext context;
-    private final Map<String, Integer> biomes = new HashMap<>();
+    private final Object2IntMap<String> biomes = new Object2IntOpenHashMap<>();
 
     public BiomeWeights(TFBiomeContext context) {
         this(10, 5, 2, context);
@@ -57,19 +59,26 @@ public class BiomeWeights implements IntUnaryOperator {
         this.rareWeight = rare;
         this.context = context;
 
+        Set<String> validBiomes = BiomeAnalyser.getOverworldBiomesSet(context, context.biomes::getName);
+
         // Get biome weights from Forge
         for (BiomeManager.BiomeType type : BiomeManager.BiomeType.values()) {
             List<BiomeManager.BiomeEntry> entries = BiomeManager.getBiomes(type);
             if (entries == null) {
                 continue;
             }
+
             for (BiomeManager.BiomeEntry entry : entries) {
-                biomes.put(entry.getKey().getLocation().toString(), entry.itemWeight);
+                Biome biome = context.biomes.get(entry.getKey());
+                String name = context.biomes.getName(biome);
+                if (validBiomes.contains(name)) {
+                    biomes.put(name.toString(), entry.itemWeight);
+                }
             }
         }
 
         // TF config gets final say
-        readWeights();
+        readWeights(validBiomes);
     }
 
     @Override
@@ -109,25 +118,18 @@ public class BiomeWeights implements IntUnaryOperator {
         }
     }
 
-    private void readWeights() {
+    private void readWeights(Set<String> validBiomes) {
         CommentedConfig config = ConfigManager.BIOME_WEIGHTS.get();
 
         for (String key : config.valueMap().keySet()) {
-            int weight = config.getInt(key);
-            if (weight < 0) {
+            if (validBiomes.contains(key)) {
                 continue;
             }
 
-            ResourceLocation name = new ResourceLocation(key);
-            if (!context.biomes.contains(name)) {
-                if (!key.equals("terraforged:example_biome")) {
-                    Log.err("Invalid biome defined: {}", name);
-                }
-                continue;
-            }
+            int weight = Math.max(0, config.getInt(key));
 
             biomes.put(key, weight);
-            Log.debug("Loaded custom biome weight: {}={}", name, weight);
+            Log.debug("Loaded custom biome weight: {}={}", key, weight);
         }
     }
 }

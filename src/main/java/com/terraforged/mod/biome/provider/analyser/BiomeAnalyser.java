@@ -24,7 +24,9 @@
 
 package com.terraforged.mod.biome.provider.analyser;
 
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.terraforged.engine.world.biome.BiomeData;
 import com.terraforged.engine.world.biome.map.BiomeMap;
 import com.terraforged.engine.world.biome.map.BiomeMapBuilder;
@@ -80,14 +82,35 @@ public class BiomeAnalyser {
         return builder.build();
     }
 
-    public static List<Biome> getOverworldBiomesList(TFBiomeContext context) {
-        return ImmutableList.copyOf(getOverworldBiomes(context));
-    }
-
     public static Biome[] getOverworldBiomes(TFBiomeContext context) {
         TFBiomeCollector collector = new TFBiomeCollector(context);
         collectOverworldBiomes(context, i -> 0, collector);
         return collector.getBiomes();
+    }
+
+    public static List<Biome> getOverworldBiomesList(TFBiomeContext context) {
+        return getOverworldBiomesList(context, Function.identity());
+    }
+
+    public static <T> List<T> getOverworldBiomesList(TFBiomeContext context, Function<Biome, T> mapper) {
+        return getOverworldBiomes(context, mapper, ImmutableList.builder()).build();
+    }
+
+    public static Set<Biome> getOverworldBiomesSet(TFBiomeContext context) {
+        return getOverworldBiomesSet(context, Function.identity());
+    }
+
+    public static <T> Set<T> getOverworldBiomesSet(TFBiomeContext context, Function<Biome, T> mapper) {
+        return getOverworldBiomes(context, mapper, ImmutableSet.builder()).build();
+    }
+
+    public static <T, C extends ImmutableCollection.Builder<T>> C getOverworldBiomes(TFBiomeContext context, Function<Biome, T> mapper, C builder) {
+        Biome[] biomes = getOverworldBiomes(context);
+        for (Biome biome : biomes) {
+            T t = mapper.apply(biome);
+            builder.add(t);
+        }
+        return builder;
     }
 
     private static void collectOverworldBiomes(TFBiomeContext context, IntUnaryOperator weightFunc, BiomeMap.Builder<RegistryKey<Biome>> builder) {
