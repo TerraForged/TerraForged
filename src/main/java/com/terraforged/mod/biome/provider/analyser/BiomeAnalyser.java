@@ -144,9 +144,6 @@ public class BiomeAnalyser {
     }
 
     private static boolean filter(Biome biome, TFBiomeContext context) {
-        if (biome.getCategory() == Biome.Category.NONE) {
-            return biome == context.biomes.get(Biomes.THE_VOID);
-        }
         if (biome.getCategory() == Biome.Category.THEEND) {
             return true;
         }
@@ -157,6 +154,9 @@ public class BiomeAnalyser {
             return true;
         }
         if (context.biomes.getName(biome).contains("hills")) {
+            return true;
+        }
+        if (biome.getCategory() == Biome.Category.NONE && biome == context.biomes.get(Biomes.THE_VOID)) {
             return true;
         }
         // exclude non-overworld biomes
