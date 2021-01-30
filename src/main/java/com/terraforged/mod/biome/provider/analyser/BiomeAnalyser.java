@@ -59,6 +59,15 @@ public class BiomeAnalyser {
         put(BiomeType.ALPINE, BiomePredicate.MOUNTAIN);
     }};
 
+    private static final BiomeFilter[] EXCLUSION_FILTERS = {
+            (biome, context) -> biome.getCategory() == Biome.Category.THEEND,
+            (biome, context) -> biome.getCategory() == Biome.Category.NETHER,
+            (biome, context) -> context.biomes.getName(biome).contains("hills"),
+            (biome, context) -> biome == context.biomes.get(Biomes.THE_VOID),
+            (biome, context) -> biome == context.biomes.get(Biomes.MOUNTAIN_EDGE),
+            (biome, context) -> !BiomeHelper.isOverworldBiome(biome, context),
+    };
+
     public static BiomeMap<RegistryKey<Biome>> createBiomeMap(TFBiomeContext context) {
         BiomeMap.Builder<RegistryKey<Biome>> builder = BiomeMapBuilder.create(context);
         BiomeWeights weights = new BiomeWeights(context);
@@ -144,23 +153,12 @@ public class BiomeAnalyser {
     }
 
     private static boolean filter(Biome biome, TFBiomeContext context) {
-        if (biome.getCategory() == Biome.Category.THEEND) {
-            return true;
+        for (BiomeFilter filter : EXCLUSION_FILTERS) {
+            if (filter.test(biome, context)) {
+                return true;
+            }
         }
-        if (biome.getCategory() == Biome.Category.NETHER) {
-            return true;
-        }
-        if (biome == context.biomes.get(Biomes.MOUNTAIN_EDGE)) {
-            return true;
-        }
-        if (context.biomes.getName(biome).contains("hills")) {
-            return true;
-        }
-        if (biome.getCategory() == Biome.Category.NONE && biome == context.biomes.get(Biomes.THE_VOID)) {
-            return true;
-        }
-        // exclude non-overworld biomes
-        return !BiomeHelper.isOverworldBiome(biome, context);
+        return false;
     }
 
     private static Vec2f getRange(ListView<Biome> biomes, Function<Biome, Float> getter) {
