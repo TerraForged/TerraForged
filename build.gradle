@@ -44,7 +44,7 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 //    lib "com.terraforged:Engine:0.2.0"
-    lib(project(":Engine"))
+    lib project(":Engine")
 }
 
 minecraft {
