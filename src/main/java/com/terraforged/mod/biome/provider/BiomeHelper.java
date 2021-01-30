@@ -27,9 +27,11 @@ package com.terraforged.mod.biome.provider;
 import com.terraforged.engine.settings.ClimateSettings;
 import com.terraforged.engine.world.biome.TempCategory;
 import com.terraforged.engine.world.biome.map.defaults.BiomeTemps;
+import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeGenerationSettings;
 import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
@@ -140,6 +142,10 @@ public class BiomeHelper {
     public static boolean isOverworldBiome(@Nullable RegistryKey<Biome> key) {
         if (key == null) {
             return false;
+        }
+        ResourceLocation name = key.getLocation();
+        if (name.getNamespace().equals(TerraForgedMod.MODID)) {
+            return true;
         }
         return BiomeDictionary.getTypes(key).contains(BiomeDictionary.Type.OVERWORLD);
     }
