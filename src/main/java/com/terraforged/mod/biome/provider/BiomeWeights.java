@@ -127,8 +127,8 @@ public class BiomeWeights implements IntUnaryOperator {
             }
 
             int weight = Math.max(0, config.getInt(key));
-
             biomes.put(key, weight);
+            
             Log.debug("Loaded custom biome weight: {}={}", key, weight);
         }
     }
