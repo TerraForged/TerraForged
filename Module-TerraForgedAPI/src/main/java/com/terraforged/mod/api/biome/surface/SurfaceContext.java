@@ -24,10 +24,10 @@
 
 package com.terraforged.mod.api.biome.surface;
 
-import com.terraforged.mod.api.chunk.column.DecoratorContext;
-import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.engine.world.climate.Climate;
 import com.terraforged.engine.world.heightmap.Levels;
+import com.terraforged.mod.api.chunk.column.DecoratorContext;
+import com.terraforged.mod.biome.TFBiomeContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.world.gen.DimensionSettings;
 
@@ -41,6 +41,7 @@ public class SurfaceContext extends DecoratorContext implements AutoCloseable {
     public final CachedSurface cached = new CachedSurface();
 
     public double noise;
+    public int surfaceY;
 
     public SurfaceContext(SurfaceChunk buffer, TFBiomeContainer biomes, Levels levels, Climate climate, DimensionSettings settings, long seed) {
         super(buffer, levels, climate);

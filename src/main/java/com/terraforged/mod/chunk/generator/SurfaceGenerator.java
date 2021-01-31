@@ -68,6 +68,8 @@ public class SurfaceGenerator implements Generator.Surfaces {
                     generator.getSurfaceManager().getSurface(ctx).buildSurface(px, pz, top, ctx);
 
                     int py = ctx.levels.scale(cell.value);
+                    ctx.surfaceY = py;
+                    ctx.pos.setPos(px, py, pz);
 
                     for (int i = 0; i < generator.getSurfaceDecorators().size(); i++) {
                         generator.getSurfaceDecorators().get(i).decorate(buffer, ctx, px, py, pz);

@@ -26,6 +26,7 @@ package com.terraforged.mod.biome.surface;
 
 import com.terraforged.engine.Seed;
 import com.terraforged.engine.util.Variance;
+import com.terraforged.engine.world.geology.Geology;
 import com.terraforged.engine.world.geology.Strata;
 import com.terraforged.engine.world.geology.Stratum;
 import com.terraforged.mod.api.biome.surface.MaskedSurface;
@@ -42,25 +43,47 @@ public class BriceSurface implements MaskedSurface, Stratum.Visitor<BlockState, 
     public static final int SEED_OFFSET = 12341341;
 
     private final Module module;
-    private final Strata<BlockState> stackStrata;
+    private final Geology<BlockState> stratas;
 
     public BriceSurface(Seed seed) {
         Random random = new Random(seed.next());
-        Variance variance = Variance.of(0.1, 0.2);
+        Variance thick = Variance.of(0.2, 0.3);
+        Variance medium = Variance.of(0.1, 0.2);
+        Variance thin = Variance.of(0.1, 0.2);
 
-        module = Source.ridge(123, 60, 4)
+        module = Source.ridge(seed.next(), 60, 4)
                 .clamp(0.8, 0.95).map(0, 1)
                 .terrace(1, 0.25, 4, 1)
-                .mult(Source.perlin(1234, 4, 1).alpha(0.05));
+                .mult(Source.perlin(seed.next(), 4, 1).alpha(0.05));
 
-        stackStrata = Strata.<BlockState>builder(seed.next(), Source.build(seed.next(), 30, 3))
-                .add(Blocks.ORANGE_TERRACOTTA.getDefaultState(), variance.next(random))
-                .add(Blocks.TERRACOTTA.getDefaultState(), variance.next(random))
-                .add(Blocks.YELLOW_TERRACOTTA.getDefaultState(), variance.next(random))
-                .add(Blocks.WHITE_TERRACOTTA.getDefaultState(), variance.next(random))
-                .add(Blocks.BROWN_TERRACOTTA.getDefaultState(), variance.next(random))
-                .add(Blocks.RED_TERRACOTTA.getDefaultState(), variance.next(random))
-                .build();
+        stratas = new Geology<>(Source.ZERO);
+
+        for (int i = 0; i < 3; i++) {
+            stratas.add(Strata.<BlockState>builder(seed.next(), Source.build(seed.next(), 100, 1))
+                    .add(Blocks.ORANGE_TERRACOTTA.getDefaultState(), thin.next(random))
+                    .add(Blocks.TERRACOTTA.getDefaultState(), medium.next(random))
+                    .add(Blocks.ORANGE_TERRACOTTA.getDefaultState(), thick.next(random))
+                    .add(Blocks.BROWN_TERRACOTTA.getDefaultState(), thin.next(random))
+                    .add(Blocks.YELLOW_TERRACOTTA.getDefaultState(), thin.next(random))
+                    .add(Blocks.TERRACOTTA.getDefaultState(), thick.next(random))
+                    .build());
+            stratas.add(Strata.<BlockState>builder(seed.next(), Source.build(seed.next(), 100, 1))
+                    .add(Blocks.ORANGE_TERRACOTTA.getDefaultState(), thin.next(random))
+                    .add(Blocks.TERRACOTTA.getDefaultState(), medium.next(random))
+                    .add(Blocks.ORANGE_TERRACOTTA.getDefaultState(), thick.next(random))
+                    .add(Blocks.YELLOW_TERRACOTTA.getDefaultState(), thin.next(random))
+                    .add(Blocks.LIGHT_GRAY_TERRACOTTA.getDefaultState(), thin.next(random))
+                    .add(Blocks.TERRACOTTA.getDefaultState(), thick.next(random))
+                    .build());
+            stratas.add(Strata.<BlockState>builder(seed.next(), Source.build(seed.next(), 100, 1))
+                    .add(Blocks.ORANGE_TERRACOTTA.getDefaultState(), medium.next(random))
+                    .add(Blocks.TERRACOTTA.getDefaultState(), thin.next(random))
+                    .add(Blocks.ORANGE_TERRACOTTA.getDefaultState(), thick.next(random))
+                    .add(Blocks.WHITE_TERRACOTTA.getDefaultState(), thin.next(random))
+                    .add(Blocks.LIGHT_GRAY_TERRACOTTA.getDefaultState(), thin.next(random))
+                    .add(Blocks.TERRACOTTA.getDefaultState(), thick.next(random))
+                    .build());
+        }
     }
 
     @Override
@@ -69,11 +92,12 @@ public class BriceSurface implements MaskedSurface, Stratum.Visitor<BlockState, 
         float value = module.getValue(x, z) * mask * strength;
 
         int top = (int) (value * 30);
-        if (top == 0) {
+        if (top <= 0) {
             return;
         }
 
-        stackStrata.downwards(x, top, z, ctx.depthBuffer.get(), ctx, this);
+        ctx.pos.setPos(x, height, z);
+        stratas.getStrata(ctx.cell.biomeRegionId).downwards(x, top, z, ctx.depthBuffer.get(), ctx, this);
     }
 
     @Override
@@ -81,7 +105,7 @@ public class BriceSurface implements MaskedSurface, Stratum.Visitor<BlockState, 
         if (y <= 0) {
             return false;
         } else {
-            ctx.pos.setY(y);
+            ctx.pos.setY(ctx.surfaceY + y);
             ctx.chunk.setBlockState(ctx.pos, state, false);
             return true;
         }
