@@ -122,7 +122,7 @@ public class BiomeWeights implements IntUnaryOperator {
         CommentedConfig config = ConfigManager.BIOME_WEIGHTS.get();
 
         for (String key : config.valueMap().keySet()) {
-            if (validBiomes.contains(key)) {
+            if (!validBiomes.contains(key)) {
                 continue;
             }
 
