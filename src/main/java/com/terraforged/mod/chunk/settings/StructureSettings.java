@@ -80,10 +80,10 @@ public class StructureSettings {
             JsonObject dest = root.getAsJsonObject();
             JsonObject source = DataUtils.toJson(this).getAsJsonObject();
 
-            // Replace stronghold settings with our own
+            // Replace stronghold settings user's preferences
             dest.add("stronghold", source.get("stronghold"));
 
-            // Replace overworld structure settings with user's choices
+            // Replace overworld structure settings with user's preferences
             JsonObject destStructures = dest.getAsJsonObject("structures");
             JsonObject sourceStructures = source.getAsJsonObject("structures");
             for (Map.Entry<String, JsonElement> entry : sourceStructures.entrySet()) {
