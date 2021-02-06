@@ -32,6 +32,7 @@ import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.chunk.settings.preset.Preset;
 import com.terraforged.mod.chunk.settings.preset.PresetManager;
 import com.terraforged.mod.util.DimUtils;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
@@ -41,6 +42,7 @@ import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 import net.minecraftforge.common.world.ForgeWorldType;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
 
@@ -96,6 +98,22 @@ public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
         TFBiomeContext game = new TFBiomeContext(biomes);
         TerraContext context = new TerraContext(settings, game);
         TFBiomeProvider biomeProvider = new TFBiomeProvider(context);
-        return new TFChunkGenerator(biomeProvider, () -> dimSettings.getOrThrow(DimensionSettings.field_242734_c));
+        return new TFChunkGenerator(biomeProvider, new RegistryGetter<>(dimSettings, DimensionSettings.field_242734_c));
+    }
+
+    private static class RegistryGetter<T> implements Supplier<T> {
+
+        private final Registry<T> registry;
+        private final RegistryKey<T> key;
+
+        private RegistryGetter(Registry<T> registry, RegistryKey<T> key) {
+            this.registry = registry;
+            this.key = key;
+        }
+
+        @Override
+        public T get() {
+            return registry.getOrThrow(key);
+        }
     }
 }
