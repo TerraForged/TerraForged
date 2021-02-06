@@ -26,7 +26,7 @@ package com.terraforged.mod.util.reflect;
 
 import java.lang.reflect.Field;
 
-public class FieldAccessor<O, T> extends Accessor<O, Field> {
+public class FieldAccessor<O, T> extends Accessor<Field> {
 
     private final Class<T> fieldType;
 
@@ -50,15 +50,5 @@ public class FieldAccessor<O, T> extends Accessor<O, Field> {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-    }
-
-    private static <O, T> FieldAccessor<O, T> byType(Class<O> owner, Class<T> type) {
-        for (Field field : owner.getDeclaredFields()) {
-            if (field.getType() == type) {
-                field.setAccessible(true);
-                return new FieldAccessor<>(type, field);
-            }
-        }
-        throw new IllegalStateException("Unable to find field for type " + type + " in class " + owner);
     }
 }

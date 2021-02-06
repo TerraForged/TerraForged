@@ -28,7 +28,6 @@ import com.google.gson.JsonElement;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.mod.LevelType;
 import com.terraforged.mod.Log;
-import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
@@ -259,7 +258,7 @@ public class ConfigScreen extends OverlayScreen {
         if (level.func_236225_f_() instanceof TFChunkGenerator) {
             TerraContext context = ((TFChunkGenerator) level.func_236225_f_()).getContext();
             DimensionStructuresSettings structuresSettings = level.func_236225_f_().func_235957_b_();
-            settings.structures.read(structuresSettings, context.biomeContext);
+            settings.structures.load(structuresSettings, context.biomeContext);
         }
     }
 
@@ -292,7 +291,7 @@ public class ConfigScreen extends OverlayScreen {
             TerraSettings copy = new TerraSettings(settings.world.seed);
             JsonElement dataCopy = DataUtils.toJson(settings);
             DataUtils.fromJson(dataCopy, copy);
-            copy.structures.read(structuresSettings, context.biomeContext);
+            copy.structures.load(structuresSettings, context.biomeContext);
             return copy;
         }
         throw new IllegalStateException("Not a TerraForged generator :[");

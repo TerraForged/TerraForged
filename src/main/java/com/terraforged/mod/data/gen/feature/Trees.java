@@ -67,6 +67,7 @@ public class Trees {
     public static void addInjectors(FeatureInjectorProvider provider) {
         provider.add("trees/acacia", acacia(provider.getContext()));
         provider.add("trees/oak_badlands", oakBadlands(provider.getContext()));
+        provider.add("trees/oak_wooded_badlands", oakWoodedBadlands(provider.getContext()));
         provider.add("trees/oak_forest", oakForest(provider.getContext()));
         provider.add("trees/oak_plains", oakPlains(provider.getContext()));
         provider.add("trees/birch", birch(provider.getContext()));
@@ -101,10 +102,8 @@ public class Trees {
         return new Modifier<>(
                 BiomeMatcher.of(
                         context,
-                        "minecraft:wooded_badlands*",
                         "minecraft:shattered_savanna*",
-                        "minecraft:modified_badlands*",
-                        "minecraft:modified_wooded*"
+                        "minecraft:modified_badlands*"
                 ),
                 FeatureMatcher.and(Blocks.OAK_LOG, Blocks.OAK_LEAVES),
                 FeatureReplacer.of(extra(
@@ -112,6 +111,23 @@ public class Trees {
                         "terraforged:oak_small",
                         Pair.of("terraforged:oak_small", 0.2F),
                         Pair.of("terraforged:acacia_bush", 0.1F)
+                ))
+        );
+    }
+
+    private static Modifier<Jsonifiable> oakWoodedBadlands(TFBiomeContext context) {
+        return new Modifier<>(
+                BiomeMatcher.of(
+                        context,
+                        "minecraft:wooded_badlands*",
+                        "minecraft:modified_wooded*"
+                ),
+                FeatureMatcher.and(Blocks.OAK_LOG, Blocks.OAK_LEAVES),
+                FeatureReplacer.of(poisson(
+                        0.2F, 0.8F, 8, 0.25F, 150, 0.75F,
+                        "terraforged:oak_small",
+                        Pair.of("terraforged:oak_small", 0.3F),
+                        Pair.of("terraforged:acacia_bush", 0.2F)
                 ))
         );
     }
@@ -318,7 +334,12 @@ public class Trees {
 
     @SafeVarargs
     private static ConfiguredFeature<?, ?> poisson(float scale, int radius, float fade, int densityScale, float densityVariation, String def, Pair<String, Float>... entries) {
-        return poisson(new FastPoissonConfig(scale, radius, fade, densityScale, densityVariation), def, entries);
+        return poisson(scale, FastPoissonConfig.LEGACY_JITTER, radius, fade, densityScale, densityVariation, def, entries);
+    }
+
+    @SafeVarargs
+    private static ConfiguredFeature<?, ?> poisson(float scale, float jitter, int radius, float fade, int densityScale, float densityVariation, String def, Pair<String, Float>... entries) {
+        return poisson(new FastPoissonConfig(scale, jitter, radius, fade, densityScale, densityVariation), def, entries);
     }
 
     @SafeVarargs

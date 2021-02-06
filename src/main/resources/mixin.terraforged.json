@@ -6,8 +6,7 @@
   "refmap": "mixin.terraforged.refmap.json",
   "mixins": [
     "common.MixinDimensionGeneratorSettings",
-    "common.MixinMinecraftServer",
-    "common.MixinWorldDecorationHelper"
+    "common.MixinMinecraftServer"
   ],
   "_disabled": [
     "benchmark.MixinNoiseChunkGenerator"

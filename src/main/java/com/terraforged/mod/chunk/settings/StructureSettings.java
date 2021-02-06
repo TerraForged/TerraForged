@@ -50,7 +50,7 @@ public class StructureSettings {
         return structures.isEmpty();
     }
 
-    public void read(DimensionStructuresSettings settings, TFBiomeContext context) {
+    public void load(DimensionStructuresSettings settings, TFBiomeContext context) {
         // Copy valid structure configs to a new instance
         StructureSettings defaults = new StructureSettings();
         JsonElement json = Codecs.encodeAndGet(DimensionStructuresSettings.field_236190_a_, settings, JsonOps.INSTANCE);
@@ -64,7 +64,7 @@ public class StructureSettings {
         this.structures = defaults.structures;
     }
 
-    public DimensionStructuresSettings write(DimensionStructuresSettings original) {
+    public DimensionStructuresSettings apply(DimensionStructuresSettings original) {
         if (isDefault()) {
             return original;
         } else {

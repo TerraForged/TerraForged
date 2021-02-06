@@ -26,7 +26,7 @@ package com.terraforged.mod.feature.decorator;
 
 import com.mojang.serialization.Codec;
 import com.terraforged.mod.api.feature.decorator.DecorationContext;
-import com.terraforged.mod.api.feature.decorator.DecorationHelper;
+import com.terraforged.mod.feature.DecorationAccessor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.feature.WorldDecoratingHelper;
 import net.minecraft.world.gen.placement.IPlacementConfig;
@@ -43,7 +43,7 @@ public abstract class ContextualDecorator<T extends IPlacementConfig> extends Pl
 
     @Override
     public Stream<BlockPos> getPositions(WorldDecoratingHelper helper, Random random, T config, BlockPos pos) {
-        DecorationContext context = DecorationHelper.getContext(helper);
+        DecorationContext context = DecorationAccessor.getContext(helper);
         if (context == null) {
             new UnsupportedOperationException().printStackTrace();
             return Stream.empty();

@@ -158,6 +158,7 @@ public class BiomeModifierManager implements BiomeModifier {
 
         private Builder(TerraContext context, BiomeMap<RegistryKey<Biome>> biomes) {
             desertBiomes = getDesertBiomes(context.biomeContext, biomes);
+            modifiers.add(new OceanModifier(context, biomes));
             modifiers.add(getBeachModifier(context, biomes));
             modifiers.add(new CoastModifier(biomes));
             modifiers.add(new DesertColorModifier(desertBiomes));

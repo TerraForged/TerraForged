@@ -25,6 +25,7 @@
 package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.mod.chunk.TFChunkGenerator;
+import com.terraforged.mod.chunk.settings.TerraSettings;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.crash.ReportedException;
@@ -37,10 +38,12 @@ import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.feature.StructureFeature;
+import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureFeatures;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 import net.minecraft.world.gen.settings.StructureSeparationSettings;
 
 import java.util.function.Supplier;
@@ -48,9 +51,17 @@ import java.util.function.Supplier;
 public class StructureGenerator implements Generator.Structures {
 
     private final TFChunkGenerator generator;
+    private final DimensionStructuresSettings structuresSettings;
 
     public StructureGenerator(TFChunkGenerator generator) {
+        TerraSettings settings = generator.getBiomeProvider().getSettings();
         this.generator = generator;
+        this.structuresSettings = settings.structures.apply(generator.getSettings().getStructures()); // defensive copy
+    }
+
+    @Override
+    public StructureSeparationSettings getSeparationSettings(Structure<?> structure) {
+        return structuresSettings.func_236197_a_(structure);
     }
 
     @Override
@@ -68,7 +79,7 @@ public class StructureGenerator implements Generator.Structures {
     private void generate(IChunk chunk, ChunkPos pos, Biome biome, StructureFeature<?, ?> structure, DynamicRegistries registries, StructureManager structures, TemplateManager templates, long seed) {
         StructureStart<?> start = structures.getStructureStart(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, chunk);
         int i = start != null ? start.getRefCount() : 0;
-        StructureSeparationSettings settings = generator.func_235957_b_().func_236197_a_(structure.field_236268_b_);
+        StructureSeparationSettings settings = getSeparationSettings(structure.field_236268_b_);
         if (settings != null) {
             StructureStart<?> start1 = structure.func_242771_a(registries, generator, generator.getBiomeProvider(), templates, seed, pos, biome, i, settings);
             structures.addStructureStart(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, start1, chunk);

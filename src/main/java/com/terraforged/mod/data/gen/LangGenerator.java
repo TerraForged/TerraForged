@@ -100,7 +100,7 @@ public class LangGenerator {
 
         // Default overworld structure settings
         DimensionStructuresSettings structuresSettings = DimensionSettings.func_242746_i().getStructures();
-        settings.structures.read(structuresSettings, context);
+        settings.structures.load(structuresSettings, context);
 
         visit(DataUtils.toNBT(settings), provider, new HashSet<>());
     }

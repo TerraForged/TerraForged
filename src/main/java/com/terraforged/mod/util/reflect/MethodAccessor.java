@@ -27,7 +27,7 @@ package com.terraforged.mod.util.reflect;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class MethodAccessor<O> extends Accessor<O, Method> {
+public class MethodAccessor<O> extends Accessor<Method> {
 
     private final Method method;
 

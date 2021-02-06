@@ -40,6 +40,9 @@ import net.minecraft.world.gen.placement.IPlacementConfig;
 
 public class FastPoissonConfig implements IPlacementConfig {
 
+    // TODO: more jitter (breaking change)
+    public static final float LEGACY_JITTER = 0.5F;
+
     public static final Codec<FastPoissonConfig> CODEC = Codecs.create(
             FastPoissonConfig::serialize,
             FastPoissonConfig::deserialize
@@ -47,12 +50,18 @@ public class FastPoissonConfig implements IPlacementConfig {
 
     public final int radius;
     public final float scale;
+    public final float jitter;
     public final float biomeFade;
     public final float densityVariation;
     public final int densityVariationScale;
 
     public FastPoissonConfig(float scale, int radius, float biomeFade, int densityScale, float densityVariation) {
+        this(scale, LEGACY_JITTER, radius, biomeFade, densityScale, densityVariation);
+    }
+
+    public FastPoissonConfig(float scale, float jitter, int radius, float biomeFade, int densityScale, float densityVariation) {
         this.scale = scale;
+        this.jitter = jitter;
         this.radius = radius;
         this.biomeFade = biomeFade;
         this.densityVariationScale = densityScale;
@@ -82,8 +91,9 @@ public class FastPoissonConfig implements IPlacementConfig {
 
     private static <T> Dynamic<T> serialize(FastPoissonConfig config, DynamicOps<T> ops) {
         ImmutableMap.Builder<T, T> builder = ImmutableMap.builder();
-        builder.put(ops.createString("scale"), ops.createFloat(config.scale));
         builder.put(ops.createString("radius"), ops.createInt(config.radius));
+        builder.put(ops.createString("scale"), ops.createFloat(config.scale));
+        builder.put(ops.createString("jitter"), ops.createFloat(config.jitter));
         builder.put(ops.createString("biome_fade"), ops.createFloat(config.biomeFade));
         builder.put(ops.createString("density_scale"), ops.createInt(config.densityVariationScale));
         builder.put(ops.createString("density_variation"), ops.createFloat(config.densityVariation));
@@ -93,9 +103,10 @@ public class FastPoissonConfig implements IPlacementConfig {
     private static <T> FastPoissonConfig deserialize(Dynamic<T> dynamic) {
         int radius = dynamic.get("radius").asInt(4);
         float scale = dynamic.get("scale").asFloat(0.1F);
+        float jitter = dynamic.get("jitter").asFloat(LEGACY_JITTER);
         float biomeFade = dynamic.get("biome_fade").asFloat(0.2F);
         int densityScale = dynamic.get("density_scale").asInt(0);
         float densityVariation = dynamic.get("density_variation").asFloat(0F);
-        return new FastPoissonConfig(scale, radius, biomeFade, densityScale, densityVariation);
+        return new FastPoissonConfig(scale, jitter, radius, biomeFade, densityScale, densityVariation);
     }
 }

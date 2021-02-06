@@ -36,7 +36,7 @@ import java.util.Properties;
 
 /**
  * Non-essential.
- * Allows users to define the TF world type without a namespace
+ * Allows users to define the TF world type without a namespace.
  */
 @Mixin(DimensionGeneratorSettings.class)
 public class MixinDimensionGeneratorSettings {

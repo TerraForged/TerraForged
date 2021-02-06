@@ -100,7 +100,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     private final Supplier<GeneratorResources> resources;
 
     public TFChunkGenerator(TFBiomeProvider biomeProvider, DimensionSettings settings) {
-        super(biomeProvider, biomeProvider.getSettings().structures.write(settings.getStructures()));
+        super(biomeProvider, biomeProvider.getSettings().structures.apply(settings.getStructures()));
         CacheManager.get().clear();
         TerraContext context = biomeProvider.getContext();
         this.seed = context.terraSettings.world.seed;
@@ -170,7 +170,7 @@ public class TFChunkGenerator extends ChunkGenerator {
         if (structure == Structure.STRONGHOLD) {
             return super.func_235956_a_(world, structure, pos, radius, flag);
         }
-        StructureSeparationSettings settings = this.settings.getStructures().func_236197_a_(structure);
+        StructureSeparationSettings settings = structureGenerator.getSeparationSettings(structure);
         if (settings == null) {
             return null;
         }

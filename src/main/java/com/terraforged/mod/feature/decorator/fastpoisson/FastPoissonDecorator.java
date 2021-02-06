@@ -52,7 +52,7 @@ public abstract class FastPoissonDecorator extends ContextualDecorator<FastPoiss
         int chunkZ = chunk.getPos().z;
         FastPoisson poisson = FastPoisson.LOCAL_POISSON.get();
         try (DensityNoise density = config.getDensityNoise(seed, context)) {
-            FastPoissonContext poissonConfig = new FastPoissonContext(config.radius, config.scale, density);
+            FastPoissonContext poissonConfig = new FastPoissonContext(config.radius, config.jitter, config.scale, density);
             Stream.Builder<BlockPos> builder = Stream.builder();
             poisson.visit(seed, chunkX, chunkZ, random, poissonConfig, builder, getVisitor(context));
             return builder.build();

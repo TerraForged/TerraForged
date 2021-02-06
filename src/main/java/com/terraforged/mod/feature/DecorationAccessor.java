@@ -22,37 +22,40 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.api.feature.decorator;
+package com.terraforged.mod.feature;
 
-import com.terraforged.mod.util.reflect.Accessor;
-import com.terraforged.mod.util.reflect.FieldAccessor;
+import com.terraforged.mod.api.feature.decorator.DecorationContext;
+import com.terraforged.mod.util.reflect.ReflectUtils;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.feature.WorldDecoratingHelper;
 
-import java.lang.reflect.Modifier;
+import java.lang.invoke.MethodHandle;
 
-class DecorationHelperFallback {
+public class DecorationAccessor {
 
-    private static final FieldAccessor<WorldDecoratingHelper, ISeedReader> REGION = Accessor.field(
-            WorldDecoratingHelper.class,
-            ISeedReader.class,
-            Accessor.fieldModifiers(Modifier::isPrivate, Modifier::isFinal)
-    );
+    private static final MethodHandle WORLD = ReflectUtils.field(WorldDecoratingHelper.class, ISeedReader.class);
+    private static final MethodHandle GENERATOR = ReflectUtils.field(WorldDecoratingHelper.class, ChunkGenerator.class);
 
-    private static final FieldAccessor<WorldDecoratingHelper, ChunkGenerator> GENERATOR = Accessor.field(
-            WorldDecoratingHelper.class,
-            ChunkGenerator.class,
-            Accessor.fieldModifiers(Modifier::isPrivate, Modifier::isFinal)
-    );
+    public static DecorationContext getContext(WorldDecoratingHelper helper) {
+        return DecorationContext.of(getWorld(helper), getGenerator(helper));
+    }
 
-    static DecorationContext getContext(WorldDecoratingHelper helper) {
+    public static ISeedReader getWorld(WorldDecoratingHelper helper) {
         try {
-            ISeedReader region = REGION.get(helper);
-            ChunkGenerator generator = GENERATOR.get(helper);
-            return DecorationContext.of(region, generator);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException("Unable to access context info for " + helper);
+            return (ISeedReader) WORLD.invokeExact(helper);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return null;
+        }
+    }
+
+    public static ChunkGenerator getGenerator(WorldDecoratingHelper helper) {
+        try {
+            return (ChunkGenerator) GENERATOR.invokeExact(helper);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return null;
         }
     }
 }
