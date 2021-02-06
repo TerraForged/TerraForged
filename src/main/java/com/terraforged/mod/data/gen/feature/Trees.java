@@ -165,7 +165,7 @@ public class Trees {
                 FeatureReplacer.of(context(
                         contextEntry("terraforged:spruce_small", 0.1F, eCntx(0.55F, 0.2F)),
                         contextEntry("terraforged:spruce_large", 0.25F, eCntx(0.3F, 0F))
-                ).withPlacement(poisson(0.3F, 4, 0.3F, 300, 0.5F)))
+                ).withPlacement(poisson(0.25F, 4, 0.3F, 300, 0.6F)))
         );
     }
 
@@ -193,7 +193,7 @@ public class Trees {
                         contextEntry("terraforged:birch_forest", 0.2F, eCntx(0.3F, 0F), bCntx(0.05F, 0.2F)),
                         contextEntry("terraforged:birch_small", 0.1F, bCntx(0.25F, 0F)),
                         contextEntry("terraforged:birch_small", 0.1F, eCntx(0.25F, 0.65F))
-                ).withPlacement(poisson(0.4F, 7, 0.25F, 175, 0.95F)))
+                ).withPlacement(poisson(0.25F, 6, 0.25F, 175, 0.9F)))
         );
     }
 
@@ -334,7 +334,7 @@ public class Trees {
 
     @SafeVarargs
     private static ConfiguredFeature<?, ?> poisson(float scale, int radius, float fade, int densityScale, float densityVariation, String def, Pair<String, Float>... entries) {
-        return poisson(scale, FastPoissonConfig.LEGACY_JITTER, radius, fade, densityScale, densityVariation, def, entries);
+        return poisson(scale, FastPoissonConfig.DEFAULT_JITTER, radius, fade, densityScale, densityVariation, def, entries);
     }
 
     @SafeVarargs
