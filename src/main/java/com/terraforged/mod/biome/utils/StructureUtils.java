@@ -24,15 +24,34 @@
 
 package com.terraforged.mod.biome.utils;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
+import com.terraforged.mod.featuremanager.util.codec.Codecs;
+import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 
 import java.util.Map;
 
 public class StructureUtils {
+
+    public static JsonObject addMissingStructures(JsonObject dest) {
+        DimensionSettings settings = WorldGenRegistries.NOISE_SETTINGS.getOrThrow(DimensionSettings.field_242734_c);
+        JsonElement element = Codecs.encode(DimensionStructuresSettings.field_236190_a_, settings.getStructures());
+        if (element.isJsonObject()) {
+            JsonObject defaults = element.getAsJsonObject();
+            for (Map.Entry<String, JsonElement> entry : defaults.entrySet()) {
+                if (!dest.has(entry.getKey())) {
+                    dest.add(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        return dest;
+    }
 
     public static void retainOverworldStructures(Map<String, ?> map, DimensionStructuresSettings settings, TFBiomeContext context) {
         Biome[] overworldBiomes = BiomeAnalyser.getOverworldBiomes(context);

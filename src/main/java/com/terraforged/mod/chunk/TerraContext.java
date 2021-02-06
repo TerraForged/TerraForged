@@ -41,8 +41,8 @@ import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.config.PerfDefaults;
 import com.terraforged.mod.material.Materials;
+import net.minecraft.block.BlockState;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.DimensionSettings;
 
 public class TerraContext extends GeneratorContext {
 
@@ -91,8 +91,8 @@ public class TerraContext extends GeneratorContext {
         return new DecoratorContext(chunk, levels, worldGenerator.get().getClimate(), false);
     }
 
-    public SurfaceContext surface(SurfaceChunk buffer, TFBiomeContainer biomes, DimensionSettings settings) {
-        return new SurfaceContext(buffer, biomes, levels, worldGenerator.get().getClimate(), settings, worldSeed);
+    public SurfaceContext surface(SurfaceChunk buffer, TFBiomeContainer biomes, BlockState solid, BlockState fluid) {
+        return new SurfaceContext(buffer, biomes, levels, worldGenerator.get().getClimate(), solid, fluid, worldSeed);
     }
 
     protected TerraSettings getTerraSettings() {

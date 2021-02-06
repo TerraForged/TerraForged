@@ -56,7 +56,7 @@ public class StructureGenerator implements Generator.Structures {
     public StructureGenerator(TFChunkGenerator generator) {
         TerraSettings settings = generator.getBiomeProvider().getSettings();
         this.generator = generator;
-        this.structuresSettings = settings.structures.apply(generator.getSettings().getStructures()); // defensive copy
+        this.structuresSettings = settings.structures.apply(generator.getSettings().get().getStructures()); // defensive copy
     }
 
     @Override

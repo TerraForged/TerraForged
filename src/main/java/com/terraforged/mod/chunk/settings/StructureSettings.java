@@ -53,8 +53,13 @@ public class StructureSettings {
     public void load(DimensionStructuresSettings settings, TFBiomeContext context) {
         // Copy valid structure configs to a new instance
         StructureSettings defaults = new StructureSettings();
+
         JsonElement json = Codecs.encodeAndGet(DimensionStructuresSettings.field_236190_a_, settings, JsonOps.INSTANCE);
+        json = StructureUtils.addMissingStructures(json.getAsJsonObject());
+
         DataUtils.fromJson(json, defaults);
+
+        // Remove structures that only appear in biomes that we can't generate
         StructureUtils.retainOverworldStructures(defaults.structures, settings, context);
 
         // Replace default values in the new instance with any contained on this instance
@@ -65,26 +70,37 @@ public class StructureSettings {
     }
 
     public DimensionStructuresSettings apply(DimensionStructuresSettings original) {
-        if (isDefault()) {
-            return original;
-        } else {
-            return Codecs.modify(original, DimensionStructuresSettings.field_236190_a_, root -> {
-                JsonObject dest = root.getAsJsonObject();
-                JsonObject source = DataUtils.toJson(this).getAsJsonObject();
+        return Codecs.modify(original, DimensionStructuresSettings.field_236190_a_, root -> {
+            root = StructureUtils.addMissingStructures(root.getAsJsonObject());
 
-                // Replace stronghold settings with our own
-                dest.add("stronghold", source.get("stronghold"));
+            if (isDefault()) {
+                return root;
+            }
 
-                // Replace overworld structure settings with our own
-                JsonObject destStructures = dest.getAsJsonObject("structures");
-                JsonObject sourceStructures = source.getAsJsonObject("structures");
-                for (Map.Entry<String, JsonElement> entry : sourceStructures.entrySet()) {
-                    destStructures.add(entry.getKey(), entry.getValue());
+            JsonObject dest = root.getAsJsonObject();
+            JsonObject source = DataUtils.toJson(this).getAsJsonObject();
+
+            // Replace stronghold settings with our own
+            dest.add("stronghold", source.get("stronghold"));
+
+            // Replace overworld structure settings with user's choices
+            JsonObject destStructures = dest.getAsJsonObject("structures");
+            JsonObject sourceStructures = source.getAsJsonObject("structures");
+            for (Map.Entry<String, JsonElement> entry : sourceStructures.entrySet()) {
+                StructureSeparation settings = structures.get(entry.getKey());
+
+                // Remove if user has disabled the structure
+                if (settings != null && settings.disabled) {
+                    destStructures.remove(entry.getKey());
+                    continue;
                 }
 
-                return root;
-            });
-        }
+                // Add the user configuration
+                destStructures.add(entry.getKey(), entry.getValue());
+            }
+
+            return root;
+        });
     }
 
     @Serializable
@@ -131,5 +147,8 @@ public class StructureSettings {
         @Range(min = 0, max = Integer.MAX_VALUE)
         @Comment("A random seed value for the structure.")
         public int salt = 0;
+
+        @Comment("Prevent this structure from generating.")
+        public boolean disabled = false;
     }
 }
