@@ -32,18 +32,17 @@ import com.terraforged.mod.featuremanager.matcher.biome.BiomeMatcher;
 import com.terraforged.mod.featuremanager.matcher.feature.FeatureMatcher;
 import com.terraforged.mod.featuremanager.transformer.FeatureAppender;
 import com.terraforged.mod.featuremanager.transformer.FeatureInjector;
-import com.terraforged.mod.featuremanager.transformer.FeatureReplacer;
 import com.terraforged.mod.featuremanager.transformer.FeatureTransformer;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.blockplacer.BlockPlacerType;
 import net.minecraft.world.gen.blockplacer.DoublePlantBlockPlacer;
 import net.minecraft.world.gen.blockplacer.SimpleBlockPlacer;
 import net.minecraft.world.gen.blockstateprovider.SimpleBlockStateProvider;
 import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.placement.AtSurfaceWithExtraConfig;
 import net.minecraft.world.gen.placement.ConfiguredPlacement;
+import net.minecraft.world.gen.placement.NoPlacementConfig;
 import net.minecraft.world.gen.placement.Placement;
 
 import java.util.Arrays;
@@ -85,6 +84,7 @@ public class Shrubs {
         // forestGrass
         // mountainGrass
         addBirchGrass(provider, "shrubs/birch_forest_grass");
+        addForestGrass(provider, "shrubs/forest_grass");
     }
 
     private static void addLargeBush(FeatureInjectorProvider provider, String path, String[] biomes, Block log, Block leaves, int count, float chance, int extra) {
@@ -128,8 +128,9 @@ public class Shrubs {
         provider.add(
                 path,
                 BiomeMatcher.of(provider.getContext(), BIRCH),
-                FeatureMatcher.and(BlockPlacerType.DOUBLE_PLANT),
-                FeatureReplacer.of(
+                FeatureMatcher.ANY,
+                FeatureAppender.head(
+                        GenerationStage.Decoration.VEGETAL_DECORATION,
                         Feature.RANDOM_SELECTOR.withConfiguration(new MultipleRandomFeatureConfig(
                                 Arrays.asList(
                                         patch(doubleBuilder(Blocks.TALL_GRASS).tries(56).func_227317_b_(), 0.8F),
@@ -139,9 +140,34 @@ public class Shrubs {
                                         patch(doubleBuilder(Blocks.PEONY).tries(32).func_227317_b_(), 0.1F)
                                 ),
                                 Feature.RANDOM_PATCH.withConfiguration(doubleBuilder(Blocks.TALL_GRASS).tries(48).func_227317_b_().build())
-                        )).withPlacement(Placement.COUNT.configure(new FeatureSpreadConfig(5)))
+                        )).withPlacement(vegetationPlacement(7))
                 )
         );
+    }
+
+    private static void addForestGrass(FeatureInjectorProvider provider, String path) {
+        provider.add(
+                path,
+                BiomeMatcher.of(provider.getContext(), FOREST),
+                FeatureMatcher.ANY,
+                FeatureAppender.head(
+                        GenerationStage.Decoration.VEGETAL_DECORATION,
+                        Feature.RANDOM_SELECTOR.withConfiguration(new MultipleRandomFeatureConfig(
+                                Arrays.asList(
+                                        patch(singleBuilder(Blocks.GRASS).tries(56).func_227317_b_(), 0.5F),
+                                        patch(doubleBuilder(Blocks.TALL_GRASS).tries(56).func_227317_b_(), 0.4F),
+                                        patch(doubleBuilder(Blocks.LARGE_FERN).tries(48).func_227317_b_(), 0.2F),
+                                        patch(singleBuilder(Blocks.FERN).tries(24).func_227317_b_(), 0.2F)
+                                ),
+                                Feature.RANDOM_PATCH.withConfiguration(singleBuilder(Blocks.GRASS).tries(48).func_227317_b_().build())
+                        )).withPlacement(vegetationPlacement(7))
+                )
+        );
+    }
+
+    private static ConfiguredPlacement<?> vegetationPlacement(int count) {
+        return Placement.HEIGHTMAP_WORLD_SURFACE.configure(NoPlacementConfig.INSTANCE)
+                .withPlacement(Placement.COUNT.configure(new FeatureSpreadConfig(count)));
     }
 
     private static ConfiguredRandomFeatureList patch(BlockClusterFeatureConfig.Builder cluster, float chance) {
