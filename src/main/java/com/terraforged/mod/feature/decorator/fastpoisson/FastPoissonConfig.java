@@ -40,8 +40,7 @@ import net.minecraft.world.gen.placement.IPlacementConfig;
 
 public class FastPoissonConfig implements IPlacementConfig {
 
-    // TODO: more jitter (breaking change)
-    public static final float LEGACY_JITTER = 0.5F;
+    public static final float DEFAULT_JITTER = 0.8F;
 
     public static final Codec<FastPoissonConfig> CODEC = Codecs.create(
             FastPoissonConfig::serialize,
@@ -56,7 +55,7 @@ public class FastPoissonConfig implements IPlacementConfig {
     public final int densityVariationScale;
 
     public FastPoissonConfig(float scale, int radius, float biomeFade, int densityScale, float densityVariation) {
-        this(scale, LEGACY_JITTER, radius, biomeFade, densityScale, densityVariation);
+        this(scale, DEFAULT_JITTER, radius, biomeFade, densityScale, densityVariation);
     }
 
     public FastPoissonConfig(float scale, float jitter, int radius, float biomeFade, int densityScale, float densityVariation) {
@@ -103,7 +102,7 @@ public class FastPoissonConfig implements IPlacementConfig {
     private static <T> FastPoissonConfig deserialize(Dynamic<T> dynamic) {
         int radius = dynamic.get("radius").asInt(4);
         float scale = dynamic.get("scale").asFloat(0.1F);
-        float jitter = dynamic.get("jitter").asFloat(LEGACY_JITTER);
+        float jitter = dynamic.get("jitter").asFloat(DEFAULT_JITTER);
         float biomeFade = dynamic.get("biome_fade").asFloat(0.2F);
         int densityScale = dynamic.get("density_scale").asInt(0);
         float densityVariation = dynamic.get("density_variation").asFloat(0F);
