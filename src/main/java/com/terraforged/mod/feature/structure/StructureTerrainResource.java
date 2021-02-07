@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.chunk.terrain;
+package com.terraforged.mod.feature.structure;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
@@ -30,7 +30,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.gen.feature.structure.StructurePiece;
 
-public class TerrainFitResource {
+public class StructureTerrainResource {
 
     public final BlockPos.Mutable mutablePos = new BlockPos.Mutable();
     public final MutableBoundingBox mutableBounds = new MutableBoundingBox();
@@ -38,7 +38,7 @@ public class TerrainFitResource {
     public final ObjectArrayList<StructurePiece> pieces = new ObjectArrayList<>(16);
     public final ObjectListIterator<StructurePiece> iterator = pieces.iterator();
 
-    public TerrainFitResource reset() {
+    public StructureTerrainResource reset() {
         mutablePos.setPos(BlockPos.ZERO);
         rewind();
         pieces.clear();

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.biome.utils;
+package com.terraforged.mod.feature.structure;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

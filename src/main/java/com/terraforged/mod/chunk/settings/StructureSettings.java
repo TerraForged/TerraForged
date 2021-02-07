@@ -29,13 +29,17 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import com.terraforged.engine.serialization.annotation.*;
 import com.terraforged.mod.biome.context.TFBiomeContext;
-import com.terraforged.mod.biome.utils.StructureUtils;
+import com.terraforged.mod.chunk.TerraContext;
+import com.terraforged.mod.feature.structure.StructureUtils;
+import com.terraforged.mod.feature.structure.StructureValidator;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import com.terraforged.mod.util.DataUtils;
+import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @Serializable
 public class StructureSettings {
@@ -67,6 +71,12 @@ public class StructureSettings {
 
         // Replace this structures map with the updated defaults
         this.structures = defaults.structures;
+    }
+
+    public DimensionStructuresSettings validateAndApply(TerraContext context, Supplier<DimensionSettings> settings) {
+        DimensionSettings dimensionSettings = settings.get();
+        StructureValidator.validateConfigs(dimensionSettings, context.biomeContext, this);
+        return apply(dimensionSettings.getStructures());
     }
 
     public DimensionStructuresSettings apply(DimensionStructuresSettings original) {

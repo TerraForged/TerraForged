@@ -37,8 +37,8 @@ import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.column.BaseDecorator;
 import com.terraforged.mod.chunk.column.BaseGeoDecorator;
 import com.terraforged.mod.chunk.column.BedrockDecorator;
-import com.terraforged.mod.chunk.terrain.TerrainFit;
 import com.terraforged.mod.chunk.util.FastChunk;
+import com.terraforged.mod.feature.structure.StructureTerrain;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.feature.structure.StructureManager;
@@ -46,17 +46,17 @@ import net.minecraft.world.gen.feature.structure.StructureManager;
 public class BaseGenerator implements Generator.Terrain {
 
     private final Levels levels;
-    private final TerrainFit terrainFittter;
     private final TFChunkGenerator generator;
     private final ColumnDecorator baseDecorator;
     private final ColumnDecorator bedrockDecorator;
+    private final StructureTerrain structureTerrain;
     private final LazySupplier<Climate> climate;
 
     public BaseGenerator(TFChunkGenerator generator) {
         this.generator = generator;
         this.levels = generator.getContext().levels;
         this.climate = generator.getContext().worldGenerator.then(WorldGeneratorFactory::getClimate);
-        this.terrainFittter = new TerrainFit(0.8F, 4F);
+        this.structureTerrain = new StructureTerrain(0.8F, 4F);
         this.baseDecorator = getBaseDecorator(generator);
         this.bedrockDecorator = new BedrockDecorator(generator.getContext());
     }
@@ -76,7 +76,7 @@ public class BaseGenerator implements Generator.Terrain {
                     bedrockDecorator.decorate(ctx.chunk, ctx, px, py, pz);
                 });
 
-                terrainFittter.apply(world, chunk);
+                structureTerrain.apply(world, chunk);
             }
         }
     }

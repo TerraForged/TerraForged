@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.chunk.terrain;
+package com.terraforged.mod.feature.structure;
 
 import com.terraforged.mod.api.material.state.States;
 import com.terraforged.noise.util.NoiseUtil;
@@ -44,7 +44,7 @@ import net.minecraft.world.gen.feature.structure.StructureStart;
 
 import java.util.List;
 
-public class TerrainFit {
+public class StructureTerrain {
 
     private static final Structure<?>[] EMPTY_ARRAY = new Structure[0];
 
@@ -55,23 +55,23 @@ public class TerrainFit {
     private final float overhang;
     private final float overhang2;
     private final Structure<?>[] structures = getTerrainFitStructures().toArray(EMPTY_ARRAY);
-    private final ThreadLocal<TerrainFitResource> resource = ThreadLocal.withInitial(TerrainFitResource::new);
+    private final ThreadLocal<StructureTerrainResource> resource = ThreadLocal.withInitial(StructureTerrainResource::new);
 
     // base - the size of the base built up around a piece as a percentage of its bounding box size
     // overhang - the amount of overhead overhang to be cut out
-    public TerrainFit(float base, float cutout) {
+    public StructureTerrain(float base, float cutout) {
         this.radiusScale = base;
         this.overhang = cutout;
         this.overhang2 = cutout * cutout;
     }
 
     public void apply(IWorld world, IChunk chunk) {
-        TerrainFitResource resource = this.resource.get().reset();
+        StructureTerrainResource resource = this.resource.get().reset();
         collectPieces(world, chunk, resource);
         buildBases(chunk, resource);
     }
 
-    private void collectPieces(IWorld world, IChunk chunk, TerrainFitResource resource) {
+    private void collectPieces(IWorld world, IChunk chunk, StructureTerrainResource resource) {
         ChunkPos pos = chunk.getPos();
         for (Structure<?> structure : structures) {
             LongSet set = chunk.getStructureReferences().get(structure);
@@ -98,7 +98,7 @@ public class TerrainFit {
     }
 
     // lowers or raises the terrain matcher the base height of each structure piece
-    private void buildBases(IChunk chunk, TerrainFitResource resource) {
+    private void buildBases(IChunk chunk, StructureTerrainResource resource) {
         final int chunkStartX = chunk.getPos().getXStart();
         final int chunkStartZ = chunk.getPos().getZStart();
         final ObjectListIterator<StructurePiece> iterator = resource.iterator;

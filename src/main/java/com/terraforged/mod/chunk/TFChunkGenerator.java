@@ -41,10 +41,10 @@ import com.terraforged.mod.api.chunk.column.BlockColumn;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.api.material.layer.LayerManager;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
-import com.terraforged.mod.biome.utils.StructureLocator;
 import com.terraforged.mod.chunk.column.ColumnResource;
 import com.terraforged.mod.chunk.generator.*;
 import com.terraforged.mod.feature.BlockDataManager;
+import com.terraforged.mod.feature.structure.StructureLocator;
 import com.terraforged.mod.featuremanager.FeatureManager;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import com.terraforged.mod.featuremanager.util.codec.DecoderFunc;
@@ -100,7 +100,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     private final Supplier<GeneratorResources> resources;
 
     public TFChunkGenerator(TFBiomeProvider biomeProvider, Supplier<DimensionSettings> settings) {
-        super(biomeProvider, biomeProvider.getSettings().structures.apply(settings.get().getStructures()));
+        super(biomeProvider, biomeProvider.getSettings().structures.validateAndApply(biomeProvider.getContext(), settings));
         CacheManager.get().clear();
         TerraContext context = biomeProvider.getContext();
         this.seed = context.terraSettings.world.seed;
