@@ -22,16 +22,14 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.chunk;
+package com.terraforged.mod.chunk.terrain;
 
-import com.google.common.collect.ImmutableSet;
+import com.terraforged.mod.api.material.state.States;
 import com.terraforged.noise.util.NoiseUtil;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
@@ -39,21 +37,16 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
-import net.minecraft.world.gen.feature.structure.*;
+import net.minecraft.world.gen.feature.structure.AbstractVillagePiece;
+import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.gen.feature.structure.StructurePiece;
+import net.minecraft.world.gen.feature.structure.StructureStart;
 
 import java.util.List;
-import java.util.Set;
 
-public class TerrainHelper {
+public class TerrainFit {
 
     private static final Structure<?>[] EMPTY_ARRAY = new Structure[0];
-
-    private static final Set<IStructurePieceType> SURFACE_STRUCTURES = ImmutableSet.of(
-            IStructurePieceType.field_242786_ad, // village
-            IStructurePieceType.TEJP, // jungle temple
-            IStructurePieceType.IGLU, // igloo
-            IStructurePieceType.TEDP // desert pyramid
-    );
 
     private static final int MIN_RADIUS = 4;
     private static final int MAX_RADIUS = 10;
@@ -61,23 +54,24 @@ public class TerrainHelper {
     private final float radiusScale;
     private final float overhang;
     private final float overhang2;
-    private final Structure<?>[] structures = getVillageStructures().toArray(EMPTY_ARRAY);
+    private final Structure<?>[] structures = getTerrainFitStructures().toArray(EMPTY_ARRAY);
+    private final ThreadLocal<TerrainFitResource> resource = ThreadLocal.withInitial(TerrainFitResource::new);
 
     // base - the size of the base built up around a piece as a percentage of its bounding box size
     // overhang - the amount of overhead overhang to be cut out
-    public TerrainHelper(float base, float cutout) {
+    public TerrainFit(float base, float cutout) {
         this.radiusScale = base;
         this.overhang = cutout;
         this.overhang2 = cutout * cutout;
     }
 
-    public void flatten(IWorld world, IChunk chunk) {
-        ObjectList<StructurePiece> pieces = new ObjectArrayList<>(16);
-        collectPieces(world, chunk, pieces);
-        buildBases(chunk, pieces);
+    public void apply(IWorld world, IChunk chunk) {
+        TerrainFitResource resource = this.resource.get().reset();
+        collectPieces(world, chunk, resource);
+        buildBases(chunk, resource);
     }
 
-    private void collectPieces(IWorld world, IChunk chunk, ObjectList<StructurePiece> pieces) {
+    private void collectPieces(IWorld world, IChunk chunk, TerrainFitResource resource) {
         ChunkPos pos = chunk.getPos();
         for (Structure<?> structure : structures) {
             LongSet set = chunk.getStructureReferences().get(structure);
@@ -95,7 +89,7 @@ public class TerrainHelper {
                     for (StructurePiece structurepiece : structureStart.getComponents()) {
                         // collect if piece is within radius of the chunk
                         if (structurepiece.func_214810_a(pos, 16)) {
-                            collectPiece(structurepiece, pieces);
+                            collectPiece(structurepiece, resource.pieces);
                         }
                     }
                 }
@@ -104,14 +98,17 @@ public class TerrainHelper {
     }
 
     // lowers or raises the terrain matcher the base height of each structure piece
-    private void buildBases(IChunk chunk, ObjectList<StructurePiece> pieces) {
-        int chunkStartX = chunk.getPos().getXStart();
-        int chunkStartZ = chunk.getPos().getZStart();
-        ObjectListIterator<StructurePiece> iterator = pieces.iterator();
+    private void buildBases(IChunk chunk, TerrainFitResource resource) {
+        final int chunkStartX = chunk.getPos().getXStart();
+        final int chunkStartZ = chunk.getPos().getZStart();
+        final ObjectListIterator<StructurePiece> iterator = resource.iterator;
 
-        BlockPos.Mutable mutablePos = new BlockPos.Mutable();
-        MutableBoundingBox mutableBounds = new MutableBoundingBox();
-        MutableBoundingBox chunkBounds = new MutableBoundingBox(chunkStartX, chunkStartZ, chunkStartX + 15, chunkStartZ + 15);
+        final BlockPos.Mutable mutablePos = resource.mutablePos;
+        final MutableBoundingBox utilBounds = resource.mutableBounds;
+        final MutableBoundingBox chunkBounds = assignChunk(resource.chunkBounds, chunkStartX, chunkStartZ);
+
+        final BlockState air = States.AIR.get();
+        final BlockState solid = States.STONE.get();
 
         for (int dz = 0; dz < 16; dz++) {
             for (int dx = 0; dx < 16; dx++) {
@@ -128,7 +125,7 @@ public class TerrainHelper {
                     int length = Math.min(pieceBounds.maxX - pieceBounds.minX, pieceBounds.maxZ - pieceBounds.minZ);
                     int borderRadius = Math.min(MIN_RADIUS, Math.max(MAX_RADIUS, NoiseUtil.round(length * radiusScale)));
 
-                    if (!intersects(chunkBounds, pieceBounds, mutableBounds, borderRadius)) {
+                    if (!intersects(chunkBounds, pieceBounds, utilBounds, borderRadius)) {
                         continue;
                     }
 
@@ -147,13 +144,13 @@ public class TerrainHelper {
                 }
 
                 // reset iterator for next pass
-                iterator.back(pieces.size());
+                resource.rewind();
 
                 if (y > surface) {
                     int delta = (int) y - surface;
                     for (int dy = 0; dy < delta; dy++) {
                         mutablePos.setPos(dx, surface + dy, dz);
-                        chunk.setBlockState(mutablePos, Blocks.STONE.getDefaultState(), false);
+                        chunk.setBlockState(mutablePos, solid, false);
                     }
                 }
 
@@ -164,8 +161,10 @@ public class TerrainHelper {
 
                     if (maxY <= surface) {
                         // gets weaker the further from the center of the piece
-                        float dist = getCenterDistance2(x, z, bounds);
-                        float distAlpha = 1F - NoiseUtil.clamp(dist / overhang2, 0, 1);
+                        float dist2 = getCenterDistance2(x, z, bounds);
+                        float distAlpha = 1F - NoiseUtil.clamp(dist2 / overhang2, 0, 1);
+
+                        distAlpha = NoiseUtil.sqrt(distAlpha);
 
                         // gets weaker the more material is overhead creating the inverse cutout (ie overhang)
                         float depth = surface - maxY;
@@ -176,7 +175,7 @@ public class TerrainHelper {
 
                     for (int dy = minY; dy <= maxY; dy++) {
                         mutablePos.setPos(dx, dy, dz);
-                        chunk.setBlockState(mutablePos, Blocks.AIR.getDefaultState(), false);
+                        chunk.setBlockState(mutablePos, air, false);
                     }
                 }
             }
@@ -197,14 +196,18 @@ public class TerrainHelper {
         dest.maxZ = src.maxZ + radius;
     }
 
-    private float raise(MutableBoundingBox bounds, BlockPos.Mutable pos, float level, float surface, int borderRadius) {
+    private static float raise(MutableBoundingBox bounds, BlockPos.Mutable pos, float level, float surface, int borderRadius) {
         float radius2 = Math.max(1, borderRadius * borderRadius);
         float distAlpha = 1 - getDistAlpha(pos.getX(), pos.getZ(), bounds, radius2);
         float alpha = NoiseUtil.pow(distAlpha, 2F - distAlpha);
         return NoiseUtil.lerp(surface, level, alpha);
     }
 
-    private float getCenterDistance2(int x, int z, MutableBoundingBox bounds) {
+    private static float getCenterDistance(int x, int z, MutableBoundingBox bounds) {
+        return (float) Math.sqrt(getCenterDistance2(x, z, bounds));
+    }
+
+    private static float getCenterDistance2(int x, int z, MutableBoundingBox bounds) {
         float cx = bounds.minX + (bounds.getXSize() / 2F);
         float cz = bounds.minZ + (bounds.getZSize() / 2F);
         float dx = cx - x;
@@ -219,7 +222,7 @@ public class TerrainHelper {
             if (placement == JigsawPattern.PlacementBehaviour.RIGID) {
                 list.add(piece);
             }
-        } else if (SURFACE_STRUCTURES.contains(structurepiece.getStructurePieceType())) {
+        } else {
             list.add(structurepiece);
         }
     }
@@ -244,7 +247,25 @@ public class TerrainHelper {
         return d2 / radius2;
     }
 
-    private static List<Structure<?>> getVillageStructures() {
+    private static MutableBoundingBox assignChunk(MutableBoundingBox box, int startX, int startZ) {
+        return assign2D(box, startX, startZ, startX + 15, startZ + 15);
+    }
+
+    private static MutableBoundingBox assign2D(MutableBoundingBox box, int x1, int z1, int x2, int z2) {
+        return assign(box, x1, 0, z1, x2, 255, z2);
+    }
+
+    private static MutableBoundingBox assign(MutableBoundingBox box, int x1, int y1, int z1, int x2, int y2, int z2) {
+        box.minX = x1;
+        box.maxX = x2;
+        box.minY = y1;
+        box.maxY = y2;
+        box.minZ = z1;
+        box.maxZ = z2;
+        return box;
+    }
+
+    private static List<Structure<?>> getTerrainFitStructures() {
         return Structure.field_236384_t_;
     }
 }

@@ -26,6 +26,7 @@ package com.terraforged.mod.api.material.state;
 
 public class States {
 
+    public static final StateSupplier AIR = DefaultState.of("minecraft:air").cache();
     public static final StateSupplier BEDROCK = DefaultState.of("minecraft:bedrock").cache();
     public static final StateSupplier COARSE_DIRT = DefaultState.of("minecraft:coarse_dirt").cache();
     public static final StateSupplier DIRT = DefaultState.of("minecraft:dirt").cache();
