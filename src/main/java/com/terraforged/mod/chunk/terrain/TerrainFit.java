@@ -164,8 +164,6 @@ public class TerrainFit {
                         float dist2 = getCenterDistance2(x, z, bounds);
                         float distAlpha = 1F - NoiseUtil.clamp(dist2 / overhang2, 0, 1);
 
-                        distAlpha = NoiseUtil.sqrt(distAlpha);
-
                         // gets weaker the more material is overhead creating the inverse cutout (ie overhang)
                         float depth = surface - maxY;
                         float depthAlpha = 1F - NoiseUtil.clamp(depth / overhang, 0, 1);
