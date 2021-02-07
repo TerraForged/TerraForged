@@ -39,26 +39,19 @@ import java.util.function.Supplier;
 
 public class StructureValidator {
 
-    private static final String ERROR_MESSAGE = "Structure: {} has been added to {} biomes but has no separation"
+    private static final String ERROR_MESSAGE = "Structure {} has been added to {} biomes but has no separation"
             + " settings registered for it! We may not be able to generate/locate it :[";
 
     public static void validateConfigs(DimensionSettings dimension, TFBiomeContext context, StructureSettings settings) {
-        final Map<Structure<?>, Set<Biome>> structures = new HashMap<>();
-        final Biome[] overworldBiomes = BiomeAnalyser.getOverworldBiomes(context);
-
-        for (Biome biome : overworldBiomes) {
-            for (Supplier<StructureFeature<?, ?>> structureFeature : biome.getGenerationSettings().getStructures()) {
-                Structure<?> structure = structureFeature.get().field_236268_b_;
-                structures.computeIfAbsent(structure, s -> new HashSet<>()).add(biome);
-            }
-        }
-
         final DimensionStructuresSettings structuresSettings = dimension.getStructures();
+        final Map<Structure<?>, Set<Biome>> structures = collectBiomeStructures(context);
         for (Map.Entry<Structure<?>, Set<Biome>> entry : structures.entrySet()) {
+            // Check for separation settings
             if (structuresSettings.func_236197_a_(entry.getKey()) == null) {
                 String name = Objects.toString(entry.getKey().getRegistryName());
                 StructureSettings.StructureSeparation userSetting = settings.structures.get(name);
 
+                // Ignore if user has disabled it anyway
                 if (userSetting != null && userSetting.disabled) {
                     continue;
                 }
@@ -66,5 +59,17 @@ public class StructureValidator {
                 Log.warn(ERROR_MESSAGE, name, entry.getValue().size());
             }
         }
+    }
+
+    private static Map<Structure<?>, Set<Biome>> collectBiomeStructures(TFBiomeContext context) {
+        final Map<Structure<?>, Set<Biome>> structures = new HashMap<>();
+        final Biome[] overworldBiomes = BiomeAnalyser.getOverworldBiomes(context);
+        for (Biome biome : overworldBiomes) {
+            for (Supplier<StructureFeature<?, ?>> structureFeature : biome.getGenerationSettings().getStructures()) {
+                Structure<?> structure = structureFeature.get().field_236268_b_;
+                structures.computeIfAbsent(structure, s -> new HashSet<>()).add(biome);
+            }
+        }
+        return structures;
     }
 }
