@@ -26,6 +26,7 @@ package com.terraforged.mod.api.material.state;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.state.Property;
 
 import java.util.function.Supplier;
 
@@ -37,5 +38,13 @@ public abstract class StateSupplier implements Supplier<BlockState> {
 
     public BlockState getDefaultState() {
         return getBlock().getDefaultState();
+    }
+
+    public CachedState cache() {
+        return new CachedState(this);
+    }
+
+    public <T extends Comparable<T>> StateSupplier with(Property<T> property, T value) {
+        return new ExtendedState<>(this, property, value);
     }
 }

@@ -25,46 +25,26 @@
 package com.terraforged.mod.api.material.state;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.state.Property;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
+public class ExtendedState<T extends Comparable<T>> extends StateSupplier {
 
-public class CachedState extends StateSupplier {
+    private final StateSupplier base;
+    private final Property<T> property;
+    private final T value;
 
-    // StateSuppliers should be pre-allocated .: once all have been created this list will not change contents
-    private static final List<CachedState> all = new CopyOnWriteArrayList<>();
-
-    private final Supplier<BlockState> supplier;
-
-    // Make sure memory changes are visible to all threads
-    private final AtomicReference<BlockState> reference = new AtomicReference<>();
-
-    public CachedState(Supplier<BlockState> supplier) {
-        this.supplier = supplier;
-        all.add(this);
+    public ExtendedState(StateSupplier base, Property<T> property, T value) {
+        this.base = base;
+        this.property = property;
+        this.value = value;
     }
 
     @Override
     public BlockState get() {
-        BlockState state = reference.get();
-        if (state == null) {
-            // It's not detrimental if two threads end up computing the state since:
-            // A) BlockStates are pre-allocated
-            // B) It's pretty fast to lookup from registry & call state.withProperty()
-            state = supplier.get();
-            reference.set(state);
+        BlockState state = base.getDefaultState();
+        if (state.hasProperty(property)) {
+            state = state.with(property, value);
         }
         return state;
-    }
-
-    public CachedState clear() {
-        reference.set(null);
-        return this;
-    }
-
-    public static void clearAll() {
-        all.forEach(CachedState::clear);
     }
 }

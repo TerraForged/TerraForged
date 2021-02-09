@@ -31,7 +31,10 @@ import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.api.chunk.column.DecoratorContext;
 import com.terraforged.mod.api.material.layer.LayerManager;
 import com.terraforged.mod.api.material.layer.LayerMaterial;
+import com.terraforged.mod.api.material.state.States;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.SpreadableSnowyDirtBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.IChunk;
 
@@ -74,6 +77,21 @@ public class LayerDecorator implements ColumnDecorator {
                 return;
             }
             chunk.setBlockState(pos, layer, false);
+
+            fixBaseBlock(chunk, pos, layer, level);
+        }
+    }
+
+    private void fixBaseBlock(IChunk chunk, BlockPos pos, BlockState layerMaterial, int level) {
+        if (level > 1 && layerMaterial.isIn(Blocks.SNOW)) {
+            BlockPos pos1 = pos.down();
+            BlockState below = chunk.getBlockState(pos1);
+
+            // Turns to dirt if submerged or the light-level is low. Light hasn't been calc'd at this
+            // at this stage of world-gen so just blanket set everything to snowy dirt.
+            if (below.getBlock() instanceof SpreadableSnowyDirtBlock) {
+                chunk.setBlockState(pos1, States.DIRT_SNOW.get(), false);
+            }
         }
     }
 }

@@ -24,12 +24,15 @@
 
 package com.terraforged.mod.api.material.state;
 
+import net.minecraft.block.SnowyDirtBlock;
+
 public class States {
 
     public static final StateSupplier AIR = DefaultState.of("minecraft:air").cache();
     public static final StateSupplier BEDROCK = DefaultState.of("minecraft:bedrock").cache();
     public static final StateSupplier COARSE_DIRT = DefaultState.of("minecraft:coarse_dirt").cache();
     public static final StateSupplier DIRT = DefaultState.of("minecraft:dirt").cache();
+    public static final StateSupplier DIRT_SNOW = DIRT.with(SnowyDirtBlock.SNOWY, true).cache();
     public static final StateSupplier GRASS_BLOCK = DefaultState.of("minecraft:grass_block").cache();
     public static final StateSupplier PODZOL = DefaultState.of("minecraft:podzol").cache();
     public static final StateSupplier CLAY = DefaultState.of("minecraft:clay").cache();

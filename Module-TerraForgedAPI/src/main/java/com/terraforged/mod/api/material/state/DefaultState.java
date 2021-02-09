@@ -38,10 +38,6 @@ public class DefaultState extends StateSupplier {
         this.name = name;
     }
 
-    public CachedState cache() {
-        return new CachedState(this);
-    }
-
     @Override
     public BlockState get() {
         Block block = ForgeRegistries.BLOCKS.getValue(name);
