@@ -54,6 +54,13 @@ public class StructureSettings {
         return structures.isEmpty();
     }
 
+    public Map<String, StructureSeparation> getOrDefaultStructures() {
+        if (isDefault()) {
+            return StructureUtils.getOverworldStructureDefaults();
+        }
+        return structures;
+    }
+
     public void load(DimensionStructuresSettings settings, TFBiomeContext context) {
         // Copy valid structure configs to a new instance
         StructureSettings defaults = new StructureSettings();

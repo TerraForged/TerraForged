@@ -28,48 +28,82 @@ import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
 import com.terraforged.mod.chunk.settings.StructureSettings;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.feature.StructureFeature;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.settings.DimensionStructuresSettings;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class StructureValidator {
 
-    private static final String ERROR_MESSAGE = "Structure {} has been added to {} biomes but has no separation"
-            + " settings registered for it! We may not be able to generate/locate it :[";
+    private static final String REMOVED = "A third-party mod has removed structure [{}] from all overworld biomes so it cannot be generated!";
+    private static final String UNREGISTERED = "Structure [{}] does not have any generation settings registered for it so it cannot be generated!";
 
     public static void validateConfigs(DimensionSettings dimension, TFBiomeContext context, StructureSettings settings) {
+        Log.info("Validating user structure preferences...");
+
         final DimensionStructuresSettings structuresSettings = dimension.getStructures();
-        final Map<Structure<?>, Set<Biome>> structures = collectBiomeStructures(context);
-        for (Map.Entry<Structure<?>, Set<Biome>> entry : structures.entrySet()) {
-            // Check for separation settings
-            if (structuresSettings.func_236197_a_(entry.getKey()) == null) {
-                String name = Objects.toString(entry.getKey().getRegistryName());
-                StructureSettings.StructureSeparation userSetting = settings.structures.get(name);
+        final List<Structure<?>> activeStructures = getActiveStructures(context);
+        final Map<String, StructureSettings.StructureSeparation> userSettings = settings.getOrDefaultStructures();
+
+        // Check for structures that have been removed from biomes when the user has it enabled
+        for (Map.Entry<String, StructureSettings.StructureSeparation> entry : userSettings.entrySet()) {
+            if (entry.getValue().disabled) {
+                continue;
+            }
+
+            ResourceLocation name = ResourceLocation.tryCreate(entry.getKey());
+            if (name == null) {
+                continue;
+            }
+
+            Structure<?> structure = ForgeRegistries.STRUCTURE_FEATURES.getValue(name);
+            if (structure != null && structuresSettings.func_236197_a_(structure) == null) {
+                Log.info(REMOVED, name);
+            }
+        }
+
+        // Check for mods removing strongholds from all biomes when the user has it enabled
+        if (!settings.stronghold.disabled && !activeStructures.contains(Structure.STRONGHOLD)) {
+            Log.info(REMOVED, Structure.STRONGHOLD.getRegistryName());
+        }
+
+        // Check for structures that have been added to biomes without having registered generation settings for it
+        for (Structure<?> structure : activeStructures) {
+            if (structuresSettings.func_236197_a_(structure) == null) {
+                String name = Objects.toString(structure.getRegistryName());
+                StructureSettings.StructureSeparation userSetting = userSettings.get(name);
 
                 // Ignore if user has disabled it anyway
                 if (userSetting != null && userSetting.disabled) {
                     continue;
                 }
 
-                Log.warn(ERROR_MESSAGE, name, entry.getValue().size());
+                Log.warn(UNREGISTERED, name);
             }
         }
     }
 
-    private static Map<Structure<?>, Set<Biome>> collectBiomeStructures(TFBiomeContext context) {
-        final Map<Structure<?>, Set<Biome>> structures = new HashMap<>();
+    private static List<Structure<?>> getActiveStructures(TFBiomeContext context) {
+        final Set<Structure<?>> structures = new HashSet<>();
         final Biome[] overworldBiomes = BiomeAnalyser.getOverworldBiomes(context);
+
         for (Biome biome : overworldBiomes) {
             for (Supplier<StructureFeature<?, ?>> structureFeature : biome.getGenerationSettings().getStructures()) {
                 Structure<?> structure = structureFeature.get().field_236268_b_;
-                structures.computeIfAbsent(structure, s -> new HashSet<>()).add(biome);
+                structures.add(structure);
             }
         }
-        return structures;
+
+        return structures.stream()
+                .filter(structure -> structure.getRegistryName() != null)
+                .sorted(Comparator.comparing(Structure::getRegistryName))
+                .collect(Collectors.toList());
     }
 }

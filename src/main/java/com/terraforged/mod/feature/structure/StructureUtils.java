@@ -28,14 +28,18 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
+import com.terraforged.mod.chunk.settings.StructureSettings;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.settings.DimensionStructuresSettings;
+import net.minecraft.world.gen.settings.StructureSeparationSettings;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class StructureUtils {
 
@@ -51,6 +55,28 @@ public class StructureUtils {
             }
         }
         return dest;
+    }
+
+    public static Map<String, StructureSettings.StructureSeparation> getOverworldStructureDefaults() {
+        Map<String, StructureSettings.StructureSeparation> map = new LinkedHashMap<>();
+
+        DimensionSettings dimensionSettings = WorldGenRegistries.NOISE_SETTINGS.getOrThrow(DimensionSettings.field_242734_c);
+        DimensionStructuresSettings structuresSettings = dimensionSettings.getStructures();
+
+        for (Map.Entry<Structure<?>, StructureSeparationSettings> entry : structuresSettings.func_236195_a_().entrySet()) {
+            if (entry.getKey().getRegistryName() == null) {
+                continue;
+            }
+
+            StructureSettings.StructureSeparation separation = new StructureSettings.StructureSeparation();
+            separation.salt = entry.getValue().func_236673_c_();
+            separation.spacing = entry.getValue().func_236668_a_();
+            separation.separation = entry.getValue().func_236671_b_();
+
+            map.put(Objects.toString(entry.getKey().getRegistryName()), separation);
+        }
+
+        return map;
     }
 
     public static void retainOverworldStructures(Map<String, ?> map, DimensionStructuresSettings settings, TFBiomeContext context) {
