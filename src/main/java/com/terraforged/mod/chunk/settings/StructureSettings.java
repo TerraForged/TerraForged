@@ -127,6 +127,9 @@ public class StructureSettings {
         @Range(min = 1, max = 4095)
         @Comment("Controls the number of strongholds that will generate in the world")
         public int count = 128;
+
+        @Comment("Prevent this structure from generating.")
+        public boolean disabled = false;
     }
 
     @Serializable

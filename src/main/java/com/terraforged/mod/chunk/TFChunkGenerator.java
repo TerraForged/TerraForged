@@ -97,6 +97,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     private final Generator.Surfaces surfaceGenerator;
     private final Generator.Features featureGenerator;
     private final Generator.Structures structureGenerator;
+    private final Generator.Strongholds strongholdGenerator;
     private final Supplier<GeneratorResources> resources;
 
     public TFChunkGenerator(TFBiomeProvider biomeProvider, Supplier<DimensionSettings> settings) {
@@ -114,6 +115,7 @@ public class TFChunkGenerator extends ChunkGenerator {
         this.surfaceGenerator = new SurfaceGenerator(this);
         this.featureGenerator = new FeatureGenerator(this);
         this.structureGenerator = new StructureGenerator(this);
+        this.strongholdGenerator = new StrongholdGenerator(seed, biomeProvider);
         this.resources = LazySupplier.factory(context.split(GeneratorResources.SEED_OFFSET), GeneratorResources.factory(this));
         Profiler.reset();
         Log.info("Created TerraForged chunk-generator with settings {}", DataUtils.toJson(context.terraSettings));
@@ -128,12 +130,12 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    protected Codec<? extends ChunkGenerator> func_230347_a_() {
+    protected final Codec<? extends ChunkGenerator> func_230347_a_() {
         return CODEC;
     }
 
     @Override
-    public ChunkGenerator func_230349_a_(long seed) {
+    public final ChunkGenerator func_230349_a_(long seed) {
         Log.debug("Creating seeded generator: {}", seed);
         TFBiomeProvider biomes = getBiomeProvider().getBiomeProvider(seed);
         return new TFChunkGenerator(biomes, getSettings());
@@ -167,14 +169,22 @@ public class TFChunkGenerator extends ChunkGenerator {
         if (!this.biomeProvider.hasStructure(structure)) {
             return null;
         }
+
         if (structure == Structure.STRONGHOLD) {
-            return super.func_235956_a_(world, structure, pos, radius, flag);
+            return strongholdGenerator.findNearestStronghold(pos);
         }
+
         StructureSeparationSettings settings = structureGenerator.getSeparationSettings(structure);
         if (settings == null) {
             return null;
         }
+
         return StructureLocator.findStructure(this, world, world.func_241112_a_(), structure, pos, radius, flag, settings);
+    }
+
+    @Override // isStrongholdChunk
+    public final boolean func_235952_a_(ChunkPos pos) {
+        return strongholdGenerator.isStrongholdChunk(pos);
     }
 
     @Override
@@ -269,7 +279,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public TFBiomeProvider getBiomeProvider() {
+    public final TFBiomeProvider getBiomeProvider() {
         return biomeProvider;
     }
 
@@ -351,7 +361,7 @@ public class TFChunkGenerator extends ChunkGenerator {
         return getChunkReader(pos.x, pos.z);
     }
 
-    public ChunkReader getChunkReader(int chunkX, int chunkZ) {
+    public final ChunkReader getChunkReader(int chunkX, int chunkZ) {
         return resources.get().tileCache.getChunk(chunkX, chunkZ);
     }
 

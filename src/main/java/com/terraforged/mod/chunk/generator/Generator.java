@@ -30,6 +30,7 @@ import com.terraforged.mod.profiler.watchdog.WarnTimer;
 import com.terraforged.mod.profiler.watchdog.WatchdogContext;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
@@ -45,6 +46,7 @@ import net.minecraft.world.gen.feature.template.TemplateManager;
 import net.minecraft.world.gen.settings.StructureSeparationSettings;
 import net.minecraft.world.server.ServerWorld;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public interface Generator {
@@ -72,6 +74,14 @@ public interface Generator {
          * The region consists of the center chunk (the chunk being generated) and it's 8 neighbouring chunks (citation needed)
          */
         void generateFeatures(WorldGenRegion region, StructureManager manager);
+    }
+
+    interface Strongholds {
+
+        boolean isStrongholdChunk(ChunkPos pos);
+
+        @Nullable
+        BlockPos findNearestStronghold(BlockPos pos);
     }
 
     interface Structures {
