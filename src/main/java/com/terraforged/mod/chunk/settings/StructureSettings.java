@@ -128,6 +128,10 @@ public class StructureSettings {
         @Comment("Controls the number of strongholds that will generate in the world")
         public int count = 128;
 
+        @Rand
+        @Comment("A seed offset used to randomise stronghold placement")
+        public int salt = 0;
+
         @Comment("Prevent this structure from generating.")
         public boolean disabled = false;
     }

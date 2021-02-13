@@ -4,16 +4,12 @@ import com.google.common.collect.ImmutableSet;
 import com.terraforged.engine.concurrent.task.LazySupplier;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.settings.StructureSettings;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.structure.Structure;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
@@ -22,6 +18,7 @@ public class StrongholdGenerator implements Generator.Strongholds {
     private static final ChunkPos[] EMPTY_ARRAY = new ChunkPos[0];
 
     private final long seed;
+    private final int salt;
     private final int count;
     private final int spread;
     private final int distance;
@@ -34,6 +31,7 @@ public class StrongholdGenerator implements Generator.Strongholds {
         this.biomeProvider = biomeProvider;
         this.positions = LazySupplier.of(this::generate);
         this.lookup = positions.then(ImmutableSet::copyOf);
+        this.salt = getStrongholdSetting(biomeProvider, s -> s.salt);
         this.count = getStrongholdSetting(biomeProvider, s -> s.count);
         this.spread = getStrongholdSetting(biomeProvider, s -> s.spread);
         this.distance = getStrongholdSetting(biomeProvider, s -> s.distance);
@@ -78,11 +76,11 @@ public class StrongholdGenerator implements Generator.Strongholds {
             int spread = this.spread;
             int distance = this.distance;
             TFBiomeProvider biomeProvider = this.biomeProvider;
-            Predicate<Biome> biomePredicate = getStrongholdBiomes();
+            Predicate<Biome> biomePredicate = getStrongholdBiomes(biomeProvider);
 
             int chunkX = 0;
             int chunkZ = 0;
-            final Random random = new Random(seed);
+            final Random random = new Random(salt); // TODO: @Breaking: Combine salt with seed
             double angle = random.nextDouble() * Math.PI * 2.0D;
 
             List<ChunkPos> chunks = new ArrayList<>();
@@ -118,9 +116,9 @@ public class StrongholdGenerator implements Generator.Strongholds {
         return EMPTY_ARRAY;
     }
 
-    private Predicate<Biome> getStrongholdBiomes() {
-        Set<Biome> biomes = new ObjectOpenHashSet<>();
-        for(Biome biome : this.biomeProvider.getBiomes()) {
+    private static Predicate<Biome> getStrongholdBiomes(TFBiomeProvider biomeProvider) {
+        Set<Biome> biomes = new HashSet<>();
+        for(Biome biome : biomeProvider.getBiomes()) {
             if (biome.getGenerationSettings().hasStructure(Structure.STRONGHOLD)) {
                 biomes.add(biome);
             }

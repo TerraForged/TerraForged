@@ -50,6 +50,7 @@ public class StructureLocator {
         return findStructure(generator, world, manager, structure, center, attempts, first, settings, 5_000L);
     }
 
+    // TODO: Consider splitting search area into concurrent search regions?
     public static BlockPos findStructure(TFChunkGenerator generator, IWorld world, StructureManager manager, Structure<?> structure, BlockPos center, int radius, boolean first, StructureSeparationSettings settings, long timeout) {
         long seed = generator.getSeed();
         int separation = settings.func_236668_a_();
