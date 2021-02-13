@@ -24,10 +24,7 @@
 
 package com.terraforged.mod.featuremanager.matcher.feature;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 import com.terraforged.engine.world.biome.map.BiomeContext;
 import com.terraforged.mod.featuremanager.modifier.Jsonifiable;
 import net.minecraft.util.ResourceLocation;
@@ -43,7 +40,7 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
 
     private final List<Rule> rules;
 
-    private FeatureMatcher(List<Rule> rules) {
+    protected FeatureMatcher(List<Rule> rules) {
         super();
         this.rules = rules;
     }
@@ -70,7 +67,7 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
         if (this == NONE) {
             return false;
         }
-        return test(element, new Search(rules));
+        return test(element, createSearch());
     }
 
     @Override
@@ -80,23 +77,41 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
                 '}';
     }
 
-    private boolean test(JsonElement element, Search search) {
+    protected boolean test(JsonElement element, Search search) {
         if (element.isJsonObject()) {
-            for (Map.Entry<String, JsonElement> e : element.getAsJsonObject().entrySet()) {
-                if (test(e.getValue(), search)) {
+            JsonObject object = element.getAsJsonObject();
+            for (Map.Entry<String, JsonElement> e : object.entrySet()) {
+                if (testObjectEntry(e.getKey(), e.getValue(), search)) {
                     return true;
                 }
             }
         } else if (element.isJsonArray()) {
-            for (JsonElement e : element.getAsJsonArray()) {
-                if (test(e, search)) {
+            JsonArray array = element.getAsJsonArray();
+            for (int i = 0; i < array.size(); i++) {
+                if (testArrayEntry(i, array.get(i), search)) {
                     return true;
                 }
             }
         } else if (element.isJsonPrimitive()) {
-            return search.test(element.getAsJsonPrimitive());
+            search.test(element.getAsJsonPrimitive());
+            return search.isComplete();
         }
         return false;
+    }
+
+    protected boolean testObjectEntry(String key, JsonElement element, Search search) {
+        if (search.test(key, element)) {
+            return true;
+        }
+        return test(element, search);
+    }
+
+    protected boolean testArrayEntry(int index, JsonElement element, Search search) {
+        return test(element, search);
+    }
+
+    protected Search createSearch() {
+        return new Search(rules);
     }
 
     public static Optional<FeatureMatcher> of(JsonElement element) {
@@ -167,8 +182,9 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
 
     public static class Builder {
 
-        private List<Rule> rules = Collections.emptyList();
-        private List<JsonPrimitive> values = Collections.emptyList();
+        protected List<Rule> rules = Collections.emptyList();
+        protected List<JsonPrimitive> values = Collections.emptyList();
+        protected Map<String, JsonElement> mappings = Collections.emptyMap();
 
         public Builder and(Object value) {
             JsonElement element = FeatureMatcher.arg(value);
@@ -195,6 +211,14 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
                 values = new ArrayList<>();
             }
             values.add(value);
+            return this;
+        }
+
+        public Builder and(String key, JsonElement value) {
+            if (mappings.isEmpty()) {
+                mappings = new HashMap<>();
+            }
+            mappings.put(key, value);
             return this;
         }
 
@@ -229,13 +253,18 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
             return newRule().and(value);
         }
 
+        public Builder or(String key, JsonElement value) {
+            return newRule().and(key, value);
+        }
+
         public Builder newRule() {
-            if (!values.isEmpty()) {
+            if (!values.isEmpty() || !mappings.isEmpty()) {
                 if (rules.isEmpty()) {
                     rules = new ArrayList<>();
                 }
-                rules.add(new Rule(values));
+                rules.add(new Rule(values, mappings));
                 values = Collections.emptyList();
+                mappings = Collections.emptyMap();
             }
             return this;
         }

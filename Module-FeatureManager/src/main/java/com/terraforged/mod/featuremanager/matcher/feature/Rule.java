@@ -26,81 +26,105 @@ package com.terraforged.mod.featuremanager.matcher.feature;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import java.util.*;
 
 public class Rule {
 
-    private final Collection<JsonPrimitive> values;
+    private final Collection<JsonPrimitive> primitives;
+    private final Map<String, JsonElement> mappings;
 
-    public Rule(Collection<JsonPrimitive> values) {
-        this.values = values;
+    public Rule(Collection<JsonPrimitive> values, Map<String, JsonElement> mappings) {
+        this.primitives = values;
+        this.mappings = mappings;
     }
 
     public JsonElement toJson() {
-        if (values.size() == 1) {
-            for (JsonPrimitive primitive : values) {
+        if (primitives.size() == 1 && mappings.isEmpty()) {
+            for (JsonPrimitive primitive : primitives) {
                 return primitive;
             }
         }
+
         JsonArray array = new JsonArray();
-        for (JsonPrimitive primitive : values) {
+        for (JsonPrimitive primitive : primitives) {
             array.add(primitive);
         }
+
+        for (Map.Entry<String, JsonElement> entry : mappings.entrySet()) {
+            JsonObject mapping = new JsonObject();
+            mapping.addProperty("key", entry.getKey());
+            mapping.add("value", entry.getValue());
+            array.add(mapping);
+        }
+
         return array;
     }
 
     @Override
     public String toString() {
         return "Rule{" +
-                "values=" + values +
+                "values=" + primitives +
                 '}';
     }
 
     public Matcher createMatcher() {
-        return new Matcher(values);
+        return new Matcher(primitives, mappings);
     }
 
     public static List<Rule> parseRules(JsonElement element) {
         List<Rule> rules = new LinkedList<>();
         if (element.isJsonPrimitive()) {
-            rules.add(new Rule(Collections.singleton(element.getAsJsonPrimitive())));
+            rules.add(new Rule(Collections.singleton(element.getAsJsonPrimitive()), Collections.emptyMap()));
         } else if (element.isJsonArray()) {
-            boolean arrays = true;
-            boolean primitive = true;
+            boolean multiRule = false;
+            boolean primitive = false;
+            boolean advanced = false;
+
             for (JsonElement e : element.getAsJsonArray()) {
                 if (e.isJsonPrimitive()) {
-                    arrays = false;
+                    primitive = true;
+                    continue;
+                }
+                if (e.isJsonObject()) {
+                    advanced = true;
                     continue;
                 }
                 if (e.isJsonArray()) {
-                    primitive = false;
+                    multiRule = true;
                     continue;
                 }
                 return Collections.emptyList();
             }
-            if (primitive) {
-                Collection<JsonPrimitive> primitives = getPrimitives(element.getAsJsonArray());
-                rules.add(new Rule(primitives));
-            } else if (arrays) {
-                for (JsonElement e : element.getAsJsonArray()) {
-                    Collection<JsonPrimitive> primitives = getPrimitives(e.getAsJsonArray());
-                    rules.add(new Rule(primitives));
+
+            List<JsonPrimitive> primitives = primitive ? new ArrayList<>() : Collections.emptyList();
+            Map<String, JsonElement> mappings = advanced ? new HashMap<>() : Collections.emptyMap();
+
+            if (multiRule) {
+                for (JsonElement rule : element.getAsJsonArray()) {
+                    loadRules(rule.getAsJsonArray(), primitives, mappings);
                 }
+            } else {
+                loadRules(element.getAsJsonArray(), primitives, mappings);
             }
+
+            rules.add(new Rule(primitives, mappings));
         }
         return rules;
     }
 
-    private static Collection<JsonPrimitive> getPrimitives(JsonArray array) {
-        Set<JsonPrimitive> set = new HashSet<>();
+    protected static void loadRules(JsonArray array, Collection<JsonPrimitive> primitives, Map<String, JsonElement> mappings) {
         for (JsonElement e : array) {
-            if (!e.isJsonPrimitive()) {
-                return Collections.emptyList();
+            if (e.isJsonPrimitive()) {
+                primitives.add(e.getAsJsonPrimitive());
+            } else if (e.isJsonObject()) {
+                JsonObject object = e.getAsJsonObject();
+                if (object.has("key") && object.has("value")) {
+                    mappings.put(object.get("key").getAsString(), object.get("value"));
+                }
             }
-            set.add(e.getAsJsonPrimitive());
         }
-        return set;
     }
 }

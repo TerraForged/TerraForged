@@ -24,25 +24,35 @@
 
 package com.terraforged.mod.featuremanager.matcher.feature;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Matcher {
 
     private final Set<JsonPrimitive> set;
+    private final Map<String, JsonElement> map;
 
-    Matcher(Collection<JsonPrimitive> set) {
-        this.set = new HashSet<>(set);
+    Matcher(Collection<JsonPrimitive> set, Map<String, JsonElement> map) {
+        this.set = set.isEmpty() ? Collections.emptySet() : new HashSet<>(set);
+        this.map = map.isEmpty() ? Collections.emptyMap() : new HashMap<>(map);
     }
 
     public boolean complete() {
-        return set.isEmpty();
+        return set.isEmpty() && map.isEmpty();
     }
 
-    public void test(JsonPrimitive value) {
-        set.remove(value);
+    public boolean test(JsonPrimitive value) {
+        return set.remove(value);
+    }
+
+    public boolean test(String key, JsonElement value) {
+        JsonElement match = map.get(key);
+        if (match != null && match.equals(value)) {
+            map.remove(key);
+            return true;
+        }
+        return false;
     }
 }

@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.feature;
 
+import com.google.gson.JsonObject;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.mod.featuremanager.matcher.BiomeFeatureMatcher;
@@ -38,11 +39,12 @@ public class Matchers {
 
     public static FeatureMatcher stoneBlobs() {
         return FeatureMatcher.builder()
-                .or("minecraft:ore").and("minecraft:dirt")
-                .or("minecraft:ore").and("minecraft:gravel")
-                .or("minecraft:ore").and("minecraft:granite")
-                .or("minecraft:ore").and("minecraft:diorite")
-                .or("minecraft:ore").and("minecraft:andesite")
+                // Match ore features when the target is using a tag_match on base_stone_overworld and the placed block is the material we want to exclude
+                .or("minecraft:ore").and("minecraft:tag_match").and("minecraft:base_stone_overworld").and("state", state("minecraft:dirt"))
+                .or("minecraft:ore").and("minecraft:tag_match").and("minecraft:base_stone_overworld").and("state", state("minecraft:gravel"))
+                .or("minecraft:ore").and("minecraft:tag_match").and("minecraft:base_stone_overworld").and("state", state("minecraft:granite"))
+                .or("minecraft:ore").and("minecraft:tag_match").and("minecraft:base_stone_overworld").and("state", state("minecraft:diorite"))
+                .or("minecraft:ore").and("minecraft:tag_match").and("minecraft:base_stone_overworld").and("state", state("minecraft:andesite"))
                 .build();
     }
 
@@ -86,5 +88,11 @@ public class Matchers {
                         .or(DiskFeature.INSTANCE).and("minecraft:dirt")
                         .build()
         );
+    }
+
+    private static JsonObject state(String stoneType) {
+        JsonObject state = new JsonObject();
+        state.addProperty("Name", stoneType);
+        return state;
     }
 }

@@ -24,29 +24,41 @@
 
 package com.terraforged.mod.featuremanager.matcher.feature;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Search {
 
-    private final List<Matcher> matchers;
+    private final Matcher[] matchers;
 
     Search(List<Rule> list) {
-        matchers = new ArrayList<>(list.size());
-        for (Rule rule : list) {
-            matchers.add(rule.createMatcher());
-        }
+        matchers = list.stream().map(Rule::createMatcher).toArray(Matcher[]::new);
     }
 
-    public boolean test(JsonPrimitive value) {
+    public boolean isComplete() {
         for (Matcher matcher : matchers) {
-            matcher.test(value);
             if (matcher.complete()) {
                 return true;
             }
         }
         return false;
+    }
+
+    public boolean test(JsonPrimitive value) {
+        boolean hasMatch = false;
+        for (Matcher matcher : matchers) {
+            hasMatch |= matcher.test(value);
+        }
+        return hasMatch;
+    }
+
+    public boolean test(String key, JsonElement value) {
+        boolean hasMatch = false;
+        for (Matcher matcher : matchers) {
+            hasMatch |= matcher.test(key, value);
+        }
+        return hasMatch;
     }
 }
