@@ -22,40 +22,29 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.feature.decorator.fastpoisson;
+package com.terraforged.mod.feature.decorator.poisson;
 
-import com.terraforged.engine.concurrent.cache.SafeCloseable;
-import com.terraforged.mod.feature.decorator.poisson.BiomeVariance;
-import com.terraforged.noise.Module;
-import com.terraforged.noise.util.NoiseUtil;
+import com.terraforged.engine.util.fastpoisson.FastPoisson;
+import com.terraforged.mod.TerraForgedMod;
+import com.terraforged.mod.api.feature.decorator.DecorationContext;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.gen.Heightmap;
 
-public class DensityNoise implements SafeCloseable, Module {
+import java.util.function.Consumer;
 
-    private final BiomeVariance biome;
-    private final Module variance;
+public class FastPoissonAtSurface extends FastPoissonDecorator {
 
-    public DensityNoise(BiomeVariance biome, Module variance) {
-        this.biome = biome;
-        this.variance = variance;
+    public static final FastPoissonAtSurface INSTANCE = new FastPoissonAtSurface();
+
+    private FastPoissonAtSurface() {
+        setRegistryName(TerraForgedMod.MODID, "fast_poisson_surface");
     }
 
     @Override
-    public float getValue(float x, float y) {
-        float value1 = biome.getValue(x, y);
-        if (value1 > 2F) {
-            return value1;
-        }
-
-        float value2 = variance.getValue(x, y);
-        if (value1 > 1F) {
-            return NoiseUtil.lerp(value2, value1, (value1 - 0.25F) / 0.25F);
-        }
-
-        return value2;
-    }
-
-    @Override
-    public void close() {
-        biome.close();
+    protected FastPoisson.Visitor<Consumer<BlockPos>> getVisitor(DecorationContext context) {
+        return (x, z, builder) -> {
+            int y = context.getRegion().getHeight(Heightmap.Type.WORLD_SURFACE, x, z);
+            builder.accept(new BlockPos(x, y, z));
+        };
     }
 }

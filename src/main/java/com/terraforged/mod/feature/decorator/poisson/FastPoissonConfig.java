@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.feature.decorator.fastpoisson;
+package com.terraforged.mod.feature.decorator.poisson;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
@@ -30,7 +30,6 @@ import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.mod.api.feature.decorator.DecorationContext;
-import com.terraforged.mod.feature.decorator.poisson.BiomeVariance;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;

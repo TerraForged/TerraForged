@@ -24,23 +24,37 @@
 
 package com.terraforged.mod.feature.decorator.poisson;
 
-import com.terraforged.mod.TerraForgedMod;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.gen.Heightmap;
+import com.terraforged.engine.concurrent.cache.SafeCloseable;
+import com.terraforged.noise.Module;
+import com.terraforged.noise.util.NoiseUtil;
 
-import java.util.Random;
+public class DensityNoise implements SafeCloseable, Module {
 
-public class PoissonAtSurface extends PoissonDecorator {
+    private final BiomeVariance biome;
+    private final Module variance;
 
-    public static final PoissonAtSurface INSTANCE = new PoissonAtSurface();
-
-    private PoissonAtSurface() {
-        setRegistryName(TerraForgedMod.MODID, "poisson_surface");
+    public DensityNoise(BiomeVariance biome, Module variance) {
+        this.biome = biome;
+        this.variance = variance;
     }
 
     @Override
-    public int getYAt(IWorld world, BlockPos pos, Random random) {
-        return world.getHeight(Heightmap.Type.WORLD_SURFACE, pos.getX(), pos.getZ());
+    public float getValue(float x, float y) {
+        float value1 = biome.getValue(x, y);
+        if (value1 > 2F) {
+            return value1;
+        }
+
+        float value2 = variance.getValue(x, y);
+        if (value1 > 1F) {
+            return NoiseUtil.lerp(value2, value1, (value1 - 0.25F) / 0.25F);
+        }
+
+        return value2;
+    }
+
+    @Override
+    public void close() {
+        biome.close();
     }
 }

@@ -29,8 +29,7 @@ import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.feature.TerraFeatures;
 import com.terraforged.mod.feature.context.ContextSelectorFeature;
 import com.terraforged.mod.feature.decorator.FilterDecorator;
-import com.terraforged.mod.feature.decorator.fastpoisson.FastPoissonAtSurface;
-import com.terraforged.mod.feature.decorator.poisson.PoissonAtSurface;
+import com.terraforged.mod.feature.decorator.poisson.FastPoissonAtSurface;
 import com.terraforged.mod.feature.feature.BushFeature;
 import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.mod.feature.feature.FreezeLayer;
@@ -78,7 +77,6 @@ public class RegistrationEvents {
     public static void registerDecorators(RegistryEvent.Register<Placement<?>> event) {
         Log.info("Registering decorators");
         event.getRegistry().register(FilterDecorator.INSTANCE);
-        event.getRegistry().register(PoissonAtSurface.INSTANCE);
         event.getRegistry().register(FastPoissonAtSurface.INSTANCE);
     }
 }

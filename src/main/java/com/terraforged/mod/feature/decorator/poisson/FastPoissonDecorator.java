@@ -24,42 +24,40 @@
 
 package com.terraforged.mod.feature.decorator.poisson;
 
-import com.terraforged.engine.util.poisson.Poisson;
+import com.terraforged.engine.util.fastpoisson.FastPoisson;
+import com.terraforged.engine.util.fastpoisson.FastPoissonContext;
 import com.terraforged.mod.api.feature.decorator.DecorationContext;
 import com.terraforged.mod.feature.decorator.ContextualDecorator;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.feature.WorldDecoratingHelper;
 
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public abstract class PoissonDecorator extends ContextualDecorator<PoissonConfig> {
+public abstract class FastPoissonDecorator extends ContextualDecorator<FastPoissonConfig> {
 
-    private Poisson instance = null;
-    private final Object lock = new Object();
+    private static final int SEED_OFFSET = 234523;
 
-    public PoissonDecorator() {
-        super(PoissonConfig.CODEC);
+    public FastPoissonDecorator() {
+        super(FastPoissonConfig.CODEC);
     }
 
     @Override
-    protected final Stream<BlockPos> getPositions(WorldDecoratingHelper helper, DecorationContext context, Random random, PoissonConfig config, BlockPos pos) {
-        int radius = Math.max(1, Math.min(30, config.radius));
-        Poisson poisson = getInstance(radius);
-        PoissonVisitor visitor = new PoissonVisitor(context.getRegion(), this, poisson, random, pos);
-        config.apply(context, visitor);
-        return visitor.stream();
-    }
-
-    public abstract int getYAt(IWorld world, BlockPos pos, Random random);
-
-    private Poisson getInstance(int radius) {
-        synchronized (lock) {
-            if (instance == null || instance.getRadius() != radius) {
-                instance = new Poisson(radius);
-            }
-            return instance;
+    protected Stream<BlockPos> getPositions(WorldDecoratingHelper helper, DecorationContext context, Random random, FastPoissonConfig config, BlockPos pos) {
+        IChunk chunk = context.getChunk();
+        int seed = context.getGenerator().getContext().seed.root() + SEED_OFFSET;
+        int chunkX = chunk.getPos().x;
+        int chunkZ = chunk.getPos().z;
+        FastPoisson poisson = FastPoisson.LOCAL_POISSON.get();
+        try (DensityNoise density = config.getDensityNoise(seed, context)) {
+            FastPoissonContext poissonConfig = new FastPoissonContext(config.radius, config.jitter, config.scale, density);
+            Stream.Builder<BlockPos> builder = Stream.builder();
+            poisson.visit(seed, chunkX, chunkZ, random, poissonConfig, builder, getVisitor(context));
+            return builder.build();
         }
     }
+
+    protected abstract FastPoisson.Visitor<Consumer<BlockPos>> getVisitor(DecorationContext context);
 }
