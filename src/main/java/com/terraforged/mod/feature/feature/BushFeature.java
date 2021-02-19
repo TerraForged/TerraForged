@@ -96,16 +96,16 @@ public class BushFeature extends Feature<BushFeature.Config> {
     }
 
     private boolean place(IWorld world, BlockPos.Mutable center, BlockPos.Mutable pos, Random random, Config config) {
-        center.setY(world.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, center.getX(), center.getZ()));
+        center.setY(world.getHeight(Heightmap.Type.WORLD_SURFACE, center.getX(), center.getZ()));
 
         // don't replace solid blocks
         if (!BlockUtils.canTreeReplace(world, center)) {
             return false;
         }
 
-        // only place on solid non-ice blocks
+        // only place on dirt/grass/natural-stone
         center.move(Direction.DOWN, 1);
-        if (!BlockUtils.isSolidNoIce(world, center)) {
+        if (!BlockUtils.isSoilOrRock(world, center)) {
             return false;
         }
 

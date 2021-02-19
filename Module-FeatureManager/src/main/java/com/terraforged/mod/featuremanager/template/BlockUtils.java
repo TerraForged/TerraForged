@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.featuremanager.template;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.pathfinding.PathType;
@@ -31,7 +32,6 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.gen.feature.TreeFeature;
 
 import java.util.function.BiPredicate;
@@ -72,9 +72,10 @@ public class BlockUtils {
         return state.isSolid() || !state.allowsMovement(reader, pos, PathType.LAND);
     }
 
-    public static boolean isSolidNoIce(IBlockReader reader, BlockPos pos) {
-        BlockState state = reader.getBlockState(pos);
-        return isSolid(state, reader, pos) && !BlockTags.ICE.contains(state.getBlock());
+    public static boolean isSoilOrRock(IWorld world, BlockPos pos) {
+        Block block = world.getBlockState(pos).getBlock();
+        // Note: forge replaces isDirt check with their dirt blocktag lookup which contains grass + dirt types
+        return TreeFeature.isDirt(block) || BlockTags.BASE_STONE_OVERWORLD.contains(block);
     }
 
     public static boolean isClearOverhead(IWorld world, BlockPos pos, int height, BiPredicate<IWorld, BlockPos> predicate) {
