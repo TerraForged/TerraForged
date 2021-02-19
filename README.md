@@ -33,7 +33,7 @@ repositories {
 }
 
 dependencies {
-    implementation fg.deobf("com.terraforged:TerraForged:1.64.4-${version}")
+    implementation fg.deobf("com.terraforged:TerraForged:1.16.4-${version}")
 }
 ```
 
