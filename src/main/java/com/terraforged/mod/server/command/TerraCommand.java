@@ -139,8 +139,8 @@ public class TerraCommand {
         getContext(context);
         BlockPos pos = context.getSource().asPlayer().getPosition();
         TFBiomeProvider biomeProvider = getBiomeProvider(context);
-        try (Resource<Cell> cell = biomeProvider.lookupPos(pos.getX(), pos.getZ())) {
-            Biome biome = biomeProvider.getBiome(cell.get(), pos.getX(), pos.getZ());
+        try (Resource<Cell> cell = Cell.pooled()) {
+            Biome biome = biomeProvider.lookupBiome(cell.get(), pos.getX(), pos.getZ(), false);
             context.getSource().sendFeedback(new StringTextComponent("At ")
                     .append(createTeleportMessage(pos))
                     .append(new StringTextComponent(": TerrainType = "))

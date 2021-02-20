@@ -25,8 +25,10 @@
 package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.engine.cell.Cell;
+import com.terraforged.engine.concurrent.Resource;
 import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.mod.biome.TFBiomeContainer;
+import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.ChunkCarverFix;
 import com.terraforged.mod.featuremanager.template.StructureUtils;
@@ -82,7 +84,7 @@ public class TerrainCarver implements Generator.Carvers {
         TFBiomeContainer biomeContainer = TFBiomeContainer.getOrNull(chunk);
         BiomeLookup lookup = new BiomeLookup(chunkpos, biomeContainer);
         BitSet mask = carverChunk.getCarvingMask(type);
-        Biome biome = generator.getBiomeProvider().getBiome(chunkpos.getXStart(), chunkpos.getZStart());
+        Biome biome = TerrainCarver.getBiome(biomeContainer, generator.getBiomeProvider(), chunkpos);
         BiomeGenerationSettings settings = biome.getGenerationSettings();
 
         WarnTimer timer = Watchdog.getWarnTimer();
@@ -126,7 +128,7 @@ public class TerrainCarver implements Generator.Carvers {
                 // Method masks to chunk-local coordinates
                 return biomes.getBiome(pos.getX(), pos.getZ());
             }
-            return generator.getBiomeProvider().lookupBiome(cell, pos.getX(), pos.getZ());
+            return generator.getBiomeProvider().lookupBiome(cell, pos.getX(), pos.getZ(), false);
         }
     }
 
@@ -134,5 +136,14 @@ public class TerrainCarver implements Generator.Carvers {
         try (ChunkReader reader = generator.getChunkReader(pos)) {
             return reader.getCell(8, 8).riverMask < 0.33F;
         }
+    }
+
+    private static Biome getBiome(@Nullable TFBiomeContainer container, TFBiomeProvider biomeProvider, ChunkPos pos) {
+        if (container == null) {
+            try (Resource<Cell> resource = Cell.pooled()) {
+                return biomeProvider.lookupBiome(resource.get(), pos.getXStart(), pos.getZStart(), false);
+            }
+        }
+        return container.getBiome(0, 0);
     }
 }

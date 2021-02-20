@@ -38,7 +38,7 @@ public class PerfDefaults {
 
     public static final int MAX_TILE_SIZE = 8;
     public static final int MAX_BATCH_COUNT = 20;
-    public static final int MAX_THREAD_COUNT = Runtime.getRuntime().availableProcessors();
+    public static final int MAX_THREAD_COUNT = Runtime.getRuntime().availableProcessors() * 2;
 
     private static boolean isUsingDefaultPerfSettings(CommentedConfig config) {
         boolean yes = true;

@@ -40,7 +40,7 @@ import java.util.function.Consumer;
 
 public class ConfigManager {
 
-    private static final String PERF_VERSION = "1.0";
+    private static final String PERF_VERSION = "1.1";
     private static final String GENERAL_VERSION = "1.0";
     private static final Path COMMON_DIR = Paths.get("config", "terraforged").toAbsolutePath();
 

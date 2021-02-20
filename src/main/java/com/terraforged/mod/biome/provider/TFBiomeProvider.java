@@ -42,11 +42,8 @@ import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import com.terraforged.noise.util.NoiseUtil;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeManager;
-import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
 import net.minecraft.world.biome.provider.BiomeProvider;
 
 import javax.annotation.Nullable;
@@ -60,6 +57,7 @@ public class TFBiomeProvider extends BiomeProvider {
 
     private final long seed;
     private final TerraContext context;
+    private final BiomeCache biomeCache;
     private final LazySupplier<BiomeResources> resources;
 
     private final float biomeSearchModifier;
@@ -68,6 +66,7 @@ public class TFBiomeProvider extends BiomeProvider {
         super(BiomeAnalyser.getOverworldBiomesList(context.biomeContext));
         this.context = context;
         this.seed = context.terraSettings.world.seed;
+        this.biomeCache = new BiomeCache(this);
         this.resources = LazySupplier.factory(context.copy(), BiomeResources::new);
         this.biomeSearchModifier = BiomeHelper.getBiomeSizeSearchModifier(context.settings.climate);
     }
@@ -79,10 +78,10 @@ public class TFBiomeProvider extends BiomeProvider {
 
     @Override
     public Biome getNoiseBiome(int x, int y, int z) {
-        x = (x << 2);
-        z = (z << 2);
-        try (Resource<Cell> cell = lookupPos(x, z)) {
-            return getBiome(cell.get(), x, z);
+        try (Resource<Cell> resource = Cell.pooled()) {
+            Cell cell = resource.get().reset();
+            int biome = biomeCache.getNoiseBiome(cell, x, z, false);
+            return getBiomeFromId(biome);
         }
     }
 
@@ -104,11 +103,9 @@ public class TFBiomeProvider extends BiomeProvider {
         int maxZ = centerZ + radius;
         Set<Biome> set = Sets.newHashSet();
         Cell cell = new Cell();
-        WorldLookup lookup = getWorldLookup();
         for (int z = minZ; z <= maxZ; z += 4) {
             for (int x = minX; x <= maxX; x += 4) {
-                lookup.applyCell(cell, x, z);
-                Biome biome = getBiome(cell, x, z);
+                Biome biome = lookupBiome(cell, x, z, false);
                 set.add(biome);
             }
         }
@@ -153,8 +150,9 @@ public class TFBiomeProvider extends BiomeProvider {
                     int x = biomeX << 2;
                     int z = biomeZ << 2;
 
-                    getWorldLookup().applyCell(cell, x, z);
-                    if (biomes.test(getBiome(cell, x, z))) {
+                    Biome biome = lookupBiome(cell, x, z, false);
+
+                    if (biomes.test(biome)) {
                         if (centerOutSearch) {
                             return new BlockPos(x, centerY, z);
                         }
@@ -174,34 +172,6 @@ public class TFBiomeProvider extends BiomeProvider {
         return pos;
     }
 
-    public BiomeMap<RegistryKey<Biome>> getBiomeMap() {
-        return getResources().biomemap;
-    }
-
-    public Resource<Cell> lookupPos(int x, int z) {
-        return getWorldLookup().getCell(x, z);
-    }
-
-    public Biome getBiome(int x, int z) {
-        try (Resource<Cell> resource = Cell.pooled()) {
-            return lookupBiome(resource.get(), x, z);
-        }
-    }
-
-    public Biome lookupBiome(Cell cell, int x, int z) {
-        getWorldLookup().applyCell(cell, x, z, true);
-        return getBiome(cell, x, z);
-    }
-
-    public Biome fastLookupBiome(Cell cell, int x, int z) {
-        getWorldLookup().applyCell(cell, x, z, false);
-        return getBiome(cell, x, z);
-    }
-
-    public Biome getSurfaceBiome(int x, int z, BiomeManager.IBiomeReader reader) {
-        return ColumnFuzzedBiomeMagnifier.INSTANCE.getBiome(seed, x, 0, z, reader);
-    }
-
     public WorldLookup getWorldLookup() {
         return getResources().worldLookup;
     }
@@ -218,7 +188,39 @@ public class TFBiomeProvider extends BiomeProvider {
         return getResources().modifierManager;
     }
 
-    public Biome getBiome(Cell cell, int x, int z) {
+    public Biome lookupBiome(Cell cell, int x, int z, boolean load) {
+        int biomeId = biomeCache.tryGetBiome(cell, x, z, load);
+        if (BiomeMap.isValid(biomeId)) {
+            return getBiomeFromId(biomeId);
+        } else {
+            biomeId = computeBiome(cell, x, z, load);
+            biomeCache.tryStoreBiome(x, z, biomeId);
+            return getBiomeFromId(biomeId);
+        }
+    }
+
+    // Read the Biome instance from the Cell
+    public Biome readBiome(Cell cell, int x, int z) {
+        int biome = getBiomeId(cell, x, z);
+        biomeCache.tryStoreBiome(x, z, biome);
+        return getBiomeFromId(biome);
+    }
+
+    // Compute the biome id at a given block position
+    protected int computeBiome(Cell cell, int x, int z, boolean load) {
+        getWorldLookup().applyCell(cell, x, z, load);
+        return getBiomeId(cell, x, z);
+    }
+
+    // Get the Biome instance from the biome id
+    private Biome getBiomeFromId(int biome) {
+        Biome result = context.biomeContext.biomes.get(biome);
+        Preconditions.checkNotNull(result, "NULL BIOME D:");
+        return result;
+    }
+
+    // Determine the biome id from the cell
+    private int getBiomeId(Cell cell, int x, int z) {
         BiomeResources resources = this.getResources();
         int biome = resources.biomemap.provideBiome(cell, context.levels);
         if (resources.modifierManager.hasModifiers(cell, context.levels)) {
@@ -227,9 +229,7 @@ public class TFBiomeProvider extends BiomeProvider {
                 biome = modified;
             }
         }
-        Biome result = context.biomeContext.biomes.get(biome);
-        Preconditions.checkNotNull(result, "NULL BIOME D:");
-        return result;
+        return biome;
     }
 
     public boolean canSpawnAt(Cell cell) {

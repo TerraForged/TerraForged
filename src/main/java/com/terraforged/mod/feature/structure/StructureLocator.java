@@ -87,7 +87,7 @@ public class StructureLocator {
 
                             int x = cx << 4;
                             int z = cz << 4;
-                            Biome biome = biomeProvider.fastLookupBiome(cell, x, z);
+                            Biome biome = biomeProvider.lookupBiome(cell, x, z, false);
                             if (!biome.getGenerationSettings().hasStructure(structure)) {
                                 continue;
                             }

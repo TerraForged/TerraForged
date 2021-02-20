@@ -49,7 +49,7 @@ public class Watchdog implements Runnable {
     private final ThreadLocal<WatchdogContext> contextPool = ThreadLocal.withInitial(WatchdogCtx::new);
 
     static {
-        ThreadPools.scheduleFixed(INSTANCE, CHECK_INTERVAL);
+        ThreadPools.scheduleRepeat(INSTANCE, CHECK_INTERVAL);
     }
 
     @Override

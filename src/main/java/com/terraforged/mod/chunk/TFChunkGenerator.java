@@ -31,7 +31,6 @@ import com.mojang.serialization.DynamicOps;
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.concurrent.cache.CacheManager;
 import com.terraforged.engine.concurrent.task.LazySupplier;
-import com.terraforged.engine.tile.Size;
 import com.terraforged.engine.tile.Tile;
 import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.engine.tile.gen.TileCache;
@@ -100,6 +99,8 @@ public class TFChunkGenerator extends ChunkGenerator {
     private final Generator.Strongholds strongholdGenerator;
     private final Supplier<GeneratorResources> resources;
 
+    private final ThreadLocal<Cell> localCellResource = ThreadLocal.withInitial(Cell::new);
+
     public TFChunkGenerator(TFBiomeProvider biomeProvider, Supplier<DimensionSettings> settings) {
         super(biomeProvider, biomeProvider.getSettings().structures.validateAndApply(biomeProvider.getContext(), settings));
         CacheManager.get().clear();
@@ -139,29 +140,6 @@ public class TFChunkGenerator extends ChunkGenerator {
         Log.debug("Creating seeded generator: {}", seed);
         TFBiomeProvider biomes = getBiomeProvider().getBiomeProvider(seed);
         return new TFChunkGenerator(biomes, getSettings());
-    }
-
-    @Override // getBlockColumn
-    public final IBlockReader func_230348_a_(int x, int z) {
-        float value;
-        try (ChunkReader chunkReader = getChunkReader(x >> 4, z >> 4)) {
-            value = chunkReader.getCell(x, z).value;
-        }
-
-        int height = getContext().levels.scale(value) + 1;
-        int surface = Math.max(height, getSeaLevel() + 1);
-        BlockColumn column = ColumnResource.get().column.withCapacity(surface);
-        BlockState solid = settings.get().getDefaultBlock();
-        for (int y = 0; y < height; y++) {
-            column.set(y, solid);
-        }
-
-        BlockState fluid = settings.get().getDefaultFluid();
-        for (int y = height; y < surface; y++) {
-            column.set(y, fluid);
-        }
-
-        return column;
     }
 
     @Nullable // findStructure
@@ -264,18 +242,40 @@ public class TFChunkGenerator extends ChunkGenerator {
         return mobGenerator.getSpawns(biome, structures, type, pos);
     }
 
+    /*
+     * Samples the noise heightmap at x,z. This is pre-erosion/smoothing so the actual height might vary, but should
+     * be accurate enough for placing structures etc since we do a terrain-fitting pass around them later.
+     */
     @Override
     public final int getHeight(int x, int z, Heightmap.Type type) {
-        int chunkX = Size.blockToChunk(x);
-        int chunkZ = Size.blockToChunk(z);
-        try (ChunkReader chunk = getChunkReader(chunkX, chunkZ)) {
-            Cell cell = chunk.getCell(x, z);
-            int level = context.levels.scale(cell.value) + 1;
-            if (type == Heightmap.Type.OCEAN_FLOOR || type == Heightmap.Type.OCEAN_FLOOR_WG) {
-                return level;
-            }
-            return Math.max(getSeaLevel(), level);
+        final Cell cell = localCellResource.get().reset();
+        biomeProvider.getWorldLookup().applyCell(cell, x, z);
+
+        final int level = getContext().levels.scale(cell.value) + 1;
+        if (type == Heightmap.Type.OCEAN_FLOOR || type == Heightmap.Type.OCEAN_FLOOR_WG) {
+            return level;
         }
+
+        return Math.max(getSeaLevel(), level);
+    }
+
+    @Override // getBlockColumn
+    public final IBlockReader func_230348_a_(int x, int z) {
+        final int height = getNoiseHeight(x, z, Heightmap.Type.OCEAN_FLOOR_WG);
+        final int surface = Math.max(height, getSeaLevel() + 1);
+
+        BlockColumn column = ColumnResource.get().column.withCapacity(surface);
+        BlockState solid = settings.get().getDefaultBlock();
+        for (int y = 0; y < height; y++) {
+            column.set(y, solid);
+        }
+
+        BlockState fluid = settings.get().getDefaultFluid();
+        for (int y = height; y < surface; y++) {
+            column.set(y, fluid);
+        }
+
+        return column;
     }
 
     @Override
@@ -341,9 +341,11 @@ public class TFChunkGenerator extends ChunkGenerator {
 
     public final void queueChunk(int chunkX, int chunkZ) {
         TileCache tileCache = resources.get().tileCache;
-        int rx = tileCache.chunkToRegion(chunkX);
-        int rz = tileCache.chunkToRegion(chunkZ);
-        tileCache.queueRegion(rx, rz);
+        if (tileCache.supportsQueuing()) {
+            int rx = tileCache.chunkToRegion(chunkX);
+            int rz = tileCache.chunkToRegion(chunkZ);
+            tileCache.queueRegion(rx, rz);
+        }
     }
 
     public final Tile getTile(ChunkPos pos) {

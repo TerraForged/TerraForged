@@ -117,7 +117,7 @@ public class TFBiomeContainer extends BiomeContainer {
             int x = chunkReader.getBlockX() + dx;
             int z = chunkReader.getBlockZ() + dz;
             Cell cell = chunkReader.getCell(dx, dz);
-            Biome biome = biomeProvider.getBiome(cell, x, z);
+            Biome biome = biomeProvider.readBiome(cell, x, z);
             biomes2D[indexOf(dx, dz)] = biome;
 
             if (cell.biome.isExtreme()) {
