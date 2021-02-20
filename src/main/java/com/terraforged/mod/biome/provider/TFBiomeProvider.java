@@ -190,13 +190,11 @@ public class TFBiomeProvider extends BiomeProvider {
 
     public Biome lookupBiome(Cell cell, int x, int z, boolean load) {
         int biomeId = biomeCache.tryGetBiome(cell, x, z, load);
-        if (BiomeMap.isValid(biomeId)) {
-            return getBiomeFromId(biomeId);
-        } else {
+        if (!BiomeMap.isValid(biomeId)) {
             biomeId = computeBiome(cell, x, z, load);
             biomeCache.tryStoreBiome(x, z, biomeId);
-            return getBiomeFromId(biomeId);
         }
+        return getBiomeFromId(biomeId);
     }
 
     // Read the Biome instance from the Cell
