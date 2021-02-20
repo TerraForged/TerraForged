@@ -317,7 +317,7 @@ public class Trees {
         return new Modifier<>(
                 BiomeMatcher.of(context, Biomes.SWAMP, Biomes.SWAMP_HILLS),
                 FeatureMatcher.and("minecraft:tree", Blocks.OAK_LEAVES, Blocks.OAK_LOG),
-                FeatureReplacer.of(extra(7, 0.1F, 1,
+                FeatureReplacer.of(extra(3, 0.05F, 1,
                         "terraforged:willow_large",
                         Pair.of("terraforged:willow_small", 0.2F),
                         Pair.of("terraforged:willow_large", 0.35F)
