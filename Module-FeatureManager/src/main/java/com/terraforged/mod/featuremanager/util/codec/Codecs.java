@@ -36,6 +36,7 @@ import org.apache.logging.log4j.MarkerManager;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
@@ -117,6 +118,23 @@ public class Codecs {
             t.printStackTrace();
             return value;
         }
+    }
+
+    public static <V, T> Optional<V> getField(T value, Codec<T> codec, Function<JsonElement, V> mapper, String path) {
+        return getField(value, codec, mapper, new String[]{path});
+    }
+
+    public static <V, T> Optional<V> getField(T value, Codec<T> codec, Function<JsonElement, V> mapper, String... path) {
+        JsonElement element = encode(codec, value);
+
+        for (String key : path) {
+            if (!element.isJsonObject()) {
+                return Optional.empty();
+            }
+            element = element.getAsJsonObject().get(key);
+        }
+
+        return Optional.ofNullable(mapper.apply(element));
     }
 
     public static <T> Optional<T> getResult(DataResult<T> result) {

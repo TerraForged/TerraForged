@@ -24,13 +24,17 @@
 
 package com.terraforged.mod.chunk.generator;
 
+import com.google.gson.JsonElement;
+import com.mojang.serialization.Codec;
 import com.terraforged.mod.chunk.TFChunkGenerator;
+import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeContainer;
 import net.minecraft.world.biome.MobSpawnInfo;
+import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureManager;
@@ -40,8 +44,6 @@ import net.minecraft.world.spawner.PatrolSpawner;
 import net.minecraft.world.spawner.PhantomSpawner;
 import net.minecraft.world.spawner.WorldEntitySpawner;
 import net.minecraftforge.common.world.StructureSpawnManager;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
@@ -49,25 +51,29 @@ import java.util.List;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class MobGenerator implements Generator.Mobs {
 
-    // may be accessed cross-thread
-    private static volatile boolean mobSpawning = true;
+    private static final String DISABLE_MOBS = "disable_mob_generation";
+    private static final Codec<DimensionSettings> CODEC = DimensionSettings.field_236097_a_;
 
+    private final boolean mobSpawning;
     private final CatSpawner catSpawner = new CatSpawner();
     private final PatrolSpawner patrolSpawner = new PatrolSpawner();
     private final PhantomSpawner phantomSpawner = new PhantomSpawner();
-    private final TFChunkGenerator generator;
 
     public MobGenerator(TFChunkGenerator generator) {
-        this.generator = generator;
+        DimensionSettings settings = generator.getSettings().get();
+        this.mobSpawning = !Codecs.getField(settings, CODEC, JsonElement::getAsBoolean, DISABLE_MOBS).orElse(false);
     }
 
     @Override
     public final void generateMobs(WorldGenRegion region) {
-        // vanilla does NOT check the mobSpawning gamerule before calling this
-        if (MobGenerator.mobSpawning) {
+        if (mobSpawning) {
             int chunkX = region.getMainChunkX();
             int chunkZ = region.getMainChunkZ();
-            Biome biome = region.getChunk(chunkX, chunkZ).getBiomes().getNoiseBiome(0, 0, 0);
+            BiomeContainer biomes = region.getChunk(chunkX, chunkZ).getBiomes();
+            if (biomes == null) {
+                return;
+            }
+            Biome biome = biomes.getNoiseBiome(0, 0, 0);
             SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
             sharedseedrandom.setDecorationSeed(region.getSeed(), chunkX << 4, chunkZ << 4);
             WorldEntitySpawner.performWorldGenSpawning(region, biome, chunkX, chunkZ, sharedseedrandom);
@@ -82,7 +88,7 @@ public class MobGenerator implements Generator.Mobs {
     }
 
     @Override
-    public List<MobSpawnInfo.Spawners> getSpawns(Biome biome, StructureManager structures, EntityClassification type, BlockPos pos) {
+    public final List<MobSpawnInfo.Spawners> getSpawns(Biome biome, StructureManager structures, EntityClassification type, BlockPos pos) {
         List<MobSpawnInfo.Spawners> spawns = StructureSpawnManager.getStructureSpawns(structures, type, pos);
         if (spawns != null) {
             return spawns;
@@ -113,12 +119,5 @@ public class MobGenerator implements Generator.Mobs {
         }
 
         return biome.getMobSpawnInfo().getSpawners(type);
-    }
-
-    @SubscribeEvent
-    public static void tick(TickEvent.WorldTickEvent event) {
-        if (event.phase == TickEvent.Phase.START && event.side.isServer()) {
-            mobSpawning = event.world.getGameRules().get(GameRules.DO_MOB_SPAWNING).get();
-        }
     }
 }
