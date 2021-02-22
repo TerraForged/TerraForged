@@ -24,11 +24,13 @@
 
 package com.terraforged.mod.server;
 
+import com.terraforged.engine.concurrent.thread.ThreadPools;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.featuremanager.data.FolderDataPackFinder;
 import com.terraforged.mod.profiler.Profiler;
 import net.minecraft.resources.ResourcePackList;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
@@ -47,5 +49,14 @@ public class ServerEvents {
     public static void addPackFinder(ResourcePackList packList) {
         Log.info("Adding DataPackFinder");
         packList.addPackFinder(new FolderDataPackFinder(TerraForgedMod.DATAPACK_DIR));
+    }
+
+    @Mod.EventBusSubscriber(value = Dist.DEDICATED_SERVER, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    public static class Dedicated {
+        @SubscribeEvent
+        public static void serverStop(FMLServerStoppedEvent event) {
+            // Shutdown all executors to ensure the server process can exit
+            ThreadPools.shutdownAll();
+        }
     }
 }
