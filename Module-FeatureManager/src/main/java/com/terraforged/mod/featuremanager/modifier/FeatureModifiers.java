@@ -29,8 +29,6 @@ import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.featuremanager.FeatureManager;
 import com.terraforged.mod.featuremanager.FeatureSerializer;
 import com.terraforged.mod.featuremanager.biome.BiomeFeature;
-import com.terraforged.mod.featuremanager.matcher.dynamic.DynamicList;
-import com.terraforged.mod.featuremanager.matcher.dynamic.DynamicPredicate;
 import com.terraforged.mod.featuremanager.predicate.BiomePredicate;
 import com.terraforged.mod.featuremanager.predicate.FeaturePredicate;
 import com.terraforged.mod.featuremanager.transformer.*;
@@ -47,7 +45,6 @@ import java.util.List;
 
 public class FeatureModifiers extends Event {
 
-    private final DynamicList dynamics = new DynamicList();
     private final ModifierList<FeatureReplacer> replacers = new ModifierList<>();
     private final ModifierList<FeatureInjector> injectors = new ModifierList<>();
     private final ModifierList<FeatureAppender> appenders = new ModifierList<>();
@@ -62,10 +59,6 @@ public class FeatureModifiers extends Event {
 
     public FeatureModifiers(TFBiomeContext context) {
         this.context = context;
-    }
-
-    public DynamicList getDynamic() {
-        return dynamics;
     }
 
     public ModifierList<FeatureReplacer> getReplacers() {
@@ -101,22 +94,13 @@ public class FeatureModifiers extends Event {
     public ModifierSet getFeature(GenerationStage.Decoration stage, Biome biome, ConfiguredFeature<?, ?> feature) {
         try {
             JsonElement element = FeatureSerializer.serialize(feature);
-            String s = element.toString();
-            if (s.contains("")) {
-
-            }
-
             ConfiguredFeature<?, ?> result = getFeature(biome, feature, element);
             if (result != feature) {
                 // re-serialize if feature has been changed
                 element = FeatureSerializer.serialize(result);
             }
 
-            FeaturePredicate predicate = getPredicate(result);
-            if (predicate == null) {
-                predicate = getPredicate(biome, element);
-            }
-
+            FeaturePredicate predicate = getPredicate(biome, element);
             List<BiomeFeature> before = getInjectors(biome, predicate, element, InjectionPosition.BEFORE);
             List<BiomeFeature> after = getInjectors(biome, predicate, element, InjectionPosition.AFTER);
 
@@ -202,15 +186,6 @@ public class FeatureModifiers extends Event {
             }
         }
         return result;
-    }
-
-    private FeaturePredicate getPredicate(ConfiguredFeature<?, ?> feature) {
-        for (DynamicPredicate predicate : dynamics) {
-            if (predicate.getMatcher().test(feature)) {
-                return predicate.getPredicate();
-            }
-        }
-        return null;
     }
 
     private FeaturePredicate getPredicate(Biome biome, JsonElement element) {

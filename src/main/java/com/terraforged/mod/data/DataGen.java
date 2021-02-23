@@ -40,8 +40,11 @@ public class DataGen {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     public static void dumpData() {
+        dumpData(new TFBiomeContext(DynamicRegistries.func_239770_b_()));
+    }
+
+    public static void dumpData(TFBiomeContext context) {
         File dataDir = new File("data").getAbsoluteFile();
-        TFBiomeContext context = new TFBiomeContext(DynamicRegistries.func_239770_b_());
         Biome[] biomes = BiomeAnalyser.getOverworldBiomes(context);
         WorldGenBiomes.genBiomeMap(dataDir, context);
         WorldGenBiomes.genBiomeData(dataDir, biomes, context);

@@ -36,9 +36,9 @@ public class Watchdog implements Runnable {
 
     public static final String FEATURE_WARN_KEY = "feature_warn_time";
     public static final String CHUNK_TIMEOUT_KEY = "chunkgen_timeout";
+    public static final long DEFAULT_WARN_TIME_MS = 100;
+    public static final long DEFAULT_TIMEOUT_MS = 60_000L;
 
-    private static final long WARN_TIME = 50;
-    private static final long CRASH_TIME = 30_000L;
     private static final long MIN_CRASH_TIME = 5_000L;
     private static final long CHECK_INTERVAL = 5_251L;
 
@@ -85,7 +85,7 @@ public class Watchdog implements Runnable {
     }
 
     public static long getWatchdogHangTime() {
-        long time = ConfigManager.GENERAL.load().getLong(CHUNK_TIMEOUT_KEY, CRASH_TIME);
+        long time = ConfigManager.GENERAL.load().getLong(CHUNK_TIMEOUT_KEY, DEFAULT_TIMEOUT_MS);
         if (time <= 0) {
             return -1L;
         }
@@ -97,6 +97,6 @@ public class Watchdog implements Runnable {
     }
 
     protected static WarnTimer createWarnTimer() {
-        return new WarnTimer(ConfigManager.GENERAL.load().getLong(FEATURE_WARN_KEY, WARN_TIME));
+        return new WarnTimer(ConfigManager.GENERAL.load().getLong(FEATURE_WARN_KEY, DEFAULT_WARN_TIME_MS));
     }
 }

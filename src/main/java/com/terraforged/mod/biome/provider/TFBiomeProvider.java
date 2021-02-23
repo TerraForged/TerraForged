@@ -80,8 +80,7 @@ public class TFBiomeProvider extends BiomeProvider {
     public Biome getNoiseBiome(int x, int y, int z) {
         try (Resource<Cell> resource = Cell.pooled()) {
             Cell cell = resource.get().reset();
-            int biome = biomeCache.getNoiseBiome(cell, x, z, false);
-            return getBiomeFromId(biome);
+            return getNoiseBiome(cell, x, z);
         }
     }
 
@@ -186,6 +185,11 @@ public class TFBiomeProvider extends BiomeProvider {
 
     public BiomeModifierManager getModifierManager() {
         return getResources().modifierManager;
+    }
+
+    public Biome getNoiseBiome(Cell cell, int x, int z) {
+        int biome = biomeCache.getNoiseBiome(cell, x, z, false);
+        return getBiomeFromId(biome);
     }
 
     public Biome lookupBiome(Cell cell, int x, int z, boolean load) {

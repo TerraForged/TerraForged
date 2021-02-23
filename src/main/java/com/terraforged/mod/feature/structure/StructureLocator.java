@@ -24,100 +24,59 @@
 
 package com.terraforged.mod.feature.structure;
 
-import com.terraforged.engine.cell.Cell;
-import com.terraforged.engine.concurrent.Resource;
-import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
-import com.terraforged.mod.chunk.TFChunkGenerator;
-import net.minecraft.util.SharedSeedRandom;
+import com.terraforged.mod.config.ConfigManager;
+import com.terraforged.mod.util.quadsearch.QuadSearch;
+import com.terraforged.mod.util.quadsearch.Search;
+import com.terraforged.mod.util.quadsearch.SearchContext;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.SectionPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.feature.structure.Structure;
-import net.minecraft.world.gen.feature.structure.StructureManager;
-import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.settings.StructureSeparationSettings;
+import net.minecraft.world.server.ServerWorld;
+
+import java.util.concurrent.TimeUnit;
 
 public class StructureLocator {
 
-    private static final int SEARCH_BATCH_SIZE = 100;
+    public static final String ASYNC_KEY = "async_structure_search";
+    public static final String TIMEOUT_KEY = "structure_search_timeout";
 
-    public static BlockPos findStructure(TFChunkGenerator generator, IWorld world, StructureManager manager, Structure<?> structure, BlockPos center, int attempts, boolean first, StructureSeparationSettings settings) {
-        return findStructure(generator, world, manager, structure, center, attempts, first, settings, 5_000L);
+    public static final boolean DEFAULT_ASYNC = true;
+    public static final long DEFAULT_TIMEOUT_MS = 5_000L;
+
+    public static BlockPos find(BlockPos center, int radius, boolean skipExisting, Structure<?> structure, StructureSeparationSettings settings, IWorld world, TFBiomeProvider biomeProvider) {
+        long timeout = ConfigManager.GENERAL.getLong(TIMEOUT_KEY, DEFAULT_TIMEOUT_MS);
+
+        if (world instanceof ServerWorld) {
+            boolean async = ConfigManager.GENERAL.getBool(ASYNC_KEY, DEFAULT_ASYNC);
+            return search(center, radius, settings, async, timeout, new StructureSearch(
+                    center,
+                    skipExisting,
+                    structure, settings,
+                    (ServerWorld) world,
+                    biomeProvider
+            ));
+        } else {
+            // Probably never happens, but in-case it's not a ServerWorld then run in sync mode
+            return search(center, radius, settings, false, timeout, new StructureSearch(
+                    center,
+                    skipExisting,
+                    structure, settings,
+                    world,
+                    biomeProvider
+            ));
+        }
     }
 
-    // TODO: Consider splitting search area into concurrent search regions?
-    public static BlockPos findStructure(TFChunkGenerator generator, IWorld world, StructureManager manager, Structure<?> structure, BlockPos center, int radius, boolean first, StructureSeparationSettings settings, long timeout) {
-        long seed = generator.getSeed();
-        int separation = settings.func_236668_a_();
+    private static BlockPos search(BlockPos center, int radius, StructureSeparationSettings settings, boolean async, long timeoutMS, Search<BlockPos> search) {
         int chunkX = center.getX() >> 4;
         int chunkZ = center.getZ() >> 4;
-
-        SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
-        TFBiomeProvider biomeProvider = generator.getBiomeProvider();
-
-        int searchCount = 0;
-        long searchTimeout = System.currentTimeMillis() + timeout;
-
-        try (Resource<Cell> resource = Cell.pooled()) {
-            Cell cell = resource.get();
-
-            for (int dr = 0; dr <= radius; ++dr) {
-                for (int dx = -dr; dx <= dr; ++dx) {
-                    boolean flag = dx == -dr || dx == dr;
-
-                    for (int dz = -dr; dz <= dr; ++dz) {
-                        boolean flag1 = dz == -dr || dz == dr;
-                        if (flag || flag1) {
-                            int cx = chunkX + separation * dx;
-                            int cz = chunkZ + separation * dz;
-
-                            if (searchCount++ > SEARCH_BATCH_SIZE) {
-                                searchCount = 0;
-                                long now = System.currentTimeMillis();
-                                if (now > searchTimeout) {
-                                    Log.warn("Structure search took too long! {}", structure.getRegistryName());
-                                    return null;
-                                }
-                            }
-
-                            int x = cx << 4;
-                            int z = cz << 4;
-                            Biome biome = biomeProvider.lookupBiome(cell, x, z, false);
-                            if (!biome.getGenerationSettings().hasStructure(structure)) {
-                                continue;
-                            }
-
-                            ChunkPos chunkpos = structure.getChunkPosForStructure(settings, seed, sharedseedrandom, cx, cz);
-                            IChunk ichunk = world.getChunk(chunkpos.x, chunkpos.z, ChunkStatus.STRUCTURE_STARTS);
-                            StructureStart<?> start = manager.getStructureStart(SectionPos.from(ichunk.getPos(), 0), structure, ichunk);
-                            if (start != null && start.isValid()) {
-                                if (first && start.isRefCountBelowMax()) {
-                                    start.incrementRefCount();
-                                    return start.getPos();
-                                }
-
-                                if (!first) {
-                                    return start.getPos();
-                                }
-                            }
-
-                            if (dr == 0) {
-                                break;
-                            }
-                        }
-                    }
-
-                    if (dr == 0) {
-                        break;
-                    }
-                }
-            }
+        int spacing = settings.func_236668_a_();
+        SearchContext context = new SearchContext(timeoutMS, TimeUnit.MILLISECONDS);
+        if (async) {
+            return QuadSearch.asyncSearch(chunkX, chunkZ, radius, spacing, search, context);
         }
-        return null;
+        return QuadSearch.search(chunkX, chunkZ, radius, spacing, search, context);
     }
 }

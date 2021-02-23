@@ -30,6 +30,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.settings.preset.Preset;
+import com.terraforged.mod.feature.structure.StructureLocator;
 import com.terraforged.mod.profiler.watchdog.Watchdog;
 
 import java.io.IOException;
@@ -41,7 +42,7 @@ import java.util.function.Consumer;
 public class ConfigManager {
 
     private static final String PERF_VERSION = "1.1";
-    private static final String GENERAL_VERSION = "1.0";
+    private static final String GENERAL_VERSION = "1.1";
     private static final Path COMMON_DIR = Paths.get("config", "terraforged").toAbsolutePath();
 
     public static final ConfigRef BIOME_WEIGHTS = new ConfigRef(() -> create("biome_weights", cfg -> set(
@@ -92,8 +93,8 @@ public class ConfigManager {
         set(
                 cfg,
                 Preset.DEFAULT_KEY,
-                "default",
-                "Set the preset to use when creating a new world"
+                Preset.DEFAULT_PRESET,
+                "Set the preset to use when creating a new world."
         );
         set(
                 cfg,
@@ -109,8 +110,21 @@ public class ConfigManager {
         );
         set(
                 cfg,
+                StructureLocator.ASYNC_KEY,
+                StructureLocator.DEFAULT_ASYNC,
+                "Set whether multiple threads should be used to perform structure searches.",
+                "This can greatly increase the speed of finding structures via the /locate command."
+        );
+        set(
+                cfg,
+                StructureLocator.TIMEOUT_KEY,
+                StructureLocator.DEFAULT_TIMEOUT_MS,
+                "Set the number of milliseconds that a structure search can run for before it is aborted."
+        );
+        set(
+                cfg,
                 Watchdog.FEATURE_WARN_KEY,
-                100,
+                Watchdog.DEFAULT_WARN_TIME_MS,
                 "The number of milliseconds a single feature/structure can generate for before a warning",
                 "is printed to the logs. This may help track down mods that are causing world-gen to run slow.",
                 "Set to -1 to disable."
@@ -118,7 +132,7 @@ public class ConfigManager {
         set(
                 cfg,
                 Watchdog.CHUNK_TIMEOUT_KEY,
-                60_000,
+                Watchdog.DEFAULT_TIMEOUT_MS,
                 "The number of milliseconds after which the server will be considered 'deadlocked' (when it",
                 "gets stuck trying to generate a feature/structure). This is usually caused by third-party mods.",
                 "Set to -1 to disable deadlock detection & reporting (the game may freeze indefinitely without it)."

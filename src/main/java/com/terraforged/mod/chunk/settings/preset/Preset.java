@@ -33,6 +33,7 @@ public class Preset implements Comparable<Preset> {
 
     public static final String DEFAULT_NAME = "Default";
     public static final String DEFAULT_KEY = "default_preset";
+    public static final String DEFAULT_PRESET = "default";
 
     private final boolean changed;
     private final boolean internal;

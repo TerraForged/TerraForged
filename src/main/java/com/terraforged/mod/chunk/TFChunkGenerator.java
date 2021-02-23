@@ -157,7 +157,7 @@ public class TFChunkGenerator extends ChunkGenerator {
             return null;
         }
 
-        return StructureLocator.findStructure(this, world, world.func_241112_a_(), structure, pos, radius, flag, settings);
+        return StructureLocator.find(pos, radius, flag, structure, settings, world, getBiomeProvider());
     }
 
     @Override // isStrongholdChunk
