@@ -30,11 +30,13 @@ import com.google.gson.JsonNull;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
 import com.terraforged.mod.featuremanager.FeatureManager;
+import com.terraforged.mod.util.Environment;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -43,7 +45,7 @@ import java.util.stream.Stream;
 public class Codecs {
 
     public static final Marker MARKER = MarkerManager.getMarker("Codecs");
-    private static final String[] FILTERS = {"tag", "Tag"};
+    private static final String[] FILTERS = {"tag"};
 
     public static <V> Codec<V> create(EncoderFunc<V> encoder, DecoderFunc<V> decoder) {
         return Codec.of(encoder, decoder).stable();
@@ -97,6 +99,11 @@ public class Codecs {
         return getResult(encode(codec, value, JsonOps.INSTANCE)).orElse(JsonNull.INSTANCE);
     }
 
+    public static <V> Optional<JsonElement> encodeOpt(Codec<V> codec, V value) {
+        Preconditions.checkNotNull(value);
+        return getResult(encode(codec, value, JsonOps.INSTANCE));
+    }
+
     public static <V, T> T createList(Codec<V> codec, DynamicOps<T> ops, List<V> list) {
         return getResult(codec.listOf().encodeStart(ops, list)).orElseGet(() -> ops.createList(Stream.empty()));
     }
@@ -140,9 +147,12 @@ public class Codecs {
     public static <T> Optional<T> getResult(DataResult<T> result) {
         if (result.error().isPresent()) {
             String message = result.error().get().message();
-            for (String filter : FILTERS) {
-                if (message.contains(filter)) {
-                    return result.result();
+            if (!Environment.isVerbose()) {
+                String search = message.toLowerCase(Locale.ROOT);
+                for (String filter : FILTERS) {
+                    if (search.contains(filter)) {
+                        return result.result();
+                    }
                 }
             }
             FeatureManager.LOG.log(Level.ERROR, MARKER, message);

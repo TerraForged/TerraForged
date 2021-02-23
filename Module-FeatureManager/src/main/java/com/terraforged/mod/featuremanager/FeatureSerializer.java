@@ -25,11 +25,14 @@
 package com.terraforged.mod.featuremanager;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.OptionalDynamic;
+import com.terraforged.mod.featuremanager.util.codec.CodecException;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
-import io.netty.handler.codec.EncoderException;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
@@ -41,11 +44,48 @@ public class FeatureSerializer {
     public static final Marker MARKER = MarkerManager.getMarker("Serializer");
 
     public static JsonElement serialize(ConfiguredFeature<?, ?> feature) {
-        return Codecs.encode(ConfiguredFeature.field_242763_a, feature);
+        Optional<JsonElement> registered = Codecs.encodeOpt(ConfiguredFeature.field_242763_a, feature);
+        if (registered.isPresent()) {
+            return registered.get();
+        }
+
+        Optional<JsonElement> unregistered = serializeUnregistered(feature);
+        if (unregistered.isPresent()) {
+            return unregistered.get();
+        }
+
+        ResourceLocation name = WorldGenRegistries.CONFIGURED_FEATURE.getKey(feature);
+        if (name != null) {
+            return new JsonPrimitive(name.toString());
+        }
+
+        throw CodecException.of("Failed to serialize feature: {}", feature);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static Optional<JsonElement> serializeUnregistered(ConfiguredFeature feature) {
+        try {
+            return Codecs.encodeOpt(feature.feature.getCodec(), feature);
+        } catch (Throwable t) {
+            return Optional.empty();
+        }
     }
 
     public static ConfiguredFeature<?, ?> deserializeUnchecked(JsonElement element) {
-        return Codecs.decode(ConfiguredFeature.field_242763_a, element).orElseThrow(EncoderException::new);
+        final Optional<ConfiguredFeature<?, ?>> feature;
+
+        if (element.isJsonPrimitive()) {
+            String string = element.getAsString();
+            ResourceLocation name = ResourceLocation.tryCreate(string);
+            if (name == null) {
+                throw CodecException.of("Failed to deserialize feature. Invalid registry name: {}", element);
+            }
+            feature = WorldGenRegistries.CONFIGURED_FEATURE.getOptional(name);
+        } else {
+            feature = Codecs.decode(ConfiguredFeature.field_242763_a, element);
+        }
+
+        return feature.orElseThrow(CodecException.get("Failed to deserialize feature Json: {}", element));
     }
 
     public static Optional<ConfiguredFeature<?, ?>> deserialize(JsonElement element) {

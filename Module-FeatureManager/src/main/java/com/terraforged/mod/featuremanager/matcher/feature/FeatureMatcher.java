@@ -82,26 +82,26 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
             JsonObject object = element.getAsJsonObject();
             for (Map.Entry<String, JsonElement> e : object.entrySet()) {
                 if (testObjectEntry(e.getKey(), e.getValue(), search)) {
-                    return true;
+                    return search.isComplete();
                 }
             }
         } else if (element.isJsonArray()) {
             JsonArray array = element.getAsJsonArray();
             for (int i = 0; i < array.size(); i++) {
                 if (testArrayEntry(i, array.get(i), search)) {
-                    return true;
+                    return search.isComplete();
                 }
             }
         } else if (element.isJsonPrimitive()) {
             search.test(element.getAsJsonPrimitive());
             return search.isComplete();
         }
-        return false;
+        return search.isComplete();
     }
 
     protected boolean testObjectEntry(String key, JsonElement element, Search search) {
         if (search.test(key, element)) {
-            return true;
+            return search.isComplete();
         }
         return test(element, search);
     }

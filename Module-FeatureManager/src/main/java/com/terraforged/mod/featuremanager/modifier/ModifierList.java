@@ -54,8 +54,16 @@ public class ModifierList<T> implements Iterable<Modifier<T>> {
         add(BiomeMatcher.ANY, featureMatcher, modifier);
     }
 
+    public void add(String name, FeatureMatcher featureMatcher, T modifier) {
+        add(name, BiomeMatcher.ANY, featureMatcher, modifier);
+    }
+
     public void add(BiomeMatcher biomeMatcher, FeatureMatcher featureMatcher, T modifier) {
-        BiomeFeatureMatcher matcher = new BiomeFeatureMatcher(biomeMatcher, featureMatcher);
+        add("UNNAMED", biomeMatcher, featureMatcher, modifier);
+    }
+
+    public void add(String name, BiomeMatcher biomeMatcher, FeatureMatcher featureMatcher, T modifier) {
+        BiomeFeatureMatcher matcher = new BiomeFeatureMatcher(name, biomeMatcher, featureMatcher);
         add(matcher, modifier);
     }
 

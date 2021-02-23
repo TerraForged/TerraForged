@@ -34,6 +34,8 @@ import com.terraforged.mod.featuremanager.predicate.FeaturePredicate;
 import com.terraforged.mod.featuremanager.transformer.*;
 import com.terraforged.mod.featuremanager.util.FeatureDebugger;
 import com.terraforged.mod.featuremanager.util.identity.FeatureIdentifier;
+import com.terraforged.mod.featuremanager.util.identity.Identifier;
+import com.terraforged.mod.util.Environment;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
@@ -94,24 +96,27 @@ public class FeatureModifiers extends Event {
     public ModifierSet getFeature(GenerationStage.Decoration stage, Biome biome, ConfiguredFeature<?, ?> feature) {
         try {
             JsonElement element = FeatureSerializer.serialize(feature);
+
             ConfiguredFeature<?, ?> result = getFeature(biome, feature, element);
             if (result != feature) {
                 // re-serialize if feature has been changed
                 element = FeatureSerializer.serialize(result);
             }
 
-            FeaturePredicate predicate = getPredicate(biome, element);
+            FeatureIdentifier identity = FeatureIdentifier.getIdentity(feature, element);
+            FeaturePredicate predicate = getPredicate(biome, element, identity);
             List<BiomeFeature> before = getInjectors(biome, predicate, element, InjectionPosition.BEFORE);
             List<BiomeFeature> after = getInjectors(biome, predicate, element, InjectionPosition.AFTER);
 
-            FeatureIdentifier identity = FeatureIdentifier.getIdentity(feature, element);
             return new ModifierSet(new BiomeFeature(predicate, result, identity), before, after);
         } catch (Throwable t) {
             String name = context.biomes.getName(biome);
             List<String> errors = FeatureDebugger.getErrors(feature);
-            FeatureManager.LOG.debug(FeatureSerializer.MARKER, "Unable to serialize feature in biome: {}", name);
+            FeatureIdentifier identity = FeatureIdentifier.getIdentity(feature);
+
+            FeatureManager.LOG.debug(FeatureSerializer.MARKER, "Unable to serialize feature in biome: {}, stage: {}, identity: {}", name, stage, identity);
             if (errors.isEmpty()) {
-                FeatureManager.LOG.debug("Unable to determine issues. See stacktrace:", t);
+                FeatureManager.LOG.debug("Unable to determine issue(s). See stacktrace:", t);
             } else {
                 for (String error : errors) {
                     FeatureManager.LOG.debug(FeatureSerializer.MARKER, " - {}", error);
@@ -122,6 +127,10 @@ public class FeatureModifiers extends Event {
     }
 
     private ConfiguredFeature<?, ?> getFeature(Biome biome, ConfiguredFeature<?, ?> feature, JsonElement element) {
+        if (element.isJsonNull()) {
+            return feature;
+        }
+
         for (Modifier<FeatureReplacer> modifier : replacers) {
             if (modifier.getMatcher().test(biome, element)) {
                 return modifier.getModifier().get();
@@ -143,7 +152,7 @@ public class FeatureModifiers extends Event {
         try {
             return FeatureSerializer.deserializeUnchecked(element);
         } catch (Throwable t) {
-            FeatureManager.LOG.warn(FeatureSerializer.MARKER, "Unable to deserialize biome feature: {}", biome);
+            FeatureManager.LOG.warn(FeatureSerializer.MARKER, "Unable to deserialize in feature json: {}", element);
             t.printStackTrace();
             return feature;
         }
@@ -188,9 +197,14 @@ public class FeatureModifiers extends Event {
         return result;
     }
 
-    private FeaturePredicate getPredicate(Biome biome, JsonElement element) {
+    private FeaturePredicate getPredicate(Biome biome, JsonElement element, Identifier identifier) {
         for (Modifier<FeaturePredicate> modifier : predicates) {
             if (modifier.getMatcher().test(biome, element)) {
+                if (Environment.isVerbose()) {
+                    String name = modifier.getMatcher().getName();
+                    String identity = identifier.getComponents();
+                    FeatureManager.LOG.debug("Adding feature predicate: Name: {}, Type: {}, Biome: {}, Feature: {}", name, modifier.getModifier(), biome.getRegistryName(), identity);
+                }
                 return modifier.getModifier();
             }
         }

@@ -41,4 +41,9 @@ public class Direct implements FeaturePredicate {
     public boolean test(IChunk chunk, Biome biome) {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

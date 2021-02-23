@@ -30,7 +30,7 @@ import com.terraforged.mod.Log;
 public class Environment {
 
     private static final boolean dev = System.getProperty("dev") != null;
-    private static final boolean verbose = System.getProperty("notVerbose") == null;
+    private static final boolean verbose = System.getProperty("verbose") != null;
     private static final boolean vanillaBiomes = System.getProperty("vanillaBiomes") != null;
 
     public static boolean isDev() {

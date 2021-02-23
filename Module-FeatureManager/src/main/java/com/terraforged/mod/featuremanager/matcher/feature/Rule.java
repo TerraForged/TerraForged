@@ -67,6 +67,7 @@ public class Rule {
     public String toString() {
         return "Rule{" +
                 "values=" + primitives +
+                ", mappings=" + mappings +
                 '}';
     }
 

@@ -87,9 +87,14 @@ public class FeatureIdentifier implements Identifier {
     }
 
     public static FeatureIdentifier getIdentity(ConfiguredFeature<?, ?> feature) {
+        ResourceLocation name = WorldGenRegistries.CONFIGURED_FEATURE.getKey(feature);
+        if (name != null) {
+            return new FeatureIdentifier(Collections.singletonList(name.toString()));
+        }
+
         try {
             JsonElement jsonElement = FeatureSerializer.serialize(feature);
-            return getIdentity(feature, jsonElement);
+            return getIdentity(jsonElement);
         } catch (Throwable t) {
             return FeatureIdentifier.NONE;
         }
@@ -100,6 +105,14 @@ public class FeatureIdentifier implements Identifier {
         if (name != null) {
             return new FeatureIdentifier(Collections.singletonList(name.toString()));
         }
+        return getIdentity(jsonElement);
+    }
+
+    private static FeatureIdentifier getIdentity(JsonElement jsonElement) {
+        if (jsonElement.isJsonNull()) {
+            return FeatureIdentifier.NONE;
+        }
+
         try {
             List<String> list = new ArrayList<>(4);
             collectIdentifiers(jsonElement, list);

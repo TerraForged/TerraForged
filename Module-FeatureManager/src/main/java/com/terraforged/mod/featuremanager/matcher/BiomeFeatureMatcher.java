@@ -37,12 +37,18 @@ import java.util.function.BiPredicate;
 
 public class BiomeFeatureMatcher implements BiPredicate<Biome, JsonElement>, Comparable<BiomeFeatureMatcher>, Jsonifiable {
 
-    public static final BiomeFeatureMatcher ANY = new BiomeFeatureMatcher(BiomeMatcher.ANY, FeatureMatcher.ANY);
+    public static final BiomeFeatureMatcher ANY = new BiomeFeatureMatcher("ANY", BiomeMatcher.ANY, FeatureMatcher.ANY);
 
+    private final String name;
     private final BiomeMatcher biomeMatcher;
     private final FeatureMatcher featureMatcher;
 
     public BiomeFeatureMatcher(BiomeMatcher biomeMatcher, FeatureMatcher featureMatcher) {
+        this("unknown", biomeMatcher, featureMatcher);
+    }
+
+    public BiomeFeatureMatcher(String name, BiomeMatcher biomeMatcher, FeatureMatcher featureMatcher) {
+        this.name = name;
         this.biomeMatcher = biomeMatcher;
         this.featureMatcher = featureMatcher;
     }
@@ -50,6 +56,10 @@ public class BiomeFeatureMatcher implements BiPredicate<Biome, JsonElement>, Com
     @Override
     public boolean test(Biome biome, JsonElement feature) {
         return getBiomeMatcher().test(biome) && getFeatureMatcher().test(feature);
+    }
+
+    public String getName() {
+        return name;
     }
 
     public BiomeMatcher getBiomeMatcher() {

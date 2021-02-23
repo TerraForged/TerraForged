@@ -89,35 +89,36 @@ public class SetupFactory {
 
         if (context.terraSettings.miscellaneous.strataDecorator) {
             // block stone blobs if strata enabled
-            modifiers.getPredicates().add(Matchers.stoneBlobs(), FeaturePredicate.DENY);
+            modifiers.getPredicates().add("STONE_BLOBS", Matchers.stoneBlobs(), FeaturePredicate.DENY);
         }
 
         if (testInv("Vanilla lakes", !context.terraSettings.miscellaneous.vanillaLakes)) {
             // block lakes if not enabled
-            modifiers.getPredicates().add(FeatureMatcher.and(Feature.LAKE, Blocks.WATER), FeaturePredicate.DENY);
+            modifiers.getPredicates().add("LAKES", FeatureMatcher.and(Feature.LAKE, Blocks.WATER), FeaturePredicate.DENY);
         }
 
         if (testInv("Vanilla lava lakes", !context.terraSettings.miscellaneous.vanillaLavaLakes)) {
             // block lava-lakes if not enabled
-            modifiers.getPredicates().add(FeatureMatcher.and(Feature.LAKE, Blocks.LAVA), FeaturePredicate.DENY);
+            modifiers.getPredicates().add("LAVA_LAKES", FeatureMatcher.and(Feature.LAKE, Blocks.LAVA), FeaturePredicate.DENY);
         }
 
         if (testInv("Vanilla water springs", !context.terraSettings.miscellaneous.vanillaSprings)) {
             // block springs if not enabled
-            modifiers.getPredicates().add(FeatureMatcher.and(Feature.SPRING_FEATURE, Blocks.WATER), FeaturePredicate.DENY);
+            modifiers.getPredicates().add("WATER_SPRINGS", FeatureMatcher.and(Feature.SPRING_FEATURE, Blocks.WATER), FeaturePredicate.DENY);
         }
 
         if (testInv("Vanilla lava springs", !context.terraSettings.miscellaneous.vanillaLavaSprings)) {
             // block springs if not enabled
-            modifiers.getPredicates().add(FeatureMatcher.and(Feature.SPRING_FEATURE, Blocks.LAVA), FeaturePredicate.DENY);
+            modifiers.getPredicates().add("LAVA_SPRINGS", FeatureMatcher.and(Feature.SPRING_FEATURE, Blocks.LAVA), FeaturePredicate.DENY);
         }
 
         if (test("Custom features", context.terraSettings.miscellaneous.customBiomeFeatures)) {
             // remove default trees from river biomes since forests can go up to the edge of rivers
-            modifiers.getPredicates().add(BiomeMatcher.of(context.biomeContext, Biome.Category.RIVER), Matchers.tree(), FeaturePredicate.DENY);
+            modifiers.getPredicates().add("RIVER_TREE", BiomeMatcher.of(context.biomeContext, Biome.Category.RIVER), Matchers.tree(), FeaturePredicate.DENY);
 
             // places snow layers below and on top of trees
             modifiers.getTransformers().add(
+                    "SNOW_LAYERS",
                     BiomeMatcher.ANY,
                     FeatureMatcher.of(Feature.FREEZE_TOP_LAYER),
                     FeatureTransformer.replace(Feature.FREEZE_TOP_LAYER, FreezeLayer.INSTANCE)
@@ -125,13 +126,14 @@ public class SetupFactory {
 
             // reduce dead bushes in deserts/badlands
             modifiers.getTransformers().add(
+                    "DESERT_DEAD_BUSHES",
                     BiomeMatcher.of(context.biomeContext, Biome.Category.MESA, Biome.Category.DESERT),
                     Matchers.deadBush(),
                     FeatureTransformer.builder().key("tries", 1).build()
             );
         }
         // prevent trees growing at high elevation on volcanoes
-        modifiers.getPredicates().add(Matchers.allTrees(), new VolcanoPredicate(generator));
+        modifiers.getPredicates().add("VOLCANO_TREELINE", Matchers.allTrees(), new VolcanoPredicate(generator));
 
         return FeatureManager.create(SetupHooks.setup(modifiers, context));
     }

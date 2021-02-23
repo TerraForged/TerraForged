@@ -31,8 +31,8 @@ import java.util.function.BiPredicate;
 
 public interface FeaturePredicate extends BiPredicate<IChunk, Biome> {
 
-    FeaturePredicate ALLOW = new Direct("allow", true);
-    FeaturePredicate DENY = new Direct("deny", false);
+    FeaturePredicate ALLOW = new Direct("ALLOW", true);
+    FeaturePredicate DENY = new Direct("DENY", false);
 
     @Override
     boolean test(IChunk chunk, Biome biome);
