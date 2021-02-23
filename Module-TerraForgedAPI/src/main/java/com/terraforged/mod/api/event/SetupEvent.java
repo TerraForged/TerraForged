@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 TerraForged
+ * Copyright (c) 2021 TerraForged
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,14 @@
 
 package com.terraforged.mod.api.event;
 
+import com.terraforged.engine.world.GeneratorContext;
 import com.terraforged.engine.world.biome.modifier.ModifierManager;
+import com.terraforged.engine.world.terrain.provider.TerrainProvider;
 import com.terraforged.mod.api.biome.surface.SurfaceManager;
 import com.terraforged.mod.api.chunk.column.DecoratorManager;
 import com.terraforged.mod.api.material.geology.GeologyManager;
 import com.terraforged.mod.api.material.layer.LayerManager;
 import com.terraforged.mod.featuremanager.modifier.FeatureModifiers;
-import com.terraforged.engine.world.GeneratorContext;
-import com.terraforged.engine.world.terrain.provider.TerrainProvider;
 import net.minecraftforge.eventbus.api.Event;
 
 public abstract class SetupEvent<T> extends Event {

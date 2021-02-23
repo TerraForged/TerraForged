@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 TerraForged
+ * Copyright (c) 2021 TerraForged
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,6 @@ import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import com.terraforged.mod.util.DataUtils;
 import com.terraforged.mod.util.nbt.DynamicReader;
 import com.terraforged.mod.util.nbt.DynamicWriter;
-import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 
 import java.io.*;
 

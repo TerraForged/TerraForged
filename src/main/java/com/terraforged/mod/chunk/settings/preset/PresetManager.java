@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 TerraForged
+ * Copyright (c) 2021 TerraForged
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,6 @@ import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.util.DataUtils;
 import com.terraforged.mod.util.function.IOFunction;
 import com.terraforged.mod.util.function.IOSupplier;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.ModList;
 
 import javax.annotation.Nullable;
