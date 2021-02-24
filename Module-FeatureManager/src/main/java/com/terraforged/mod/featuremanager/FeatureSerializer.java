@@ -25,6 +25,7 @@
 package com.terraforged.mod.featuremanager;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
@@ -59,7 +60,7 @@ public class FeatureSerializer {
             return new JsonPrimitive(name.toString());
         }
 
-        throw CodecException.of("Failed to serialize feature: {}", feature);
+        return JsonNull.INSTANCE;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

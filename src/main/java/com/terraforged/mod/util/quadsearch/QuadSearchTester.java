@@ -35,8 +35,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class QuadSearchTester {
 
     public static void main(String[] args) {
-        final int step = 16;
-        final int size = 512;
+        final int step = 8;
+        final int size = 256;
         final int half = size >> 1;
 
         Search<int[]> search = find(size, step);
@@ -47,6 +47,8 @@ public class QuadSearchTester {
             System.out.println("no result");
             grid = search.result();
         }
+
+        printColors(grid);
 
         BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
         for (int z = 0; z < size; z++) {

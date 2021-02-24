@@ -56,6 +56,11 @@ public class VolcanoPredicate implements FeaturePredicate {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "VOLCANO";
+    }
+
     private boolean testHeight(ChunkReader chunk, Cell cell) {
         int x = chunk.getBlockX() + 8;
         int z = chunk.getBlockZ() + 8;
