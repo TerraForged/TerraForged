@@ -104,7 +104,7 @@ public class QuadSearchTester {
 
                 if (testX == findX && testZ == findZ) {
                     set(x, z, grid, size, step, 0xFFFFFF);
-                    return false;
+                    return true;
                 } else {
                     int color = Thread.currentThread().hashCode() & 0xFFFFFF;
                     set(x, z, grid, size, step, color);

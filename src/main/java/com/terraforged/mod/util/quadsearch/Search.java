@@ -34,6 +34,10 @@ public interface Search<T> extends Comparator<T>, SafeCloseable {
 
     boolean test(int x, int z);
 
+    default Throwable error() {
+        return null;
+    }
+
     @Override
     default void close() {
 

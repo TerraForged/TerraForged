@@ -102,12 +102,18 @@ public class QuadSearch {
                     // Search each quad segment of the ring
                     T result = searchQuads(x, z, r, radius, stepSize, worker, workers, task1, task2, search, context);
 
-                    // The lower r is the closer the position is to x,z so exit early on first nonnull result
                     if (result != null) {
                         // Let other threads know which ring we completed on so they can exit early if they've
                         // already searched past it.
                         context.submit(radius);
                         return result;
+                    }
+
+                    Throwable error = search.error();
+                    if (error != null) {
+                        // Tell other threads to stop since we're completing exceptionally
+                        context.submit(Integer.MIN_VALUE);
+                        return null;
                     }
                 }
             }
@@ -163,18 +169,22 @@ public class QuadSearch {
     }
 
     private static boolean isCurrentThreadsTask(int taskId, int workerId, int workerCount) {
-        return taskId != -1 && workerCount > 1 && (taskId % workerCount) == workerId;
+        return taskId != -1 && (workerCount <= 1 || (taskId % workerCount) == workerId);
     }
 
-    private static <T> T waitOnResults(ForkJoinTask<T>[] tasks, Comparator<T> comparator, SearchContext context) {
+    private static <T> T waitOnResults(ForkJoinTask<T>[] tasks, Search<T> search, SearchContext context) {
         T result = null;
 
         while (context.hasTasks() && !context.hasTimedOut()) {
             for (ForkJoinTask<T> task : tasks) {
                 if (task.isDone()) {
-                    result = getFirstResult(result, task.join(), comparator);
+                    result = getFirstResult(result, task.join(), search);
                 }
             }
+        }
+
+        if (search.error() != null) {
+            return null;
         }
 
         return result;

@@ -39,12 +39,20 @@ public class SearchContext implements SafeCloseable {
     private final AtomicInteger status = new AtomicInteger(Integer.MAX_VALUE);
 
     public SearchContext() {
-        this(Long.MAX_VALUE, TimeUnit.DAYS);
+        this(Long.MAX_VALUE);
+    }
+
+    private SearchContext(long timeoutNS) {
+        this.timeoutNS = timeoutNS;
     }
 
     public SearchContext(long timeout, TimeUnit unit) {
         long nanos = System.nanoTime() + unit.toNanos(timeout);
         timeoutNS = nanos < 0 ? Long.MAX_VALUE : nanos;
+    }
+
+    public SearchContext newWithTimeout() {
+        return new SearchContext(timeoutNS);
     }
 
     public boolean hasTimedOut() {

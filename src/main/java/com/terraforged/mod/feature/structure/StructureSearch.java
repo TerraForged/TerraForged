@@ -26,6 +26,7 @@ package com.terraforged.mod.feature.structure;
 
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
+import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.generator.StructureGenerator;
 import com.terraforged.mod.util.quadsearch.Search;
 import net.minecraft.util.SharedSeedRandom;
@@ -43,7 +44,7 @@ import net.minecraft.world.gen.feature.template.TemplateManager;
 import net.minecraft.world.gen.settings.StructureSeparationSettings;
 import net.minecraft.world.server.ServerWorld;
 
-import javax.annotation.Nullable;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class StructureSearch implements Search<BlockPos> {
@@ -55,16 +56,16 @@ public class StructureSearch implements Search<BlockPos> {
     private final Structure<?> structure;
     private final StructureSeparationSettings settings;
     private final TFBiomeProvider biomeProvider;
-
     private final ThreadLocal<ThreadResource> resource;
+    private final AtomicReference<Throwable> errors = new AtomicReference<>();
 
     public StructureSearch(BlockPos center,
                            boolean skipExisting,
                            Structure<?> structure,
                            StructureSeparationSettings settings,
                            ServerWorld world,
-                           TFBiomeProvider biomeProvider) {
-        this(center, skipExisting, structure, settings, biomeProvider, () -> new FastThreadResource(world));
+                           TFChunkGenerator generator) {
+        this(center, skipExisting, structure, settings, generator.getBiomeProvider(), () -> new FastThreadResource(world, generator));
     }
 
     public StructureSearch(BlockPos center,
@@ -72,8 +73,8 @@ public class StructureSearch implements Search<BlockPos> {
                            Structure<?> structure,
                            StructureSeparationSettings settings,
                            IWorld world,
-                           TFBiomeProvider biomeProvider) {
-        this(center, skipExisting, structure, settings, biomeProvider, () -> new ThreadResource(world));
+                           TFChunkGenerator generator) {
+        this(center, skipExisting, structure, settings, generator.getBiomeProvider(), () -> new ThreadResource(world));
     }
 
     public StructureSearch(BlockPos center,
@@ -91,10 +92,19 @@ public class StructureSearch implements Search<BlockPos> {
         this.resource = ThreadLocal.withInitial(resourceSupplier);
     }
 
-    @Nullable
+    public StructureSearch reset() {
+        errors.set(null);
+        return this;
+    }
+
     @Override
     public final BlockPos result() {
         return resource.get().drainResult();
+    }
+
+    @Override
+    public Throwable error() {
+        return errors.get();
     }
 
     @Override
@@ -106,29 +116,35 @@ public class StructureSearch implements Search<BlockPos> {
     public final boolean test(int chunkX, int chunkZ) {
         final ThreadResource resource = this.resource.get();
 
-        ChunkPos pos = structure.getChunkPosForStructure(settings, seed, resource.random, chunkX, chunkZ);
+        try {
+            ChunkPos pos = structure.getChunkPosForStructure(settings, seed, resource.random, chunkX, chunkZ);
 
-        int biomeX = StructureGenerator.chunkToBiomeChunkCenter(pos.x);
-        int biomeZ = StructureGenerator.chunkToBiomeChunkCenter(pos.z);
-        Biome biome = biomeProvider.getNoiseBiome(resource.cell.reset(), biomeX, biomeZ);
+            int biomeX = StructureGenerator.chunkToBiomeChunkCenter(pos.x);
+            int biomeZ = StructureGenerator.chunkToBiomeChunkCenter(pos.z);
+            Biome biome = biomeProvider.getNoiseBiome(resource.cell.reset(), biomeX, biomeZ);
 
-        if (!biome.getGenerationSettings().hasStructure(structure)) {
-            return false;
-        }
-
-        IChunk chunk = resource.getChunk(pos);
-        StructureStart<?> start = chunk.getStructureStarts().get(structure);
-        if (start != null && start.isValid()) {
-            if (skipExisting && start.isRefCountBelowMax()) {
-                start.incrementRefCount();
-                resource.setResult(start.getPos());
-                return true;
+            if (!biome.getGenerationSettings().hasStructure(structure)) {
+                return false;
             }
 
-            if (!skipExisting) {
-                resource.setResult(start.getPos());
-                return true;
+            IChunk chunk = resource.getChunk(pos);
+            StructureStart<?> start = chunk.getStructureStarts().get(structure);
+            if (start != null && start.isValid()) {
+                if (skipExisting && start.isRefCountBelowMax()) {
+                    start.incrementRefCount();
+                    resource.setResult(start.getPos());
+                    return true;
+                }
+
+                if (!skipExisting) {
+                    resource.setResult(start.getPos());
+                    return true;
+                }
             }
+        } catch (Throwable t) {
+            errors.set(t);
+            resource.setResult(null);
+            return true;
         }
 
         return false;
@@ -169,21 +185,22 @@ public class StructureSearch implements Search<BlockPos> {
     private static class FastThreadResource extends ThreadResource {
 
         private final ServerWorld world;
+        private final TFChunkGenerator generator;
         private final StructureSearchChunk searchChunk = new StructureSearchChunk();
 
-        private FastThreadResource(ServerWorld world) {
+        private FastThreadResource(ServerWorld world, TFChunkGenerator generator) {
             super(world);
             this.world = world;
+            this.generator = generator;
         }
 
         @Override
         protected IChunk getChunk(ChunkPos pos) {
-            long seed = world.getSeed();
             DynamicRegistries registries = world.func_241828_r();
             StructureManager manager = world.func_241112_a_();
             TemplateManager templates = world.getStructureTemplateManager();
             StructureSearchChunk chunk = searchChunk.init(pos);
-            world.getChunkProvider().getChunkGenerator().func_242707_a(registries, manager, chunk, templates, seed);
+            generator.getStructureGenerator().generateStructureStarts(chunk, registries, manager, templates);
             return chunk;
         }
     }

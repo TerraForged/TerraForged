@@ -98,28 +98,29 @@ public class WorldGenBiomes extends DataGen {
     public static void genBiomeWeights(File dataDir, TFBiomeContext context) {
         if (dataDir.exists() || dataDir.mkdirs()) {
             BiomeWeights weights = new BiomeWeights(context);
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_weights.txt")))) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_weights.conf")))) {
                 writer.write("# REGISTERED BIOME WEIGHTS\n");
-                weights.forEachEntry((name, weight) -> {
-                    try {
-                        writer.write(name + "=" + weight + "\n");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+                weights.forEachEntry((name, weight) -> write(name, weight, writer));
 
                 writer.write("\n");
                 writer.write("# UNREGISTERED BIOME WEIGHTS\n");
-                weights.forEachUnregistered((name, weight) -> {
-                    try {
-                        writer.write(name + "=" + weight + "\n");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+                weights.forEachUnregistered((name, weight) -> write(name, weight, writer));
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private static void write(String name, int weight, Writer writer) {
+        try {
+            writer.write('"');
+            writer.write(name);
+            writer.write('"');
+            writer.write(" = ");
+            writer.write(weight);
+            writer.write('\n');
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
