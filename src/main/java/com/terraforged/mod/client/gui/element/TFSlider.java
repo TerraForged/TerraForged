@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.client.gui.element;
 
+import com.terraforged.engine.serialization.serializer.Serializer;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.StringTextComponent;
@@ -78,13 +79,13 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
     protected abstract void onChange(Slider slider, CompoundNBT value);
 
     private static float min(String name, CompoundNBT value) {
-        CompoundNBT meta = value.getCompound("#" + name);
-        return meta.getFloat("min");
+        CompoundNBT meta = value.getCompound(Serializer.META_PREFIX + name);
+        return meta.getFloat(Serializer.BOUND_MIN);
     }
 
     private static float max(String name, CompoundNBT value) {
-        CompoundNBT meta = value.getCompound("#" + name);
-        return meta.getFloat("max");
+        CompoundNBT meta = value.getCompound(Serializer.META_PREFIX + name);
+        return meta.getFloat(Serializer.BOUND_MAX);
     }
 
     public static class Int extends TFSlider {
@@ -127,11 +128,11 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
 
         public BoundSlider(String name, CompoundNBT value, float defaultPad, boolean decimal) {
             super(name, value, decimal);
-            CompoundNBT meta = value.getCompound("#" + name);
-            float pad = meta.getFloat("pad");
+            CompoundNBT meta = value.getCompound(Serializer.META_PREFIX + name);
+            float pad = meta.getFloat(Serializer.LINK_PAD);
             this.pad = pad < 0 ? defaultPad : pad;
-            this.lower = meta.getString("limit_lower");
-            this.upper = meta.getString("limit_upper");
+            this.lower = meta.getString(Serializer.LINK_LOWER);
+            this.upper = meta.getString(Serializer.LINK_UPPER);
         }
 
         protected float getLower(CompoundNBT value) {

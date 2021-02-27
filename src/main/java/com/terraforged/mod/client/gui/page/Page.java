@@ -25,6 +25,7 @@
 package com.terraforged.mod.client.gui.page;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.terraforged.engine.serialization.serializer.Serializer;
 import com.terraforged.mod.client.gui.element.*;
 import com.terraforged.mod.client.gui.screen.ScrollPane;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayRenderer;
@@ -221,14 +222,15 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
     }
 
     private static boolean hasOptions(String name, CompoundNBT value) {
-        return value.getCompound("#" + name).contains("options");
+        return value.getCompound(Serializer.META_PREFIX + name).contains(Serializer.OPTIONS);
     }
 
     private static boolean hasLimit(String name, CompoundNBT value) {
-        return value.getCompound("#" + name).contains("limit_lower") || value.getCompound("#" + name).contains("limit_upper");
+        String key = Serializer.META_PREFIX + name;
+        return value.getCompound(key).contains(Serializer.LINK_LOWER) || value.getCompound(key).contains(Serializer.LINK_UPPER);
     }
 
     private static boolean isRand(String name, CompoundNBT value) {
-        return value.getCompound("#" + name).contains("random");
+        return value.getCompound(Serializer.META_PREFIX + name).contains(Serializer.RANDOM);
     }
 }

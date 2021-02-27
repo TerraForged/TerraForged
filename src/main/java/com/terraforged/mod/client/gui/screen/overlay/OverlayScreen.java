@@ -45,8 +45,8 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
         super.minecraft = Minecraft.getInstance();
         super.font = minecraft.fontRenderer;
         this.config = ConfigManager.GENERAL.get();
-        PreviewSettings.showTooltips = config.getOrElse("tooltips", true);
-        PreviewSettings.showCoords = config.getOrElse("coords", false);
+        PreviewSettings.showTooltips = config.getOrElse(GuiKeys.TOOLTIPS_KEY, true);
+        PreviewSettings.showCoords = config.getOrElse(GuiKeys.COORDS_KEY, false);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
             public void onClick(double mouseX, double mouseY) {
                 super.onClick(mouseX, mouseY);
                 PreviewSettings.showTooltips = isChecked();
-                config.set("tooltips", PreviewSettings.showTooltips);
+                config.set(GuiKeys.TOOLTIPS_KEY, PreviewSettings.showTooltips);
                 config.save();
             }
 
@@ -101,7 +101,7 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
             public void onClick(double mouseX, double mouseY) {
                 super.onClick(mouseX, mouseY);
                 PreviewSettings.showCoords = isChecked();
-                config.set("coords", PreviewSettings.showCoords);
+                config.set(GuiKeys.COORDS_KEY, PreviewSettings.showCoords);
                 config.save();
             }
 

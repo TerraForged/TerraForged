@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.client.gui.element;
 
+import com.terraforged.engine.serialization.serializer.Serializer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.ByteNBT;
 import net.minecraft.nbt.CompoundNBT;
@@ -55,9 +56,9 @@ public class TFToggle extends TFButton {
         this.tooltip = Element.getToolTip(name, value);
 
         INBT selected = value.get(name);
-        CompoundNBT meta = value.getCompound("#" + name);
-        this.noname = meta.contains("noname");
-        this.options = (ListNBT) meta.get("options");
+        CompoundNBT meta = value.getCompound(Serializer.META_PREFIX + name);
+        this.noname = meta.contains(Serializer.NO_NAME);
+        this.options = (ListNBT) meta.get(Serializer.OPTIONS);
         Objects.requireNonNull(options, "Missing options list");
 
         for (int i = 0; i < options.size(); i++) {

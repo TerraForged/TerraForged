@@ -30,8 +30,9 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.settings.preset.Preset;
-import com.terraforged.mod.feature.structure.StructureLocator;
+import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.profiler.watchdog.Watchdog;
+import com.terraforged.mod.structure.StructureLocator;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -98,14 +99,14 @@ public class ConfigManager {
         );
         set(
                 cfg,
-                "tooltips",
-                true,
+                GuiKeys.TOOLTIPS_KEY,
+                GuiKeys.DEFAULT_TOOLTIPS,
                 "Set whether tooltips should be displayed by default in the config gui."
         );
         set(
                 cfg,
-                "coords",
-                false,
+                GuiKeys.COORDS_KEY,
+                GuiKeys.DEFAULT_COORDS,
                 "Set whether coordinates should be displayed by default in the config gui."
         );
         set(

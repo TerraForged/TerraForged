@@ -22,32 +22,34 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.feature.structure;
+package com.terraforged.mod.structure;
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectListIterator;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.gen.feature.structure.StructurePiece;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.palette.UpgradeData;
+import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.chunk.ChunkStatus;
 
-public class StructureTerrainResource {
+import java.util.Collections;
 
-    public final BlockPos.Mutable mutablePos = new BlockPos.Mutable();
-    public final MutableBoundingBox mutableBounds = new MutableBoundingBox();
-    public final MutableBoundingBox chunkBounds = new MutableBoundingBox();
-    public final ObjectArrayList<StructurePiece> pieces = new ObjectArrayList<>(16);
-    public final ObjectListIterator<StructurePiece> iterator = pieces.iterator();
+public class StructureSearchChunk extends ChunkPrimer {
 
-    public StructureTerrainResource reset() {
-        mutablePos.setPos(BlockPos.ZERO);
-        rewind();
-        pieces.clear();
+    private ChunkPos pos;
+
+    public StructureSearchChunk() {
+        super(new ChunkPos(0, 0), UpgradeData.EMPTY);
+        pos = super.getPos();
+    }
+
+    public StructureSearchChunk init(ChunkPos pos) {
+        this.pos = pos;
+        setStatus(ChunkStatus.EMPTY);
+        setStructureStarts(Collections.emptyMap());
+        setStructureReferences(Collections.emptyMap());
         return this;
     }
 
-    public void rewind() {
-        while (iterator.hasPrevious()) {
-            iterator.previous();
-        }
+    @Override
+    public ChunkPos getPos() {
+        return pos;
     }
 }

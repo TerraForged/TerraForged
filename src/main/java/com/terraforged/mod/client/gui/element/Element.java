@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.client.gui.element;
 
+import com.terraforged.engine.serialization.serializer.Serializer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
@@ -82,6 +83,6 @@ public interface Element {
     }
 
     static String getKey(String name, CompoundNBT value) {
-        return value.getCompound("#" + name).getString("key");
+        return value.getCompound(Serializer.META_PREFIX + name).getString(Serializer.KEY);
     }
 }

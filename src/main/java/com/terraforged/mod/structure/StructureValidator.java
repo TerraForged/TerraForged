@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.feature.structure;
+package com.terraforged.mod.structure;
 
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.context.TFBiomeContext;

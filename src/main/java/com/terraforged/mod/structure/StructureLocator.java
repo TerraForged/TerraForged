@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.feature.structure;
+package com.terraforged.mod.structure;
 
 import com.google.common.base.Charsets;
 import com.terraforged.mod.Log;

@@ -38,7 +38,7 @@ import com.terraforged.mod.chunk.column.BaseDecorator;
 import com.terraforged.mod.chunk.column.BaseGeoDecorator;
 import com.terraforged.mod.chunk.column.BedrockDecorator;
 import com.terraforged.mod.chunk.util.FastChunk;
-import com.terraforged.mod.feature.structure.StructureTerrain;
+import com.terraforged.mod.structure.StructureTerrain;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.feature.structure.StructureManager;

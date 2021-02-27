@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.client.gui.element;
 
+import com.terraforged.engine.serialization.serializer.Serializer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.StringTextComponent;
 
@@ -49,8 +50,8 @@ public class TFRandButton extends TFButton {
         this.value = value.getInt(name);
         this.prefix = Element.getDisplayName(name, value) + ": ";
         this.tooltip = Element.getToolTip(name, value);
-        this.min = getLimit(value, name, "limit_lower", Integer.MIN_VALUE);
-        this.max = getLimit(value, name, "limit_upper", Integer.MAX_VALUE);
+        this.min = getLimit(value, name, Serializer.BOUND_MIN, Integer.MIN_VALUE);
+        this.max = getLimit(value, name, Serializer.BOUND_MAX, Integer.MAX_VALUE);
         setMessage(new StringTextComponent(prefix + this.value));
     }
 
@@ -73,17 +74,10 @@ public class TFRandButton extends TFButton {
     }
 
     private static int getLimit(CompoundNBT value, String name, String limitType, int defaultLimit) {
-        CompoundNBT meta = value.getCompound("#" + name);
+        CompoundNBT meta = value.getCompound(Serializer.META_PREFIX + name);
         if (meta.contains(limitType)) {
             return meta.getInt(limitType);
         }
         return defaultLimit;
-    }
-
-    private static int clamp(int value, int min, int max) {
-        if (value < min) {
-            return min;
-        }
-        return Math.min(value, max);
     }
 }

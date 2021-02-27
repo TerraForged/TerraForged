@@ -28,6 +28,11 @@ import com.terraforged.mod.util.TranslationKey;
 
 public class GuiKeys {
 
+    public static final String TOOLTIPS_KEY = "tooltips";
+    public static final String COORDS_KEY = "coords";
+    public static final boolean DEFAULT_COORDS = false;
+    public static final boolean DEFAULT_TOOLTIPS = true;
+
     public static final TranslationKey COORDS = TranslationKey.gui("general.coords", "Coords");
     public static final TranslationKey TOOLTIPS = TranslationKey.gui("general.tooltips", "Tooltips");
     public static final TranslationKey DONE = TranslationKey.gui("general.done", "Done");
