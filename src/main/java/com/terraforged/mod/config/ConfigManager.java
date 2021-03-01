@@ -31,6 +31,7 @@ import com.electronwill.nightconfig.toml.TomlFormat;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.settings.preset.Preset;
 import com.terraforged.mod.client.gui.GuiKeys;
+import com.terraforged.mod.feature.TagConfigFixer;
 import com.terraforged.mod.profiler.watchdog.Watchdog;
 import com.terraforged.mod.structure.StructureLocator;
 
@@ -137,6 +138,14 @@ public class ConfigManager {
                 "The number of milliseconds after which the server will be considered 'deadlocked' (when it",
                 "gets stuck trying to generate a feature/structure). This is usually caused by third-party mods.",
                 "Set to -1 to disable deadlock detection & reporting (the game may freeze indefinitely without it)."
+        );
+        set(
+                cfg,
+                TagConfigFixer.FIX_BLOCK_TAG_KEY,
+                TagConfigFixer.FIX_BLOCK_TAG_DEFAULT,
+                "Fixes a vanilla serialization bug for block tags which TerraForged relies on",
+                "to slightly increase the vanilla ore distribution to suit the taller terrain.",
+                "Disable if this causes issues with other mods."
         );
     }));
 

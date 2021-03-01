@@ -35,7 +35,9 @@ import net.minecraftforge.common.Tags;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class WGTags {
 
@@ -45,6 +47,7 @@ public class WGTags {
     public static final ITag.INamedTag<Block> SEDIMENT = tag("forge:wg_sediment");
     public static final ITag.INamedTag<Block> ERODIBLE = tag("forge:wg_erodible");
     public static final List<ITag.INamedTag<Block>> WG_TAGS = Collections.unmodifiableList(Arrays.asList(STONE, DIRT, CLAY, SEDIMENT, ERODIBLE));
+    public static final Set<ResourceLocation> NAMED_WG_TAGS = WG_TAGS.stream().map(ITag.INamedTag::getName).collect(Collectors.toSet());
 
     public static void init() {
         Log.info("Initializing tags");

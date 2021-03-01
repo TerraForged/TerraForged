@@ -28,6 +28,7 @@ import com.terraforged.engine.Engine;
 import com.terraforged.engine.concurrent.task.LazySupplier;
 import com.terraforged.mod.api.material.WGTags;
 import com.terraforged.mod.config.ConfigManager;
+import com.terraforged.mod.feature.TagConfigFixer;
 import com.terraforged.mod.server.command.TerraCommand;
 import com.terraforged.mod.util.DataUtils;
 import com.terraforged.mod.util.Environment;
@@ -87,6 +88,7 @@ public class TerraForgedMod {
         public static void update(TagsUpdatedEvent event) {
             Log.info("Tags Reloaded");
             WGTags.printTags();
+            TagConfigFixer.reset();
         }
     }
 
