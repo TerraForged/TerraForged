@@ -28,12 +28,17 @@ import com.google.common.collect.ImmutableSet;
 import com.terraforged.engine.concurrent.task.LazySupplier;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.settings.StructureSettings;
+import com.terraforged.noise.util.Vec2i;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.structure.Structure;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
@@ -46,12 +51,18 @@ public class StrongholdGenerator implements Generator.Strongholds {
     private final int count;
     private final int spread;
     private final int distance;
+    private final boolean constrain;
+    private final Vec2i origin;
     private final TFBiomeProvider biomeProvider;
     private final LazySupplier<ChunkPos[]> positions;
     private final LazySupplier<Set<ChunkPos>> lookup;
 
     public StrongholdGenerator(long seed, TFBiomeProvider biomeProvider) {
         this.seed = seed;
+        // TODO: @Breaking: Center strongholds on the origin of the continent when set to continent center.
+        //  This requires the origin to be stored on the GeneratorContext since the world spawn can changed
+        //  after world creation.
+        this.origin = new Vec2i(0, 0);
         this.biomeProvider = biomeProvider;
         this.positions = LazySupplier.of(this::generate);
         this.lookup = positions.then(ImmutableSet::copyOf);
@@ -59,6 +70,7 @@ public class StrongholdGenerator implements Generator.Strongholds {
         this.count = getStrongholdSetting(biomeProvider, s -> s.count);
         this.spread = getStrongholdSetting(biomeProvider, s -> s.spread);
         this.distance = getStrongholdSetting(biomeProvider, s -> s.distance);
+        this.constrain = biomeProvider.getContext().terraSettings.structures.stronghold.constrainToBiomes;
     }
 
     @Override
@@ -96,6 +108,9 @@ public class StrongholdGenerator implements Generator.Strongholds {
 
     private ChunkPos[] generate() {
         if (count > 0 && spread > 0 && distance > 0) {
+            final int originX = origin.x;
+            final int originZ = origin.y;
+
             int count = this.count;
             int spread = this.spread;
             int distance = this.distance;
@@ -104,14 +119,16 @@ public class StrongholdGenerator implements Generator.Strongholds {
 
             int chunkX = 0;
             int chunkZ = 0;
-            final Random random = new Random(salt); // TODO: @Breaking: Combine salt with seed
+
+            // TODO: @Breaking: Combine salt with seed
+            final Random random = new Random(salt);
             double angle = random.nextDouble() * Math.PI * 2.0D;
 
             List<ChunkPos> chunks = new ArrayList<>();
             for(int i = 0; i < count; ++i) {
-                double wtf = (4 * distance + distance * chunkZ * 6) + (random.nextDouble() - 0.5D) * distance * 2.5D;
-                int x = (int) Math.round(Math.cos(angle) * wtf);
-                int z = (int) Math.round(Math.sin(angle) * wtf);
+                double pos = (4 * distance + distance * chunkZ * 6) + (random.nextDouble() - 0.5D) * distance * 2.5D;
+                int x = originX + (int) Math.round(Math.cos(angle) * pos);
+                int z = originZ + (int) Math.round(Math.sin(angle) * pos);
 
                 int chunkCenterX = (x << 4) + 8;
                 int chunkCenterZ = (z << 4) + 8;
@@ -122,7 +139,11 @@ public class StrongholdGenerator implements Generator.Strongholds {
                     z = blockpos.getZ() >> 4;
                 }
 
-                chunks.add(new ChunkPos(x, z));
+                // Record the position if it is a valid stronghold biome or if biome constraining is disabled.
+                if (blockpos != null || !constrain) {
+                    chunks.add(new ChunkPos(x, z));
+                }
+
                 angle += (Math.PI * 2.0D) / spread;
                 ++chunkX;
 

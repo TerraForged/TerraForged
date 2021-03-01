@@ -41,7 +41,15 @@ import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.api.material.layer.LayerManager;
 import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.column.ColumnResource;
-import com.terraforged.mod.chunk.generator.*;
+import com.terraforged.mod.chunk.generator.BaseGenerator;
+import com.terraforged.mod.chunk.generator.BiomeGenerator;
+import com.terraforged.mod.chunk.generator.FeatureGenerator;
+import com.terraforged.mod.chunk.generator.Generator;
+import com.terraforged.mod.chunk.generator.MobGenerator;
+import com.terraforged.mod.chunk.generator.StrongholdGenerator;
+import com.terraforged.mod.chunk.generator.StructureGenerator;
+import com.terraforged.mod.chunk.generator.SurfaceGenerator;
+import com.terraforged.mod.chunk.generator.TerrainCarver;
 import com.terraforged.mod.feature.BlockDataManager;
 import com.terraforged.mod.featuremanager.FeatureManager;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
@@ -68,7 +76,11 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.*;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.DimensionSettings;
+import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.TemplateManager;
@@ -384,7 +396,7 @@ public class TFChunkGenerator extends ChunkGenerator {
                 return terra.getChunkReader(region.getMainChunkX(), region.getMainChunkZ());
             }
         }
-        throw new IllegalStateException("NONONO");
+        throw new IllegalStateException("Attempted to access TerraForged chunk-generation data from a non-TerraForged chunk generator!");
     }
 
     private static <TF extends TFChunkGenerator, T> Dynamic<T> encodeGenerator(TF generator, DynamicOps<T> ops) {

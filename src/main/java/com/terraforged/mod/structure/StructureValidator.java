@@ -36,14 +36,19 @@ import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class StructureValidator {
 
     private static final String REMOVED = "A third-party mod has removed structure [{}] from all overworld biomes so it cannot be generated!";
-    private static final String UNREGISTERED = "Structure [{}] does not have any generation settings registered for it so it cannot be generated!";
+    private static final String UNREGISTERED = "Structure [{}] does not have any SeparationSettings registered for it so we cannot generated it!";
 
     public static void validateConfigs(DimensionSettings dimension, TFBiomeContext context, StructureSettings settings) {
         Log.info("Validating user structure preferences...");

@@ -27,7 +27,14 @@ package com.terraforged.mod.chunk.settings;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
-import com.terraforged.engine.serialization.annotation.*;
+import com.terraforged.engine.serialization.annotation.Comment;
+import com.terraforged.engine.serialization.annotation.Limit;
+import com.terraforged.engine.serialization.annotation.Name;
+import com.terraforged.engine.serialization.annotation.NoName;
+import com.terraforged.engine.serialization.annotation.Rand;
+import com.terraforged.engine.serialization.annotation.Range;
+import com.terraforged.engine.serialization.annotation.Serializable;
+import com.terraforged.engine.serialization.annotation.Sorted;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
@@ -70,7 +77,7 @@ public class StructureSettings {
 
         DataUtils.fromJson(json, defaults);
 
-        // Remove structures that only appear in biomes that we can't generate
+        // Remove structures that appear in biomes that don't generate in overworld
         StructureUtils.retainOverworldStructures(defaults.structures, settings, context);
 
         // Replace default values in the new instance with any contained on this instance
@@ -138,6 +145,14 @@ public class StructureSettings {
         @Rand
         @Comment("A seed offset used to randomise stronghold placement")
         public int salt = 0;
+
+        @Comment({
+                "Set whether strongholds should only start in valid stronghold biomes. The vanilla behaviour",
+                "(false) tries its best to move them to a valid biome but does not prevent generation if there",
+                "are no valid biomes nearby. Setting to true outright blocks strongholds from starting in invalid",
+                "biomes (note: it doesn't prevent them extending from a valid biome to an invalid one)."
+        })
+        public boolean constrainToBiomes = false;
 
         @Comment("Prevent this structure from generating.")
         public boolean disabled = false;

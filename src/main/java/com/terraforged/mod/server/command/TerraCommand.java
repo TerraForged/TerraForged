@@ -61,7 +61,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.util.text.*;
+import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponentUtils;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.biome.Biome;
@@ -74,7 +79,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -307,12 +316,7 @@ public class TerraCommand {
     }
 
     private static TerraContext getContext(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        ChunkGenerator generator = context.getSource().getWorld().getChunkProvider().getChunkGenerator();
-        if (generator instanceof TFChunkGenerator) {
-            TFChunkGenerator gen = (TFChunkGenerator) generator;
-            return gen.getContext();
-        }
-        throw createException("Invalid world type", "This command can only be run in a TerraForged world!");
+        return getTFChunkGenerator(context).getContext();
     }
 
     private static Biome getBiome(CommandContext<CommandSource> context, String name) throws CommandSyntaxException {
@@ -328,6 +332,14 @@ public class TerraCommand {
                 .map(r -> r.getKey(biome))
                 .map(Objects::toString)
                 .orElse("unknown");
+    }
+
+    private static TFChunkGenerator getTFChunkGenerator(CommandContext<CommandSource> context) throws CommandSyntaxException {
+        ChunkGenerator generator = context.getSource().getWorld().getChunkProvider().getChunkGenerator();
+        if (generator instanceof TFChunkGenerator) {
+            return (TFChunkGenerator) generator;
+        }
+        throw createException("Invalid world type", "This command can only be run in a TerraForged world!");
     }
 
     private static ChunkGenerator getChunkGenerator(CommandContext<CommandSource> context) {

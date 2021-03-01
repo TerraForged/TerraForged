@@ -30,18 +30,17 @@ import com.google.gson.JsonElement;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.world.biome.Biome;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 
 public class DataGen {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-
-    public static void dumpData() {
-        dumpData(new TFBiomeContext(DynamicRegistries.func_239770_b_()));
-    }
 
     public static void dumpData(TFBiomeContext context) {
         File dataDir = new File("data").getAbsoluteFile();
@@ -51,6 +50,7 @@ public class DataGen {
         WorldGenBiomes.genBiomeWeights(dataDir, context);
         WorldGenBlocks.genBlockTags(dataDir);
         WorldGenFeatures.genBiomeFeatures(dataDir, biomes, context);
+        WorldGenStructures.genDefaultDimSettings(dataDir);
     }
 
     protected static void write(File file, IOConsumer consumer) {
