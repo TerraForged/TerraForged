@@ -10,7 +10,6 @@
     "common.MixinTagMatchRuleTest"
   ],
   "_disabled": [
-    "benchmark.MixinNoiseChunkGenerator",
-    "benchmark.MixinTagMatchRuleTest"
+    "benchmark.MixinNoiseChunkGenerator"
   ]
 }

@@ -46,9 +46,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(TagMatchRuleTest.class)
 public class MixinTagMatchRuleTest {
 
-    @Mutable
     @Final
     @Shadow
+    @Mutable
     private ITag<Block> tag;
 
     @Inject(method = "<init>", at = @At("RETURN"))
