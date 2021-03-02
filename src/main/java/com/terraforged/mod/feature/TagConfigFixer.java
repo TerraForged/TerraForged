@@ -35,6 +35,7 @@ import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -69,7 +70,10 @@ public class TagConfigFixer {
     }
 
     private static ITag<Block> computeTag(ITag<Block> tag) {
-        List<Block> source = tag.getAllElements();
+        List<Block> source = getElementsSafely(tag);
+        if (source.isEmpty()) {
+            return null;
+        }
 
         // Check for ambiguous tags
         List<ResourceLocation> matches = new ArrayList<>();
@@ -79,7 +83,12 @@ public class TagConfigFixer {
                 continue;
             }
 
-            if (equalsUnordered(source, entry.getValue().getAllElements())) {
+            List<Block> blocks = getElementsSafely(entry.getValue());
+            if (blocks.isEmpty()) {
+                continue;
+            }
+
+            if (equalsUnordered(source, blocks)) {
                 matches.add(entry.getKey());
             }
         }
@@ -90,13 +99,27 @@ public class TagConfigFixer {
         }
 
         for (ITag.INamedTag<Block> named : TARGET_TAGS) {
-            if (equalsUnordered(source, named.getAllElements())) {
+            List<Block> blocks = getElementsSafely(named);
+            if (blocks.isEmpty()) {
+                continue;
+            }
+
+            if (equalsUnordered(source, blocks)) {
                 Log.debug("Matched tag-reference to named-tag. Tag: {}, Blocks: {}", named.getName(), toString(source));
                 return named;
             }
         }
 
         return null;
+    }
+
+    private static List<Block> getElementsSafely(ITag<Block> tag) {
+        try {
+            return tag.getAllElements();
+        } catch (Throwable ignored) {
+            // Thrown if something prompts the get too early
+            return Collections.emptyList();
+        }
     }
 
     private static boolean equalsUnordered(List<Block> source, List<Block> test) {
