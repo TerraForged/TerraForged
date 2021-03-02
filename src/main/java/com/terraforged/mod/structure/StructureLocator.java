@@ -52,10 +52,17 @@ public class StructureLocator {
     public static final boolean DEFAULT_ASYNC = true;
     public static final long DEFAULT_TIMEOUT_MS = 5_000L;
 
+    // @Magic Value:
+    // Testing showed that spacings above 26 are sufficiently fast that they overcome the overhead of searching
+    // asynchronously. It can come down to performance of the biome-gen and structure start code somewhat, but
+    // assuming an average of a couple of ms per check, then the threshold of 26 seems to be the optimal point
+    // at which to switch to/from async searching.
+    private static final int ASYNC_SPACING_THRESHOLD = 26;
+
     private static final String UNSAFE_ERROR = "Async search for structure {} failed! It might not be thread-safe! \nError: {}";
     private static final String FALLBACK_MESSAGE = "Falling back to synchronous search for structure {}";
 
-    // Keep track of structures that are not thread-safe
+    // Used to keep track of structures that are not thread-safe
     private static final Set<Structure<?>> unsafeStructures = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     public static BlockPos find(BlockPos center, int radius, boolean skipExisting, Structure<?> structure, StructureSeparationSettings settings, IWorld world, TFChunkGenerator generator) {
@@ -88,7 +95,7 @@ public class StructureLocator {
         int spacing = settings.func_236668_a_();
         SearchContext context = new SearchContext(timeoutMS, TimeUnit.MILLISECONDS);
 
-        if (async && !unsafeStructures.contains(structure)) {
+        if (async && spacing <= ASYNC_SPACING_THRESHOLD && !unsafeStructures.contains(structure)) {
             BlockPos result = QuadSearch.asyncSearch(chunkX, chunkZ, radius, spacing, search, context);
             if (result != null) {
                 return result;

@@ -74,6 +74,7 @@ public class StructureGenerator implements Generator.Structures {
         int biomeZ = chunkToBiomeChunkCenter(pos.z);
         Biome biome = generator.getBiomeProvider().getNoiseBiome(biomeX, 0, biomeZ);
         generate(chunk, pos, biome, StructureFeatures.STRONGHOLD, registries, structures, templates, seed);
+
         for (Supplier<StructureFeature<?, ?>> supplier : biome.getGenerationSettings().getStructures()) {
             this.generate(chunk, pos, biome, supplier.get(), registries, structures, templates, seed);
         }
@@ -82,6 +83,7 @@ public class StructureGenerator implements Generator.Structures {
     private void generate(IChunk chunk, ChunkPos pos, Biome biome, StructureFeature<?, ?> structure, DynamicRegistries registries, StructureManager structures, TemplateManager templates, long seed) {
         StructureStart<?> start = structures.getStructureStart(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, chunk);
         int i = start != null ? start.getRefCount() : 0;
+
         StructureSeparationSettings settings = getSeparationSettings(structure.field_236268_b_);
         if (settings != null) {
             StructureStart<?> start1 = structure.func_242771_a(registries, generator, generator.getBiomeProvider(), templates, seed, pos, biome, i, settings);
