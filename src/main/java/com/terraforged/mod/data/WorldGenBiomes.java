@@ -37,7 +37,12 @@ import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.stream.IntStream;
 
 public class WorldGenBiomes extends DataGen {
@@ -98,12 +103,11 @@ public class WorldGenBiomes extends DataGen {
     public static void genBiomeWeights(File dataDir, TFBiomeContext context) {
         if (dataDir.exists() || dataDir.mkdirs()) {
             BiomeWeights weights = new BiomeWeights(context);
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dataDir, "biome_weights.conf")))) {
-                writer.write("# REGISTERED BIOME WEIGHTS\n");
+            try (PrintWriter writer = newPrinter(dataDir, "biome_weights.conf")) {
+                writer.println("# REGISTERED BIOME WEIGHTS");
                 weights.forEachEntry((name, weight) -> write(name, weight, writer));
 
-                writer.write("\n");
-                writer.write("# UNREGISTERED BIOME WEIGHTS\n");
+                writer.println("# UNREGISTERED BIOME WEIGHTS");
                 weights.forEachUnregistered((name, weight) -> write(name, weight, writer));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -111,16 +115,15 @@ public class WorldGenBiomes extends DataGen {
         }
     }
 
-    private static void write(String name, int weight, Writer writer) {
-        try {
-            writer.write('"');
-            writer.write(name);
-            writer.write('"');
-            writer.write(" = ");
-            writer.write(weight);
-            writer.write('\n');
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private static PrintWriter newPrinter(File dir, String filename) throws IOException {
+        return new PrintWriter(new BufferedWriter(new FileWriter(new File(dir, filename))));
+    }
+
+    private static void write(String name, int weight, PrintWriter writer) {
+        writer.print('"');
+        writer.print(name);
+        writer.print('"');
+        writer.print(" = ");
+        writer.println(weight);
     }
 }
