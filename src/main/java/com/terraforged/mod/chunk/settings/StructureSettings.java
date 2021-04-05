@@ -72,7 +72,7 @@ public class StructureSettings {
         // Copy valid structure configs to a new instance
         StructureSettings defaults = new StructureSettings();
 
-        JsonElement json = Codecs.encodeAndGet(DimensionStructuresSettings.field_236190_a_, settings, JsonOps.INSTANCE);
+        JsonElement json = Codecs.encodeAndGet(DimensionStructuresSettings.CODEC, settings, JsonOps.INSTANCE);
         json = StructureUtils.addMissingStructures(json.getAsJsonObject());
 
         DataUtils.fromJson(json, defaults);
@@ -90,11 +90,11 @@ public class StructureSettings {
     public DimensionStructuresSettings validateAndApply(TerraContext context, Supplier<DimensionSettings> settings) {
         DimensionSettings dimensionSettings = settings.get();
         StructureValidator.validateConfigs(dimensionSettings, context.biomeContext, this);
-        return apply(dimensionSettings.getStructures());
+        return apply(dimensionSettings.structureSettings());
     }
 
     public DimensionStructuresSettings apply(DimensionStructuresSettings original) {
-        return Codecs.modify(original, DimensionStructuresSettings.field_236190_a_, root -> {
+        return Codecs.modify(original, DimensionStructuresSettings.CODEC, root -> {
             root = StructureUtils.addMissingStructures(root.getAsJsonObject());
 
             if (isDefault()) {

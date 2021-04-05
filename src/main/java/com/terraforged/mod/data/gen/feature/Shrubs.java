@@ -39,7 +39,13 @@ import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.blockplacer.DoublePlantBlockPlacer;
 import net.minecraft.world.gen.blockplacer.SimpleBlockPlacer;
 import net.minecraft.world.gen.blockstateprovider.SimpleBlockStateProvider;
-import net.minecraft.world.gen.feature.*;
+import net.minecraft.world.gen.feature.BlockClusterFeatureConfig;
+import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.ConfiguredRandomFeatureList;
+import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.FeatureSpreadConfig;
+import net.minecraft.world.gen.feature.Features;
+import net.minecraft.world.gen.feature.MultipleRandomFeatureConfig;
 import net.minecraft.world.gen.placement.AtSurfaceWithExtraConfig;
 import net.minecraft.world.gen.placement.ConfiguredPlacement;
 import net.minecraft.world.gen.placement.NoPlacementConfig;
@@ -109,13 +115,13 @@ public class Shrubs {
                 FeatureMatcher.ANY,
                 FeatureAppender.head(
                         GenerationStage.Decoration.VEGETAL_DECORATION,
-                        BushFeature.INSTANCE.withConfiguration(new BushFeature.Config(
-                                log.getDefaultState(),
-                                leaves.getDefaultState(),
+                        BushFeature.INSTANCE.configured(new BushFeature.Config(
+                                log.defaultBlockState(),
+                                leaves.defaultBlockState(),
                                 air,
                                 leaf,
                                 size
-                        )).withPlacement(Placement.COUNT_EXTRA.configure(new AtSurfaceWithExtraConfig(
+                        )).decorated(Placement.COUNT_EXTRA.configured(new AtSurfaceWithExtraConfig(
                                 count,
                                 chance,
                                 extra
@@ -131,16 +137,16 @@ public class Shrubs {
                 FeatureMatcher.ANY,
                 FeatureAppender.head(
                         GenerationStage.Decoration.VEGETAL_DECORATION,
-                        Feature.RANDOM_SELECTOR.withConfiguration(new MultipleRandomFeatureConfig(
+                        Feature.RANDOM_SELECTOR.configured(new MultipleRandomFeatureConfig(
                                 Arrays.asList(
-                                        patch(doubleBuilder(Blocks.TALL_GRASS).tries(56).func_227317_b_(), 0.8F),
-                                        patch(doubleBuilder(Blocks.LILAC).tries(64).func_227317_b_(), 0.5F),
-                                        patch(doubleBuilder(Blocks.LARGE_FERN).tries(48).func_227317_b_(), 0.3F),
-                                        patch(singleBuilder(Blocks.FERN).tries(24).func_227317_b_(), 0.2F),
-                                        patch(doubleBuilder(Blocks.PEONY).tries(32).func_227317_b_(), 0.1F)
+                                        patch(doubleBuilder(Blocks.TALL_GRASS).tries(56).noProjection(), 0.8F),
+                                        patch(doubleBuilder(Blocks.LILAC).tries(64).noProjection(), 0.5F),
+                                        patch(doubleBuilder(Blocks.LARGE_FERN).tries(48).noProjection(), 0.3F),
+                                        patch(singleBuilder(Blocks.FERN).tries(24).noProjection(), 0.2F),
+                                        patch(doubleBuilder(Blocks.PEONY).tries(32).noProjection(), 0.1F)
                                 ),
-                                Feature.RANDOM_PATCH.withConfiguration(doubleBuilder(Blocks.TALL_GRASS).tries(48).func_227317_b_().build())
-                        )).withPlacement(vegetationPlacement(7))
+                                Feature.RANDOM_PATCH.configured(doubleBuilder(Blocks.TALL_GRASS).tries(48).noProjection().build())
+                        )).decorated(vegetationPlacement(7))
                 )
         );
     }
@@ -152,34 +158,34 @@ public class Shrubs {
                 FeatureMatcher.ANY,
                 FeatureAppender.head(
                         GenerationStage.Decoration.VEGETAL_DECORATION,
-                        Feature.RANDOM_SELECTOR.withConfiguration(new MultipleRandomFeatureConfig(
+                        Feature.RANDOM_SELECTOR.configured(new MultipleRandomFeatureConfig(
                                 Arrays.asList(
-                                        patch(singleBuilder(Blocks.GRASS).tries(56).func_227317_b_(), 0.5F),
-                                        patch(doubleBuilder(Blocks.TALL_GRASS).tries(56).func_227317_b_(), 0.4F),
-                                        patch(doubleBuilder(Blocks.LARGE_FERN).tries(48).func_227317_b_(), 0.2F),
-                                        patch(singleBuilder(Blocks.FERN).tries(24).func_227317_b_(), 0.2F)
+                                        patch(singleBuilder(Blocks.GRASS).tries(56).noProjection(), 0.5F),
+                                        patch(doubleBuilder(Blocks.TALL_GRASS).tries(56).noProjection(), 0.4F),
+                                        patch(doubleBuilder(Blocks.LARGE_FERN).tries(48).noProjection(), 0.2F),
+                                        patch(singleBuilder(Blocks.FERN).tries(24).noProjection(), 0.2F)
                                 ),
-                                Feature.RANDOM_PATCH.withConfiguration(singleBuilder(Blocks.GRASS).tries(48).func_227317_b_().build())
-                        )).withPlacement(vegetationPlacement(7))
+                                Feature.RANDOM_PATCH.configured(singleBuilder(Blocks.GRASS).tries(48).noProjection().build())
+                        )).decorated(vegetationPlacement(7))
                 )
         );
     }
 
     private static ConfiguredPlacement<?> vegetationPlacement(int count) {
-        return Placement.HEIGHTMAP_WORLD_SURFACE.configure(NoPlacementConfig.INSTANCE)
-                .withPlacement(Placement.COUNT.configure(new FeatureSpreadConfig(count)));
+        return Placement.HEIGHTMAP_WORLD_SURFACE.configured(NoPlacementConfig.INSTANCE)
+                .decorated(Placement.COUNT.configured(new FeatureSpreadConfig(count)));
     }
 
     private static ConfiguredRandomFeatureList patch(BlockClusterFeatureConfig.Builder cluster, float chance) {
-        return Feature.RANDOM_PATCH.withConfiguration(cluster.build()).withChance(chance);
+        return Feature.RANDOM_PATCH.configured(cluster.build()).weighted(chance);
     }
 
     private static BlockClusterFeatureConfig.Builder singleBuilder(Block block) {
-        return new BlockClusterFeatureConfig.Builder(new SimpleBlockStateProvider(block.getDefaultState()), new SimpleBlockPlacer());
+        return new BlockClusterFeatureConfig.Builder(new SimpleBlockStateProvider(block.defaultBlockState()), new SimpleBlockPlacer());
     }
 
     private static BlockClusterFeatureConfig.Builder doubleBuilder(Block block) {
-        return new BlockClusterFeatureConfig.Builder(new SimpleBlockStateProvider(block.getDefaultState()), new DoublePlantBlockPlacer());
+        return new BlockClusterFeatureConfig.Builder(new SimpleBlockStateProvider(block.defaultBlockState()), new DoublePlantBlockPlacer());
     }
 
     private static JsonPrimitive wrap(Block block) {
@@ -187,11 +193,11 @@ public class Shrubs {
     }
 
     private static ConfiguredFeature<?, ?> bush(int count, float chance, int extra) {
-        return bush(Placement.COUNT_EXTRA.configure(new AtSurfaceWithExtraConfig(count, chance, extra)));
+        return bush(Placement.COUNT_EXTRA.configured(new AtSurfaceWithExtraConfig(count, chance, extra)));
     }
 
     private static ConfiguredFeature<?, ?> bush(ConfiguredPlacement<?> placement) {
-        return Features.JUNGLE_BUSH.withPlacement(placement);
+        return Features.JUNGLE_BUSH.decorated(placement);
     }
 
     private static ConfiguredFeature<?, ?> transform(ConfiguredFeature<?, ?> feature, FeatureTransformer transformer) {

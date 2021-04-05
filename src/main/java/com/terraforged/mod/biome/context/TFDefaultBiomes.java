@@ -130,6 +130,6 @@ public class TFDefaultBiomes {
     );
 
     public static boolean overridesRiver(Biome biome) {
-        return biome.getCategory() == Biome.Category.SWAMP || biome.getCategory() == Biome.Category.JUNGLE;
+        return biome.getBiomeCategory() == Biome.Category.SWAMP || biome.getBiomeCategory() == Biome.Category.JUNGLE;
     }
 }

@@ -42,8 +42,8 @@ public class RegionFix extends RegionDelegate {
         return generator.getSeaLevel();
     }
 
-    @Override // getWorldHeight
-    public int func_234938_ad_() {
-        return generator.getMaxBuildHeight();
+    @Override
+    public int getMaxBuildHeight() {
+        return generator.getGenDepth();
     }
 }

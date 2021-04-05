@@ -47,14 +47,14 @@ public class TFTextBox extends TextFieldWidget implements Element, Consumer<Stri
     private Consumer<TFTextBox> callback = t -> {};
 
     public TFTextBox(String name, CompoundNBT value) {
-        super(Minecraft.getInstance().fontRenderer, 0, 0, 100, 20, new StringTextComponent(Element.getDisplayName(name, value) + ": "));
+        super(Minecraft.getInstance().font, 0, 0, 100, 20, new StringTextComponent(Element.getDisplayName(name, value) + ": "));
         this.name = name;
         this.value = value;
         this.tooltip = Element.getToolTip(name, value);
         this.stringValue = value.getString(name);
-        setText(value.getString(name));
+        setValue(value.getString(name));
         setResponder(this);
-        setEnabled(true);
+        setEditable(true);
     }
 
     public boolean isValid() {
@@ -90,7 +90,7 @@ public class TFTextBox extends TextFieldWidget implements Element, Consumer<Stri
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (isMouseOver(mouseX, mouseY)) {
             setFocused(true);
-            setEnabled(true);
+            setEditable(true);
             active = true;
         }
         return super.mouseClicked(mouseX, mouseY, button);

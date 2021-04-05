@@ -58,17 +58,17 @@ public class ClientCrashHandler implements CrashHandler {
         }
     }
     private static void displayCrashReport(CrashReport report) {
-        File file1 = new File(Minecraft.getInstance().gameDir, "crash-reports");
+        File file1 = new File(Minecraft.getInstance().gameDirectory, "crash-reports");
         File file2 = new File(file1, "crash-" + (new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss")).format(new Date()) + "-client.txt");
-        Bootstrap.printToSYSOUT(report.getCompleteReport());
-        if (report.getFile() != null) {
-            Bootstrap.printToSYSOUT("#@!@# Game crashed! Crash report saved to: #@!@# " + report.getFile());
+        Bootstrap.realStdoutPrintln(report.getFriendlyReport());
+        if (report.getSaveFile() != null) {
+            Bootstrap.realStdoutPrintln("#@!@# Game crashed! Crash report saved to: #@!@# " + report.getSaveFile());
             Runtime.getRuntime().halt(-1);
         } else if (report.saveToFile(file2)) {
-            Bootstrap.printToSYSOUT("#@!@# Game crashed! Crash report saved to: #@!@# " + file2.getAbsolutePath());
+            Bootstrap.realStdoutPrintln("#@!@# Game crashed! Crash report saved to: #@!@# " + file2.getAbsolutePath());
             Runtime.getRuntime().halt(-1);
         } else {
-            Bootstrap.printToSYSOUT("#@?@# Game crashed! Crash report could not be saved. #@?@#");
+            Bootstrap.realStdoutPrintln("#@?@# Game crashed! Crash report could not be saved. #@?@#");
             Runtime.getRuntime().halt(-2);
         }
     }

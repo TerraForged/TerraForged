@@ -43,7 +43,7 @@ public class BiomeBuilders {
         builder.type(BiomeManager.BiomeType.DESERT);
         builder.filterFeatures(DynamicMatcher.config(BaseTreeFeatureConfig.class));
         // dead bush
-        DefaultBiomeFeatures.withDesertDeadBushes(builder.getSettings());
+        DefaultBiomeFeatures.addDesertVegetation(builder.getSettings());
         return builder;
     }
 
@@ -52,7 +52,7 @@ public class BiomeBuilders {
         builder.type(BiomeManager.BiomeType.ICY);
         builder.downfall(0.5F);
         builder.temperature(0.225F);
-        builder.category(Biome.Category.SWAMP);
+        builder.biomeCategory(Biome.Category.SWAMP);
         builder.precipitation(Biome.RainType.SNOW);
         builder.filterFeatures(DynamicMatcher.config(BaseTreeFeatureConfig.class));
         deadBush(builder);
@@ -105,7 +105,7 @@ public class BiomeBuilders {
     public static BiomeBuilder frozenMarsh() {
         BiomeBuilder builder = BiomeUtils.getBuilder(Biomes.SNOWY_TAIGA);
         builder.type(BiomeManager.BiomeType.ICY);
-        builder.category(Biome.Category.SWAMP);
+        builder.biomeCategory(Biome.Category.SWAMP);
         builder.downfall(0.15F);
         builder.temperature(0.14999F);
         builder.precipitation(Biome.RainType.SNOW);
@@ -124,12 +124,12 @@ public class BiomeBuilders {
         BiomeBuilder builder = BiomeUtils.getBuilder(Biomes.SWAMP);
         builder.type(BiomeManager.BiomeType.COOL);
         builder.temperature(0.7F);
-        builder.category(Biome.Category.SWAMP);
+        builder.biomeCategory(Biome.Category.SWAMP);
         builder.filterFeatures(DynamicMatcher.config(BaseTreeFeatureConfig.class));
         deadBush(builder);
         ferns(builder);
         denseGrass(builder);
-        DefaultBiomeFeatures.withSwampSugarcaneAndPumpkin(builder.getSettings());
+        DefaultBiomeFeatures.addDefaultExtraVegetation(builder.getSettings());
         return builder;
     }
 
@@ -153,7 +153,7 @@ public class BiomeBuilders {
     public static BiomeBuilder snowyFirForest() {
         BiomeBuilder builder = BiomeUtils.getBuilder(Biomes.SNOWY_TAIGA);
         builder.type(BiomeManager.BiomeType.ICY);
-        builder.category(Biome.Category.ICY);
+        builder.biomeCategory(Biome.Category.ICY);
         ferns(builder);
         return builder;
     }
@@ -176,8 +176,9 @@ public class BiomeBuilders {
                 DynamicMatcher.of(Features.BROWN_MUSHROOM_TAIGA)
         );
         builder.setParentKey(Biomes.SHATTERED_SAVANNA_PLATEAU);
-        builder.category(Biome.Category.SAVANNA);
+        builder.biomeCategory(Biome.Category.SAVANNA);
         builder.copyAmbience(Biomes.SAVANNA);
+        builder.precipitation(Biome.RainType.NONE);
         builder.downfall(0.05F);
         builder.temperature(1.2F);
         deadBush(builder);
@@ -211,26 +212,26 @@ public class BiomeBuilders {
         BiomeBuilder builder = BiomeUtils.getBuilder(Biomes.WARM_OCEAN);
         builder.type(BiomeManager.BiomeType.WARM);
         builder.filterFeatures(DynamicMatcher.config(BaseTreeFeatureConfig.class));
-        builder.category(Biome.Category.BEACH);
+        builder.biomeCategory(Biome.Category.BEACH);
         builder.temperature(1.0F);
         return builder;
     }
 
     private static void deadBush(BiomeBuilder builder) {
         // dead bush
-        DefaultBiomeFeatures.withDesertDeadBushes(builder.getSettings());
+        DefaultBiomeFeatures.addDesertVegetation(builder.getSettings());
     }
 
     private static void denseGrass(BiomeBuilder builder) {
         // plains grass
-        builder.getSettings().withFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.PATCH_GRASS_PLAIN);
+        builder.getSettings().addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.PATCH_GRASS_PLAIN);
         // extra grass 1
-        DefaultBiomeFeatures.withNormalGrassPatch(builder.getSettings());
+        DefaultBiomeFeatures.addDefaultGrass(builder.getSettings());
         // extra grass 2
-        DefaultBiomeFeatures.withSavannaGrass(builder.getSettings());
+        DefaultBiomeFeatures.addSavannaGrass(builder.getSettings());
     }
 
     private static void ferns(BiomeBuilder builder) {
-        DefaultBiomeFeatures.withLargeFern(builder.getSettings());
+        DefaultBiomeFeatures.addFerns(builder.getSettings());
     }
 }

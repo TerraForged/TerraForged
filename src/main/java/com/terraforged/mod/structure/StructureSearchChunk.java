@@ -43,8 +43,8 @@ public class StructureSearchChunk extends ChunkPrimer {
     public StructureSearchChunk init(ChunkPos pos) {
         this.pos = pos;
         setStatus(ChunkStatus.EMPTY);
-        setStructureStarts(Collections.emptyMap());
-        setStructureReferences(Collections.emptyMap());
+        setAllReferences(Collections.emptyMap());
+        setAllStarts(Collections.emptyMap());
         return this;
     }
 

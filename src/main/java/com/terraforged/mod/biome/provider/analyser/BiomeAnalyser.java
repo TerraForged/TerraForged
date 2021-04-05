@@ -41,7 +41,13 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
 
@@ -62,8 +68,8 @@ public class BiomeAnalyser {
     }};
 
     private static final BiomeFilter[] EXCLUSION_FILTERS = {
-            (biome, context) -> biome.getCategory() == Biome.Category.THEEND,
-            (biome, context) -> biome.getCategory() == Biome.Category.NETHER,
+            (biome, context) -> biome.getBiomeCategory() == Biome.Category.THEEND,
+            (biome, context) -> biome.getBiomeCategory() == Biome.Category.NETHER,
             (biome, context) -> context.biomes.getName(biome).contains("hills"),
             (biome, context) -> biome == context.biomes.get(Biomes.THE_VOID),
             (biome, context) -> biome == context.biomes.get(Biomes.MOUNTAIN_EDGE),
@@ -168,7 +174,7 @@ public class BiomeAnalyser {
             String name = context.biomes.getName(biome);
             float moisture = (biome.getDownfall() - moistRange.x) / (moistRange.y - moistRange.x);
             float temperature = (BiomeHelper.getDefaultTemperature(biome) - tempRange.x) / (tempRange.y - tempRange.x);
-            int color = BiomeHelper.getSurface(biome).getTop().getMaterial().getColor().colorValue;
+            int color = BiomeHelper.getSurface(biome).getTopMaterial().getMaterial().getColor().col;
             list.add(new BiomeData(name, context.biomes.getId(biome), color, moisture, temperature));
         }
 

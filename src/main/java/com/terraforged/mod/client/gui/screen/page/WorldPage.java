@@ -98,7 +98,7 @@ public class WorldPage extends BasePage {
     private CompoundNBT getDimSettings() {
         CompoundNBT dimSettings = instance.settingsData.getCompound("dimensions");
         CompoundNBT generators = dimSettings.getCompound("dimensions");
-        for (String name : generators.keySet()) {
+        for (String name : generators.getAllKeys()) {
             if (name.startsWith("#")) {
                 INBT value = generators.get(name.substring(1));
                 if (value instanceof StringNBT) {

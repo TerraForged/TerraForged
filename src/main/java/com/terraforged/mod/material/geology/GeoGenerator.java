@@ -85,7 +85,7 @@ public class GeoGenerator implements StrataGenerator {
             }
             if (index != lastIndex) {
                 lastIndex = index;
-                BlockState material = materials.get(index).getDefaultState();
+                BlockState material = materials.get(index).defaultBlockState();
                 float depth = config.getDepth(random.nextFloat());
                 Source type = nextType(random);
                 result.add(new Layer(material, depth, type));

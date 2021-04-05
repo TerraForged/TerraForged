@@ -37,11 +37,11 @@ public class WorldGenBlocks extends DataGen {
 
     public static void genBlockTags(File dataDir) {
         if (dataDir.exists() || dataDir.mkdirs()) {
-            printMaterials(dataDir, "forge:wg_stone", WGTags.STONE.getAllElements());
-            printMaterials(dataDir, "forge:wg_dirt", WGTags.DIRT.getAllElements());
-            printMaterials(dataDir, "forge:wg_clay", WGTags.CLAY.getAllElements());
-            printMaterials(dataDir, "forge:wg_sediment", WGTags.SEDIMENT.getAllElements());
-            printMaterials(dataDir, "forge:wg_erodible", WGTags.ERODIBLE.getAllElements());
+            printMaterials(dataDir, "forge:wg_stone", WGTags.STONE.getValues());
+            printMaterials(dataDir, "forge:wg_dirt", WGTags.DIRT.getValues());
+            printMaterials(dataDir, "forge:wg_clay", WGTags.CLAY.getValues());
+            printMaterials(dataDir, "forge:wg_sediment", WGTags.SEDIMENT.getValues());
+            printMaterials(dataDir, "forge:wg_erodible", WGTags.ERODIBLE.getValues());
         }
     }
 

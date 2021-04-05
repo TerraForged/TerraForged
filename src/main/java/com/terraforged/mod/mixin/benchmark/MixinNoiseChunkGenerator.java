@@ -84,37 +84,37 @@ public abstract class MixinNoiseChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public void func_242707_a(DynamicRegistries registries, StructureManager structures, IChunk chunk, TemplateManager templates, long seed) {
+    public void createStructures(DynamicRegistries registries, StructureManager structures, IChunk chunk, TemplateManager templates, long seed) {
         try (Section section = Profiler.STRUCTURE_STARTS.punchIn()) {
-            super.func_242707_a(registries, structures, chunk, templates, seed);
+            super.createStructures(registries, structures, chunk, templates, seed);
         }
     }
 
     @Override
-    public void func_235953_a_(ISeedReader world, StructureManager structures, IChunk chunk) {
+    public void createReferences(ISeedReader world, StructureManager structures, IChunk chunk) {
         try (Section section = Profiler.STRUCTURE_REFS.punchIn()) {
-            super.func_235953_a_(world, structures, chunk);
+            super.createReferences(world, structures, chunk);
         }
     }
 
     @Override
-    public void func_242706_a(Registry<Biome> registry, IChunk chunk) {
+    public void createBiomes(Registry<Biome> registry, IChunk chunk) {
         try (Section section = Profiler.BIOMES.punchIn()) {
-            super.func_242706_a(registry, chunk);
+            super.createBiomes(registry, chunk);
         }
     }
 
     @Override
-    public void func_230350_a_(long seed, BiomeManager biomes, IChunk chunk, GenerationStage.Carving carver) {
+    public void applyCarvers(long seed, BiomeManager biomes, IChunk chunk, GenerationStage.Carving carver) {
         try (Section section = Profiler.get(carver).punchIn()) {
-            super.func_230350_a_(seed, biomes, chunk, carver);
+            super.applyCarvers(seed, biomes, chunk, carver);
         }
     }
 
     @Override
-    public void func_230351_a_(WorldGenRegion region, StructureManager structures) {
+    public void applyBiomeDecoration(WorldGenRegion region, StructureManager structures) {
         try (Section section = Profiler.DECORATION.punchIn()) {
-            super.func_230351_a_(region, structures);
+            super.applyBiomeDecoration(region, structures);
         }
     }
 }

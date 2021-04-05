@@ -63,7 +63,7 @@ public interface Element {
         if (key.endsWith(".")) {
             return "";
         }
-        return I18n.format(key);
+        return I18n.get(key);
     }
 
     static List<String> getToolTip(String name, CompoundNBT value) {
@@ -71,7 +71,7 @@ public interface Element {
         if (key.endsWith(".")) {
             return Collections.emptyList();
         }
-        return Collections.singletonList(I18n.format(key));
+        return Collections.singletonList(I18n.get(key));
     }
 
     static String getDisplayKey(String name, CompoundNBT value) {

@@ -122,6 +122,7 @@ public class ReflectUtils {
         return true;
     }
 
+    @SafeVarargs
     private static <T> boolean equals(T[] array, T... value) {
         return Arrays.equals(array, value);
     }

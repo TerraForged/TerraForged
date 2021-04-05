@@ -81,10 +81,10 @@ public class BushFeature extends Feature<BushFeature.Config> {
     }
 
     @Override
-    public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, Config config) {
+    public boolean place(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, Config config) {
         BlockPos.Mutable log = new BlockPos.Mutable();
         BlockPos.Mutable leaf = new BlockPos.Mutable();
-        place(world, log.setPos(pos), leaf, rand, config);
+        place(world, log.set(pos), leaf, rand, config);
         for (float chance = rand.nextFloat(); chance < config.size_chance; chance += rand.nextFloat()) {
             addToMutable(log, logs[rand.nextInt(logs.length)]);
 
@@ -110,7 +110,7 @@ public class BushFeature extends Feature<BushFeature.Config> {
         }
 
         center.move(Direction.UP, 1);
-        world.setBlockState(center, config.trunk, 2);
+        world.setBlock(center, config.trunk, 2);
 
         BlockState leaves = config.leavesWithDistance(1);
         BlockState leavesExtra = config.leavesWithDistance(2);
@@ -120,17 +120,17 @@ public class BushFeature extends Feature<BushFeature.Config> {
                 continue;
             }
 
-            pos.setPos(center);
+            pos.set(center);
             addToMutable(pos, neighbour);
 
             if (BlockUtils.canTreeReplace(world, pos)) {
-                world.setBlockState(pos, leaves, 2);
+                world.setBlock(pos, leaves, 2);
 
                 // randomly place extra leaves below if non-solid
                 if (neighbour.getY() == 0 && random.nextFloat() < config.leafChance) {
                     pos.move(Direction.DOWN, 1);
                     if (BlockUtils.canTreeReplace(world, pos)) {
-                        world.setBlockState(pos, leavesExtra, 2);
+                        world.setBlock(pos, leavesExtra, 2);
                     }
                     pos.move(Direction.UP, 1);
                 }
@@ -139,7 +139,7 @@ public class BushFeature extends Feature<BushFeature.Config> {
                 if (neighbour.getY() == 0 && random.nextFloat() < config.leafChance) {
                     pos.move(Direction.UP, 1);
                     if (BlockUtils.canTreeReplace(world, pos)) {
-                        world.setBlockState(pos, leavesExtra, 2);
+                        world.setBlock(pos, leavesExtra, 2);
                     }
                 }
             }
@@ -149,7 +149,7 @@ public class BushFeature extends Feature<BushFeature.Config> {
     }
 
     private static void addToMutable(BlockPos.Mutable pos, Vector3i add) {
-        pos.setPos(pos.getX() + add.getX(), pos.getY() + add.getY(), pos.getZ() + add.getZ());
+        pos.set(pos.getX() + add.getX(), pos.getY() + add.getY(), pos.getZ() + add.getZ());
     }
 
     public static <T> Dynamic<T> serialize(Config config, DynamicOps<T> ops) {
@@ -197,7 +197,7 @@ public class BushFeature extends Feature<BushFeature.Config> {
 
         public BlockState leavesWithDistance(int distance) {
             if (leaves.hasProperty(LeavesBlock.DISTANCE)) {
-                return leaves.with(LeavesBlock.DISTANCE, distance);
+                return leaves.setValue(LeavesBlock.DISTANCE, distance);
             }
             return leaves;
         }

@@ -42,7 +42,7 @@ public class BaseGeoDecorator extends BaseDecorator implements Stratum.Visitor<B
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
         y = decorateFluid(chunk, context, x, y, z);
 
-        context.pos.setPos(x, y, z);
+        context.pos.set(x, y, z);
 
         generator.getGeologyManager().getGeology(context.biome)
                 .getStrata(x, z)

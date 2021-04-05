@@ -116,7 +116,7 @@ public class ChunkBitSet implements Spliterator<BlockPos.Mutable> {
         } else {
             int x = index >> 4;
             int z = index - (x << 4);
-            action.accept(pos.setPos(offsetX + x, offsetY, offsetZ + z));
+            action.accept(pos.set(offsetX + x, offsetY, offsetZ + z));
             return true;
         }
     }

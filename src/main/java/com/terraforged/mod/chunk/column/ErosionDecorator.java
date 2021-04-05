@@ -92,11 +92,11 @@ public class ErosionDecorator implements ColumnDecorator {
 
         IChunk chunk = plainStone ? buffer : buffer.getDelegate();
 
-        y = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
+        y = chunk.getHeight(Heightmap.Type.WORLD_SURFACE_WG, x, z);
 
         ISurfaceBuilderConfig config = BiomeHelper.getSurface(context.biome);
-        BlockState top = config.getTop();
-        BlockState middle = config.getUnder();
+        BlockState top = config.getTopMaterial();
+        BlockState middle = config.getUnderMaterial();
         Materials materials = this.materials.get();
 
         if (materials.isErodible(top.getBlock())) {
@@ -118,7 +118,7 @@ public class ErosionDecorator implements ColumnDecorator {
         BlockState material = States.GRAVEL.get();
         // find the uppermost layer of rock & record it's depth
         for (int dy = 3; dy < 32; dy++) {
-            context.pos.setPos(dx, y - dy, dz);
+            context.pos.set(dx, y - dy, dz);
             BlockState state = chunk.getBlockState(context.pos);
             if (materials.isStone(state.getBlock())) {
                 material = state;
@@ -129,7 +129,7 @@ public class ErosionDecorator implements ColumnDecorator {
 
         // fill downwards to the first rock layer
         for (int dy = 0; dy < depth; dy++) {
-            ColumnDecorator.replaceSolid(chunk, context.pos.setPos(dx, y - dy, dz), material);
+            ColumnDecorator.replaceSolid(chunk, context.pos.set(dx, y - dy, dz), material);
         }
     }
 
@@ -170,20 +170,20 @@ public class ErosionDecorator implements ColumnDecorator {
     }
 
     private static BlockState rock(BlockState state) {
-        if (state.getMaterial() == Material.ROCK) {
+        if (state.getMaterial() == Material.STONE) {
             return state;
         }
         return States.STONE.get();
     }
 
     private static BlockState ground(BlockState state) {
-        if (state.getMaterial() == Material.ORGANIC) {
+        if (state.getMaterial() == Material.GRASS) {
             return States.COARSE_DIRT.get();
         }
-        if (state.getMaterial() == Material.ROCK) {
+        if (state.getMaterial() == Material.STONE) {
             return States.GRAVEL.get();
         }
-        if (state.getMaterial() == Material.EARTH) {
+        if (state.getMaterial() == Material.DIRT) {
             return state;
         }
         if (state.getMaterial() == Material.SAND) {

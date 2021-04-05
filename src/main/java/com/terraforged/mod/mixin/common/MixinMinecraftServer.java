@@ -41,8 +41,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(MinecraftServer.class)
 public class MixinMinecraftServer {
 
-    @Inject(method = "func_240772_a_", at = @At("HEAD"))
-    private static void onBuildDataPacks(ResourcePackList packList, DatapackCodec codec, boolean vanillaOnly, CallbackInfoReturnable<DatapackCodec> cir) {
+    @Inject(method = "configurePackRepository", at = @At("HEAD"))
+    private static void onConfigurePackRepository(ResourcePackList packList, DatapackCodec codec, boolean vanillaOnly, CallbackInfoReturnable<DatapackCodec> cir) {
         ServerEvents.addPackFinder(packList);
     }
 }

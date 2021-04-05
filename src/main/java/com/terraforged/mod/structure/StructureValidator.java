@@ -53,7 +53,7 @@ public class StructureValidator {
     public static void validateConfigs(DimensionSettings dimension, TFBiomeContext context, StructureSettings settings) {
         Log.info("Validating user structure preferences...");
 
-        final DimensionStructuresSettings structuresSettings = dimension.getStructures();
+        final DimensionStructuresSettings structuresSettings = dimension.structureSettings();
         final List<Structure<?>> activeStructures = getActiveStructures(context);
         final Map<String, StructureSettings.StructureSeparation> userSettings = settings.getOrDefaultStructures();
 
@@ -63,13 +63,13 @@ public class StructureValidator {
                 continue;
             }
 
-            ResourceLocation name = ResourceLocation.tryCreate(entry.getKey());
+            ResourceLocation name = ResourceLocation.tryParse(entry.getKey());
             if (name == null) {
                 continue;
             }
 
             Structure<?> structure = ForgeRegistries.STRUCTURE_FEATURES.getValue(name);
-            if (structure != null && structuresSettings.func_236197_a_(structure) == null) {
+            if (structure != null && structuresSettings.getConfig(structure) == null) {
                 Log.info(REMOVED, name);
             }
         }
@@ -81,7 +81,7 @@ public class StructureValidator {
 
         // Check for structures that have been added to biomes without having registered generation settings for it
         for (Structure<?> structure : activeStructures) {
-            if (structuresSettings.func_236197_a_(structure) == null) {
+            if (structuresSettings.getConfig(structure) == null) {
                 String name = Objects.toString(structure.getRegistryName());
                 StructureSettings.StructureSeparation userSetting = userSettings.get(name);
 
@@ -100,8 +100,8 @@ public class StructureValidator {
         final Biome[] overworldBiomes = BiomeAnalyser.getOverworldBiomes(context);
 
         for (Biome biome : overworldBiomes) {
-            for (Supplier<StructureFeature<?, ?>> structureFeature : biome.getGenerationSettings().getStructures()) {
-                Structure<?> structure = structureFeature.get().field_236268_b_;
+            for (Supplier<StructureFeature<?, ?>> structureFeature : biome.getGenerationSettings().structures()) {
+                Structure<?> structure = structureFeature.get().feature;
                 structures.add(structure);
             }
         }

@@ -112,7 +112,7 @@ public class TerraCommand {
 
     private static LiteralArgumentBuilder<CommandSource> command() {
         return Commands.literal("terra")
-                .requires(source -> source.hasPermissionLevel(2))
+                .requires(source -> source.hasPermission(2))
                 .then(Commands.literal("benchmark")
                         .then(Commands.literal("reset")
                                 .executes(TerraCommand::benchmarkStart))
@@ -131,26 +131,26 @@ public class TerraCommand {
                         .executes(TerraCommand::debugBiome))
                 .then(Commands.literal("locate")
                         .then(Commands.literal("biome")
-                                .then(Commands.argument("biome", ResourceLocationArgument.resourceLocation())
-                                        .suggests(SuggestionProviders.field_239574_d_)
+                                .then(Commands.argument("biome", ResourceLocationArgument.id())
+                                        .suggests(SuggestionProviders.AVAILABLE_BIOMES)
                                         .executes(TerraCommand::findBiome)))
                         .then(Commands.literal("terrain")
                                 .then(Commands.argument("terrain", TerrainArgType.terrain())
                                         .executes(TerraCommand::findTerrain)))
                         .then(Commands.literal("both")
-                                .then(Commands.argument("biome", ResourceLocationArgument.resourceLocation())
-                                        .suggests(SuggestionProviders.field_239574_d_)
+                                .then(Commands.argument("biome", ResourceLocationArgument.id())
+                                        .suggests(SuggestionProviders.AVAILABLE_BIOMES)
                                         .then(Commands.argument("terrain", TerrainArgType.terrain())
                                                 .executes(TerraCommand::findTerrainAndBiome)))));
     }
 
     private static int query(CommandContext<CommandSource> context) throws CommandSyntaxException {
         getContext(context);
-        BlockPos pos = context.getSource().asPlayer().getPosition();
+        BlockPos pos = context.getSource().getPlayerOrException().blockPosition();
         TFBiomeProvider biomeProvider = getBiomeProvider(context);
         try (Resource<Cell> cell = Cell.pooled()) {
             Biome biome = biomeProvider.lookupBiome(cell.get(), pos.getX(), pos.getZ(), false);
-            context.getSource().sendFeedback(new StringTextComponent("At ")
+            context.getSource().sendSuccess(new StringTextComponent("At ")
                     .append(createTeleportMessage(pos))
                     .append(new StringTextComponent(": TerrainType = "))
                     .append(createPrimary(cell.get().terrain.getName()))
@@ -164,7 +164,7 @@ public class TerraCommand {
 
     private static int benchmarkStart(CommandContext<CommandSource> context) throws CommandSyntaxException {
         Profiler.reset();
-        context.getSource().sendFeedback(createText("Reset profiler"), false);
+        context.getSource().sendSuccess(createText("Reset profiler"), false);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -177,14 +177,14 @@ public class TerraCommand {
             average += profiler.averageMS();
             slowest += profiler.maxMS();
             fastest += profiler.minMS();
-            context.getSource().sendFeedback(profiler.toText(), false);
+            context.getSource().sendSuccess(profiler.toText(), false);
         }
 
         long min = fastest;
         long max = slowest;
-        context.getSource().sendFeedback(createText("Chunk Average", PREFIX_FORMAT)
-                .appendString(String.format(": %.3fms", average))
-                .modifyStyle(style -> style.setHoverEvent(Profiler.createHoverStats(min, max))),false);
+        context.getSource().sendSuccess(createText("Chunk Average", PREFIX_FORMAT)
+                .append(String.format(": %.3fms", average))
+                .withStyle(style -> style.withHoverEvent(Profiler.createHoverStats(min, max))),false);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -193,7 +193,7 @@ public class TerraCommand {
         TerraContext terraContext = getContext(context);
 
         try {
-            context.getSource().sendFeedback(new StringTextComponent("Exporting data"), true);
+            context.getSource().sendSuccess(new StringTextComponent("Exporting data"), true);
             DataGen.dumpData(terraContext.biomeContext);
         } catch (Throwable t) {
             t.printStackTrace();
@@ -206,7 +206,7 @@ public class TerraCommand {
         TerraContext terraContext = getContext(context);
         String name = StringArgumentType.getString(context, "name");
         Preset preset = new Preset(name, terraContext.terraSettings);
-        context.getSource().sendFeedback(new StringTextComponent("Saving preset: " + preset.getName()), true);
+        context.getSource().sendSuccess(new StringTextComponent("Saving preset: " + preset.getName()), true);
 
         PresetManager presets = PresetManager.load();
         presets.add(preset);
@@ -216,17 +216,17 @@ public class TerraCommand {
     }
 
     private static int debugBiome(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity player = context.getSource().asPlayer();
-        BlockPos position = player.getPosition();
+        ServerPlayerEntity player = context.getSource().getPlayerOrException();
+        BlockPos position = player.blockPosition();
         int x = position.getX();
         int z = position.getZ();
 
-        long seed = player.getServerWorld().getSeed();
-        BiomeProvider biomeProvider = player.getServerWorld().getChunkProvider().generator.getBiomeProvider();
-        Biome actual = player.getServerWorld().getBiome(position);
+        long seed = player.getLevel().getSeed();
+        BiomeProvider biomeProvider = player.getLevel().getChunkSource().generator.getBiomeSource();
+        Biome actual = player.getLevel().getBiome(position);
         Biome biome = ColumnFuzzedBiomeMagnifier.INSTANCE.getBiome(seed, x, 0, z, biomeProvider);
 
-        context.getSource().sendFeedback(new StringTextComponent("At ")
+        context.getSource().sendSuccess(new StringTextComponent("At ")
                 .append(createTeleportMessage(position))
                 .append(new StringTextComponent(": Actual Biome = "))
                 .append(createPrimary(actual.getRegistryName()))
@@ -239,13 +239,13 @@ public class TerraCommand {
     private static int findTerrain(CommandContext<CommandSource> context) throws CommandSyntaxException {
         TerraContext terraContext = getContext(context);
         Terrain type = TerrainArgType.getTerrain(context, "terrain");
-        BlockPos pos = context.getSource().asPlayer().getPosition();
-        UUID playerID = context.getSource().asPlayer().getUniqueID();
+        BlockPos pos = context.getSource().getPlayerOrException().blockPosition();
+        UUID playerID = context.getSource().getPlayerOrException().getUUID();
         MinecraftServer server = context.getSource().getServer();
         WorldGenerator generator = terraContext.worldGenerator.get().get();
         Search search = new TerrainSearchTask(pos, type, getChunkGenerator(context), generator);
         int identifier = doSearch(server, playerID, search);
-        context.getSource().sendFeedback(createPrefix(identifier)
+        context.getSource().sendSuccess(createPrefix(identifier)
                 .append(new StringTextComponent(" Searching for "))
                 .append(createPrimary(type.getName()))
                 .append(new StringTextComponent("...")), false);
@@ -255,13 +255,13 @@ public class TerraCommand {
     private static int findBiome(CommandContext<CommandSource> context) throws CommandSyntaxException {
         getContext(context);
         Biome biome = getBiome(context, "biome");
-        BlockPos pos = context.getSource().asPlayer().getPosition();
-        UUID playerID = context.getSource().asPlayer().getUniqueID();
+        BlockPos pos = context.getSource().getPlayerOrException().blockPosition();
+        UUID playerID = context.getSource().getPlayerOrException().getUUID();
         MinecraftServer server = context.getSource().getServer();
-        ServerWorld world = context.getSource().asPlayer().getServerWorld();
-        Search search = new BiomeSearchTask(pos, biome, world.getChunkProvider().getChunkGenerator(), getBiomeProvider(context));
+        ServerWorld world = context.getSource().getPlayerOrException().getLevel();
+        Search search = new BiomeSearchTask(pos, biome, world.getChunkSource().getGenerator(), getBiomeProvider(context));
         int identifier = doSearch(server, playerID, search);
-        context.getSource().sendFeedback(createPrefix(identifier)
+        context.getSource().sendSuccess(createPrefix(identifier)
                 .append(new StringTextComponent(" Searching for "))
                 .append(createPrimary(biome.getRegistryName()))
                 .append(new StringTextComponent("...")), false);
@@ -272,15 +272,15 @@ public class TerraCommand {
         TerraContext terraContext = getContext(context);
         Terrain target = TerrainArgType.getTerrain(context, "terrain");
         Biome biome = getBiome(context, "biome");
-        BlockPos pos = context.getSource().asPlayer().getPosition();
-        UUID playerID = context.getSource().asPlayer().getUniqueID();
+        BlockPos pos = context.getSource().getPlayerOrException().blockPosition();
+        UUID playerID = context.getSource().getPlayerOrException().getUUID();
         MinecraftServer server = context.getSource().getServer();
         WorldGenerator generator = terraContext.worldGenerator.get().get();
         Search biomeSearch = new BiomeSearchTask(pos, biome, getChunkGenerator(context), getBiomeProvider(context));
         Search terrainSearch = new TerrainSearchTask(pos, target, getChunkGenerator(context), generator);
         Search search = new BothSearchTask(pos, biomeSearch, terrainSearch);
         int identifier = doSearch(server, playerID, search);
-        context.getSource().sendFeedback(createPrefix(identifier)
+        context.getSource().sendSuccess(createPrefix(identifier)
                 .append(new StringTextComponent(" Searching for "))
                 .append(createPrimary(biome.getRegistryName()))
                 .append(new StringTextComponent(" and "))
@@ -291,8 +291,8 @@ public class TerraCommand {
 
     private static int doSearch(MinecraftServer server, UUID userId, Supplier<BlockPos> supplier) {
         int identifier = SEARCH_IDS.compute(userId, INCREMENTER);
-        CompletableFuture.supplyAsync(supplier).thenAccept(pos -> server.deferTask(() -> {
-            PlayerEntity player = server.getPlayerList().getPlayerByUUID(userId);
+        CompletableFuture.supplyAsync(supplier).thenAccept(pos -> server.submit(() -> {
+            PlayerEntity player = server.getPlayerList().getPlayer(userId);
             if (player == null) {
                 SEARCH_IDS.remove(userId);
                 return;
@@ -300,17 +300,17 @@ public class TerraCommand {
 
             if (pos == BlockPos.ZERO) {
                 ITextComponent message = createPrefix(identifier).append(new StringTextComponent(" Location not found :["));
-                player.sendMessage(message, Util.DUMMY_UUID);
+                player.sendMessage(message, Util.NIL_UUID);
                 return;
             }
 
-            double distance = Math.sqrt(player.getPosition().distanceSq(pos));
+            double distance = Math.sqrt(player.blockPosition().distSqr(pos));
             ITextComponent result = createPrefix(identifier)
                     .append(new StringTextComponent(" Nearest match: "))
                     .append(createTeleportMessage(pos))
                     .append(new StringTextComponent(String.format(" Distance: %.2f", distance)));
 
-            player.sendMessage(result, Util.DUMMY_UUID);
+            player.sendMessage(result, Util.NIL_UUID);
         }));
         return identifier;
     }
@@ -320,22 +320,21 @@ public class TerraCommand {
     }
 
     private static Biome getBiome(CommandContext<CommandSource> context, String name) throws CommandSyntaxException {
-        ResourceLocation location = ResourceLocationArgument.getResourceLocation(context, name);
-        return context.getSource().getServer().func_244267_aX().func_230521_a_(Registry.BIOME_KEY)
+        ResourceLocation location = ResourceLocationArgument.getId(context, name);
+        return context.getSource().getServer().registryAccess().registry(Registry.BIOME_REGISTRY)
                 .flatMap(registry -> registry.getOptional(location))
                 .orElseThrow(() -> createException("biome", "Unrecognized biome %s", location));
     }
 
     private static String getBiomeName(CommandContext<CommandSource> context, Biome biome) {
-        return context.getSource().getServer().func_244267_aX()
-                .func_230521_a_(Registry.BIOME_KEY)
+        return context.getSource().getServer().registryAccess().registry(Registry.BIOME_REGISTRY)
                 .map(r -> r.getKey(biome))
                 .map(Objects::toString)
                 .orElse("unknown");
     }
 
     private static TFChunkGenerator getTFChunkGenerator(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        ChunkGenerator generator = context.getSource().getWorld().getChunkProvider().getChunkGenerator();
+        ChunkGenerator generator = context.getSource().getLevel().getChunkSource().getGenerator();
         if (generator instanceof TFChunkGenerator) {
             return (TFChunkGenerator) generator;
         }
@@ -343,11 +342,11 @@ public class TerraCommand {
     }
 
     private static ChunkGenerator getChunkGenerator(CommandContext<CommandSource> context) {
-        return context.getSource().getWorld().getChunkProvider().getChunkGenerator();
+        return context.getSource().getLevel().getChunkSource().getGenerator();
     }
 
     private static TFBiomeProvider getBiomeProvider(CommandContext<CommandSource> context) {
-        return (TFBiomeProvider) context.getSource().getWorld().getChunkProvider().getChunkGenerator().getBiomeProvider();
+        return (TFBiomeProvider) context.getSource().getLevel().getChunkSource().getGenerator().getBiomeSource();
     }
 
     private static CommandSyntaxException createException(String type, String message, Object... args) {
@@ -358,18 +357,18 @@ public class TerraCommand {
     }
 
     private static IFormattableTextComponent createTeleportMessage(BlockPos pos) {
-        return TextComponentUtils.wrapWithSquareBrackets(new TranslationTextComponent(
+        return TextComponentUtils.wrapInSquareBrackets(new TranslationTextComponent(
                 "chat.coordinates", pos.getX(), pos.getY(), pos.getZ()
-        )).modifyStyle(s -> s.applyFormatting(TextFormatting.GREEN)
-                .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + pos.getX() + " " + pos.getY() + " " + pos.getZ()))
-                .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("chat.coordinates.tooltip")))
+        )).withStyle(s -> s.withColor(TextFormatting.GREEN)
+                .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + pos.getX() + " " + pos.getY() + " " + pos.getZ()))
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("chat.coordinates.tooltip")))
         );
     }
 
     private static IFormattableTextComponent createPrefix(int identifier) {
         return new StringTextComponent("")
-                .append(TextComponentUtils.wrapWithSquareBrackets(new StringTextComponent(String.format("%03d", identifier)))
-                        .modifyStyle(style -> style.applyFormatting(PREFIX_FORMAT)));
+                .append(TextComponentUtils.wrapInSquareBrackets(new StringTextComponent(String.format("%03d", identifier)))
+                        .withStyle(style -> style.withColor(PREFIX_FORMAT)));
     }
 
     private static IFormattableTextComponent createPrimary(@Nullable Object name) {
@@ -378,10 +377,8 @@ public class TerraCommand {
 
     private static IFormattableTextComponent createText(@Nullable Object name, TextFormatting... formatting) {
         String title = name == null ? "null" : name.toString();
-        return new StringTextComponent("").append(new StringTextComponent(title).modifyStyle(style -> {
-            for (TextFormatting f : formatting) {
-                style = style.applyFormatting(f);
-            }
+        return new StringTextComponent("").append(new StringTextComponent(title).withStyle(style -> {
+            style.applyFormats(formatting);
             return style;
         }));
     }

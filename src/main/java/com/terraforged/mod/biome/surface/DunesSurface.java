@@ -68,7 +68,7 @@ public class DunesSurface implements MaskedSurface {
     @Override
     public void buildSurface(int x, int z, int surface, float mask, SurfaceContext ctx) {
         float value = module.getValue(x, z) * mask;
-        float baseHeight = ctx.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, x & 15, z & 15);
+        float baseHeight = ctx.chunk.getHeight(Heightmap.Type.WORLD_SURFACE_WG, x & 15, z & 15);
         float duneHeight = baseHeight + value * maxHeight;
         int duneBase = (int) baseHeight;
         int duneTop = (int) duneHeight + 1;
@@ -78,7 +78,7 @@ public class DunesSurface implements MaskedSurface {
 
         LayerMaterial material = null;//deserts.getSandLayers(ctx.biome);
         if (material == null) {
-            fill(x, z, duneBase - 4, duneTop, ctx, ctx.chunk, Blocks.SAND.getDefaultState());
+            fill(x, z, duneBase - 4, duneTop, ctx, ctx.chunk, Blocks.SAND.defaultBlockState());
             return;
         }
 
@@ -87,7 +87,7 @@ public class DunesSurface implements MaskedSurface {
         float depth = material.getDepth(duneHeight);
         int levels = material.getLevel(depth);
         BlockState top = material.getState(levels);
-        ctx.chunk.setBlockState(pos.setPos(x, duneTop, z), top, false);
+        ctx.chunk.setBlockState(pos.set(x, duneTop, z), top, false);
     }
 
     public static Surface create(TerraContext context, TFBiomeProvider provider) {

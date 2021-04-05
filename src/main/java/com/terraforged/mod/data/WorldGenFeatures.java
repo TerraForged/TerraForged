@@ -56,7 +56,7 @@ public class WorldGenFeatures extends DataGen {
     private static void genBiomeFeatures(File dir, Biome biome, TFBiomeContext context) {
         write(new File(dir, getJsonPath("features", context.biomes.getRegistryName(biome))), writer -> {
             JsonObject root = new JsonObject();
-            List<List<Supplier<ConfiguredFeature<?, ?>>>> stageFeatures = biome.getGenerationSettings().getFeatures();;
+            List<List<Supplier<ConfiguredFeature<?, ?>>>> stageFeatures = biome.getGenerationSettings().features();
 
             for (GenerationStage.Decoration type : GenerationStage.Decoration.values()) {
                 if (type.ordinal() >= stageFeatures.size()) {

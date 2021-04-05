@@ -41,7 +41,7 @@ public interface CrashHandler {
     }
 
     static void handle(WorldGenRegion region, TFChunkGenerator generator, Throwable t) {
-        IChunk chunk = region.getChunk(region.getMainChunkX(), region.getMainChunkZ());
+        IChunk chunk = region.getChunk(region.getCenterX(), region.getCenterZ());
         INSTANCE.get().crash(chunk, generator, t);
     }
 }

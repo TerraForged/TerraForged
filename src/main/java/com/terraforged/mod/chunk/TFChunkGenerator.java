@@ -138,25 +138,25 @@ public class TFChunkGenerator extends ChunkGenerator {
         return seed;
     }
 
-    public final Supplier<DimensionSettings> getSettings() {
+    public final Supplier<DimensionSettings> getDimensionSettings() {
         return settings;
     }
 
     @Override
-    protected final Codec<? extends ChunkGenerator> func_230347_a_() {
+    protected final Codec<? extends ChunkGenerator> codec() {
         return CODEC;
     }
 
     @Override
-    public final ChunkGenerator func_230349_a_(long seed) {
+    public final ChunkGenerator withSeed(long seed) {
         Log.debug("Creating seeded generator: {}", seed);
-        TFBiomeProvider biomes = getBiomeProvider().getBiomeProvider(seed);
-        return new TFChunkGenerator(biomes, getSettings());
+        TFBiomeProvider biomes = getBiomeSource().withSeed(seed);
+        return new TFChunkGenerator(biomes, getDimensionSettings());
     }
 
     @Nullable // findStructure
-    public final BlockPos func_235956_a_(ServerWorld world, Structure<?> structure, BlockPos pos, int radius, boolean flag) {
-        if (!this.biomeProvider.hasStructure(structure)) {
+    public final BlockPos findNearestMapFeature(ServerWorld world, Structure<?> structure, BlockPos pos, int radius, boolean flag) {
+        if (!this.biomeProvider.canGenerateStructure(structure)) {
             return null;
         }
 
@@ -173,12 +173,12 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override // isStrongholdChunk
-    public final boolean func_235952_a_(ChunkPos pos) {
+    public final boolean hasStronghold(ChunkPos pos) {
         return strongholdGenerator.isStrongholdChunk(pos);
     }
 
     @Override
-    public final void func_242707_a(DynamicRegistries registries, StructureManager structures, IChunk chunk, TemplateManager templates, long seed) {
+    public final void createStructures(DynamicRegistries registries, StructureManager structures, IChunk chunk, TemplateManager templates, long seed) {
         try (Section section = Profiler.STRUCTURE_STARTS.punchIn()) {
             structureGenerator.generateStructureStarts(chunk, registries, structures, templates);
         } catch (Throwable t) {
@@ -187,7 +187,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public final void func_235953_a_(ISeedReader world, StructureManager structures, IChunk chunk) {
+    public final void createReferences(ISeedReader world, StructureManager structures, IChunk chunk) {
         try (Section section = Profiler.STRUCTURE_REFS.punchIn()) {
             structureGenerator.generateStructureReferences(world, chunk, structures);
         } catch (Throwable t) {
@@ -196,7 +196,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public final void func_242706_a(Registry<Biome> registry, IChunk chunk) {
+    public final void createBiomes(Registry<Biome> registry, IChunk chunk) {
         try (Section section = Profiler.BIOMES.punchIn()) {
             biomeGenerator.generateBiomes(chunk);
         } catch (Throwable t) {
@@ -205,7 +205,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public final void func_230352_b_(IWorld world, StructureManager structures, IChunk chunk) {
+    public final void fillFromNoise(IWorld world, StructureManager structures, IChunk chunk) {
         try (Section section = Profiler.TERRAIN.punchIn()) {
             terrainGenerator.generateTerrain(world, chunk, structures);
         } catch (Throwable t) {
@@ -214,7 +214,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public final void generateSurface(WorldGenRegion region, IChunk chunk) {
+    public final void buildSurfaceAndBedrock(WorldGenRegion region, IChunk chunk) {
         try (Section section = Profiler.SURFACE.punchIn()) {
             surfaceGenerator.generateSurface(region, chunk);
         } catch (Throwable t) {
@@ -223,7 +223,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public final void func_230350_a_(long seed, BiomeManager biomes, IChunk chunk, GenerationStage.Carving carver) {
+    public final void applyCarvers(long seed, BiomeManager biomes, IChunk chunk, GenerationStage.Carving carver) {
         try (Section section = Profiler.get(carver).punchIn()) {
             terrainCarver.carveTerrain(biomes, chunk, carver);
         } catch (Throwable t) {
@@ -232,7 +232,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public final void func_230351_a_(WorldGenRegion region, StructureManager structures) {
+    public final void applyBiomeDecoration(WorldGenRegion region, StructureManager structures) {
         try (Section section = Profiler.DECORATION.punchIn()) {
             featureGenerator.generateFeatures(region, structures);
         } catch (Throwable t) {
@@ -241,7 +241,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public final void func_230354_a_(WorldGenRegion region) {
+    public final void spawnOriginalMobs(WorldGenRegion region) {
         try (Section section = Profiler.MOB_SPAWNS.punchIn()) {
             mobGenerator.generateMobs(region);
         } catch (Throwable t) {
@@ -250,7 +250,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public final List<MobSpawnInfo.Spawners> func_230353_a_(Biome biome, StructureManager structures, EntityClassification type, BlockPos pos) {
+    public final List<MobSpawnInfo.Spawners> getMobsAt(Biome biome, StructureManager structures, EntityClassification type, BlockPos pos) {
         return mobGenerator.getSpawns(biome, structures, type, pos);
     }
 
@@ -259,7 +259,7 @@ public class TFChunkGenerator extends ChunkGenerator {
      * be accurate enough for placing structures etc since we do a terrain-fitting pass around them later.
      */
     @Override
-    public final int getHeight(int x, int z, Heightmap.Type type) {
+    public final int getBaseHeight(int x, int z, Heightmap.Type type) {
         final Cell cell = localCellResource.get().reset();
         biomeProvider.getWorldLookup().applyCell(cell, x, z);
 
@@ -272,8 +272,8 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override // getBlockColumn
-    public final IBlockReader func_230348_a_(int x, int z) {
-        final int height = getNoiseHeight(x, z, Heightmap.Type.OCEAN_FLOOR_WG);
+    public final IBlockReader getBaseColumn(int x, int z) {
+        final int height = getBaseHeight(x, z, Heightmap.Type.OCEAN_FLOOR_WG);
         final int surface = Math.max(height, getSeaLevel() + 1);
 
         BlockColumn column = ColumnResource.get().column.withCapacity(surface);
@@ -291,7 +291,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public final TFBiomeProvider getBiomeProvider() {
+    public final TFBiomeProvider getBiomeSource() {
         return biomeProvider;
     }
 
@@ -300,7 +300,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public final int getMaxBuildHeight() {
+    public final int getGenDepth() {
         // getMaxHeight
         return getContext().levels.worldHeight;
     }
@@ -311,7 +311,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public final int getGroundHeight() {
+    public final int getSpawnHeight() {
         return getContext().levels.groundLevel;
     }
 
@@ -393,24 +393,24 @@ public class TFChunkGenerator extends ChunkGenerator {
 
             if (world instanceof WorldGenRegion) {
                 WorldGenRegion region = (WorldGenRegion) world;
-                return terra.getChunkReader(region.getMainChunkX(), region.getMainChunkZ());
+                return terra.getChunkReader(region.getCenterX(), region.getCenterZ());
             }
         }
         throw new IllegalStateException("Attempted to access TerraForged chunk-generation data from a non-TerraForged chunk generator!");
     }
 
     private static <TF extends TFChunkGenerator, T> Dynamic<T> encodeGenerator(TF generator, DynamicOps<T> ops) {
-        T biomeProvider = Codecs.encodeAndGet(TFBiomeProvider.CODEC, generator.getBiomeProvider(), ops);
-        T dimensionSettings = Codecs.encodeAndGet(DimensionSettings.field_236098_b_, generator.getSettings(), ops);
+        T biomeSource = Codecs.encodeAndGet(TFBiomeProvider.CODEC, generator.getBiomeSource(), ops);
+        T dimensionSettings = Codecs.encodeAndGet(DimensionSettings.CODEC, generator.getDimensionSettings(), ops);
         return new Dynamic<>(ops, ops.createMap(ImmutableMap.of(
-                ops.createString("biome_provider"), biomeProvider,
+                ops.createString("biome_provider"), biomeSource,
                 ops.createString("dimension_settings"), dimensionSettings
         )));
     }
 
     private static <TF extends TFChunkGenerator, T> TF decodeGenerator(Dynamic<T> dynamic, BiFunction<TFBiomeProvider, Supplier<DimensionSettings>, TF> constructor) {
         TFBiomeProvider biomes = Codecs.decodeAndGet(TFBiomeProvider.CODEC, dynamic.get("biome_provider"));
-        Supplier<DimensionSettings> settings = Codecs.decodeAndGet(DimensionSettings.field_236098_b_, dynamic.get("dimension_settings"));
+        Supplier<DimensionSettings> settings = Codecs.decodeAndGet(DimensionSettings.CODEC, dynamic.get("dimension_settings"));
         return constructor.apply(biomes, settings);
     }
 

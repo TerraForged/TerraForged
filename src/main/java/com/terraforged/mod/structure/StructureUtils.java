@@ -44,8 +44,8 @@ import java.util.Objects;
 public class StructureUtils {
 
     public static JsonObject addMissingStructures(JsonObject dest) {
-        DimensionSettings settings = WorldGenRegistries.NOISE_SETTINGS.getOrThrow(DimensionSettings.field_242734_c);
-        JsonElement element = Codecs.encode(DimensionStructuresSettings.field_236190_a_, settings.getStructures());
+        DimensionSettings settings = WorldGenRegistries.NOISE_GENERATOR_SETTINGS.getOrThrow(DimensionSettings.OVERWORLD);
+        JsonElement element = Codecs.encode(DimensionStructuresSettings.CODEC, settings.structureSettings());
         if (element.isJsonObject()) {
             JsonObject defaults = element.getAsJsonObject();
             for (Map.Entry<String, JsonElement> entry : defaults.entrySet()) {
@@ -60,18 +60,18 @@ public class StructureUtils {
     public static Map<String, StructureSettings.StructureSeparation> getOverworldStructureDefaults() {
         Map<String, StructureSettings.StructureSeparation> map = new LinkedHashMap<>();
 
-        DimensionSettings dimensionSettings = WorldGenRegistries.NOISE_SETTINGS.getOrThrow(DimensionSettings.field_242734_c);
-        DimensionStructuresSettings structuresSettings = dimensionSettings.getStructures();
+        DimensionSettings dimensionSettings = WorldGenRegistries.NOISE_GENERATOR_SETTINGS.getOrThrow(DimensionSettings.OVERWORLD);
+        DimensionStructuresSettings structuresSettings = dimensionSettings.structureSettings();
 
-        for (Map.Entry<Structure<?>, StructureSeparationSettings> entry : structuresSettings.func_236195_a_().entrySet()) {
+        for (Map.Entry<Structure<?>, StructureSeparationSettings> entry : structuresSettings.structureConfig().entrySet()) {
             if (entry.getKey().getRegistryName() == null) {
                 continue;
             }
 
             StructureSettings.StructureSeparation separation = new StructureSettings.StructureSeparation();
-            separation.salt = entry.getValue().func_236673_c_();
-            separation.spacing = entry.getValue().func_236668_a_();
-            separation.separation = entry.getValue().func_236671_b_();
+            separation.salt = entry.getValue().salt();
+            separation.spacing = entry.getValue().spacing();
+            separation.separation = entry.getValue().separation();
 
             map.put(Objects.toString(entry.getKey().getRegistryName()), separation);
         }
@@ -81,7 +81,7 @@ public class StructureUtils {
 
     public static void retainOverworldStructures(Map<String, ?> map, DimensionStructuresSettings settings, TFBiomeContext context) {
         Biome[] overworldBiomes = BiomeAnalyser.getOverworldBiomes(context);
-        for (Structure<?> structure : settings.func_236195_a_().keySet()) {
+        for (Structure<?> structure : settings.structureConfig().keySet()) {
             if (structure.getRegistryName() == null) {
                 continue;
             }
@@ -95,7 +95,7 @@ public class StructureUtils {
 
     public static boolean hasStructure(Structure<?> structure, Biome[] biomes) {
         for (Biome biome : biomes) {
-            if (biome.getGenerationSettings().hasStructure(structure)) {
+            if (biome.getGenerationSettings().isValidStart(structure)) {
                 return true;
             }
         }

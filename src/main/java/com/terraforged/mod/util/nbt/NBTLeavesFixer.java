@@ -24,9 +24,18 @@
 
 package com.terraforged.mod.util.nbt;
 
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.StringNBT;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 
 public class NBTLeavesFixer {
@@ -69,7 +78,7 @@ public class NBTLeavesFixer {
         if (nbt instanceof CompoundNBT) {
             CompoundNBT map = (CompoundNBT) nbt;
             boolean change = false;
-            for (String key : map.keySet()) {
+            for (String key : map.getAllKeys()) {
                 INBT value = map.get(key);
                 INBT result = modify(key, value, ruleSet);
                 map.put(key, result);
@@ -92,7 +101,7 @@ public class NBTLeavesFixer {
                 return nbt;
             }
             if (nbt instanceof StringNBT) {
-                String value = nbt.getString();
+                String value = nbt.getAsString();
                 if (value.equals(rule.match)) {
                     System.out.println(" Replaced value for: " + name);
                     return StringNBT.valueOf(rule.replace.toString());

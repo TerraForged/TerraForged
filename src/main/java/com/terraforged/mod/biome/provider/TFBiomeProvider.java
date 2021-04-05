@@ -72,7 +72,7 @@ public class TFBiomeProvider extends BiomeProvider {
     }
 
     @Override
-    protected Codec<TFBiomeProvider> getBiomeProviderCodec() {
+    protected Codec<TFBiomeProvider> codec() {
         return CODEC;
     }
 
@@ -85,7 +85,7 @@ public class TFBiomeProvider extends BiomeProvider {
     }
 
     @Override
-    public TFBiomeProvider getBiomeProvider(long seed) {
+    public TFBiomeProvider withSeed(long seed) {
         Log.debug("Creating seeded biome provider: {}", seed);
         TerraSettings settings = context.terraSettings;
         settings.world.seed = seed;
@@ -93,7 +93,7 @@ public class TFBiomeProvider extends BiomeProvider {
     }
 
     @Override
-    public Set<Biome> getBiomes(int centerX, int centerY, int centerZ, int radius) {
+    public Set<Biome> getBiomesWithin(int centerX, int centerY, int centerZ, int radius) {
         // search smaller radius to encourage more attempts to generate structures like mansions
         radius = Math.max(8, NoiseUtil.round(biomeSearchModifier * radius));
         int minX = centerX - radius;
@@ -113,7 +113,7 @@ public class TFBiomeProvider extends BiomeProvider {
 
     @Override
     @Nullable
-    public BlockPos findBiomePosition(int centerX, int centerY, int centerZ, int radius, int increment, Predicate<Biome> biomes, Random random, boolean centerOutSearch) {
+    public BlockPos findBiomeHorizontal(int centerX, int centerY, int centerZ, int radius, int increment, Predicate<Biome> biomes, Random random, boolean centerOutSearch) {
         // convert block coords to biome coords
         int biomeRadius = radius >> 2;
         int biomeCenterX = centerX >> 2;
@@ -160,7 +160,7 @@ public class TFBiomeProvider extends BiomeProvider {
                             pos = new BlockPos.Mutable(x, centerY, z);
                         } else if (random.nextInt(count + 1) == 0) {
                             // as the match count increases the chance of getting a zero reduces
-                            pos.setPos(x, centerY, z);
+                            pos.set(x, centerY, z);
                         }
 
                         count++;

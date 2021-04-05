@@ -47,7 +47,7 @@ public class TFBiomeContext implements BiomeContext<RegistryKey<Biome>> {
     public final RegistryInstance<Biome> biomes;
 
     public TFBiomeContext(DynamicRegistries.Impl registries) {
-        this(registries.getRegistry(Registry.BIOME_KEY));
+        this(registries.registryOrThrow(Registry.BIOME_REGISTRY));
     }
 
     public TFBiomeContext(Registry<Biome> biomes) {
@@ -93,14 +93,14 @@ public class TFBiomeContext implements BiomeContext<RegistryKey<Biome>> {
     }
 
     private static <T> TFBiomeContext decodeBiomeContext(Dynamic<T> dynamic) {
-        return new TFBiomeContext(Codecs.decodeAndGet(RegistryLookupCodec.getLookUpCodec(Registry.BIOME_KEY).codec(), dynamic));
+        return new TFBiomeContext(Codecs.decodeAndGet(RegistryLookupCodec.create(Registry.BIOME_REGISTRY).codec(), dynamic));
     }
 
     private static <T> Dynamic<T> encodeBiomeContext(TFBiomeContext context, DynamicOps<T> ops) {
-        return new Dynamic<>(ops, Codecs.encodeAndGet(RegistryLookupCodec.getLookUpCodec(Registry.BIOME_KEY).codec(), context.biomes.getRegistry(), ops));
+        return new Dynamic<>(ops, Codecs.encodeAndGet(RegistryLookupCodec.create(Registry.BIOME_REGISTRY).codec(), context.biomes.getRegistry(), ops));
     }
 
     public static TFBiomeContext dynamic() {
-        return new TFBiomeContext(DynamicRegistries.func_239770_b_());
+        return new TFBiomeContext(DynamicRegistries.builtin());
     }
 }

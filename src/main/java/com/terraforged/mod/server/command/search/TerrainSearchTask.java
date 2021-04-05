@@ -83,7 +83,7 @@ public class TerrainSearchTask extends ChunkGeneratorSearch {
     public BlockPos success(BlockPos.Mutable pos) {
         int x = PosUtil.unpackLeft(result);
         int z = PosUtil.unpackRight(result);
-        return super.success(pos.setPos(x, pos.getY(), z));
+        return super.success(pos.set(x, pos.getY(), z));
     }
 
     @Override

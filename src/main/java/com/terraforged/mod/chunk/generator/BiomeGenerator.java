@@ -42,7 +42,7 @@ public class BiomeGenerator implements Generator.Biomes {
     public void generateBiomes(IChunk chunk) {
         ChunkPos pos = chunk.getPos();
         try (ChunkReader reader = generator.getChunkReader(pos.x, pos.z)) {
-            TFBiomeContainer.create(reader, generator.getBiomeProvider());
+            TFBiomeContainer.create(reader, generator.getBiomeSource());
         }
     }
 }

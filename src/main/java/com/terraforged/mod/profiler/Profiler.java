@@ -101,9 +101,9 @@ public enum Profiler {
     public ITextComponent toText() {
         return new StringTextComponent(name().toLowerCase())
                 .append(new StringTextComponent(String.format(": %.3fms", averageMS()))
-                        .modifyStyle(style -> style.forceFormatting(TextFormatting.WHITE)))
-                .modifyStyle(style -> style.applyFormatting(TextFormatting.YELLOW)
-                        .setHoverEvent(createHoverStats(minMS(), maxMS())));
+                        .withStyle(style -> style.withColor(TextFormatting.WHITE)))
+                .withStyle(style -> style.withColor(TextFormatting.YELLOW)
+                        .withHoverEvent(createHoverStats(minMS(), maxMS())));
     }
 
     public static Profiler get(GenerationStage.Carving stage) {
@@ -113,7 +113,7 @@ public enum Profiler {
     public static HoverEvent createHoverStats(long min, long max) {
         String message = String.format("Min: %sms, Max: %sms", min, max);
         return new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new StringTextComponent(message).modifyStyle(s -> s.forceFormatting(TextFormatting.WHITE)));
+                new StringTextComponent(message).withStyle(s -> s.withColor(TextFormatting.WHITE)));
     }
 
     public static void reset() {

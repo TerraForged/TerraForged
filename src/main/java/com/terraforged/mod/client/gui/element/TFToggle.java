@@ -90,7 +90,7 @@ public class TFToggle extends TFButton {
     public boolean mouseClicked(double mx, double my, int button) {
         if (isValidClickButton(button)) {
             int direction = button == 0 ? 1 : -1;
-            this.playDownSound(Minecraft.getInstance().getSoundHandler());
+            this.playDownSound(Minecraft.getInstance().getSoundManager());
             this.onClick(mx, my, direction);
             return true;
         }
@@ -134,8 +134,8 @@ public class TFToggle extends TFButton {
             return "null";
         }
         if (nbt.getId() == Constants.NBT.TAG_BYTE) {
-            return ((ByteNBT) nbt).getByte() == 0b01 ? "true" : "false";
+            return ((ByteNBT) nbt).getAsByte() == 0b01 ? "true" : "false";
         }
-        return nbt.getString();
+        return nbt.getAsString();
     }
 }

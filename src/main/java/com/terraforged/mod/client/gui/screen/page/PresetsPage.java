@@ -111,7 +111,7 @@ public class PresetsPage extends BasePage {
 
                 // register with the manager & reset the text field
                 manager.add(preset);
-                nameInput.setText("");
+                nameInput.setValue("");
 
                 // select newly created preset & load
                 setSelected(preset);
@@ -246,7 +246,7 @@ public class PresetsPage extends BasePage {
 
     private void setSelected(Preset preset) {
         ScrollPane pane = getColumn(0).scrollPane;
-        for (ScrollPane.Entry entry : pane.getEventListeners()) {
+        for (ScrollPane.Entry entry : pane.children()) {
             if (entry.option.getMessage().getString().equalsIgnoreCase(preset.getName())) {
                 pane.setSelected(entry);
                 return;
@@ -266,7 +266,7 @@ public class PresetsPage extends BasePage {
         Column left = getColumn(0);
         left.scrollPane.setSelected(null);
         left.scrollPane.setRenderSelection(true);
-        left.scrollPane.getEventListeners().clear();
+        left.scrollPane.children().clear();
 
         for (Preset preset : manager) {
             if (preset.internal()) {

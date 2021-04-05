@@ -48,7 +48,7 @@ public class ChunkCarverFix extends ChunkDelegate {
     }
 
     public BitSet getCarvingMask(GenerationStage.Carving type) {
-        return ((ChunkPrimer) delegate).getOrAddCarvingMask(type);
+        return ((ChunkPrimer) delegate).getOrCreateCarvingMask(type);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class ChunkCarverFix extends ChunkDelegate {
     @Override
     public BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving) {
         if (maskDepth != -1) {
-            int surface = delegate.getTopBlockY(Heightmap.Type.WORLD_SURFACE, pos.getX(), pos.getZ());
+            int surface = delegate.getHeight(Heightmap.Type.WORLD_SURFACE, pos.getX(), pos.getZ());
             if (pos.getY() > surface - maskDepth) {
                 return state;
             }

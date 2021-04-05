@@ -48,11 +48,11 @@ public class LayerDecorator implements ColumnDecorator {
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        context.pos.setPos(x, y + 1, z);
+        context.pos.set(x, y + 1, z);
 
         BlockState state = chunk.getBlockState(context.pos);
         if (state.isAir(chunk, context.pos)) {
-            context.pos.setPos(x, y, z);
+            context.pos.set(x, y, z);
             state = chunk.getBlockState(context.pos);
             if (state.isAir(chunk, context.pos)) {
                 return;
@@ -83,8 +83,8 @@ public class LayerDecorator implements ColumnDecorator {
     }
 
     private void fixBaseBlock(IChunk chunk, BlockPos pos, BlockState layerMaterial, int level) {
-        if (level > 1 && layerMaterial.isIn(Blocks.SNOW)) {
-            BlockPos pos1 = pos.down();
+        if (level > 1 && layerMaterial.is(Blocks.SNOW)) {
+            BlockPos pos1 = pos.below();
             BlockState below = chunk.getBlockState(pos1);
 
             // Turns to dirt if submerged or the light-level is low. Light hasn't been calc'd at this

@@ -46,7 +46,7 @@ public class TFLabel extends TFButton {
     @Override
     public void render(MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
         Minecraft minecraft = Minecraft.getInstance();
-        FontRenderer fontrenderer = minecraft.fontRenderer;
-        fontrenderer.drawString(matrix, getMessage().getString(), x, y + (height - 8) / 2F, color);
+        FontRenderer fontrenderer = minecraft.font;
+        fontrenderer.draw(matrix, getMessage().getString(), x, y + (height - 8) / 2F, color);
     }
 }

@@ -86,21 +86,21 @@ public class StrongholdGenerator implements Generator.Strongholds {
 
         final ChunkPos[] chunks = positions.get();
         for(ChunkPos chunkpos : chunks) {
-            mutable.setPos((chunkpos.x << 4) + 8, 32, (chunkpos.z << 4) + 8);
-            double dist2 = mutable.distanceSq(pos);
+            mutable.set((chunkpos.x << 4) + 8, 32, (chunkpos.z << 4) + 8);
+            double dist2 = mutable.distSqr(pos);
 
             if (nearest == null) {
                 nearest = new BlockPos.Mutable();
-                nearest.setPos(mutable);
+                nearest.set(mutable);
                 distance2 = dist2;
             } else if (dist2 < distance2) {
-                nearest.setPos(mutable);
+                nearest.set(mutable);
                 distance2 = dist2;
             }
         }
 
         if (nearest != null) {
-            return nearest.toImmutable();
+            return nearest.immutable();
         }
 
         return null;
@@ -132,7 +132,7 @@ public class StrongholdGenerator implements Generator.Strongholds {
 
                 int chunkCenterX = (x << 4) + 8;
                 int chunkCenterZ = (z << 4) + 8;
-                BlockPos blockpos = biomeProvider.findBiomePosition(chunkCenterX, 0, chunkCenterZ, 112, biomePredicate, random);
+                BlockPos blockpos = biomeProvider.findBiomeHorizontal(chunkCenterX, 0, chunkCenterZ, 112, biomePredicate, random);
 
                 if (blockpos != null) {
                     x = blockpos.getX() >> 4;
@@ -163,8 +163,8 @@ public class StrongholdGenerator implements Generator.Strongholds {
 
     private static Predicate<Biome> getStrongholdBiomes(TFBiomeProvider biomeProvider) {
         Set<Biome> biomes = new HashSet<>();
-        for(Biome biome : biomeProvider.getBiomes()) {
-            if (biome.getGenerationSettings().hasStructure(Structure.STRONGHOLD)) {
+        for(Biome biome : biomeProvider.possibleBiomes()) {
+            if (biome.getGenerationSettings().isValidStart(Structure.STRONGHOLD)) {
                 biomes.add(biome);
             }
         }

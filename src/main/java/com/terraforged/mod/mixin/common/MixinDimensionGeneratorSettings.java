@@ -41,8 +41,8 @@ import java.util.Properties;
 @Mixin(DimensionGeneratorSettings.class)
 public class MixinDimensionGeneratorSettings {
 
-    @Inject(method = "func_242753_a", at = @At("HEAD"))
-    private static void onLoadLevel(DynamicRegistries registries, Properties properties, CallbackInfoReturnable<DimensionGeneratorSettings> ci) {
+    @Inject(method = "create", at = @At("HEAD"))
+    private static void onCreate(DynamicRegistries registries, Properties properties, CallbackInfoReturnable<DimensionGeneratorSettings> ci) {
         PropertyUtils.fixTFLevelType(properties);
     }
 }

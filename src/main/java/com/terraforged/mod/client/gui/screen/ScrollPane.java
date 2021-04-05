@@ -55,7 +55,7 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
 
     @Override
     public void renderOverlays(MatrixStack matrixStack, Screen screen, int x, int y) {
-        for (Entry entry : this.getEventListeners()) {
+        for (Entry entry : this.children()) {
             if (entry.isMouseOver(x, y) && entry.option.isMouseOver(x, y)) {
                 Widget button = entry.option;
                 if (button instanceof Element) {
@@ -87,7 +87,7 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        for (Entry entry : getEventListeners()) {
+        for (Entry entry : children()) {
             if (!entry.isMouseOver(mouseX, mouseY) && entry.option.isFocused()) {
                 entry.option.changeFocus(true);
             }
@@ -102,7 +102,7 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
 
     @Override
     protected boolean isSelectedItem(int index) {
-        return renderSelection && Objects.equals(getSelected(), getEventListeners().get(index));
+        return renderSelection && Objects.equals(getSelected(), children().get(index));
     }
 
     public class Entry extends AbstractOptionList.Entry<Entry> {
@@ -119,7 +119,7 @@ public class ScrollPane extends AbstractOptionList<ScrollPane.Entry> implements 
         }
 
         @Override
-        public List<? extends IGuiEventListener> getEventListeners() {
+        public List<? extends IGuiEventListener> children() {
             return Collections.singletonList(option);
         }
 

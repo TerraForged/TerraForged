@@ -52,7 +52,7 @@ import java.util.List;
 public class MobGenerator implements Generator.Mobs {
 
     private static final String DISABLE_MOBS = "disable_mob_generation";
-    private static final Codec<DimensionSettings> CODEC = DimensionSettings.field_236097_a_;
+    private static final Codec<DimensionSettings> CODEC = DimensionSettings.DIRECT_CODEC;
 
     private final boolean mobSpawning;
     private final CatSpawner catSpawner = new CatSpawner();
@@ -60,15 +60,15 @@ public class MobGenerator implements Generator.Mobs {
     private final PhantomSpawner phantomSpawner = new PhantomSpawner();
 
     public MobGenerator(TFChunkGenerator generator) {
-        DimensionSettings settings = generator.getSettings().get();
+        DimensionSettings settings = generator.getDimensionSettings().get();
         this.mobSpawning = !Codecs.getField(settings, CODEC, JsonElement::getAsBoolean, DISABLE_MOBS).orElse(false);
     }
 
     @Override
     public final void generateMobs(WorldGenRegion region) {
         if (mobSpawning) {
-            int chunkX = region.getMainChunkX();
-            int chunkZ = region.getMainChunkZ();
+            int chunkX = region.getCenterX();
+            int chunkZ = region.getCenterZ();
             BiomeContainer biomes = region.getChunk(chunkX, chunkZ).getBiomes();
             if (biomes == null) {
                 return;
@@ -76,15 +76,15 @@ public class MobGenerator implements Generator.Mobs {
             Biome biome = biomes.getNoiseBiome(0, 0, 0);
             SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
             sharedseedrandom.setDecorationSeed(region.getSeed(), chunkX << 4, chunkZ << 4);
-            WorldEntitySpawner.performWorldGenSpawning(region, biome, chunkX, chunkZ, sharedseedrandom);
+            WorldEntitySpawner.spawnMobsForChunkGeneration(region, biome, chunkX, chunkZ, sharedseedrandom);
         }
     }
 
     @Override
     public final void tickSpawners(ServerWorld world, boolean hostile, boolean peaceful) {
-        phantomSpawner.func_230253_a_(world, hostile, peaceful);
-        patrolSpawner.func_230253_a_(world, hostile, peaceful);
-        catSpawner.func_230253_a_(world, hostile, peaceful);
+        phantomSpawner.tick(world, hostile, peaceful);
+        patrolSpawner.tick(world, hostile, peaceful);
+        catSpawner.tick(world, hostile, peaceful);
     }
 
     @Override
@@ -94,30 +94,30 @@ public class MobGenerator implements Generator.Mobs {
             return spawns;
         }
 
-        if (structures.getStructureStart(pos, true, Structure.SWAMP_HUT).isValid()) {
+        if (structures.getStructureAt(pos, true, Structure.SWAMP_HUT).isValid()) {
             if (type == EntityClassification.MONSTER) {
-                return Structure.SWAMP_HUT.getSpawnList();
+                return Structure.SWAMP_HUT.getDefaultSpawnList();
             }
 
             if (type == EntityClassification.CREATURE) {
-                return Structure.SWAMP_HUT.getCreatureSpawnList();
+                return Structure.SWAMP_HUT.getDefaultCreatureSpawnList();
             }
         }
 
         if (type == EntityClassification.MONSTER) {
-            if (structures.getStructureStart(pos, false, Structure.PILLAGER_OUTPOST).isValid()) {
-                return Structure.PILLAGER_OUTPOST.getSpawnList();
+            if (structures.getStructureAt(pos, false, Structure.PILLAGER_OUTPOST).isValid()) {
+                return Structure.PILLAGER_OUTPOST.getSpecialEnemies();
             }
 
-            if (structures.getStructureStart(pos, false, Structure.MONUMENT).isValid()) {
-                return Structure.MONUMENT.getSpawnList();
+            if (structures.getStructureAt(pos, false, Structure.OCEAN_MONUMENT).isValid()) {
+                return Structure.OCEAN_MONUMENT.getSpecialEnemies();
             }
 
-            if (structures.getStructureStart(pos, true, Structure.FORTRESS).isValid()) {
-                return Structure.FORTRESS.getSpawnList();
+            if (structures.getStructureAt(pos, true, Structure.NETHER_BRIDGE).isValid()) {
+                return Structure.NETHER_BRIDGE.getSpecialEnemies();
             }
         }
 
-        return biome.getMobSpawnInfo().getSpawners(type);
+        return biome.getMobSettings().getMobs(type);
     }
 }

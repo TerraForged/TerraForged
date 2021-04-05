@@ -70,16 +70,16 @@ public class DemoScreen extends OverlayScreen {
         int buttonsRow = height - 25;
 
         // -52
-        addButton(new Button(buttonsCenter - buttonWidth - buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.CANCEL.getText(), b -> closeScreen()));
+        addButton(new Button(buttonsCenter - buttonWidth - buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.CANCEL.getText(), b -> onClose()));
 
         // +2
         addButton(new Button(buttonsCenter + buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.DONE.getText(), b -> {
             Log.debug("Updating generator settings...");
-            DynamicRegistries registries = parent.field_238934_c_.func_239055_b_();
+            DynamicRegistries registries = parent.worldGenSettingsComponent.registryHolder();
             outputSettings = LevelType.updateOverworld(inputSettings, registries, instance.settings);
             Log.debug("Updating seed...");
             ConfigScreen.setSeed(parent, preview.getSeed());
-            closeScreen();
+            onClose();
         }));
     }
 
@@ -90,7 +90,7 @@ public class DemoScreen extends OverlayScreen {
         if (minecraft == null) {
             return;
         }
-        minecraft.fontRenderer.drawString(matrixStack, message, 5, 10, MESSAGE_COLOR);
+        minecraft.font.draw(matrixStack, message, 5, 10, MESSAGE_COLOR);
     }
 
     @Override
@@ -114,10 +114,10 @@ public class DemoScreen extends OverlayScreen {
     }
 
     @Override
-    public void closeScreen() {
+    public void onClose() {
         Log.debug("Returning to parent screen");
         preview.close();
-        Minecraft.getInstance().displayGuiScreen(parent);
-        parent.field_238934_c_.func_239043_a_(outputSettings);
+        Minecraft.getInstance().setScreen(parent);
+        parent.worldGenSettingsComponent.updateSettings(outputSettings);
     }
 }

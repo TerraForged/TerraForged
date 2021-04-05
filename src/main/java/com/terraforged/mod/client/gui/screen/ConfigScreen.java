@@ -116,7 +116,7 @@ public class ConfigScreen extends OverlayScreen {
         }
 
         // -52
-        addButton(new Button(buttonsCenter - buttonWidth - buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.CANCEL.getText(), b -> closeScreen()));
+        addButton(new Button(buttonsCenter - buttonWidth - buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.CANCEL.getText(), b -> onClose()));
 
         // +2
         addButton(new Button(buttonsCenter + buttonPad, buttonsRow, buttonWidth, buttonHeight, GuiKeys.DONE.getText(), b -> {
@@ -126,12 +126,12 @@ public class ConfigScreen extends OverlayScreen {
 
             Log.debug("Updating generator settings...");
             TerraSettings settings = instance.copySettings();
-            DynamicRegistries registries = parent.field_238934_c_.func_239055_b_();
+            DynamicRegistries registries = parent.worldGenSettingsComponent.registryHolder();
             outputSettings = LevelType.updateOverworld(inputSettings, registries, settings);
 
             Log.debug("Updating seed...");
             ConfigScreen.setSeed(parent, preview.getSeed());
-            closeScreen();
+            onClose();
         }));
 
         // -106
@@ -243,21 +243,21 @@ public class ConfigScreen extends OverlayScreen {
     }
 
     @Override
-    public void closeScreen() {
+    public void onClose() {
         Log.debug("Returning to parent screen");
         for (Page page : pages) {
             page.close();
         }
         preview.close();
-        Minecraft.getInstance().displayGuiScreen(parent);
-        parent.field_238934_c_.func_239043_a_(outputSettings);
+        Minecraft.getInstance().setScreen(parent);
+        parent.worldGenSettingsComponent.updateSettings(outputSettings);
     }
 
     public void syncStructureSettings(TerraSettings settings) {
         DimensionGeneratorSettings level = inputSettings;
-        if (level.func_236225_f_() instanceof TFChunkGenerator) {
-            TerraContext context = ((TFChunkGenerator) level.func_236225_f_()).getContext();
-            DimensionStructuresSettings structuresSettings = level.func_236225_f_().func_235957_b_();
+        if (level.overworld() instanceof TFChunkGenerator) {
+            TerraContext context = ((TFChunkGenerator) level.overworld()).getContext();
+            DimensionStructuresSettings structuresSettings = level.overworld().getSettings();;
             settings.structures.load(structuresSettings, context.biomeContext);
         }
     }
@@ -272,21 +272,21 @@ public class ConfigScreen extends OverlayScreen {
 
     protected static int getSeed(CreateWorldScreen screen) {
         TextFieldWidget field = getWidget(screen);
-        if (field != null && !field.getText().isEmpty()) {
+        if (field != null && !field.getValue().isEmpty()) {
             try {
-                long seed = Long.parseLong(field.getText());
+                long seed = Long.parseLong(field.getValue());
                 return (int) seed;
             } catch (NumberFormatException var6) {
-                return field.getText().hashCode();
+                return field.getValue().hashCode();
             }
         }
         return -1;
     }
 
     protected static TerraSettings getInitialSettings(DimensionGeneratorSettings level) {
-        if (level.func_236225_f_() instanceof TFChunkGenerator) {
-            TerraContext context = ((TFChunkGenerator) level.func_236225_f_()).getContext();
-            DimensionStructuresSettings structuresSettings = level.func_236225_f_().func_235957_b_();
+        if (level.overworld() instanceof TFChunkGenerator) {
+            TerraContext context = ((TFChunkGenerator) level.overworld()).getContext();
+            DimensionStructuresSettings structuresSettings = level.overworld().getSettings();
             TerraSettings settings = context.terraSettings;
             TerraSettings copy = new TerraSettings(settings.world.seed);
             JsonElement dataCopy = DataUtils.toJson(settings);
@@ -300,13 +300,13 @@ public class ConfigScreen extends OverlayScreen {
     protected static void setSeed(CreateWorldScreen screen, int seed) {
         TextFieldWidget field = getWidget(screen);
         if (field != null) {
-            field.setText(String.valueOf(seed));
+            field.setValue(String.valueOf(seed));
         }
     }
 
     private static TextFieldWidget getWidget(CreateWorldScreen screen) {
-        String message = I18n.format("selectWorld.enterSeed");
-        for (IGuiEventListener widget : screen.getEventListeners()) {
+        String message = I18n.get("selectWorld.enterSeed");
+        for (IGuiEventListener widget : screen.children()) {
             if (widget instanceof TextFieldWidget) {
                 TextFieldWidget field = (TextFieldWidget) widget;
                 if (field.getMessage().getString().equals(message)) {

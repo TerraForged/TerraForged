@@ -145,7 +145,7 @@ public class QuadSearch {
                 int maxZ = startZ + (dir.y * radiusf);
                 if (search.test(px, maxZ)) {
                     task1 = -1;
-                    result = getFirstResult(result, search.result(), search);
+                    result = getResult(result, search.result(), search);
                 }
             }
 
@@ -155,7 +155,7 @@ public class QuadSearch {
                 int maxX = startX + (dir.x * radiusf);
                 if (search.test(maxX, pz)) {
                     task2 = -1;
-                    result = getFirstResult(result, search.result(), search);
+                    result = getResult(result, search.result(), search);
                 }
             }
 
@@ -178,7 +178,7 @@ public class QuadSearch {
         while (context.hasTasks() && !context.hasTimedOut()) {
             for (ForkJoinTask<T> task : tasks) {
                 if (task.isDone()) {
-                    result = getFirstResult(result, task.join(), search);
+                    result = getResult(result, task.join(), search);
                 }
             }
         }
@@ -190,7 +190,7 @@ public class QuadSearch {
         return result;
     }
 
-    private static <T> T getFirstResult(T current, T value, Comparator<T> comparator) {
+    private static <T> T getResult(T current, T value, Comparator<T> comparator) {
         if (current == null) {
             return value;
         }

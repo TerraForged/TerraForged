@@ -97,7 +97,7 @@ public class ModBiomes {
     }
 
     private static RegistryKey<Biome> createKey(String name) {
-        return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, new ResourceLocation(TerraForgedMod.MODID, name));
+        return RegistryKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(TerraForgedMod.MODID, name));
     }
 
     private static void register(RegistryEvent.Register<Biome> event, RegistryKey<Biome> key, BiomeBuilder builder) {

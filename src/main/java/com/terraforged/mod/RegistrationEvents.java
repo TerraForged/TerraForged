@@ -47,8 +47,8 @@ import net.minecraftforge.fml.common.Mod;
 public class RegistrationEvents {
 
     static void registerCodecs() {
-        Registry.register(Registry.BIOME_PROVIDER_CODEC, TerraForgedMod.MODID + ":climate", TFBiomeProvider.CODEC);
-        Registry.register(Registry.CHUNK_GENERATOR_CODEC, TerraForgedMod.MODID + ":generator", TFChunkGenerator.CODEC);
+        Registry.register(Registry.BIOME_SOURCE, TerraForgedMod.MODID + ":climate", TFBiomeProvider.CODEC);
+        Registry.register(Registry.CHUNK_GENERATOR, TerraForgedMod.MODID + ":generator", TFChunkGenerator.CODEC);
     }
 
     static void registerMissingBiomeTypes() {

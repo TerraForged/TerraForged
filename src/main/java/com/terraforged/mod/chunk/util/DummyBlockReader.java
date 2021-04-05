@@ -44,11 +44,11 @@ public class DummyBlockReader implements IBlockReader {
     private FluidState fluid;
 
     public DummyBlockReader set(BlockState state) {
-        return set(state, Fluids.EMPTY.getDefaultState());
+        return set(state, Fluids.EMPTY.defaultFluidState());
     }
 
     public DummyBlockReader set(FluidState fluid) {
-        return set(Blocks.AIR.getDefaultState(), fluid);
+        return set(Blocks.AIR.defaultBlockState(), fluid);
     }
 
     public DummyBlockReader set(BlockState state, FluidState fluid) {
@@ -59,7 +59,7 @@ public class DummyBlockReader implements IBlockReader {
 
     @Nullable
     @Override
-    public TileEntity getTileEntity(BlockPos pos) {
+    public TileEntity getBlockEntity(BlockPos pos) {
         return null;
     }
 

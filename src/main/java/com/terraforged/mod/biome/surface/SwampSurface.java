@@ -39,7 +39,7 @@ import net.minecraft.world.gen.surfacebuilders.SurfaceBuilderConfig;
 public class SwampSurface implements Surface {
 
     private final Module noise;
-    private final SurfaceBuilderConfig config = SurfaceBuilder.GRASS_DIRT_GRAVEL_CONFIG;
+    private final SurfaceBuilderConfig config = SurfaceBuilder.CONFIG_GRASS;
 
     public SwampSurface(GeneratorContext context) {
         noise = Source.simplex(context.seed.next(), 40, 2).warp(Source.RAND, context.seed.next(), 2, 1, 4);
@@ -47,13 +47,13 @@ public class SwampSurface implements Surface {
 
     @Override
     public void buildSurface(int x, int z, int height, SurfaceContext ctx) {
-        double noise = Biome.INFO_NOISE.noiseAt(x * 0.25D, z * 0.25D, false);
+        double noise = Biome.BIOME_INFO_NOISE.getValue(x * 0.25D, z * 0.25D, false);
 
         if (noise > 0.0D) {
             int dx = x & 15;
             int dz = z & 15;
             for (int y = height; y >= height - 10; --y) {
-                ctx.pos.setPos(dx, y, dz);
+                ctx.pos.set(dx, y, dz);
                 if (ctx.buffer.getBlockState(ctx.pos).isAir()) {
                     continue;
                 }
@@ -65,11 +65,11 @@ public class SwampSurface implements Surface {
             }
         }
 
-        SurfaceBuilder.DEFAULT.buildSurface(ctx.random, ctx.buffer, ctx.biome, x, z, height, noise, ctx.solid, ctx.fluid, ctx.levels.waterLevel, ctx.seed, config);
+        SurfaceBuilder.DEFAULT.apply(ctx.random, ctx.buffer, ctx.biome, x, z, height, noise, ctx.solid, ctx.fluid, ctx.levels.waterLevel, ctx.seed, config);
 
-        int y = ctx.chunk.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, x, z);
+        int y = ctx.chunk.getHeight(Heightmap.Type.OCEAN_FLOOR_WG, x, z);
         if (y <= ctx.levels.waterY) {
-            ctx.buffer.setBlockState(ctx.pos.setPos(x, y, z), getMaterial(x, y, z, ctx), false);
+            ctx.buffer.setBlockState(ctx.pos.set(x, y, z), getMaterial(x, y, z, ctx), false);
         }
     }
 

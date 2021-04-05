@@ -44,13 +44,13 @@ public class DiskFeature extends Feature<SphereReplaceConfig> {
     private final Module domain = Source.simplex(1, 6, 3);
 
     private DiskFeature() {
-        super(SphereReplaceConfig.field_236516_a_);
+        super(SphereReplaceConfig.CODEC);
         setRegistryName(TerraForgedMod.MODID, "disk");
     }
 
     @Override
-    public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, SphereReplaceConfig config) {
-        if (!world.getFluidState(pos).isTagged(FluidTags.WATER)) {
+    public boolean place(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, SphereReplaceConfig config) {
+        if (!world.getFluidState(pos).is(FluidTags.WATER)) {
             return false;
         } else {
             int cRadius = 6;
@@ -67,13 +67,13 @@ public class DiskFeature extends Feature<SphereReplaceConfig> {
                     int dz = z - pos.getZ();
                     float rad2 = domain.getValue(x, z) * radius2;
                     if (dx * dx + dz * dz <= rad2) {
-                        for(int y = pos.getY() - ySize; y <= pos.getY() + ySize && y + 1 < generator.getMaxBuildHeight(); ++y) {
-                            blockPos.setPos(x, y, z);
+                        for(int y = pos.getY() - ySize; y <= pos.getY() + ySize && y + 1 < generator.getGenDepth(); ++y) {
+                            blockPos.set(x, y, z);
                             BlockState current = world.getBlockState(blockPos);
 
                             for(BlockState target : config.targets) {
                                 if (target.getBlock() == current.getBlock()) {
-                                    world.setBlockState(blockPos, config.state, 2);
+                                    world.setBlock(blockPos, config.state, 2);
                                     ++i;
                                     break;
                                 }

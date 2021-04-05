@@ -34,13 +34,16 @@ import com.terraforged.mod.util.DataUtils;
 import com.terraforged.mod.util.Environment;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
+import net.minecraftforge.forgespi.language.IModInfo;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 @Mod(TerraForgedMod.MODID)
@@ -52,7 +55,9 @@ public class TerraForgedMod {
     public static final File PRESETS_DIR = new File(CONFIG_DIR, "presets");
     public static final File DATAPACK_DIR = new File(CONFIG_DIR, "datapacks");
     private static final Supplier<String> VERSION = LazySupplier.of(() -> ModList.get().getModContainerById(MODID)
-            .map(mod -> mod.getModInfo().getVersion().toString())
+            .map(ModContainer::getModInfo)
+            .map(IModInfo::getVersion)
+            .map(Objects::toString)
             .orElse("unknown"));
 
     public TerraForgedMod() {

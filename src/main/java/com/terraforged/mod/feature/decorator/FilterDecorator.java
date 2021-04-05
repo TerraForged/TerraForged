@@ -44,6 +44,6 @@ public class FilterDecorator extends ContextualDecorator<FilterDecoratorConfig> 
 
     @Override
     protected Stream<BlockPos> getPositions(WorldDecoratingHelper helper, DecorationContext context, Random random, FilterDecoratorConfig config, BlockPos pos) {
-        return config.placement.func_242876_a(helper, random, pos).filter(p -> config.filter.test(context, p));
+        return config.placement.getPositions(helper, random, pos).filter(p -> config.filter.test(context, p));
     }
 }

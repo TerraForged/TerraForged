@@ -54,33 +54,33 @@ public class FastChunk extends ChunkDelegate {
     protected FastChunk(ChunkPrimer primer) {
         super(primer);
         this.primer = primer;
-        this.blockX = primer.getPos().getXStart();
-        this.blockZ = primer.getPos().getZStart();
-        this.worldSurface = primer.getHeightmap(Heightmap.Type.WORLD_SURFACE_WG);
-        this.oceanSurface = primer.getHeightmap(Heightmap.Type.OCEAN_FLOOR_WG);
+        this.blockX = primer.getPos().getMinBlockX();
+        this.blockZ = primer.getPos().getMinBlockZ();
+        this.worldSurface = primer.getOrCreateHeightmapUnprimed(Heightmap.Type.WORLD_SURFACE_WG);
+        this.oceanSurface = primer.getOrCreateHeightmapUnprimed(Heightmap.Type.OCEAN_FLOOR_WG);
     }
 
     @Override
     public BlockState setBlockState(BlockPos pos, BlockState state, boolean falling) {
         if (pos.getY() >= 0 && pos.getY() < 256) {
-            ChunkSection section = primer.getSection(pos.getY() >> 4);
-            section.lock();
+            ChunkSection section = primer.getOrCreateSection(pos.getY() >> 4);
+            section.acquire();
             int dx = pos.getX() & 15;
             int dy = pos.getY() & 15;
             int dz = pos.getZ() & 15;
             BlockState replaced = section.setBlockState(dx, dy, dz, state, false);
             if (!state.isAir()) {
-                mutable.setPos(blockX + dx, pos.getY(), blockZ + dz);
+                mutable.set(blockX + dx, pos.getY(), blockZ + dz);
                 if (state.getLightValue(primer, mutable) != 0) {
-                    primer.addLightPosition(mutable);
+                    primer.addLight(mutable);
                 }
                 worldSurface.update(dx, pos.getY(), dz, state);
                 oceanSurface.update(dx, pos.getY(), dz, state);
             }
-            section.unlock();
+            section.release();
             return replaced;
         }
-        return Blocks.VOID_AIR.getDefaultState();
+        return Blocks.VOID_AIR.defaultBlockState();
     }
 
     public void setBiomes(BiomeContainer biomes) {
@@ -98,6 +98,6 @@ public class FastChunk extends ChunkDelegate {
     }
 
     public static void updateWGHeightmaps(IChunk chunk) {
-        Heightmap.updateChunkHeightmaps(chunk, HEIGHT_MAPS);
+        Heightmap.primeHeightmaps(chunk, HEIGHT_MAPS);
     }
 }

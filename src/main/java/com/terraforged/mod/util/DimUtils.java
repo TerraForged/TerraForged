@@ -60,29 +60,29 @@ public class DimUtils {
     private static final ThreadLocalResource<Map<ForgeWorldType, SimpleRegistry<Dimension>>> CACHE = ThreadLocalResource.withInitial(HashMap::new, Map::clear);
 
     public static RegistryKey<DimensionType> getOverworldType() {
-        return DimensionType.OVERWORLD;
+        return DimensionType.OVERWORLD_LOCATION;
     }
 
     public static SimpleRegistry<Dimension> createDimensionRegistry(long seed, DynamicRegistries registries, ChunkGenerator generator) {
-        SimpleRegistry<Dimension> registry = new SimpleRegistry<>(Registry.DIMENSION_KEY, Lifecycle.stable());
+        SimpleRegistry<Dimension> registry = new SimpleRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.stable());
         registry.register(Dimension.OVERWORLD, createDimension(getOverworldType(), registries, generator), Lifecycle.stable());
-        registry.register(Dimension.THE_NETHER, createDefaultNether(seed, registries), Lifecycle.stable());
-        registry.register(Dimension.THE_END, createDefaultEnd(seed, registries), Lifecycle.stable());
+        registry.register(Dimension.NETHER, createDefaultNether(seed, registries), Lifecycle.stable());
+        registry.register(Dimension.END, createDefaultEnd(seed, registries), Lifecycle.stable());
         return registry;
     }
 
     public static SimpleRegistry<Dimension> updateDimensionRegistry(SimpleRegistry<Dimension> registry, DynamicRegistries registries, ChunkGenerator generator) {
         Dimension dimension = createDimension(getOverworldType(), registries, generator);
-        registry.validateAndRegister(OptionalInt.empty(), Dimension.OVERWORLD, dimension, Lifecycle.stable());
+        registry.registerOrOverride(OptionalInt.empty(), Dimension.OVERWORLD, dimension, Lifecycle.stable());
         return registry;
     }
 
     public static DimensionGeneratorSettings populateDimensions(DimensionGeneratorSettings level, DynamicRegistries registries, TerraSettings settings) {
         try (Resource<?> ignored = CACHE.get()) {
             // replace nether with custom dimension if present
-            overrideDimension(Dimension.THE_NETHER, settings.dimensions.dimensions.nether, level, registries);
+            overrideDimension(Dimension.NETHER, settings.dimensions.dimensions.nether, level, registries);
             // replace end with custom dimension if present
-            overrideDimension(Dimension.THE_END, settings.dimensions.dimensions.end, level, registries);
+            overrideDimension(Dimension.END, settings.dimensions.dimensions.end, level, registries);
             // scan forge registry for other level-types and add their extra (ie not overworld,nether,end) dimensions
             if (settings.dimensions.dimensions.includeExtraDimensions) {
                 addExtraDimensions(level, registries);
@@ -97,14 +97,14 @@ public class DimUtils {
             return;
         }
 
-        Dimension dimension = dimensions.getValueForKey(key);
+        Dimension dimension = dimensions.get(key);
         if (dimension == null) {
             return;
         }
 
         // replace the current Dimension assigned to the key without changing the id
-        Log.info("Overriding dimension {} with {}'s", key.getLocation(), levelType);
-        level.func_236224_e_().validateAndRegister(OptionalInt.empty(), key, dimension, Lifecycle.stable());
+        Log.info("Overriding dimension {} with {}'s", key.location(), levelType);
+        level.dimensions().registerOrOverride(OptionalInt.empty(), key, dimension, Lifecycle.stable());
     }
 
     private static void addExtraDimensions(DimensionGeneratorSettings level, DynamicRegistries registries) {
@@ -118,13 +118,13 @@ public class DimUtils {
                 continue;
             }
 
-            for (Map.Entry<RegistryKey<Dimension>, Dimension> entry : dimensions.getEntries()) {
+            for (Map.Entry<RegistryKey<Dimension>, Dimension> entry : dimensions.entrySet()) {
                 // skip existing dims
-                if (level.func_236224_e_().getValueForKey(entry.getKey()) != null) {
+                if (level.dimensions().get(entry.getKey()) != null) {
                     continue;
                 }
-                Log.info("Adding extra dimension {} dimension from {}", entry.getKey().getLocation(), type.getRegistryName());
-                level.func_236224_e_().register(entry.getKey(), entry.getValue(), Lifecycle.stable());
+                Log.info("Adding extra dimension {} dimension from {}", entry.getKey().location(), type.getRegistryName());
+                level.dimensions().register(entry.getKey(), entry.getValue(), Lifecycle.stable());
             }
         }
     }
@@ -143,28 +143,28 @@ public class DimUtils {
         }
 
         return CACHE.open().computeIfAbsent(type, t -> {
-            long seed = level.getSeed();
-            boolean chest = level.hasBonusChest();
-            boolean structures = level.doesGenerateFeatures();
-            return t.createSettings(registries, seed, structures, chest, "").func_236224_e_();
+            long seed = level.seed();
+            boolean chest = level.generateBonusChest();
+            boolean structures = level.generateFeatures();
+            return t.createSettings(registries, seed, structures, chest, "").dimensions();
         });
     }
 
     private static Dimension createDefaultNether(long seed, DynamicRegistries registries) {
         return createDefaultDimension(
                 seed,
-                DimensionType.THE_NETHER,
-                DimensionSettings.field_242736_e,
+                DimensionType.NETHER_LOCATION,
+                DimensionSettings.NETHER,
                 registries,
-                NetherBiomeProvider.Preset.DEFAULT_NETHER_PROVIDER_PRESET::build
+                NetherBiomeProvider.Preset.NETHER::biomeSource
         );
     }
 
     private static Dimension createDefaultEnd(long seed, DynamicRegistries registries) {
         return createDefaultDimension(
                 seed,
-                DimensionType.THE_END,
-                DimensionSettings.field_242737_f,
+                DimensionType.END_LOCATION,
+                DimensionSettings.END,
                 registries,
                 EndBiomeProvider::new
         );
@@ -175,8 +175,8 @@ public class DimUtils {
                                                     RegistryKey<DimensionSettings> setting,
                                                     DynamicRegistries registries,
                                                     BiFunction<Registry<Biome>, Long, BiomeProvider> factory) {
-        Registry<Biome> biomes = registries.getRegistry(Registry.BIOME_KEY);
-        Registry<DimensionSettings> settings = registries.getRegistry(Registry.NOISE_SETTINGS_KEY);
+        Registry<Biome> biomes = registries.registryOrThrow(Registry.BIOME_REGISTRY);
+        Registry<DimensionSettings> settings = registries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
         Supplier<DimensionSettings> settingSupplier = () -> settings.getOrThrow(setting);
         BiomeProvider biomeProvider = factory.apply(biomes, seed);
         ChunkGenerator generator = new NoiseChunkGenerator(biomeProvider, seed, settingSupplier);
@@ -184,8 +184,8 @@ public class DimUtils {
     }
 
     private static Dimension createDimension(RegistryKey<DimensionType> type, DynamicRegistries registries, ChunkGenerator generator) {
-        Log.info("Creating dimension: {}", type.getLocation());
-        Registry<DimensionType> types = registries.getRegistry(Registry.DIMENSION_TYPE_KEY);
+        Log.info("Creating dimension: {}", type.location());
+        Registry<DimensionType> types = registries.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
         Supplier<DimensionType> typeSupplier = () -> types.getOrThrow(type);
         return new Dimension(typeSupplier, generator);
     }
@@ -202,7 +202,7 @@ public class DimUtils {
             return LevelType.TERRAFORGED;
         }
 
-        ResourceLocation location = ResourceLocation.tryCreate(name);
+        ResourceLocation location = ResourceLocation.tryParse(name);
         if (location == null || location.equals(LevelType.TERRAFORGED.getRegistryName())) {
             return LevelType.TERRAFORGED;
         }

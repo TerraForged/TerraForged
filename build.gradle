@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath group: "org.spongepowered", name: "mixingradle", version: "0.7-SNAPSHOT", changing: true
-        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "3.+", changing: true
+        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "4.1.+", changing: true
     }
 }
 
@@ -29,13 +29,19 @@ configurations {
     compile.extendsFrom lib
 }
 
-mixin {
-    add sourceSets.main, "mixin.terraforged.refmap.json"
+sourceSets {
+    main.java {
+        srcDirs += "FeatureManager/src/main/java"
+    }
+    main.resources {
+        srcDirs += "DataGen/resources/"
+        srcDirs += "FeatureManager/src/main/resources"
+        exclude ".cache"
+    }
 }
 
 repositories {
     maven { url "https://io.terraforged.com/repository/maven/" }
-    maven { url "https://www.dogforce-games.com/maven/" }
     mavenCentral()
     jcenter()
 }
@@ -45,6 +51,10 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 //    lib "com.terraforged:Engine:0.2.0"
     lib project(":Engine")
+}
+
+mixin {
+    add sourceSets.main, "mixin.terraforged.refmap.json"
 }
 
 minecraft {
@@ -80,7 +90,7 @@ minecraft {
             property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
             property "forge.logging.console.level", "debug"
             property "fml.earlyprogresswindow", "false"
-            args "--mod", "terraforged", "--server", "--output", file("Module-Data/resources/")
+            args "--mod", "terraforged", "--server", "--output", file("DataGen/resources/")
             jvmArgs "-Xmx4G", "-Xms2G"
             mods {
                 terraforged {
@@ -88,20 +98,6 @@ minecraft {
                 }
             }
         }
-    }
-}
-
-sourceSets {
-    main.java {
-        srcDirs += "Module-TerraForgedAPI/src/main/java"
-        srcDirs += "Module-FeatureManager/src/main/java"
-    }
-    // add resources for the runData task to path
-    main.resources {
-        srcDirs += "Module-Data/resources/"
-        srcDirs += "Module-TerraForgedAPI/src/main/resources"
-        srcDirs += "Module-FeatureManager/src/main/resources"
-        exclude ".cache"
     }
 }
 

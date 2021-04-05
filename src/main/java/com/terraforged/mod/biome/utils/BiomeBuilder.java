@@ -35,7 +35,11 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class BiomeBuilder extends Biome.Builder {
@@ -104,21 +108,21 @@ public class BiomeBuilder extends Biome.Builder {
     protected BiomeBuilder init() {
         settings = new BiomeGenerationSettings.Builder();
         // surface
-        settings.withSurfaceBuilder(parentBiome.getGenerationSettings().getSurfaceBuilder().get());
+        settings.surfaceBuilder(parentBiome.getGenerationSettings().getSurfaceBuilder().get());
         // mobs
-        withMobSpawnSettings(parentBiome.getMobSpawnInfo());
+        mobSpawnSettings(parentBiome.getMobSettings());
         // category
-        category(parentBiome.getCategory());
+        biomeCategory(parentBiome.getBiomeCategory());
         // structures
-        parentBiome.getGenerationSettings().getStructures().forEach(s -> settings.withStructure(s.get()));
+        parentBiome.getGenerationSettings().structures().forEach(s -> settings.addStructureStart(s.get()));
         // carvers
         for (GenerationStage.Carving stage : GenerationStage.Carving.values()) {
             List<Supplier<ConfiguredCarver<?>>> carvers = parentBiome.getGenerationSettings().getCarvers(stage);
-            carvers.forEach(c -> this.settings.withCarver(stage, c.get()));
+            carvers.forEach(c -> this.settings.addCarver(stage, c.get()));
         }
         // features
         for (GenerationStage.Decoration stage : GenerationStage.Decoration.values()) {
-            List<Supplier<ConfiguredFeature<?, ?>>> features = parentBiome.getGenerationSettings().getFeatures().get(stage.ordinal());
+            List<Supplier<ConfiguredFeature<?, ?>>> features = parentBiome.getGenerationSettings().features().get(stage.ordinal());
             features.forEach(f -> this.features.computeIfAbsent(stage, s -> new ArrayList<>()).add(f));
         }
         return this;
@@ -140,11 +144,11 @@ public class BiomeBuilder extends Biome.Builder {
     }
 
     public void copyAmbience(RegistryKey<Biome> key) {
-        Biome biome = ForgeRegistries.BIOMES.getValue(key.getLocation());
+        Biome biome = ForgeRegistries.BIOMES.getValue(key.location());
         if (biome == null) {
             return;
         }
-        setEffects(biome.getAmbience());
+        specialEffects(biome.getSpecialEffects());
     }
 
     public Biome getBiome() {
@@ -157,13 +161,13 @@ public class BiomeBuilder extends Biome.Builder {
 
     @Override
     public Biome build() {
-        withGenerationSettings(settings.build());
+        generationSettings(settings.build());
         return super.build();
     }
 
     public Biome build(RegistryKey<Biome> key) {
-        features.forEach((stage, list) -> list.forEach(f -> getSettings().withFeature(stage, f.get())));
-        withGenerationSettings(settings.build());
-        return super.build().setRegistryName(key.getLocation());
+        features.forEach((stage, list) -> list.forEach(f -> getSettings().addFeature(stage, f.get())));
+        generationSettings(settings.build());
+        return super.build().setRegistryName(key.location());
     }
 }

@@ -33,13 +33,22 @@ import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.chunk.util.DummyBlockReader;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
-import net.minecraft.block.*;
+import net.minecraft.block.AirBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.GrassBlock;
+import net.minecraft.block.MyceliumBlock;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 public class Materials {
 
@@ -94,7 +103,7 @@ public class Materials {
 
     private static Set<Block> createSet(ITag<Block> tag, Block def) {
         try {
-            ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(tag.getAllElements());
+            ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(tag.getValues());
             if (set.isEmpty() && def != null) {
                 set.add(def);
             }
@@ -106,7 +115,7 @@ public class Materials {
 
     private static Set<Block> createSet(ITag.INamedTag<Block> tag, Block def, ITag.INamedTag<Block> required) {
         try {
-            ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(tag.getAllElements());
+            ObjectOpenHashSet<Block> set = new ObjectOpenHashSet<>(tag.getValues());
             set.removeIf(block -> isAbsent(block, tag, required));
 
             if (set.isEmpty() && def != null) {
@@ -129,7 +138,7 @@ public class Materials {
     public static float getHardness(BlockState state) {
         try (Resource<DummyBlockReader> reader = DummyBlockReader.pooled()) {
             reader.get().set(state);
-            return state.getBlockHardness(reader.get(), BlockPos.ZERO);
+            return state.getDestroySpeed(reader.get(), BlockPos.ZERO);
         }
     }
 

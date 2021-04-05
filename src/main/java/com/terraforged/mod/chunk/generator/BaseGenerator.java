@@ -64,7 +64,7 @@ public class BaseGenerator implements Generator.Terrain {
     @Override
     public final void generateTerrain(IWorld world, IChunk chunk, StructureManager structures) {
         try (ChunkReader reader = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z)) {
-            TFBiomeContainer container = TFBiomeContainer.getOrCreate(FastChunk.wrap(chunk), reader, generator.getBiomeProvider());
+            TFBiomeContainer container = TFBiomeContainer.getOrCreate(FastChunk.wrap(chunk), reader, generator.getBiomeSource());
             try (DecoratorContext context = new DecoratorContext(chunk, levels, climate.get())) {
                 reader.iterate(context, (cell, dx, dz, ctx) -> {
                     int px = ctx.blockX + dx;

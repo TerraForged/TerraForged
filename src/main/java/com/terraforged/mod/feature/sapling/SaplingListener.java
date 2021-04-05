@@ -98,7 +98,7 @@ public class SaplingListener {
         // attempt to paste the tree & then clear up any remaining saplings
         if (TemplateFeature.paste(world, event.getRand(), origin, mirror, rotation, feature, feature.decorator, Template.CHECKED)) {
             for (Vector3i dir : directions) {
-                BlockPos neighbour = origin.add(dir);
+                BlockPos neighbour = origin.offset(dir);
                 BlockState state = world.getBlockState(neighbour);
                 if (state.getBlock() == block) {
                     world.destroyBlock(neighbour, false);
@@ -109,7 +109,7 @@ public class SaplingListener {
 
     private static Optional<BlockDataManager> getDataManger(SaplingGrowTreeEvent event) {
         // ignore if client
-        if (event.getWorld().isRemote()) {
+        if (event.getWorld().isClientSide()) {
             return Optional.empty();
         }
 
@@ -121,7 +121,7 @@ public class SaplingListener {
         // get the data manager from the world's chunk generator
         if (event.getWorld() instanceof ServerWorld) {
             ServerWorld serverWorld = (ServerWorld) event.getWorld();
-            ChunkGenerator generator = serverWorld.getChunkProvider().generator;
+            ChunkGenerator generator = serverWorld.getChunkSource().generator;
             if (generator instanceof TFChunkGenerator) {
                 TerraContext context = ((TFChunkGenerator) generator).getContext();
                 if (context.terraSettings.miscellaneous.customBiomeFeatures) {
@@ -133,9 +133,9 @@ public class SaplingListener {
     }
 
     private static boolean isTerraGen(IWorld world) {
-        if (world.getChunkProvider() instanceof ServerChunkProvider) {
-            ServerChunkProvider chunkProvider = (ServerChunkProvider) world.getChunkProvider();
-            return chunkProvider.getChunkGenerator() instanceof TFChunkGenerator;
+        if (world.getChunkSource() instanceof ServerChunkProvider) {
+            ServerChunkProvider chunkProvider = (ServerChunkProvider) world.getChunkSource();
+            return chunkProvider.getGenerator() instanceof TFChunkGenerator;
         }
         return false;
     }
@@ -157,7 +157,7 @@ public class SaplingListener {
             for (Vector3i[] dirs : DIRECTIONS) {
                 boolean match = true;
                 for (Vector3i dir : dirs) {
-                    BlockState state = world.getBlockState(pos.add(dir));
+                    BlockState state = world.getBlockState(pos.offset(dir));
                     if (state.getBlock() != block) {
                         match = false;
                         break;
@@ -165,7 +165,7 @@ public class SaplingListener {
                 }
                 if (match) {
                     Vector3i min = getMin(dirs, Mirror.NONE, Rotation.NONE);
-                    return pos.add(min);
+                    return pos.offset(min);
                 }
             }
         }
@@ -174,7 +174,7 @@ public class SaplingListener {
 
     private static Vector3i getTranslation(Vector3i[] directions, Mirror mirror, Rotation rotation) {
         if (directions.length == 1 || mirror == Mirror.NONE && rotation == Rotation.NONE) {
-            return Vector3i.NULL_VECTOR;
+            return Vector3i.ZERO;
         }
         return getMin(directions, mirror, rotation);
     }
@@ -184,7 +184,7 @@ public class SaplingListener {
         int minZ = 0;
         BlockPos.Mutable pos = new BlockPos.Mutable();
         for (Vector3i vec : directions) {
-            BlockPos dir = Template.transform(pos.setPos(vec), mirror, rotation);
+            BlockPos dir = Template.transform(pos.set(vec), mirror, rotation);
             minX = Math.min(dir.getX(), minX);
             minZ = Math.min(dir.getZ(), minZ);
         }
@@ -196,7 +196,7 @@ public class SaplingListener {
             for (Vector3i[] dirs : DIRECTIONS) {
                 boolean match = true;
                 for (Vector3i dir : dirs) {
-                    BlockState state = world.getBlockState(pos.add(dir));
+                    BlockState state = world.getBlockState(pos.offset(dir));
                     if (state.getBlock() != block) {
                         match = false;
                         break;

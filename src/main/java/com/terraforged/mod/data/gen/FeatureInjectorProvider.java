@@ -95,7 +95,7 @@ public class FeatureInjectorProvider implements IDataProvider {
     }
 
     @Override
-    public void act(DirectoryCache cache) throws IOException {
+    public void run(DirectoryCache cache) throws IOException {
         for (Map.Entry<String, Modifier<Jsonifiable>> entry : modifiers.entrySet()) {
             Path dest = dir.resolve(entry.getKey() + ".json");
             Modifier<Jsonifiable> modifier = entry.getValue();
@@ -109,13 +109,13 @@ public class FeatureInjectorProvider implements IDataProvider {
     @SuppressWarnings("UnstableApiUsage")
     private void write(JsonElement json, Path dest, DirectoryCache cache) throws IOException {
         String data = JavaUnicodeEscaper.outsideOf(0, 0x7f).translate(gson.toJson(json));
-        String hash = IDataProvider.HASH_FUNCTION.hashUnencodedChars(data).toString();
-        if (!Objects.equals(cache.getPreviousHash(dest), hash) || !Files.exists(dest)) {
+        String hash = IDataProvider.SHA1.hashUnencodedChars(data).toString();
+        if (!Objects.equals(cache.getHash(dest), hash) || !Files.exists(dest)) {
             Files.createDirectories(dest.getParent());
             try (BufferedWriter bufferedwriter = Files.newBufferedWriter(dest)) {
                 bufferedwriter.write(data);
             }
         }
-        cache.recordHash(dest, hash);
+        cache.putNew(dest, hash);
     }
 }

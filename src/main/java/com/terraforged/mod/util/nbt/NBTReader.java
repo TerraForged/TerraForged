@@ -25,7 +25,12 @@
 package com.terraforged.mod.util.nbt;
 
 import com.terraforged.engine.serialization.serializer.Reader;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.ByteNBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.FloatNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.IntNBT;
+import net.minecraft.nbt.ListNBT;
 
 import java.util.Collection;
 
@@ -60,7 +65,7 @@ public class NBTReader implements Reader {
 
     @Override
     public Collection<String> getKeys() {
-        return ((CompoundNBT) root).keySet();
+        return ((CompoundNBT) root).getAllKeys();
     }
 
     @Override
@@ -95,21 +100,21 @@ public class NBTReader implements Reader {
 
     @Override
     public String getString() {
-        return root.getString();
+        return root.getAsString();
     }
 
     @Override
     public boolean getBool() {
-        return ((ByteNBT) root).getByte() == 1;
+        return ((ByteNBT) root).getAsByte() == 1;
     }
 
     @Override
     public float getFloat() {
-        return ((FloatNBT) root).getFloat();
+        return ((FloatNBT) root).getAsFloat();
     }
 
     @Override
     public int getInt() {
-        return ((IntNBT) root).getInt();
+        return ((IntNBT) root).getAsInt();
     }
 }

@@ -56,8 +56,8 @@ public class TranslationKey {
     }
 
     public String get() {
-        if (I18n.hasKey(translationKey)) {
-            return I18n.format(translationKey);
+        if (I18n.exists(translationKey)) {
+            return I18n.get(translationKey);
         }
         return defaultValue;
     }
@@ -67,8 +67,8 @@ public class TranslationKey {
     }
 
     public String get(Object... args) {
-        if (I18n.hasKey(translationKey)) {
-            return I18n.format(translationKey, args);
+        if (I18n.exists(translationKey)) {
+            return I18n.get(translationKey, args);
         }
         return defaultValue;
     }

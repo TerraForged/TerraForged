@@ -57,39 +57,39 @@ public class CrashReportBuilder {
         try {
             addContext(chunk, generator, report);
         } catch (Throwable ctx) {
-            report.makeCategory("Reporting Exception").addCrashSectionThrowable("Uh Oh", ctx);
+            report.addCategory("Reporting Exception").setDetail("Uh Oh", ctx);
         }
         return report;
     }
 
     private static void addContext(IChunk chunk, TFChunkGenerator generator, CrashReport report) {
-        addContext(chunk, report.makeCategory("Current Chunk"));
-        addContext(generator, report.makeCategory("TerraForged ChunkGenerator"));
-        addContext(generator.getBiomeProvider(), report.makeCategory("TerraForged BiomeProvider"));
-        addContext(ConfigManager.PERFORMANCE, report.makeCategory("TerraForged Performance Config"));
-        addContext(ConfigManager.BIOME_WEIGHTS, report.makeCategory("TerraForged Biome Weights Config"));
-        addProfilerContext(report.makeCategory("TerraForged Profiler"));
+        addContext(chunk, report.addCategory("Current Chunk"));
+        addContext(generator, report.addCategory("TerraForged ChunkGenerator"));
+        addContext(generator.getBiomeSource(), report.addCategory("TerraForged BiomeProvider"));
+        addContext(ConfigManager.PERFORMANCE, report.addCategory("TerraForged Performance Config"));
+        addContext(ConfigManager.BIOME_WEIGHTS, report.addCategory("TerraForged Biome Weights Config"));
+        addProfilerContext(report.addCategory("TerraForged Profiler"));
     }
 
     private static void addContext(IChunk chunk, CrashReportCategory report) {
-        report.addDetail("Pos", chunk.getPos());
-        report.addDetail("Status", chunk.getStatus().getName());
-        report.addDetail("Structure Starts", getStructures(chunk.getStructureStarts()));
-        report.addDetail("Structure Refs", getStructures(chunk.getStructureReferences()));
+        report.setDetail("Pos", chunk.getPos());
+        report.setDetail("Status", chunk.getStatus().getName());
+        report.setDetail("Structure Starts", getStructures(chunk.getAllStarts()));
+        report.setDetail("Structure Refs", getStructures(chunk.getAllReferences()));
     }
 
     private static void addContext(TFChunkGenerator generator, CrashReportCategory report) {
-        report.addDetail("Seed", generator.getSeed());
-        report.addDetail("Settings", DataUtils.toJson(generator.getContext().terraSettings));
+        report.setDetail("Seed", generator.getSeed());
+        report.setDetail("Settings", DataUtils.toJson(generator.getContext().terraSettings));
     }
 
     private static void addContext(TFBiomeProvider biomes, CrashReportCategory report) {
-        report.addDetail("Overworld Biomes", biomes.getBiomes().stream().map(Biome::getRegistryName).collect(Collectors.toList()));
-//        report.addDetail("Biome Map", biomes.getBiomeMap().toJson(biomes.getContext().gameContext));
+        report.setDetail("Overworld Biomes", biomes.possibleBiomes().stream().map(Biome::getRegistryName).collect(Collectors.toList()));
+//        report.setDetail("Biome Map", biomes.getBiomeMap().toJson(biomes.getContext().gameContext));
     }
 
     private static void addContext(ConfigRef ref, CrashReportCategory report) {
-        ref.forEach(report::addDetail);
+        ref.forEach(report::setDetail);
     }
 
     private static void addProfilerContext(CrashReportCategory report) {
@@ -99,7 +99,7 @@ public class CrashReportBuilder {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        report.addDetail("Timings", "\n" + writer.toString());
+        report.setDetail("Timings", "\n" + writer.toString());
     }
 
     private static List<String> getStructures(Map<Structure<?>, ?> map) {
@@ -109,7 +109,7 @@ public class CrashReportBuilder {
     private static String getStructureName(Structure<?> structure) {
         ResourceLocation name = structure.getRegistryName();
         if (name == null) {
-            return structure.getStructureName();
+            return structure.getFeatureName();
         }
         return name.toString();
     }

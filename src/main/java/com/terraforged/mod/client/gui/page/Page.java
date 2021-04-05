@@ -26,7 +26,12 @@ package com.terraforged.mod.client.gui.page;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.engine.serialization.serializer.Serializer;
-import com.terraforged.mod.client.gui.element.*;
+import com.terraforged.mod.client.gui.element.Element;
+import com.terraforged.mod.client.gui.element.TFLabel;
+import com.terraforged.mod.client.gui.element.TFRandButton;
+import com.terraforged.mod.client.gui.element.TFSlider;
+import com.terraforged.mod.client.gui.element.TFTextBox;
+import com.terraforged.mod.client.gui.element.TFToggle;
 import com.terraforged.mod.client.gui.screen.ScrollPane;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayRenderer;
 import com.terraforged.mod.client.gui.screen.overlay.OverlayScreen;
@@ -71,7 +76,7 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
     @Override
     public void renderOverlays(MatrixStack matrixStack, Screen screen, int mouseX, int mouseY) {
         for (Column column : columns) {
-            if (column.scrollPane.getEventListeners().isEmpty()) {
+            if (column.scrollPane.children().isEmpty()) {
                 continue;
             }
             column.scrollPane.renderOverlays(matrixStack, screen, mouseX, mouseY);
@@ -80,7 +85,7 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
 
     public void visit(Consumer<ScrollPane> consumer) {
         for (Column column : columns) {
-            if (column.scrollPane.getEventListeners().isEmpty()) {
+            if (column.scrollPane.children().isEmpty()) {
                 continue;
             }
             consumer.accept(column.scrollPane);
@@ -90,7 +95,7 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
     public boolean action(Function<ScrollPane, Boolean> action) {
         boolean result = false;
         for (Column column : columns) {
-            if (column.scrollPane.getEventListeners().isEmpty()) {
+            if (column.scrollPane.children().isEmpty()) {
                 continue;
             }
             boolean b = action.apply(column.scrollPane);

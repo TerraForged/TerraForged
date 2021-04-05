@@ -48,11 +48,11 @@ public class BiomeHelper {
 
     public static TempCategory getTempCategory(Biome biome, TFBiomeContext context) {
         // vanilla ocean biome properties are not at all helpful for determining temperature
-        if (biome.getCategory() == Biome.Category.OCEAN) {
+        if (biome.getBiomeCategory() == Biome.Category.OCEAN) {
             return tempFromName(context.biomes.getName(biome));
-        } else if (biome.getCategory() == Biome.Category.BEACH) {
+        } else if (biome.getBiomeCategory() == Biome.Category.BEACH) {
             // Beaches have slightly modified temps
-            float temp = biome.getTemperature();
+            float temp = biome.getBaseTemperature();
             if (temp <= 0.4F) {
                 return TempCategory.COLD;
             }
@@ -62,7 +62,7 @@ public class BiomeHelper {
             return tempFromName(context.biomes.getName(biome));
         } else {
             // snowy = 0.0F, plains = 0.8F, desert = 2.0F
-            float temp = biome.getTemperature();
+            float temp = biome.getBaseTemperature();
             if (temp <= 0.3F) {
                 return TempCategory.COLD;
             }
@@ -110,7 +110,7 @@ public class BiomeHelper {
     }
 
     public static float getDefaultTemperature(Biome biome) {
-        return biome.getTemperature();
+        return biome.getBaseTemperature();
     }
 
     public static ISurfaceBuilderConfig getSurface(Biome biome) {
@@ -119,7 +119,7 @@ public class BiomeHelper {
                 return biome.getGenerationSettings().getSurfaceBuilderConfig();
             }
         }
-        return SurfaceBuilder.GRASS_DIRT_GRAVEL_CONFIG;
+        return SurfaceBuilder.CONFIG_COARSE_DIRT;
     }
 
     public static ConfiguredSurfaceBuilder<?> getSurfaceBuilder(Biome biome) {
@@ -128,7 +128,7 @@ public class BiomeHelper {
                 return biome.getGenerationSettings().getSurfaceBuilder().get();
             }
         }
-        return SurfaceBuilder.DEFAULT.func_242929_a(SurfaceBuilder.GRASS_DIRT_GRAVEL_CONFIG);
+        return SurfaceBuilder.DEFAULT.configured(SurfaceBuilder.CONFIG_GRASS);
     }
 
     public static BiomeGenerationSettings getGenSettings(Biome biome) {
@@ -143,7 +143,7 @@ public class BiomeHelper {
         if (key == null) {
             return false;
         }
-        ResourceLocation name = key.getLocation();
+        ResourceLocation name = key.location();
         if (name.getNamespace().equals(TerraForgedMod.MODID)) {
             return true;
         }

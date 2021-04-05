@@ -58,11 +58,11 @@ public class BedrockDecorator implements ColumnDecorator {
     }
 
     private static BlockState getState(String name) {
-        ResourceLocation location = ResourceLocation.tryCreate(name);
+        ResourceLocation location = ResourceLocation.tryParse(name);
         if (location != null && ForgeRegistries.BLOCKS.containsKey(location)) {
             Block block = ForgeRegistries.BLOCKS.getValue(location);
             if (block != null) {
-                return block.getDefaultState();
+                return block.defaultBlockState();
             }
         }
         return States.BEDROCK.get();

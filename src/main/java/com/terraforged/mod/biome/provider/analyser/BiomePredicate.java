@@ -55,7 +55,7 @@ public interface BiomePredicate {
     }
 
     static BiomePredicate type(Biome.Category... categories) {
-        return (d, b) -> anyMatch(b.getCategory(), categories, (c1, c2) -> c1 == c2);
+        return (d, b) -> anyMatch(b.getBiomeCategory(), categories, (c1, c2) -> c1 == c2);
     }
 
     static BiomePredicate rain(double min, double max) {

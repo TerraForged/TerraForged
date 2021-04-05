@@ -109,8 +109,8 @@ public class Preview extends Button {
 
     public boolean click(double mx, double my) {
         if (updateLegend((int) mx, (int) my) && !hoveredCoords.isEmpty()) {
-            super.playDownSound(Minecraft.getInstance().getSoundHandler());
-            Minecraft.getInstance().keyboardListener.setClipboardString(hoveredCoords);
+            super.playDownSound(Minecraft.getInstance().getSoundManager());
+            Minecraft.getInstance().keyboardHandler.setClipboard(hoveredCoords);
             return true;
         }
         return false;
@@ -122,7 +122,7 @@ public class Preview extends Button {
 
         preRender();
 
-        texture.bindTexture();
+        texture.bind();
         RenderSystem.enableBlend();
         RenderSystem.enableRescaleNormal();
         RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
@@ -178,7 +178,7 @@ public class Preview extends Button {
     }
 
     private void render(Tile tile) {
-        NativeImage image = texture.getTextureData();
+        NativeImage image = texture.getPixels();
         if (image == null) {
             return;
         }
@@ -197,7 +197,7 @@ public class Preview extends Button {
             }
         });
 
-        texture.updateDynamicTexture();
+        texture.upload();
     }
 
     private CacheEntry<Tile> generate(Settings settings, CompoundNBT prevSettings) {
@@ -258,7 +258,7 @@ public class Preview extends Button {
     }
 
     private float getLegendScale() {
-        int index = Minecraft.getInstance().gameSettings.guiScale - 1;
+        int index = Minecraft.getInstance().options.guiScale - 1;
         if (index < 0 || index >= LEGEND_SCALES.length) {
             // index=-1 == GuiScale(AUTO) which is the same as GuiScale(4)
             // values above 4 don't exist but who knows what mods might try set it to
@@ -275,10 +275,10 @@ public class Preview extends Button {
         RenderSystem.translatef(left + 3.75F * scale, top - lineHeight * (3.2F * scale), 0);
         RenderSystem.scalef(scale, scale, 1);
 
-        FontRenderer renderer = Minecraft.getInstance().fontRenderer;
+        FontRenderer renderer = Minecraft.getInstance().font;
         int spacing = 0;
         for (String s : labels) {
-            spacing = Math.max(spacing, renderer.getStringWidth(s));
+            spacing = Math.max(spacing, renderer.width(s));
         }
 
         float maxWidth = (width - 4) / scale;
@@ -286,7 +286,7 @@ public class Preview extends Button {
             String label = labels[i];
             String value = values[i];
 
-            while (value.length() > 0 && spacing + renderer.getStringWidth(value) > maxWidth) {
+            while (value.length() > 0 && spacing + renderer.width(value) > maxWidth) {
                 value = value.substring(0, value.length() - 1);
             }
 

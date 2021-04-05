@@ -51,7 +51,7 @@ public class CrashTestFeature extends Feature<CrashTestConfig> {
     }
 
     @Override
-    public boolean generate(ISeedReader region, ChunkGenerator generator, Random rand, BlockPos pos, CrashTestConfig config) {
+    public boolean place(ISeedReader region, ChunkGenerator generator, Random rand, BlockPos pos, CrashTestConfig config) {
         if (ThreadLocalRandom.current().nextInt(100) < CRASH_CHANCE_PERCENTAGE) {
             switch (config.crashType) {
                 case DEADLOCK:
@@ -87,7 +87,7 @@ public class CrashTestFeature extends Feature<CrashTestConfig> {
         // then using unsafe methods on the Entity (ie setLocationAndRotation)
         int x = 50 + pos.getX() >> 4;
         int z = 124 + pos.getZ() >> 4;
-        region.getWorld().getChunk(x, z);
+        region.getLevel().getChunk(x, z);
     }
 
 //    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -106,12 +106,12 @@ public class CrashTestFeature extends Feature<CrashTestConfig> {
             Log.info("Adding crash-test");
             event.getManager().getAppenders().add(BiomeFeatureMatcher.ANY, FeatureAppender.head(
                     GenerationStage.Decoration.VEGETAL_DECORATION,
-                    CrashTestFeature.INSTANCE.withConfiguration(new CrashTestConfig(CrashTestConfig.CrashType.SLOW))
+                    CrashTestFeature.INSTANCE.configured(new CrashTestConfig(CrashTestConfig.CrashType.SLOW))
             ));
 
             event.getManager().getAppenders().add(BiomeFeatureMatcher.ANY, FeatureAppender.tail(
                     GenerationStage.Decoration.VEGETAL_DECORATION,
-                    CrashTestFeature.INSTANCE.withConfiguration(new CrashTestConfig(CrashTestConfig.CrashType.DEADLOCK))
+                    CrashTestFeature.INSTANCE.configured(new CrashTestConfig(CrashTestConfig.CrashType.DEADLOCK))
             ));
         }
     }

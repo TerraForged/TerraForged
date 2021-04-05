@@ -49,29 +49,29 @@ public class BiomeUtils {
     }
 
     public static BiomeBuilder copy(RegistryKey<Biome> key) {
-        Biome biome = ForgeRegistries.BIOMES.getValue(key.getLocation());
+        Biome biome = ForgeRegistries.BIOMES.getValue(key.location());
         if (biome == null) {
-            throw new NullPointerException(key.getLocation().toString());
+            throw new NullPointerException(key.location().toString());
         }
 
         BiomeBuilder builder = new BiomeBuilder(key, biome);
 
         builder.scale(biome.getScale());
         builder.depth(biome.getDepth());
-        builder.category(biome.getCategory());
+        builder.biomeCategory(biome.getBiomeCategory());
 
         // ambience
-        builder.setEffects(biome.getAmbience());
+        builder.specialEffects(biome.getSpecialEffects());
 
         // climate
         Biome.Climate climate = getClimate(biome);
         builder.downfall(climate.downfall);
         builder.temperature(climate.temperature);
         builder.precipitation(climate.precipitation);
-        builder.withTemperatureModifier(climate.temperatureModifier);
+        builder.temperatureAdjustment(climate.temperatureModifier);
 
         // mobs
-        builder.withMobSpawnSettings(biome.getMobSpawnInfo());
+        builder.mobSpawnSettings(biome.getMobSettings());
 
         return builder;
     }
@@ -84,7 +84,7 @@ public class BiomeUtils {
         }
 
         try {
-            JsonElement json = Codecs.encodeAndGet(Biome.CODEC, biome, JsonOps.INSTANCE);
+            JsonElement json = Codecs.encodeAndGet(Biome.DIRECT_CODEC, biome, JsonOps.INSTANCE);
             return Codecs.decodeAndGet(CLIMATE_CODEC, new Dynamic<>(JsonOps.INSTANCE, json));
         } catch (Throwable t) {
             t.printStackTrace();

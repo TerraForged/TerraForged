@@ -113,7 +113,7 @@ public class DataUtils {
     }
 
     public static Stream<String> streamKeys(CompoundNBT compound) {
-        return compound.keySet().stream()
+        return compound.getAllKeys().stream()
                 .filter(name -> !name.startsWith("#"))
                 .sorted(Comparator.comparing(name -> compound.getCompound("#" + name).getInt("order")));
     }
@@ -121,7 +121,7 @@ public class DataUtils {
     public static <T extends INBT> T stripMetadata(T tag) {
         if (tag instanceof CompoundNBT) {
             CompoundNBT compound = (CompoundNBT) tag;
-            List<String> keys = new LinkedList<>(compound.keySet());
+            List<String> keys = new LinkedList<>(compound.getAllKeys());
             for (String key : keys) {
                 if (key.charAt(0) == '#') {
                     compound.remove(key);

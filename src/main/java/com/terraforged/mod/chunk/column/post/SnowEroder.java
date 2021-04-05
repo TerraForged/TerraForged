@@ -59,7 +59,7 @@ public class SnowEroder extends ErosionDecorator {
 
     @Override
     public void decorate(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        int surface = chunk.getTopBlockY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, x, z);
+        int surface = chunk.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, x, z);
         if (y - surface > 0) {
             if (y - surface > 4) {
                 return;
@@ -67,7 +67,7 @@ public class SnowEroder extends ErosionDecorator {
             y = surface;
         }
 
-        if (context.biome.getTemperature(context.pos.setPos(x, y, z)) <= 0.25) {
+        if (context.biome.getTemperature(context.pos.set(x, y, z)) <= 0.25) {
             float var = -ColumnDecorator.getNoise(x, z, seed1, 16, 0);
             float hNoise = rand.getValue(x, z, seed2) * HEIGHT_MODIFIER;
             float sNoise = rand.getValue(x, z, seed3) * SLOPE_MODIFIER;
@@ -75,9 +75,9 @@ public class SnowEroder extends ErosionDecorator {
             float height = context.cell.value + var + hNoise + vModifier;
             float steepness = context.cell.gradient + var + sNoise + vModifier;
             if (snowErosion(x, z, steepness, height)) {
-                Predicate<BlockState> predicate = Heightmap.Type.MOTION_BLOCKING.getHeightLimitPredicate();
+                Predicate<BlockState> predicate = Heightmap.Type.MOTION_BLOCKING.isOpaque();
                 for (int dy = 2; dy > 0; dy--) {
-                    context.pos.setPos(x, y + dy, z);
+                    context.pos.set(x, y + dy, z);
                     BlockState state = chunk.getBlockState(context.pos);
                     if (!predicate.test(state) || state.getBlock() == Blocks.SNOW) {
                         erodeSnow(chunk, context.pos);
@@ -94,13 +94,13 @@ public class SnowEroder extends ErosionDecorator {
     }
 
     private void erodeSnow(IChunk chunk, BlockPos.Mutable pos) {
-        chunk.setBlockState(pos, Blocks.AIR.getDefaultState(), false);
+        chunk.setBlockState(pos, Blocks.AIR.defaultBlockState(), false);
 
         if (pos.getY() > 0) {
             pos.setY(pos.getY() - 1);
             BlockState below = chunk.getBlockState(pos);
             if (below.hasProperty(GrassBlock.SNOWY)) {
-                chunk.setBlockState(pos, below.with(GrassBlock.SNOWY, false), false);
+                chunk.setBlockState(pos, below.setValue(GrassBlock.SNOWY, false), false);
             }
         }
     }

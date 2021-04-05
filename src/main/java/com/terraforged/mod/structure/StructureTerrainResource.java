@@ -39,7 +39,7 @@ public class StructureTerrainResource {
     public final ObjectListIterator<StructurePiece> iterator = pieces.iterator();
 
     public StructureTerrainResource reset() {
-        mutablePos.setPos(BlockPos.ZERO);
+        mutablePos.set(BlockPos.ZERO);
         rewind();
         pieces.clear();
         return this;

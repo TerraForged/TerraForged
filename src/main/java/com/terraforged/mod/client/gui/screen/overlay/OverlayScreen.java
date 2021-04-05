@@ -43,7 +43,7 @@ public class OverlayScreen extends Screen implements OverlayRenderer {
     public OverlayScreen() {
         super(new TranslationTextComponent(""));
         super.minecraft = Minecraft.getInstance();
-        super.font = minecraft.fontRenderer;
+        super.font = minecraft.font;
         this.config = ConfigManager.GENERAL.get();
         PreviewSettings.showTooltips = config.getOrElse(GuiKeys.TOOLTIPS_KEY, true);
         PreviewSettings.showCoords = config.getOrElse(GuiKeys.COORDS_KEY, false);

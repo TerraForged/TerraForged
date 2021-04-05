@@ -33,7 +33,11 @@ import com.terraforged.mod.chunk.util.FastChunk;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.*;
+import net.minecraft.world.gen.DimensionSettings;
+import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.gen.INoiseGenerator;
+import net.minecraft.world.gen.PerlinNoiseGenerator;
+import net.minecraft.world.gen.WorldGenRegion;
 
 import java.util.stream.IntStream;
 
@@ -45,7 +49,7 @@ public class SurfaceGenerator implements Generator.Surfaces {
     private final INoiseGenerator surfaceNoise;
 
     public SurfaceGenerator(TFChunkGenerator generator) {
-        DimensionSettings settings = generator.getSettings().get();
+        DimensionSettings settings = generator.getDimensionSettings().get();
         this.generator = generator;
         this.solid = settings.getDefaultBlock();
         this.fluid = settings.getDefaultBlock();
@@ -55,14 +59,14 @@ public class SurfaceGenerator implements Generator.Surfaces {
     @Override
     public final void generateSurface(WorldGenRegion world, IChunk chunk) {
         try (ChunkReader reader = generator.getChunkReader(chunk.getPos().x, chunk.getPos().z)) {
-            TFBiomeContainer container = TFBiomeContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
+            TFBiomeContainer container = TFBiomeContainer.getOrCreate(chunk, reader, generator.getBiomeSource());
             SurfaceChunk buffer = new SurfaceChunk(chunk);
 
             try (SurfaceContext context = generator.getContext().surface(buffer, container, solid, fluid)) {
                 reader.iterate(context, (cell, dx, dz, ctx) -> {
                     int px = ctx.blockX + dx;
                     int pz = ctx.blockZ + dz;
-                    int top = ctx.chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, dx, dz);
+                    int top = ctx.chunk.getHeight(Heightmap.Type.WORLD_SURFACE_WG, dx, dz);
 
                     ctx.buffer.setSurfaceLevel(top);
                     ctx.cell = cell;
@@ -72,7 +76,7 @@ public class SurfaceGenerator implements Generator.Surfaces {
 
                     int py = ctx.levels.scale(cell.value);
                     ctx.surfaceY = py;
-                    ctx.pos.setPos(px, py, pz);
+                    ctx.pos.set(px, py, pz);
 
                     for (int i = 0; i < generator.getSurfaceDecorators().size(); i++) {
                         generator.getSurfaceDecorators().get(i).decorate(buffer, ctx, px, py, pz);
@@ -89,6 +93,6 @@ public class SurfaceGenerator implements Generator.Surfaces {
         double noiseZ = z * scale;
         double unusedValue1 = scale;
         double unusedValue2 = (x & 15) * scale;
-        return surfaceNoise.noiseAt(noiseX, noiseZ, unusedValue1, unusedValue2);
+        return surfaceNoise.getSurfaceNoiseValue(noiseX, noiseZ, unusedValue1, unusedValue2);
     }
 }

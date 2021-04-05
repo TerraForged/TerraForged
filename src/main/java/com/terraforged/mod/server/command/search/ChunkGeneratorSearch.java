@@ -48,7 +48,7 @@ public abstract class ChunkGeneratorSearch extends Search {
 
     @Override
     public BlockPos success(BlockPos.Mutable pos) {
-        pos.setY(chunkGenerator.getHeight(pos.getX(), pos.getZ(), Heightmap.Type.WORLD_SURFACE_WG));
+        pos.setY(chunkGenerator.getBaseHeight(pos.getX(), pos.getZ(), Heightmap.Type.WORLD_SURFACE_WG));
         return pos;
     }
 }

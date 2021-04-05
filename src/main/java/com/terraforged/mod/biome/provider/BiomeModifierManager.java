@@ -28,7 +28,17 @@ import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.concurrent.Resource;
 import com.terraforged.engine.world.biome.DesertBiomes;
 import com.terraforged.engine.world.biome.map.BiomeMap;
-import com.terraforged.engine.world.biome.modifier.*;
+import com.terraforged.engine.world.biome.modifier.BeachModifier;
+import com.terraforged.engine.world.biome.modifier.BiomeModifier;
+import com.terraforged.engine.world.biome.modifier.CoastModifier;
+import com.terraforged.engine.world.biome.modifier.DesertColorModifier;
+import com.terraforged.engine.world.biome.modifier.DesertWetlandModifier;
+import com.terraforged.engine.world.biome.modifier.ModifierManager;
+import com.terraforged.engine.world.biome.modifier.MountainModifier;
+import com.terraforged.engine.world.biome.modifier.OceanModifier;
+import com.terraforged.engine.world.biome.modifier.VolcanoModifier;
+import com.terraforged.engine.world.biome.modifier.WarmLakeModifier;
+import com.terraforged.engine.world.biome.modifier.WetlandModifier;
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.engine.world.heightmap.Levels;
 import com.terraforged.mod.biome.ModBiomes;
@@ -124,10 +134,10 @@ public class BiomeModifierManager implements BiomeModifier {
                 if (config == null) {
                     continue;
                 }
-                BlockState top = config.getTop();
-                MaterialColor color = top.getMaterialColor(reader.get().set(top), BlockPos.ZERO);
+                BlockState top = config.getTopMaterial();
+                MaterialColor color = top.getMapColor(reader.get().set(top), BlockPos.ZERO);
                 int whiteDist2 = distance2(color, MaterialColor.SAND);
-                int redDist2 = distance2(color, MaterialColor.ADOBE);
+                int redDist2 = distance2(color, MaterialColor.CLAY);
                 if (whiteDist2 < redDist2) {
                     whiteSand.add(id);
                 } else {
@@ -139,8 +149,8 @@ public class BiomeModifierManager implements BiomeModifier {
     }
 
     private static int distance2(MaterialColor mc1, MaterialColor mc2) {
-        Color c1 = new Color(mc1.colorValue);
-        Color c2 = new Color(mc2.colorValue);
+        Color c1 = new Color(mc1.col);
+        Color c2 = new Color(mc2.col);
         int dr = c1.getRed() - c2.getRed();
         int dg = c1.getGreen() - c2.getGreen();
         int db = c1.getBlue() - c2.getBlue();

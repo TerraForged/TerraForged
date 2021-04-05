@@ -99,14 +99,14 @@ public class LangGenerator {
         DataGenSettings settings = new DataGenSettings();
 
         // Default overworld structure settings
-        DimensionStructuresSettings structuresSettings = DimensionSettings.func_242746_i().getStructures();
+        DimensionStructuresSettings structuresSettings = DimensionSettings.bootstrap().structureSettings();;
         settings.structures.load(structuresSettings, context);
 
         visit(DataUtils.toNBT(settings), provider, new HashSet<>());
     }
 
     private static void visit(CompoundNBT tag, LanguageProvider lang, Set<String> visited) {
-        tag.keySet().forEach(name -> {
+        tag.getAllKeys().forEach(name -> {
             if (name.startsWith("#")) {
                 return;
             }

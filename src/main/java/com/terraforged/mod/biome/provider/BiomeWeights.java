@@ -72,7 +72,7 @@ public class BiomeWeights implements IntUnaryOperator {
                 Biome biome = context.biomes.get(entry.getKey());
                 String name = context.biomes.getName(biome);
                 if (validBiomes.contains(name)) {
-                    biomes.put(name.toString(), entry.itemWeight);
+                    biomes.put(name.toString(), entry.weight);
                 }
             }
         }
@@ -95,7 +95,7 @@ public class BiomeWeights implements IntUnaryOperator {
         if (BiomeDictionary.getTypes(context.getValue(biome)).contains(BiomeDictionary.Type.RARE)) {
             return rareWeight;
         }
-        if (context.biomes.get(biome).getCategory() == Biome.Category.FOREST) {
+        if (context.biomes.get(biome).getBiomeCategory() == Biome.Category.FOREST) {
             return forestWeight;
         }
         return standardWeight;

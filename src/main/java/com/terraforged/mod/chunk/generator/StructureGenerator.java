@@ -33,7 +33,6 @@ import net.minecraft.network.DebugPacketSender;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.SectionPos;
 import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunk;
@@ -54,14 +53,14 @@ public class StructureGenerator implements Generator.Structures {
     private final DimensionStructuresSettings structuresSettings;
 
     public StructureGenerator(TFChunkGenerator generator) {
-        TerraSettings settings = generator.getBiomeProvider().getSettings();
+        TerraSettings settings = generator.getBiomeSource().getSettings();
         this.generator = generator;
-        this.structuresSettings = settings.structures.apply(generator.getSettings().get().getStructures()); // defensive copy
+        this.structuresSettings = settings.structures.apply(generator.getDimensionSettings().get().structureSettings()); // defensive copy
     }
 
     @Override
     public StructureSeparationSettings getSeparationSettings(Structure<?> structure) {
-        return structuresSettings.func_236197_a_(structure);
+        return structuresSettings.getConfig(structure);
     }
 
     @Override
@@ -72,22 +71,23 @@ public class StructureGenerator implements Generator.Structures {
 
         int biomeX = chunkToBiomeChunkCenter(pos.x);
         int biomeZ = chunkToBiomeChunkCenter(pos.z);
-        Biome biome = generator.getBiomeProvider().getNoiseBiome(biomeX, 0, biomeZ);
+        Biome biome = generator.getBiomeSource().getNoiseBiome(biomeX, 0, biomeZ);
         generate(chunk, pos, biome, StructureFeatures.STRONGHOLD, registries, structures, templates, seed);
 
-        for (Supplier<StructureFeature<?, ?>> supplier : biome.getGenerationSettings().getStructures()) {
+        for (Supplier<StructureFeature<?, ?>> supplier : biome.getGenerationSettings().structures()) {
             this.generate(chunk, pos, biome, supplier.get(), registries, structures, templates, seed);
         }
     }
 
     private void generate(IChunk chunk, ChunkPos pos, Biome biome, StructureFeature<?, ?> structure, DynamicRegistries registries, StructureManager structures, TemplateManager templates, long seed) {
-        StructureStart<?> start = structures.getStructureStart(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, chunk);
-        int i = start != null ? start.getRefCount() : 0;
+        SectionPos sectionpos = SectionPos.of(chunk.getPos(), 0);
+        StructureStart<?> start = structures.getStartForFeature(sectionpos, structure.feature, chunk);
+        int i = start != null ? start.getReferences() : 0;
 
-        StructureSeparationSettings settings = getSeparationSettings(structure.field_236268_b_);
+        StructureSeparationSettings settings = getSeparationSettings(structure.feature);
         if (settings != null) {
-            StructureStart<?> start1 = structure.func_242771_a(registries, generator, generator.getBiomeProvider(), templates, seed, pos, biome, i, settings);
-            structures.addStructureStart(SectionPos.from(chunk.getPos(), 0), structure.field_236268_b_, start1, chunk);
+            StructureStart<?> start1 = structure.generate(registries, generator, generator.getBiomeSource(), templates, seed, pos, biome, i, settings);
+            structures.setStartForFeature(sectionpos, structure.feature, start1, chunk);
         }
     }
 
@@ -100,24 +100,24 @@ public class StructureGenerator implements Generator.Structures {
         int startZ = chunkZ << 4;
         int endX = startX + 15;
         int endZ = startZ + 15;
-        SectionPos sectionpos = SectionPos.from(chunk.getPos(), 0);
+        SectionPos sectionpos = SectionPos.of(chunk.getPos(), 0);
 
         for (int x = chunkX - radius; x <= chunkX + radius; ++x) {
             for (int z = chunkZ - radius; z <= chunkZ + radius; ++z) {
                 long posId = ChunkPos.asLong(x, z);
 
-                for (StructureStart<?> start : world.getChunk(x, z).getStructureStarts().values()) {
+                for (StructureStart<?> start : world.getChunk(x, z).getAllStarts().values()) {
                     try {
-                        if (start != StructureStart.DUMMY && start.getBoundingBox().intersectsWith(startX, startZ, endX, endZ)) {
-                            structures.addReference(sectionpos, start.getStructure(), posId, chunk);
-                            DebugPacketSender.sendStructureStart(world, start);
+                        if (start != StructureStart.INVALID_START && start.getBoundingBox().intersects(startX, startZ, endX, endZ)) {
+                            structures.addReferenceForFeature(sectionpos, start.getFeature(), posId, chunk);
+                            DebugPacketSender.sendStructurePacket(world, start);
                         }
                     } catch (Exception exception) {
-                        CrashReport crashreport = CrashReport.makeCrashReport(exception, "Generating structure reference");
-                        CrashReportCategory crashreportcategory = crashreport.makeCategory("Structure");
-                        crashreportcategory.addDetail("Id", () -> Registry.STRUCTURE_FEATURE.getKey(start.getStructure()).toString());
-                        crashreportcategory.addDetail("Name", () -> start.getStructure().getStructureName());
-                        crashreportcategory.addDetail("Class", () -> start.getStructure().getClass().getCanonicalName());
+                        CrashReport crashreport = CrashReport.forThrowable(exception, "Generating structure reference");
+                        CrashReportCategory crashreportcategory = crashreport.addCategory("Structure");
+                        crashreportcategory.setDetail("Id", () -> start.getFeature().getRegistryName() + "");
+                        crashreportcategory.setDetail("Name", () -> start.getFeature().getFeatureName());
+                        crashreportcategory.setDetail("Class", () -> start.getFeature().getClass().getCanonicalName());
                         throw new ReportedException(crashreport);
                     }
                 }

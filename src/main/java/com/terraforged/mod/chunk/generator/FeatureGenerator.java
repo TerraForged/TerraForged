@@ -70,12 +70,12 @@ public class FeatureGenerator implements Generator.Features {
 
     @Override
     public final void generateFeatures(WorldGenRegion region, StructureManager manager) {
-        int chunkX = region.getMainChunkX();
-        int chunkZ = region.getMainChunkZ();
+        int chunkX = region.getCenterX();
+        int chunkZ = region.getCenterZ();
         IChunk chunk = region.getChunk(chunkX, chunkZ);
 
         ChunkReader reader = generator.getChunkReader(chunkX, chunkZ);
-        TFBiomeContainer container = TFBiomeContainer.getOrCreate(chunk, reader, generator.getBiomeProvider());
+        TFBiomeContainer container = TFBiomeContainer.getOrCreate(chunk, reader, generator.getBiomeSource());
 
         // de-hardcode sea-level
         RegionFix regionFix = new RegionFix(region, generator);
@@ -133,8 +133,8 @@ public class FeatureGenerator implements Generator.Features {
                     random.setFeatureSeed(decorationSeed, featureSeed++, stageIndex);
                     try {
                         long timeStamp = timer.now();
-                        context.pushIdentifier(structure.getStructureName(), timeStamp);
-                        manager.func_235011_a_(SectionPos.from(pos), structure).forEach(start -> start.func_230366_a_(
+                        context.pushIdentifier(structure.getFeatureName(), timeStamp);
+                        manager.startsForFeature(SectionPos.of(pos), structure).forEach(start -> start.placeInChunk(
                                 region,
                                 manager,
                                 generator,
@@ -142,9 +142,9 @@ public class FeatureGenerator implements Generator.Features {
                                 chunkBounds.init(start),
                                 chunkPos
                         ));
-                        Generator.checkTime(STRUCTURE, structure.getStructureName(), timer, timeStamp, context);
+                        Generator.checkTime(STRUCTURE, structure.getFeatureName(), timer, timeStamp, context);
                     } catch (Throwable t) {
-                        throw new UncheckedException(STRUCTURE, structure.getStructureName(), t);
+                        throw new UncheckedException(STRUCTURE, structure.getFeatureName(), t);
                     }
                 }
             }
@@ -163,7 +163,7 @@ public class FeatureGenerator implements Generator.Features {
                     try {
                         long timeStamp = timer.now();
                         context.pushIdentifier(feature.getIdentity(), timeStamp);
-                        feature.getFeature().generate(region, generator, random, pos);
+                        feature.getFeature().place(region, generator, random, pos);
                         Generator.checkTime(FEATURE, feature.getIdentity(), timer, timeStamp, context);
                     } catch (Throwable t) {
                         throw new UncheckedException(FEATURE, feature.getIdentity(), t);
@@ -178,7 +178,7 @@ public class FeatureGenerator implements Generator.Features {
         reader.iterate(context, (cell, dx, dz, ctx) -> {
             int px = ctx.blockX + dx;
             int pz = ctx.blockZ + dz;
-            int py = ctx.chunk.getTopBlockY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, dx, dz);
+            int py = ctx.chunk.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, dx, dz);
             ctx.cell = cell;
             ctx.biome = container.getBiome(dx, dz);
             for (ColumnDecorator decorator : decorators) {

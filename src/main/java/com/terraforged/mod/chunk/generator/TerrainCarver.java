@@ -84,7 +84,7 @@ public class TerrainCarver implements Generator.Carvers {
         TFBiomeContainer biomeContainer = TFBiomeContainer.getOrNull(chunk);
         BiomeLookup lookup = new BiomeLookup(chunkpos, biomeContainer);
         BitSet mask = carverChunk.getCarvingMask(type);
-        Biome biome = TerrainCarver.getBiome(biomeContainer, generator.getBiomeProvider(), chunkpos);
+        Biome biome = TerrainCarver.getBiome(biomeContainer, generator.getBiomeSource(), chunkpos);
         BiomeGenerationSettings settings = biome.getGenerationSettings();
 
         WarnTimer timer = Watchdog.getWarnTimer();
@@ -96,9 +96,9 @@ public class TerrainCarver implements Generator.Carvers {
                     int index = iterator.nextIndex();
                     ConfiguredCarver<?> carver = iterator.next().get();
                     random.setLargeFeatureSeed(generator.getSeed() + index, cx, cz);
-                    if (carver.shouldCarve(random, cx, cz)) {
+                    if (carver.isStartChunk(random, cx, cz)) {
                         long timestamp = timer.now();
-                        carver.carveRegion(carverChunk, lookup, random, seaLevel, cx, cz, chunkX, chunkZ, mask);
+                        carver.carve(carverChunk, lookup, random, seaLevel, cx, cz, chunkX, chunkZ, mask);
                         Generator.checkTime(TYPE, carver, timer, timestamp, context);
                     }
                 }
@@ -128,7 +128,7 @@ public class TerrainCarver implements Generator.Carvers {
                 // Method masks to chunk-local coordinates
                 return biomes.getBiome(pos.getX(), pos.getZ());
             }
-            return generator.getBiomeProvider().lookupBiome(cell, pos.getX(), pos.getZ(), false);
+            return generator.getBiomeSource().lookupBiome(cell, pos.getX(), pos.getZ(), false);
         }
     }
 
@@ -141,7 +141,7 @@ public class TerrainCarver implements Generator.Carvers {
     private static Biome getBiome(@Nullable TFBiomeContainer container, TFBiomeProvider biomeProvider, ChunkPos pos) {
         if (container == null) {
             try (Resource<Cell> resource = Cell.pooled()) {
-                return biomeProvider.lookupBiome(resource.get(), pos.getXStart(), pos.getZStart(), false);
+                return biomeProvider.lookupBiome(resource.get(), pos.getMinBlockX(), pos.getMinBlockZ(), false);
             }
         }
         return container.getBiome(0, 0);

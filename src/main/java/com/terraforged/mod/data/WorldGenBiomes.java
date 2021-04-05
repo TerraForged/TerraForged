@@ -86,7 +86,7 @@ public class WorldGenBiomes extends DataGen {
                         continue;
                     }
 
-                    JsonElement json = Codecs.encodeAndGet(Biome.CODEC, biome, JsonOps.INSTANCE);
+                    JsonElement json = Codecs.encodeAndGet(Biome.DIRECT_CODEC, biome, JsonOps.INSTANCE);
 
                     if (json.isJsonObject()) {
                         json.getAsJsonObject().remove(FORGE_REG_NAME_KEY);

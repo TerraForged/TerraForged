@@ -77,7 +77,7 @@ public class TagConfigFixer {
 
         // Check for ambiguous tags
         List<ResourceLocation> matches = new ArrayList<>();
-        for (Map.Entry<ResourceLocation, ITag<Block>> entry : BlockTags.getCollection().getIDTagMap().entrySet()) {
+        for (Map.Entry<ResourceLocation, ITag<Block>> entry : BlockTags.getAllTags().getAllTags().entrySet()) {
             // Ignore our own tags since we know we don't add them to TagMatchRuleTest's
             if (WGTags.NAMED_WG_TAGS.contains(entry.getKey())) {
                 continue;
@@ -115,7 +115,7 @@ public class TagConfigFixer {
 
     private static List<Block> getElementsSafely(ITag<Block> tag) {
         try {
-            return tag.getAllElements();
+            return tag.getValues();
         } catch (Throwable ignored) {
             // Thrown if something prompts the get too early
             return Collections.emptyList();

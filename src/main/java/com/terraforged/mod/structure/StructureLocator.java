@@ -92,7 +92,7 @@ public class StructureLocator {
     private static BlockPos search(BlockPos center, int radius, Structure<?> structure, StructureSeparationSettings settings, boolean async, long timeoutMS, StructureSearch search) {
         int chunkX = center.getX() >> 4;
         int chunkZ = center.getZ() >> 4;
-        int spacing = settings.func_236668_a_();
+        int spacing = settings.spacing();
         SearchContext context = new SearchContext(timeoutMS, TimeUnit.MILLISECONDS);
 
         if (async && spacing <= ASYNC_SPACING_THRESHOLD && !unsafeStructures.contains(structure)) {

@@ -51,7 +51,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.gen.feature.*;
+import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.ConfiguredRandomFeatureList;
+import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.Features;
+import net.minecraft.world.gen.feature.MultipleRandomFeatureConfig;
+import net.minecraft.world.gen.feature.TwoFeatureChoiceConfig;
 import net.minecraft.world.gen.placement.AtSurfaceWithExtraConfig;
 import net.minecraft.world.gen.placement.ChanceConfig;
 import net.minecraft.world.gen.placement.ConfiguredPlacement;
@@ -165,7 +170,7 @@ public class Trees {
                 FeatureReplacer.of(context(
                         contextEntry("terraforged:spruce_small", 0.1F, eCntx(0.55F, 0.2F)),
                         contextEntry("terraforged:spruce_large", 0.25F, eCntx(0.3F, 0F))
-                ).withPlacement(poisson(0.25F, 4, 0.3F, 300, 0.6F)))
+                ).decorated(poisson(0.25F, 4, 0.3F, 300, 0.6F)))
         );
     }
 
@@ -193,7 +198,7 @@ public class Trees {
                         contextEntry("terraforged:birch_forest", 0.2F, eCntx(0.3F, 0F), bCntx(0.05F, 0.2F)),
                         contextEntry("terraforged:birch_small", 0.1F, bCntx(0.25F, 0F)),
                         contextEntry("terraforged:birch_small", 0.1F, eCntx(0.25F, 0.65F))
-                ).withPlacement(poisson(0.25F, 6, 0.25F, 175, 0.9F)))
+                ).decorated(poisson(0.25F, 6, 0.25F, 175, 0.9F)))
         );
     }
 
@@ -293,7 +298,7 @@ public class Trees {
                         contextEntry("terraforged:redwood_large", 0.2F, eCntx(0.25F, 0F), bCntx(0.05F, 0.25F)),
                         contextEntry("terraforged:spruce_large", 0.4F, eCntx(0.35F, 0.15F)),
                         contextEntry("terraforged:spruce_small", 0.2F, eCntx(0.5F, 0.2F))
-                ).withPlacement(poisson(0.3F, 6, 0.3F, 250, 0.75F)))
+                ).decorated(poisson(0.3F, 6, 0.3F, 250, 0.75F)))
         );
     }
 
@@ -309,7 +314,7 @@ public class Trees {
         return new Modifier<>(
                 BiomeMatcher.of(context, "minecraft:snowy_tundra", "minecraft:snowy_taiga_mountains", "minecraft:gravelly_mountains", "minecraft:modified_gravelly_mountains"),
                 FeatureMatcher.and("minecraft:tree", Blocks.SPRUCE_LOG, Blocks.SPRUCE_LEAVES),
-                FeatureReplacer.of(template("terraforged:pine").withPlacement(Placement.CHANCE.configure(new ChanceConfig(80))))
+                FeatureReplacer.of(template("terraforged:pine").decorated(Placement.CHANCE.configured(new ChanceConfig(80))))
         );
     }
 
@@ -328,8 +333,8 @@ public class Trees {
     @SafeVarargs
     private static ConfiguredFeature<?, ?> extra(int count, float chance, int extra, String def, Pair<String, Float>... entries) {
         return select(def, entries)
-                .withPlacement(Features.Placements.HEIGHTMAP_PLACEMENT)
-                .withPlacement(Placement.COUNT_EXTRA.configure(new AtSurfaceWithExtraConfig(count, chance, extra)));
+                .decorated(Features.Placements.HEIGHTMAP)
+                .decorated(Placement.COUNT_EXTRA.configured(new AtSurfaceWithExtraConfig(count, chance, extra)));
     }
 
     @SafeVarargs
@@ -344,7 +349,7 @@ public class Trees {
 
     @SafeVarargs
     private static ConfiguredFeature<?, ?> poisson(FastPoissonConfig config, String def, Pair<String, Float>... entries) {
-        return select(def, entries).withPlacement(poisson(config));
+        return select(def, entries).decorated(poisson(config));
     }
 
     private static ConfiguredPlacement<?> poisson(float scale, int radius, float fade, int densityScale, float densityVariation) {
@@ -352,9 +357,9 @@ public class Trees {
     }
 
     private static ConfiguredPlacement<?> poisson(FastPoissonConfig config) {
-        ConfiguredPlacement<?> poisson = FastPoissonAtSurface.INSTANCE.configure(config);
+        ConfiguredPlacement<?> poisson = FastPoissonAtSurface.INSTANCE.configured(config);
         Optional<ConfiguredPlacement<?>> filtered = PlacementFilter.decode("biome")
-                .map(f -> FilterDecorator.INSTANCE.configure(new FilterDecoratorConfig(poisson, f)));
+                .map(f -> FilterDecorator.INSTANCE.configured(new FilterDecoratorConfig(poisson, f)));
         if (filtered.isPresent()) {
             return filtered.get();
         }
@@ -386,7 +391,7 @@ public class Trees {
         if (entries.length == 0) {
             return template(def);
         } else if (entries.length == 1) {
-            return Feature.RANDOM_BOOLEAN_SELECTOR.withConfiguration(new TwoFeatureChoiceConfig(
+            return Feature.RANDOM_BOOLEAN_SELECTOR.configured(new TwoFeatureChoiceConfig(
                     () -> template(def),
                     () -> template(entries[0].getFirst())
             ));
@@ -398,7 +403,7 @@ public class Trees {
                         entry.getSecond()
                 ));
             }
-            return Feature.RANDOM_SELECTOR.withConfiguration(new MultipleRandomFeatureConfig(features, template(def)));
+            return Feature.RANDOM_SELECTOR.configured(new MultipleRandomFeatureConfig(features, template(def)));
         }
     }
 
@@ -410,10 +415,10 @@ public class Trees {
     }
 
     private static ConfiguredFeature<?, ?> context(ContextualFeature... features) {
-        return ContextSelectorFeature.INSTANCE.withConfiguration(new ContextSelectorConfig(Arrays.asList(features)));
+        return ContextSelectorFeature.INSTANCE.configured(new ContextSelectorConfig(Arrays.asList(features)));
     }
 
     private static ConfiguredFeature<?, ?> template(String name) {
-        return TerraFeatures.INSTANCE.withConfiguration(TemplateManager.getInstance().getTemplateConfig(new ResourceLocation(name)));
+        return TerraFeatures.INSTANCE.configured(TemplateManager.getInstance().getTemplateConfig(new ResourceLocation(name)));
     }
 }

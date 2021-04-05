@@ -39,9 +39,9 @@ public class DesertSurface implements Surface {
     private final float level;
     private final Module noise;
     private final BlockState sandstone = States.SMOOTH_SANDSTONE.get();
-    private final BlockState low = Blocks.TERRACOTTA.delegate.get().getDefaultState();
-    private final BlockState mid = Blocks.ORANGE_TERRACOTTA.delegate.get().getDefaultState();
-    private final BlockState high = Blocks.BROWN_TERRACOTTA.delegate.get().getDefaultState();
+    private final BlockState low = Blocks.TERRACOTTA.delegate.get().defaultBlockState();
+    private final BlockState mid = Blocks.ORANGE_TERRACOTTA.delegate.get().defaultBlockState();
+    private final BlockState high = Blocks.BROWN_TERRACOTTA.delegate.get().defaultBlockState();
 
     public DesertSurface(GeneratorContext context) {
         min = context.levels.ground(10);
@@ -79,7 +79,7 @@ public class DesertSurface implements Surface {
             }
 
             for (int dy = 0; dy < 4; dy++) {
-                ctx.buffer.setBlockState(ctx.pos.setPos(x, height - dy, z), state, false);
+                ctx.buffer.setBlockState(ctx.pos.set(x, height - dy, z), state, false);
             }
         }
     }

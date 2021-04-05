@@ -34,16 +34,16 @@ import java.io.File;
 public class WorldGenStructures extends DataGen {
 
     private static final String PATH = "minecraft/"
-            + Registry.NOISE_SETTINGS_KEY.getLocation().getPath() + "/"             // noise_settings
-            + DimensionSettings.field_242734_c.getLocation().getPath() + ".json";   // overworld.json
+            + Registry.NOISE_GENERATOR_SETTINGS_REGISTRY.location().getPath() + "/"             // noise_settings
+            + DimensionSettings.OVERWORLD.location().getPath() + ".json";   // overworld.json
 
     public static void genDefaultDimSettings(File dataDir) {
-        WorldGenRegistries.NOISE_SETTINGS.getOptionalValue(DimensionSettings.field_242734_c)
+        WorldGenRegistries.NOISE_GENERATOR_SETTINGS.getOptional(DimensionSettings.OVERWORLD)
                 .ifPresent(settings -> genDimSettings(dataDir, settings));
     }
 
     public static void genDimSettings(File dataDir, DimensionSettings settings) {
-        Codecs.encodeOpt(DimensionSettings.field_236097_a_, settings)
+        Codecs.encodeOpt(DimensionSettings.DIRECT_CODEC, settings)
                 .ifPresent(json -> write(json, dataDir, PATH));
     }
 }

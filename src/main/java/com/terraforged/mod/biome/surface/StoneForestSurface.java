@@ -64,14 +64,14 @@ public class StoneForestSurface implements MaskedSurface {
 
         int top = height + (int) (value * 50);
         if (top > height) {
-            height = ctx.chunk.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, x, z);
+            height = ctx.chunk.getHeight(Heightmap.Type.OCEAN_FLOOR_WG, x, z);
 
             for (int y = height; y < top - 1; y++) {
-                ctx.buffer.setBlockState(ctx.pos.setPos(x, y, z), stone, false);
+                ctx.buffer.setBlockState(ctx.pos.set(x, y, z), stone, false);
             }
 
-            ctx.buffer.setBlockState(ctx.pos.setPos(x, top, z), grass, false);
-            ctx.buffer.setBlockState(ctx.pos.setPos(x, top - 1, z), dirt, false);
+            ctx.buffer.setBlockState(ctx.pos.set(x, top, z), grass, false);
+            ctx.buffer.setBlockState(ctx.pos.set(x, top - 1, z), dirt, false);
         }
     }
 }

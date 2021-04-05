@@ -66,8 +66,8 @@ public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
     @Override
     public DimensionGeneratorSettings createSettings(DynamicRegistries registries, long seed, boolean generateStructures, boolean bonusChest, String options) {
         Log.info("Creating TerraForged level settings");
-        Registry<Biome> biomes = registries.getRegistry(Registry.BIOME_KEY);
-        Registry<DimensionSettings> settings = registries.getRegistry(Registry.NOISE_SETTINGS_KEY);
+        Registry<Biome> biomes = registries.registryOrThrow(Registry.BIOME_REGISTRY);
+        Registry<DimensionSettings> settings = registries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
         TFChunkGenerator chunkGenerator = createChunkGenerator(biomes, settings, seed, options);
         DimensionGeneratorSettings level = new DimensionGeneratorSettings(
                 seed,
@@ -82,23 +82,23 @@ public class LevelType implements ForgeWorldType.IChunkGeneratorFactory {
         Log.info("Updating TerraForged level settings");
         TFChunkGenerator updatedGenerator = createOverworld(settings, registries);
         DimensionGeneratorSettings updatedLevel = new DimensionGeneratorSettings(
-                level.getSeed(),
-                level.doesGenerateFeatures(),
-                level.hasBonusChest(),
-                DimUtils.updateDimensionRegistry(level.func_236224_e_(), registries, updatedGenerator)
+                level.seed(),
+                level.generateFeatures(),
+                level.generateBonusChest(),
+                DimUtils.updateDimensionRegistry(level.dimensions(), registries, updatedGenerator)
         );
         return DimUtils.populateDimensions(updatedLevel, registries, settings);
     }
 
     private static TFChunkGenerator createOverworld(TerraSettings settings, DynamicRegistries registries) {
-        return createOverworld(settings, registries.getRegistry(Registry.BIOME_KEY), registries.getRegistry(Registry.NOISE_SETTINGS_KEY));
+        return createOverworld(settings, registries.registryOrThrow(Registry.BIOME_REGISTRY), registries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY));
     }
 
     private static TFChunkGenerator createOverworld(TerraSettings settings, Registry<Biome> biomes, Registry<DimensionSettings> dimSettings) {
         TFBiomeContext game = new TFBiomeContext(biomes);
         TerraContext context = new TerraContext(settings, game);
         TFBiomeProvider biomeProvider = new TFBiomeProvider(context);
-        return new TFChunkGenerator(biomeProvider, new RegistryGetter<>(dimSettings, DimensionSettings.field_242734_c));
+        return new TFChunkGenerator(biomeProvider, new RegistryGetter<>(dimSettings, DimensionSettings.OVERWORLD));
     }
 
     private static class RegistryGetter<T> implements Supplier<T> {

@@ -28,7 +28,12 @@ import com.terraforged.mod.Log;
 import com.terraforged.mod.api.biome.surface.SurfaceManager;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.biome.ModBiomes;
-import com.terraforged.mod.biome.surface.*;
+import com.terraforged.mod.biome.surface.BriceSurface;
+import com.terraforged.mod.biome.surface.DesertSurface;
+import com.terraforged.mod.biome.surface.ForestSurface;
+import com.terraforged.mod.biome.surface.IcebergsSurface;
+import com.terraforged.mod.biome.surface.StoneForestSurface;
+import com.terraforged.mod.biome.surface.SwampSurface;
 import com.terraforged.mod.chunk.column.ErosionDecorator;
 import com.terraforged.mod.chunk.column.post.LayerDecorator;
 import com.terraforged.mod.chunk.column.post.SnowEroder;
@@ -104,12 +109,12 @@ public class SetupFactory {
 
         if (testInv("Vanilla water springs", !context.terraSettings.miscellaneous.vanillaSprings)) {
             // block springs if not enabled
-            modifiers.getPredicates().add("WATER_SPRINGS", FeatureMatcher.and(Feature.SPRING_FEATURE, Blocks.WATER), FeaturePredicate.DENY);
+            modifiers.getPredicates().add("WATER_SPRINGS", FeatureMatcher.and(Feature.SPRING, Blocks.WATER), FeaturePredicate.DENY);
         }
 
         if (testInv("Vanilla lava springs", !context.terraSettings.miscellaneous.vanillaLavaSprings)) {
             // block springs if not enabled
-            modifiers.getPredicates().add("LAVA_SPRINGS", FeatureMatcher.and(Feature.SPRING_FEATURE, Blocks.LAVA), FeaturePredicate.DENY);
+            modifiers.getPredicates().add("LAVA_SPRINGS", FeatureMatcher.and(Feature.SPRING, Blocks.LAVA), FeaturePredicate.DENY);
         }
 
         if (test("Custom features", context.terraSettings.miscellaneous.customBiomeFeatures)) {

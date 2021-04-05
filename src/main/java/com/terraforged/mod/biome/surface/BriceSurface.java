@@ -60,28 +60,28 @@ public class BriceSurface implements MaskedSurface, Stratum.Visitor<BlockState, 
 
         for (int i = 0; i < 3; i++) {
             stratas.add(Strata.<BlockState>builder(seed.next(), Source.build(seed.next(), 100, 1))
-                    .add(Blocks.ORANGE_TERRACOTTA.getDefaultState(), thin.next(random))
-                    .add(Blocks.TERRACOTTA.getDefaultState(), medium.next(random))
-                    .add(Blocks.ORANGE_TERRACOTTA.getDefaultState(), thick.next(random))
-                    .add(Blocks.BROWN_TERRACOTTA.getDefaultState(), thin.next(random))
-                    .add(Blocks.YELLOW_TERRACOTTA.getDefaultState(), thin.next(random))
-                    .add(Blocks.TERRACOTTA.getDefaultState(), thick.next(random))
+                    .add(Blocks.ORANGE_TERRACOTTA.defaultBlockState(), thin.next(random))
+                    .add(Blocks.TERRACOTTA.defaultBlockState(), medium.next(random))
+                    .add(Blocks.ORANGE_TERRACOTTA.defaultBlockState(), thick.next(random))
+                    .add(Blocks.BROWN_TERRACOTTA.defaultBlockState(), thin.next(random))
+                    .add(Blocks.YELLOW_TERRACOTTA.defaultBlockState(), thin.next(random))
+                    .add(Blocks.TERRACOTTA.defaultBlockState(), thick.next(random))
                     .build());
             stratas.add(Strata.<BlockState>builder(seed.next(), Source.build(seed.next(), 100, 1))
-                    .add(Blocks.ORANGE_TERRACOTTA.getDefaultState(), thin.next(random))
-                    .add(Blocks.TERRACOTTA.getDefaultState(), medium.next(random))
-                    .add(Blocks.ORANGE_TERRACOTTA.getDefaultState(), thick.next(random))
-                    .add(Blocks.YELLOW_TERRACOTTA.getDefaultState(), thin.next(random))
-                    .add(Blocks.LIGHT_GRAY_TERRACOTTA.getDefaultState(), thin.next(random))
-                    .add(Blocks.TERRACOTTA.getDefaultState(), thick.next(random))
+                    .add(Blocks.ORANGE_TERRACOTTA.defaultBlockState(), thin.next(random))
+                    .add(Blocks.TERRACOTTA.defaultBlockState(), medium.next(random))
+                    .add(Blocks.ORANGE_TERRACOTTA.defaultBlockState(), thick.next(random))
+                    .add(Blocks.YELLOW_TERRACOTTA.defaultBlockState(), thin.next(random))
+                    .add(Blocks.LIGHT_GRAY_TERRACOTTA.defaultBlockState(), thin.next(random))
+                    .add(Blocks.TERRACOTTA.defaultBlockState(), thick.next(random))
                     .build());
             stratas.add(Strata.<BlockState>builder(seed.next(), Source.build(seed.next(), 100, 1))
-                    .add(Blocks.ORANGE_TERRACOTTA.getDefaultState(), medium.next(random))
-                    .add(Blocks.TERRACOTTA.getDefaultState(), thin.next(random))
-                    .add(Blocks.ORANGE_TERRACOTTA.getDefaultState(), thick.next(random))
-                    .add(Blocks.WHITE_TERRACOTTA.getDefaultState(), thin.next(random))
-                    .add(Blocks.LIGHT_GRAY_TERRACOTTA.getDefaultState(), thin.next(random))
-                    .add(Blocks.TERRACOTTA.getDefaultState(), thick.next(random))
+                    .add(Blocks.ORANGE_TERRACOTTA.defaultBlockState(), medium.next(random))
+                    .add(Blocks.TERRACOTTA.defaultBlockState(), thin.next(random))
+                    .add(Blocks.ORANGE_TERRACOTTA.defaultBlockState(), thick.next(random))
+                    .add(Blocks.WHITE_TERRACOTTA.defaultBlockState(), thin.next(random))
+                    .add(Blocks.LIGHT_GRAY_TERRACOTTA.defaultBlockState(), thin.next(random))
+                    .add(Blocks.TERRACOTTA.defaultBlockState(), thick.next(random))
                     .build());
         }
     }
@@ -96,7 +96,7 @@ public class BriceSurface implements MaskedSurface, Stratum.Visitor<BlockState, 
             return;
         }
 
-        ctx.pos.setPos(x, height, z);
+        ctx.pos.set(x, height, z);
         stratas.getStrata(ctx.cell.biomeRegionId).downwards(x, top, z, ctx.depthBuffer.get(), ctx, this);
     }
 

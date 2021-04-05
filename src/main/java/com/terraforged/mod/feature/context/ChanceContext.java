@@ -99,7 +99,7 @@ public class ChanceContext implements SafeCloseable {
             TFChunkGenerator terraGenerator = (TFChunkGenerator) generator;
             Levels levels = terraGenerator.getContext().levels;
             WorldGenRegion region = ((RegionDelegate) world).getDelegate();
-            IChunk chunk = region.getChunk(region.getMainChunkX(), region.getMainChunkZ());
+            IChunk chunk = region.getChunk(region.getCenterX(), region.getCenterZ());
             Resource<ChanceContext> item = pool.get();
             item.get().chunk = chunk;
             item.get().levels = levels;

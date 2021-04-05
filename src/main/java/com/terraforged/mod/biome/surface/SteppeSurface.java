@@ -47,8 +47,8 @@ public class SteppeSurface implements Surface {
             state = States.DIRT.get();
         }
 
-        ctx.chunk.setBlockState(ctx.pos.setPos(x, height, z), state, false);
-        ctx.chunk.setBlockState(ctx.pos.setPos(x, height-1, z), state, false);
-        ctx.chunk.setBlockState(ctx.pos.setPos(x, height-2, z), state, false);
+        ctx.chunk.setBlockState(ctx.pos.set(x, height, z), state, false);
+        ctx.chunk.setBlockState(ctx.pos.set(x, height-1, z), state, false);
+        ctx.chunk.setBlockState(ctx.pos.set(x, height-2, z), state, false);
     }
 }

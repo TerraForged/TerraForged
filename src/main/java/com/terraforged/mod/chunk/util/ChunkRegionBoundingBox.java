@@ -34,80 +34,80 @@ public class ChunkRegionBoundingBox extends MutableBoundingBox {
     private static final int INCLUSIVE_SIZE = 15;
     private static final String ERROR_MESSAGE = "Structure {} attempted to change the world-gen region bounds to an unsafe location/size. Original: {}, Altered: {}";
 
-    private final int x1, z1, x2, z2;
-    private final int rx1, rz1, rx2, rz2;
+    private final int boundX0, boundZ1, boundX1, boundZ2;
+    private final int radiusX0, radiusZ0, radiusX1, radiusZ1;
 
     private String structure = "unknown";
 
     public ChunkRegionBoundingBox(int chunkX, int chunkZ, int chunkRadius) {
         super(chunkX << 4, chunkZ << 4, (chunkX << 4) + INCLUSIVE_SIZE, (chunkZ << 4) + INCLUSIVE_SIZE);
-        this.x1 = minX;
-        this.z1 = minZ;
-        this.x2 = maxX;
-        this.z2 = maxZ;
-        this.rx1 = (chunkX - chunkRadius) << 4;
-        this.rz1 = (chunkZ - chunkRadius) << 4;
-        this.rx2 = ((chunkX + chunkRadius) << 4) + INCLUSIVE_SIZE;
-        this.rz2 = ((chunkZ + chunkRadius) << 4) + INCLUSIVE_SIZE;
+        this.boundX0 = x0;
+        this.boundZ1 = z0;
+        this.boundX1 = x1;
+        this.boundZ2 = z1;
+        this.radiusX0 = (chunkX - chunkRadius) << 4;
+        this.radiusZ0 = (chunkZ - chunkRadius) << 4;
+        this.radiusX1 = ((chunkX + chunkRadius) << 4) + INCLUSIVE_SIZE;
+        this.radiusZ1 = ((chunkZ + chunkRadius) << 4) + INCLUSIVE_SIZE;
     }
 
     public ChunkRegionBoundingBox init(StructureStart<?> start) {
-        return init(start.getStructure().getStructureName());
+        return init(start.getFeature().getFeatureName());
     }
 
     public ChunkRegionBoundingBox init(String name) {
-        minX = x1;
-        minZ = z1;
-        maxX = x2;
-        maxZ = z2;
-        minY = 1;
-        maxY = 512;
+        x0 = boundX0;
+        z0 = boundZ1;
+        x1 = boundX1;
+        z1 = boundZ2;
+        y0 = 1;
+        y1 = 512;
         structure = name;
         return this;
     }
 
     @Override
-    public void expandTo(MutableBoundingBox other) {
-        super.expandTo(other);
+    public void expand(MutableBoundingBox other) {
+        super.expand(other);
         validate();
     }
 
     @Override
-    public void offset(int x, int y, int z) {
-        super.offset(x, y, z);
+    public void move(int x, int y, int z) {
+        super.move(x, y, z);
         validate();
     }
 
     @Override
-    public void func_236989_a_(Vector3i vec) {
-        super.func_236989_a_(vec);
+    public void move(Vector3i vec) {
+        super.move(vec);
         validate();
     }
 
     @Override
     public String toString() {
         return "BoundingBox{"
-                + "minX=" + minX + ", minZ=" + minZ + ", maxX=" + maxX + ", maxZ=" + maxZ
+                + "minX=" + x0 + ", minZ=" + z0 + ", maxX=" + x1 + ", maxZ=" + z1
                 + ", sizeChunks=" + getSizeChunks()
                 + "}";
     }
 
     private String getSizeChunks() {
-        int chunkSizeX = (maxX >> 4) - (minX >> 4);
-        int chunkSizeZ = (maxZ >> 4) - (minZ >> 4);
+        int chunkSizeX = (x1 >> 4) - (x0 >> 4);
+        int chunkSizeZ = (z1 >> 4) - (z0 >> 4);
         return chunkSizeX + "x" + chunkSizeZ;
     }
 
     private void validate() {
-        if (!contains(minX, minZ, rx1, rz1, rx2, rz2) || !contains(maxX, maxZ, rx1, rz1, rx2, rz2)) {
-            String from = toString(rx1, rz1, rx2, rz2);
-            String to = toString(minX, minZ, maxX, maxZ);
+        if (!contains(x0, z0, radiusX0, radiusZ0, radiusX1, radiusZ1) || !contains(x1, z1, radiusX0, radiusZ0, radiusX1, radiusZ1)) {
+            String from = toString(radiusX0, radiusZ0, radiusX1, radiusZ1);
+            String to = toString(x0, z0, x1, z1);
             Log.warn(ERROR_MESSAGE, structure, from, to);
         }
     }
 
     public static boolean contains(int x, int z, MutableBoundingBox bounds) {
-        return contains(x, z, bounds.minX, bounds.minZ, bounds.maxX, bounds.maxZ);
+        return contains(x, z, bounds.x0, bounds.z0, bounds.x1, bounds.z1);
     }
 
     public static boolean contains(int x, int z, int minX, int minZ, int maxX, int maxZ) {
