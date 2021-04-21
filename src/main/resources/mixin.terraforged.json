@@ -8,8 +8,5 @@
     "common.MixinDimensionGeneratorSettings",
     "common.MixinMinecraftServer",
     "common.MixinTagMatchRuleTest"
-  ],
-  "_disabled": [
-    "benchmark.MixinNoiseChunkGenerator"
   ]
 }

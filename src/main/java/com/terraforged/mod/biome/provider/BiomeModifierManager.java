@@ -170,7 +170,7 @@ public class BiomeModifierManager implements BiomeModifier {
             desertBiomes = getDesertBiomes(context.biomeContext, biomes);
             modifiers.add(new OceanModifier(context, biomes));
             modifiers.add(getBeachModifier(context, biomes));
-            modifiers.add(new CoastModifier(biomes));
+            modifiers.add(new CoastModifier(context, biomes));
             modifiers.add(new DesertColorModifier(desertBiomes));
             modifiers.add(new DesertWetlandModifier(biomes));
             modifiers.add(new WetlandModifier(biomes.getContext(), ModBiomes.MARSHLAND, ModBiomes.COLD_MARSHLAND, ModBiomes.FROZEN_MARSH));

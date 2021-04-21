@@ -60,7 +60,7 @@ public class TFBiomeContainer extends BiomeContainer {
     public Biome getBiome(int x, int z) {
         x &= 15;
         z &= 15;
-        return surface[z * 16 + x];
+        return surface[indexOf(x, z)];
     }
 
     public Biome getFeatureBiome() {
