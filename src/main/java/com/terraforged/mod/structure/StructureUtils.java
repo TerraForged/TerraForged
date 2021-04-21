@@ -25,7 +25,9 @@
 package com.terraforged.mod.structure;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
 import com.terraforged.mod.chunk.settings.StructureSettings;
@@ -36,12 +38,54 @@ import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 import net.minecraft.world.gen.settings.StructureSeparationSettings;
+import net.minecraft.world.gen.settings.StructureSpreadSettings;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public class StructureUtils {
+    private static final String ERROR_MESSAGE = "Critical error loading structure settings for [{}] (it may be configured incorrectly!): {}";
+
+    public static JsonObject encode(DimensionStructuresSettings settings) {
+        JsonObject root = new JsonObject();
+
+        JsonElement stronghold = encodeStronghold(settings.stronghold());
+        if (!stronghold.isJsonNull()) {
+            root.add("stronghold", stronghold);
+        }
+
+        JsonObject structures = new JsonObject();
+        for (Map.Entry<Structure<?>, StructureSeparationSettings> entry : settings.structureConfig().entrySet()) {
+            String name = Objects.toString(entry.getKey().getRegistryName());
+            JsonElement structure = encodeStructure(name, entry.getValue());
+            if (!structure.isJsonNull()) {
+                structures.add(name, structure);
+            }
+        }
+
+        root.add("structures", structures);
+
+        return root;
+    }
+
+    public static JsonElement encodeStronghold(StructureSpreadSettings settings) {
+        try {
+            return Codecs.encode(StructureSpreadSettings.CODEC, settings);
+        } catch (Throwable t) {
+            Log.err(ERROR_MESSAGE, "minecraft:stronghold", t);
+            return JsonNull.INSTANCE;
+        }
+    }
+
+    public static JsonElement encodeStructure(String name, StructureSeparationSettings settings) {
+        try {
+            return Codecs.encode(StructureSeparationSettings.CODEC, settings);
+        } catch (Throwable t) {
+            Log.err(ERROR_MESSAGE, name, t);
+            return JsonNull.INSTANCE;
+        }
+    }
 
     public static JsonObject addMissingStructures(JsonObject dest) {
         DimensionSettings settings = WorldGenRegistries.NOISE_GENERATOR_SETTINGS.getOrThrow(DimensionSettings.OVERWORLD);

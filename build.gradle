@@ -29,17 +29,6 @@ configurations {
     compile.extendsFrom lib
 }
 
-sourceSets {
-    main.java {
-        srcDirs += "FeatureManager/src/main/java"
-    }
-    main.resources {
-        srcDirs += "DataGen/resources/"
-        srcDirs += "FeatureManager/src/main/resources"
-        exclude ".cache"
-    }
-}
-
 repositories {
     maven { url "https://io.terraforged.com/repository/maven/" }
     mavenCentral()
@@ -49,8 +38,20 @@ repositories {
 // If building from source
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    annotationProcessor "org.spongepowered:mixin:0.8.2:processor"
 //    lib "com.terraforged:Engine:0.2.0"
     lib project(":Engine")
+}
+
+sourceSets {
+    main.java {
+        srcDirs += "FeatureManager/src/main/java"
+    }
+    main.resources {
+        srcDirs += "DataGen/resources/"
+        srcDirs += "FeatureManager/src/main/resources"
+        exclude ".cache"
+    }
 }
 
 mixin {

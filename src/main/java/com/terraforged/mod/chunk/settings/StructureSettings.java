@@ -72,10 +72,10 @@ public class StructureSettings {
         // Copy valid structure configs to a new instance
         StructureSettings defaults = new StructureSettings();
 
-        JsonElement json = Codecs.encodeAndGet(DimensionStructuresSettings.CODEC, settings, JsonOps.INSTANCE);
-        json = StructureUtils.addMissingStructures(json.getAsJsonObject());
+        JsonObject root = StructureUtils.encode(settings);
+        StructureUtils.addMissingStructures(root);
 
-        DataUtils.fromJson(json, defaults);
+        DataUtils.fromJson(root, defaults);
 
         // Remove structures that appear in biomes that don't generate in overworld
         StructureUtils.retainOverworldStructures(defaults.structures, settings, context);
@@ -94,21 +94,17 @@ public class StructureSettings {
     }
 
     public DimensionStructuresSettings apply(DimensionStructuresSettings original) {
-        return Codecs.modify(original, DimensionStructuresSettings.CODEC, root -> {
-            root = StructureUtils.addMissingStructures(root.getAsJsonObject());
+        JsonObject root = StructureUtils.encode(original);
+        StructureUtils.addMissingStructures(root);
 
-            if (isDefault()) {
-                return root;
-            }
-
-            JsonObject dest = root.getAsJsonObject();
+        if (!isDefault()) {
             JsonObject source = DataUtils.toJson(this).getAsJsonObject();
 
             // Replace stronghold settings user's preferences
-            dest.add("stronghold", source.get("stronghold"));
+            root.add("stronghold", source.get("stronghold"));
 
             // Replace overworld structure settings with user's preferences
-            JsonObject destStructures = dest.getAsJsonObject("structures");
+            JsonObject destStructures = root.getAsJsonObject("structures");
             JsonObject sourceStructures = source.getAsJsonObject("structures");
             for (Map.Entry<String, JsonElement> entry : sourceStructures.entrySet()) {
                 StructureSeparation settings = structures.get(entry.getKey());
@@ -122,9 +118,9 @@ public class StructureSettings {
                 // Add the user configuration
                 destStructures.add(entry.getKey(), entry.getValue());
             }
+        }
 
-            return root;
-        });
+        return Codecs.decodeAndGet(DimensionStructuresSettings.CODEC, root, JsonOps.INSTANCE);
     }
 
     @Serializable
