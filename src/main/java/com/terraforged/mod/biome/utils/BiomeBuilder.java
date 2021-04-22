@@ -106,6 +106,8 @@ public class BiomeBuilder extends Biome.Builder {
     }
 
     protected BiomeBuilder init() {
+        dictionaryTypes.retainAll(BiomeDictionary.getTypes(parentKey));
+
         settings = new BiomeGenerationSettings.Builder();
         // surface
         settings.surfaceBuilder(parentBiome.getGenerationSettings().getSurfaceBuilder().get());
