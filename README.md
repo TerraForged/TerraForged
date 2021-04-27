@@ -10,8 +10,10 @@ The primary outlet of which is a Forge mod for the popular game Minecraft (Java 
 ```shell
 git clone https://github.com/TerraForged/TerraForged.git
 ```
-2. Modify the build-script to uncomment line#46 and comment-out line#47 (ie the Engine dependency)
-3. Generate the TerraForged resources & then build the mod jar:
+2. The buildscript is set up with Engine as a local repo - you can modify this so that it
+pulls the Engine dependency from maven instead by commenting/uncommenting the appropriate
+lines in the dependencies block
+4. Generate the TerraForged resources & then build the mod jar:
 ```shell script
 cd TerraForged
 ./gradlew runData
