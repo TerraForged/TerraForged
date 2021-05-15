@@ -35,6 +35,7 @@ import com.terraforged.engine.serialization.annotation.Rand;
 import com.terraforged.engine.serialization.annotation.Range;
 import com.terraforged.engine.serialization.annotation.Serializable;
 import com.terraforged.engine.serialization.annotation.Sorted;
+import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.chunk.TerraContext;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
@@ -120,7 +121,12 @@ public class StructureSettings {
             }
         }
 
-        return Codecs.decodeAndGet(DimensionStructuresSettings.CODEC, root, JsonOps.INSTANCE);
+        try {
+            return Codecs.decodeAndGet(DimensionStructuresSettings.CODEC, root, JsonOps.INSTANCE);
+        } catch (Throwable t) {
+            Log.err("Critical error occurred whilst setting up structure settings: {}", t);
+            return original;
+        }
     }
 
     @Serializable

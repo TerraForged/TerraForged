@@ -61,15 +61,15 @@ public class Codecs {
     }
 
     public static <V, T> V decodeAndGet(Codec<V> codec, OptionalDynamic<T> dynamic) {
-        return dynamic.result().flatMap(d -> decode(codec, d)).orElseThrow(CodecException.SUPPLIER);
+        return dynamic.result().flatMap(d -> decode(codec, d)).orElseThrow(CodecException.decode(dynamic));
     }
 
     public static <V, T> V decodeAndGet(Codec<V> codec, Dynamic<T> dynamic) {
-        return decode(codec, dynamic).orElseThrow(CodecException.SUPPLIER);
+        return decode(codec, dynamic).orElseThrow(CodecException.decode(dynamic));
     }
 
     public static <V, T> V decodeAndGet(Codec<V> codec, T value, DynamicOps<T> ops) {
-        return decode(codec, value, ops).orElseThrow(CodecException.SUPPLIER);
+        return decode(codec, value, ops).orElseThrow(CodecException.decode(value));
     }
 
     public static <V, T> Optional<V> decode(Codec<V> codec, OptionalDynamic<T> dynamic) {

@@ -56,6 +56,10 @@ public class CodecException extends RuntimeException {
         return new CodecException(String.format(message, args), cause);
     }
 
+    public static Supplier<CodecException> decode(Object src) {
+        return () -> of("Failed to decode data: %s", src);
+    }
+
     public static Supplier<CodecException> get(String message, Object... args) {
         return () -> of(message, args);
     }

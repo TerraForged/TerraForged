@@ -51,8 +51,8 @@ public class StructureUtils {
         JsonObject root = new JsonObject();
 
         JsonElement stronghold = encodeStronghold(settings.stronghold());
-        if (!stronghold.isJsonNull()) {
-            root.add("stronghold", stronghold);
+        if (stronghold.isJsonNull()) {
+            stronghold = encodeStronghold(DimensionStructuresSettings.DEFAULT_STRONGHOLD);
         }
 
         JsonObject structures = new JsonObject();
@@ -64,6 +64,7 @@ public class StructureUtils {
             }
         }
 
+        root.add("stronghold", stronghold);
         root.add("structures", structures);
 
         return root;
@@ -87,7 +88,7 @@ public class StructureUtils {
         }
     }
 
-    public static JsonObject addMissingStructures(JsonObject dest) {
+    public static void addMissingStructures(JsonObject dest) {
         DimensionSettings settings = WorldGenRegistries.NOISE_GENERATOR_SETTINGS.getOrThrow(DimensionSettings.OVERWORLD);
         JsonElement element = Codecs.encode(DimensionStructuresSettings.CODEC, settings.structureSettings());
         if (element.isJsonObject()) {
@@ -98,7 +99,6 @@ public class StructureUtils {
                 }
             }
         }
-        return dest;
     }
 
     public static Map<String, StructureSettings.StructureSeparation> getOverworldStructureDefaults() {
