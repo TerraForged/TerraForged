@@ -169,6 +169,7 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
                     label.y = top.getAndAdd(SLIDER_HEIGHT + SLIDER_PAD);
                     consumer.accept(label);
                 }
+
                 addElements(x, top.get(), column, (CompoundNBT) child, true, consumer, callback);
             }
         });

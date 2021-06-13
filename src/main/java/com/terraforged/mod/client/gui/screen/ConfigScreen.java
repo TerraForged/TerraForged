@@ -261,6 +261,7 @@ public class ConfigScreen extends OverlayScreen {
             DimensionStructuresSettings structuresSettings = level.overworld().getSettings();
             settings.structures = new StructureSettings();
             settings.structures.addSettings(structuresSettings);
+            settings.structures.hideNonOverworld(context.biomeContext);
         }
     }
 
