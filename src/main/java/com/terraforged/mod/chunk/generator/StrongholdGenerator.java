@@ -51,6 +51,7 @@ public class StrongholdGenerator implements Generator.Strongholds {
     private final int count;
     private final int spread;
     private final int distance;
+    private final boolean disabled;
     private final boolean constrain;
     private final Vec2i origin;
     private final TFBiomeProvider biomeProvider;
@@ -70,16 +71,21 @@ public class StrongholdGenerator implements Generator.Strongholds {
         this.count = getStrongholdSetting(biomeProvider, s -> s.count);
         this.spread = getStrongholdSetting(biomeProvider, s -> s.spread);
         this.distance = getStrongholdSetting(biomeProvider, s -> s.distance);
+        this.disabled = biomeProvider.getContext().terraSettings.structures.stronghold.disabled;
         this.constrain = biomeProvider.getContext().terraSettings.structures.stronghold.constrainToBiomes;
     }
 
     @Override
     public boolean isStrongholdChunk(ChunkPos pos) {
-        return lookup.get().contains(pos);
+        return !disabled && lookup.get().contains(pos);
     }
 
     @Override
     public BlockPos findNearestStronghold(BlockPos pos) {
+        if (disabled) {
+            return null;
+        }
+
         double distance2 = Double.MAX_VALUE;
         BlockPos.Mutable nearest = null;
         BlockPos.Mutable mutable = new BlockPos.Mutable();
@@ -107,6 +113,10 @@ public class StrongholdGenerator implements Generator.Strongholds {
     }
 
     private ChunkPos[] generate() {
+        if (disabled) {
+            return EMPTY_ARRAY;
+        }
+
         if (count > 0 && spread > 0 && distance > 0) {
             final int originX = origin.x;
             final int originZ = origin.y;

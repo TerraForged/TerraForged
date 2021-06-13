@@ -27,6 +27,8 @@ package com.terraforged.mod.structure;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.JsonOps;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
@@ -40,6 +42,7 @@ import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 import net.minecraft.world.gen.settings.StructureSeparationSettings;
 import net.minecraft.world.gen.settings.StructureSpreadSettings;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -48,6 +51,9 @@ public class StructureUtils {
     private static final String ERROR_MESSAGE = "Critical error loading structure settings for [{}] (it may be configured incorrectly!): {}";
 
     public static JsonObject encode(DimensionStructuresSettings settings) {
+        DataResult<JsonElement> result = DimensionStructuresSettings.CODEC.encodeStart(JsonOps.INSTANCE, settings);
+
+
         JsonObject root = new JsonObject();
 
         JsonElement stronghold = encodeStronghold(settings.stronghold());
@@ -70,7 +76,7 @@ public class StructureUtils {
         return root;
     }
 
-    public static JsonElement encodeStronghold(StructureSpreadSettings settings) {
+    public static JsonElement encodeStronghold(@Nullable StructureSpreadSettings settings) {
         try {
             return Codecs.encode(StructureSpreadSettings.CODEC, settings);
         } catch (Throwable t) {

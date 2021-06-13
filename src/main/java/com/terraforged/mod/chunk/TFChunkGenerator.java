@@ -114,7 +114,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     private final ThreadLocal<Cell> localCellResource = ThreadLocal.withInitial(Cell::new);
 
     public TFChunkGenerator(TFBiomeProvider biomeProvider, Supplier<DimensionSettings> settings) {
-        super(biomeProvider, biomeProvider.getSettings().structures.validateAndApply(biomeProvider.getContext(), settings));
+        super(biomeProvider, biomeProvider.getSettings().structures.apply(settings));
         CacheManager.get().clear();
         TerraContext context = biomeProvider.getContext();
         this.seed = context.terraSettings.world.seed;

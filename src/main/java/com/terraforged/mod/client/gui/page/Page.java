@@ -39,6 +39,7 @@ import com.terraforged.mod.util.DataUtils;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.nbt.ByteNBT;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraftforge.common.util.Constants;
@@ -136,8 +137,12 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
     }
 
     public void addElements(int x, int y, Column column, CompoundNBT settings, boolean deep, Consumer<Widget> consumer, Runnable callback) {
-        AtomicInteger top = new AtomicInteger(y);
+        // Don't add if element is hidden
+        if (skip(settings)) {
+            return;
+        }
 
+        AtomicInteger top = new AtomicInteger(y);
         DataUtils.streamKeys(settings).forEach(name -> {
             Widget button = createButton(name, settings, callback);
             if (button != null) {
@@ -152,6 +157,12 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
                 if (child == null || child.getId() != Constants.NBT.TAG_COMPOUND) {
                     return;
                 }
+
+                // Don't add if child element is hidden
+                if (skip((CompoundNBT) child)) {
+                    return;
+                }
+
                 Widget label = createLabel(name, settings);
                 if (label != null) {
                     label.x = x;
@@ -224,6 +235,11 @@ public abstract class Page implements IGuiEventListener, OverlayRenderer {
             this.scrollPane.updateSize(width, height, 30, height - 30);
             this.scrollPane.setLeftPos(this.left);
         }
+    }
+
+    private static boolean skip(CompoundNBT value) {
+        INBT tag = value.get(Serializer.HIDE);
+        return tag instanceof ByteNBT && ((ByteNBT) tag).getAsByte() == 1;
     }
 
     private static boolean hasOptions(String name, CompoundNBT value) {

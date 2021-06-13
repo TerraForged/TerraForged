@@ -24,29 +24,28 @@
 
 package com.terraforged.mod.chunk.settings;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.serialization.JsonOps;
-import com.terraforged.engine.serialization.annotation.Comment;
-import com.terraforged.engine.serialization.annotation.Limit;
-import com.terraforged.engine.serialization.annotation.Name;
-import com.terraforged.engine.serialization.annotation.NoName;
-import com.terraforged.engine.serialization.annotation.Rand;
-import com.terraforged.engine.serialization.annotation.Range;
-import com.terraforged.engine.serialization.annotation.Serializable;
-import com.terraforged.engine.serialization.annotation.Sorted;
+import com.terraforged.engine.serialization.annotation.*;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.context.TFBiomeContext;
-import com.terraforged.mod.chunk.TerraContext;
+import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
 import com.terraforged.mod.featuremanager.util.codec.Codecs;
-import com.terraforged.mod.structure.StructureUtils;
-import com.terraforged.mod.structure.StructureValidator;
 import com.terraforged.mod.util.DataUtils;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.WorldGenRegistries;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.DimensionSettings;
+import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.settings.DimensionStructuresSettings;
+import net.minecraft.world.gen.settings.StructureSeparationSettings;
+import net.minecraft.world.gen.settings.StructureSpreadSettings;
 
+import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 @Serializable
@@ -58,95 +57,143 @@ public class StructureSettings {
     @Sorted
     public Map<String, StructureSeparation> structures = new LinkedHashMap<>();
 
-    public boolean isDefault() {
-        return structures.isEmpty();
-    }
 
-    public Map<String, StructureSeparation> getOrDefaultStructures() {
-        if (isDefault()) {
-            return StructureUtils.getOverworldStructureDefaults();
-        }
-        return structures;
-    }
+    public DimensionStructuresSettings apply(Supplier<DimensionSettings> settings) {
+        init(settings);
 
-    public void load(DimensionStructuresSettings settings, TFBiomeContext context) {
-        // Copy valid structure configs to a new instance
-        StructureSettings defaults = new StructureSettings();
+        return Codecs.modify(settings.get().structureSettings(), DimensionStructuresSettings.CODEC, data -> {
+            JsonObject structures = data.getAsJsonObject().getAsJsonObject("structures");
+            if (structures == null) {
+                structures = new JsonObject();
+            }
 
-        JsonObject root = StructureUtils.encode(settings);
-        StructureUtils.addMissingStructures(root);
-
-        DataUtils.fromJson(root, defaults);
-
-        // Remove structures that appear in biomes that don't generate in overworld
-        StructureUtils.retainOverworldStructures(defaults.structures, settings, context);
-
-        // Replace default values in the new instance with any contained on this instance
-        this.structures.forEach((name, setting) -> defaults.structures.replace(name, setting));
-
-        // Replace this structures map with the updated defaults
-        this.structures = defaults.structures;
-    }
-
-    public DimensionStructuresSettings validateAndApply(TerraContext context, Supplier<DimensionSettings> settings) {
-        DimensionSettings dimensionSettings = settings.get();
-        StructureValidator.validateConfigs(dimensionSettings, context.biomeContext, this);
-        return apply(dimensionSettings.structureSettings());
-    }
-
-    public DimensionStructuresSettings apply(DimensionStructuresSettings original) {
-        JsonObject root = StructureUtils.encode(original);
-        StructureUtils.addMissingStructures(root);
-
-        if (!isDefault()) {
-            JsonObject source = DataUtils.toJson(this).getAsJsonObject();
-
-            // Replace stronghold settings user's preferences
-            root.add("stronghold", source.get("stronghold"));
-
-            // Replace overworld structure settings with user's preferences
-            JsonObject destStructures = root.getAsJsonObject("structures");
-            JsonObject sourceStructures = source.getAsJsonObject("structures");
-            for (Map.Entry<String, JsonElement> entry : sourceStructures.entrySet()) {
-                StructureSeparation settings = structures.get(entry.getKey());
-
-                // Remove if user has disabled the structure
-                if (settings != null && settings.disabled) {
-                    destStructures.remove(entry.getKey());
+            for (Map.Entry<String, StructureSeparation> entry : this.structures.entrySet()) {
+                if (entry.getValue().disabled) {
+                    structures.remove(entry.getKey());
                     continue;
                 }
-
-                // Add the user configuration
-                destStructures.add(entry.getKey(), entry.getValue());
+                structures.add(entry.getKey(), DataUtils.toJson(entry.getValue()));
             }
+
+            return data;
+        });
+    }
+
+    public StructureSettings init(Supplier<DimensionSettings> settings) {
+        // Current settings held in this instance (loaded from level.dat) take priority
+
+        // Then: add any missing structures from the datapack
+        addSettings(settings.get().structureSettings());
+
+        // Then: add any missing structures from the WorldGenRegistry
+        addDefaults();
+
+        return this;
+    }
+
+    // Adds settings contained in the DimensionStructuresSettings instance if they are missing
+    // from the StructureSettings
+    public StructureSettings addSettings(DimensionStructuresSettings structuresSettings) {
+        initStronghold(structuresSettings.stronghold());
+        initStructures(structuresSettings.structureConfig());
+        return this;
+    }
+
+    // Adds settings contained in the default overworld DimensionStructuresSettings instance if
+    // they are missing from the StructureSettings.
+    public StructureSettings addDefaults() {
+        DimensionSettings settings = WorldGenRegistries.NOISE_GENERATOR_SETTINGS.getOrThrow(DimensionSettings.OVERWORLD);
+        DimensionStructuresSettings structuresSettings = settings.structureSettings();
+        return addSettings(structuresSettings);
+    }
+
+    public void hideNonOverworld(TFBiomeContext context) {
+        Predicate<String> predicate = getOverworldStructurePredicate(context);
+        for (Map.Entry<String, StructureSeparation> entry : structures.entrySet()) {
+            entry.getValue().hidden = !predicate.test(entry.getKey());
+        }
+    }
+
+    private void initStronghold(@Nullable StructureSpreadSettings stronghold) {
+        // Ignore if stronghold is already configured
+        if (!this.stronghold.isDefaulted()) {
+            return;
         }
 
-        try {
-            return Codecs.decodeAndGet(DimensionStructuresSettings.CODEC, root, JsonOps.INSTANCE);
-        } catch (Throwable t) {
-            Log.err("Critical error occurred whilst setting up structure settings: {}", t);
-            return original;
+        // Null or 0 count indicates to the chunk generator that strongholds are disabled
+        this.stronghold.disabled = stronghold == null;
+
+        if (stronghold == null) {
+            return;
+        }
+
+        // Skip invalid configurations
+        if (!validateStronghold(stronghold.count(), stronghold.spread(), stronghold.distance())) {
+            Log.warn("Structure [minecraft:stronghold] configured with invalid settings. Ignoring to prevent crashes!");
+            return;
+        }
+
+        // Copy settings
+        this.stronghold.count = stronghold.count();
+        this.stronghold.spread = stronghold.spread();
+        this.stronghold.distance = stronghold.distance();
+    }
+
+    private void initStructures(Map<Structure<?>, StructureSeparationSettings> structures) {
+        for (Map.Entry<Structure<?>, StructureSeparationSettings> entry : structures.entrySet()) {
+            ResourceLocation registryName = entry.getKey().getRegistryName();
+            StructureSeparationSettings settings = entry.getValue();
+
+            // Ignore unregistered structures
+            if (registryName == null) {
+                continue;
+            }
+
+            String name = registryName.toString();
+            StructureSettings.StructureSeparation separation = this.structures.get(name);
+
+            // Create preferences for the missing structure
+            if (separation == null) {
+                separation = new StructureSettings.StructureSeparation();
+                separation.disabled = false;
+                separation.salt = settings.salt();
+                separation.spacing = settings.spacing();
+                separation.separation = settings.separation();
+            }
+
+            // Skip & log invalidate configuratioms
+            if (!validateStructure(name, separation.spacing, separation.separation, separation.salt)) {
+                Log.warn("Structure [{}] registered with invalid separation settings. Ignoring to prevent crashes!");
+                continue;
+            }
+
+            // Only add missing entries so that user prefs aren't overwritten
+            this.structures.putIfAbsent(name, separation);
         }
     }
 
     @Serializable
     public static class StructureSpread {
+        private static final int DEF_DISTANCE = 32;
+        private static final int DEF_SPREAD = 3;
+        private static final int DEF_COUNT = 128;
+        private static final int DEF_SALT = 0;
 
         @Range(min = 0, max = 1023)
         @Comment("Controls how far from spawn strongholds will start generating")
-        public int distance = 32;
+        public int distance = DEF_DISTANCE;
 
         @Range(min = 0, max = 1023)
         @Comment("Controls how spread apart strongholds will generate")
-        public int spread = 3;
+        public int spread = DEF_SPREAD;
 
         @Range(min = 1, max = 4095)
         @Comment("Controls the number of strongholds that will generate in the world")
-        public int count = 128;
+        public int count = DEF_COUNT;
 
         @Rand
         @Comment("A seed offset used to randomise stronghold placement")
-        public int salt = 0;
+        public int salt = DEF_SALT;
 
         @Comment({
                 "Set whether strongholds should only start in valid stronghold biomes. The vanilla behaviour",
@@ -158,6 +205,11 @@ public class StructureSettings {
 
         @Comment("Prevent this structure from generating.")
         public boolean disabled = false;
+
+        public boolean isDefaulted() {
+            return !disabled && !constrainToBiomes && distance == DEF_DISTANCE
+                    && spread == DEF_SPREAD && count == DEF_COUNT && salt == DEF_SALT;
+        }
     }
 
     @Serializable
@@ -191,5 +243,53 @@ public class StructureSettings {
 
         @Comment("Prevent this structure from generating.")
         public boolean disabled = false;
+
+        @Hide
+        public transient boolean hidden = false;
+    }
+
+    private static Predicate<String> getOverworldStructurePredicate(TFBiomeContext context) {
+        Biome[] biomes = BiomeAnalyser.getOverworldBiomes(context);
+        Set<String> set = new HashSet<>();
+        for (Biome biome : biomes) {
+            biome.getGenerationSettings().structures().forEach(s -> {
+                Structure<?> structure = s.get().feature;
+                ResourceLocation name = structure.getRegistryName();
+                if (name != null) {
+                    set.add(name.toString());
+                }
+            });
+        }
+        return set::contains;
+    }
+
+    private static boolean validateStructure(String name, int spacing, int separation, int salt) {
+        if (spacing < separation) {
+            Log.err("[{}] structure spacing ({}) cannot be lower than separation ({})", name, spacing, separation);
+            return false;
+        }
+
+        boolean result;
+        result = checkRange(0, 4096, spacing, name, "spacing");
+        result &= checkRange(0, 4096, separation, name, "separation");
+        result &= checkRange(0, Integer.MAX_VALUE, salt, name, "salt");
+
+        return result;
+    }
+
+    private static boolean validateStronghold(int count, int spread, int distance) {
+        boolean result;
+        result = checkRange(0, 1023, distance, "minecraft:stronghold", "distance");
+        result &= checkRange(0, 1023, spread, "minecraft:stronghold", "spread");
+        result &= checkRange(1, 4095, count, "minecraft:stronghold", "count");
+        return result;
+    }
+
+    private static boolean checkRange(int min, int max, int value, String name, String variable) {
+        if (value >= min && value <= max) {
+            return true;
+        }
+        Log.err("[{}] structure setting: {} = {} is outside of the valid range: {} - {}", name, variable, value, min, max);
+        return false;
     }
 }
