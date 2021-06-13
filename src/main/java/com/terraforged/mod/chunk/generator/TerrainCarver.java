@@ -32,6 +32,8 @@ import com.terraforged.mod.biome.provider.TFBiomeProvider;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.fix.ChunkCarverFix;
 import com.terraforged.mod.featuremanager.template.StructureUtils;
+import com.terraforged.mod.featuremanager.util.identity.FeatureIdentifier;
+import com.terraforged.mod.featuremanager.util.identity.IdentityCache;
 import com.terraforged.mod.profiler.watchdog.WarnTimer;
 import com.terraforged.mod.profiler.watchdog.Watchdog;
 import com.terraforged.mod.profiler.watchdog.WatchdogContext;
@@ -57,6 +59,7 @@ public class TerrainCarver implements Generator.Carvers {
 
     private final TFChunkGenerator generator;
     private final long timeout;
+    private final IdentityCache<ConfiguredCarver<?>> identityCache = new IdentityCache<>(FeatureIdentifier::getIdentity);
 
     public TerrainCarver(TFChunkGenerator generator) {
         this.generator = generator;
@@ -99,7 +102,7 @@ public class TerrainCarver implements Generator.Carvers {
                     if (carver.isStartChunk(random, cx, cz)) {
                         long timestamp = timer.now();
                         carver.carve(carverChunk, lookup, random, seaLevel, cx, cz, chunkX, chunkZ, mask);
-                        Generator.checkTime(TYPE, carver, timer, timestamp, context);
+                        Generator.checkTime(TYPE, carver, identityCache, timer, timestamp, context);
                     }
                 }
 

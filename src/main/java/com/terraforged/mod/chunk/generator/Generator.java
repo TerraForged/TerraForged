@@ -48,6 +48,7 @@ import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Function;
 
 public interface Generator {
 
@@ -146,6 +147,15 @@ public interface Generator {
         if (timer.warn(duration)) {
             context.pushTime(type, identity, duration);
             Log.warn("{} was slow to generate! ({}ms): {}", type, duration, identity.getComponents());
+        }
+    }
+
+    static <T> void checkTime(String type, T instance, Function<T, Identifier> identityFunc, WarnTimer timer, long timestamp, WatchdogContext context) {
+        long duration = timer.since(timestamp);
+        if (timer.warn(duration)) {
+            Identifier identity = identityFunc.apply(instance);
+            context.pushTime(type, identity, duration);
+            Log.warn("{} was slow to generate! ({}ms): {}", type, duration, identity);
         }
     }
 }

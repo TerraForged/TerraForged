@@ -27,8 +27,10 @@ package com.terraforged.mod.featuremanager.util.identity;
 import com.google.common.base.Suppliers;
 import com.google.gson.JsonElement;
 import com.terraforged.mod.featuremanager.FeatureSerializer;
+import com.terraforged.mod.featuremanager.util.codec.Codecs;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.WorldGenRegistries;
+import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 
 import java.util.ArrayList;
@@ -96,6 +98,21 @@ public class FeatureIdentifier implements Identifier {
             JsonElement jsonElement = FeatureSerializer.serialize(feature);
             return getIdentity(jsonElement);
         } catch (Throwable t) {
+            return FeatureIdentifier.NONE;
+        }
+    }
+
+    public static FeatureIdentifier getIdentity(ConfiguredCarver<?> carver) {
+        ResourceLocation name = WorldGenRegistries.CONFIGURED_CARVER.getKey(carver);
+        if (name != null) {
+            return new FeatureIdentifier(Collections.singletonList(name.toString()));
+        }
+
+        try {
+            JsonElement jsonElement = Codecs.encode(ConfiguredCarver.DIRECT_CODEC, carver);
+            return getIdentity(jsonElement);
+        } catch (Throwable t) {
+            t.printStackTrace();
             return FeatureIdentifier.NONE;
         }
     }
