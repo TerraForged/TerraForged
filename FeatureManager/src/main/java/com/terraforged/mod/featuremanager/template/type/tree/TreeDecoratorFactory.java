@@ -25,11 +25,13 @@
 package com.terraforged.mod.featuremanager.template.type.tree;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import com.terraforged.mod.featuremanager.template.decorator.Decorator;
 import com.terraforged.mod.featuremanager.util.codec.CodecHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.ISeedReader;
+import net.minecraft.world.gen.treedecorator.TreeDecoratorType;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Optional;
@@ -43,8 +45,39 @@ public class TreeDecoratorFactory implements Decorator.Factory<TreeDecoratorBuff
 
     @Override
     public Optional<Decorator<TreeDecoratorBuffer>> parse(ResourceLocation name, JsonElement config) {
-        return Optional.ofNullable(ForgeRegistries.TREE_DECORATOR_TYPES.getValue(name))
-                .map(type -> CodecHelper.treeDecorator(type, config, JsonOps.INSTANCE))
-                .map(TreeDecorator::new);
+        TreeDecoratorType<?> type = ForgeRegistries.TREE_DECORATOR_TYPES.getValue(name);
+        if (type == null) {
+            return Optional.empty();
+        }
+
+        JsonElement modified = getModifiedConfig(config);
+        net.minecraft.world.gen.treedecorator.TreeDecorator decorator = decode(type, config);
+        net.minecraft.world.gen.treedecorator.TreeDecorator modifiedDecorator = decorator;
+
+        if (modified != config) {
+            modifiedDecorator = decode(type, modified);
+        }
+
+        return Optional.of(new TreeDecorator(decorator, modifiedDecorator));
+    }
+
+    private static net.minecraft.world.gen.treedecorator.TreeDecorator decode(TreeDecoratorType<?> type, JsonElement config) {
+        return CodecHelper.treeDecorator(type, config, JsonOps.INSTANCE);
+    }
+
+    private static JsonElement getModifiedConfig(JsonElement config) {
+        if (!config.isJsonObject()) {
+            return config;
+        }
+
+        JsonObject object = config.getAsJsonObject();
+        if (object.has("probability") && object.has("modified_probability")) {
+            double probability = object.get("modified_probability").getAsDouble();
+            JsonObject result = new JsonObject();
+            result.addProperty("probability", probability);
+            return result;
+        }
+
+        return config;
     }
 }

@@ -36,18 +36,24 @@ public class TreeDecorator implements Decorator<TreeDecoratorBuffer> {
     private static final DummySet<BlockPos> DUMMY_SET = DummySet.get();
 
     private final net.minecraft.world.gen.treedecorator.TreeDecorator decorator;
+    private final net.minecraft.world.gen.treedecorator.TreeDecorator modifiedDecorator;
 
-    public TreeDecorator(net.minecraft.world.gen.treedecorator.TreeDecorator decorator) {
+    public TreeDecorator(net.minecraft.world.gen.treedecorator.TreeDecorator decorator, net.minecraft.world.gen.treedecorator.TreeDecorator modifiedDecorator) {
         this.decorator = decorator;
+        this.modifiedDecorator = modifiedDecorator;
+    }
+
+    public net.minecraft.world.gen.treedecorator.TreeDecorator getDecorator(boolean modified) {
+        return modified ? modifiedDecorator : decorator;
     }
 
     @Override
-    public void apply(TreeDecoratorBuffer buffer, Random random) {
+    public void apply(TreeDecoratorBuffer buffer, Random random, boolean modified) {
         if (buffer.getLogs().isEmpty() || buffer.getLeaves().isEmpty()) {
             return;
         }
 
-        decorator.place(
+        getDecorator(modified).place(
                 buffer.getDelegate(),
                 random,
                 buffer.getLogs(),

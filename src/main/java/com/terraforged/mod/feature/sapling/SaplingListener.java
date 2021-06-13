@@ -32,6 +32,7 @@ import com.terraforged.mod.featuremanager.template.feature.TemplateFeatureConfig
 import com.terraforged.mod.featuremanager.template.template.Template;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
@@ -91,12 +92,13 @@ public class SaplingListener {
         // translate the pos so that the mirrored/rotated 2x2 grid aligns correctly
         Vector3i translation = getTranslation(directions, mirror, rotation);
         BlockPos origin = pos.subtract(translation);
+        boolean flowers = hasFlowers(world, origin);
 
         // prevent vanilla tree growing
         event.setResult(Event.Result.DENY);
 
         // attempt to paste the tree & then clear up any remaining saplings
-        if (TemplateFeature.paste(world, event.getRand(), origin, mirror, rotation, feature, feature.decorator, Template.CHECKED)) {
+        if (TemplateFeature.paste(world, event.getRand(), origin, mirror, rotation, feature, feature.decorator, Template.CHECKED, flowers)) {
             for (Vector3i dir : directions) {
                 BlockPos neighbour = origin.offset(dir);
                 BlockState state = world.getBlockState(neighbour);
@@ -171,6 +173,16 @@ public class SaplingListener {
         }
         return pos;
     }
+
+    private static boolean hasFlowers(IWorld world, BlockPos pos) {
+        for(BlockPos blockpos : BlockPos.Mutable.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
+            if (world.getBlockState(blockpos).is(BlockTags.FLOWERS)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private static Vector3i getTranslation(Vector3i[] directions, Mirror mirror, Rotation rotation) {
         if (directions.length == 1 || mirror == Mirror.NONE && rotation == Rotation.NONE) {

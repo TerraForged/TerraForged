@@ -11,12 +11,24 @@
   "decorators": {
     "default": {
       "minecraft:beehive": {
-        "probability": 0.002
+        "probability": 0.002,
+        "modified_probability": 0.05
+      }
+    },
+    "minecraft:plains": {
+      "minecraft:beehive": {
+        "probability": 0.05
+      }
+    },
+    "minecraft:sunflower_plains": {
+      "minecraft:beehive": {
+        "probability": 0.05
       }
     },
     "minecraft:flower_forest": {
       "minecraft:beehive": {
-        "probability": 0.02
+        "probability": 0.02,
+        "modified_probability": 0.05
       }
     }
   }

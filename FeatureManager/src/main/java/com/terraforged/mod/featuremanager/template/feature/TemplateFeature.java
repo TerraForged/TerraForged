@@ -71,6 +71,10 @@ public class TemplateFeature extends Feature<TemplateFeatureConfig> {
     }
 
     public static <T extends IWorld> boolean paste(ISeedReader world, Random rand, BlockPos pos, Mirror mirror, Rotation rotation, TemplateFeatureConfig config, DecoratorConfig<T> decorator, PasteType pasteType) {
+        return paste(world, rand, pos, mirror, rotation, config, decorator, pasteType, false);
+    }
+
+    public static <T extends IWorld> boolean paste(ISeedReader world, Random rand, BlockPos pos, Mirror mirror, Rotation rotation, TemplateFeatureConfig config, DecoratorConfig<T> decorator, PasteType pasteType, boolean modified) {
         if (config.templates.isEmpty()) {
             FeatureManager.LOG.warn("Empty template list for config: {}", config.name);
             return false;
@@ -88,7 +92,7 @@ public class TemplateFeature extends Feature<TemplateFeatureConfig> {
         if (paste.apply(buffer, pos, mirror, rotation, placement, config.paste)) {
             ResourceLocation biome = world.getBiomeName(pos).map(RegistryKey::getRegistryName).orElse(null);
             for (Decorator<T> d : decorator.getDecorators(biome)) {
-                d.apply(buffer, rand);
+                d.apply(buffer, rand, modified);
             }
             return true;
         }

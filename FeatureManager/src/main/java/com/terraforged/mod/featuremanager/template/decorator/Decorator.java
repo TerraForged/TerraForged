@@ -34,7 +34,7 @@ import java.util.Random;
 
 public interface Decorator<T extends IWorld> {
 
-    void apply(T world, Random random);
+    void apply(T world, Random random, boolean modified);
 
     interface Factory<T extends IWorld> {
 
