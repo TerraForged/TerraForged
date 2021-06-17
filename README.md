@@ -30,17 +30,14 @@ Notes:
 ```groovy
 repositories {
     maven { 
-        url "https://io.terraforged.com/repository/maven/" 
+        url "https://io.terraforged.com/maven/" 
     }
 }
 
 dependencies {
-    implementation fg.deobf("com.terraforged:TerraForged:1.16.4-${version}")
+    implementation fg.deobf("com.terraforged:TerraForged:1.16.5-${version}")
 }
 ```
-
-Obtain a `${version}` from the [repository tags](https://github.com/TerraForged/TerraForged/releases)
-(versions 0.0.1 to 0.1.2 inclusive are currently unavailable).
 
 #### Usage
 

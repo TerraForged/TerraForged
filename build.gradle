@@ -30,7 +30,7 @@ configurations {
 }
 
 repositories {
-    maven { url "https://io.terraforged.com/repository/maven/" }
+    maven { url "https://io.terraforged.com/maven/" }
     mavenCentral()
     jcenter()
 }
@@ -171,7 +171,7 @@ publishing {
     if (System.getenv("MAVEN_USER") != null && System.getenv("MAVEN_PASS") != null) {
         repositories {
             maven {
-                url = "https://io.terraforged.com/repository/maven/"
+                url = "https://io.terraforged.com/maven/"
                 credentials {
                     username System.getenv("MAVEN_USER")
                     password System.getenv("MAVEN_PASS")
