@@ -29,6 +29,7 @@ import com.terraforged.mod.Log;
 
 public class Environment {
 
+    private static final int MIN_CORES = 4;
     private static final boolean dev = System.getProperty("dev") != null;
     private static final boolean verbose = System.getProperty("verbose") != null;
     private static final boolean vanillaBiomes = System.getProperty("vanillaBiomes") != null;
@@ -47,5 +48,18 @@ public class Environment {
 
     public static void log() {
         Log.info("Environment: dev={}, stable={}, vanilla={}", dev, Engine.ENFORCE_STABLE_OPTIONS, vanillaBiomes);
+        perf();
+    }
+
+    private static void perf() {
+        int processors = Runtime.getRuntime().availableProcessors();
+        if (processors < MIN_CORES) {
+            Log.warn("Running on unsupported cpu! TerraForged may not work correctly! Available Processors: {}", processors);
+            return;
+        }
+
+        if (processors == MIN_CORES) {
+            Log.info("Running on minimum supported core-count. Performance may not be optimal!");
+        }
     }
 }
