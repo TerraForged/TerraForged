@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.mixin.common;
 
-import com.terraforged.mod.feature.TagConfigFixer;
+import com.terraforged.mod.util.TagFixer;
 import net.minecraft.block.Block;
 import net.minecraft.tags.ITag;
 import net.minecraft.world.gen.feature.template.TagMatchRuleTest;
@@ -38,10 +38,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * Non-essential.
- * Fixes references to the base_stone_overworld block-tag. This is to work around a vanilla
- * bug where the active tag-manager instance changes between creation of the TagMatchRuleTest
- * and serialization of it causing tags to become orphaned from the active tag-manager and so
- * produces the 'unknown tag Tag@#####' message when trying to encode the TagMatchRuleTest.
+ * Fixes vanilla/forge bug where TagMatchRuleTest does not properly encode due to tags reloading
+ * after creation of the TagMatchRuleTest.
  */
 @Mixin(TagMatchRuleTest.class)
 public class MixinTagMatchRuleTest {
@@ -53,6 +51,6 @@ public class MixinTagMatchRuleTest {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(ITag<Block> tagIn, CallbackInfo info) {
-        tag = TagConfigFixer.getFixedBlockTag(tagIn);
+        tag = TagFixer.wrap(tagIn);
     }
 }

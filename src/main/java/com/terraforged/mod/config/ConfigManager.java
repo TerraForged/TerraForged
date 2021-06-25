@@ -31,9 +31,9 @@ import com.electronwill.nightconfig.toml.TomlFormat;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.settings.preset.Preset;
 import com.terraforged.mod.client.gui.GuiKeys;
-import com.terraforged.mod.feature.TagConfigFixer;
 import com.terraforged.mod.profiler.watchdog.Watchdog;
 import com.terraforged.mod.structure.StructureLocator;
+import com.terraforged.mod.util.TagFixer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -141,8 +141,8 @@ public class ConfigManager {
         );
         set(
                 cfg,
-                TagConfigFixer.FIX_BLOCK_TAG_KEY,
-                TagConfigFixer.FIX_BLOCK_TAG_DEFAULT,
+                TagFixer.FIX_BLOCK_TAG_KEY,
+                TagFixer.FIX_BLOCK_TAG_DEFAULT,
                 "Fixes a vanilla serialization bug for block tags which TerraForged relies on",
                 "to slightly increase the vanilla ore distribution to suit the taller terrain.",
                 "Disable if this causes issues with other mods."

@@ -27,15 +27,18 @@ package com.terraforged.mod.featuremanager.util.codec;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.*;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.OptionalDynamic;
 import com.terraforged.mod.featuremanager.FeatureManager;
-import com.terraforged.mod.util.Environment;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -44,7 +47,6 @@ import java.util.stream.Stream;
 public class Codecs {
 
     public static final Marker MARKER = MarkerManager.getMarker("Codecs");
-    private static final String[] FILTERS = {"tag"};
 
     public static <V> Codec<V> create(EncoderFunc<V> encoder, DecoderFunc<V> decoder) {
         return Codec.of(encoder, decoder).stable();
@@ -112,12 +114,10 @@ public class Codecs {
 
     public static <T> T modify(T value, Codec<T> codec, UnaryOperator<JsonElement> modifier) {
         try {
-            DataResult<JsonElement> input = encode(codec, value, JsonOps.INSTANCE);
+            JsonElement input = getResult(encode(codec, value, JsonOps.INSTANCE))
+                    .orElseThrow(() -> CodecException.of("Failed to encode: %s", value));
 
-            JsonElement output = modifier.apply(input.getOrThrow(true, message -> {
-                CodecException exception = CodecException.of("Failed to encode value %s. Error: %s", value, message);
-                exception.printStackTrace();
-            }));
+            JsonElement output = modifier.apply(input);
 
             return decodeAndGet(codec, output, JsonOps.INSTANCE);
         } catch (Throwable t) {
@@ -144,18 +144,6 @@ public class Codecs {
     }
 
     public static <T> Optional<T> getResult(DataResult<T> result) {
-        if (result.error().isPresent()) {
-            String message = result.error().get().message();
-            if (!Environment.isVerbose()) {
-                String search = message.toLowerCase(Locale.ROOT);
-                for (String filter : FILTERS) {
-                    if (search.contains(filter)) {
-                        return result.result();
-                    }
-                }
-            }
-            FeatureManager.LOG.log(Level.ERROR, MARKER, message);
-        }
-        return result.result();
+        return result.resultOrPartial(message -> FeatureManager.LOG.log(Level.ERROR, MARKER, message));
     }
 }
