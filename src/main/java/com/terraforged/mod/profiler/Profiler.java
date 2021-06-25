@@ -48,7 +48,10 @@ public enum Profiler {
     FLUID_CARVERS("fluid carvers"),
     DECORATION("features & structures"),
     MOB_SPAWNS("mob spawns"),
+    STRUCTURE_SEARCHES("structure searches")
     ;
+
+    private static final Profiler[] VALUES = Profiler.values();
 
     private final AtomicLong time = new AtomicLong();
     private final AtomicLong hits = new AtomicLong();
@@ -117,7 +120,7 @@ public enum Profiler {
     }
 
     public static void reset() {
-        for (Profiler profiler : Profiler.values()) {
+        for (Profiler profiler : VALUES) {
             profiler.time.set(0);
             profiler.hits.set(0);
             profiler.longest.set(0);

@@ -61,6 +61,7 @@ import com.terraforged.mod.profiler.Profiler;
 import com.terraforged.mod.profiler.Section;
 import com.terraforged.mod.profiler.crash.CrashHandler;
 import com.terraforged.mod.profiler.crash.WorldGenException;
+import com.terraforged.mod.profiler.watchdog.UncheckedException;
 import com.terraforged.mod.structure.StructureLocator;
 import com.terraforged.mod.util.DataUtils;
 import net.minecraft.block.BlockState;
@@ -156,20 +157,25 @@ public class TFChunkGenerator extends ChunkGenerator {
 
     @Nullable // findStructure
     public final BlockPos findNearestMapFeature(ServerWorld world, Structure<?> structure, BlockPos pos, int radius, boolean flag) {
-        if (!this.biomeProvider.canGenerateStructure(structure)) {
+        try (Section section = Profiler.STRUCTURE_SEARCHES.punchIn()) {
+            if (!this.biomeProvider.canGenerateStructure(structure)) {
+                return null;
+            }
+
+            if (structure == Structure.STRONGHOLD) {
+                return strongholdGenerator.findNearestStronghold(pos);
+            }
+
+            StructureSeparationSettings settings = structureGenerator.getSeparationSettings(structure);
+            if (settings == null) {
+                return null;
+            }
+
+            return StructureLocator.find(pos, radius, flag, structure, settings, world, this);
+        } catch (Throwable t) {
+            UncheckedException.search(structure.getRegistryName(), t).printStackTrace();
             return null;
         }
-
-        if (structure == Structure.STRONGHOLD) {
-            return strongholdGenerator.findNearestStronghold(pos);
-        }
-
-        StructureSeparationSettings settings = structureGenerator.getSeparationSettings(structure);
-        if (settings == null) {
-            return null;
-        }
-
-        return StructureLocator.find(pos, radius, flag, structure, settings, world, this);
     }
 
     @Override // isStrongholdChunk

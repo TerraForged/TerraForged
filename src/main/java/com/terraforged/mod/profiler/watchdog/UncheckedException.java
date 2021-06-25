@@ -24,9 +24,12 @@
 
 package com.terraforged.mod.profiler.watchdog;
 
+import com.terraforged.mod.profiler.Profiler;
+
 public class UncheckedException extends RuntimeException {
 
     private static final String MESSAGE = "Critical error detected whilst generating %s %s";
+    private static final String SEARCH_MESSAGE = "Critical error encountered whilst searching for structure: [%s]";
 
     public UncheckedException(String message, StackTraceElement[] stacktrace) {
         super(message);
@@ -34,7 +37,11 @@ public class UncheckedException extends RuntimeException {
     }
 
     public UncheckedException(String phase, Object identity, Throwable cause) {
-        super(createMessage(phase, identity), cause);
+        this(MESSAGE, phase, identity, cause);
+    }
+
+    public UncheckedException(String message, String phase, Object identity, Throwable cause) {
+        super(createMessage(message, phase, identity), cause);
     }
 
     @Override
@@ -42,13 +49,17 @@ public class UncheckedException extends RuntimeException {
         return this;
     }
 
-    private static String createMessage(String phase, Object identity) {
+    private static String createMessage(String format, String phase, Object identity) {
         String phaseName = nonNullStringValue(phase, "unknown");
         String identName = nonNullStringValue(identity, "unknown");
-        return String.format(MESSAGE, phaseName, identName);
+        return String.format(format, phaseName, identName);
     }
 
     protected static String nonNullStringValue(Object o, String def) {
         return o != null ? o.toString() : def;
+    }
+
+    public static UncheckedException search(Object identity, Throwable cause) {
+        return new UncheckedException(SEARCH_MESSAGE, Profiler.STRUCTURE_SEARCHES.getReportDescription(), identity, cause);
     }
 }
