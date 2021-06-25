@@ -72,6 +72,15 @@ public class DataUtils {
         }
     }
 
+    public static JsonObject getOrAddObject(JsonObject object, String key) {
+        JsonObject value = object.getAsJsonObject(key);
+        if (value == null) {
+            value = new JsonObject();
+            object.add(key, value);
+        }
+        return value;
+    }
+
     public static CompoundNBT fromJson(JsonElement json) {
         Dynamic<JsonElement> input = new Dynamic<>(JsonOps.INSTANCE, json);
         Dynamic<INBT> output = input.convert(NBTDynamicOps.INSTANCE);

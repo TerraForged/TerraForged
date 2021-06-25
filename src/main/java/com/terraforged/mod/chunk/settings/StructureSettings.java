@@ -25,7 +25,15 @@
 package com.terraforged.mod.chunk.settings;
 
 import com.google.gson.JsonObject;
-import com.terraforged.engine.serialization.annotation.*;
+import com.terraforged.engine.serialization.annotation.Comment;
+import com.terraforged.engine.serialization.annotation.Hide;
+import com.terraforged.engine.serialization.annotation.Limit;
+import com.terraforged.engine.serialization.annotation.Name;
+import com.terraforged.engine.serialization.annotation.NoName;
+import com.terraforged.engine.serialization.annotation.Rand;
+import com.terraforged.engine.serialization.annotation.Range;
+import com.terraforged.engine.serialization.annotation.Serializable;
+import com.terraforged.engine.serialization.annotation.Sorted;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
@@ -62,10 +70,8 @@ public class StructureSettings {
         init(settings);
 
         return Codecs.modify(settings.get().structureSettings(), DimensionStructuresSettings.CODEC, data -> {
-            JsonObject structures = data.getAsJsonObject().getAsJsonObject("structures");
-            if (structures == null) {
-                structures = new JsonObject();
-            }
+            JsonObject structures = DataUtils.getOrAddObject(data.getAsJsonObject(), "structures");
+            JsonObject stronghold = DataUtils.getOrAddObject(data.getAsJsonObject(), "stronghold");
 
             for (Map.Entry<String, StructureSeparation> entry : this.structures.entrySet()) {
                 if (entry.getValue().disabled) {
@@ -74,6 +80,11 @@ public class StructureSettings {
                 }
                 structures.add(entry.getKey(), DataUtils.toJson(entry.getValue()));
             }
+
+            stronghold.addProperty("salt", this.stronghold.salt);
+            stronghold.addProperty("count", this.stronghold.count);
+            stronghold.addProperty("spread", this.stronghold.spread);
+            stronghold.addProperty("distance", this.stronghold.distance);
 
             return data;
         });
