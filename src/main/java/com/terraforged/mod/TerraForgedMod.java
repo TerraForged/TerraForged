@@ -31,6 +31,7 @@ import com.terraforged.mod.config.ConfigManager;
 import com.terraforged.mod.server.command.TerraCommand;
 import com.terraforged.mod.util.DataUtils;
 import com.terraforged.mod.util.Environment;
+import com.terraforged.mod.util.TagFixer;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModContainer;
@@ -84,6 +85,7 @@ public class TerraForgedMod {
     public static void complete(FMLLoadCompleteEvent event) {
         // log version because people do dumb stuff like renaming jars
         Log.info("Loaded TerraForged version {}", getVersion());
+        TagFixer.markPostInit();
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)

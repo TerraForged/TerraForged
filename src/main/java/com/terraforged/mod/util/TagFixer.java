@@ -28,15 +28,16 @@ import com.terraforged.mod.Log;
 import com.terraforged.mod.config.ConfigManager;
 import net.minecraft.block.Block;
 import net.minecraft.tags.ITag;
-import net.minecraft.tags.ITagCollection;
 import net.minecraft.tags.TagCollectionManager;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TagFixer<T> implements ITag.INamedTag<T> {
     public static final String FIX_BLOCK_TAG_KEY = "fixBlockTags";
     public static final boolean FIX_BLOCK_TAG_DEFAULT = true;
+    private static volatile boolean postInit = false;
 
     private final ResourceLocation name;
     private final ITag<T> delegate;
@@ -70,18 +71,26 @@ public class TagFixer<T> implements ITag.INamedTag<T> {
     }
 
     public static ITag<Block> wrap(ITag<Block> tag) {
-        return wrap(tag, TagCollectionManager.getInstance().getBlocks());
-    }
+        // Avoid possible early access to TagCollectionManager (if someone is using plain a Tag for some reason).
+        if (!postInit) return tag;
 
-    public static <T> ITag<T> wrap(ITag<T> tag, ITagCollection<T> collection) {
-        if (!ConfigManager.GENERAL.getBool(FIX_BLOCK_TAG_KEY, FIX_BLOCK_TAG_DEFAULT)) return tag;
-
+        // Don't need to wrap if it's already a named tag.
+        // All early lifecyle tags are (should be) named tags so this acts as a second lock against wrapping too early.
         if (tag instanceof INamedTag) return tag;
 
-        ResourceLocation name = collection.getId(tag);
+        // If the fix is disabled do nothing.
+        if (!ConfigManager.GENERAL.getBool(FIX_BLOCK_TAG_KEY, FIX_BLOCK_TAG_DEFAULT)) return tag;
+
+        // If we've made it this far it should be fine to retrieve the id.
+        ResourceLocation name = TagCollectionManager.getInstance().getBlocks().getId(tag);
         if (name != null) return new TagFixer<>(name, tag);
 
-        Log.err("Failed to find name for tag: {}", tag);
+        Log.warn("Failed to find name for tag: {}", tag.getValues().stream().map(Block::getRegistryName).collect(Collectors.toList()));
+
         return tag;
+    }
+
+    public static void markPostInit() {
+        postInit = true;
     }
 }
