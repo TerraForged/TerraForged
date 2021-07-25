@@ -137,7 +137,7 @@ public class TFChunkGenerator extends ChunkGenerator {
         this.strongholdGenerator = new StrongholdGenerator(seed, biomeProvider);
         this.resources = LazySupplier.factory(context.split(GeneratorResources.SEED_OFFSET), GeneratorResources.factory(this));
         Profiler.reset();
-        Log.info("Created TerraForged chunk-generator with settings {}", DataUtils.toJson(context.terraSettings));
+        Log.debug("Created TerraForged chunk-generator with settings {}", DataUtils.toJson(context.terraSettings));
     }
 
     public final long getSeed() {
