@@ -63,6 +63,7 @@ import com.terraforged.mod.profiler.crash.CrashHandler;
 import com.terraforged.mod.profiler.crash.WorldGenException;
 import com.terraforged.mod.profiler.watchdog.UncheckedException;
 import com.terraforged.mod.structure.StructureLocator;
+import com.terraforged.mod.structure.StructureSettingsCache;
 import com.terraforged.mod.util.DataUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityClassification;
@@ -85,6 +86,7 @@ import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 import net.minecraft.world.gen.settings.StructureSeparationSettings;
 import net.minecraft.world.server.ServerWorld;
 
@@ -101,6 +103,7 @@ public class TFChunkGenerator extends ChunkGenerator {
     private final TerraContext context;
     private final TFBiomeProvider biomeProvider;
     private final Supplier<DimensionSettings> settings;
+    private final DimensionStructuresSettings structuresSettings;
 
     private final Generator.Mobs mobGenerator;
     private final Generator.Biomes biomeGenerator;
@@ -117,10 +120,12 @@ public class TFChunkGenerator extends ChunkGenerator {
     public TFChunkGenerator(TFBiomeProvider biomeProvider, Supplier<DimensionSettings> settings) {
         super(biomeProvider, biomeProvider.getSettings().structures.apply(settings));
         CacheManager.get().clear();
+        StructureSettingsCache.clear();
         TerraContext context = biomeProvider.getContext();
         this.seed = context.terraSettings.world.seed;
         this.context = context;
         this.settings = settings;
+        this.structuresSettings = context.terraSettings.structures.apply(settings);
         this.biomeProvider = biomeProvider;
         this.mobGenerator = new MobGenerator(this);
         this.biomeGenerator = new BiomeGenerator(this);
@@ -128,7 +133,7 @@ public class TFChunkGenerator extends ChunkGenerator {
         this.terrainGenerator = new BaseGenerator(this);
         this.surfaceGenerator = new SurfaceGenerator(this);
         this.featureGenerator = new FeatureGenerator(this);
-        this.structureGenerator = new StructureGenerator(this);
+        this.structureGenerator = new StructureGenerator(this, structuresSettings);
         this.strongholdGenerator = new StrongholdGenerator(seed, biomeProvider);
         this.resources = LazySupplier.factory(context.split(GeneratorResources.SEED_OFFSET), GeneratorResources.factory(this));
         Profiler.reset();
@@ -141,6 +146,11 @@ public class TFChunkGenerator extends ChunkGenerator {
 
     public final Supplier<DimensionSettings> getDimensionSettings() {
         return settings;
+    }
+
+    @Override
+    public final DimensionStructuresSettings getSettings() {
+        return StructureSettingsCache.get(structuresSettings);
     }
 
     @Override

@@ -25,7 +25,6 @@
 package com.terraforged.mod.chunk.generator;
 
 import com.terraforged.mod.chunk.TFChunkGenerator;
-import com.terraforged.mod.chunk.settings.TerraSettings;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.crash.ReportedException;
@@ -52,10 +51,9 @@ public class StructureGenerator implements Generator.Structures {
     private final TFChunkGenerator generator;
     private final DimensionStructuresSettings structuresSettings;
 
-    public StructureGenerator(TFChunkGenerator generator) {
-        TerraSettings settings = generator.getBiomeSource().getSettings();
+    public StructureGenerator(TFChunkGenerator generator, DimensionStructuresSettings structuresSettings) {
         this.generator = generator;
-        this.structuresSettings = settings.structures.apply(generator.getDimensionSettings()); // defensive copy
+        this.structuresSettings = structuresSettings;
     }
 
     @Override
