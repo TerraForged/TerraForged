@@ -38,22 +38,29 @@ import net.minecraft.block.Blocks;
 
 import java.util.Random;
 
-public class BriceSurface implements MaskedSurface, Stratum.Visitor<BlockState, SurfaceContext> {
+public class BryceSurface implements MaskedSurface, Stratum.Visitor<BlockState, SurfaceContext> {
 
     public static final int SEED_OFFSET = 12341341;
 
     private final Module module;
     private final Geology<BlockState> stratas;
 
-    public BriceSurface(Seed seed) {
+    public BryceSurface(Seed seed) {
         Random random = new Random(seed.next());
         Variance thick = Variance.of(0.2, 0.3);
         Variance medium = Variance.of(0.1, 0.2);
         Variance thin = Variance.of(0.1, 0.2);
 
-        module = Source.ridge(seed.next(), 60, 4)
-                .clamp(0.8, 0.95).map(0, 1)
-                .terrace(1, 0.25, 4, 1)
+//        module = new LegacyTerrace(
+//                Source.ridge(seed.next(), 60, 4).clamp(0.8, 0.95).map(0, 1),
+//                Source.constant(1),
+//                Source.constant(0.25),
+//                4,
+//                1.0F
+//        ).mult(Source.perlin(seed.next(), 4, 1).alpha(0.05));
+
+        module = Source.ridge(seed.next(), 60, 4).clamp(0.8, 0.95).map(0, 0.999)
+                .legacyTerrace(1, 0.25, 4, 0.25)
                 .mult(Source.perlin(seed.next(), 4, 1).alpha(0.05));
 
         stratas = new Geology<>(Source.ZERO);

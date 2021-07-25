@@ -30,7 +30,6 @@ import com.terraforged.mod.LevelType;
 import com.terraforged.mod.Log;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import com.terraforged.mod.chunk.TerraContext;
-import com.terraforged.mod.chunk.settings.StructureSettings;
 import com.terraforged.mod.chunk.settings.TerraSettings;
 import com.terraforged.mod.client.gui.GuiKeys;
 import com.terraforged.mod.client.gui.element.TFLabel;
@@ -254,14 +253,13 @@ public class ConfigScreen extends OverlayScreen {
         parent.worldGenSettingsComponent.updateSettings(outputSettings);
     }
 
-    public void syncStructureSettings(TerraSettings settings) {
+    public void loadPresetStructures(TerraSettings presetSettings) {
         DimensionGeneratorSettings level = inputSettings;
         if (level.overworld() instanceof TFChunkGenerator) {
             TerraContext context = ((TFChunkGenerator) level.overworld()).getContext();
             DimensionStructuresSettings structuresSettings = level.overworld().getSettings();
-            settings.structures = new StructureSettings();
-            settings.structures.addSettings(structuresSettings);
-            settings.structures.hideNonOverworld(context.biomeContext);
+            presetSettings.structures.addSettings(structuresSettings);
+            presetSettings.structures.hideNonOverworld(context.biomeContext);
         }
     }
 

@@ -239,7 +239,7 @@ public class PresetsPage extends BasePage {
 
     private void load(Preset preset) {
         TerraSettings settings = preset.getSettings();
-        parent.syncStructureSettings(settings);
+        parent.loadPresetStructures(settings);
         instance.sync(settings);
         update();
     }

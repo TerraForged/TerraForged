@@ -172,7 +172,7 @@ public class StructureSettings {
                 separation.separation = settings.separation();
             }
 
-            // Skip & log invalidate configuratioms
+            // Skip & log invalidate configurations
             if (!validateStructure(name, separation.spacing, separation.separation, separation.salt)) {
                 Log.warn("Structure [{}] registered with invalid separation settings. Ignoring to prevent crashes!");
                 continue;

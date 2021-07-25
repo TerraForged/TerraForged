@@ -49,9 +49,11 @@ public class StoneForestSurface implements MaskedSurface {
         stone = States.STONE.get();
         grass = States.GRASS_BLOCK.get();
 
-        IntFunction<Module> func = scale ->Source.ridge(seed.next(), scale, 4).clamp(0.7, 0.95).map(0, 1)
+        IntFunction<Module> func = scale -> Source.ridge(seed.next(), scale, 4)
+                .clamp(0.7, 0.95)
+                .map(0, 1)
                 .pow(1.5)
-                .terrace(1, 0.25, 4, 1);
+                .legacyTerrace(1, 0.25, 4, 0.25);
 
         module = func.apply(50).max(func.apply(55));
     }

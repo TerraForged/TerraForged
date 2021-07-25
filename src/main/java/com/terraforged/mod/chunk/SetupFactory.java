@@ -28,7 +28,7 @@ import com.terraforged.mod.Log;
 import com.terraforged.mod.api.biome.surface.SurfaceManager;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.biome.ModBiomes;
-import com.terraforged.mod.biome.surface.BriceSurface;
+import com.terraforged.mod.biome.surface.BryceSurface;
 import com.terraforged.mod.biome.surface.DesertSurface;
 import com.terraforged.mod.biome.surface.ForestSurface;
 import com.terraforged.mod.biome.surface.IcebergsSurface;
@@ -147,7 +147,7 @@ public class SetupFactory {
         SurfaceManager manager = new SurfaceManager(context.biomeContext);
         manager.replace(Biomes.DEEP_FROZEN_OCEAN, new IcebergsSurface(context, 30, 30));
         manager.replace(Biomes.FROZEN_OCEAN, new IcebergsSurface(context, 20, 15));
-        manager.append(ModBiomes.BRYCE, new BriceSurface(context.seed(BriceSurface.SEED_OFFSET)));
+        manager.append(ModBiomes.BRYCE, new BryceSurface(context.seed(BryceSurface.SEED_OFFSET)));
         manager.append(ModBiomes.STONE_FOREST, new StoneForestSurface(context.seed(StoneForestSurface.SEED_OFFSET)));
         manager.append(
                 new DesertSurface(context),
