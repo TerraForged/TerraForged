@@ -28,13 +28,14 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraforged.engine.cell.Cell;
-import com.terraforged.engine.concurrent.cache.CacheEntry;
 import com.terraforged.engine.concurrent.cache.CacheManager;
+import com.terraforged.engine.concurrent.task.LazyCallable;
 import com.terraforged.engine.concurrent.thread.ThreadPool;
 import com.terraforged.engine.concurrent.thread.ThreadPools;
 import com.terraforged.engine.settings.Settings;
 import com.terraforged.engine.tile.Size;
 import com.terraforged.engine.tile.Tile;
+import com.terraforged.engine.tile.api.TileFactory;
 import com.terraforged.engine.tile.gen.TileGenerator;
 import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.GeneratorContext;
@@ -73,7 +74,7 @@ public class Preview extends Button {
     private int seed;
     private long lastUpdate = 0L;
     private Tile tile = null;
-    private CacheEntry<Tile> task = null;
+    private LazyCallable<Tile> task = null;
     private CompoundNBT lastWorldSettings = null;
     private CompoundNBT lastPreviewSettings = null;
 
@@ -200,7 +201,7 @@ public class Preview extends Button {
         texture.upload();
     }
 
-    private CacheEntry<Tile> generate(Settings settings, CompoundNBT prevSettings) {
+    private LazyCallable<Tile> generate(Settings settings, CompoundNBT prevSettings) {
         DataUtils.fromNBT(prevSettings, previewSettings);
         settings.world.seed = seed;
         this.settings = settings;
@@ -216,14 +217,14 @@ public class Preview extends Button {
             center.z = 0;
         }
 
-        TileGenerator renderer = TileGenerator.builder()
+        TileFactory renderer = TileGenerator.builder()
                 .pool(threadPool)
                 .size(FACTOR, 0)
                 .factory(context.worldGenerator.get())
                 .batch(6)
-                .build();
+                .build().async();
 
-        return renderer.getAsync(center.x, center.z, getZoom(), false);
+        return renderer.getTile(center.x, center.z, getZoom(), false);
     }
 
     private boolean updateLegend(int mx ,int my) {

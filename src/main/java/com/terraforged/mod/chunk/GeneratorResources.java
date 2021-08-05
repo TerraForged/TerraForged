@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.chunk;
 
-import com.terraforged.engine.tile.gen.TileCache;
+import com.terraforged.engine.tile.api.TileProvider;
 import com.terraforged.mod.api.biome.surface.SurfaceManager;
 import com.terraforged.mod.api.chunk.column.ColumnDecorator;
 import com.terraforged.mod.feature.BlockDataManager;
@@ -40,7 +40,7 @@ public class GeneratorResources {
 
     public static final int SEED_OFFSET = 746382634;
 
-    final TileCache tileCache;
+    final TileProvider tileCache;
     final FeatureManager featureManager;
     final BlockDataManager blockDataManager;
     final GeoManager geologyManager;

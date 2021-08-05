@@ -66,7 +66,6 @@ public class CrashReportBuilder {
         addContext(chunk, report.addCategory("Current Chunk"));
         addContext(generator, report.addCategory("TerraForged ChunkGenerator"));
         addContext(generator.getBiomeSource(), report.addCategory("TerraForged BiomeProvider"));
-        addContext(ConfigManager.PERFORMANCE, report.addCategory("TerraForged Performance Config"));
         addContext(ConfigManager.BIOME_WEIGHTS, report.addCategory("TerraForged Biome Weights Config"));
         addProfilerContext(report.addCategory("TerraForged Profiler"));
     }

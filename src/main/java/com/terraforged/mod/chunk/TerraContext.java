@@ -24,10 +24,9 @@
 
 package com.terraforged.mod.chunk;
 
-import com.electronwill.nightconfig.core.CommentedConfig;
 import com.terraforged.engine.concurrent.task.LazySupplier;
 import com.terraforged.engine.concurrent.thread.ThreadPools;
-import com.terraforged.engine.tile.gen.TileCache;
+import com.terraforged.engine.tile.api.TileProvider;
 import com.terraforged.engine.tile.gen.TileGenerator;
 import com.terraforged.engine.world.GeneratorContext;
 import com.terraforged.engine.world.WorldGeneratorFactory;
@@ -99,20 +98,19 @@ public class TerraContext extends GeneratorContext {
         return terraSettings;
     }
 
-    public static TileCache createCache(WorldGeneratorFactory factory) {
-        Log.info("CREATING CACHE...");
-        CommentedConfig config = PerfDefaults.getAndPrintPerfSettings();
-        boolean batching = config.getOrElse("batching", false);
-        int tileSize = Math.min(PerfDefaults.MAX_TILE_SIZE, Math.max(2, config.getInt("tile_size")));
+    public static TileProvider createCache(WorldGeneratorFactory factory) {
+        Log.info("Create Tile Cache...");
+        PerfDefaults.print();
+        int tileSize = PerfDefaults.TILE_SIZE;
         int tileBorder = PerfDefaults.getTileBorderSize(factory.getFilters().getSettings());
-        int batchCount = Math.min(PerfDefaults.MAX_BATCH_COUNT, Math.max(1, config.getInt("batch_count")));
-        int threadCount = Math.min(PerfDefaults.MAX_THREAD_COUNT, Math.max(1, config.getInt("thread_count")));
+        int batchCount = PerfDefaults.BATCH_COUNT;
+        int threadCount = PerfDefaults.THREAD_COUNT;
         return TileGenerator.builder()
-                .pool(ThreadPools.create(threadCount, batching))
+                .pool(ThreadPools.create(threadCount))
                 .size(tileSize, tileBorder)
                 .batch(batchCount)
                 .factory(factory)
                 .build()
-                .toCache(false);
+                .cached();
     }
 }

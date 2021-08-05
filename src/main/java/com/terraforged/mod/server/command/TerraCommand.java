@@ -148,7 +148,7 @@ public class TerraCommand {
         getContext(context);
         BlockPos pos = context.getSource().getPlayerOrException().blockPosition();
         TFBiomeProvider biomeProvider = getBiomeProvider(context);
-        try (Resource<Cell> cell = Cell.pooled()) {
+        try (Resource<Cell> cell = Cell.getResource()) {
             Biome biome = biomeProvider.lookupBiome(cell.get(), pos.getX(), pos.getZ(), false);
             context.getSource().sendSuccess(new StringTextComponent("At ")
                     .append(createTeleportMessage(pos))

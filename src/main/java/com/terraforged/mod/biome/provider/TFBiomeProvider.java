@@ -78,7 +78,7 @@ public class TFBiomeProvider extends BiomeProvider {
 
     @Override
     public Biome getNoiseBiome(int x, int y, int z) {
-        try (Resource<Cell> resource = Cell.pooled()) {
+        try (Resource<Cell> resource = Cell.getResource()) {
             Cell cell = resource.get().reset();
             return getNoiseBiome(cell, x, z);
         }

@@ -24,44 +24,25 @@
 
 package com.terraforged.mod.config;
 
-import com.electronwill.nightconfig.core.CommentedConfig;
 import com.terraforged.engine.concurrent.thread.ThreadPools;
 import com.terraforged.engine.settings.FilterSettings;
 import com.terraforged.mod.Log;
 
 public class PerfDefaults {
 
-    public static final boolean BATCHING = true;
     public static final int TILE_SIZE = 3;
     public static final int BATCH_COUNT = 6;
     public static final int THREAD_COUNT = ThreadPools.defaultPoolSize();
 
-    public static final int MAX_TILE_SIZE = 8;
-    public static final int MAX_BATCH_COUNT = 20;
-    public static final int MAX_THREAD_COUNT = Runtime.getRuntime().availableProcessors() * 2;
-
-    private static boolean isUsingDefaultPerfSettings(CommentedConfig config) {
-        boolean yes = true;
-        yes &= config.getOrElse("batching", BATCHING);
-        yes &= config.getInt("thread_count") == THREAD_COUNT;
-        yes &= config.getInt("batch_count") == BATCH_COUNT;
-        yes &= config.getInt("tile_size") == TILE_SIZE;
-        return yes;
-    }
-
-    public static CommentedConfig getAndPrintPerfSettings() {
-        CommentedConfig config = ConfigManager.PERFORMANCE.get();
-        boolean defaults = isUsingDefaultPerfSettings(config);
-        Log.info("Performance Settings [default={}]", defaults);
-        Log.info(" - Thread Count: {} (default: {})", config.getInt("thread_count"), THREAD_COUNT);
-        Log.info(" - Tile Size: {} (default: {})", config.getInt("tile_size"), TILE_SIZE);
-        Log.info(" - Batching: {} (default: {})", config.getOrElse("batching", BATCHING), BATCHING);
-        Log.info(" - Batch Count: {} (default: {})", config.getInt("batch_count"), BATCH_COUNT);
-        return config;
-    }
-
     public static int getTileBorderSize(FilterSettings settings) {
         // Scale tile border size with droplet lifetime
         return Math.min(2, Math.max(1, settings.erosion.dropletLifetime / 16));
+    }
+
+    public static void print() {
+        Log.info("System Defaults:");
+        Log.info(" Thread Count:  {}", THREAD_COUNT);
+        Log.info(" Tile Size:     {}", TILE_SIZE);
+        Log.info(" Batch Size:    {}", BATCH_COUNT);
     }
 }

@@ -143,7 +143,7 @@ public class TerrainCarver implements Generator.Carvers {
 
     private static Biome getBiome(@Nullable TFBiomeContainer container, TFBiomeProvider biomeProvider, ChunkPos pos) {
         if (container == null) {
-            try (Resource<Cell> resource = Cell.pooled()) {
+            try (Resource<Cell> resource = Cell.getResource()) {
                 return biomeProvider.lookupBiome(resource.get(), pos.getMinBlockX(), pos.getMinBlockZ(), false);
             }
         }
