@@ -218,9 +218,9 @@ public class Preview extends Button {
         }
 
         TileFactory renderer = TileGenerator.builder()
-                .pool(threadPool)
-                .size(FACTOR, 0)
                 .factory(context.worldGenerator.get())
+                .size(FACTOR, 0)
+                .pool(threadPool)
                 .batch(6)
                 .build().async();
 
