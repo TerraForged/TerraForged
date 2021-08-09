@@ -30,8 +30,8 @@ import com.terraforged.mod.Log;
 
 public class PerfDefaults {
 
-    public static final int TILE_SIZE = 3;
-    public static final int BATCH_COUNT = 6;
+    public static final int TILE_SIZE = 3;      // 1 << 3 == 8 + 2 border chunks == tile size of 10x10 chunks
+    public static final int BATCH_COUNT = 5;    // divides nicely into the 10x10 size!
     public static final int THREAD_COUNT = ThreadPools.defaultPoolSize();
 
     public static int getTileBorderSize(FilterSettings settings) {
