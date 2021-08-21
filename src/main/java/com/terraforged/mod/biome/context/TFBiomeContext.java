@@ -83,12 +83,12 @@ public class TFBiomeContext implements BiomeContext<RegistryKey<Biome>> {
     }
 
     @Override
-    public Defaults<RegistryKey<Biome>> getDefaults() {
+    public BiomeDefaults getDefaults() {
         return defaults;
     }
 
     @Override
-    public Properties<RegistryKey<Biome>> getProperties() {
+    public BiomeProperties getProperties() {
         return properties;
     }
 

@@ -30,6 +30,8 @@ import com.terraforged.mod.biome.provider.BiomeHelper;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 
+import java.util.function.Function;
+
 public class BiomeProperties implements BiomeContext.Properties<RegistryKey<Biome>> {
 
     private final TFBiomeContext context;
@@ -56,6 +58,12 @@ public class BiomeProperties implements BiomeContext.Properties<RegistryKey<Biom
     }
 
     @Override
+    public float getTemperature(RegistryKey<Biome> key) {
+        Biome biome = context.biomes.get(key);
+        return biome.getBaseTemperature();
+    }
+
+    @Override
     public TempCategory getTempCategory(RegistryKey<Biome> key) {
         Biome biome = context.biomes.get(key);
         return BiomeHelper.getTempCategory(biome, context);
@@ -65,5 +73,10 @@ public class BiomeProperties implements BiomeContext.Properties<RegistryKey<Biom
     public TempCategory getMountainCategory(RegistryKey<Biome> key) {
         Biome biome = context.biomes.get(key);
         return BiomeHelper.getMountainCategory(biome);
+    }
+
+    public <P> P getProperty(int id, Function<Biome, P> getter) {
+        Biome biome = context.biomes.get(id);
+        return getter.apply(biome);
     }
 }

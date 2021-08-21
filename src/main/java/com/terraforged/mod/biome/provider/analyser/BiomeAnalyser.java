@@ -27,7 +27,6 @@ package com.terraforged.mod.biome.provider.analyser;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.terraforged.engine.world.biome.BiomeData;
 import com.terraforged.engine.world.biome.map.BiomeMap;
 import com.terraforged.engine.world.biome.map.BiomeMapBuilder;
 import com.terraforged.engine.world.biome.type.BiomeType;
@@ -35,13 +34,10 @@ import com.terraforged.mod.biome.ModBiomes;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.BiomeHelper;
 import com.terraforged.mod.biome.provider.BiomeWeights;
-import com.terraforged.mod.util.ListView;
-import com.terraforged.noise.util.Vec2f;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,7 +48,6 @@ import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
 
 public class BiomeAnalyser {
-
     private static final Map<BiomeType, BiomePredicate> PREDICATES = new HashMap<BiomeType, BiomePredicate>() {{
         put(BiomeType.TROPICAL_RAINFOREST, BiomePredicate.TROPICAL_RAINFOREST);
         put(BiomeType.SAVANNA, BiomePredicate.SAVANNA.or(BiomePredicate.MESA).not(BiomePredicate.DESERT).not(BiomePredicate.STEPPE).not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN).not(BiomePredicate.WETLAND));
@@ -61,7 +56,7 @@ public class BiomeAnalyser {
         put(BiomeType.TEMPERATE_FOREST, BiomePredicate.TEMPERATE_FOREST.not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN).not(BiomePredicate.WETLAND));
         put(BiomeType.GRASSLAND, BiomePredicate.GRASSLAND.not(BiomePredicate.WETLAND).not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN));
         put(BiomeType.COLD_STEPPE, BiomePredicate.COLD_STEPPE.not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN));
-        put(BiomeType.STEPPE, BiomePredicate.STEPPE.not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN));
+        put(BiomeType.STEPPE, BiomePredicate.STEPPE.not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN).not(BiomePredicate.COLD_STEPPE));
         put(BiomeType.TAIGA, BiomePredicate.TAIGA.not(BiomePredicate.TUNDRA).not(BiomePredicate.COLD_STEPPE).not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN));
         put(BiomeType.TUNDRA, BiomePredicate.TUNDRA.not(BiomePredicate.TAIGA).not(BiomePredicate.BEACH).not(BiomePredicate.MOUNTAIN));
         put(BiomeType.ALPINE, BiomePredicate.MOUNTAIN);
@@ -120,28 +115,32 @@ public class BiomeAnalyser {
     }
 
     private static void collectOverworldBiomes(TFBiomeContext context, IntUnaryOperator weightFunc, BiomeMap.Builder<RegistryKey<Biome>> builder) {
-        List<BiomeData> biomes = getAllBiomeData(context);
-        for (BiomeData data : biomes) {
-            RegistryKey<Biome> key = context.getValue(data.id);
-            int weight = weightFunc.applyAsInt(data.id);
-            if (BiomePredicate.BEACH.test(data, context)) {
+        for (Biome biome : context.biomes) {
+            if (filter(biome, context)) {
+                continue;
+            }
+
+            int id = context.biomes.getId(biome);
+            RegistryKey<Biome> key = context.biomes.getKey(biome);
+            int weight = weightFunc.applyAsInt(id);
+            if (BiomePredicate.BEACH.test(id, context)) {
                 builder.addBeach(key, weight);
-            } else if (BiomePredicate.COAST.test(data, context)) {
+            } else if (BiomePredicate.COAST.test(id, context)) {
                 builder.addCoast(key, weight);
-            } else if (BiomePredicate.OCEAN.test(data, context)) {
+            } else if (BiomePredicate.OCEAN.test(id, context)) {
                 builder.addOcean(key, weight);
-            } else if (BiomePredicate.RIVER.test(data, context)) {
+            } else if (BiomePredicate.RIVER.test(id, context)) {
                 builder.addRiver(key, weight);
-            } else if (BiomePredicate.LAKE.test(data, context)) {
+            } else if (BiomePredicate.LAKE.test(id, context)) {
                 builder.addLake(key, weight);
-            } else if (BiomePredicate.WETLAND.test(data, context)) {
+            } else if (BiomePredicate.WETLAND.test(id, context)) {
                 builder.addWetland(key, weight);
-            } else if (BiomePredicate.VOLCANO.test(data, context)) {
+            } else if (BiomePredicate.VOLCANO.test(id, context)) {
                 builder.addVolcano(key, weight);
-            } else if (BiomePredicate.MOUNTAIN.test(data, context)) {
+            } else if (BiomePredicate.MOUNTAIN.test(id, context)) {
                 builder.addMountain(key, weight);
             } else {
-                Collection<BiomeType> types = getTypes(data, context);
+                Collection<BiomeType> types = getTypes(id, context);
                 for (BiomeType type : types) {
                     // shouldn't happen
                     if (type == BiomeType.ALPINE) {
@@ -153,32 +152,14 @@ public class BiomeAnalyser {
         }
     }
 
-    public static Collection<BiomeType> getTypes(BiomeData data, TFBiomeContext context) {
+    public static Collection<BiomeType> getTypes(int biome, TFBiomeContext context) {
         Set<BiomeType> types = new HashSet<>();
         for (Map.Entry<BiomeType, BiomePredicate> entry : PREDICATES.entrySet()) {
-            if (entry.getValue().test(data, context)) {
+            if (entry.getValue().test(biome, context)) {
                 types.add(entry.getKey());
             }
         }
         return types;
-    }
-
-    public static List<BiomeData> getAllBiomeData(TFBiomeContext context) {
-        ListView<Biome> biomes = new ListView<>(context.biomes, biome -> filter(biome, context));
-
-        Vec2f moistRange = getRange(biomes, Biome::getDownfall);
-        Vec2f tempRange = getRange(biomes, BiomeHelper::getDefaultTemperature);
-
-        List<BiomeData> list = new ArrayList<>();
-        for (Biome biome : biomes) {
-            String name = context.biomes.getName(biome);
-            float moisture = (biome.getDownfall() - moistRange.x) / (moistRange.y - moistRange.x);
-            float temperature = (BiomeHelper.getDefaultTemperature(biome) - tempRange.x) / (tempRange.y - tempRange.x);
-            int color = BiomeHelper.getSurface(biome).getTopMaterial().getMaterial().getColor().col;
-            list.add(new BiomeData(name, context.biomes.getId(biome), color, moisture, temperature));
-        }
-
-        return list;
     }
 
     private static boolean filter(Biome biome, TFBiomeContext context) {
@@ -188,16 +169,5 @@ public class BiomeAnalyser {
             }
         }
         return false;
-    }
-
-    private static Vec2f getRange(ListView<Biome> biomes, Function<Biome, Float> getter) {
-        float min = Float.MAX_VALUE;
-        float max = Float.MIN_VALUE;
-        for (Biome biome : biomes) {
-            float value = getter.apply(biome);
-            min = Math.min(min, value);
-            max = Math.max(max, value);
-        }
-        return new Vec2f(min, max);
     }
 }

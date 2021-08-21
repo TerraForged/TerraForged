@@ -51,7 +51,7 @@ public class BiomeBuilders {
         BiomeBuilder builder = BiomeUtils.getBuilder(Biomes.SNOWY_TAIGA);
         builder.type(BiomeManager.BiomeType.ICY);
         builder.downfall(0.5F);
-        builder.temperature(0.225F);
+        builder.temperature(0.2F);
         builder.biomeCategory(Biome.Category.SWAMP);
         builder.precipitation(Biome.RainType.SNOW);
         builder.filterFeatures(DynamicMatcher.config(BaseTreeFeatureConfig.class));
@@ -72,7 +72,7 @@ public class BiomeBuilders {
                 DynamicMatcher.of(Features.RED_MUSHROOM_TAIGA),
                 DynamicMatcher.of(Features.BROWN_MUSHROOM_TAIGA)
         );
-        builder.temperature(0.25F);
+        builder.temperature(0.2F);
         builder.downfall(0.025F);
         deadBush(builder);
         denseGrass(builder);

@@ -24,7 +24,6 @@
 
 package com.terraforged.mod.biome.provider.analyser;
 
-import com.terraforged.engine.world.biome.BiomeData;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import net.minecraft.world.biome.Biome;
 
@@ -32,46 +31,45 @@ import java.util.function.BiPredicate;
 
 public interface BiomePredicate {
 
-    boolean test(BiomeData data, Biome biome);
-
-    default boolean test(BiomeData data, TFBiomeContext context) {
-        return test(data, context.biomes.get(data.id));
-    }
+    boolean test(int biome, TFBiomeContext context);
 
     default BiomePredicate and(BiomePredicate other) {
-        return (d, b) -> this.test(d, b) && other.test(d, b);
+        return (b, c) -> this.test(b, c) && other.test(b, c);
     }
 
     default BiomePredicate not(BiomePredicate other) {
-        return (d, b) -> this.test(d, b) && !other.test(d, b);
+        return (b, c) -> this.test(b, c) && !other.test(b, c);
     }
 
     default BiomePredicate or(BiomePredicate other) {
-        return (d, b) -> this.test(d, b) || other.test(d, b);
+        return (b, c) -> this.test(b, c) || other.test(b, c);
     }
 
     static BiomePredicate name(String... name) {
-        return (d, b) -> anyMatch(d.name, name, String::contains);
+        return (b, c) -> anyMatch(c.getName(b), name, String::contains);
     }
 
     static BiomePredicate type(Biome.Category... categories) {
-        return (d, b) -> anyMatch(b.getBiomeCategory(), categories, (c1, c2) -> c1 == c2);
+        return (b, c) -> anyMatch(c.getProperties().getProperty(b, Biome::getBiomeCategory), categories, (x, y) -> x == y);
     }
 
-    static BiomePredicate rain(double min, double max) {
-        return (d, b) -> d.rainfall >= min && d.rainfall <= max;
+    static BiomePredicate rain(float min, float max) {
+        return (b, c) -> testRange(c.getProperties().getMoisture(b), min,  max);
     }
 
     static BiomePredicate rainType(Biome.RainType... rainTypes) {
-        return (d, b) -> anyMatch(b.getPrecipitation(), rainTypes, (c1, c2) -> c1 == c2);
+        return (b, c) -> anyMatch(c.getProperties().getProperty(b, Biome::getPrecipitation), rainTypes, (x, y) -> x == y);
     }
 
-    static BiomePredicate temp(double min, double max) {
-        return (d, b) -> d.temperature >= min && d.temperature <= max;
+    static BiomePredicate temp(float min, float max) {
+        return (b, c) -> {
+            float temp = c.getProperties().getTemperature(b);
+            return testRange(temp, min,  max);
+        };
     }
 
-    static BiomePredicate depth(double min, double max) {
-        return (d, b) -> b.getDepth() >= min && b.getDepth() <= max;
+    static BiomePredicate depth(float min, float max) {
+        return (b, c) -> testRange(c.getProperties().getDepth(b), min, max);
     }
 
     static <T> boolean anyMatch(T value, T[] test, BiPredicate<T, T> tester) {
@@ -83,23 +81,41 @@ public interface BiomePredicate {
         return false;
     }
 
+    static boolean testRange(float value, float min, float max) {
+        return value >= min && value <= max;
+    }
+
+    float ANY_MIN = -Float.MAX_VALUE;
+    float ANY_MAX = Float.MAX_VALUE;
+
+    // Temps
+    float FROZEN = -0.4F;
+    float COLD = 0.2F;
+    float WARM = 1.4F;
+    float HOT = 1.7F;
+
+    // Rain
+    float LIGHT = 0.2F;
+    float MODERATE = 0.4F;
+    float HEAVY = 0.8F;
+
     BiomePredicate OCEAN = type(Biome.Category.OCEAN);
     BiomePredicate BEACH = type(Biome.Category.BEACH).or(name("beach", "shore"));
     BiomePredicate COAST = type(Biome.Category.MUSHROOM).or(name("coast"));
-    BiomePredicate COLD_STEPPE = name("steppe").and(temp(-1, 0.3));
-    BiomePredicate DESERT = type(Biome.Category.DESERT).or(temp(0.9, 2).and(rain(-1, 0.2)));
+    BiomePredicate COLD_STEPPE = name("steppe").and(temp(ANY_MIN, COLD));
+    BiomePredicate DESERT = type(Biome.Category.DESERT).or(temp(HOT, ANY_MAX).and(rain(ANY_MIN, LIGHT)));
     BiomePredicate GRASSLAND = type(Biome.Category.PLAINS);
     BiomePredicate LAKE = type(Biome.Category.RIVER).and(name("lake")).or(name("lake"));
     BiomePredicate MESA = type(Biome.Category.MESA);
-    BiomePredicate MOUNTAIN = type(Biome.Category.EXTREME_HILLS).or(name("mountain"));
-    BiomePredicate VOLCANO = name("volcano");
+    BiomePredicate MOUNTAIN = type(Biome.Category.EXTREME_HILLS).or(name("mountain")).or(name("cliff"));
+    BiomePredicate VOLCANO = name("volcano").or(name("volcanic"));
     BiomePredicate RIVER = type(Biome.Category.RIVER).not(LAKE);
-    BiomePredicate SAVANNA = type(Biome.Category.SAVANNA).or(temp(0.8, 2).and(rain(-1, 0.4)));
-    BiomePredicate STEPPE = name("steppe").and(temp(0.3, 1));
-    BiomePredicate TAIGA = type(Biome.Category.TAIGA).or(temp(0.19, 0.35)).not(rainType(Biome.RainType.SNOW));
-    BiomePredicate TEMPERATE_FOREST = type(Biome.Category.FOREST).and(rain(-1, 0.81));
-    BiomePredicate TEMPERATE_RAINFOREST = type(Biome.Category.FOREST).and(rain(0.8, 2));
+    BiomePredicate SAVANNA = type(Biome.Category.SAVANNA).or(temp(WARM, ANY_MAX).and(rain(ANY_MIN, MODERATE)));
+    BiomePredicate STEPPE = name("steppe").and(temp(COLD, ANY_MAX));
+    BiomePredicate TAIGA = type(Biome.Category.TAIGA).or(temp(FROZEN, COLD)).not(rainType(Biome.RainType.SNOW));
+    BiomePredicate TEMPERATE_FOREST = type(Biome.Category.FOREST).and(rain(ANY_MIN, HEAVY));
+    BiomePredicate TEMPERATE_RAINFOREST = type(Biome.Category.FOREST).and(rain(HEAVY, ANY_MAX));
     BiomePredicate TROPICAL_RAINFOREST = type(Biome.Category.JUNGLE);
-    BiomePredicate TUNDRA = type(Biome.Category.ICY).or(temp(-1, 0.21).and(rainType(Biome.RainType.SNOW)));
+    BiomePredicate TUNDRA = type(Biome.Category.ICY).or(temp(ANY_MIN, FROZEN).and(rainType(Biome.RainType.SNOW)));
     BiomePredicate WETLAND = type(Biome.Category.SWAMP);
 }
