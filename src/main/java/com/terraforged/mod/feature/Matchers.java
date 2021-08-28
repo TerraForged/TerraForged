@@ -25,6 +25,7 @@
 package com.terraforged.mod.feature;
 
 import com.google.gson.JsonObject;
+import com.terraforged.mod.TerraForgedMod;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.feature.feature.DiskFeature;
 import com.terraforged.mod.featuremanager.matcher.BiomeFeatureMatcher;
@@ -88,6 +89,14 @@ public class Matchers {
                         .or(DiskFeature.INSTANCE).and("minecraft:dirt")
                         .build()
         );
+    }
+
+    public static FeatureMatcher lakes() {
+        return FeatureMatcher.and(Feature.LAKE, Blocks.WATER).withNamespace("minecraft", TerraForgedMod.MODID);
+    }
+
+    public static FeatureMatcher lavaLakes() {
+        return FeatureMatcher.and(Feature.LAKE, Blocks.LAVA).withNamespace("minecraft", TerraForgedMod.MODID);
     }
 
     private static JsonObject state(String stoneType) {

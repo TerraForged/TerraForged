@@ -99,12 +99,12 @@ public class SetupFactory {
 
         if (testInv("Vanilla lakes", !context.terraSettings.miscellaneous.vanillaLakes)) {
             // block lakes if not enabled
-            modifiers.getPredicates().add("LAKES", FeatureMatcher.and(Feature.LAKE, Blocks.WATER), FeaturePredicate.DENY);
+            modifiers.getPredicates().add("LAKES", Matchers.lakes(), FeaturePredicate.DENY);
         }
 
         if (testInv("Vanilla lava lakes", !context.terraSettings.miscellaneous.vanillaLavaLakes)) {
             // block lava-lakes if not enabled
-            modifiers.getPredicates().add("LAVA_LAKES", FeatureMatcher.and(Feature.LAKE, Blocks.LAVA), FeaturePredicate.DENY);
+            modifiers.getPredicates().add("LAVA_LAKES", Matchers.lavaLakes(), FeaturePredicate.DENY);
         }
 
         if (testInv("Vanilla water springs", !context.terraSettings.miscellaneous.vanillaSprings)) {

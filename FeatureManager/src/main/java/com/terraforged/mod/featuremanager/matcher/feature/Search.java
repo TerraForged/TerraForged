@@ -32,12 +32,24 @@ import java.util.List;
 public class Search {
 
     private final Matcher[] matchers;
+    private boolean cancelled = false;
 
     Search(List<Rule> list) {
         matchers = list.stream().map(Rule::createMatcher).toArray(Matcher[]::new);
     }
 
+    public void cancel() {
+        this.cancelled = true;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
     public boolean isComplete() {
+        if (isCancelled()) {
+            return false;
+        }
         for (Matcher matcher : matchers) {
             if (matcher.complete()) {
                 return true;

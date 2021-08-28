@@ -45,14 +45,22 @@ import java.util.function.Predicate;
 
 public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
 
-    public static final FeatureMatcher ANY = new FeatureMatcher(Collections.emptyList());
-    public static final FeatureMatcher NONE = new FeatureMatcher(Collections.emptyList());
+    public static final Predicate<JsonElement> ALLOW_ALL = json -> true;
+    public static final Predicate<JsonElement> ALLOW_NONE = json -> false;
+    public static final FeatureMatcher ANY = new FeatureMatcher(Collections.emptyList(), ALLOW_ALL);
+    public static final FeatureMatcher NONE = new FeatureMatcher(Collections.emptyList(), ALLOW_NONE);
 
-    private final List<Rule> rules;
+    protected final List<Rule> rules;
+    protected final Predicate<JsonElement> filter;
 
     protected FeatureMatcher(List<Rule> rules) {
+        this(rules, ALLOW_ALL);
+    }
+
+    protected FeatureMatcher(List<Rule> rules, Predicate<JsonElement> filter) {
         super();
         this.rules = rules;
+        this.filter = filter;
     }
 
     @Override
@@ -87,7 +95,41 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
                 '}';
     }
 
+    public FeatureMatcher withFilter(Predicate<JsonElement> filter) {
+        return new FeatureMatcher(rules, filter);
+    }
+
+    public FeatureMatcher withNamespace(String... namespaces) {
+        return withFilter(json -> {
+            // Ignore if it can't be a string
+            if (!json.isJsonPrimitive()) {
+                return true;
+            }
+
+            String value = json.getAsString();
+            int i = value.indexOf(':');
+            // Ignore if not a registry name
+            if (i == -1) {
+                return true;
+            }
+
+            // Only match if it starts with one of the namespaces
+            for (String namespace : namespaces) {
+                if (value.regionMatches(0, namespace, 0, i)) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
     protected boolean test(JsonElement element, Search search) {
+        if (!filter.test(element)) {
+            search.cancel();
+            return false;
+        }
+
         if (element.isJsonObject()) {
             JsonObject object = element.getAsJsonObject();
             for (Map.Entry<String, JsonElement> e : object.entrySet()) {
@@ -106,6 +148,7 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
             search.test(element.getAsJsonPrimitive());
             return search.isComplete();
         }
+
         return search.isComplete();
     }
 
@@ -284,7 +327,7 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
                 return FeatureMatcher.NONE;
             }
             newRule();
-            return new FeatureMatcher(rules);
+            return new FeatureMatcher(rules, ALLOW_ALL);
         }
     }
 }
