@@ -46,11 +46,13 @@ public class Matchers {
                 .or("minecraft:ore").and("minecraft:tag_match").and("minecraft:base_stone_overworld").and("state", state("minecraft:granite"))
                 .or("minecraft:ore").and("minecraft:tag_match").and("minecraft:base_stone_overworld").and("state", state("minecraft:diorite"))
                 .or("minecraft:ore").and("minecraft:tag_match").and("minecraft:base_stone_overworld").and("state", state("minecraft:andesite"))
+                .namespace("minecraft", TerraForgedMod.MODID)
                 .build();
     }
 
     public static FeatureMatcher deadBush() {
-        return FeatureMatcher.of(Blocks.DEAD_BUSH);
+        return FeatureMatcher.of(Blocks.DEAD_BUSH)
+                .withNamespace("minecraft", TerraForgedMod.MODID);
     }
 
     public static FeatureMatcher tree() {

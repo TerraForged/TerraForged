@@ -189,12 +189,11 @@ public class TerraCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int dump(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        TerraContext terraContext = getContext(context);
-
+    private static int dump(CommandContext<CommandSource> context) {
         try {
             context.getSource().sendSuccess(new StringTextComponent("Exporting data"), true);
-            DataGen.dumpData(terraContext.biomeContext);
+            DataGen.dumpData(context.getSource().getServer());
+            context.getSource().sendSuccess(new StringTextComponent("Complete!"), true);
         } catch (Throwable t) {
             t.printStackTrace();
         }
