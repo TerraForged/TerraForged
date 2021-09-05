@@ -102,20 +102,19 @@ public class BiomeWeights implements IntUnaryOperator {
     }
 
     public void forEachEntry(BiConsumer<String, Integer> consumer) {
-        biomes.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
+        biomes.entrySet().stream().sorted(Map.Entry.comparingByKey())
                 .forEach(e -> consumer.accept(e.getKey(), e.getValue()));
     }
 
     public void forEachUnregistered(BiConsumer<String, Integer> consumer) {
-        for (Biome biome : context.biomes) {
-            int id = context.biomes.getId(biome);
+        context.biomes.getRegistry().entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(entry -> {
+            int id = context.biomes.getId(entry.getValue());
             String name = context.getName(id);
             if (!biomes.containsKey(name)) {
                 int weight = getWeight(id);
                 consumer.accept(name, weight);
             }
-        }
+        });
     }
 
     private void readWeights(Set<String> validBiomes) {
