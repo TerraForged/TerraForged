@@ -35,6 +35,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -107,14 +108,16 @@ public class BiomeWeights implements IntUnaryOperator {
     }
 
     public void forEachUnregistered(BiConsumer<String, Integer> consumer) {
-        context.biomes.getRegistry().entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(entry -> {
-            int id = context.biomes.getId(entry.getValue());
-            String name = context.getName(id);
-            if (!biomes.containsKey(name)) {
-                int weight = getWeight(id);
-                consumer.accept(name, weight);
-            }
-        });
+        context.biomes.getRegistry().entrySet().stream()
+                .sorted(Comparator.comparing(e -> context.getName(context.getId(e.getKey()))))
+                .forEach(entry -> {
+                    int id = context.biomes.getId(entry.getValue());
+                    String name = context.getName(id);
+                    if (!biomes.containsKey(name)) {
+                        int weight = getWeight(id);
+                        consumer.accept(name, weight);
+                    }
+                });
     }
 
     private void readWeights(Set<String> validBiomes) {
