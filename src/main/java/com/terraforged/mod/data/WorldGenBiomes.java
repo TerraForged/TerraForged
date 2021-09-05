@@ -26,16 +26,11 @@ package com.terraforged.mod.data;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.serialization.JsonOps;
 import com.terraforged.engine.world.biome.map.BiomeMap;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.BiomeWeights;
 import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
-import com.terraforged.mod.featuremanager.util.codec.Codecs;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.Biome;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -73,29 +68,6 @@ public class WorldGenBiomes extends DataGen {
                 new GsonBuilder().setPrettyPrinting().create().toJson(rootJson, writer);
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-        }
-    }
-
-    public static void genBiomeData(File dataDir, Biome[] biomes, TFBiomeContext context) {
-        if (dataDir.exists() || dataDir.mkdirs()) {
-            for (Biome biome : biomes) {
-                try {
-                    ResourceLocation name = context.biomes.getRegistryName(biome);
-                    if (name == null) {
-                        continue;
-                    }
-
-                    JsonElement json = Codecs.encodeAndGet(Biome.DIRECT_CODEC, biome, JsonOps.INSTANCE);
-
-                    if (json.isJsonObject()) {
-                        json.getAsJsonObject().remove(FORGE_REG_NAME_KEY);
-                    }
-
-                    write(json, dataDir, getJsonPath("worldgen/biome", name));
-                } catch (Throwable t){
-                    t.printStackTrace();
-                }
             }
         }
     }

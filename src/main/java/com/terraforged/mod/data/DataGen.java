@@ -29,7 +29,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.terraforged.mod.biome.context.TFBiomeContext;
 import com.terraforged.mod.biome.provider.analyser.BiomeAnalyser;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 
 import java.io.BufferedWriter;
@@ -42,15 +45,15 @@ public class DataGen {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    public static void dumpData(TFBiomeContext context) {
+    public static void dumpData(MinecraftServer server) {
+        TFBiomeContext context = new TFBiomeContext(server.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY));
+
         File dataDir = new File("data").getAbsoluteFile();
         Biome[] biomes = BiomeAnalyser.getOverworldBiomes(context);
         WorldGenBiomes.genBiomeMap(dataDir, context);
-        WorldGenBiomes.genBiomeData(dataDir, biomes, context);
         WorldGenBiomes.genBiomeWeights(dataDir, context);
         WorldGenBlocks.genBlockTags(dataDir);
-        WorldGenFeatures.genBiomeFeatures(dataDir, biomes, context);
-        WorldGenStructures.genDefaultDimSettings(dataDir);
+        WorldGenExport.export(dataDir, server, biomes);
     }
 
     protected static void write(File file, IOConsumer consumer) {
@@ -85,6 +88,12 @@ public class DataGen {
             return "unknown";
         }
         return location.getNamespace() + "/" + type + "/" + location.getPath() + ".json";
+    }
+
+    protected static String getJsonPath(RegistryKey<?> registryKey) {
+        ResourceLocation registry = registryKey.getRegistryName();
+        ResourceLocation name = registryKey.location();
+        return name.getNamespace() + "/" + registry.getPath() + "/" + name.getPath() + ".json";
     }
 
     public interface IOConsumer {

@@ -100,28 +100,7 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
     }
 
     public FeatureMatcher withNamespace(String... namespaces) {
-        return withFilter(json -> {
-            // Ignore if it can't be a string
-            if (!json.isJsonPrimitive()) {
-                return true;
-            }
-
-            String value = json.getAsString();
-            int i = value.indexOf(':');
-            // Ignore if not a registry name
-            if (i == -1) {
-                return true;
-            }
-
-            // Only match if it starts with one of the namespaces
-            for (String namespace : namespaces) {
-                if (value.regionMatches(0, namespace, 0, i)) {
-                    return true;
-                }
-            }
-
-            return false;
-        });
+        return withFilter(namespaceFilter(namespaces));
     }
 
     protected boolean test(JsonElement element, Search search) {
@@ -173,6 +152,31 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
             return Optional.empty();
         }
         return Optional.of(new FeatureMatcher(rules));
+    }
+
+    public static Predicate<JsonElement> namespaceFilter(String... namespaces) {
+        return json -> {
+            // Ignore if it can't be a string
+            if (!json.isJsonPrimitive()) {
+                return true;
+            }
+
+            String value = json.getAsString();
+            int i = value.indexOf(':');
+            // Ignore if not a registry name
+            if (i == -1) {
+                return true;
+            }
+
+            // Only match if it starts with one of the namespaces
+            for (String namespace : namespaces) {
+                if (value.regionMatches(0, namespace, 0, i)) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
     }
 
     /**
@@ -235,6 +239,7 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
 
     public static class Builder {
 
+        protected Predicate<JsonElement> filter = ALLOW_ALL;
         protected List<Rule> rules = Collections.emptyList();
         protected List<JsonPrimitive> values = Collections.emptyList();
         protected Map<String, JsonElement> mappings = Collections.emptyMap();
@@ -322,12 +327,17 @@ public class FeatureMatcher implements Predicate<JsonElement>, Jsonifiable {
             return this;
         }
 
+        public Builder namespace(String... namespaces) {
+            filter = namespaceFilter(namespaces);
+            return this;
+        }
+
         public FeatureMatcher build() {
             if (rules.isEmpty() && values.isEmpty()) {
                 return FeatureMatcher.NONE;
             }
             newRule();
-            return new FeatureMatcher(rules, ALLOW_ALL);
+            return new FeatureMatcher(rules, filter);
         }
     }
 }
