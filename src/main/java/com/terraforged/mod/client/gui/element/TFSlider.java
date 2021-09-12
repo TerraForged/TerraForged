@@ -24,8 +24,10 @@
 
 package com.terraforged.mod.client.gui.element;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.engine.serialization.serializer.Serializer;
 import com.terraforged.noise.util.NoiseUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.client.gui.widget.Slider;
@@ -37,6 +39,7 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
     protected final String name;
     private final CompoundNBT value;
     private final List<String> tooltip;
+    private final DependencyBinding binding;
 
     private boolean lock = false;
     private Runnable callback = () -> {};
@@ -47,6 +50,7 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
         this.value = value;
         this.parent = this;
         this.tooltip = Element.getToolTip(name, value);
+        this.binding = DependencyBinding.of(name, value);
     }
 
     public TFSlider callback(Runnable callback) {
@@ -55,8 +59,29 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
     }
 
     @Override
+    public void render(MatrixStack stack, int x, int y, float delta) {
+        super.active = binding.isValid();
+        super.render(stack, x, y, delta);
+    }
+
+    @Override
     public List<String> getTooltip() {
         return tooltip;
+    }
+
+    @Override
+    public boolean mouseClicked(double x, double y, int button) {
+        if (button == 0) {
+            return super.mouseClicked(x, y, button);
+        }
+
+        if (clicked(x, y)) {
+            reset();
+            playDownSound(Minecraft.getInstance().getSoundManager());
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -78,6 +103,8 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
 
     protected abstract void onChange(Slider slider, CompoundNBT value);
 
+    protected abstract void reset();
+
     private static float min(String name, CompoundNBT value) {
         CompoundNBT meta = value.getCompound(Serializer.META_PREFIX + name);
         return meta.getFloat(Serializer.BOUND_MIN);
@@ -90,9 +117,12 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
 
     public static class Int extends TFSlider {
 
+        protected final int defaultValue;
+
         public Int(String name, CompoundNBT value) {
             super(name, value, false);
-            setValue(value.getInt(name));
+            defaultValue = value.getInt(name);
+            setValue(defaultValue);
             updateSlider();
         }
 
@@ -100,14 +130,23 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
         protected void onChange(Slider slider, CompoundNBT value) {
             value.putInt(name, slider.getValueInt());
         }
+
+        @Override
+        protected void reset() {
+            setValue(defaultValue);
+            updateSlider();
+        }
     }
 
     public static class Float extends TFSlider {
 
+        protected final float defaultValue;
+
         public Float(String name, CompoundNBT value) {
             super(name, value, true);
             precision = 3;
-            setValue(value.getFloat(name));
+            defaultValue = value.getFloat(name);
+            setValue(defaultValue);
             updateSlider();
         }
 
@@ -116,6 +155,12 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
             int i = (int) (slider.getValue() * 1000);
             float f = i / 1000F;
             value.putFloat(name, f);
+        }
+
+        @Override
+        protected void reset() {
+            setValue(defaultValue);
+            updateSlider();
         }
     }
 
@@ -153,6 +198,8 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
     // float (0.0-1.0) variant of the bound slider
     public static class BoundFloat extends BoundSlider {
 
+        private final float defaultValue;
+
         public BoundFloat(String name, CompoundNBT value) {
             this(name, value, 0.005F);
         }
@@ -160,7 +207,8 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
         public BoundFloat(String name, CompoundNBT value, float pad) {
             super(name, value, pad, true);
             precision = 3;
-            setValue(value.getFloat(name));
+            defaultValue = value.getFloat(name);
+            setValue(defaultValue);
             updateSlider();
         }
 
@@ -179,10 +227,18 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
             setValue(val);
             updateSlider();
         }
+
+        @Override
+        protected void reset() {
+            setValue(defaultValue);
+            updateSlider();
+        }
     }
 
     // int variant of the bound slider
     public static class BoundInt extends BoundSlider {
+
+        private final int defaultValue;
 
         public BoundInt(String name, CompoundNBT value) {
             this(name, value, 1);
@@ -190,7 +246,8 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
 
         public BoundInt(String name, CompoundNBT value, int pad) {
             super(name, value, pad, false);
-            setValue(value.getInt(name));
+            this.defaultValue = value.getInt(name);
+            setValue(defaultValue);
             updateSlider();
         }
 
@@ -207,6 +264,12 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
 
             // update actual slider value
             setValue(val);
+            updateSlider();
+        }
+
+        @Override
+        protected void reset() {
+            setValue(defaultValue);
             updateSlider();
         }
     }

@@ -183,11 +183,13 @@ publishing {
 
 def getClassifier() {
     def classifier = ""
-    // Don't append a classifier if building a release jar!
-    if (System.getenv("GIT_TAG_NAME") != null) {
+    if (System.getenv("GIT_TAG_NAME") == null) {
+        if (!mod_classifier.isEmpty()) {
+            classifier += "-${mod_classifier}"
+        }
+    } else {
         // Append development version (ALPHA/BETA/RC-#)
-        def dev = "${dev_version}"
-        if (!dev.isEmpty()) {
+        if (!dev_version.isEmpty()) {
             classifier += "-${dev_version}"
         }
 

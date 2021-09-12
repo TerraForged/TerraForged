@@ -1,6 +1,6 @@
 modLoader="javafml"
 license="MIT"
-loaderVersion="[35.1,)"
+loaderVersion="[36.1,)"
 
 [[mods]]
 modId="terraforged"
@@ -20,4 +20,4 @@ Description:
     modId="forge"
     side="BOTH"
     mandatory=true
-    versionRange="[35.1.5,)"
+    versionRange="[36.1,)"

@@ -25,7 +25,13 @@
 package com.terraforged.mod.util.nbt;
 
 import com.terraforged.engine.serialization.serializer.AbstractWriter;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.ByteNBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.FloatNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.IntNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.StringNBT;
 import net.minecraftforge.common.util.Constants;
 
 public class NBTWriter extends AbstractWriter<INBT, CompoundNBT, ListNBT, NBTWriter> {

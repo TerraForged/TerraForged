@@ -33,11 +33,8 @@ import net.minecraft.util.text.TextComponent;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public interface Element {
-
-    AtomicInteger ID_COUNTER = new AtomicInteger(0);
 
     default ITextComponent getToolTipText() {
         TextComponent base = new StringTextComponent("");
@@ -49,10 +46,6 @@ public interface Element {
 
     default List<String> getTooltip() {
         return Collections.emptyList();
-    }
-
-    static int nextID() {
-        return ID_COUNTER.getAndAdd(1);
     }
 
     static String getDisplayName(String name, CompoundNBT value) {
