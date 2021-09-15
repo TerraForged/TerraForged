@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.client.gui.element;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.terraforged.engine.serialization.serializer.Serializer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.ByteNBT;
@@ -44,6 +45,7 @@ public class TFToggle extends TFButton {
     private final CompoundNBT value;
     private final ListNBT options;
     private final List<String> tooltip;
+    private final DependencyBinding binding;
 
     private int index;
     private Runnable callback = () -> {};
@@ -54,6 +56,7 @@ public class TFToggle extends TFButton {
         this.value = value;
         this.prefix = Element.getDisplayName(name, value) + ": ";
         this.tooltip = Element.getToolTip(name, value);
+        this.binding = DependencyBinding.of(name, value);
 
         INBT selected = value.get(name);
         CompoundNBT meta = value.getCompound(Serializer.META_PREFIX + name);
@@ -82,13 +85,19 @@ public class TFToggle extends TFButton {
     }
 
     @Override
+    public void render(MatrixStack stack, int x, int y, float delta) {
+        this.active = binding.isValid();
+        super.render(stack, x, y, delta);
+    }
+
+    @Override
     public List<String> getTooltip() {
         return tooltip;
     }
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
-        if (isValidClickButton(button)) {
+        if (active && isValidClickButton(button)) {
             int direction = button == 0 ? 1 : -1;
             this.playDownSound(Minecraft.getInstance().getSoundManager());
             this.onClick(mx, my, direction);

@@ -77,6 +77,7 @@ public abstract class TFSlider extends Slider implements Slider.ISlider, Element
 
         if (clicked(x, y)) {
             reset();
+            callback.run();
             playDownSound(Minecraft.getInstance().getSoundManager());
             return true;
         }
