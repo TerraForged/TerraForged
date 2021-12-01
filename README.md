@@ -1,3 +1,4 @@
 # TerraForged
 
-TerraForged is world-gen mod made for Minecraft (Java)
+TerraForged is a world-gen mod for Minecraft (Java).
+This branch is being actively developed for 1.18, is very stripped back, and may be unstable.
