@@ -26,7 +26,7 @@ public class RegistryUtil {
             var levelStem = new LevelStem(overworld.typeSupplier(), generator);
             registry.registerOrOverride(OptionalInt.empty(), LevelStem.OVERWORLD, levelStem, lifecycle);
 
-            TerraForged.LOG.info("Re-seeded generator: {}", seed);
+            TerraForged.LOG.info("Re-seeded TerraForged generator: {}", seed);
         }
 
         return registry;
@@ -38,7 +38,7 @@ public class RegistryUtil {
         }
 
         try {
-            var field = GETTER.get();
+            var field = REGISTRY_ACCESS_GETTER.get();
             var access = (RegistryAccess) field.get(ops);
             return Optional.ofNullable(access);
         } catch (Throwable t) {
@@ -47,7 +47,7 @@ public class RegistryUtil {
         }
     }
 
-    protected static final Supplier<Field> GETTER = Suppliers.memoize(() -> {
+    protected static final Supplier<Field> REGISTRY_ACCESS_GETTER = Suppliers.memoize(() -> {
         for (var field : RegistryReadOps.class.getDeclaredFields()) {
             if (field.getType() == RegistryAccess.class) {
                 field.setAccessible(true);

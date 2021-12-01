@@ -1,8 +1,6 @@
 package com.terraforged.mod.platform.fabric;
 
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.init.ModInit;
-import com.terraforged.mod.platform.Platform;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -10,14 +8,14 @@ import net.fabricmc.loader.api.ModContainer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class TerraForgedMod extends TerraForged<ModContainer> implements Platform, ModInitializer {
+public class TerraForgedMod extends TerraForged<ModContainer> implements ModInitializer {
     public TerraForgedMod() {
         super(FabricLoader.getInstance()::getModContainer);
     }
 
     @Override
     public void onInitialize() {
-        ModInit.init();
+        init();
     }
 
     @Override

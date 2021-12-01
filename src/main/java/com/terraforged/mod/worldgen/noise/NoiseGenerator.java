@@ -27,15 +27,15 @@ public class NoiseGenerator {
     protected final ControlPoints controlPoints;
     protected final ThreadLocal<NoiseData> localData = ThreadLocal.withInitial(NoiseData::new);
 
-    public NoiseGenerator(long seed, RegistryAccess access) {
-        this.levels = NoiseLevels.getDefault();
-        this.ocean = Source.ZERO;
+    public NoiseGenerator(long seed, TerrainLevels levels, RegistryAccess access) {
+        this.levels = levels.noiseLevels;
+        this.ocean = createOceanTerrain(seed);
         this.land = createLandTerrain(seed, access);
-        this.continent = createContinentNoise(seed, TerrainLevels.DEFAULT);
+        this.continent = createContinentNoise(seed, levels);
         this.controlPoints = continent.getControlPoints();
     }
 
-    private NoiseGenerator(long seed, TerrainLevels levels, NoiseGenerator other) {
+    public NoiseGenerator(long seed, TerrainLevels levels, NoiseGenerator other) {
         this.levels = levels.noiseLevels;
         this.land = other.land.withSeed(seed);
         this.ocean = createOceanTerrain(seed);
@@ -43,12 +43,12 @@ public class NoiseGenerator {
         this.controlPoints = continent.getControlPoints();
     }
 
-    public NoiseGenerator with(long seed, TerrainLevels levels) {
-        return new NoiseGenerator(seed, levels, this);
-    }
-
     public float getHeightNoise(int x, int z) {;
         return getNoiseSample(x, z).heightNoise;
+    }
+
+    public ContinentNoise getContinent() {
+        return continent;
     }
 
     public NoiseSample getNoiseSample(int x, int z) {

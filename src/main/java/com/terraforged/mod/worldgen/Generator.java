@@ -1,12 +1,15 @@
 package com.terraforged.mod.worldgen;
 
 import com.mojang.serialization.Codec;
+import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.util.ChunkUtil;
 import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
-import com.terraforged.mod.worldgen.feature.StructureGenerator;
+import com.terraforged.mod.worldgen.noise.NoiseGenerator;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
-import com.terraforged.mod.worldgen.terrain.TerrainGenerator;
+import com.terraforged.mod.worldgen.terrain.TerrainLevels;
+import com.terraforged.mod.worldgen.util.DelegateGenerator;
+import com.terraforged.mod.worldgen.util.StructureConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.ServerLevel;
@@ -33,29 +36,33 @@ public class Generator extends ChunkGenerator {
     public static final Codec<Generator> CODEC = new GeneratorCodec().stable();
 
     protected final long seed;
-    protected final ChunkGenerator vanilla;
     protected final Source biomeSource;
-    protected final Climate.Sampler climateSampler;
+    protected final TerrainLevels levels;
+    protected final StructureConfig structureConfig;
     protected final BiomeGenerator biomeGenerator;
-    protected final TerrainGenerator terrainGenerator;
-    protected final StructureGenerator structureGenerator;
+    protected final NoiseGenerator noiseGenerator;
     protected final GeneratorCache terrainCache;
+    protected final ChunkGenerator vanillaGenerator;
+    protected final ChunkGenerator structureGenerator;
 
     public Generator(long seed,
+                     TerrainLevels levels,
                      ChunkGenerator vanilla,
                      Source biomeSource,
                      BiomeGenerator biomeGenerator,
-                     TerrainGenerator terrainGenerator,
-                     StructureGenerator structureGenerator) {
-        super(biomeSource, biomeSource, structureGenerator.getSettings(), seed);
+                     NoiseGenerator noiseGenerator,
+                     StructureConfig structureConfig) {
+        super(biomeSource, biomeSource, structureConfig.copy(), seed);
         this.seed = seed;
-        this.vanilla = vanilla;
+        this.levels = levels;
+        this.vanillaGenerator = vanilla;
         this.biomeSource = biomeSource;
-        this.climateSampler = biomeSource.createSampler(seed, this);
-        this.terrainGenerator = terrainGenerator.withGenerator(seed, this);
-        this.biomeGenerator = biomeGenerator.withGenerator(seed, this);
-        this.structureGenerator = structureGenerator.withGenerator(seed, this);
-        this.terrainCache = new GeneratorCache(terrainGenerator);
+        this.structureConfig = structureConfig;
+        this.biomeGenerator = biomeGenerator;
+        this.noiseGenerator = noiseGenerator;
+        this.terrainCache = new GeneratorCache(levels, noiseGenerator);
+        this.structureGenerator = new DelegateGenerator(seed, this, structureConfig) {};
+        TerraForged.LOG.debug("Created TerraForged chunk generator. Seed: {}", seed);
     }
 
     public TerrainData getChunkData(ChunkPos pos) {
@@ -69,9 +76,9 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public ChunkGenerator withSeed(long seed) {
-        if (seed == this.seed) return this;
-
-        return new Generator(seed, vanilla.withSeed(seed), biomeSource.withSeed(seed), biomeGenerator, terrainGenerator, structureGenerator);
+        var noiseGenerator = new NoiseGenerator(seed, levels, this.noiseGenerator);
+        var biomeSource = new Source(seed, noiseGenerator, this.biomeSource);
+        return new Generator(seed, levels, vanillaGenerator, biomeSource, biomeGenerator, noiseGenerator, structureConfig);
     }
 
     @Override
@@ -81,12 +88,12 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public int getSeaLevel() {
-        return 63;
+        return levels.seaLevel;
     }
 
     @Override
     public int getGenDepth() {
-        return 384;
+        return levels.genDepth;
     }
 
     @Override
@@ -101,7 +108,7 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public Climate.Sampler climateSampler() {
-        return climateSampler;
+        return Source.NoopSampler.INSTANCE;
     }
 
     @Override
@@ -111,7 +118,7 @@ public class Generator extends ChunkGenerator {
 
     @Nullable
     public BlockPos findNearestMapFeature(ServerLevel server, StructureFeature<?> feature, BlockPos pos, int i, boolean first) {
-        return structureGenerator.find(server, feature, pos, i, first);
+        return structureGenerator.findNearestMapFeature(server, feature, pos, i, first);
     }
 
     @Override
@@ -119,7 +126,7 @@ public class Generator extends ChunkGenerator {
         terrainCache.hint(chunk.getPos());
 
         try (var timer = Stage.STRUCTURE_STARTS.start()) {
-            structureGenerator.generateStarts(seed, chunk, structureFeatures, structures, access);
+            structureGenerator.createStructures(access, structureFeatures, chunk, structures, seed);
         }
     }
 
@@ -128,7 +135,7 @@ public class Generator extends ChunkGenerator {
         terrainCache.hint(chunk.getPos());
 
         try (var timer = Stage.STRUCTURE_REFS.start()) {
-            structureGenerator.generateRefs(chunk, level, structureFeatures);
+            structureGenerator.createReferences(level, structureFeatures, chunk);
         }
     }
 
@@ -174,7 +181,7 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public int getBaseHeight(int x, int z, net.minecraft.world.level.levelgen.Heightmap.Types types, LevelHeightAccessor levelHeightAccessor) {
-        int height = terrainGenerator.getHeight(x, z) + 1;
+        int height = terrainCache.getHeight(x, z) + 1;
         return switch (types) {
             case WORLD_SURFACE, WORLD_SURFACE_WG, MOTION_BLOCKING, MOTION_BLOCKING_NO_LEAVES -> Math.max(getSeaLevel(), height);
             case OCEAN_FLOOR, OCEAN_FLOOR_WG -> height;
@@ -183,7 +190,7 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor levelHeightAccessor) {
-        int height = terrainGenerator.getHeight(x, z) + 1;
+        int height = terrainCache.getHeight(x, z) + 1;
         int surface = Math.max(getSeaLevel(), height);
 
         var states = new BlockState[surface];

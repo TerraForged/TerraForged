@@ -5,7 +5,7 @@ license="MIT"
 [[mods]]
 modId="terraforged"
 displayName="TerraForged"
-version="${version}"
+version="0.3.0"
 authors="dags,Won-Ton"
 credits="Devs:dags,Won-Ton|Artist/Builder:monsterfish_"
 logoFile="terraforged.png"

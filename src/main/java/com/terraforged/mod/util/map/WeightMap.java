@@ -30,7 +30,7 @@ public class WeightMap<T> {
             }
         }
 
-        return values[0];
+        return null;
     }
 
     public interface Weighted {

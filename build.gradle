@@ -17,26 +17,39 @@ allprojects {
 }
 
 subprojects {
-    task copyClasses(type: Copy) {
+    task commonClasses(type: Copy) {
         from("$rootDir/build/classes/")
         into("$buildDir/classes/")
     }
 
-    task copyResources(type: Copy) {
+    task commonResources(type: Copy) {
         from("$rootDir/src/main/resources/")
         into("$buildDir/resources/main/")
     }
 
-    classes.dependsOn(copyClasses)
+    classes.dependsOn(commonClasses)
 
-    processResources.dependsOn(copyResources)
+    processResources.dependsOn(commonResources)
+}
+
+configurations {
+    library
+    implementation.extendsFrom library
 }
 
 dependencies {
 //    annotationProcessor "org.spongepowered:mixin:0.8.4:processor"
-    implementation "org.spongepowered:mixin:0.8.4"
-    implementation "com.terraforged:Engine:0.2.5"
+    implementation "org.spongepowered:mixin:0.8.5"
+    library "com.terraforged:Engine:0.2.5"
 }
+
+task libraries(type: Copy) {
+    from { configurations.library.collect { it.isDirectory() ? it : zipTree(it) } }
+    into("build/classes/java/main")
+    duplicatesStrategy = "EXCLUDE"
+}
+
+classes.dependsOn(libraries)
 
 minecraft {
     version(minecraft_version)

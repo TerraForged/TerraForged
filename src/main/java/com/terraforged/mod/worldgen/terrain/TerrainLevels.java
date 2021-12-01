@@ -12,6 +12,10 @@ public class TerrainLevels {
     public final int genDepth;
     public final NoiseLevels noiseLevels;
 
+    public TerrainLevels() {
+        this(DEFAULT_SEA_LEVEL, 384);
+    }
+
     public TerrainLevels(int seaLevel, int genDepth) {
         this.seaLevel = seaLevel;
         this.genDepth = genDepth;

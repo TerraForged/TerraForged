@@ -17,6 +17,8 @@ public class DataPackExporter {
     public static DataPackConfig setup(@Nullable Path dir, DataPackConfig config) {
         if (dir == null) throw new NullPointerException("Dir is null!");
 
+        TerraForged.LOG.info("Generating TerraForged datapack");
+
         try {
             var dest = dir.resolve(TerraForged.TITLE + ".zip");
             var path = Paths.get("default");

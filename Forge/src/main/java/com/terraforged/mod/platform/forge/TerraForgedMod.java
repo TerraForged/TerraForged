@@ -1,7 +1,6 @@
 package com.terraforged.mod.platform.forge;
 
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.init.ModInit;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
@@ -14,7 +13,7 @@ import java.nio.file.Path;
 public class TerraForgedMod extends TerraForged<ModContainer> {
     public TerraForgedMod() {
         super(ModList.get()::getModContainerById);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onInit);
     }
 
     @Override
@@ -27,7 +26,7 @@ public class TerraForgedMod extends TerraForged<ModContainer> {
         return getContainer().resolve(path);
     }
 
-    void init(FMLCommonSetupEvent event) {
-        event.enqueueWork(ModInit::init);
+    void onInit(FMLCommonSetupEvent event) {
+        event.enqueueWork(super::init);
     }
 }

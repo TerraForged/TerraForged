@@ -1,8 +1,10 @@
 package com.terraforged.mod.worldgen;
 
 import com.terraforged.mod.util.Timer;
+import com.terraforged.mod.worldgen.noise.NoiseGenerator;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.mod.worldgen.terrain.TerrainGenerator;
+import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import org.jetbrains.annotations.Nullable;
@@ -16,8 +18,8 @@ public class GeneratorCache {
     private final Timer noiseTimer = new Timer("NOISE_GEN", 10, TimeUnit.SECONDS);
     private final Map<ChunkPos, ForkJoinTask<TerrainData>> cache = new ConcurrentHashMap<>();
 
-    public GeneratorCache(TerrainGenerator generator) {
-        this.generator = generator;
+    public GeneratorCache(TerrainLevels levels, NoiseGenerator noiseGenerator) {
+        this.generator = new TerrainGenerator(levels, noiseGenerator);
     }
 
     public void drop(ChunkPos pos) {
@@ -34,6 +36,10 @@ public class GeneratorCache {
     public CompletableFuture<ChunkAccess> hint(ChunkAccess chunk) {
         hint(chunk.getPos());
         return CompletableFuture.completedFuture(chunk);
+    }
+
+    public int getHeight(int x, int z) {
+        return generator.getHeight(x, z);
     }
 
     public TerrainData getNow(ChunkPos pos) {

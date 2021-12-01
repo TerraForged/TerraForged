@@ -12,13 +12,19 @@ import com.terraforged.noise.util.Vec2f;
 public class ContinentNoise extends AdvancedContinentGenerator {
     protected final float offsetX;
     protected final float offsetZ;
+    protected final GeneratorContext context;
     protected final ThreadLocal<RiverCache> localRiverCache = ThreadLocal.withInitial(RiverCache::new);
 
     public ContinentNoise(Seed seed, GeneratorContext context) {
         super(seed, context);
         var centre = NoiseUtil.cell(this.seed, 0, 0);
-        offsetX = (centre.x  * jitter) / frequency;
-        offsetZ = (centre.y  * jitter) / frequency;
+        this.context = context;
+        this.offsetX = (centre.x  * jitter) / frequency;
+        this.offsetZ = (centre.y  * jitter) / frequency;
+    }
+
+    public GeneratorContext getContext() {
+        return context;
     }
 
     public RiverCache getRiverCache() {
