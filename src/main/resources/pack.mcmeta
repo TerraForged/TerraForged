@@ -1,6 +1,6 @@
 {
-    "pack": {
-        "description": "TerraForged resources",
-        "pack_format": 6
-    }
+  "pack": {
+    "description": "TerraForged Mod",
+    "pack_format": 8
+  }
 }

@@ -1,0 +1,974 @@
+{
+  "terrain": "badlands",
+  "weight": 1.0,
+  "noise": {
+    "type": "Bias",
+    "source": {
+      "type": "Scale",
+      "source": {
+        "type": "Mult",
+        "modules": [
+          {
+            "type": "Scale",
+            "source": {
+              "type": "Add",
+              "modules": [
+                {
+                  "type": "Scale",
+                  "source": {
+                    "type": "Steps",
+                    "curve": {
+                      "type": "Interpolation",
+                      "mode": "CURVE3"
+                    },
+                    "source": {
+                      "type": "Mult",
+                      "modules": [
+                        {
+                          "type": "Warp",
+                          "source": {
+                            "type": "Warp",
+                            "source": {
+                              "type": "Ridge",
+                              "seed": 42,
+                              "gain": 0.975,
+                              "octaves": 4,
+                              "frequency": 0.0036363637,
+                              "lacunarity": 2.0,
+                              "interpolation": "CURVE3"
+                            },
+                            "domain": {
+                              "type": "DomainWarp",
+                              "x": {
+                                "type": "Map",
+                                "source": {
+                                  "type": "Perlin",
+                                  "seed": 43,
+                                  "gain": 0.5,
+                                  "octaves": 2,
+                                  "frequency": 0.0025,
+                                  "lacunarity": 2.0,
+                                  "interpolation": "CURVE3"
+                                },
+                                "min": {
+                                  "type": "Const",
+                                  "value": -0.5
+                                },
+                                "max": {
+                                  "type": "Const",
+                                  "value": 0.5
+                                }
+                              },
+                              "y": {
+                                "type": "Map",
+                                "source": {
+                                  "type": "Perlin",
+                                  "seed": 44,
+                                  "gain": 0.5,
+                                  "octaves": 2,
+                                  "frequency": 0.0025,
+                                  "lacunarity": 2.0,
+                                  "interpolation": "CURVE3"
+                                },
+                                "min": {
+                                  "type": "Const",
+                                  "value": -0.5
+                                },
+                                "max": {
+                                  "type": "Const",
+                                  "value": 0.5
+                                }
+                              },
+                              "distance": {
+                                "type": "Const",
+                                "value": 100.0
+                              }
+                            }
+                          },
+                          "domain": {
+                            "type": "DomainWarp",
+                            "x": {
+                              "type": "Map",
+                              "source": {
+                                "type": "Perlin",
+                                "seed": 44,
+                                "gain": 0.5,
+                                "octaves": 1,
+                                "frequency": 0.055555556,
+                                "lacunarity": 2.0,
+                                "interpolation": "CURVE3"
+                              },
+                              "min": {
+                                "type": "Const",
+                                "value": -0.5
+                              },
+                              "max": {
+                                "type": "Const",
+                                "value": 0.5
+                              }
+                            },
+                            "y": {
+                              "type": "Map",
+                              "source": {
+                                "type": "Perlin",
+                                "seed": 45,
+                                "gain": 0.5,
+                                "octaves": 1,
+                                "frequency": 0.055555556,
+                                "lacunarity": 2.0,
+                                "interpolation": "CURVE3"
+                              },
+                              "min": {
+                                "type": "Const",
+                                "value": -0.5
+                              },
+                              "max": {
+                                "type": "Const",
+                                "value": 0.5
+                              }
+                            },
+                            "distance": {
+                              "type": "Const",
+                              "value": 20.0
+                            }
+                          }
+                        },
+                        {
+                          "type": "Map",
+                          "source": {
+                            "type": "Clamp",
+                            "source": {
+                              "type": "Perlin",
+                              "seed": 41,
+                              "gain": 0.5,
+                              "octaves": 3,
+                              "frequency": 0.0037037036,
+                              "lacunarity": 2.0,
+                              "interpolation": "CURVE3"
+                            },
+                            "min": {
+                              "type": "Const",
+                              "value": 0.35
+                            },
+                            "max": {
+                              "type": "Const",
+                              "value": 0.65
+                            }
+                          },
+                          "min": {
+                            "type": "Const",
+                            "value": 0.0
+                          },
+                          "max": {
+                            "type": "Const",
+                            "value": 1.0
+                          }
+                        }
+                      ]
+                    },
+                    "steps": {
+                      "type": "Const",
+                      "value": 4.0
+                    },
+                    "slope_min": {
+                      "type": "Const",
+                      "value": 0.65
+                    },
+                    "slope_max": {
+                      "type": "Const",
+                      "value": 0.75
+                    }
+                  },
+                  "scale": {
+                    "type": "Const",
+                    "value": 0.6
+                  }
+                }
+              ]
+            },
+            "scale": {
+              "type": "Const",
+              "value": 0.6
+            }
+          },
+          {
+            "type": "Alpha",
+            "source": {
+              "type": "Add",
+              "modules": [
+                {
+                  "type": "Add",
+                  "modules": [
+                    {
+                      "type": "Scale",
+                      "source": {
+                        "type": "Steps",
+                        "curve": {
+                          "type": "Interpolation",
+                          "mode": "LINEAR"
+                        },
+                        "source": {
+                          "type": "Mult",
+                          "modules": [
+                            {
+                              "type": "Warp",
+                              "source": {
+                                "type": "Warp",
+                                "source": {
+                                  "type": "Ridge",
+                                  "seed": 42,
+                                  "gain": 0.975,
+                                  "octaves": 4,
+                                  "frequency": 0.0036363637,
+                                  "lacunarity": 2.0,
+                                  "interpolation": "CURVE3"
+                                },
+                                "domain": {
+                                  "type": "DomainWarp",
+                                  "x": {
+                                    "type": "Map",
+                                    "source": {
+                                      "type": "Perlin",
+                                      "seed": 43,
+                                      "gain": 0.5,
+                                      "octaves": 2,
+                                      "frequency": 0.0025,
+                                      "lacunarity": 2.0,
+                                      "interpolation": "CURVE3"
+                                    },
+                                    "min": {
+                                      "type": "Const",
+                                      "value": -0.5
+                                    },
+                                    "max": {
+                                      "type": "Const",
+                                      "value": 0.5
+                                    }
+                                  },
+                                  "y": {
+                                    "type": "Map",
+                                    "source": {
+                                      "type": "Perlin",
+                                      "seed": 44,
+                                      "gain": 0.5,
+                                      "octaves": 2,
+                                      "frequency": 0.0025,
+                                      "lacunarity": 2.0,
+                                      "interpolation": "CURVE3"
+                                    },
+                                    "min": {
+                                      "type": "Const",
+                                      "value": -0.5
+                                    },
+                                    "max": {
+                                      "type": "Const",
+                                      "value": 0.5
+                                    }
+                                  },
+                                  "distance": {
+                                    "type": "Const",
+                                    "value": 100.0
+                                  }
+                                }
+                              },
+                              "domain": {
+                                "type": "DomainWarp",
+                                "x": {
+                                  "type": "Map",
+                                  "source": {
+                                    "type": "Perlin",
+                                    "seed": 44,
+                                    "gain": 0.5,
+                                    "octaves": 1,
+                                    "frequency": 0.055555556,
+                                    "lacunarity": 2.0,
+                                    "interpolation": "CURVE3"
+                                  },
+                                  "min": {
+                                    "type": "Const",
+                                    "value": -0.5
+                                  },
+                                  "max": {
+                                    "type": "Const",
+                                    "value": 0.5
+                                  }
+                                },
+                                "y": {
+                                  "type": "Map",
+                                  "source": {
+                                    "type": "Perlin",
+                                    "seed": 45,
+                                    "gain": 0.5,
+                                    "octaves": 1,
+                                    "frequency": 0.055555556,
+                                    "lacunarity": 2.0,
+                                    "interpolation": "CURVE3"
+                                  },
+                                  "min": {
+                                    "type": "Const",
+                                    "value": -0.5
+                                  },
+                                  "max": {
+                                    "type": "Const",
+                                    "value": 0.5
+                                  }
+                                },
+                                "distance": {
+                                  "type": "Const",
+                                  "value": 20.0
+                                }
+                              }
+                            },
+                            {
+                              "type": "Map",
+                              "source": {
+                                "type": "Clamp",
+                                "source": {
+                                  "type": "Perlin",
+                                  "seed": 41,
+                                  "gain": 0.5,
+                                  "octaves": 3,
+                                  "frequency": 0.0037037036,
+                                  "lacunarity": 2.0,
+                                  "interpolation": "CURVE3"
+                                },
+                                "min": {
+                                  "type": "Const",
+                                  "value": 0.35
+                                },
+                                "max": {
+                                  "type": "Const",
+                                  "value": 0.65
+                                }
+                              },
+                              "min": {
+                                "type": "Const",
+                                "value": 0.0
+                              },
+                              "max": {
+                                "type": "Const",
+                                "value": 1.0
+                              }
+                            }
+                          ]
+                        },
+                        "steps": {
+                          "type": "Const",
+                          "value": 4.0
+                        },
+                        "slope_min": {
+                          "type": "Const",
+                          "value": 0.6
+                        },
+                        "slope_max": {
+                          "type": "Const",
+                          "value": 0.7
+                        }
+                      },
+                      "scale": {
+                        "type": "Const",
+                        "value": 0.6
+                      }
+                    },
+                    {
+                      "type": "Scale",
+                      "source": {
+                        "type": "Warp",
+                        "source": {
+                          "type": "Mult",
+                          "modules": [
+                            {
+                              "type": "Warp",
+                              "source": {
+                                "type": "Warp",
+                                "source": {
+                                  "type": "Ridge",
+                                  "seed": 42,
+                                  "gain": 0.975,
+                                  "octaves": 4,
+                                  "frequency": 0.0036363637,
+                                  "lacunarity": 2.0,
+                                  "interpolation": "CURVE3"
+                                },
+                                "domain": {
+                                  "type": "DomainWarp",
+                                  "x": {
+                                    "type": "Map",
+                                    "source": {
+                                      "type": "Perlin",
+                                      "seed": 43,
+                                      "gain": 0.5,
+                                      "octaves": 2,
+                                      "frequency": 0.0025,
+                                      "lacunarity": 2.0,
+                                      "interpolation": "CURVE3"
+                                    },
+                                    "min": {
+                                      "type": "Const",
+                                      "value": -0.5
+                                    },
+                                    "max": {
+                                      "type": "Const",
+                                      "value": 0.5
+                                    }
+                                  },
+                                  "y": {
+                                    "type": "Map",
+                                    "source": {
+                                      "type": "Perlin",
+                                      "seed": 44,
+                                      "gain": 0.5,
+                                      "octaves": 2,
+                                      "frequency": 0.0025,
+                                      "lacunarity": 2.0,
+                                      "interpolation": "CURVE3"
+                                    },
+                                    "min": {
+                                      "type": "Const",
+                                      "value": -0.5
+                                    },
+                                    "max": {
+                                      "type": "Const",
+                                      "value": 0.5
+                                    }
+                                  },
+                                  "distance": {
+                                    "type": "Const",
+                                    "value": 100.0
+                                  }
+                                }
+                              },
+                              "domain": {
+                                "type": "DomainWarp",
+                                "x": {
+                                  "type": "Map",
+                                  "source": {
+                                    "type": "Perlin",
+                                    "seed": 44,
+                                    "gain": 0.5,
+                                    "octaves": 1,
+                                    "frequency": 0.055555556,
+                                    "lacunarity": 2.0,
+                                    "interpolation": "CURVE3"
+                                  },
+                                  "min": {
+                                    "type": "Const",
+                                    "value": -0.5
+                                  },
+                                  "max": {
+                                    "type": "Const",
+                                    "value": 0.5
+                                  }
+                                },
+                                "y": {
+                                  "type": "Map",
+                                  "source": {
+                                    "type": "Perlin",
+                                    "seed": 45,
+                                    "gain": 0.5,
+                                    "octaves": 1,
+                                    "frequency": 0.055555556,
+                                    "lacunarity": 2.0,
+                                    "interpolation": "CURVE3"
+                                  },
+                                  "min": {
+                                    "type": "Const",
+                                    "value": -0.5
+                                  },
+                                  "max": {
+                                    "type": "Const",
+                                    "value": 0.5
+                                  }
+                                },
+                                "distance": {
+                                  "type": "Const",
+                                  "value": 20.0
+                                }
+                              }
+                            },
+                            {
+                              "type": "Map",
+                              "source": {
+                                "type": "Clamp",
+                                "source": {
+                                  "type": "Perlin",
+                                  "seed": 41,
+                                  "gain": 0.5,
+                                  "octaves": 3,
+                                  "frequency": 0.0037037036,
+                                  "lacunarity": 2.0,
+                                  "interpolation": "CURVE3"
+                                },
+                                "min": {
+                                  "type": "Const",
+                                  "value": 0.35
+                                },
+                                "max": {
+                                  "type": "Const",
+                                  "value": 0.65
+                                }
+                              },
+                              "min": {
+                                "type": "Const",
+                                "value": 0.0
+                              },
+                              "max": {
+                                "type": "Const",
+                                "value": 1.0
+                              }
+                            }
+                          ]
+                        },
+                        "domain": {
+                          "type": "DomainWarp",
+                          "x": {
+                            "type": "Map",
+                            "source": {
+                              "type": "Perlin",
+                              "seed": 45,
+                              "gain": 0.5,
+                              "octaves": 1,
+                              "frequency": 0.01,
+                              "lacunarity": 2.0,
+                              "interpolation": "CURVE3"
+                            },
+                            "min": {
+                              "type": "Const",
+                              "value": -0.5
+                            },
+                            "max": {
+                              "type": "Const",
+                              "value": 0.5
+                            }
+                          },
+                          "y": {
+                            "type": "Map",
+                            "source": {
+                              "type": "Perlin",
+                              "seed": 46,
+                              "gain": 0.5,
+                              "octaves": 1,
+                              "frequency": 0.01,
+                              "lacunarity": 2.0,
+                              "interpolation": "CURVE3"
+                            },
+                            "min": {
+                              "type": "Const",
+                              "value": -0.5
+                            },
+                            "max": {
+                              "type": "Const",
+                              "value": 0.5
+                            }
+                          },
+                          "distance": {
+                            "type": "Const",
+                            "value": 50.0
+                          }
+                        }
+                      },
+                      "scale": {
+                        "type": "Const",
+                        "value": 0.4
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "Add",
+                  "modules": [
+                    {
+                      "type": "Scale",
+                      "source": {
+                        "type": "Steps",
+                        "curve": {
+                          "type": "Interpolation",
+                          "mode": "LINEAR"
+                        },
+                        "source": {
+                          "type": "Mult",
+                          "modules": [
+                            {
+                              "type": "Warp",
+                              "source": {
+                                "type": "Warp",
+                                "source": {
+                                  "type": "Ridge",
+                                  "seed": 42,
+                                  "gain": 0.975,
+                                  "octaves": 4,
+                                  "frequency": 0.0036363637,
+                                  "lacunarity": 2.0,
+                                  "interpolation": "CURVE3"
+                                },
+                                "domain": {
+                                  "type": "DomainWarp",
+                                  "x": {
+                                    "type": "Map",
+                                    "source": {
+                                      "type": "Perlin",
+                                      "seed": 43,
+                                      "gain": 0.5,
+                                      "octaves": 2,
+                                      "frequency": 0.0025,
+                                      "lacunarity": 2.0,
+                                      "interpolation": "CURVE3"
+                                    },
+                                    "min": {
+                                      "type": "Const",
+                                      "value": -0.5
+                                    },
+                                    "max": {
+                                      "type": "Const",
+                                      "value": 0.5
+                                    }
+                                  },
+                                  "y": {
+                                    "type": "Map",
+                                    "source": {
+                                      "type": "Perlin",
+                                      "seed": 44,
+                                      "gain": 0.5,
+                                      "octaves": 2,
+                                      "frequency": 0.0025,
+                                      "lacunarity": 2.0,
+                                      "interpolation": "CURVE3"
+                                    },
+                                    "min": {
+                                      "type": "Const",
+                                      "value": -0.5
+                                    },
+                                    "max": {
+                                      "type": "Const",
+                                      "value": 0.5
+                                    }
+                                  },
+                                  "distance": {
+                                    "type": "Const",
+                                    "value": 100.0
+                                  }
+                                }
+                              },
+                              "domain": {
+                                "type": "DomainWarp",
+                                "x": {
+                                  "type": "Map",
+                                  "source": {
+                                    "type": "Perlin",
+                                    "seed": 44,
+                                    "gain": 0.5,
+                                    "octaves": 1,
+                                    "frequency": 0.055555556,
+                                    "lacunarity": 2.0,
+                                    "interpolation": "CURVE3"
+                                  },
+                                  "min": {
+                                    "type": "Const",
+                                    "value": -0.5
+                                  },
+                                  "max": {
+                                    "type": "Const",
+                                    "value": 0.5
+                                  }
+                                },
+                                "y": {
+                                  "type": "Map",
+                                  "source": {
+                                    "type": "Perlin",
+                                    "seed": 45,
+                                    "gain": 0.5,
+                                    "octaves": 1,
+                                    "frequency": 0.055555556,
+                                    "lacunarity": 2.0,
+                                    "interpolation": "CURVE3"
+                                  },
+                                  "min": {
+                                    "type": "Const",
+                                    "value": -0.5
+                                  },
+                                  "max": {
+                                    "type": "Const",
+                                    "value": 0.5
+                                  }
+                                },
+                                "distance": {
+                                  "type": "Const",
+                                  "value": 20.0
+                                }
+                              }
+                            },
+                            {
+                              "type": "Map",
+                              "source": {
+                                "type": "Clamp",
+                                "source": {
+                                  "type": "Perlin",
+                                  "seed": 41,
+                                  "gain": 0.5,
+                                  "octaves": 3,
+                                  "frequency": 0.0037037036,
+                                  "lacunarity": 2.0,
+                                  "interpolation": "CURVE3"
+                                },
+                                "min": {
+                                  "type": "Const",
+                                  "value": 0.35
+                                },
+                                "max": {
+                                  "type": "Const",
+                                  "value": 0.65
+                                }
+                              },
+                              "min": {
+                                "type": "Const",
+                                "value": 0.0
+                              },
+                              "max": {
+                                "type": "Const",
+                                "value": 1.0
+                              }
+                            }
+                          ]
+                        },
+                        "steps": {
+                          "type": "Const",
+                          "value": 10.0
+                        },
+                        "slope_min": {
+                          "type": "Const",
+                          "value": 0.6
+                        },
+                        "slope_max": {
+                          "type": "Const",
+                          "value": 0.7
+                        }
+                      },
+                      "scale": {
+                        "type": "Const",
+                        "value": 0.6
+                      }
+                    },
+                    {
+                      "type": "Scale",
+                      "source": {
+                        "type": "Warp",
+                        "source": {
+                          "type": "Mult",
+                          "modules": [
+                            {
+                              "type": "Warp",
+                              "source": {
+                                "type": "Warp",
+                                "source": {
+                                  "type": "Ridge",
+                                  "seed": 42,
+                                  "gain": 0.975,
+                                  "octaves": 4,
+                                  "frequency": 0.0036363637,
+                                  "lacunarity": 2.0,
+                                  "interpolation": "CURVE3"
+                                },
+                                "domain": {
+                                  "type": "DomainWarp",
+                                  "x": {
+                                    "type": "Map",
+                                    "source": {
+                                      "type": "Perlin",
+                                      "seed": 43,
+                                      "gain": 0.5,
+                                      "octaves": 2,
+                                      "frequency": 0.0025,
+                                      "lacunarity": 2.0,
+                                      "interpolation": "CURVE3"
+                                    },
+                                    "min": {
+                                      "type": "Const",
+                                      "value": -0.5
+                                    },
+                                    "max": {
+                                      "type": "Const",
+                                      "value": 0.5
+                                    }
+                                  },
+                                  "y": {
+                                    "type": "Map",
+                                    "source": {
+                                      "type": "Perlin",
+                                      "seed": 44,
+                                      "gain": 0.5,
+                                      "octaves": 2,
+                                      "frequency": 0.0025,
+                                      "lacunarity": 2.0,
+                                      "interpolation": "CURVE3"
+                                    },
+                                    "min": {
+                                      "type": "Const",
+                                      "value": -0.5
+                                    },
+                                    "max": {
+                                      "type": "Const",
+                                      "value": 0.5
+                                    }
+                                  },
+                                  "distance": {
+                                    "type": "Const",
+                                    "value": 100.0
+                                  }
+                                }
+                              },
+                              "domain": {
+                                "type": "DomainWarp",
+                                "x": {
+                                  "type": "Map",
+                                  "source": {
+                                    "type": "Perlin",
+                                    "seed": 44,
+                                    "gain": 0.5,
+                                    "octaves": 1,
+                                    "frequency": 0.055555556,
+                                    "lacunarity": 2.0,
+                                    "interpolation": "CURVE3"
+                                  },
+                                  "min": {
+                                    "type": "Const",
+                                    "value": -0.5
+                                  },
+                                  "max": {
+                                    "type": "Const",
+                                    "value": 0.5
+                                  }
+                                },
+                                "y": {
+                                  "type": "Map",
+                                  "source": {
+                                    "type": "Perlin",
+                                    "seed": 45,
+                                    "gain": 0.5,
+                                    "octaves": 1,
+                                    "frequency": 0.055555556,
+                                    "lacunarity": 2.0,
+                                    "interpolation": "CURVE3"
+                                  },
+                                  "min": {
+                                    "type": "Const",
+                                    "value": -0.5
+                                  },
+                                  "max": {
+                                    "type": "Const",
+                                    "value": 0.5
+                                  }
+                                },
+                                "distance": {
+                                  "type": "Const",
+                                  "value": 20.0
+                                }
+                              }
+                            },
+                            {
+                              "type": "Map",
+                              "source": {
+                                "type": "Clamp",
+                                "source": {
+                                  "type": "Perlin",
+                                  "seed": 41,
+                                  "gain": 0.5,
+                                  "octaves": 3,
+                                  "frequency": 0.0037037036,
+                                  "lacunarity": 2.0,
+                                  "interpolation": "CURVE3"
+                                },
+                                "min": {
+                                  "type": "Const",
+                                  "value": 0.35
+                                },
+                                "max": {
+                                  "type": "Const",
+                                  "value": 0.65
+                                }
+                              },
+                              "min": {
+                                "type": "Const",
+                                "value": 0.0
+                              },
+                              "max": {
+                                "type": "Const",
+                                "value": 1.0
+                              }
+                            }
+                          ]
+                        },
+                        "domain": {
+                          "type": "DomainWarp",
+                          "x": {
+                            "type": "Map",
+                            "source": {
+                              "type": "Perlin",
+                              "seed": 45,
+                              "gain": 0.5,
+                              "octaves": 1,
+                              "frequency": 0.01,
+                              "lacunarity": 2.0,
+                              "interpolation": "CURVE3"
+                            },
+                            "min": {
+                              "type": "Const",
+                              "value": -0.5
+                            },
+                            "max": {
+                              "type": "Const",
+                              "value": 0.5
+                            }
+                          },
+                          "y": {
+                            "type": "Map",
+                            "source": {
+                              "type": "Perlin",
+                              "seed": 46,
+                              "gain": 0.5,
+                              "octaves": 1,
+                              "frequency": 0.01,
+                              "lacunarity": 2.0,
+                              "interpolation": "CURVE3"
+                            },
+                            "min": {
+                              "type": "Const",
+                              "value": -0.5
+                            },
+                            "max": {
+                              "type": "Const",
+                              "value": 0.5
+                            }
+                          },
+                          "distance": {
+                            "type": "Const",
+                            "value": 50.0
+                          }
+                        }
+                      },
+                      "scale": {
+                        "type": "Const",
+                        "value": 0.4
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "alpha": {
+              "type": "Const",
+              "value": 0.5
+            }
+          }
+        ]
+      },
+      "scale": {
+        "type": "Const",
+        "value": 0.55
+      }
+    },
+    "bias": {
+      "type": "Const",
+      "value": 0.025
+    }
+  }
+}

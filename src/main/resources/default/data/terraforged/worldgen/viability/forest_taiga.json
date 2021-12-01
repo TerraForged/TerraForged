@@ -1,0 +1,19 @@
+{
+  "category": "TAIGA",
+  "viability": {
+    "type": "Multiply",
+    "rules": [
+      {
+        "type": "Height",
+        "min": 25.0,
+        "mid": 75.0,
+        "max": 120.0
+      },
+      {
+        "type": "Slope",
+        "normalize": 60.0,
+        "max": 0.7
+      }
+    ]
+  }
+}

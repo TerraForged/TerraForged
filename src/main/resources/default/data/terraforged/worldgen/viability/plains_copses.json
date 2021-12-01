@@ -1,0 +1,53 @@
+{
+  "category": "PLAINS",
+  "viability": {
+    "type": "Multiply",
+    "rules": [
+      {
+        "type": "Height",
+        "min": 10.0,
+        "mid": 40.0,
+        "max": 100.0
+      },
+      {
+        "type": "Slope",
+        "normalize": 80.0,
+        "max": 0.6
+      },
+      {
+        "type": "Noise",
+        "noise": {
+          "type": "Map",
+          "source": {
+            "type": "Clamp",
+            "source": {
+              "type": "Simplex",
+              "seed": 123,
+              "gain": 0.5,
+              "octaves": 1,
+              "frequency": 0.008333334,
+              "lacunarity": 2.0,
+              "interpolation": "CURVE3"
+            },
+            "min": {
+              "type": "Const",
+              "value": 0.6
+            },
+            "max": {
+              "type": "Const",
+              "value": 1.0
+            }
+          },
+          "min": {
+            "type": "Const",
+            "value": 0.0
+          },
+          "max": {
+            "type": "Const",
+            "value": 1.0
+          }
+        }
+      }
+    ]
+  }
+}

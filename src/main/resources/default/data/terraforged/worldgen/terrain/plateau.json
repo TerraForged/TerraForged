@@ -1,0 +1,103 @@
+{
+  "terrain": "plateau",
+  "weight": 1.5,
+  "noise": {
+    "type": "Scale",
+    "source": {
+      "type": "Add",
+      "modules": [
+        {
+          "type": "Terrace",
+          "steps": 4,
+          "blend_range": 0.4,
+          "source": {
+            "type": "Add",
+            "modules": []
+          },
+          "ramp": {
+            "type": "Const",
+            "value": 0.9
+          },
+          "cliff": {
+            "type": "Const",
+            "value": 0.15
+          },
+          "ramp_height": {
+            "type": "Const",
+            "value": 0.35
+          }
+        },
+        {
+          "type": "Warp",
+          "source": {
+            "type": "Scale",
+            "source": {
+              "type": "Perlin",
+              "seed": 38,
+              "gain": 0.5,
+              "octaves": 3,
+              "frequency": 0.05,
+              "lacunarity": 2.0,
+              "interpolation": "CURVE3"
+            },
+            "scale": {
+              "type": "Const",
+              "value": 0.05
+            }
+          },
+          "domain": {
+            "type": "DomainWarp",
+            "x": {
+              "type": "Map",
+              "source": {
+                "type": "Perlin",
+                "seed": 39,
+                "gain": 0.5,
+                "octaves": 2,
+                "frequency": 0.025,
+                "lacunarity": 2.0,
+                "interpolation": "CURVE3"
+              },
+              "min": {
+                "type": "Const",
+                "value": -0.5
+              },
+              "max": {
+                "type": "Const",
+                "value": 0.5
+              }
+            },
+            "y": {
+              "type": "Map",
+              "source": {
+                "type": "Perlin",
+                "seed": 40,
+                "gain": 0.5,
+                "octaves": 2,
+                "frequency": 0.025,
+                "lacunarity": 2.0,
+                "interpolation": "CURVE3"
+              },
+              "min": {
+                "type": "Const",
+                "value": -0.5
+              },
+              "max": {
+                "type": "Const",
+                "value": 0.5
+              }
+            },
+            "distance": {
+              "type": "Const",
+              "value": 20.0
+            }
+          }
+        }
+      ]
+    },
+    "scale": {
+      "type": "Const",
+      "value": 0.4655
+    }
+  }
+}

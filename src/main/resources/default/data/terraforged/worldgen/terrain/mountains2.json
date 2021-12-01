@@ -1,0 +1,69 @@
+{
+  "terrain": "mountains",
+  "weight": 2.5,
+  "noise": {
+    "type": "Scale",
+    "source": {
+      "type": "Warp",
+      "source": {
+        "type": "Valley",
+        "seed": 63,
+        "octaves": 2,
+        "strength": 0.65,
+        "grid_size": 128.0,
+        "amplitude": 0.15,
+        "lacunarity": 3.1,
+        "fall_off": 0.8,
+        "blend": "CONSTANT",
+        "source": {
+          "type": "Pow",
+          "source": {
+            "type": "Mult",
+            "modules": [
+              {
+                "type": "Alpha",
+                "source": {
+                  "type": "Ridge",
+                  "seed": 61,
+                  "gain": 0.975,
+                  "octaves": 4,
+                  "frequency": 0.008,
+                  "lacunarity": 2.0,
+                  "interpolation": "CURVE3"
+                },
+                "alpha": {
+                  "type": "Const",
+                  "value": 0.37
+                }
+              }
+            ]
+          },
+          "power": {
+            "type": "Const",
+            "value": 1.1
+          }
+        }
+      },
+      "domain": {
+        "type": "DirectionWarp",
+        "direction": {
+          "type": "Perlin",
+          "seed": 62,
+          "gain": 0.5,
+          "octaves": 1,
+          "frequency": 0.1,
+          "lacunarity": 2.0,
+          "interpolation": "CURVE3"
+        },
+        "strength": {
+          "type": "Const",
+          "value": 2.0
+        }
+      }
+    },
+    "scale": {
+      "type": "Const",
+      "value": 0.6321
+    }
+  }
+}

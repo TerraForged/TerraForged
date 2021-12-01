@@ -1,0 +1,77 @@
+buildscript {
+    repositories {
+        maven { url "https://repo.spongepowered.org/maven" }
+        maven { url = "https://maven.minecraftforge.net" }
+        mavenCentral()
+    }
+    dependencies {
+//        classpath group: "org.spongepowered", name: "mixingradle", version: "0.7-SNAPSHOT", changing: true
+        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "5.1.+", changing: true
+    }
+}
+
+apply plugin: "net.minecraftforge.gradle"
+//apply plugin: "org.spongepowered.mixin"
+apply plugin: "eclipse"
+
+minecraft {
+    mappings channel: "official", version: minecraft_version
+    runs {
+        client {
+            workingDirectory project.file("run/cient")
+            property "forge.logging.markers", "REGISTRIES"
+            property "forge.logging.console.level", "debug"
+            arg "-mixin.config=terraforged.mixins.json"
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file("run/server")
+            property "forge.logging.markers", "REGISTRIES"
+            property "forge.logging.console.level", "debug"
+            arg "-mixin.config=terraforged.mixins.json"
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file("run/data")
+            property "forge.logging.markers", "REGISTRIES"
+            property "forge.logging.console.level", "debug"
+            args "--mod", "examplemod", "--all", "--output", file("src/generated/resources/"), "--existing", file("src/main/resources/")
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+repositories {
+    maven { url "https://repo.spongepowered.org/maven" }
+    maven { url = "https://maven.fabricmc.net/" }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:1.18-${forge_version}"
+    implementation rootProject
+//    implementation "org.spongepowered:mixin:0.8.4"
+}
+
+//mixin {
+//    add sourceSets.main, "mixin.terraforged.refmap.json"
+//}
+
+jar {
+    archivesBaseName = archives_base_name
+    archiveClassifier.set(project.name.toLowerCase())
+    finalizedBy("reobfJar")
+}

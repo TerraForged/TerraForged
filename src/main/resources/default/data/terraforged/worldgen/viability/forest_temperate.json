@@ -1,0 +1,19 @@
+{
+  "category": "FOREST",
+  "viability": {
+    "type": "Multiply",
+    "rules": [
+      {
+        "type": "Height",
+        "min": 10.0,
+        "mid": 40.0,
+        "max": 100.0
+      },
+      {
+        "type": "Slope",
+        "normalize": 80.0,
+        "max": 0.5
+      }
+    ]
+  }
+}

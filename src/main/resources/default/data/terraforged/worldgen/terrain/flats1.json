@@ -1,0 +1,139 @@
+{
+  "terrain": "flats",
+  "weight": 1.0,
+  "noise": {
+    "type": "Bias",
+    "source": {
+      "type": "Scale",
+      "source": {
+        "type": "Warp",
+        "source": {
+          "type": "Warp",
+          "source": {
+            "type": "Mult",
+            "modules": [
+              {
+                "type": "Alpha",
+                "source": {
+                  "type": "Perlin",
+                  "seed": 0,
+                  "gain": 0.5,
+                  "octaves": 3,
+                  "frequency": 0.002,
+                  "lacunarity": 3.75,
+                  "interpolation": "CURVE3"
+                },
+                "alpha": {
+                  "type": "Const",
+                  "value": 0.45
+                }
+              }
+            ]
+          },
+          "domain": {
+            "type": "DomainWarp",
+            "x": {
+              "type": "Map",
+              "source": {
+                "type": "Perlin",
+                "seed": 1,
+                "gain": 0.5,
+                "octaves": 3,
+                "frequency": 0.016129032,
+                "lacunarity": 3.0,
+                "interpolation": "CURVE3"
+              },
+              "min": {
+                "type": "Const",
+                "value": -0.5
+              },
+              "max": {
+                "type": "Const",
+                "value": 0.5
+              }
+            },
+            "y": {
+              "type": "Map",
+              "source": {
+                "type": "Perlin",
+                "seed": 2,
+                "gain": 0.5,
+                "octaves": 3,
+                "frequency": 0.016129032,
+                "lacunarity": 3.0,
+                "interpolation": "CURVE3"
+              },
+              "min": {
+                "type": "Const",
+                "value": -0.5
+              },
+              "max": {
+                "type": "Const",
+                "value": 0.5
+              }
+            },
+            "distance": {
+              "type": "Const",
+              "value": 62.5
+            }
+          }
+        },
+        "domain": {
+          "type": "DomainWarp",
+          "x": {
+            "type": "Map",
+            "source": {
+              "type": "Perlin",
+              "seed": 4,
+              "gain": 0.5,
+              "octaves": 1,
+              "frequency": 0.00390625,
+              "lacunarity": 2.0,
+              "interpolation": "CURVE3"
+            },
+            "min": {
+              "type": "Const",
+              "value": -0.5
+            },
+            "max": {
+              "type": "Const",
+              "value": 0.5
+            }
+          },
+          "y": {
+            "type": "Map",
+            "source": {
+              "type": "Perlin",
+              "seed": 5,
+              "gain": 0.5,
+              "octaves": 1,
+              "frequency": 0.00390625,
+              "lacunarity": 2.0,
+              "interpolation": "CURVE3"
+            },
+            "min": {
+              "type": "Const",
+              "value": -0.5
+            },
+            "max": {
+              "type": "Const",
+              "value": 0.5
+            }
+          },
+          "distance": {
+            "type": "Const",
+            "value": 200.0
+          }
+        }
+      },
+      "scale": {
+        "type": "Const",
+        "value": 0.08
+      }
+    },
+    "bias": {
+      "type": "Const",
+      "value": -0.02
+    }
+  }
+}
