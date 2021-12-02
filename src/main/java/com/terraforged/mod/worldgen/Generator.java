@@ -62,6 +62,7 @@ public class Generator extends ChunkGenerator {
         this.noiseGenerator = noiseGenerator;
         this.terrainCache = new TerrainCache(levels, noiseGenerator);
         this.structureGenerator = new DelegateGenerator(seed, this, structureConfig) {};
+        Stage.reset();
     }
 
     public TerrainData getChunkData(ChunkPos pos) {

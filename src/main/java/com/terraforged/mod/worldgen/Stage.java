@@ -14,6 +14,8 @@ public enum Stage {
     DECORATION,
     ;
 
+    private static final Stage[] STAGES = values();
+
     private final Timer timer;
 
     Stage() {
@@ -26,5 +28,11 @@ public enum Stage {
 
     public Timer.Instance start() {
         return timer.start();
+    }
+
+    public static void reset() {
+        for (var stage : STAGES) {
+            stage.timer.reset();
+        }
     }
 }

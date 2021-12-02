@@ -39,7 +39,7 @@ public class Timer {
     protected final long interval;
 
     protected final AtomicLong timestamp = new AtomicLong();
-    protected final AtomicLong sumDuration = new AtomicLong();
+    protected final AtomicLong duration = new AtomicLong();
     protected final AtomicInteger count = new AtomicInteger();
     protected final ThreadLocal<Instance> localInstance;
 
@@ -49,12 +49,18 @@ public class Timer {
         this.localInstance = ThreadLocal.withInitial(this::createInstance);
     }
 
+    public void reset() {
+        timestamp.set(0L);
+        duration.set(0L);
+        count.set(0);
+    }
+
     public Instance start() {
         return localInstance.get().punchIn();
     }
 
     public double getAverageNanos() {
-        return sumDuration.get() / (double) count.get();
+        return duration.get() / (double) count.get();
     }
 
     public double getAverageMS() {
@@ -62,7 +68,7 @@ public class Timer {
     }
 
     public void submit(long duration) {
-        sumDuration.addAndGet(duration);
+        this.duration.addAndGet(duration);
         count.incrementAndGet();
 
         tick();
@@ -80,7 +86,7 @@ public class Timer {
         }
 
         if (now > time && timestamp.compareAndSet(time, now + interval)) {
-            double average = (sumDuration.get() * NANO_TO_MS) / count.get();
+            double average = getAverageMS();
             average = trim(average, 100);
             TerraForged.LOG.info("Average Time: {} = {}ms", name, average);
         }
