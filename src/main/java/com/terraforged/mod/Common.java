@@ -46,7 +46,7 @@ public class Common extends Init {
         Registry.register(Registry.CHUNK_GENERATOR, TerraForged.location("generator"), Generator.CODEC);
 
         TerraForged.LOG.info("Registering world-gen component codecs");
-        GenRegistry.register(ModRegistry.BIOME_TAG, BiomeTag.CODEC);
+        GenRegistry.register(ModRegistry.BIOME_TAG, BiomeTag.DIRECT_CODEC);
         GenRegistry.register(ModRegistry.TERRAIN, TerrainConfig.CODEC);
         GenRegistry.register(ModRegistry.VIABILITY, ViabilityConfig.CODEC); // depends on BiomeTag
 

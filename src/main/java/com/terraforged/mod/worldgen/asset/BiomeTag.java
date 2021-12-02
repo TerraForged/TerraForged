@@ -25,52 +25,21 @@
 package com.terraforged.mod.worldgen.asset;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.terraforged.mod.registry.ModRegistry;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import com.terraforged.mod.worldgen.util.WorldgenTag;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
+import it.unimi.dsi.fastutil.objects.ObjectSets;
 import net.minecraft.resources.RegistryFileCodec;
 import net.minecraft.world.level.biome.Biome;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 import java.util.function.Supplier;
 
-public class BiomeTag {
-    public static final BiomeTag NONE = new BiomeTag(Collections.emptySet());
-    public static final Codec<BiomeTag> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Biome.LIST_CODEC.fieldOf("biomes").xmap(BiomeTag::unwrap, BiomeTag::wrap).forGetter(BiomeTag::biomes)
-    ).apply(instance, BiomeTag::new));
-    public static final Codec<Supplier<BiomeTag>> REFERENCE_CODEC = RegistryFileCodec.create(ModRegistry.BIOME_TAG, CODEC);
+public class BiomeTag extends WorldgenTag<Biome> {
+    public static final BiomeTag NONE = new BiomeTag(ObjectSets.emptySet());
+    public static final Codec<BiomeTag> DIRECT_CODEC = WorldgenTag.codec("biomes", Biome.LIST_CODEC, BiomeTag::new);
+    public static final Codec<Supplier<BiomeTag>> CODEC = RegistryFileCodec.create(ModRegistry.BIOME_TAG, DIRECT_CODEC);
 
-    private final Set<Biome> biomes;
-
-    public BiomeTag(Set<Biome> biomes) {
-        this.biomes = biomes;
-    }
-
-    public Set<Biome> biomes() {
-        return biomes;
-    }
-
-    public boolean contains(Biome biome) {
-        return biomes.contains(biome);
-    }
-
-    private static Set<Biome> unwrap(List<Supplier<Biome>> list) {
-        var set = new ObjectOpenHashSet<Biome>(list.size());
-        for (var biome : list) {
-            set.add(biome.get());
-        }
-        return set;
-    }
-
-    private static List<Supplier<Biome>> wrap(Set<Biome> biomes) {
-        var list = new ArrayList<Supplier<Biome>>(biomes.size());
-        for (var biome : biomes) {
-            list.add(() -> biome);
-        }
-        return list;
+    BiomeTag(ObjectSet<Biome> biomes) {
+        super(biomes);
     }
 }

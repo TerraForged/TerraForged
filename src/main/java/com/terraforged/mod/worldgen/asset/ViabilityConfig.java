@@ -15,7 +15,7 @@ public record ViabilityConfig(Supplier<BiomeTag> biomes, float density, Viabilit
     public static final ViabilityConfig NONE = new ViabilityConfig(Suppliers.ofInstance(BiomeTag.NONE), 1F, Viability.NONE);
 
     public static final Codec<ViabilityConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            BiomeTag.REFERENCE_CODEC.fieldOf("biomes").forGetter(ViabilityConfig::biomes),
+            BiomeTag.CODEC.fieldOf("biomes").forGetter(ViabilityConfig::biomes),
             Codec.FLOAT.optionalFieldOf("density", 1F).forGetter(ViabilityConfig::density),
             ViabilityCodec.CODEC.fieldOf("viability").forGetter(ViabilityConfig::viability)
     ).apply(instance, ViabilityConfig::new));
