@@ -1,12 +1,1 @@
-pluginManagement {
-    repositories {
-        maven { url "https://repo.spongepowered.org/maven" }
-        maven { url = 'https://maven.fabricmc.net/' }
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
-
-rootProject.name = 'TerraForged'
-include ":Fabric"
-include ":Forge"
+rootProject.name = "TerraForged"

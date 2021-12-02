@@ -12,7 +12,7 @@
 
   "environment": "*",
   "entrypoints": {
-    "main": ["com.terraforged.mod.platform.fabric.TerraForgedMod"]
+    "main": ["com.terraforged.mod.platform.fabric.TFFabric"]
   },
   "mixins": ["terraforged.mixins.json"],
 

@@ -1,56 +1,69 @@
-plugins {
-    id "org.spongepowered.gradle.vanilla" version "0.2.1-SNAPSHOT"
-    id "java"
-}
-
-allprojects {
-    group = mod_group
-    version = mod_version
-
-    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
+buildscript {
     repositories {
         maven { url "https://repo.spongepowered.org/maven" }
-        maven { url "https://io.terraforged.com/maven/" }
+        maven { url = "https://maven.minecraftforge.net" }
         mavenCentral()
     }
+    dependencies {
+        classpath group: "org.spongepowered", name: "mixingradle", version: "0.7-SNAPSHOT", changing: true
+        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "5.1.+", changing: true
+    }
 }
 
-subprojects {
-    task commonClasses(type: Copy) {
-        from("$rootDir/build/classes/")
-        into("$buildDir/classes/")
-    }
+apply plugin: "net.minecraftforge.gradle"
+apply plugin: "org.spongepowered.mixin"
+apply plugin: "java"
 
-    task commonResources(type: Copy) {
-        from("$rootDir/src/main/resources/")
-        into("$buildDir/resources/main/")
-    }
+apply from: file("common.gradle")
 
-    classes.dependsOn(commonClasses)
-
-    processResources.dependsOn(commonResources)
+sourceSets {
+    main.java { srcDirs += "/Forge/main/java" }
+    main.resources { srcDirs += "/Forge/main/resources" }
 }
 
-configurations {
-    library
-    implementation.extendsFrom library
+repositories {
+    maven { url "https://repo.spongepowered.org/maven" }
 }
 
 dependencies {
-//    annotationProcessor "org.spongepowered:mixin:0.8.4:processor"
-    implementation "org.spongepowered:mixin:0.8.5"
-    library "com.terraforged:Engine:0.2.5"
+    annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
+    minecraft "net.minecraftforge:forge:1.18-${forge_version}"
 }
 
-task libraries(type: Copy) {
-    from { configurations.library.collect { it.isDirectory() ? it : zipTree(it) } }
-    into("build/classes/java/main")
-    duplicatesStrategy = "EXCLUDE"
+jar {
+    finalizedBy("reobfJar")
+    manifest { attributes(["MixinConfigs": "terraforged.mixins.json"]) }
 }
 
-classes.dependsOn(libraries)
+mixin {
+    add sourceSets.main, "terraforged.mixins.refmap.json"
+}
 
 minecraft {
-    version(minecraft_version)
+    mappings channel: "official", version: minecraft_version
+    runs {
+        client {
+            workingDirectory project.file("run")
+            property "forge.logging.markers", "REGISTRIES"
+            property "forge.logging.console.level", "debug"
+            arg "-mixin.config=terraforged.mixins.json"
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file("run")
+            property "forge.logging.markers", "REGISTRIES"
+            property "forge.logging.console.level", "debug"
+            arg "-mixin.config=terraforged.mixins.json"
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
 }

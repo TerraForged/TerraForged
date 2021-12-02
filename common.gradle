@@ -1,0 +1,30 @@
+group = mod_group
+version = mod_version
+
+configurations {
+    library
+    implementation.extendsFrom library
+}
+
+repositories {
+    maven { url "https://io.terraforged.com/maven/" }
+}
+
+dependencies {
+    library "com.terraforged:Engine:0.2.5"
+}
+
+task libraries(type: Copy) {
+    from { configurations.library.collect { it.isDirectory() ? it : zipTree(it) } }
+    into("build/classes/java/main")
+    duplicatesStrategy = "EXCLUDE"
+}
+
+classes {
+    dependsOn(libraries)
+}
+
+jar {
+    archivesBaseName = "${archives_base_name}-${minecraft_version}"
+}
+

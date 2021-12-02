@@ -1,0 +1,11 @@
+pluginManagement {
+    repositories {
+        maven { url "https://repo.spongepowered.org/maven" }
+        maven { url = 'https://maven.fabricmc.net/' }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = "TerraForged-Fabric"
+settings

@@ -1,98 +1,110 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2021 TerraForged
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.terraforged.mod.util;
 
-import com.terraforged.mod.TerraForged;
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.stream.Stream;
+import java.nio.file.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class FileUtil {
-    public static Stream<Path> listFiles(Path dir) throws IOException {
-        return Files.list(dir).flatMap(path -> {
-            if (Files.isDirectory(path)) {
-                try {
-                    return listFiles(path);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return Stream.of(path);
-        });
-    }
-
-    public static void copy(Path from, Path to) throws IOException {
-        FileUtil.listFiles(from).parallel().forEach(file -> {
-            try {
-                var path = from.relativize(file);
-                var dest = to.resolve(path);
-                var dir = dest.getParent();
-
-                if (!Files.exists(dir)) {
-                    Files.createDirectories(dir);
-                }
-
-                TerraForged.LOG.info("Copying file: {} -> {}", file, dest);
-                Files.copy(file, dest, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    public static void createZipCopy(Path from, Path to) throws IOException {
-        try (var output = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(to)))) {
-            ZipUtils.copyDirToZip(from, from, output);
+    public static void walk(Path root, String path, FileSystemVisitor visitor) throws IOException {
+        if (Files.isDirectory(root)) {
+            walkDir(root, path, visitor);
+        } else {
+            walkSystem(root, path, visitor);
         }
     }
 
-    protected static class ZipUtils {
-        protected static void copyToZip(Path file, Path from, ZipOutputStream output) throws IOException {
-            var path = from.relativize(file);
-            if (Files.isDirectory(file)) {
-                output.putNextEntry(createEntry(file, path, true));
-                output.closeEntry();
-                copyDirToZip(file, from, output);
-            } else {
-                output.putNextEntry(createEntry(file, path, false));
-                copyFileToZip(file, output);
-                output.closeEntry();
-            }
-        }
+    public static void walkDir(Path root, String path, FileSystemVisitor visitor) throws IOException {
+        root = root.resolve(path);
+        walk(FileSystems.getDefault(), root, root, visitor);
+    }
 
-        protected static void copyDirToZip(Path dir, Path from, ZipOutputStream output) throws IOException {
-            FileUtil.listFiles(dir).forEach(file -> {
+    public static void walkSystem(Path root, String path, FileSystemVisitor visitor) throws IOException {
+        try (var fs = FileSystems.newFileSystem(root)) {
+            root = fs.getPath(path);
+            walk(fs, root, root, visitor);
+        }
+    }
+
+    public static void walk(FileSystem fs, Path root, Path path, FileSystemVisitor visitor) throws IOException {
+        var file = fs.getPath(path.toString());
+        if (Files.isDirectory(file)) {
+            fs.provider().newDirectoryStream(file, entry -> true).forEach(f -> {
                 try {
-                    copyToZip(file, from, output);
+                    walk(fs, root, f, visitor);
                 } catch (IOException e) {
                     throw new Error(e);
                 }
             });
+        } else {
+            visitor.visit(fs, root, file);
         }
+    }
 
-        protected static void copyFileToZip(Path file, ZipOutputStream output) throws IOException {
-            try (var input = Files.newBufferedReader(file)) {
-                IOUtils.copy(input, output, Charset.defaultCharset());
-            }
+    public static void createZipCopy(Path from, String path, Path to) throws IOException {
+        try (var output = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(to)))) {
+            walk(from, path, (fs, root, file) -> {
+                var name = root.relativize(file).toString().replace('\\', '/');
+                if (Files.isDirectory(file)) {
+                    if (!name.endsWith("/")) {
+                        name += "'/";
+                    }
+
+                    var entry = new ZipEntry(name);
+                    entry.setTime(System.currentTimeMillis());
+                    output.putNextEntry(entry);
+                    output.closeEntry();
+                } else {
+                    var entry = new ZipEntry(name);
+                    entry.setTime(System.currentTimeMillis());
+                    output.putNextEntry(entry);
+                    try (var input = new InputStreamReader(fs.provider().newInputStream(file))) {
+                        IOUtils.copy(input, output, Charset.defaultCharset());
+                    }
+                    output.closeEntry();
+                }
+            });
         }
+    }
 
-        protected static ZipEntry createEntry(Path file, Path path, boolean dir) throws IOException {
-            var name = path.toString().replace('\\', '/');
+    public interface FileSystemVisitor {
+        void visit(FileSystem fs, Path root, Path path) throws IOException;
+    }
 
-            if (dir && !name.endsWith("/")) {
-                name += "'/";
-            }
+    public static void main(String[] args) throws IOException {
+        var dir = Paths.get("C:\\Users\\Rob\\IdeaProjects\\TerraForged\\src-common\\resources");
+        var zip = Paths.get("C:\\Users\\Rob\\AppData\\Roaming\\.minecraft\\mods\\TerraForged-terraforged.jar");
 
-            var entry = new ZipEntry(name);
-            entry.setTime(Files.getLastModifiedTime(file).toMillis());
-
-            return entry;
-        }
+        FileUtil.createZipCopy(dir, "resources/default", Paths.get("dir.zip"));
+        FileUtil.createZipCopy(zip, "resources/default", Paths.get("zip.zip"));
     }
 }

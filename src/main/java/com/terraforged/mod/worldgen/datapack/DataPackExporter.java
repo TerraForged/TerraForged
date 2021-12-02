@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +20,8 @@ public class DataPackExporter {
 
         try {
             var dest = dir.resolve(TerraForged.TITLE + ".zip");
-            var path = Paths.get("default");
-            var builtin = TerraForged.getPlatform().getFile(path);
-            FileUtil.createZipCopy(builtin, dest);
+            var root = TerraForged.getPlatform().getContainer();
+            FileUtil.createZipCopy(root, "default", dest);
         } catch (IOException e) {
             e.printStackTrace();
         }

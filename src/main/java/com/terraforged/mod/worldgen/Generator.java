@@ -2,12 +2,12 @@ package com.terraforged.mod.worldgen;
 
 import com.mojang.serialization.Codec;
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.util.ChunkUtil;
 import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
+import com.terraforged.mod.worldgen.util.ChunkUtil;
 import com.terraforged.mod.worldgen.util.DelegateGenerator;
 import com.terraforged.mod.worldgen.util.StructureConfig;
 import net.minecraft.core.BlockPos;

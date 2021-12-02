@@ -7,6 +7,4 @@ public interface Platform {
     AtomicReference<Platform> ACTIVE_PLATFORM = new AtomicReference<>();
 
     Path getContainer();
-
-    Path getFile(Path path);
 }
