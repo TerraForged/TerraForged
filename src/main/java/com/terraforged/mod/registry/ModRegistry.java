@@ -8,7 +8,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 
 public interface ModRegistry {
-    ResourceKey<Registry<BiomeTag>> BIOME_TAG = TerraForged.registry("worldgen/biome_tag");
+    ResourceKey<Registry<BiomeTag>> BIOME_TAG = TerraForged.registry("worldgen/tag/biome");
     ResourceKey<Registry<TerrainConfig>> TERRAIN = TerraForged.registry("worldgen/terrain");
     ResourceKey<Registry<ViabilityConfig>> VIABILITY = TerraForged.registry("worldgen/viability");
 }
