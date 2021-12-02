@@ -38,6 +38,6 @@ public class BiomeVegetationManager {
     }
 
     private static ViabilityConfig getViability(Biome biome, Registry<ViabilityConfig> registry) {
-        return registry.stream().filter(s -> s.category() == biome.getBiomeCategory()).findFirst().orElse(null);
+        return registry.stream().filter(vc -> vc.biomes().get().contains(biome)).findFirst().orElse(null);
     }
 }

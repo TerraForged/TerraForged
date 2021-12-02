@@ -1,0 +1,20 @@
+{
+  "biomes": "terraforged:trees/hardy",
+  "density": 0.65,
+  "viability": {
+    "type": "Multiply",
+    "rules": [
+      {
+        "type": "Height",
+        "min": -1.0,
+        "mid": 0.0,
+        "max": 400.0
+      },
+      {
+        "type": "Slope",
+        "normalize": 75.0,
+        "max": 0.65
+      }
+    ]
+  }
+}

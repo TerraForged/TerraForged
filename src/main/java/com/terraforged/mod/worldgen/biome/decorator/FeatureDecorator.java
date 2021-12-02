@@ -87,7 +87,7 @@ public class FeatureDecorator {
     }
 
     private void decorateTrees(long seed, ChunkAccess chunk, WorldGenLevel level, Generator generator, WorldgenRandom random) {
-        TreePositionSampler.place(seed, 0.15F, 0.85F, chunk, level, generator, random, this);
+        TreePositionSampler.place(seed, 0.25F, 0.85F, chunk, level, generator, random, this);
     }
 
     private void decorateOther(long seed, BlockPos origin, Biome biome, WorldGenLevel level, Generator generator, WorldgenRandom random) {

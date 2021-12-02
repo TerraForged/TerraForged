@@ -1,18 +1,19 @@
 {
-  "category": "PLAINS",
+  "biomes": "terraforged:trees/sparse",
+  "density": 0.4,
   "viability": {
     "type": "Multiply",
     "rules": [
       {
         "type": "Height",
-        "min": 10.0,
-        "mid": 40.0,
-        "max": 100.0
+        "min": 0.0,
+        "mid": 10.0,
+        "max": 180.0
       },
       {
         "type": "Slope",
         "normalize": 80.0,
-        "max": 0.6
+        "max": 0.75
       },
       {
         "type": "Noise",
@@ -25,13 +26,13 @@
               "seed": 123,
               "gain": 0.5,
               "octaves": 1,
-              "frequency": 0.008333334,
+              "frequency": 0.008,
               "lacunarity": 2.0,
               "interpolation": "CURVE3"
             },
             "min": {
               "type": "Const",
-              "value": 0.6
+              "value": 0.7
             },
             "max": {
               "type": "Const",

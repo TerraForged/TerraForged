@@ -27,11 +27,13 @@ package com.terraforged.mod.util;
 import com.terraforged.mod.TerraForged;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Timer {
-    protected static final double NANO_TO_MS = 1.0 / TimeUnit.MILLISECONDS.toNanos(1);;
+    public static final AtomicBoolean LOGGING = new AtomicBoolean(false);
+    protected static final double NANO_TO_MS = 1.0 / TimeUnit.MILLISECONDS.toNanos(1);
 
     protected final String name;
     protected final long interval;
@@ -67,6 +69,8 @@ public class Timer {
     }
 
     protected void tick() {
+        if (!LOGGING.get()) return;
+
         long now = System.nanoTime();
         long time = timestamp.get();
 

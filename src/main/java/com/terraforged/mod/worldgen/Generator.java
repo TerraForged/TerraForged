@@ -1,7 +1,6 @@
 package com.terraforged.mod.worldgen;
 
 import com.mojang.serialization.Codec;
-import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
@@ -62,7 +61,6 @@ public class Generator extends ChunkGenerator {
         this.noiseGenerator = noiseGenerator;
         this.terrainCache = new GeneratorCache(levels, noiseGenerator);
         this.structureGenerator = new DelegateGenerator(seed, this, structureConfig) {};
-        TerraForged.LOG.debug("Created TerraForged chunk generator. Seed: {}", seed);
     }
 
     public TerrainData getChunkData(ChunkPos pos) {

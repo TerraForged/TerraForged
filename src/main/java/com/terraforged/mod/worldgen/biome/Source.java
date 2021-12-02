@@ -109,25 +109,7 @@ public class Source extends BiomeSource {
     protected static Map<BiomeType, List<Biome>> getBiomeTypeMap(Registry<Biome> registry, List<Biome> biomes) {
         return biomes.stream()
                 .sorted(BiomeUtils.getBiomeSorter(registry))
-                .collect(Collectors.groupingBy(Source::getType));
-    }
-
-    protected static BiomeType getType(Biome biome) {
-        return switch (biome.getBiomeCategory()) {
-            case PLAINS -> BiomeType.GRASSLAND;
-            case MESA, DESERT -> BiomeType.DESERT;
-            case TAIGA -> getTaiga(biome);
-            case ICY -> BiomeType.TUNDRA;
-            case SAVANNA -> BiomeType.SAVANNA;
-            case JUNGLE -> BiomeType.TROPICAL_RAINFOREST;
-            case FOREST -> BiomeType.TEMPERATE_FOREST;
-            case SWAMP -> BiomeType.TEMPERATE_RAINFOREST;
-            default -> BiomeType.ALPINE;
-        };
-    }
-
-    protected static BiomeType getTaiga(Biome biome) {
-        return biome.getBaseTemperature() < 0.2 ? BiomeType.TUNDRA : BiomeType.TAIGA;
+                .collect(Collectors.groupingBy(BiomeUtils::getType));
     }
 
     public static class NoopSampler implements Climate.Sampler {

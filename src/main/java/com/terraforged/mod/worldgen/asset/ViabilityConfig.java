@@ -1,35 +1,35 @@
 package com.terraforged.mod.worldgen.asset;
 
+import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
-import com.terraforged.cereal.spec.DataSpec;
-import com.terraforged.cereal.spec.DataSpecs;
-import com.terraforged.mod.codec.SpecCodec;
-import com.terraforged.mod.registry.DataSeedable;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.terraforged.cereal.Cereal;
+import com.terraforged.cereal.spec.Context;
+import com.terraforged.mod.registry.Seedable;
 import com.terraforged.mod.util.DataUtil;
 import com.terraforged.mod.worldgen.biome.viability.*;
-import net.minecraft.world.level.biome.Biome;
 
-public record ViabilityConfig(Biome.BiomeCategory category, Viability viability) implements DataSeedable<ViabilityConfig> {
-    public static final ViabilityConfig NONE = new ViabilityConfig(Biome.BiomeCategory.NONE, Viability.NONE);
+import java.util.function.Supplier;
 
-    public static final DataSpec<ViabilityConfig> SPEC = DataSpec.builder(
-            ViabilityConfig.class,
-            (data, spec, context) -> new ViabilityConfig(
-                    spec.getEnum("category", data, Biome.BiomeCategory.class),
-                    spec.get("viability", data, Viability.class, context)))
-            .add("category", Biome.BiomeCategory.NONE, ViabilityConfig::category)
-            .addObj("viability", ViabilityConfig::viability)
-            .build();
+public record ViabilityConfig(Supplier<BiomeTag> biomes, float density, Viability viability) implements Seedable<ViabilityConfig> {
+    public static final ViabilityConfig NONE = new ViabilityConfig(Suppliers.ofInstance(BiomeTag.NONE), 1F, Viability.NONE);
 
-    public static final Codec<ViabilityConfig> CODEC = SpecCodec.of(SPEC);
+    public static final Codec<ViabilityConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            BiomeTag.REFERENCE_CODEC.fieldOf("biomes").forGetter(ViabilityConfig::biomes),
+            Codec.FLOAT.optionalFieldOf("density", 1F).forGetter(ViabilityConfig::density),
+            ViabilityCodec.CODEC.fieldOf("viability").forGetter(ViabilityConfig::viability)
+    ).apply(instance, ViabilityConfig::new));
 
     @Override
-    public DataSpec<ViabilityConfig> getSpec() {
-        return SPEC;
+    public ViabilityConfig withSeed(long seed) {
+        var data = Cereal.serialize(viability);
+        var context = new Context();
+        context.getData().add("seed", seed);
+        var viability = Cereal.deserialize(data.asObj(), Viability.class, context);
+        return new ViabilityConfig(biomes, density, viability);
     }
 
     static {
-        DataSpecs.register(SPEC);
         DataUtil.registerSub(Viability.class, MultViability.SPEC);
         DataUtil.registerSub(Viability.class, HeightViability.SPEC);
         DataUtil.registerSub(Viability.class, NoiseViability.SPEC);

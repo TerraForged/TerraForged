@@ -1,0 +1,11 @@
+{
+  "biomes": [
+    "minecraft:taiga",
+    "minecraft:jungle",
+    "minecraft:bamboo_jungle",
+    "minecraft:dark_forest",
+    "minecraft:windswept_forest",
+    "minecraft:old_growth_pine_taiga",
+    "minecraft:old_growth_spruce_taiga"
+  ]
+}

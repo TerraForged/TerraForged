@@ -1,0 +1,9 @@
+{
+  "biomes": [
+    "minecraft:forest",
+    "minecraft:taiga",
+    "minecraft:birch_forest",
+    "minecraft:flower_forest",
+    "minecraft:old_growth_birch_forest"
+  ]
+}

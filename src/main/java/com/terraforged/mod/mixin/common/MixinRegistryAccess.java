@@ -12,6 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinRegistryAccess {
     @Inject(method = "load", at = @At("RETURN"))
     private static void onLoad(RegistryAccess access, RegistryReadOps<?> ops, CallbackInfo ci) {
-        GenRegistry.get().load(access, ops);
+        GenRegistry.INSTANCE.load(access, ops);
     }
 }

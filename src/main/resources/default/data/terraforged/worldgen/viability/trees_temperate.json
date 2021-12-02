@@ -1,17 +1,18 @@
 {
-  "category": "TAIGA",
+  "biomes": "terraforged:trees/temperate",
+  "density": 0.8,
   "viability": {
     "type": "Multiply",
     "rules": [
       {
         "type": "Height",
-        "min": 25.0,
-        "mid": 75.0,
-        "max": 120.0
+        "min": 0.0,
+        "mid": 10.0,
+        "max": 200.0
       },
       {
         "type": "Slope",
-        "normalize": 60.0,
+        "normalize": 80.0,
         "max": 0.7
       }
     ]

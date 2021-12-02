@@ -1,0 +1,7 @@
+{
+  "biomes": [
+    "minecraft:desert",
+    "minecraft:badlands",
+    "minecraft:eroded_badlands"
+  ]
+}

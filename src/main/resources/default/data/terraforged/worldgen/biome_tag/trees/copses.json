@@ -1,0 +1,8 @@
+{
+  "biomes": [
+    "minecraft:plains",
+    "minecraft:meadow",
+    "minecraft:snowy_plains",
+    "minecraft:sunflower_plains"
+  ]
+}

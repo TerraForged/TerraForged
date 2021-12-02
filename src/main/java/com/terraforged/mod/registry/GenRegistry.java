@@ -5,6 +5,7 @@ import com.google.gson.JsonParseException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import com.terraforged.mod.TerraForged;
+import com.terraforged.mod.util.Init;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -16,24 +17,16 @@ import net.minecraft.resources.ResourceKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-public class GenRegistry {
-    private static final GenRegistry INSTANCE = new GenRegistry();
+public class GenRegistry extends Init {
+    public static final GenRegistry INSTANCE = new GenRegistry();
 
     protected final List<Holder<?>> holders = new ArrayList<>();
-    protected final AtomicBoolean init = new AtomicBoolean(false);
-
-    public <T> void register(ResourceKey<Registry<T>> key, Codec<T> codec) {
-        holders.add(new Holder<>(key, codec));
-    }
 
     public Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> extend(
             Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> map) {
 
         if (holders.isEmpty()) return map;
-
-        init();
 
         var builder = ImmutableMap.<ResourceKey<? extends Registry<?>>, MappedRegistry<?>>builder();
         builder.putAll(map);
@@ -68,21 +61,27 @@ public class GenRegistry {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void init() {
-        if (init.compareAndSet(false, true)) {
-            TerraForged.LOG.info("Initializing builtin world-gen component registries");
+    @Override
+    protected void doInit() {
+        var writableRegistry = (WritableRegistry) BuiltinRegistries.REGISTRY;
 
-            var writableRegistry = (WritableRegistry) BuiltinRegistries.REGISTRY;
-
-            for (var holder : holders) {
-                writableRegistry.register(holder.key, new MappedRegistry<>(holder.key, Lifecycle.stable()), Lifecycle.stable());
-            }
+        for (var holder : holders) {
+            writableRegistry.register(holder.key, new MappedRegistry<>(holder.key, Lifecycle.stable()), Lifecycle.stable());
         }
     }
 
     protected record Holder<T>(ResourceKey<Registry<T>> key, Codec<T> direct) {}
 
-    public static GenRegistry get() {
-        return INSTANCE;
+    public static <T> void register(ResourceKey<Registry<T>> key, Codec<T> codec) {
+        if (INSTANCE.isDone()) {
+            TerraForged.LOG.warn("Attempted to register extension after init: {}", key);
+            return;
+        }
+
+        INSTANCE.holders.add(new Holder<>(key, codec));
+    }
+
+    public static void commit() {
+        INSTANCE.init();
     }
 }

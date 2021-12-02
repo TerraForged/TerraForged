@@ -98,15 +98,16 @@ public class TreePositionSampler {
 
         var manager = decorator.getVegetationManager();
         var vegetation = manager.getVegetation(biome);
-        var viability = manager.getViability(biome).viability();
+        var viability = manager.getViability(biome);
 
-        float value = viability.getFitness(pos.getX(), pos.getZ(), terrainData, generator);
-        if (value < MathUtil.rand(hash)) return false;
+        float density = viability.density();
+        float value = viability.viability().getFitness(pos.getX(), pos.getZ(), terrainData, generator);
+        if (value * density < MathUtil.rand(hash)) return false;
 
         for (var feature : vegetation.getTrees()) {
             random.setFeatureSeed(seed, offset, BiomeVegetation.STAGE);
             if (feature.place(level, generator, random, pos)) {
-                return true;
+//                return true;
             }
         }
 

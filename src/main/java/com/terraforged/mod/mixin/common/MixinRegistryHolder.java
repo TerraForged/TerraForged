@@ -22,6 +22,6 @@ public class MixinRegistryHolder {
     private static Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> onInit(
             Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> registries) {
 
-        return GenRegistry.get().extend(registries);
+        return GenRegistry.INSTANCE.extend(registries);
     }
 }

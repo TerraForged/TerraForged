@@ -1,0 +1,9 @@
+{
+  "biomes": [
+    "minecraft:sparse_jungle",
+    "minecraft:savanna",
+    "minecraft:savanna_plateau",
+    "minecraft:windswept_savanna",
+    "minecraft:wooded_badlands"
+  ]
+}
