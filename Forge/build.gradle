@@ -14,8 +14,6 @@ apply plugin: "net.minecraftforge.gradle"
 apply plugin: "org.spongepowered.mixin"
 apply plugin: "eclipse"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
 repositories {
     maven { url "https://repo.spongepowered.org/maven" }
     maven { url = "https://maven.fabricmc.net/" }
