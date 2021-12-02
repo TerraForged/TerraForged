@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
+import com.terraforged.mod.worldgen.terrain.TerrainCache;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import com.terraforged.mod.worldgen.util.ChunkUtil;
@@ -40,7 +41,7 @@ public class Generator extends ChunkGenerator {
     protected final StructureConfig structureConfig;
     protected final BiomeGenerator biomeGenerator;
     protected final NoiseGenerator noiseGenerator;
-    protected final GeneratorCache terrainCache;
+    protected final TerrainCache terrainCache;
     protected final ChunkGenerator vanillaGenerator;
     protected final ChunkGenerator structureGenerator;
 
@@ -59,7 +60,7 @@ public class Generator extends ChunkGenerator {
         this.structureConfig = structureConfig;
         this.biomeGenerator = biomeGenerator;
         this.noiseGenerator = noiseGenerator;
-        this.terrainCache = new GeneratorCache(levels, noiseGenerator);
+        this.terrainCache = new TerrainCache(levels, noiseGenerator);
         this.structureGenerator = new DelegateGenerator(seed, this, structureConfig) {};
     }
 
