@@ -37,7 +37,7 @@ import net.minecraft.core.Registry;
 public class Common extends Init {
     public static final Common INSTANCE = new Common();
 
-    private Common() {}
+    Common() {}
 
     @Override
     protected void doInit() {

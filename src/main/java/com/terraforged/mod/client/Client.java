@@ -31,7 +31,7 @@ import com.terraforged.mod.util.Init;
 public class Client extends Init {
     public static final Client INSTANCE = new Client();
 
-    private Client() {}
+    Client() {}
 
     @Override
     protected void doInit() {

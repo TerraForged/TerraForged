@@ -30,7 +30,10 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.nio.file.*;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -98,13 +101,5 @@ public class FileUtil {
 
     public interface FileSystemVisitor {
         void visit(FileSystem fs, Path root, Path path) throws IOException;
-    }
-
-    public static void main(String[] args) throws IOException {
-        var dir = Paths.get("C:\\Users\\Rob\\IdeaProjects\\TerraForged\\src-common\\resources");
-        var zip = Paths.get("C:\\Users\\Rob\\AppData\\Roaming\\.minecraft\\mods\\TerraForged-terraforged.jar");
-
-        FileUtil.createZipCopy(dir, "resources/default", Paths.get("dir.zip"));
-        FileUtil.createZipCopy(zip, "resources/default", Paths.get("zip.zip"));
     }
 }
