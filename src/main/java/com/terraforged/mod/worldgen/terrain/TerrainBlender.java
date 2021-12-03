@@ -25,9 +25,9 @@
 package com.terraforged.mod.worldgen.terrain;
 
 import com.terraforged.engine.world.terrain.Terrain;
-import com.terraforged.mod.registry.Seedable;
 import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.util.map.WeightMap;
+import com.terraforged.mod.util.seed.Seedable;
 import com.terraforged.mod.worldgen.asset.TerrainConfig;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.domain.Domain;

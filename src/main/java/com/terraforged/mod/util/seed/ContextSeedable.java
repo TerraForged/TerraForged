@@ -22,8 +22,22 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.registry;
+package com.terraforged.mod.util.seed;
 
-public interface Seedable<T> {
-    T withSeed(long seed);
+import com.terraforged.cereal.Cereal;
+import com.terraforged.cereal.spec.Context;
+
+public interface ContextSeedable<T> extends Seedable<T> {
+    default <V> V withSeed(long seed, V value, Class<V> type) {
+        try {
+            var data = Cereal.serialize(value);
+
+            var context = new Context();
+            context.getData().add("seed", seed);
+
+            return Cereal.deserialize(data.asObj(), type, context);
+        } catch (Throwable t) {
+            throw new Error("Failed to reseed value: " + value, t);
+        }
+    }
 }

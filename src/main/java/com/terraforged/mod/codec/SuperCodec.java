@@ -75,7 +75,13 @@ public record SuperCodec<V>(Class<V> type, Supplier<Void> validator) implements 
         });
     }
 
+    private static final Supplier<Void> NOOP_VALIDATOR = () -> null;
+
     public static <T> SuperCodec<T> of(Class<T> type) {
         return new SuperCodec<>(type, getValidator(type));
+    }
+
+    public static <T> SuperCodec<T> withoutValidator(Class<T> type) {
+        return new SuperCodec<>(type, NOOP_VALIDATOR);
     }
 }

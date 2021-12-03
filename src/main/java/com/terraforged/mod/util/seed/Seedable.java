@@ -22,25 +22,16 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.registry;
+package com.terraforged.mod.util.seed;
 
 import com.terraforged.cereal.spec.Context;
-import com.terraforged.cereal.spec.DataSpec;
 
-public interface DataSeedable<T> extends Seedable<T> {
-    DataSpec<T> getSpec();
+public interface Seedable<T> {
+    T withSeed(long seed);
 
-    @Override
-    default T withSeed(long seed) {
-        try {
-            var data = getSpec().serialize(this);
-
-            var context = new Context();
-            context.getData().add("seed", seed);
-
-            return getSpec().deserialize(data.asObj(), context);
-        } catch (Throwable t) {
-            throw new Error("Failed to reseed object: " + this, t);
-        }
+    static Context context(long seed) {
+        var context = new Context();
+        context.getData().add("seed", seed);
+        return context;
     }
 }
