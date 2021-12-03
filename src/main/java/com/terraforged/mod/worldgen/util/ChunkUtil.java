@@ -27,7 +27,11 @@ package com.terraforged.mod.worldgen.util;
 import com.terraforged.mod.worldgen.terrain.StructureTerrain;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.QuartPos;
 import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -36,6 +40,43 @@ import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 public class ChunkUtil {
+    protected static final ThreadLocal<Biome[]> BIOME_BUFFER_2D = ThreadLocal.withInitial(() -> new Biome[4 * 4]);
+
+    public static void fillNoiseBiomes(ChunkAccess chunk, BiomeSource source, Climate.Sampler sampler) {
+        var pos = chunk.getPos();
+        int biomeX = QuartPos.fromBlock(pos.getMinBlockX());
+        int biomeZ = QuartPos.fromBlock(pos.getMinBlockZ());
+        var heightAccessor = chunk.getHeightAccessorForGeneration();
+
+        var biomeBuffer = BIOME_BUFFER_2D.get();
+        for (int dz = 0; dz < 4; dz++) {
+            for (int dx = 0; dx < 4; dx++) {
+                var biome = source.getNoiseBiome(biomeX + dx, 0, biomeZ + dz, sampler);
+
+                biomeBuffer[dz << 2 | dx] = biome;
+            }
+        }
+
+        for(int i = heightAccessor.getMinSection(); i < heightAccessor.getMaxSection(); ++i) {
+            var chunkSection = chunk.getSection(chunk.getSectionIndexFromSectionY(i));
+            fillNoiseBiomes(chunkSection, biomeBuffer);
+        }
+    }
+
+    private static void fillNoiseBiomes(LevelChunkSection section, Biome[] biomeBuffer) {
+        var biomes = section.getBiomes();
+        biomes.acquire();
+        for (int dz = 0; dz < 4; dz++) {
+            for (int dx = 0; dx < 4; dx++) {
+                var biome = biomeBuffer[dz << 2 | dx];
+                for (int dy = 0; dy < 4; dy++) {
+                    biomes.getAndSetUnchecked(dx, dy, dz, biome);
+                }
+            }
+        }
+        biomes.release();
+    }
+
     public static void fillChunk(int seaLevel, ChunkAccess chunk, TerrainData terrainData, FillerBlock filler) {
         int max = Math.max(seaLevel, terrainData.getMax());
 

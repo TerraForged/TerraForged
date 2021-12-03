@@ -24,20 +24,21 @@
 
 package com.terraforged.mod.worldgen.terrain;
 
-import com.terraforged.mod.util.Timer;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
+import net.minecraft.Util;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.function.BiFunction;
 
 public class TerrainCache {
     private final TerrainGenerator generator;
-    private final Timer noiseTimer = new Timer("NOISE_GEN", 10, TimeUnit.SECONDS);
-    private final Map<ChunkPos, ForkJoinTask<TerrainData>> cache = new ConcurrentHashMap<>();
+    private final Map<ChunkPos, CompletableFuture<TerrainData>> cache = new ConcurrentHashMap<>();
 
     public TerrainCache(TerrainLevels levels, NoiseGenerator noiseGenerator) {
         this.generator = new TerrainGenerator(levels, noiseGenerator);
@@ -52,11 +53,6 @@ public class TerrainCache {
 
     public void hint(ChunkPos pos) {
         getAsync(pos);
-    }
-
-    public CompletableFuture<ChunkAccess> hint(ChunkAccess chunk) {
-        hint(chunk.getPos());
-        return CompletableFuture.completedFuture(chunk);
     }
 
     public int getHeight(int x, int z) {
@@ -75,25 +71,18 @@ public class TerrainCache {
         return task.join();
     }
 
-    public ForkJoinTask<TerrainData> getAsync(ChunkPos pos) {
+    public CompletableFuture<TerrainData> getAsync(ChunkPos pos) {
         return cache.computeIfAbsent(pos, this::compute);
     }
 
     public <T> CompletableFuture<ChunkAccess> combineAsync(Executor executor,
-                                                           ChunkAccess chunkAccess,
+                                                           ChunkAccess chunk,
                                                            BiFunction<ChunkAccess, TerrainData, ChunkAccess> function) {
 
-        return CompletableFuture.completedFuture(chunkAccess)
-                .thenApplyAsync(chunk -> function.apply(chunk, getNow(chunk.getPos())), executor);
+        return getAsync(chunk.getPos()).thenApplyAsync(terrainData -> function.apply(chunk, terrainData), executor);
     }
 
-    protected ForkJoinTask<TerrainData> compute(ChunkPos pos) {
-        return ForkJoinPool.commonPool().submit(() -> generate(pos));
-    }
-
-    protected TerrainData generate(ChunkPos pos) {
-        try (var timer = noiseTimer.start()) {
-            return generator.generate(pos);
-        }
+    protected CompletableFuture<TerrainData> compute(ChunkPos pos) {
+        return CompletableFuture.supplyAsync(() -> generator.generate(pos), Util.backgroundExecutor());
     }
 }

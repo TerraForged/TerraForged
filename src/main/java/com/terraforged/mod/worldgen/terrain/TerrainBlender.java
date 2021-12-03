@@ -26,14 +26,13 @@ package com.terraforged.mod.worldgen.terrain;
 
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.mod.util.MathUtil;
+import com.terraforged.mod.util.map.Object2FloatCache;
 import com.terraforged.mod.util.map.WeightMap;
 import com.terraforged.mod.util.seed.Seedable;
 import com.terraforged.mod.worldgen.asset.TerrainConfig;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.domain.Domain;
 import com.terraforged.noise.util.NoiseUtil;
-import it.unimi.dsi.fastutil.objects.Object2FloatMap;
-import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 
 public class TerrainBlender implements Module, Seedable<TerrainBlender> {
     private static final int REGION_SEED_OFFSET = 21491124;
@@ -78,7 +77,7 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
     public float getValue(float x, float z, Blender blender) {
         float rx = warp.getX(x, z) * frequency;
         float rz = warp.getY(x, z) * frequency;
-        getCell(regionSeed, rx, rz, jitter, blender);
+        getCell(regionSeed, x * frequency, z * frequency, jitter, blender);
         return blender.getValue(x, z, blending, terrains);
     }
 
@@ -88,21 +87,19 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
 
     public Terrain getTerrain(Blender blender) {
         float index = blender.getCentreNoiseIndex();
-        return terrains.getValue(index).type();
+        return terrains.getValue(index).terrain();
     }
 
     private static void getCell(int seed, float x, float z, float jitter, Blender blender) {
         int xr = NoiseUtil.floor(x);
         int zr = NoiseUtil.floor(z);
 
-        blender.sumDistance = 0;
         blender.closestIndex = 0;
         blender.closestIndex2 = 0;
 
         int nearestIndex = -1;
         int nearestIndex2 = -1;
 
-        float sumDistance = 0F;
         float nearestDistance = Float.MAX_VALUE;
         float nearestDistance2 = Float.MAX_VALUE;
 
@@ -116,8 +113,6 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
                 float px = cx + dx * jitter;
                 float pz = cz + dz * jitter;
                 float dist2 = NoiseUtil.dist2(x, z, px, pz);
-
-                sumDistance += dist2;
 
                 blender.hashes[i] = hash;
                 blender.distances[i] = dist2;
@@ -134,7 +129,6 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
             }
         }
 
-        blender.sumDistance = sumDistance;
         blender.closestIndex = nearestIndex;
         blender.closestIndex2 = nearestIndex2;
     }
@@ -142,57 +136,57 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
     public static class Blender {
         protected int closestIndex;
         protected int closestIndex2;
-        protected float sumDistance;
 
         protected final int[] hashes = new int[9];
         protected final float[] distances = new float[9];
-        protected final Object2FloatMap<TerrainConfig> cache = new Object2FloatOpenHashMap<>();
-
-        public Blender() {
-            cache.defaultReturnValue(Float.NaN);
-        }
-
-        public float getValue(float x, float z, float edge, WeightMap<TerrainConfig> terrains) {
-            float dist0 = distances[closestIndex];
-            float dist1 = distances[closestIndex2];
-
-            float distNoise = NoiseUtil.sqrt(dist0 / dist1);
-            float edgeNoise = 1 - distNoise;
-
-            if (edgeNoise >= edge) {
-                return getCentreValue(x, z, terrains);
-            } else {
-                float blendRange = getBlendRange(dist0, dist1, edge, edgeNoise);
-                return getBlendedValue(x, z, dist0, blendRange, terrains);
-            }
-        }
+        protected final Object2FloatCache<TerrainConfig> cache = new Object2FloatCache<>(9);
 
         public float getCentreNoiseIndex() {
             return getNoiseIndex(closestIndex);
         }
 
-        public float getCentreValue(float x, float z, WeightMap<TerrainConfig> terrains) {
-            float noise = getCentreNoiseIndex();
-            return terrains.getValue(noise).heightmap().getValue(x, z);
+        public float getDistance(int index) {
+            return NoiseUtil.sqrt(distances[index]);
         }
 
-        public float getBlendedValue(float x, float z, float nearest, float blendRange, WeightMap<TerrainConfig> terrains) {
-            float sumNoise = 0F;
-            float sumWeight = 0F;
+        public float getCentreValue(float x, float z, WeightMap<TerrainConfig> terrains) {
+            float noise = getCentreNoiseIndex();
+            return terrains.getValue(noise).noise().getValue(x, z);
+        }
 
+        public float getValue(float x, float z, float edge, WeightMap<TerrainConfig> terrains) {
+            float dist0 = getDistance(closestIndex);
+            float dist1 = getDistance(closestIndex2);
+            float edgeNoise = 1 - dist0 / dist1;
+
+            if (edgeNoise >= edge) {
+                return getCentreValue(x, z, terrains);
+            } else {
+                float blendRange = getBlendRange(dist0, dist1, edge, edgeNoise);
+                return getBlendedValue(x, z, dist0, dist1, blendRange, terrains);
+            }
+        }
+
+        public float getBlendedValue(float x, float z, float nearest, float nearest2, float blendRange, WeightMap<TerrainConfig> terrains) {
             cache.clear();
-            cache.defaultReturnValue(Float.NaN);
+
+            float sumNoise = getCacheValue(closestIndex, x, z, terrains);
+            float sumWeight = getWeight(nearest, nearest, blendRange);
+
+            float nearestWeight2 = getWeight(nearest2, nearest, blendRange);
+            if (nearestWeight2 > 0) {
+                sumNoise += getCacheValue(closestIndex2, x, z, terrains) * nearestWeight2;
+                sumWeight += nearestWeight2;
+            }
 
             for (int i = 0; i < 9; i++) {
-                float dist = distances[i] - nearest;
-                if (dist > blendRange) continue;
+                if (i == closestIndex || i == closestIndex2) continue;
 
-                float weight = 1 - dist / blendRange;
-                if (weight == 0F) continue;
-
-                float value = getCacheValue(i, x, z, terrains);
-                sumNoise += value * weight;
-                sumWeight += weight;
+                float weight = getWeight(getDistance(i), nearest, blendRange);
+                if (weight > 0) {
+                    sumNoise += getCacheValue(i, x, z, terrains) * weight;
+                    sumWeight += weight;
+                }
             }
 
             return NoiseUtil.clamp(sumNoise / sumWeight, 0, 1);
@@ -200,17 +194,19 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
 
         private float getBlendRange(float dist0, float dist1, float edge, float edgeNoise) {
             float alpha = edgeNoise / edge;
+            if (alpha == 0) return dist0 * edge;
+
             float mid = (dist0 + dist1) * 0.5F;
-            return ((mid - dist0) / alpha) * 2F;
+            return ((mid - dist0) / alpha);
         }
 
         private float getCacheValue(int index, float x, float z, WeightMap<TerrainConfig> terrains) {
             float noiseIndex = getNoiseIndex(index);
             var terrain = terrains.getValue(noiseIndex);
 
-            float value = cache.getFloat(terrain);
+            float value = cache.get(terrain);
             if (Float.isNaN(value)) {
-                value = terrain.heightmap().getValue(x, z);
+                value = terrain.noise().getValue(x, z);
                 cache.put(terrain, value);
             }
 
@@ -219,6 +215,12 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
 
         private float getNoiseIndex(int index) {
             return MathUtil.rand(hashes[index]);
+        }
+
+        private static float getWeight(float dist, float origin, float blendRange) {
+            float delta = dist - origin;
+            float weight = delta >= blendRange ? 0 : 1 - delta / blendRange;
+            return weight * weight;
         }
     }
 }

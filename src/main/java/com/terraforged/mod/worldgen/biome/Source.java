@@ -25,10 +25,9 @@
 package com.terraforged.mod.worldgen.biome;
 
 import com.mojang.serialization.Codec;
-import com.terraforged.engine.cell.Cell;
-import com.terraforged.engine.world.biome.type.BiomeType;
-import com.terraforged.engine.world.climate.ClimateModule;
-import com.terraforged.mod.util.map.WeightMap;
+import com.terraforged.engine.concurrent.cache.map.LoadBalanceLongMap;
+import com.terraforged.engine.concurrent.cache.map.LongMap;
+import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
@@ -36,28 +35,21 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 
-import java.util.Arrays;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class Source extends BiomeSource {
     public static final Codec<Source> CODEC = new SourceCodec();
 
     protected final long seed;
-    protected final ClimateModule climate;
-    protected final Map<BiomeType, WeightMap<Biome>> biomeMap;
-    protected final ThreadLocal<Cell> localCell = ThreadLocal.withInitial(Cell::new);
-
+    protected final BiomeGenerator biomeGenerator;
     protected final Registry<Biome> registry;
+    protected final LongMap<Biome> cache = creatBiomeCache();
 
     public Source(long seed, NoiseGenerator noise, Source other) {
         super(List.copyOf(other.possibleBiomes()));
         this.seed = seed;
         this.registry = other.registry;
-        this.biomeMap = other.biomeMap;
-        this.climate = createClimate(noise);
+        this.biomeGenerator = new BiomeGenerator(noise, other.registry, List.copyOf(other.possibleBiomes()));
     }
 
     public Source(long seed, NoiseGenerator noise, Registry<Biome> biomes) {
@@ -68,8 +60,7 @@ public class Source extends BiomeSource {
         super(biomes);
         this.seed = seed;
         this.registry = registry;
-        this.climate = createClimate(noise);
-        this.biomeMap = getBiomeMapping(registry, biomes);
+        this.biomeGenerator = new BiomeGenerator(noise, registry, biomes);
     }
 
     @Override
@@ -84,15 +75,7 @@ public class Source extends BiomeSource {
 
     @Override
     public Biome getNoiseBiome(int x, int y, int z, Climate.Sampler sampler) {
-        var cell = localCell.get().reset();
-        climate.apply(cell, x << 2, z << 2);
-
-        var biomes = biomeMap.get(cell.biome);
-        if (biomes == null) {
-            return registry.getOrThrow(Biomes.PLAINS);
-        }
-
-        return biomes.getValue(cell.biomeRegionId);
+        return cache.computeIfAbsent(PosUtil.pack(x, z), this::compute);
     }
 
     public Biome getCarvingBiome() {
@@ -103,37 +86,15 @@ public class Source extends BiomeSource {
         return registry;
     }
 
-    protected static ClimateModule createClimate(NoiseGenerator generator) {
-        if (generator == null) return null;
-        return new ClimateModule(generator.getContinent(), generator.getContinent().getContext());
+    protected Biome compute(long index) {
+        int x = PosUtil.unpackLeft(index) << 2;
+        int z = PosUtil.unpackRight(index) << 2;
+        return biomeGenerator.generate(x, z);
     }
 
-    protected static Map<BiomeType, WeightMap<Biome>> getBiomeMapping(Registry<Biome> registry, List<Biome> biomes) {
-        var types = getBiomeTypeMap(registry, biomes);
-        var mapping = new EnumMap<BiomeType, WeightMap<Biome>>(BiomeType.class);
-
-        for (var type : BiomeType.values()) {
-            var list = types.get(type);
-            if (list == null) continue;
-
-            var map = getWeightedMap(list);
-            mapping.put(type, map);
-        }
-
-        return mapping;
-    }
-
-    protected static WeightMap<Biome> getWeightedMap(List<Biome> biomes) {
-        var biome = biomes.toArray(Biome[]::new);
-        var weights = new float[biomes.size()];
-        Arrays.fill(weights, 1.0F);
-        return new WeightMap<>(biome, weights);
-    }
-
-    protected static Map<BiomeType, List<Biome>> getBiomeTypeMap(Registry<Biome> registry, List<Biome> biomes) {
-        return biomes.stream()
-                .sorted(BiomeUtils.getBiomeSorter(registry))
-                .collect(Collectors.groupingBy(BiomeUtils::getType));
+    protected static LongMap<Biome> creatBiomeCache() {
+        int factor = Runtime.getRuntime().availableProcessors();
+        return new LoadBalanceLongMap<>(factor, 1024);
     }
 
     public static class NoopSampler implements Climate.Sampler {

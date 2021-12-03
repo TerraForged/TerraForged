@@ -25,7 +25,7 @@
 package com.terraforged.mod.worldgen;
 
 import com.mojang.serialization.Codec;
-import com.terraforged.mod.worldgen.biome.BiomeGenerator;
+import com.terraforged.mod.worldgen.biome.BiomeComponents;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
 import com.terraforged.mod.worldgen.terrain.TerrainCache;
@@ -34,11 +34,14 @@ import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import com.terraforged.mod.worldgen.util.ChunkUtil;
 import com.terraforged.mod.worldgen.util.DelegateGenerator;
 import com.terraforged.mod.worldgen.util.StructureConfig;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.*;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.block.Blocks;
@@ -62,31 +65,30 @@ public class Generator extends ChunkGenerator {
     protected final long seed;
     protected final Source biomeSource;
     protected final TerrainLevels levels;
+    protected final VanillaGen vanillaGen;
     protected final StructureConfig structureConfig;
-    protected final BiomeGenerator biomeGenerator;
+    protected final BiomeComponents biomeGenerator;
     protected final NoiseGenerator noiseGenerator;
     protected final TerrainCache terrainCache;
-    protected final ChunkGenerator vanillaGenerator;
     protected final ChunkGenerator structureGenerator;
 
     public Generator(long seed,
                      TerrainLevels levels,
-                     ChunkGenerator vanilla,
+                     VanillaGen vanillaGen,
                      Source biomeSource,
-                     BiomeGenerator biomeGenerator,
+                     BiomeComponents biomeGenerator,
                      NoiseGenerator noiseGenerator,
                      StructureConfig structureConfig) {
         super(biomeSource, biomeSource, structureConfig.copy(), seed);
         this.seed = seed;
         this.levels = levels;
-        this.vanillaGenerator = vanilla;
+        this.vanillaGen = vanillaGen;
         this.biomeSource = biomeSource;
         this.structureConfig = structureConfig;
         this.biomeGenerator = biomeGenerator;
         this.noiseGenerator = noiseGenerator;
         this.terrainCache = new TerrainCache(levels, noiseGenerator);
         this.structureGenerator = new DelegateGenerator(seed, this, structureConfig) {};
-        Stage.reset();
     }
 
     public TerrainData getChunkData(ChunkPos pos) {
@@ -102,7 +104,8 @@ public class Generator extends ChunkGenerator {
     public ChunkGenerator withSeed(long seed) {
         var noiseGenerator = new NoiseGenerator(seed, levels, this.noiseGenerator);
         var biomeSource = new Source(seed, noiseGenerator, this.biomeSource);
-        return new Generator(seed, levels, vanillaGenerator, biomeSource, biomeGenerator, noiseGenerator, structureConfig);
+        var vanillaGen = new VanillaGen(seed, biomeSource, this.vanillaGen);
+        return new Generator(seed, levels, vanillaGen, biomeSource, biomeGenerator, noiseGenerator, structureConfig);
     }
 
     @Override
@@ -148,19 +151,22 @@ public class Generator extends ChunkGenerator {
     @Override
     public void createStructures(RegistryAccess access, StructureFeatureManager structureFeatures, ChunkAccess chunk, StructureManager structures, long seed) {
         terrainCache.hint(chunk.getPos());
-
-        try (var timer = Stage.STRUCTURE_STARTS.start()) {
-            structureGenerator.createStructures(access, structureFeatures, chunk, structures, seed);
-        }
+        structureGenerator.createStructures(access, structureFeatures, chunk, structures, seed);
     }
 
     @Override
     public void createReferences(WorldGenLevel level, StructureFeatureManager structureFeatures, ChunkAccess chunk) {
         terrainCache.hint(chunk.getPos());
+        structureGenerator.createReferences(level, structureFeatures, chunk);
+    }
 
-        try (var timer = Stage.STRUCTURE_REFS.start()) {
-            structureGenerator.createReferences(level, structureFeatures, chunk);
-        }
+    @Override
+    public CompletableFuture<ChunkAccess> createBiomes(Registry<Biome> registry, Executor executor, Blender blender, StructureFeatureManager structures, ChunkAccess chunk) {
+        terrainCache.hint(chunk.getPos());
+        return CompletableFuture.supplyAsync(() -> {
+            ChunkUtil.fillNoiseBiomes(chunk, biomeSource, climateSampler());
+            return chunk;
+        }, Util.backgroundExecutor());
     }
 
     @Override
@@ -175,32 +181,24 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public void buildSurface(WorldGenRegion region, StructureFeatureManager structures, ChunkAccess chunk) {
-        try (var timer = Stage.SURFACE.start()) {
-            biomeGenerator.getSurfaceDecorator().decorate(chunk, this);
-//            vanilla.buildSurface(region, structures, chunk);
-        }
+        vanillaGen.buildSurface(region, structures, chunk, this);
     }
 
     @Override
     public void applyCarvers(WorldGenRegion region, long seed, BiomeManager biomes, StructureFeatureManager structures, ChunkAccess chunk, GenerationStep.Carving stage) {
-        try (var timer = Stage.CARVER.start()) {
-//            vanilla.applyCarvers(region, seed, biomes, structures, chunk, stage);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+        vanillaGen.getVanillaGenerator().applyCarvers(region, seed, biomes, structures, chunk, stage);
     }
 
     @Override
     public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk, StructureFeatureManager structures) {
-        try (var timer = Stage.DECORATION.start()) {
-            biomeGenerator.getFeatureDecorator().decorate(chunk, level, structures, this);
-            terrainCache.drop(chunk.getPos());
-        }
+//        vanillaGen.getVanillaGenerator().applyBiomeDecoration(level, chunk, structures);
+        biomeGenerator.getFeatureDecorator().decorate(chunk, level, structures, this);
+        terrainCache.drop(chunk.getPos());
     }
 
     @Override
     public void spawnOriginalMobs(WorldGenRegion region) {
-//        vanilla.spawnOriginalMobs(region);
+        vanillaGen.getVanillaGenerator().spawnOriginalMobs(region);
     }
 
     @Override

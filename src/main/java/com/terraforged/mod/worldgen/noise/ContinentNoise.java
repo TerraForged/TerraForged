@@ -29,6 +29,8 @@ import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.GeneratorContext;
 import com.terraforged.engine.world.continent.advanced.AdvancedContinentGenerator;
 import com.terraforged.engine.world.heightmap.ControlPoints;
+import com.terraforged.engine.world.terrain.Terrain;
+import com.terraforged.engine.world.terrain.TerrainType;
 import com.terraforged.noise.source.Line;
 import com.terraforged.noise.util.NoiseUtil;
 import com.terraforged.noise.util.Vec2f;
@@ -122,6 +124,7 @@ public class ContinentNoise extends AdvancedContinentGenerator {
         if (shouldSkip(cellX, cellY)) {
             sample.continentNoise = -1;
             sample.continentCentre = 0;
+            sample.terrainType = TerrainType.NONE;
             return;
         }
 
@@ -130,11 +133,11 @@ public class ContinentNoise extends AdvancedContinentGenerator {
 
         sample.continentNoise = getDistanceValue(x, y, cellX, cellY, nearest);
         sample.continentCentre = PosUtil.pack(continentX, continentZ);
+        sample.terrainType = getTerrainType(sample);
     }
 
     public void sampleRiver(float x, float z, NoiseSample sample, RiverCache cache) {
-        if (sample.continentNoise <= 0)
-            return;
+        if (sample.continentNoise <= 0) return;
 
         x += offsetX;
         z += offsetZ;
@@ -149,5 +152,18 @@ public class ContinentNoise extends AdvancedContinentGenerator {
         sample.heightNoise = cell.value;
         sample.terrainType = cell.terrain;
         sample.riverNoise = cell.riverMask;
+    }
+
+    private Terrain getTerrainType(NoiseSample sample) {
+        if (sample.continentNoise < controlPoints.shallowOcean) {
+            return TerrainType.DEEP_OCEAN;
+        }
+        if (sample.continentNoise < controlPoints.beach) {
+            return TerrainType.SHALLOW_OCEAN;
+        }
+        if (sample.continentNoise < controlPoints.coastMarker) {
+            return TerrainType.COAST;
+        }
+        return TerrainType.NONE;
     }
 }

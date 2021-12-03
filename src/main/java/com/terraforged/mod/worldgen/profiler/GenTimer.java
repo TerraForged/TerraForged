@@ -22,41 +22,16 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen;
+package com.terraforged.mod.worldgen.profiler;
 
-import com.terraforged.mod.util.Timer;
-
-import java.util.concurrent.TimeUnit;
-
-public enum Stage {
-    STRUCTURE_STARTS,
-    STRUCTURE_REFS,
-    BIOMES,
-    FILL,
-    SURFACE,
-    CARVER,
-    DECORATION,
-    ;
-
-    private static final Stage[] STAGES = values();
-
-    private final Timer timer;
-
-    Stage() {
-        timer = new Timer(name(), 5, TimeUnit.SECONDS);
+public record GenTimer(GenStage stage, long start) {
+    public void punchOut() {
+        long now = System.nanoTime();
+        stage.push(now - start);
     }
 
-    public Timer timer() {
-        return timer;
-    }
-
-    public Timer.Instance start() {
-        return timer.start();
-    }
-
-    public static void reset() {
-        for (var stage : STAGES) {
-            stage.timer.reset();
-        }
+    public <T> T punchOut(T t) {
+        punchOut();
+        return t;
     }
 }

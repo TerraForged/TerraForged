@@ -28,9 +28,11 @@ import com.google.common.base.Suppliers;
 import com.mojang.serialization.DynamicOps;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.worldgen.Generator;
+import com.terraforged.mod.worldgen.profiler.GeneratorProfiler;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.RegistryReadOps;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
 
 import java.lang.reflect.Field;
@@ -41,19 +43,33 @@ import java.util.function.Supplier;
 public class RegistryUtil {
     public static MappedRegistry<LevelStem> reseed(long seed, MappedRegistry<LevelStem> registry) {
         var overworld = registry.getOrThrow(LevelStem.OVERWORLD);
+        var generator = overworld.generator();
 
-        if (overworld.generator() instanceof Generator) {
-            var generator = overworld.generator().withSeed(seed);
-            if (generator == overworld.generator()) return registry;
-
-            var lifecycle = registry.lifecycle(overworld);
-            var levelStem = new LevelStem(overworld.typeSupplier(), generator);
-            registry.registerOrOverride(OptionalInt.empty(), LevelStem.OVERWORLD, levelStem, lifecycle);
-
+        if (generator instanceof Generator) {
+            generator = generator.withSeed(seed);
             TerraForged.LOG.info("Re-seeded TerraForged generator: {}", seed);
         }
 
+        generator = withProfiler(generator);
+
+        if (generator == overworld.generator()) return registry;
+
+        var lifecycle = registry.lifecycle(overworld);
+        var levelStem = new LevelStem(overworld.typeSupplier(), generator);
+        registry.registerOrOverride(OptionalInt.empty(), LevelStem.OVERWORLD, levelStem, lifecycle);
+
+        if (GeneratorProfiler.PROFILING.get()) {
+            TerraForged.LOG.info("Attached generator profiler");
+        }
+
         return registry;
+    }
+
+    public static ChunkGenerator withProfiler(ChunkGenerator generator) {
+        if (GeneratorProfiler.PROFILING.get()) {
+            return GeneratorProfiler.wrap(generator);
+        }
+        return generator;
     }
 
     public static Optional<RegistryAccess> getAccess(DynamicOps<?> ops) {

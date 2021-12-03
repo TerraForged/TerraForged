@@ -39,6 +39,10 @@ public class WeightMap<T> {
         this.sumWeight = MathUtil.sum(weights) * MathUtil.EPSILON;
     }
 
+    public boolean isEmpty() {
+        return values.length == 0;
+    }
+
     public T[] getValues() {
         return values;
     }

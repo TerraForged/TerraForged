@@ -67,6 +67,10 @@ public class NoiseGenerator {
         this.controlPoints = continent.getControlPoints();
     }
 
+    public NoiseLevels getLevels() {
+        return levels;
+    }
+
     public float getHeightNoise(int x, int z) {;
         return getNoiseSample(x, z).heightNoise;
     }
@@ -159,7 +163,7 @@ public class NoiseGenerator {
     }
 
     protected Terrain getTerrain(float value, TerrainBlender.Blender blender) {
-        if (value <= levels.heightMin) return TerrainType.DEEP_OCEAN;
+        if (value <= levels.heightMin) return TerrainType.SHALLOW_OCEAN;
 
         return land.getTerrain(blender);
     }
@@ -169,7 +173,7 @@ public class NoiseGenerator {
     }
 
     protected static TerrainBlender createLandTerrain(long seed, RegistryAccess access) {
-        return new TerrainBlender(seed, 400, 0.8F, 0.65F, getTerrain(access));
+        return new TerrainBlender(seed, 400, 0.8F, 1F, getTerrain(access));
     }
 
     protected static ContinentNoise createContinentNoise(long seed, TerrainLevels levels) {
@@ -180,7 +184,6 @@ public class NoiseGenerator {
         settings.rivers.riverCount = 7;
 
         var context = new GeneratorContext(settings);
-
         return new ContinentNoise(context.seed, context);
     }
 

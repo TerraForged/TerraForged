@@ -32,6 +32,7 @@ import com.terraforged.mod.worldgen.asset.BiomeTag;
 import com.terraforged.mod.worldgen.asset.TerrainConfig;
 import com.terraforged.mod.worldgen.asset.ViabilityConfig;
 import com.terraforged.mod.worldgen.biome.Source;
+import com.terraforged.mod.worldgen.profiler.GeneratorProfiler;
 import net.minecraft.core.Registry;
 
 public class Common extends Init {
@@ -44,6 +45,7 @@ public class Common extends Init {
         TerraForged.LOG.info("Registering world-gen core codecs");
         Registry.register(Registry.BIOME_SOURCE, TerraForged.location("climate"), Source.CODEC);
         Registry.register(Registry.CHUNK_GENERATOR, TerraForged.location("generator"), Generator.CODEC);
+        Registry.register(Registry.CHUNK_GENERATOR, TerraForged.location("profiler"), GeneratorProfiler.CODEC);
 
         TerraForged.LOG.info("Registering world-gen component codecs");
         GenRegistry.register(ModRegistry.BIOME_TAG, BiomeTag.DIRECT_CODEC);
@@ -52,5 +54,7 @@ public class Common extends Init {
 
         TerraForged.LOG.info("Registering world-gen registry extensions");
         GenRegistry.commit();
+
+        TerraForged.dump();
     }
 }
