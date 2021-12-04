@@ -36,8 +36,8 @@ import java.util.List;
 public class SurfaceRegion extends DelegateRegion {
     protected final BiomeManager biomeManager;
 
-    public SurfaceRegion(ServerLevel level, List<ChunkAccess> chunks, ChunkStatus status, int radius) {
-        super(level, chunks, status, radius);
+    public SurfaceRegion(ServerLevel level, List<ChunkAccess> chunks, ChunkStatus status) {
+        super(level, chunks, status);
         this.biomeManager = SurfaceBiomeManager.assign(getCenter(), super.getBiomeManager());
     }
 

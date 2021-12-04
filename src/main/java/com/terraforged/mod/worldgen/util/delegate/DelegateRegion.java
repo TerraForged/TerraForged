@@ -35,22 +35,29 @@ import java.util.List;
 public class DelegateRegion extends WorldGenRegion {
     public static final ThreadLocal<Builder> LOCAL_BUILDER = ThreadLocal.withInitial(Builder::new);
 
-    public DelegateRegion(ServerLevel level, List<ChunkAccess> chunks, ChunkStatus status, int radius) {
-        super(level, chunks, status, radius);
+    public DelegateRegion(ServerLevel level, List<ChunkAccess> chunks, ChunkStatus status) {
+        super(level, chunks, status, getCutoffRadius(status));
     }
 
     public interface Factory<T extends WorldGenRegion> {
-        T build(ServerLevel level, List<ChunkAccess> chunks, ChunkStatus centerStatus, int radius);
+        T build(ServerLevel level, List<ChunkAccess> chunks, ChunkStatus centerStatus);
+    }
+
+    public static int getCutoffRadius(ChunkStatus status) {
+        int cutoff = 0;
+        if (status == ChunkStatus.STRUCTURE_REFERENCES) cutoff = -1;
+        else if (status == ChunkStatus.BIOMES) cutoff = -1;
+        else if (status == ChunkStatus.FEATURES) cutoff = 1;
+        else if (status == ChunkStatus.SPAWN) cutoff = -1;
+        return cutoff;
     }
 
     public static class Builder {
-        private int radius;
         private ServerLevel level;
         private ChunkStatus status;
         private final List<ChunkAccess> chunks = new ArrayList<>(17 * 17);
 
         public Builder source(WorldGenRegion region) {
-            this.radius = 0;
             this.chunks.clear();
             this.level = region.getLevel();
             this.status = ChunkStatus.EMPTY;
@@ -65,7 +72,6 @@ public class DelegateRegion extends WorldGenRegion {
 
                     var chunk = region.getChunk(cx, cz);
                     chunks.add(chunk);
-                    radius = Math.max(radius, dx);
 
                     if (dx == 0 && dz == 0) {
                         status = chunk.getStatus();
@@ -77,7 +83,7 @@ public class DelegateRegion extends WorldGenRegion {
         }
 
         public <T extends WorldGenRegion> T build(Factory<T> factory) {
-            return factory.build(level, chunks, status, radius);
+            return factory.build(level, chunks, status);
         }
     }
 }
