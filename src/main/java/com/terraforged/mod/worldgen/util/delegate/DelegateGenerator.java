@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.util;
+package com.terraforged.mod.worldgen.util.delegate;
 
 import com.mojang.serialization.Codec;
 import com.terraforged.mod.worldgen.Generator;

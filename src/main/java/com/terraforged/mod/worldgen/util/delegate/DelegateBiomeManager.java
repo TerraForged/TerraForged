@@ -22,30 +22,46 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.mixin.common;
+package com.terraforged.mod.worldgen.util.delegate;
 
-import com.terraforged.mod.registry.GenRegistry;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceKey;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeManager;
 
-import java.util.Map;
+public class DelegateBiomeManager extends BiomeManager {
+    protected BiomeManager delegate;
 
-@Mixin(RegistryAccess.RegistryHolder.class)
-public class MixinRegistryHolder {
+    public DelegateBiomeManager() {
+        super(null, 0L);
+    }
 
-    @ModifyVariable(
-            method = "<init>(Ljava/util/Map;)V",
-            at = @At("HEAD"),
-            ordinal = 0
-    )
-    private static Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> onInit(
-            Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> registries) {
+    protected void set(BiomeManager biomeManager) {
+        this.delegate = biomeManager;
+    }
 
-        return GenRegistry.INSTANCE.extend(registries);
+    @Override
+    public BiomeManager withDifferentSource(NoiseBiomeSource p_186688_) {
+        delegate = delegate.withDifferentSource(p_186688_);
+        return this;
+    }
+
+    @Override
+    public Biome getBiome(BlockPos pos) {
+        return delegate.getBiome(pos);
+    }
+
+    @Override
+    public Biome getNoiseBiomeAtPosition(double x, double y, double z) {
+        return delegate.getNoiseBiomeAtPosition(x, y, z);
+    }
+
+    @Override
+    public Biome getNoiseBiomeAtPosition(BlockPos pos) {
+        return delegate.getNoiseBiomeAtPosition(pos);
+    }
+
+    @Override
+    public Biome getNoiseBiomeAtQuart(int x, int y, int z) {
+        return delegate.getNoiseBiomeAtQuart(x, y, z);
     }
 }

@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataPackExporter {
-    private static final String PACK = "file/" + TerraForged.TITLE;
+    private static final String PACK = "file/" + TerraForged.TITLE + ".zip";
 
     public static DataPackConfig setup(@Nullable Path dir, DataPackConfig config) {
         if (dir == null) throw new NullPointerException("Dir is null!");

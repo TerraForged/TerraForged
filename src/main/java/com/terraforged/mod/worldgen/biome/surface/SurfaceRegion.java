@@ -22,20 +22,33 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.mixin.common;
+package com.terraforged.mod.worldgen.biome.surface;
 
-import com.terraforged.mod.registry.GenRegistry;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.RegistryReadOps;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import com.terraforged.mod.worldgen.util.delegate.DelegateRegion;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.level.biome.BiomeManager;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
 
-@Mixin(RegistryAccess.class)
-public class MixinRegistryAccess {
-    @Inject(method = "load", at = @At("RETURN"))
-    private static void onLoad(RegistryAccess access, RegistryReadOps<?> ops, CallbackInfo ci) {
-        GenRegistry.INSTANCE.load(access, ops);
+import java.util.List;
+
+public class SurfaceRegion extends DelegateRegion {
+    protected final BiomeManager biomeManager;
+
+    public SurfaceRegion(ServerLevel level, List<ChunkAccess> chunks, ChunkStatus status, int radius) {
+        super(level, chunks, status, radius);
+        this.biomeManager = SurfaceBiomeManager.assign(getCenter(), super.getBiomeManager());
+    }
+
+    @Override
+    public BiomeManager getBiomeManager() {
+        return biomeManager;
+    }
+
+    public static SurfaceRegion wrap(WorldGenRegion region) {
+        var builder = DelegateRegion.LOCAL_BUILDER.get();
+        builder.source(region);
+        return builder.build(SurfaceRegion::new);
     }
 }

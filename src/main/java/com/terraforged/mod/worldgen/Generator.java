@@ -32,8 +32,8 @@ import com.terraforged.mod.worldgen.terrain.TerrainCache;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import com.terraforged.mod.worldgen.util.ChunkUtil;
-import com.terraforged.mod.worldgen.util.DelegateGenerator;
 import com.terraforged.mod.worldgen.util.StructureConfig;
+import com.terraforged.mod.worldgen.util.delegate.DelegateGenerator;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -93,6 +93,10 @@ public class Generator extends ChunkGenerator {
 
     public TerrainData getChunkData(ChunkPos pos) {
         return terrainCache.getNow(pos);
+    }
+
+    public CompletableFuture<TerrainData> getChunkDataAsync(ChunkPos pos) {
+        return terrainCache.getAsync(pos);
     }
 
     @Override
@@ -182,6 +186,7 @@ public class Generator extends ChunkGenerator {
     @Override
     public void buildSurface(WorldGenRegion region, StructureFeatureManager structures, ChunkAccess chunk) {
         vanillaGen.buildSurface(region, structures, chunk, this);
+        biomeGenerator.getSurfaceDecorator().decorate(chunk, this);
     }
 
     @Override

@@ -24,6 +24,8 @@
 
 package com.terraforged.mod.worldgen;
 
+import com.terraforged.mod.worldgen.biome.surface.SurfaceChunk;
+import com.terraforged.mod.worldgen.biome.surface.SurfaceRegion;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.StructureFeatureManager;
@@ -55,7 +57,9 @@ public class VanillaGen {
         return vanillaGenerator;
     }
 
-    public void buildSurface(WorldGenRegion region, StructureFeatureManager structures, ChunkAccess chunk, ChunkGenerator generator) {
+    public void buildSurface(WorldGenRegion region, StructureFeatureManager structures, ChunkAccess chunk, Generator generator) {
+        region = SurfaceRegion.wrap(region);
+        chunk = SurfaceChunk.assign(chunk, generator.getChunkDataAsync(chunk.getPos()));
         vanillaGenerator.buildSurface(region, structures, chunk);
     }
 }

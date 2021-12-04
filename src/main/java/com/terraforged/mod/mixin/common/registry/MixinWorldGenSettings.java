@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.mixin.common;
+package com.terraforged.mod.mixin.common.registry;
 
 import com.terraforged.mod.util.RegistryUtil;
 import net.minecraft.core.MappedRegistry;
