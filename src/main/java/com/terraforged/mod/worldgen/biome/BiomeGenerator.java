@@ -30,6 +30,7 @@ import com.terraforged.engine.world.climate.ClimateModule;
 import com.terraforged.engine.world.terrain.TerrainType;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.util.map.WeightMap;
+import com.terraforged.mod.worldgen.biome.util.BiomeUtil;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
 import com.terraforged.mod.worldgen.noise.RiverCache;
@@ -151,8 +152,8 @@ public class BiomeGenerator {
 
     protected static Map<BiomeType, List<Biome>> getBiomeTypeMap(Registry<Biome> registry, List<Biome> biomes) {
         return biomes.stream()
-                .sorted(BiomeUtils.getBiomeSorter(registry))
-                .collect(Collectors.groupingBy(BiomeUtils::getType));
+                .sorted(BiomeUtil.getBiomeSorter(registry))
+                .collect(Collectors.groupingBy(BiomeUtil::getType));
     }
 
     protected static class ClimateSample extends NoiseSample {

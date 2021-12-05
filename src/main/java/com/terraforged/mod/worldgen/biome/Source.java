@@ -28,6 +28,7 @@ import com.mojang.serialization.Codec;
 import com.terraforged.engine.concurrent.cache.map.LoadBalanceLongMap;
 import com.terraforged.engine.concurrent.cache.map.LongMap;
 import com.terraforged.engine.util.pos.PosUtil;
+import com.terraforged.mod.worldgen.biome.util.BiomeUtil;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
@@ -53,7 +54,7 @@ public class Source extends BiomeSource {
     }
 
     public Source(long seed, NoiseGenerator noise, Registry<Biome> biomes) {
-        this(seed, noise, biomes, BiomeUtils.getOverworldBiomes(biomes));
+        this(seed, noise, biomes, BiomeUtil.getOverworldBiomes(biomes));
     }
 
     public Source(long seed, NoiseGenerator noise, Registry<Biome> registry, List<Biome> biomes) {

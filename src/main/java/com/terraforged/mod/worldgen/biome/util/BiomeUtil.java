@@ -22,19 +22,31 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.biome;
+package com.terraforged.mod.worldgen.biome.util;
 
 import com.terraforged.engine.world.biome.type.BiomeType;
+import com.terraforged.mod.TerraForged;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
-public class BiomeUtils {
+public class BiomeUtil {
+    private static final Map<BiomeType, ResourceLocation> TYPE_NAMES = new EnumMap<>(BiomeType.class);
+
+    static {
+        for (var type : BiomeType.values()) {
+            TYPE_NAMES.put(type, TerraForged.location(type.name().toLowerCase(Locale.ROOT)));
+        }
+    }
+
+    public static ResourceLocation getRegistryName(BiomeType type) {
+        return TYPE_NAMES.get(type);
+    }
+
     public static List<Biome> getOverworldBiomes(RegistryAccess access) {
         return getOverworldBiomes(access.registryOrThrow(Registry.BIOME_REGISTRY));
     }
