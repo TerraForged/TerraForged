@@ -32,7 +32,10 @@ import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.ClipBlockStateContext;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeResolver;
 import net.minecraft.world.level.biome.Climate;
@@ -363,11 +366,6 @@ public abstract class DelegateChunk extends ChunkAccess {
     @Override
     public LevelHeightAccessor getHeightAccessorForGeneration() {
         return delegate.getHeightAccessorForGeneration();
-    }
-
-    @Override
-    public LevelAccessor getWorldForge() {
-        return delegate.getWorldForge();
     }
 
     @Override
