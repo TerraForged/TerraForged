@@ -47,6 +47,7 @@ minecraft {
             property "forge.logging.markers", "REGISTRIES"
             property "forge.logging.console.level", "debug"
             arg "-mixin.config=terraforged.mixins.json"
+            jvmArgs "-Dprofiling"
             mods {
                 examplemod {
                     source sourceSets.main

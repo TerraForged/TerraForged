@@ -50,7 +50,9 @@ public class RegistryUtil {
             TerraForged.LOG.info("Re-seeded TerraForged generator: {}", seed);
         }
 
-        generator = withProfiler(generator);
+        if (Environment.PROFILING) {
+            generator = withProfiler(generator);
+        }
 
         if (generator == overworld.generator()) return registry;
 

@@ -32,19 +32,22 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ProfilerStages {
     private static final long INTERVAL_MS = TimeUnit.SECONDS.toMillis(10);
 
-    public final GenStage starts = new GenStage("starts");
-    public final GenStage refs = new GenStage("refs");
-    public final GenStage biomes = new GenStage("biomes");
-    public final GenStage noise = new GenStage("noise");
-    public final GenStage carve = new GenStage("carve");
-    public final GenStage surface = new GenStage("surface");
+    // @formatter:off
+    public final GenStage starts     = new GenStage("starts    ");
+    public final GenStage refs       = new GenStage("refs      ");
+    public final GenStage biomes     = new GenStage("biomes    ");
+    public final GenStage noise      = new GenStage("noise/fill");
+    public final GenStage carve      = new GenStage("carve     ");
+    public final GenStage surface    = new GenStage("surface   ");
     public final GenStage decoration = new GenStage("decoration");
+    // @formatter:on
 
     private final long start = System.currentTimeMillis() + INTERVAL_MS * 2;
     private final AtomicLong timestamp = new AtomicLong(0);
     private final GenStage[] stages = {starts, refs, biomes, noise, carve, surface, decoration};
 
     public void reset() {
+        timestamp.set(0L);
         for (var stage : stages) {
             stage.reset();
         }
@@ -55,13 +58,14 @@ public class ProfilerStages {
         long now = System.currentTimeMillis();
 
         if (time == 0L) {
-            timestamp.set(now + INTERVAL_MS);
+            timestamp.set(now + INTERVAL_MS * 2);
             if (now > start) reset();
             return;
         }
 
         if (now > time && timestamp.compareAndSet(time, now + INTERVAL_MS)) {
             TerraForged.LOG.info("Timings:");
+
             double sumAverage = 0;
             for (var stage : stages) {
                 double average = stage.getAverageMS();

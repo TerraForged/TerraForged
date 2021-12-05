@@ -28,6 +28,7 @@ import com.google.common.base.Suppliers;
 import com.google.gson.GsonBuilder;
 import com.mojang.serialization.JsonOps;
 import com.terraforged.mod.platform.Platform;
+import com.terraforged.mod.util.Environment;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -50,6 +51,7 @@ public abstract class TerraForged implements Platform {
 	protected TerraForged(Supplier<Path> containerGetter) {
 		this.container = Suppliers.memoize(containerGetter::get);
 		Platform.ACTIVE_PLATFORM.set(this);
+		Environment.log();
 	}
 
 	@Override
