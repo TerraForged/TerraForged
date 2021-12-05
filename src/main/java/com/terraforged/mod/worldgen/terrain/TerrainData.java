@@ -30,7 +30,9 @@ import com.terraforged.mod.util.map.ObjectMap;
 import com.terraforged.mod.worldgen.noise.NoiseData;
 import com.terraforged.noise.util.NoiseUtil;
 
-public class TerrainData {
+import java.util.function.Consumer;
+
+public class TerrainData implements Consumer<NoiseData> {
     protected final TerrainLevels levels;
     protected final FloatMap height = new FloatMap();
     protected final FloatMap gradient = new FloatMap();
@@ -72,7 +74,8 @@ public class TerrainData {
         return NoiseUtil.clamp(grad * norm, 0, 1);
     }
 
-    public void assign(NoiseData noiseData) {
+    @Override
+    public void accept(NoiseData noiseData) {
         var noiseMap = noiseData.getHeight();
         var terrainMap = noiseData.getTerrain();
 

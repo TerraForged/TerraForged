@@ -25,6 +25,7 @@
 package com.terraforged.mod.util.map;
 
 import java.util.function.IntFunction;
+import java.util.function.Supplier;
 
 public class ObjectMap<T> {
     private final Index index;
@@ -59,5 +60,11 @@ public class ObjectMap<T> {
 
     public void set(int index, T value) {
         data[index] = value;
+    }
+
+    public void fill(Supplier<T> supplier) {
+        for (int i = 0; i < data.length; i++) {
+            data[i] = supplier.get();
+        }
     }
 }

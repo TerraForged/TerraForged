@@ -33,10 +33,6 @@ public class TerrainGenerator {
     protected final NoiseGenerator noiseGenerator;
     protected final ObjectPool<TerrainData> terrainDataPool;
 
-    public TerrainGenerator(NoiseGenerator generator) {
-        this(TerrainLevels.DEFAULT, generator);
-    }
-
     public TerrainGenerator(TerrainLevels levels, NoiseGenerator noiseGenerator) {
         this.levels = levels;
         this.noiseGenerator = noiseGenerator;
@@ -56,9 +52,8 @@ public class TerrainGenerator {
     }
 
     public TerrainData generate(ChunkPos chunkPos) {
-        var noiseData = noiseGenerator.generate(chunkPos);
         var terrainData = terrainDataPool.take();
-        terrainData.assign(noiseData);
+        noiseGenerator.generate(chunkPos, terrainData);
         return terrainData;
     }
 
