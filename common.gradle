@@ -1,5 +1,5 @@
 group = mod_group
-version = mod_version
+version = mod_version + "-alpha"
 
 configurations {
     library

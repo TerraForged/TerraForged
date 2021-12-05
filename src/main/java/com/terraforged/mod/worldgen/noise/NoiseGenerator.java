@@ -161,7 +161,7 @@ public class NoiseGenerator {
     }
 
     protected Terrain getTerrain(float value, TerrainBlender.Blender blender) {
-        if (value <= levels.heightMin) return TerrainType.SHALLOW_OCEAN;
+        if (value < levels.heightMin) return TerrainType.SHALLOW_OCEAN;
 
         return land.getTerrain(blender);
     }

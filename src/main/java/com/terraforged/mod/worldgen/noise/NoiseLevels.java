@@ -37,7 +37,7 @@ public class NoiseLevels {
 
     public NoiseLevels(int seaLevel, int genDepth) {
         this.depthMin = (seaLevel - 40) / (float) genDepth;
-        this.heightMin = seaLevel / (float) genDepth;
+        this.heightMin = (seaLevel + 1) / (float) genDepth;
         this.heightRange = 1F - heightMin;
         this.depthRange = heightMin - depthMin;
         this.frequency = calcFrequency(genDepth - seaLevel);
