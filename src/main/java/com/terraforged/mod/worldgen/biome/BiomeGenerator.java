@@ -31,7 +31,7 @@ import com.terraforged.engine.world.terrain.TerrainType;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.util.map.WeightMap;
 import com.terraforged.mod.worldgen.biome.util.BiomeUtil;
-import com.terraforged.mod.worldgen.noise.NoiseGenerator;
+import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
 import com.terraforged.mod.worldgen.noise.RiverCache;
 import net.minecraft.core.Registry;
@@ -46,12 +46,12 @@ import java.util.stream.Collectors;
 
 public class BiomeGenerator {
     protected final Registry<Biome> biomes;
-    protected final NoiseGenerator noiseGenerator;
+    protected final INoiseGenerator noiseGenerator;
     protected final ClimateModule climateModule;
     protected final Map<BiomeType, WeightMap<Biome>> biomeMap;
     protected final ThreadLocal<ClimateSample> localSample = ThreadLocal.withInitial(ClimateSample::new);
 
-    public BiomeGenerator(NoiseGenerator noiseGenerator, Registry<Biome> registry, List<Biome> biomes) {
+    public BiomeGenerator(INoiseGenerator noiseGenerator, Registry<Biome> registry, List<Biome> biomes) {
         this.biomes = registry;
         this.noiseGenerator = noiseGenerator;
         this.climateModule = createClimate(noiseGenerator);
@@ -116,14 +116,16 @@ public class BiomeGenerator {
             };
         }
 
-        if (sample.cell.terrain.isRiver()) {
-            return biomeType == BiomeType.TUNDRA ? biomes.get(Biomes.FROZEN_RIVER) : biomes.get(Biomes.RIVER);
+        if (sample.cell.terrain.isRiver() || sample.cell.terrain.isLake()) {
+            if (sample.cell.value < noiseGenerator.getLevels().heightMin) {
+                return biomeType == BiomeType.TUNDRA ? biomes.get(Biomes.FROZEN_RIVER) : biomes.get(Biomes.RIVER);
+            }
         }
 
         return input;
     }
 
-    protected static ClimateModule createClimate(NoiseGenerator generator) {
+    protected static ClimateModule createClimate(INoiseGenerator generator) {
         if (generator == null) return null;
         return new ClimateModule(generator.getContinent(), generator.getContinent().getContext());
     }

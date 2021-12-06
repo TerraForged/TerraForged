@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.worldgen.terrain;
 
-import com.terraforged.mod.worldgen.noise.NoiseGenerator;
-import net.minecraft.Util;
+import com.terraforged.mod.worldgen.noise.INoiseGenerator;
+import com.terraforged.mod.worldgen.util.ThreadPool;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +40,7 @@ public class TerrainCache {
     private final TerrainGenerator generator;
     private final Map<ChunkPos, CompletableFuture<TerrainData>> cache = new ConcurrentHashMap<>();
 
-    public TerrainCache(TerrainLevels levels, NoiseGenerator noiseGenerator) {
+    public TerrainCache(TerrainLevels levels, INoiseGenerator noiseGenerator) {
         this.generator = new TerrainGenerator(levels, noiseGenerator);
     }
 
@@ -72,7 +72,7 @@ public class TerrainCache {
     }
 
     public CompletableFuture<TerrainData> getAsync(ChunkPos pos) {
-        return cache.computeIfAbsent(pos, this::compute);
+        return cache.computeIfAbsent(pos, this::generate);
     }
 
     public <T> CompletableFuture<ChunkAccess> combineAsync(Executor executor,
@@ -82,7 +82,7 @@ public class TerrainCache {
         return getAsync(chunk.getPos()).thenApplyAsync(terrainData -> function.apply(chunk, terrainData), executor);
     }
 
-    protected CompletableFuture<TerrainData> compute(ChunkPos pos) {
-        return CompletableFuture.supplyAsync(() -> generator.generate(pos), Util.backgroundExecutor());
+    protected CompletableFuture<TerrainData> generate(ChunkPos pos) {
+        return CompletableFuture.supplyAsync(() -> generator.generate(pos.x, pos.z), ThreadPool.EXECUTOR);
     }
 }

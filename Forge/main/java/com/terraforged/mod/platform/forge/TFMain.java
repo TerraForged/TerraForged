@@ -27,6 +27,9 @@ package com.terraforged.mod.platform.forge;
 import com.terraforged.mod.Common;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.client.Client;
+import com.terraforged.mod.platform.PlatformData;
+import net.minecraft.core.IdMap;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -37,10 +40,17 @@ import java.nio.file.Path;
 
 @Mod(TerraForged.MODID)
 public class TFMain extends TerraForged {
+    private final PlatformData platformData = new ForgePlatformData();
+
     public TFMain() {
         super(TFMain::getRootPath);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onInit);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientInit);
+    }
+
+    @Override
+    public PlatformData getData() {
+        return platformData;
     }
 
     void onInit(FMLCommonSetupEvent event) {
@@ -53,5 +63,12 @@ public class TFMain extends TerraForged {
 
     private static Path getRootPath() {
         return ModList.get().getModContainerById(MODID).orElseThrow().getModInfo().getOwningFile().getFile().getFilePath();
+    }
+
+    private static class ForgePlatformData implements PlatformData {
+        @Override
+        public IdMap<BlockState> getBlockStateRegistry() {
+            return net.minecraftforge.registries.GameData.getBlockStateIDMap();
+        }
     }
 }

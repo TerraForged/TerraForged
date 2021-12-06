@@ -29,80 +29,111 @@ import com.terraforged.engine.world.GeneratorContext;
 import com.terraforged.engine.world.heightmap.ControlPoints;
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.engine.world.terrain.TerrainType;
-import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.worldgen.asset.TerrainConfig;
-import com.terraforged.mod.worldgen.noise.filter.NoiseResource;
+import com.terraforged.mod.worldgen.noise.erosion.ErodedNoiseGenerator;
+import com.terraforged.mod.worldgen.noise.erosion.NoiseTileSize;
 import com.terraforged.mod.worldgen.terrain.TerrainBlender;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
 import com.terraforged.noise.util.NoiseUtil;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.level.ChunkPos;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
-public class NoiseGenerator {
-    public static final float SCALE = 1.20F;
+public class NoiseGenerator implements INoiseGenerator {
+    protected final float heightMultiplier = 1.0F / 0.98F;
 
-    protected final float heightMultiplier = SCALE;
-
+    protected final long seed;
     protected final NoiseLevels levels;
     protected final Module ocean;
+    protected final Module baseHeight;
     protected final TerrainBlender land;
     protected final ContinentNoise continent;
     protected final ControlPoints controlPoints;
-    protected final ErodeNoiseGenerator noiseFilter;
-    protected final ThreadLocal<NoiseResource> localResource = ThreadLocal.withInitial(NoiseResource::new);
+    protected final ThreadLocal<NoiseData> localChunk = ThreadLocal.withInitial(NoiseData::new);
+    protected final ThreadLocal<NoiseSample> localSample = ThreadLocal.withInitial(NoiseSample::new);
 
-    public NoiseGenerator(long seed, TerrainLevels levels, RegistryAccess access) {
+    public NoiseGenerator(long seed, TerrainLevels levels, TerrainConfig[] terrainConfigs) {
+        this.seed = seed;
         this.levels = levels.noiseLevels;
         this.ocean = createOceanTerrain(seed);
-        this.land = createLandTerrain(seed, access);
+        this.baseHeight = createBaseTerrain(seed);
+        this.land = createLandTerrain(seed, terrainConfigs);
         this.continent = createContinentNoise(seed, levels);
         this.controlPoints = continent.getControlPoints();
-        this.noiseFilter = new ErodeNoiseGenerator(seed, this);
     }
 
     public NoiseGenerator(long seed, TerrainLevels levels, NoiseGenerator other) {
+        this.seed = seed;
         this.levels = levels.noiseLevels;
         this.land = other.land.withSeed(seed);
         this.ocean = createOceanTerrain(seed);
+        this.baseHeight = createBaseTerrain(seed);
         this.continent = createContinentNoise(seed, levels);
         this.controlPoints = continent.getControlPoints();
-        this.noiseFilter = new ErodeNoiseGenerator(seed, this);
     }
 
+    @Override
+    public NoiseGenerator with(long seed, TerrainLevels levels) {
+        return new NoiseGenerator(seed, levels, this);
+    }
+
+    @Override
     public NoiseLevels getLevels() {
         return levels;
     }
 
-    public float getHeightNoise(int x, int z) {;
-        return getNoiseSample(x, z).heightNoise;
-    }
-
+    @Override
     public ContinentNoise getContinent() {
         return continent;
     }
 
+    @Override
+    public float getHeightNoise(int x, int z) {;
+        return getNoiseSample(x, z).heightNoise;
+    }
+
+    @Override
+    public void generate(int chunkX, int chunkZ, Consumer<NoiseData> consumer) {
+        var noiseData = localChunk.get();
+        var blender = land.getBlenderResource();
+        var riverCache = continent.getRiverCache();
+        var sample = noiseData.sample;
+
+        int startX = chunkX << 4;
+        int startZ = chunkZ << 4;
+        for (int dz = -1; dz < 17; dz++) {
+            for (int dx = -1; dx < 17; dx++) {
+                int x = startX + dx;
+                int z = startZ + dz;
+
+                sample(x, z, sample, riverCache, blender);
+
+                noiseData.setNoise(dx, dz, sample);
+            }
+        }
+
+        consumer.accept(noiseData);
+    }
+
+    public INoiseGenerator withErosion() {
+        return new ErodedNoiseGenerator(seed, getNoiseTileSize(), this);
+    }
+
+    public TerrainBlender.Blender getBlenderResource() {
+        return land.getBlenderResource();
+    }
+
     public NoiseSample getNoiseSample(int x, int z) {
-        var sample = localResource.get().sharedSample;
+        var sample = localSample.get();
         var blender = land.getBlenderResource();
         var riverCache = continent.getRiverCache();
         return sample(x, z, sample, riverCache, blender);
     }
 
-    public void generate(ChunkPos pos, Consumer<NoiseData> consumer) {
-        var resource = localResource.get();
-        var blender = land.getBlenderResource();
-        noiseFilter.generate(pos.x, pos.z, resource, blender);
-        consumer.accept(resource.chunk);
-    }
-
     public NoiseSample sample(int x, int z, NoiseSample sample, RiverCache riverCache, TerrainBlender.Blender blender) {
-        float nx = x * levels.frequency;
-        float nz = z * levels.frequency;
+        float nx = getNoiseCoord(x);
+        float nz = getNoiseCoord(z);
         sampleTerrain(nx, nz, sample, blender);
         continent.sampleRiver(nx, nz, sample, riverCache);
         return sample;
@@ -136,9 +167,10 @@ public class NoiseGenerator {
     }
 
     protected void getInland(float x, float z, NoiseSample sample, TerrainBlender.Blender blender) {
+        float baseNoise = baseHeight.getValue(x, z);
         float rawNoise = land.getValue(x, z, blender) * heightMultiplier;
 
-        sample.heightNoise = levels.toHeightNoise(rawNoise);
+        sample.heightNoise = levels.toHeightNoise(baseNoise, rawNoise);
         sample.terrainType = land.getTerrain(blender);
     }
 
@@ -148,8 +180,9 @@ public class NoiseGenerator {
         float lowerRaw = ocean.getValue(x, z);
         float lower = levels.toDepthNoise(lowerRaw);
 
+        float baseNoise = baseHeight.getValue(x, z);
         float upperRaw = land.getValue(x, z, blender) * heightMultiplier;
-        float upper = levels.toHeightNoise(upperRaw);
+        float upper = levels.toHeightNoise(baseNoise, upperRaw);
 
         float heightNoise = NoiseUtil.lerp(lower, upper, alpha);
         sample.heightNoise = heightNoise;
@@ -166,12 +199,20 @@ public class NoiseGenerator {
         return land.getTerrain(blender);
     }
 
+    protected static NoiseTileSize getNoiseTileSize() {
+        return new NoiseTileSize(1);
+    }
+
     protected static Module createOceanTerrain(long seed) {
         return Source.simplex((int) seed, 64, 3).scale(0.4);
     }
 
-    protected static TerrainBlender createLandTerrain(long seed, RegistryAccess access) {
-        return new TerrainBlender(seed, 400, 0.8F, 1F, getTerrain(access));
+    protected static Module createBaseTerrain(long seed) {
+        return Source.simplex((int) seed, 200, 2);
+    }
+
+    protected static TerrainBlender createLandTerrain(long seed, TerrainConfig[] terrainConfigs) {
+        return new TerrainBlender(seed, 400, 0.8F, 1F, terrainConfigs);
     }
 
     protected static ContinentNoise createContinentNoise(long seed, TerrainLevels levels) {
@@ -183,12 +224,5 @@ public class NoiseGenerator {
 
         var context = new GeneratorContext(settings);
         return new ContinentNoise(context.seed, context);
-    }
-
-    protected static TerrainConfig[] getTerrain(RegistryAccess access) {
-        var registry = access.registryOrThrow(ModRegistry.TERRAIN);
-        return registry.entrySet().stream()
-                .map(Map.Entry::getValue)
-                .toArray(TerrainConfig[]::new);
     }
 }

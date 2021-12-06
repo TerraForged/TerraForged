@@ -27,14 +27,14 @@ package com.terraforged.mod.worldgen;
 import com.mojang.serialization.Codec;
 import com.terraforged.mod.worldgen.biome.BiomeComponents;
 import com.terraforged.mod.worldgen.biome.Source;
-import com.terraforged.mod.worldgen.noise.NoiseGenerator;
+import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 import com.terraforged.mod.worldgen.terrain.TerrainCache;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import com.terraforged.mod.worldgen.util.ChunkUtil;
 import com.terraforged.mod.worldgen.util.StructureConfig;
+import com.terraforged.mod.worldgen.util.ThreadPool;
 import com.terraforged.mod.worldgen.util.delegate.DelegateGenerator;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -68,16 +68,17 @@ public class Generator extends ChunkGenerator {
     protected final VanillaGen vanillaGen;
     protected final StructureConfig structureConfig;
     protected final BiomeComponents biomeGenerator;
-    protected final NoiseGenerator noiseGenerator;
+    protected final INoiseGenerator noiseGenerator;
     protected final TerrainCache terrainCache;
     protected final ChunkGenerator structureGenerator;
+    protected final ThreadLocal<GeneratorResource> localResource = ThreadLocal.withInitial(GeneratorResource::new);
 
     public Generator(long seed,
                      TerrainLevels levels,
                      VanillaGen vanillaGen,
                      Source biomeSource,
                      BiomeComponents biomeGenerator,
-                     NoiseGenerator noiseGenerator,
+                     INoiseGenerator noiseGenerator,
                      StructureConfig structureConfig) {
         super(biomeSource, biomeSource, structureConfig.copy(), seed);
         this.seed = seed;
@@ -106,7 +107,7 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public ChunkGenerator withSeed(long seed) {
-        var noiseGenerator = new NoiseGenerator(seed, levels, this.noiseGenerator);
+        var noiseGenerator = this.noiseGenerator.with(seed, levels);
         var biomeSource = new Source(seed, noiseGenerator, this.biomeSource);
         var vanillaGen = new VanillaGen(seed, biomeSource, this.vanillaGen);
         return new Generator(seed, levels, vanillaGen, biomeSource, biomeGenerator, noiseGenerator, structureConfig);
@@ -168,16 +169,16 @@ public class Generator extends ChunkGenerator {
     public CompletableFuture<ChunkAccess> createBiomes(Registry<Biome> registry, Executor executor, Blender blender, StructureFeatureManager structures, ChunkAccess chunk) {
         terrainCache.hint(chunk.getPos());
         return CompletableFuture.supplyAsync(() -> {
-            ChunkUtil.fillNoiseBiomes(chunk, biomeSource, climateSampler());
+            ChunkUtil.fillNoiseBiomes(chunk, biomeSource, climateSampler(), localResource.get());
             return chunk;
-        }, Util.backgroundExecutor());
+        }, ThreadPool.EXECUTOR);
     }
 
     @Override
     public CompletableFuture<ChunkAccess> fillFromNoise(Executor executor, Blender blender, StructureFeatureManager structureManager, ChunkAccess chunkAccess) {
         return terrainCache.combineAsync(executor, chunkAccess, (chunk, terrainData) -> {
-            ChunkUtil.fillChunk(getSeaLevel(), chunk, terrainData, Generator::getFiller);
-            ChunkUtil.primeHeightmaps(getSeaLevel(), chunk, terrainData, Generator::getFiller);
+            ChunkUtil.fillChunk(getSeaLevel(), chunk, terrainData, ChunkUtil.FILLER, localResource.get());
+            ChunkUtil.primeHeightmaps(getSeaLevel(), chunk, terrainData, ChunkUtil.FILLER);
             ChunkUtil.buildStructureTerrain(chunk, terrainData, structureManager);
             return chunk;
         });
@@ -227,9 +228,5 @@ public class Generator extends ChunkGenerator {
         }
 
         return new NoiseColumn(height, states);
-    }
-
-    protected static BlockState getFiller(int y, int height) {
-        return y >= height ? Blocks.WATER.defaultBlockState() : Blocks.STONE.defaultBlockState();
     }
 }

@@ -24,10 +24,16 @@
 
 package com.terraforged.mod.worldgen.util;
 
+import com.google.common.base.Suppliers;
+import com.terraforged.mod.platform.Platform;
+import com.terraforged.mod.worldgen.GeneratorResource;
 import com.terraforged.mod.worldgen.terrain.StructureTerrain;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.QuartPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -36,19 +42,23 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.levelgen.Heightmap;
 
-public class ChunkUtil {
-    protected static final ThreadLocal<Biome[]> BIOME_BUFFER_2D = ThreadLocal.withInitial(() -> new Biome[4 * 4]);
+import java.util.function.Supplier;
 
-    public static void fillNoiseBiomes(ChunkAccess chunk, BiomeSource source, Climate.Sampler sampler) {
+public class ChunkUtil {
+    public static final FillerBlock FILLER = ChunkUtil::getFiller;
+    public static final Supplier<ByteBuf> FULL_SECTION = Suppliers.memoize(ChunkUtil::createFullPalette);
+
+    public static void fillNoiseBiomes(ChunkAccess chunk, BiomeSource source, Climate.Sampler sampler, GeneratorResource resource) {
         var pos = chunk.getPos();
         int biomeX = QuartPos.fromBlock(pos.getMinBlockX());
         int biomeZ = QuartPos.fromBlock(pos.getMinBlockZ());
         var heightAccessor = chunk.getHeightAccessorForGeneration();
 
-        var biomeBuffer = BIOME_BUFFER_2D.get();
+        var biomeBuffer = resource.biomeBuffer2D;
         for (int dz = 0; dz < 4; dz++) {
             for (int dx = 0; dx < 4; dx++) {
                 var biome = source.getNoiseBiome(biomeX + dx, 0, biomeZ + dz, sampler);
@@ -77,13 +87,30 @@ public class ChunkUtil {
         biomes.release();
     }
 
-    public static void fillChunk(int seaLevel, ChunkAccess chunk, TerrainData terrainData, FillerBlock filler) {
-        int max = Math.max(seaLevel, terrainData.getMax());
+    public static void fillChunk(int seaLevel, ChunkAccess chunk, TerrainData terrainData, FillerBlock filler, GeneratorResource resource) {
+        int waterMaxY = seaLevel + 1;
+        int min = getLowestSection(terrainData);
+        int max = getHighestColumn(waterMaxY, terrainData);
 
-        for (int sy = chunk.getMinBuildHeight(); sy < max; sy += 16) {
+        // @Optimization Note:
+        // Here, we've precomputed a full stone chunk section and written it to a bytebuffer
+        // which we are then reading into each chunk section below the lowest non-full chunk
+        // section (determined from our heightmap). This is waaay faster than setting blocks
+        // individually in the section so helps reduce the impact of low minY values.
+        var sectionData = resource.fullSection;
+        for (int sy = chunk.getMinBuildHeight(); sy < min; sy += 16) {
             int index = chunk.getSectionIndex(sy);
             var section = chunk.getSection(index);
-            fillSection(sy, seaLevel, terrainData, chunk, section, filler);
+            sectionData.resetReaderIndex();
+            section.getStates().read(sectionData);
+            section.recalcBlockCounts();
+        }
+
+        // Here we fill the chunk section by the block
+        for (int sy = min; sy < max; sy += 16) {
+            int index = chunk.getSectionIndex(sy);
+            var section = chunk.getSection(index);
+            fillSection(sy, waterMaxY, terrainData, chunk, section, filler);
         }
     }
 
@@ -115,18 +142,18 @@ public class ChunkUtil {
         }
     }
 
-    private static void fillSection(int startY, int seaLevel, TerrainData terrainData, ChunkAccess chunk, LevelChunkSection section, FillerBlock filler) {
+    private static void fillSection(int startY, int waterMaxY, TerrainData terrainData, ChunkAccess chunk, LevelChunkSection section, FillerBlock filler) {
         section.acquire();
 
-        int endY = startY + 16;
+        int sectionMaxY = startY + 16;
         for (int z = 0, i = 0; z < 16; z++) {
             for (int x = 0; x < 16; x++, i++) {
-                int terrainHeight = terrainData.getHeight(x, z);
-                int columnHeight = Math.max(terrainHeight, seaLevel);
+                int solidMaxY = terrainData.getHeight(x, z) + 1;
+                int surfaceMaxY = Math.max(solidMaxY, waterMaxY);
 
-                int maxY = Math.min(endY, columnHeight);
+                int maxY = Math.min(sectionMaxY, surfaceMaxY);
                 for (int y = startY; y < maxY; y++) {
-                    var state = filler.getState(y, terrainHeight);
+                    var state = filler.getState(y, solidMaxY);
 
                     section.setBlockState(x, y & 15, z, state, false);
 
@@ -142,5 +169,42 @@ public class ChunkUtil {
 
     public interface FillerBlock {
         BlockState getState(int y, int height);
+    }
+
+    protected static BlockState getFiller(int y, int surfaceAir) {
+        return y >= surfaceAir ? Blocks.WATER.defaultBlockState() : Blocks.STONE.defaultBlockState();
+    }
+
+    protected static int getHighestColumn(int waterMaxY, TerrainData terrainData) {
+        return Math.max(waterMaxY, terrainData.getMax() + 1);
+    }
+
+    protected static int getLowestSection(TerrainData terrainData) {
+        int y = terrainData.getMin();
+        return (y >> 4) << 4;
+    }
+
+    protected static ByteBuf createFullPalette() {
+        var stateRegistry = Platform.ACTIVE_PLATFORM.get().getData().getBlockStateRegistry();
+        var container = new PalettedContainer<>(stateRegistry, Blocks.STONE.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES);
+
+        container.acquire();
+        for (int x = 0; x < 16; x++) {
+            for (int y = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    container.getAndSetUnchecked(x, y, z, Blocks.STONE.defaultBlockState());
+                }
+            }
+        }
+        container.release();
+
+        var buffer = new FriendlyByteBuf(Unpooled.buffer());
+        container.write(buffer);
+
+        return buffer;
+    }
+
+    public static FriendlyByteBuf getFullSection() {
+        return new FriendlyByteBuf(FULL_SECTION.get().copy());
     }
 }

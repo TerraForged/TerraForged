@@ -22,36 +22,43 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.noise.filter;
+package com.terraforged.mod.worldgen.noise.erosion;
 
+import com.terraforged.engine.util.FastRandom;
 import com.terraforged.mod.util.map.ObjectMap;
 import com.terraforged.mod.worldgen.noise.NoiseData;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
 import com.terraforged.mod.worldgen.noise.RiverCache;
 
+import java.util.concurrent.CompletableFuture;
+
 public class NoiseResource {
-    public static final int CHUNK_SIZE = 16;
-    public static final int CHUNK_AREA = CHUNK_SIZE * CHUNK_SIZE;
-    public static final int REL_MIN = -CHUNK_SIZE;
-    public static final int REL_MAX = CHUNK_SIZE * 2;
-    public static final int REGION_SIZE = REL_MAX - REL_MIN;
+    public final FastRandom random = new FastRandom();
 
     public final NoiseData chunk = new NoiseData();
     public final RiverCache riverCache = new RiverCache();
+    public final ErosionFilter.Resource erosionResource = new ErosionFilter.Resource();
 
-    public final float[] heightmap = new float[CHUNK_AREA * 9];
-    public final NoiseSample sharedSample = new NoiseSample();
-    public final ObjectMap<NoiseSample> chunkSample = new ObjectMap<>(1, NoiseSample[]::new);
+    public final float[] heightmap;
+    public final NoiseSample sharedSample;
+    public final ObjectMap<NoiseSample> chunkSample;
+
+    public final CompletableFuture<float[]>[] chunkCache;
 
     public NoiseResource() {
+        this(NoiseTileSize.DEFAULT);
+    }
+
+    public NoiseResource(NoiseTileSize tileSize) {
+        this.heightmap = new float[tileSize.regionSize];
+        this.sharedSample = new NoiseSample();
+        this.chunkSample = new ObjectMap<>(1, NoiseSample[]::new);
         this.chunkSample.fill(NoiseSample::new);
+        //noinspection unchecked
+        this.chunkCache = new CompletableFuture[tileSize.chunkSize];
     }
 
     public NoiseSample getSample(int dx, int dz) {
         return NoiseData.isInsideChunk(dx, dz) ? chunkSample.get(dx, dz) : sharedSample;
-    }
-
-    public static int indexOf(int rx, int rz) {
-        return rz * REGION_SIZE + rx;
     }
 }

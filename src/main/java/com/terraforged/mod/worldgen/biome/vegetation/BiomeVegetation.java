@@ -54,10 +54,14 @@ public class BiomeVegetation {
             PlacementModifierType.NOISE_BASED_COUNT,
             PlacementModifierType.NOISE_THRESHOLD_COUNT
     );
+
     protected static final Set<PlacementModifierType<?>> TREE_EXCLUSIONS = ImmutableSet.<PlacementModifierType<?>>builder()
             .addAll(EXCLUSIONS)
             .add(PlacementModifierType.IN_SQUARE)
             .build();
+
+    protected static final String[] TREE_KEYWORDS = {"tree", "spruce", "oak", "birch", "pine", "dark_forest_vegetation"};
+    protected static final String[] GRASS_KEYWORDS = {"grass"};
 
     private final PlacedFeature[] trees;
     private final PlacedFeature[] grass;
@@ -85,9 +89,10 @@ public class BiomeVegetation {
                 if (featureKey == null) {
                     other.add(feature.get());
                 } else {
-                    if (featureKey.getPath().contains("tree")) {
+                    var path = featureKey.getPath();
+                    if (matches(path, TREE_KEYWORDS)) {
                         trees.add(unwrap(feature, TREE_EXCLUSIONS));
-                    } else if (featureKey.getPath().contains("grass")) {
+                    } else if (matches(path, GRASS_KEYWORDS)) {
                         grass.add(unwrap(feature, TREE_EXCLUSIONS));
                     } else {
                         other.add(unwrap(feature, EXCLUSIONS));
@@ -111,6 +116,15 @@ public class BiomeVegetation {
 
     public PlacedFeature[] getOther() {
         return other;
+    }
+
+    protected static boolean matches(String name, String[] keywords) {
+        for (var keyword : keywords) {
+            if (name.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected static PlacedFeature unwrap(Supplier<PlacedFeature> supplier, Set<PlacementModifierType<?>> exclusions) {

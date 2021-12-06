@@ -22,10 +22,11 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.noise.filter;
+package com.terraforged.mod.worldgen.noise.erosion;
 
 import com.terraforged.engine.settings.FilterSettings;
 import com.terraforged.engine.util.FastRandom;
+import com.terraforged.mod.util.MathUtil;
 import com.terraforged.noise.util.NoiseUtil;
 
 public class ErosionFilter {
@@ -64,31 +65,27 @@ public class ErosionFilter {
         initBrushes(mapSize, erosionRadius);
     }
 
-    public void apply(float[] map, int chunkX, int chunkZ, int mapSize) {
-        apply(map, chunkX, chunkZ, mapSize, new Resource());
-    }
-
-    public void apply(float[] map, int chunkX, int chunkZ, int mapSize, Resource resource) {
-        var random = new FastRandom();
-
-        int maxIndex = mapSize - 2;
-        int minChunkX = chunkX - 1;
-        int minChunkZ = chunkZ - 1;
+    public void apply(float[] map, int chunkX, int chunkZ, NoiseTileSize size, Resource resource, FastRandom random) {
+        int maxIndex = size.regionLength - 2;
         for (int i = 0; i < iterations; i++) {
             long iterationSeed = NoiseUtil.seed(this.seed, i);
 
-            for (int cz = 0; cz < 3; cz++) {
-                for (int cx = 0; cx < 3; cx++) {
-                    long chunkSeed = NoiseUtil.seed(minChunkX + cx, minChunkZ + cz);
+            for (int dz = size.chunkMin; dz < size.chunkMax; dz++) {
+                int startZ = (dz - size.chunkMin) << 4;
+
+                for (int dx = size.chunkMin; dx < size.chunkMax; dx++) {
+                    int startX = (dx - size.chunkMin) << 4;
+
+                    long chunkSeed = NoiseUtil.seed(chunkX + dx, chunkZ + dz);
                     random.seed(chunkSeed, iterationSeed);
 
-                    int x = (cx << 4) + random.nextInt(16);
-                    int z = (cz << 4) + random.nextInt(16);
+                    int x = startX + random.nextInt(NoiseTileSize.CHUNK_SIZE);
+                    int z = startZ + random.nextInt(NoiseTileSize.CHUNK_SIZE);
 
-                    x = Math.min(x, maxIndex);
-                    z = Math.min(z, maxIndex);
+                    x = MathUtil.clamp(x, 1, maxIndex);
+                    z = MathUtil.clamp(z, 1, maxIndex);
 
-                    applyDrop(x, z, map, mapSize, resource);
+                    applyDrop(x, z, map, size.regionLength, resource);
                 }
             }
         }

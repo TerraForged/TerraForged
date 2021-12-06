@@ -22,35 +22,13 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.terrain;
+package com.terraforged.mod.worldgen;
 
-import com.terraforged.mod.worldgen.noise.NoiseLevels;
-import com.terraforged.noise.util.NoiseUtil;
+import com.terraforged.mod.worldgen.util.ChunkUtil;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.biome.Biome;
 
-public class TerrainLevels {
-    public static final int DEFAULT_SEA_LEVEL = 63;
-    public static final int DEFAULT_GEN_DEPTH = 256;
-    public static final TerrainLevels DEFAULT = new TerrainLevels(DEFAULT_SEA_LEVEL, DEFAULT_GEN_DEPTH);
-
-    public final int seaLevel;
-    public final int genDepth;
-    public final NoiseLevels noiseLevels;
-
-    public TerrainLevels() {
-        this(DEFAULT_SEA_LEVEL, 384);
-    }
-
-    public TerrainLevels(int seaLevel, int genDepth) {
-        this.seaLevel = seaLevel;
-        this.genDepth = genDepth;
-        this.noiseLevels = new NoiseLevels(seaLevel, genDepth);
-    }
-
-    public float getScaledHeight(float heightNoise) {
-        return heightNoise * genDepth;
-    }
-
-    public int getHeight(float scaledHeight) {
-        return NoiseUtil.floor(scaledHeight);
-    }
+public class GeneratorResource {
+    public final Biome[] biomeBuffer2D = new Biome[4 * 4];
+    public final FriendlyByteBuf fullSection = ChunkUtil.getFullSection();
 }

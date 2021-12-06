@@ -22,35 +22,13 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.terrain;
+package com.terraforged.mod.worldgen.util;
 
-import com.terraforged.mod.worldgen.noise.NoiseLevels;
-import com.terraforged.noise.util.NoiseUtil;
+import net.minecraft.Util;
 
-public class TerrainLevels {
-    public static final int DEFAULT_SEA_LEVEL = 63;
-    public static final int DEFAULT_GEN_DEPTH = 256;
-    public static final TerrainLevels DEFAULT = new TerrainLevels(DEFAULT_SEA_LEVEL, DEFAULT_GEN_DEPTH);
+import java.util.concurrent.Executor;
 
-    public final int seaLevel;
-    public final int genDepth;
-    public final NoiseLevels noiseLevels;
-
-    public TerrainLevels() {
-        this(DEFAULT_SEA_LEVEL, 384);
-    }
-
-    public TerrainLevels(int seaLevel, int genDepth) {
-        this.seaLevel = seaLevel;
-        this.genDepth = genDepth;
-        this.noiseLevels = new NoiseLevels(seaLevel, genDepth);
-    }
-
-    public float getScaledHeight(float heightNoise) {
-        return heightNoise * genDepth;
-    }
-
-    public int getHeight(float scaledHeight) {
-        return NoiseUtil.floor(scaledHeight);
-    }
+public class ThreadPool {
+    // TODO: Consider using own service
+    public static final Executor EXECUTOR = Util.backgroundExecutor();
 }

@@ -25,25 +25,20 @@
 package com.terraforged.mod.worldgen.terrain;
 
 import com.terraforged.mod.util.ObjectPool;
-import com.terraforged.mod.worldgen.noise.NoiseGenerator;
-import net.minecraft.world.level.ChunkPos;
+import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 
 public class TerrainGenerator {
     protected final TerrainLevels levels;
-    protected final NoiseGenerator noiseGenerator;
+    protected final INoiseGenerator noiseGenerator;
     protected final ObjectPool<TerrainData> terrainDataPool;
 
-    public TerrainGenerator(TerrainLevels levels, NoiseGenerator noiseGenerator) {
+    public TerrainGenerator(TerrainLevels levels, INoiseGenerator noiseGenerator) {
         this.levels = levels;
         this.noiseGenerator = noiseGenerator;
         this.terrainDataPool = new ObjectPool<>(() -> new TerrainData(this.levels));
     }
 
-    public TerrainGenerator withNoise(NoiseGenerator generator) {
-        return new TerrainGenerator(levels, generator);
-    }
-
-    public NoiseGenerator getNoiseGenerator() {
+    public INoiseGenerator getNoiseGenerator() {
         return noiseGenerator;
     }
 
@@ -51,9 +46,9 @@ public class TerrainGenerator {
         terrainDataPool.restore(terrainData);
     }
 
-    public TerrainData generate(ChunkPos chunkPos) {
+    public TerrainData generate(int chunkX, int chunkZ) {
         var terrainData = terrainDataPool.take();
-        noiseGenerator.generate(chunkPos, terrainData);
+        noiseGenerator.generate(chunkX, chunkZ, terrainData);
         return terrainData;
     }
 

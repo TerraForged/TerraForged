@@ -116,7 +116,11 @@ public class TreePositionSampler {
                                      Generator generator,
                                      WorldgenRandom random) {
 
-        pos.setY(chunk.getHeight(Heightmap.Types.WORLD_SURFACE_WG, pos.getX(), pos.getZ()));
+        int y = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, pos.getX(), pos.getZ());
+
+        if (y <= generator.getSeaLevel()) return false;
+
+        pos.setY(y);
 
         var biome = level.getBiome(pos);
 
@@ -131,14 +135,10 @@ public class TreePositionSampler {
         for (var feature : vegetation.getTrees()) {
             random.setFeatureSeed(seed, offset, BiomeVegetation.STAGE);
             if (feature.place(level, generator, random, pos)) {
-//                return true;
+                return true;
             }
         }
 
         return false;
-    }
-
-    public static void main(String[] args) {
-
     }
 }

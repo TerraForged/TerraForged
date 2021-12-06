@@ -29,7 +29,7 @@ import com.terraforged.engine.concurrent.cache.map.LoadBalanceLongMap;
 import com.terraforged.engine.concurrent.cache.map.LongMap;
 import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.mod.worldgen.biome.util.BiomeUtil;
-import com.terraforged.mod.worldgen.noise.NoiseGenerator;
+import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -46,18 +46,18 @@ public class Source extends BiomeSource {
     protected final Registry<Biome> registry;
     protected final LongMap<Biome> cache = creatBiomeCache();
 
-    public Source(long seed, NoiseGenerator noise, Source other) {
+    public Source(long seed, INoiseGenerator noise, Source other) {
         super(List.copyOf(other.possibleBiomes()));
         this.seed = seed;
         this.registry = other.registry;
         this.biomeGenerator = new BiomeGenerator(noise, other.registry, List.copyOf(other.possibleBiomes()));
     }
 
-    public Source(long seed, NoiseGenerator noise, Registry<Biome> biomes) {
+    public Source(long seed, INoiseGenerator noise, Registry<Biome> biomes) {
         this(seed, noise, biomes, BiomeUtil.getOverworldBiomes(biomes));
     }
 
-    public Source(long seed, NoiseGenerator noise, Registry<Biome> registry, List<Biome> biomes) {
+    public Source(long seed, INoiseGenerator noise, Registry<Biome> registry, List<Biome> biomes) {
         super(biomes);
         this.seed = seed;
         this.registry = registry;

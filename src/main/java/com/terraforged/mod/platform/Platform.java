@@ -31,4 +31,8 @@ public interface Platform {
     AtomicReference<Platform> ACTIVE_PLATFORM = new AtomicReference<>();
 
     Path getContainer();
+
+    default PlatformData getData() {
+        return PlatformData.DEFAULT;
+    }
 }

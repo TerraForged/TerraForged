@@ -38,10 +38,15 @@ public class TerrainData implements Consumer<NoiseData> {
     protected final FloatMap gradient = new FloatMap();
     protected final ObjectMap<Terrain> terrain = new ObjectMap<>(Terrain[]::new);
 
-    protected float max = 0F;
+    protected float min = Float.MAX_VALUE;
+    protected float max = Float.MIN_VALUE;
 
     public TerrainData(TerrainLevels levels) {
         this.levels = levels;
+    }
+
+    public int getMin() {
+        return levels.getHeight(min);
     }
 
     public int getMax() {
@@ -99,11 +104,8 @@ public class TerrainData implements Consumer<NoiseData> {
                 terrain.set(x, z, terrainType);
                 height.set(x, z, scaledHeight);
                 max = Math.max(max, scaledHeight);
+                min = Math.min(min, scaledHeight);
             }
         }
-    }
-
-    public static boolean isInsideChunk(int x, int z) {
-        return x >= 0 && x <= 15 && z >= 0 && z <= 15;
     }
 }

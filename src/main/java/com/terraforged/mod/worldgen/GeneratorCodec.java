@@ -26,6 +26,8 @@ package com.terraforged.mod.worldgen;
 
 import com.mojang.serialization.DynamicOps;
 import com.terraforged.mod.codec.WorldGenCodec;
+import com.terraforged.mod.registry.ModRegistry;
+import com.terraforged.mod.worldgen.asset.TerrainConfig;
 import com.terraforged.mod.worldgen.biome.BiomeComponents;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
@@ -46,7 +48,7 @@ public class GeneratorCodec implements WorldGenCodec<Generator> {
         var biomes = access.registryOrThrow(Registry.BIOME_REGISTRY);
 
         var biomeGenerator = new BiomeComponents(seed, access);
-        var noiseGenerator = new NoiseGenerator(seed, levels, access);
+        var noiseGenerator = new NoiseGenerator(seed, levels, getTerrain(access)).withErosion();
         var biomeSource = new Source(seed, noiseGenerator, biomes);
         var vanillaGen = getVanillaGen(seed, biomeSource, access);
         var structureConfig = getStructureSettings(access);
@@ -79,5 +81,12 @@ public class GeneratorCodec implements WorldGenCodec<Generator> {
                 .map(NoiseGeneratorSettings::structureSettings)
                 .map(StructureConfig::new)
                 .orElseThrow();
+    }
+
+    protected static TerrainConfig[] getTerrain(RegistryAccess access) {
+        var registry = access.registryOrThrow(ModRegistry.TERRAIN);
+        return registry.entrySet().stream()
+                .map(Map.Entry::getValue)
+                .toArray(TerrainConfig[]::new);
     }
 }

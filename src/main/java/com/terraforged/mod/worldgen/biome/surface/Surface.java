@@ -43,7 +43,7 @@ public class Surface {
         var pos = new BlockPos.MutableBlockPos();
         for (int dz = 0; dz < 16; dz++) {
             for (int dx = 0; dx < 16; dx++) {
-                int y = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, dx, dz) - 1;
+                int y = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, dx, dz);
 
                 float gradient = terrainData.getGradient(dx, dz, norm);
                 if (y < 60 || gradient < 0.6F) continue;

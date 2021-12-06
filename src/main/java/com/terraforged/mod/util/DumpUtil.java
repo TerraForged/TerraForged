@@ -24,49 +24,21 @@
 
 package com.terraforged.mod.util;
 
-import com.terraforged.noise.util.NoiseUtil;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 
-public class MathUtil {
-    public static final float EPSILON = 0.99999F;
+import java.io.PrintStream;
 
-    public static int clamp(int x, int min, int max) {
-        if (x < min) return min;
-        if (x > max) return max;
-        return x;
-    }
+public class DumpUtil {
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    public static int hash(int seed, int x) {
-        return NoiseUtil.hash(seed, x);
-    }
-
-    public static int hash(int seed, int x, int z) {
-        return NoiseUtil.hash2D(seed, x, z);
-    }
-
-    public static float randX(int hash) {
-        return rand(hash, NoiseUtil.X_PRIME);
-    }
-
-    public static float randZ(int hash) {
-        return rand(hash, NoiseUtil.Y_PRIME);
-    }
-
-    public static float rand(int seed, int offset) {
-        return rand(hash(seed, offset));
-    }
-
-    public static float rand(int n) {
-        n ^= 1619;
-        n ^= 31337;
-        float value = (n * n * n * '\uec4d') / 2.14748365E9F;
-        return NoiseUtil.map(value, -1, 1, 2);
-    }
-
-    public static float sum(float[] values) {
-        float sum = 0F;
-        for (float value : values) {
-            sum += value;
-        }
-        return sum;
+    public static <T> void dump(T t, Codec<T> codec, PrintStream out) {
+        codec.encodeStart(JsonOps.INSTANCE, t).result().ifPresent(json -> {
+            out.println();
+            GSON.toJson(json, out);
+            out.println();
+        });
     }
 }

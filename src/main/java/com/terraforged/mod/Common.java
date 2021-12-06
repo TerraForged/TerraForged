@@ -54,7 +54,5 @@ public class Common extends Init {
 
         TerraForged.LOG.info("Registering world-gen registry extensions");
         GenRegistry.commit();
-
-        TerraForged.dump();
     }
 }

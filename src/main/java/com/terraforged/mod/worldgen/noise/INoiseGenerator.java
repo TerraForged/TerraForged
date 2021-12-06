@@ -26,38 +26,20 @@ package com.terraforged.mod.worldgen.noise;
 
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 
-public class NoiseLevels {
-    public final float depthMin;
-    public final float depthRange;
+import java.util.function.Consumer;
 
-    public final float heightMin;
-    public final float baseRange;
-    public final float heightRange;
+public interface INoiseGenerator {
+    INoiseGenerator with(long seed, TerrainLevels levels);
 
-    public final float frequency;
+    NoiseLevels getLevels();
 
-    public NoiseLevels(int seaLevel, int genDepth) {
-        this.depthMin = (seaLevel - 40F) / genDepth;
-        this.heightMin = seaLevel / (float) genDepth;
-        this.baseRange = (genDepth * 0.15F) / genDepth;
-        this.heightRange = 1F - (heightMin + baseRange);
-        this.depthRange = heightMin - depthMin;
-        this.frequency = calcFrequency(genDepth - seaLevel);
-    }
+    ContinentNoise getContinent();
 
-    public float toDepthNoise(float noise) {
-        return depthMin + noise * depthRange;
-    }
+    float getHeightNoise(int x, int z);
 
-    public float toHeightNoise(float baseNoise, float heightNoise) {
-        return heightMin + baseRange * baseNoise + heightRange * heightNoise;
-    }
+    void generate(int chunkX, int chunkZ, Consumer<NoiseData> consumer);
 
-    public static NoiseLevels getDefault() {
-        return TerrainLevels.DEFAULT.noiseLevels;
-    }
-
-    public static float calcFrequency(int verticalRange) {
-        return (TerrainLevels.DEFAULT_GEN_DEPTH - TerrainLevels.DEFAULT_SEA_LEVEL) / (float) verticalRange;
+    default float getNoiseCoord(int coord) {
+        return coord * getLevels().frequency;
     }
 }

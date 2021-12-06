@@ -25,16 +25,11 @@
 package com.terraforged.mod;
 
 import com.google.common.base.Suppliers;
-import com.google.gson.GsonBuilder;
-import com.mojang.serialization.JsonOps;
 import com.terraforged.mod.platform.Platform;
 import com.terraforged.mod.util.Environment;
 import net.minecraft.core.Registry;
-import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.SurfaceRules;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -69,17 +64,5 @@ public abstract class TerraForged implements Platform {
 
 	public static <T> ResourceKey<Registry<T>> registry(String name) {
 		return ResourceKey.createRegistryKey(location(name));
-	}
-
-	public static void dump() {
-		var settings = BuiltinRegistries.NOISE_GENERATOR_SETTINGS.get(NoiseGeneratorSettings.OVERWORLD);
-
-		SurfaceRules.RuleSource.CODEC.encodeStart(JsonOps.INSTANCE, settings.surfaceRule()).result().ifPresent(json -> {
-
-			var gson = new GsonBuilder().setPrettyPrinting().create();
-
-			System.err.println("\n\n" + gson.toJson(json) + "\n\n");
-
-		});
 	}
 }
