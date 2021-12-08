@@ -25,9 +25,8 @@
 package com.terraforged.mod.worldgen.biome;
 
 import com.mojang.serialization.Codec;
-import com.terraforged.engine.concurrent.cache.map.LoadBalanceLongMap;
-import com.terraforged.engine.concurrent.cache.map.LongMap;
 import com.terraforged.engine.util.pos.PosUtil;
+import com.terraforged.mod.util.map.LossyCache;
 import com.terraforged.mod.worldgen.biome.util.BiomeUtil;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 import net.minecraft.core.Registry;
@@ -44,7 +43,7 @@ public class Source extends BiomeSource {
     protected final long seed;
     protected final BiomeGenerator biomeGenerator;
     protected final Registry<Biome> registry;
-    protected final LongMap<Biome> cache = creatBiomeCache();
+    protected final LossyCache<Biome> cache = LossyCache.concurrent(2048, Biome[]::new);
 
     public Source(long seed, INoiseGenerator noise, Source other) {
         super(List.copyOf(other.possibleBiomes()));
@@ -91,11 +90,6 @@ public class Source extends BiomeSource {
         int x = PosUtil.unpackLeft(index) << 2;
         int z = PosUtil.unpackRight(index) << 2;
         return biomeGenerator.generate(x, z);
-    }
-
-    protected static LongMap<Biome> creatBiomeCache() {
-        int factor = Runtime.getRuntime().availableProcessors();
-        return new LoadBalanceLongMap<>(factor, 1024);
     }
 
     public static class NoopSampler implements Climate.Sampler {

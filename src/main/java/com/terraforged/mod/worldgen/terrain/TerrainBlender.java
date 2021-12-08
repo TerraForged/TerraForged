@@ -77,7 +77,7 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
     public float getValue(float x, float z, Blender blender) {
         float rx = warp.getX(x, z) * frequency;
         float rz = warp.getY(x, z) * frequency;
-        getCell(regionSeed, x * frequency, z * frequency, jitter, blender);
+        getCell(regionSeed, rx, rz, jitter, blender);
         return blender.getValue(x, z, blending, terrains);
     }
 
@@ -154,16 +154,18 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
             return terrains.getValue(noise).noise().getValue(x, z);
         }
 
-        public float getValue(float x, float z, float edge, WeightMap<TerrainConfig> terrains) {
+        public float getValue(float x, float z, float blending, WeightMap<TerrainConfig> terrains) {
             float dist0 = getDistance(closestIndex);
             float dist1 = getDistance(closestIndex2);
-            float edgeNoise = 1 - dist0 / dist1;
 
-            if (edgeNoise >= edge) {
+            float borderDistance = (dist0 + dist1) * 0.5F;
+            float blendRadius = borderDistance * blending;
+            float blendStart = borderDistance - blendRadius;
+
+            if (dist0 <= blendStart) {
                 return getCentreValue(x, z, terrains);
             } else {
-                float blendRange = getBlendRange(dist0, dist1, edge, edgeNoise);
-                return getBlendedValue(x, z, dist0, dist1, blendRange, terrains);
+                return getBlendedValue(x, z, dist0, dist1, blendRadius, terrains);
             }
         }
 
@@ -192,14 +194,6 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
             return NoiseUtil.clamp(sumNoise / sumWeight, 0, 1);
         }
 
-        private float getBlendRange(float dist0, float dist1, float edge, float edgeNoise) {
-            float alpha = edgeNoise / edge;
-            if (alpha == 0) return dist0 * edge;
-
-            float mid = (dist0 + dist1) * 0.5F;
-            return ((mid - dist0) / alpha);
-        }
-
         private float getCacheValue(int index, float x, float z, WeightMap<TerrainConfig> terrains) {
             float noiseIndex = getNoiseIndex(index);
             var terrain = terrains.getValue(noiseIndex);
@@ -219,7 +213,10 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
 
         private static float getWeight(float dist, float origin, float blendRange) {
             float delta = dist - origin;
-            float weight = delta >= blendRange ? 0 : 1 - delta / blendRange;
+            if (delta <= 0) return 1F;
+            if (delta >= blendRange) return 0F;
+
+            float weight = 1 - (delta / blendRange);
             return weight * weight;
         }
     }

@@ -24,24 +24,28 @@
 
 package com.terraforged.mod.worldgen;
 
-import com.terraforged.mod.worldgen.biome.surface.SurfaceChunk;
-import com.terraforged.mod.worldgen.biome.surface.SurfaceRegion;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
-import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.*;
+import net.minecraft.world.level.levelgen.carver.CarvingContext;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
 import java.util.function.Supplier;
 
 public class VanillaGen {
-    protected final ChunkGenerator vanillaGenerator;
+    protected final NoiseSampler noiseSampler;
+    protected final NoiseBasedChunkGenerator vanillaGenerator;
     protected final Supplier<NoiseGeneratorSettings> settings;
     protected final Registry<NormalNoise.NoiseParameters> parameters;
+
+    protected final int lavaLevel;
+    protected final Aquifer.FluidStatus fluidStatus1;
+    protected final Aquifer.FluidStatus fluidStatus2;
+    protected final Aquifer.FluidPicker globalFluidPicker;
 
     public VanillaGen(long seed, BiomeSource biomeSource, VanillaGen other) {
         this(seed, biomeSource, other.settings, other.parameters);
@@ -51,15 +55,30 @@ public class VanillaGen {
         this.settings = settings;
         this.parameters = parameters;
         this.vanillaGenerator = new NoiseBasedChunkGenerator(parameters, biomeSource, seed, settings);
+        this.noiseSampler = new NoiseSampler(settings.get().noiseSettings(), settings.get().isNoiseCavesEnabled(), seed, parameters, settings.get().getRandomSource());
+        this.lavaLevel = Math.min(-54, settings.get().seaLevel());
+        this.fluidStatus1 = new Aquifer.FluidStatus(-54, Blocks.LAVA.defaultBlockState());
+        this.fluidStatus2 = new Aquifer.FluidStatus(settings.get().seaLevel(), settings.get().getDefaultFluid());
+        this.globalFluidPicker = (x, y, z) -> y < lavaLevel ? fluidStatus1 : fluidStatus2;
+    }
+
+    public Aquifer.FluidPicker getGlobalFluidPicker() {
+        return globalFluidPicker;
+    }
+
+    public NoiseSampler getNoiseSampler() {
+        return noiseSampler;
+    }
+
+    public Supplier<NoiseGeneratorSettings> getSettings() {
+        return settings;
     }
 
     public ChunkGenerator getVanillaGenerator() {
         return vanillaGenerator;
     }
 
-    public void buildSurface(WorldGenRegion region, StructureFeatureManager structures, ChunkAccess chunk, Generator generator) {
-        region = SurfaceRegion.wrap(region);
-        chunk = SurfaceChunk.assign(chunk, generator.getChunkDataAsync(chunk.getPos()));
-        vanillaGenerator.buildSurface(region, structures, chunk);
+    public CarvingContext createCarvingContext(WorldGenRegion region, ChunkAccess chunk, NoiseChunk noiseChunk) {
+        return new CarvingContext(vanillaGenerator, region.registryAccess(), chunk.getHeightAccessorForGeneration(), noiseChunk);
     }
 }

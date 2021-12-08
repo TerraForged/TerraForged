@@ -27,13 +27,12 @@ package com.terraforged.mod.worldgen;
 import com.mojang.serialization.Codec;
 import com.terraforged.mod.worldgen.biome.BiomeComponents;
 import com.terraforged.mod.worldgen.biome.Source;
+import com.terraforged.mod.worldgen.biome.surface.SurfaceRegion;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 import com.terraforged.mod.worldgen.terrain.TerrainCache;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
-import com.terraforged.mod.worldgen.util.ChunkUtil;
-import com.terraforged.mod.worldgen.util.StructureConfig;
-import com.terraforged.mod.worldgen.util.ThreadPool;
+import com.terraforged.mod.worldgen.util.*;
 import com.terraforged.mod.worldgen.util.delegate.DelegateGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -98,6 +97,10 @@ public class Generator extends ChunkGenerator {
 
     public CompletableFuture<TerrainData> getChunkDataAsync(ChunkPos pos) {
         return terrainCache.getAsync(pos);
+    }
+
+    public VanillaGen getVanillaGen() {
+        return vanillaGen;
     }
 
     @Override
@@ -186,18 +189,20 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public void buildSurface(WorldGenRegion region, StructureFeatureManager structures, ChunkAccess chunk) {
-        vanillaGen.buildSurface(region, structures, chunk, this);
+        NoiseChunkUtil.initChunk(chunk, this);
+        region = SurfaceRegion.wrap(region);
+
+        vanillaGen.getVanillaGenerator().buildSurface(region, structures, chunk);
         biomeGenerator.getSurfaceDecorator().decorate(chunk, this);
     }
 
     @Override
     public void applyCarvers(WorldGenRegion region, long seed, BiomeManager biomes, StructureFeatureManager structures, ChunkAccess chunk, GenerationStep.Carving stage) {
-        vanillaGen.getVanillaGenerator().applyCarvers(region, seed, biomes, structures, chunk, stage);
+        CarverUtil.applyCarvers(seed, chunk, region, biomes, stage, this);
     }
 
     @Override
     public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk, StructureFeatureManager structures) {
-//        vanillaGen.getVanillaGenerator().applyBiomeDecoration(level, chunk, structures);
         biomeGenerator.getFeatureDecorator().decorate(chunk, level, structures, this);
         terrainCache.drop(chunk.getPos());
     }

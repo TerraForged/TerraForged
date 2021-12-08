@@ -49,7 +49,9 @@ public class BiomeVegetation {
     private static final MethodHandle FEATURE_GETTER = ReflectionUtils.field(PlacedFeature.class, Supplier.class);
     private static final MethodHandle PLACEMENTS_GETTER = ReflectionUtils.field(PlacedFeature.class, List.class);
 
-    private static final Set<PlacementModifierType<?>> EXCLUSIONS = ImmutableSet.of(
+    private static final Set<PlacementModifierType<?>> BIOME_CHECK = Set.of(PlacementModifierType.BIOME_FILTER);
+
+    private static final Set<PlacementModifierType<?>> EXCLUSIONS = Set.of(
             PlacementModifierType.BIOME_FILTER,
             PlacementModifierType.COUNT,
             PlacementModifierType.COUNT_ON_EVERY_LAYER,
@@ -96,7 +98,7 @@ public class BiomeVegetation {
                     } else if (matches(path, GRASS_KEYWORDS)) {
                         grass.add(unwrap(feature, TREE_EXCLUSIONS));
                     } else {
-                        other.add(unwrap(feature, EXCLUSIONS));
+                        other.add(unwrap(feature, BIOME_CHECK));
                     }
                 }
             }

@@ -107,22 +107,21 @@ public class ErosionFilter {
             float cellOffsetY = posY - nodeY;
 
             // Calculate droplet's height and direction of flow with bilinear interpolation of surrounding heights
-            var gradient = at(map, mapSize, posX, posY, resource.grad1);
+            var gradient = grad(map, mapSize, posX, posY, resource.grad1);
 
             // Update the droplet's direction and position (move position 1 unit regardless of speed)
             dirX = (dirX * inertia - gradient[GRAD_X] * (1 - inertia));
             dirY = (dirY * inertia - gradient[GRAD_Y] * (1 - inertia));
 
             // Normalize direction
-            float len = (float) Math.sqrt(dirX * dirX + dirY * dirY);
-            if (Float.isNaN(len)) {
-                len = 0;
+            float len2 = dirX * dirX + dirY * dirY;
+            if (len2 == 0) {
+                return;
             }
 
-            if (len != 0) {
-                dirX /= len;
-                dirY /= len;
-            }
+            float len = NoiseUtil.sqrt(len2);
+            dirX /= len;
+            dirY /= len;
 
             posX += dirX;
             posY += dirY;
@@ -133,7 +132,7 @@ public class ErosionFilter {
             }
 
             // Find the droplet's new height and calculate the deltaHeight
-            float newHeight = at(map, mapSize, posX, posY, resource.grad2)[HEIGHT];
+            float newHeight = grad(map, mapSize, posX, posY, resource.grad2)[HEIGHT];
             float deltaHeight = newHeight - gradient[HEIGHT];
 
             // Calculate the droplet's sediment capacity (higher when moving fast down a slope and contains lots of water)
@@ -166,13 +165,12 @@ public class ErosionFilter {
                 }
             }
 
-            // Update droplet's speed and water content
-            speed = (float) Math.sqrt(speed * speed + deltaHeight * gravity);
-            water *= (1 - evaporateSpeed);
+            float speed2 = speed * speed + deltaHeight * gravity;
+            if (speed2 <= 0) return;
 
-            if (Float.isNaN(speed)) {
-                speed = 0;
-            }
+            // Update droplet's speed and water content
+            speed = NoiseUtil.sqrt(speed2);
+            water *= (1 - evaporateSpeed);
         }
     }
 
@@ -221,7 +219,7 @@ public class ErosionFilter {
         }
     }
 
-    private float[] at(float[] nodes, int mapSize, float posX, float posY, float[] resource) {
+    private float[] grad(float[] nodes, int mapSize, float posX, float posY, float[] resource) {
         int coordX = (int) posX;
         int coordY = (int) posY;
 
