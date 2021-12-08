@@ -24,20 +24,18 @@
 
 package com.terraforged.mod.client.ingame;
 
-import com.google.common.base.Suppliers;
+import com.terraforged.mod.util.ReflectionUtils;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Map;
+import java.lang.invoke.MethodHandle;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 public class DimensionEffects extends DimensionSpecialEffects {
     public static final AtomicInteger CLOUD_HEIGHT = new AtomicInteger(300);
+    private static final MethodHandle REGISTRY_GETTER = ReflectionUtils.field(DimensionSpecialEffects.class, Object2ObjectMap.class);
 
     protected final DimensionSpecialEffects source;
 
@@ -67,21 +65,18 @@ public class DimensionEffects extends DimensionSpecialEffects {
 
     public static void register(ResourceLocation location, DimensionSpecialEffects effects) {
         try {
-            var getter = REGISTRY_GETTER.get();
-            var map = (Map) getter.get(null);
-            map.put(location, effects);
+            getRegistry().put(location, effects);
         } catch (Throwable t) {
             t.printStackTrace();
         }
     }
 
-    private static final Supplier<Field> REGISTRY_GETTER = Suppliers.memoize(() -> {
-        for (var field : DimensionSpecialEffects.class.getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers()) && field.getType() == Object2ObjectMap.class) {
-                field.setAccessible(true);
-                return field;
-            }
+    @SuppressWarnings("unchecked")
+    private static Object2ObjectMap<ResourceLocation, DimensionSpecialEffects> getRegistry() {
+        try {
+            return (Object2ObjectMap<ResourceLocation, DimensionSpecialEffects>) REGISTRY_GETTER.invokeExact();
+        } catch (Throwable e) {
+            throw new Error(e);
         }
-        throw new Error("Could reflect DimensionSpecialEffects map!");
-    });
+    }
 }

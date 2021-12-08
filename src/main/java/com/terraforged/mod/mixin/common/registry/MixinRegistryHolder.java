@@ -37,7 +37,6 @@ import java.util.Map;
 
 @Mixin(RegistryAccess.RegistryHolder.class)
 public class MixinRegistryHolder {
-
     @ModifyVariable(
             method = "<init>(Ljava/util/Map;)V",
             at = @At("HEAD"),
@@ -46,6 +45,6 @@ public class MixinRegistryHolder {
     private static Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> onInit(
             Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> registries) {
 
-        return GenRegistry.INSTANCE.extend(registries);
+        return GenRegistry.INSTANCE.addBuiltin(registries);
     }
 }

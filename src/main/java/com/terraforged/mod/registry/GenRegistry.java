@@ -24,7 +24,6 @@
 
 package com.terraforged.mod.registry;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
@@ -39,6 +38,7 @@ import net.minecraft.resources.RegistryReadOps;
 import net.minecraft.resources.ResourceKey;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,29 +47,35 @@ public class GenRegistry extends Init {
 
     protected final List<Holder<?>> holders = new ArrayList<>();
 
-    public Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> extend(
-            Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> map) {
-
-        if (holders.isEmpty()) return map;
-
-        var builder = ImmutableMap.<ResourceKey<? extends Registry<?>>, MappedRegistry<?>>builder();
-        builder.putAll(map);
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    protected void doInit() {
+        var writableRegistry = (WritableRegistry) BuiltinRegistries.REGISTRY;
 
         for (var holder : holders) {
-            builder.put(holder.key, new MappedRegistry<>(holder.key, Lifecycle.stable()));
+            writableRegistry.register(holder.key, new MappedRegistry<>(holder.key, Lifecycle.stable()), Lifecycle.stable());
         }
-
-        return builder.build();
     }
 
-    public void load(RegistryAccess access, RegistryReadOps<?> ops) {
+    public Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> addBuiltin(
+            Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> map) {
+        var copy = new HashMap<ResourceKey<? extends Registry<?>>, MappedRegistry<?>>(map);
+
+        for (var holder : holders) {
+            copy.put(holder.key, new MappedRegistry<>(holder.key, Lifecycle.stable()));
+        }
+
+        return copy;
+    }
+
+    public void loadData(RegistryAccess access, RegistryReadOps<?> ops) {
         TerraForged.LOG.info("Loading world-gen registry extensions:");
         for (var holder : holders) {
-            load(holder, access, ops);
+            loadData(holder, access, ops);
         }
     }
 
-    protected <T> void load(Holder<T> holder, RegistryAccess access, RegistryReadOps<?> ops) {
+    protected <T> void loadData(Holder<T> holder, RegistryAccess access, RegistryReadOps<?> ops) {
         var registry = access.ownedRegistry(holder.key());
         if (registry.isEmpty()) return;
 
@@ -82,16 +88,6 @@ public class GenRegistry extends Init {
         result.error().ifPresent((partialResult) -> {
             throw new JsonParseException("Error loading registry data: " + partialResult.message());
         });
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    @Override
-    protected void doInit() {
-        var writableRegistry = (WritableRegistry) BuiltinRegistries.REGISTRY;
-
-        for (var holder : holders) {
-            writableRegistry.register(holder.key, new MappedRegistry<>(holder.key, Lifecycle.stable()), Lifecycle.stable());
-        }
     }
 
     protected record Holder<T>(ResourceKey<Registry<T>> key, Codec<T> direct) {}

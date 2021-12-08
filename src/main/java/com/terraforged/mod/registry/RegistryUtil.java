@@ -22,11 +22,12 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util;
+package com.terraforged.mod.registry;
 
-import com.google.common.base.Suppliers;
 import com.mojang.serialization.DynamicOps;
 import com.terraforged.mod.TerraForged;
+import com.terraforged.mod.util.Environment;
+import com.terraforged.mod.util.ReflectionUtils;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.profiler.GeneratorProfiler;
 import net.minecraft.core.MappedRegistry;
@@ -35,12 +36,13 @@ import net.minecraft.resources.RegistryReadOps;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
 
-import java.lang.reflect.Field;
+import java.lang.invoke.MethodHandle;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.function.Supplier;
 
 public class RegistryUtil {
+    private static final MethodHandle REGISTRY_ACCESS_GETTER = ReflectionUtils.field(RegistryReadOps.class, RegistryAccess.class);
+
     public static MappedRegistry<LevelStem> reseed(long seed, MappedRegistry<LevelStem> registry) {
         var overworld = registry.getOrThrow(LevelStem.OVERWORLD);
         var generator = overworld.generator();
@@ -80,23 +82,18 @@ public class RegistryUtil {
         }
 
         try {
-            var field = REGISTRY_ACCESS_GETTER.get();
-            var access = (RegistryAccess) field.get(ops);
-            return Optional.ofNullable(access);
+            return Optional.ofNullable(getRegistryAccess((RegistryReadOps<?>) ops));
         } catch (Throwable t) {
             t.printStackTrace();
             return Optional.empty();
         }
     }
 
-    protected static final Supplier<Field> REGISTRY_ACCESS_GETTER = Suppliers.memoize(() -> {
-        for (var field : RegistryReadOps.class.getDeclaredFields()) {
-            if (field.getType() == RegistryAccess.class) {
-                field.setAccessible(true);
-                return field;
-            }
+    private static RegistryAccess getRegistryAccess(RegistryReadOps<?> ops) {
+        try {
+            return (RegistryAccess) REGISTRY_ACCESS_GETTER.invokeExact(ops);
+        } catch (Throwable e) {
+            return null;
         }
-
-        throw new UnsupportedOperationException("Method not found!");
-    });
+    }
 }

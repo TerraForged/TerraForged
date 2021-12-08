@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.worldgen.biome.vegetation;
 
-import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableSet;
+import com.terraforged.mod.util.ReflectionUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -36,8 +36,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.lang.invoke.MethodHandle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -47,15 +46,17 @@ public class BiomeVegetation {
     public static BiomeVegetation NONE = new BiomeVegetation();
     public static final int STAGE = GenerationStep.Decoration.VEGETAL_DECORATION.ordinal();
 
-    protected static final Set<PlacementModifierType<?>> EXCLUSIONS = ImmutableSet.of(
+    private static final MethodHandle FEATURE_GETTER = ReflectionUtils.field(PlacedFeature.class, Supplier.class);
+    private static final MethodHandle PLACEMENTS_GETTER = ReflectionUtils.field(PlacedFeature.class, List.class);
+
+    private static final Set<PlacementModifierType<?>> EXCLUSIONS = ImmutableSet.of(
             PlacementModifierType.BIOME_FILTER,
             PlacementModifierType.COUNT,
             PlacementModifierType.COUNT_ON_EVERY_LAYER,
             PlacementModifierType.NOISE_BASED_COUNT,
-            PlacementModifierType.NOISE_THRESHOLD_COUNT
-    );
+            PlacementModifierType.NOISE_THRESHOLD_COUNT);
 
-    protected static final Set<PlacementModifierType<?>> TREE_EXCLUSIONS = ImmutableSet.<PlacementModifierType<?>>builder()
+    private static final Set<PlacementModifierType<?>> TREE_EXCLUSIONS = ImmutableSet.<PlacementModifierType<?>>builder()
             .addAll(EXCLUSIONS)
             .add(PlacementModifierType.IN_SQUARE)
             .build();
@@ -136,39 +137,19 @@ public class BiomeVegetation {
             placements.removeIf(placement -> exclusions.contains(placement.type()));
 
             return new PlacedFeature(feature, placements);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        } catch (Throwable t) {
+            t.printStackTrace();
             return supplier.get();
         }
     }
 
     @SuppressWarnings("unchecked")
-    protected static Supplier<ConfiguredFeature<?, ?>> getFeature(PlacedFeature feature) throws IllegalAccessException {
-        return (Supplier<ConfiguredFeature<?, ?>>) FEATURE_FIELD.get().get(feature);
+    protected static Supplier<ConfiguredFeature<?, ?>> getFeature(PlacedFeature feature) throws Throwable {
+        return (Supplier<ConfiguredFeature<?, ?>>) FEATURE_GETTER.invokeExact(feature);
     }
 
     @SuppressWarnings("unchecked")
-    protected static List<PlacementModifier> getPlacements(PlacedFeature feature) throws IllegalAccessException {
-        return (List<PlacementModifier>) PLACEMENT_FIELD.get().get(feature);
+    protected static List<PlacementModifier> getPlacements(PlacedFeature feature) throws Throwable {
+        return (List<PlacementModifier>) PLACEMENTS_GETTER.invokeExact(feature);
     }
-
-    protected static final Supplier<Field> FEATURE_FIELD = Suppliers.memoize(() -> {
-        for (var field : PlacedFeature.class.getDeclaredFields()) {
-            if (!Modifier.isStatic(field.getModifiers()) && field.getType() == Supplier.class) {
-                field.setAccessible(true);
-                return field;
-            }
-        }
-        throw new Error("Oh no");
-    });
-
-    protected static final Supplier<Field> PLACEMENT_FIELD = Suppliers.memoize(() -> {
-        for (var field : PlacedFeature.class.getDeclaredFields()) {
-            if (!Modifier.isStatic(field.getModifiers()) && field.getType() == List.class) {
-                field.setAccessible(true);
-                return field;
-            }
-        }
-        throw new Error("Oh no");
-    });
 }

@@ -28,7 +28,7 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
-import com.terraforged.mod.util.RegistryUtil;
+import com.terraforged.mod.registry.RegistryUtil;
 import net.minecraft.core.RegistryAccess;
 
 public interface WorldGenCodec<V> extends Codec<V> {
