@@ -42,4 +42,9 @@ public class BiomeTag extends WorldgenTag<Biome> {
     BiomeTag(ObjectSet<Biome> biomes) {
         super(biomes);
     }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

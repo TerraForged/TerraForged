@@ -22,27 +22,19 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.registry;
+package com.terraforged.mod.util;
 
-import com.mojang.serialization.DynamicOps;
+import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.util.Environment;
-import com.terraforged.mod.util.ReflectionUtils;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.profiler.GeneratorProfiler;
 import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.RegistryReadOps;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
 
-import java.lang.invoke.MethodHandle;
-import java.util.Optional;
 import java.util.OptionalInt;
 
-public class RegistryUtil {
-    private static final MethodHandle REGISTRY_ACCESS_GETTER = ReflectionUtils.field(RegistryReadOps.class, RegistryAccess.class);
-
+public class GeneratorUtil {
     public static MappedRegistry<LevelStem> reseed(long seed, MappedRegistry<LevelStem> registry) {
         var overworld = registry.getOrThrow(LevelStem.OVERWORLD);
         var generator = overworld.generator();
@@ -74,26 +66,5 @@ public class RegistryUtil {
             return GeneratorProfiler.wrap(generator);
         }
         return generator;
-    }
-
-    public static Optional<RegistryAccess> getAccess(DynamicOps<?> ops) {
-        if (!(ops instanceof RegistryReadOps)) {
-            return Optional.empty();
-        }
-
-        try {
-            return Optional.ofNullable(getRegistryAccess((RegistryReadOps<?>) ops));
-        } catch (Throwable t) {
-            t.printStackTrace();
-            return Optional.empty();
-        }
-    }
-
-    private static RegistryAccess getRegistryAccess(RegistryReadOps<?> ops) {
-        try {
-            return (RegistryAccess) REGISTRY_ACCESS_GETTER.invokeExact(ops);
-        } catch (Throwable e) {
-            return null;
-        }
     }
 }

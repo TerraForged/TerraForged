@@ -24,18 +24,42 @@
 
 package com.terraforged.mod.mixin.common.registry;
 
-import com.terraforged.mod.registry.GenRegistry;
+import com.terraforged.mod.registry.RegistryAccessUtil;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.RegistryReadOps;
+import net.minecraft.resources.RegistryResourceAccess;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(RegistryAccess.class)
 public class MixinRegistryAccess {
+    @Final
+    @Shadow
+    private static RegistryAccess.RegistryHolder BUILTIN;
+
     @Inject(method = "load", at = @At("RETURN"))
     private static void onLoad(RegistryAccess access, RegistryReadOps<?> ops, CallbackInfo ci) {
-        GenRegistry.INSTANCE.loadData(access, ops);
+        RegistryAccessUtil.load(access, ops);
+    }
+
+    @Inject(
+            method = "builtin",
+            at = @At(
+                    value = "INVOKE",
+                    shift = At.Shift.BEFORE,
+                    target = "Lnet/minecraft/resources/RegistryReadOps;createAndLoad(Lcom/mojang/serialization/DynamicOps;Lnet/minecraft/resources/RegistryResourceAccess;Lnet/minecraft/core/RegistryAccess;)Lnet/minecraft/resources/RegistryReadOps;"
+            ),
+            locals = LocalCapture.CAPTURE_FAILSOFT
+    )
+    private static void onBuiltin(CallbackInfoReturnable<RegistryAccess.RegistryHolder> cir,
+                                  RegistryAccess.RegistryHolder holder,
+                                  RegistryResourceAccess.InMemoryStorage storage) {
+        RegistryAccessUtil.inject(BUILTIN, storage);
     }
 }

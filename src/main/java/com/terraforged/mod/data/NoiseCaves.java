@@ -22,19 +22,17 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util;
+package com.terraforged.mod.data;
 
-import com.terraforged.mod.TerraForged;
+import com.terraforged.mod.registry.ModRegistries;
+import com.terraforged.mod.registry.ModRegistry;
+import com.terraforged.mod.worldgen.asset.NoiseCaveConfig;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.world.level.biome.Biomes;
 
-public interface Environment {
-    boolean PROFILING = hasFlag("profiling");
-
-    static boolean hasFlag(String flag) {
-        return System.getProperty(flag) != null;
-    }
-
-    static void log() {
-        TerraForged.LOG.info("Environment:");
-        TerraForged.LOG.info("- Profiling: {}", PROFILING);
+interface NoiseCaves extends ModRegistry {
+    static void register() {
+        ModRegistries.register(NOISE_CAVE, "lush_caves", NoiseCaveConfig.create0(0, Biomes.LUSH_CAVES, BuiltinRegistries.BIOME::getOrThrow));
+        ModRegistries.register(NOISE_CAVE, "dripstone_caves", NoiseCaveConfig.create1(0, Biomes.DRIPSTONE_CAVES, BuiltinRegistries.BIOME::getOrThrow));
     }
 }

@@ -24,7 +24,8 @@
 
 package com.terraforged.mod;
 
-import com.terraforged.mod.registry.GenRegistry;
+import com.terraforged.mod.data.Content;
+import com.terraforged.mod.registry.ModRegistries;
 import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.util.Init;
 import com.terraforged.mod.worldgen.Generator;
@@ -49,12 +50,15 @@ public class Common extends Init {
         Registry.register(Registry.CHUNK_GENERATOR, TerraForged.location("profiler"), GeneratorProfiler.CODEC);
 
         TerraForged.LOG.info("Registering world-gen component codecs");
-        GenRegistry.register(ModRegistry.BIOME_TAG, BiomeTag.DIRECT_CODEC);
-        GenRegistry.register(ModRegistry.TERRAIN, TerrainConfig.CODEC);
-        GenRegistry.register(ModRegistry.VIABILITY, ViabilityConfig.CODEC); // depends on BiomeTag
-        GenRegistry.register(ModRegistry.NOISE_CAVE, NoiseCaveConfig.CODEC);
+        ModRegistries.createRegistry(ModRegistry.BIOME_TAG, BiomeTag.DIRECT_CODEC);
+        ModRegistries.createRegistry(ModRegistry.TERRAIN, TerrainConfig.CODEC);
+        ModRegistries.createRegistry(ModRegistry.VIABILITY, ViabilityConfig.CODEC); // depends on BiomeTag
+        ModRegistries.createRegistry(ModRegistry.NOISE_CAVE, NoiseCaveConfig.CODEC);
 
-        TerraForged.LOG.info("Registering world-gen registry extensions");
-        GenRegistry.commit();
+        TerraForged.LOG.info("Locking world-gen registries");
+        ModRegistries.commit();
+
+        TerraForged.LOG.info("Registering world-gen content");
+        Content.INSTANCE.init();
     }
 }

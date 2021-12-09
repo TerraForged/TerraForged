@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.worldgen.cave;
 
+import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.asset.NoiseCaveConfig;
 import net.minecraft.core.Registry;
@@ -38,7 +39,7 @@ public class NoiseCaveGenerator {
     protected final NoiseCaveConfig[] configs;
 
     public NoiseCaveGenerator(long seed, RegistryAccess access) {
-        this(createDummyConfigs(seed, access));
+        this(access.registryOrThrow(ModRegistry.NOISE_CAVE));
     }
 
     public NoiseCaveGenerator(Registry<NoiseCaveConfig> registry) {
@@ -65,8 +66,8 @@ public class NoiseCaveGenerator {
         var random = new Random(seed);
         var registry = access.registryOrThrow(Registry.BIOME_REGISTRY);
         return new NoiseCaveConfig[]{
-                NoiseCaveConfig.create0(random.nextInt(), Biomes.LUSH_CAVES, registry),
-                NoiseCaveConfig.create1(random.nextInt(), Biomes.DRIPSTONE_CAVES, registry),
+                NoiseCaveConfig.create0(random.nextInt(), Biomes.LUSH_CAVES, registry::getOrThrow),
+                NoiseCaveConfig.create1(random.nextInt(), Biomes.DRIPSTONE_CAVES, registry::getOrThrow),
         };
     }
 }

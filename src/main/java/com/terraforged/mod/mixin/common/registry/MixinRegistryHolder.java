@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.mixin.common.registry;
 
-import com.terraforged.mod.registry.GenRegistry;
+import com.terraforged.mod.registry.RegistryAccessUtil;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -44,7 +44,6 @@ public class MixinRegistryHolder {
     )
     private static Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> onInit(
             Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> registries) {
-
-        return GenRegistry.INSTANCE.addBuiltin(registries);
+        return RegistryAccessUtil.extend(registries);
     }
 }

@@ -26,7 +26,6 @@ package com.terraforged.mod;
 
 import com.google.common.base.Suppliers;
 import com.terraforged.mod.platform.Platform;
-import com.terraforged.mod.util.Environment;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;

@@ -33,7 +33,8 @@ import com.terraforged.mod.worldgen.biome.viability.*;
 
 import java.util.function.Supplier;
 
-public record ViabilityConfig(Supplier<BiomeTag> biomes, float density, Viability viability) implements ContextSeedable<ViabilityConfig> {
+@SuppressWarnings("ClassCanBeRecord")
+public class ViabilityConfig implements ContextSeedable<ViabilityConfig> {
     public static final ViabilityConfig NONE = new ViabilityConfig(Suppliers.ofInstance(BiomeTag.NONE), 1F, Viability.NONE);
 
     public static final Codec<ViabilityConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -42,10 +43,41 @@ public record ViabilityConfig(Supplier<BiomeTag> biomes, float density, Viabilit
             ViabilityCodec.CODEC.fieldOf("viability").forGetter(ViabilityConfig::viability)
     ).apply(instance, ViabilityConfig::new));
 
+    private final Supplier<BiomeTag> biomes;
+    private final float density;
+    private final Viability viability;
+
+    public ViabilityConfig(Supplier<BiomeTag> biomes, float density, Viability viability) {
+        this.biomes = biomes;
+        this.density = density;
+        this.viability = viability;
+    }
+
     @Override
     public ViabilityConfig withSeed(long seed) {
         var viability = withSeed(seed, viability(), Viability.class);
         return new ViabilityConfig(biomes, density, viability);
+    }
+
+    public Supplier<BiomeTag> biomes() {
+        return biomes;
+    }
+
+    public float density() {
+        return density;
+    }
+
+    public Viability viability() {
+        return viability;
+    }
+
+    @Override
+    public String toString() {
+        return "ViabilityConfig{" +
+                "biomes=" + biomes +
+                ", density=" + density +
+                ", viability=" + viability +
+                '}';
     }
 
     static {

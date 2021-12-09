@@ -54,8 +54,10 @@ public class TerrainConfig implements ContextSeedable<TerrainConfig>, WeightMap.
         this.noise = noise;
     }
 
-    public Terrain terrain() {
-        return terrain;
+    @Override
+    public TerrainConfig withSeed(long seed) {
+        var heightmap = withSeed(seed, noise(), Module.class);
+        return new TerrainConfig(terrain, weight, heightmap);
     }
 
     @Override
@@ -63,13 +65,20 @@ public class TerrainConfig implements ContextSeedable<TerrainConfig>, WeightMap.
         return weight;
     }
 
+    public Terrain terrain() {
+        return terrain;
+    }
+
     public Module noise() {
         return noise;
     }
 
     @Override
-    public TerrainConfig withSeed(long seed) {
-        var heightmap = withSeed(seed, noise(), Module.class);
-        return new TerrainConfig(terrain, weight, heightmap);
+    public String toString() {
+        return "TerrainConfig{" +
+                "terrain=" + terrain +
+                ", weight=" + weight +
+                ", noise=" + noise +
+                '}';
     }
 }

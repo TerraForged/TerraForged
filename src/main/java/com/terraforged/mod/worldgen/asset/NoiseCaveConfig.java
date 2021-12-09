@@ -32,10 +32,10 @@ import com.terraforged.mod.worldgen.noise.NoiseCodec;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
 import com.terraforged.noise.util.NoiseUtil;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class NoiseCaveConfig implements ContextSeedable<NoiseCaveConfig>  {
@@ -93,15 +93,29 @@ public class NoiseCaveConfig implements ContextSeedable<NoiseCaveConfig>  {
         return getScaleValue(x, z, 0, size, floor);
     }
 
+    @Override
+    public String toString() {
+        return "NoiseCaveConfig{" +
+                "biome=" + biome +
+                ", elevation=" + elevation +
+                ", shape=" + shape +
+                ", floor=" + floor +
+                ", size=" + size +
+                ", minY=" + minY +
+                ", maxY=" + maxY +
+                ", rangeY=" + rangeY +
+                '}';
+    }
+
     private static int getScaleValue(int x, int z, int min, int range, Module noise) {
         if (range <= 0) return 0;
 
         return min + NoiseUtil.floor(noise.getValue(x, z) * range);
     }
 
-    public static NoiseCaveConfig create0(int seed, ResourceKey<Biome> biome, Registry<Biome> registry) {
+    public static NoiseCaveConfig create0(int seed, ResourceKey<Biome> biome, Function<ResourceKey<Biome>, Biome> registry) {
         return new NoiseCaveConfig(
-                Suppliers.memoize(() -> registry.getOrThrow(biome)),
+                Suppliers.memoize(() -> registry.apply(biome)),
                 Source.simplex(seed += 233, 300, 2).scale(0.8).bias(0.1),
                 Source.ridge(seed += 678145, 150, 3).clamp(0.8, 1.0).map(0, 1),
                 Source.simplex(seed += 98673, 20, 2).clamp(0.0, 0.25).map(0, 1),
@@ -109,9 +123,9 @@ public class NoiseCaveConfig implements ContextSeedable<NoiseCaveConfig>  {
         );
     }
 
-    public static NoiseCaveConfig create1(int seed, ResourceKey<Biome> biome, Registry<Biome> registry) {
+    public static NoiseCaveConfig create1(int seed, ResourceKey<Biome> biome, Function<ResourceKey<Biome>, Biome> registry) {
         return new NoiseCaveConfig(
-                Suppliers.memoize(() -> registry.getOrThrow(biome)),
+                Suppliers.memoize(() -> registry.apply(biome)),
                 Source.simplex(seed += 153, 300, 2).scale(0.8).bias(0.1),
                 Source.ridge(seed += 13, 150, 3).clamp(0.8, 1.0).map(0, 1),
                 Source.simplex(seed += 43465, 20, 2).clamp(0.0, 0.25).map(0, 1),

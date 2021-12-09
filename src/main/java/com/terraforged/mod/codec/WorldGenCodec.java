@@ -28,7 +28,7 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
-import com.terraforged.mod.registry.RegistryUtil;
+import com.terraforged.mod.registry.RegistryAccessUtil;
 import net.minecraft.core.RegistryAccess;
 
 public interface WorldGenCodec<V> extends Codec<V> {
@@ -38,7 +38,7 @@ public interface WorldGenCodec<V> extends Codec<V> {
 
     @Override
     default <T> DataResult<Pair<V, T>> decode(DynamicOps<T> ops, T input) {
-        var access = RegistryUtil.getAccess(ops);
+        var access = RegistryAccessUtil.getRegistryAccess(ops);
         if (access.isEmpty()) return DataResult.error("Invalid ops");
 
         var result = decode(ops, input, access.get());

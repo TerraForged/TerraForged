@@ -24,6 +24,8 @@
 
 package com.terraforged.mod.util;
 
+import com.terraforged.mod.Environment;
+
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,7 +43,7 @@ public class ObjectPool<T> {
     protected final IntUnaryOperator restoreOp;
 
     public ObjectPool(Supplier<T> factory) {
-        this(Runtime.getRuntime().availableProcessors(), factory);
+        this(Environment.CORES, factory);
     }
 
     public ObjectPool(int capacity, Supplier<T> factory) {

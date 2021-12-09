@@ -22,24 +22,24 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.mixin.common.registry;
+package com.terraforged.mod;
 
-import com.terraforged.mod.util.GeneratorUtil;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.WorldGenSettings;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+public interface Environment {
+    boolean DEV_ENV = hasFlag("dev");
+    boolean PROFILING = DEV_ENV || hasFlag("profiling");
+    boolean UNLIMITED = DEV_ENV || hasFlag("unlimited");
+    boolean DEBUGGING = DEV_ENV || hasFlag("debugging");
+    int CORES = Runtime.getRuntime().availableProcessors();
 
-@Mixin(WorldGenSettings.class)
-public class MixinWorldGenSettings {
+    static boolean hasFlag(String flag) {
+        return System.getProperty(flag) != null;
+    }
 
-    @ModifyVariable(
-            method = "<init>(JZZLnet/minecraft/core/MappedRegistry;Ljava/util/Optional;)V",
-            at = @At("HEAD")
-    )
-    private static MappedRegistry<LevelStem> onInit(MappedRegistry<LevelStem> dimensions, long seed) {
-        return GeneratorUtil.reseed(seed, dimensions);
+    static void log() {
+        TerraForged.LOG.info("Environment:");
+        TerraForged.LOG.info("- Dev:       {}", DEV_ENV);
+        TerraForged.LOG.info("- Profiling: {}", PROFILING);
+        TerraForged.LOG.info("- Unlimited: {}", UNLIMITED);
+        TerraForged.LOG.info("- Cores:     {}", CORES);
     }
 }

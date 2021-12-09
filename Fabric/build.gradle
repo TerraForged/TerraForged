@@ -34,12 +34,14 @@ loom {
 			setConfigName("Fabric Client")
 			ideConfigGenerated(true)
 			runDir("run")
+			vmArgs "-Ddev"
 		}
 		server {
 			server()
 			setConfigName("Fabric Server")
 			ideConfigGenerated(true)
 			runDir("run")
+			vmArgs "-Ddev"
 		}
 	}
 }
