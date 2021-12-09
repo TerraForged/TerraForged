@@ -29,6 +29,7 @@ import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.util.Init;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.asset.BiomeTag;
+import com.terraforged.mod.worldgen.asset.NoiseCaveConfig;
 import com.terraforged.mod.worldgen.asset.TerrainConfig;
 import com.terraforged.mod.worldgen.asset.ViabilityConfig;
 import com.terraforged.mod.worldgen.biome.Source;
@@ -51,6 +52,7 @@ public class Common extends Init {
         GenRegistry.register(ModRegistry.BIOME_TAG, BiomeTag.DIRECT_CODEC);
         GenRegistry.register(ModRegistry.TERRAIN, TerrainConfig.CODEC);
         GenRegistry.register(ModRegistry.VIABILITY, ViabilityConfig.CODEC); // depends on BiomeTag
+        GenRegistry.register(ModRegistry.NOISE_CAVE, NoiseCaveConfig.CODEC);
 
         TerraForged.LOG.info("Registering world-gen registry extensions");
         GenRegistry.commit();

@@ -41,7 +41,7 @@ public class Source extends BiomeSource {
     public static final Codec<Source> CODEC = new SourceCodec();
 
     protected final long seed;
-    protected final BiomeGenerator biomeGenerator;
+    protected final BiomeSampler biomeSampler;
     protected final Registry<Biome> registry;
     protected final LossyCache<Biome> cache = LossyCache.concurrent(2048, Biome[]::new);
 
@@ -49,7 +49,7 @@ public class Source extends BiomeSource {
         super(List.copyOf(other.possibleBiomes()));
         this.seed = seed;
         this.registry = other.registry;
-        this.biomeGenerator = new BiomeGenerator(noise, other.registry, List.copyOf(other.possibleBiomes()));
+        this.biomeSampler = new BiomeSampler(noise, other.registry, List.copyOf(other.possibleBiomes()));
     }
 
     public Source(long seed, INoiseGenerator noise, Registry<Biome> biomes) {
@@ -60,7 +60,7 @@ public class Source extends BiomeSource {
         super(biomes);
         this.seed = seed;
         this.registry = registry;
-        this.biomeGenerator = new BiomeGenerator(noise, registry, biomes);
+        this.biomeSampler = new BiomeSampler(noise, registry, biomes);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class Source extends BiomeSource {
     protected Biome compute(long index) {
         int x = PosUtil.unpackLeft(index) << 2;
         int z = PosUtil.unpackRight(index) << 2;
-        return biomeGenerator.generate(x, z);
+        return biomeSampler.sampleBiome(x, z);
     }
 
     public static class NoopSampler implements Climate.Sampler {

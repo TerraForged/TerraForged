@@ -130,7 +130,11 @@ public class BiomeVegetation {
         return false;
     }
 
-    protected static PlacedFeature unwrap(Supplier<PlacedFeature> supplier, Set<PlacementModifierType<?>> exclusions) {
+    public static PlacedFeature unwrap(Supplier<PlacedFeature> supplier) {
+        return unwrap(supplier, BIOME_CHECK);
+    }
+
+    public static PlacedFeature unwrap(Supplier<PlacedFeature> supplier, Set<PlacementModifierType<?>> exclusions) {
         try {
             PlacedFeature placed = supplier.get();
 

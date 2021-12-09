@@ -25,14 +25,15 @@
 package com.terraforged.mod.worldgen;
 
 import com.mojang.serialization.Codec;
-import com.terraforged.mod.worldgen.biome.BiomeComponents;
+import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
-import com.terraforged.mod.worldgen.biome.surface.SurfaceRegion;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 import com.terraforged.mod.worldgen.terrain.TerrainCache;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
-import com.terraforged.mod.worldgen.util.*;
+import com.terraforged.mod.worldgen.util.ChunkUtil;
+import com.terraforged.mod.worldgen.util.StructureConfig;
+import com.terraforged.mod.worldgen.util.ThreadPool;
 import com.terraforged.mod.worldgen.util.delegate.DelegateGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -66,7 +67,7 @@ public class Generator extends ChunkGenerator {
     protected final TerrainLevels levels;
     protected final VanillaGen vanillaGen;
     protected final StructureConfig structureConfig;
-    protected final BiomeComponents biomeGenerator;
+    protected final BiomeGenerator biomeGenerator;
     protected final INoiseGenerator noiseGenerator;
     protected final TerrainCache terrainCache;
     protected final ChunkGenerator structureGenerator;
@@ -76,7 +77,7 @@ public class Generator extends ChunkGenerator {
                      TerrainLevels levels,
                      VanillaGen vanillaGen,
                      Source biomeSource,
-                     BiomeComponents biomeGenerator,
+                     BiomeGenerator biomeGenerator,
                      INoiseGenerator noiseGenerator,
                      StructureConfig structureConfig) {
         super(biomeSource, biomeSource, structureConfig.copy(), seed);
@@ -189,21 +190,17 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public void buildSurface(WorldGenRegion region, StructureFeatureManager structures, ChunkAccess chunk) {
-        NoiseChunkUtil.initChunk(chunk, this);
-        region = SurfaceRegion.wrap(region);
-
-        vanillaGen.getVanillaGenerator().buildSurface(region, structures, chunk);
-        biomeGenerator.getSurfaceDecorator().decorate(chunk, this);
+        biomeGenerator.surface(chunk, region, structures, this);
     }
 
     @Override
     public void applyCarvers(WorldGenRegion region, long seed, BiomeManager biomes, StructureFeatureManager structures, ChunkAccess chunk, GenerationStep.Carving stage) {
-        CarverUtil.applyCarvers(seed, chunk, region, biomes, stage, this);
+        biomeGenerator.carve(seed, chunk, region, biomes, stage, this);
     }
 
     @Override
-    public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk, StructureFeatureManager structures) {
-        biomeGenerator.getFeatureDecorator().decorate(chunk, level, structures, this);
+    public void applyBiomeDecoration(WorldGenLevel region, ChunkAccess chunk, StructureFeatureManager structures) {
+        biomeGenerator.decorate(chunk, region, structures, this);
         terrainCache.drop(chunk.getPos());
     }
 

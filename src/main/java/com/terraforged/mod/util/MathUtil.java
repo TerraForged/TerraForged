@@ -29,10 +29,10 @@ import com.terraforged.noise.util.NoiseUtil;
 public class MathUtil {
     public static final float EPSILON = 0.99999F;
 
-    public static int clamp(int x, int min, int max) {
-        if (x < min) return min;
-        if (x > max) return max;
-        return x;
+    public static int clamp(int value, int min, int max) {
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
     }
 
     public static int hash(int seed, int x) {

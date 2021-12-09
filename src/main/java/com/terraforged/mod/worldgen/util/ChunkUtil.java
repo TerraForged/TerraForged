@@ -61,7 +61,7 @@ public class ChunkUtil {
         var biomeBuffer = resource.biomeBuffer2D;
         for (int dz = 0; dz < 4; dz++) {
             for (int dx = 0; dx < 4; dx++) {
-                var biome = source.getNoiseBiome(biomeX + dx, 0, biomeZ + dz, sampler);
+                var biome = source.getNoiseBiome(biomeX + dx, -1, biomeZ + dz, sampler);
 
                 biomeBuffer[dz << 2 | dx] = biome;
             }

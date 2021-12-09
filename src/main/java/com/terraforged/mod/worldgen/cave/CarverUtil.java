@@ -22,23 +22,18 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.util;
+package com.terraforged.mod.worldgen.cave;
 
 import com.terraforged.mod.worldgen.Generator;
-import com.terraforged.mod.worldgen.biome.surface.SurfaceRegion;
-import net.minecraft.core.BlockPos;
+import com.terraforged.mod.worldgen.util.NoiseChunkUtil;
 import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.RandomSupport;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
-
-import java.util.function.Function;
 
 public class CarverUtil {
     public static void applyCarvers(long seed,
@@ -74,58 +69,11 @@ public class CarverUtil {
                     var carver = carvers.get(i).get();
 
                     random.setLargeFeatureSeed(seed + i, chunkPos.x, chunkPos.z);
-                    if (carver.isStartChunk(random)) {
+                    if (random.nextFloat() < 0.5F && carver.isStartChunk(random)) {
                         carver.carve(context, centerChunk, biomeManager::getBiome, random, aquifer, chunkPos, mask);
                     }
                 }
             }
-        }
-    }
-
-    private static class CarverBiomeManager implements Function<BlockPos, Biome> {
-        private final WorldGenRegion region;
-        private final BiomeManager regionBiomes;
-        private final BiomeManager worldBiomes;
-        private final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-
-        private CarverBiomeManager(WorldGenRegion region, Generator generator) {
-            this.region = region;
-            this.regionBiomes = SurfaceRegion.wrap(region).getBiomeManager();
-            this.worldBiomes = region.getBiomeManager().withDifferentSource(generator);
-        }
-
-        public Biome getBiome(int x, int y, int z) {
-            if (true) {
-                return worldBiomes.getBiome(pos.set(x, y, z));
-            }
-
-            int chunkX = x >> 4;
-            int chunkZ = z >> 4;
-
-            if (region.hasChunk(chunkX, chunkZ)) {
-                var status = region.getChunk(chunkX, chunkZ).getStatus();
-                if (status.isOrAfter(ChunkStatus.BIOMES)) {
-                    return regionBiomes.getBiome(pos.set(x, y, z));
-                }
-            }
-
-            return worldBiomes.getNoiseBiomeAtPosition(pos.set(x, y, z));
-        }
-
-        @Override
-        public Biome apply(BlockPos pos) {
-            int chunkX = pos.getX() >> 4;
-            int chunkZ = pos.getZ() >> 4;
-
-            if (true) {
-                return worldBiomes.getBiome(pos);
-            }
-
-            if (region.hasChunk(chunkX, chunkZ)) {
-                return regionBiomes.getBiome(pos);
-            }
-
-            return worldBiomes.getBiome(pos);
         }
     }
 }
