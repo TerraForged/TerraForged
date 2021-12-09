@@ -114,6 +114,7 @@ public class Generator extends ChunkGenerator {
         var noiseGenerator = this.noiseGenerator.with(seed, levels);
         var biomeSource = new Source(seed, noiseGenerator, this.biomeSource);
         var vanillaGen = new VanillaGen(seed, biomeSource, this.vanillaGen);
+        var biomeGenerator = new BiomeGenerator(seed, this.biomeGenerator);
         return new Generator(seed, levels, vanillaGen, biomeSource, biomeGenerator, noiseGenerator, structureConfig);
     }
 

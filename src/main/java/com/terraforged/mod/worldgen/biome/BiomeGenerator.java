@@ -49,6 +49,12 @@ public class BiomeGenerator {
         this.noiseCaveGenerator = new NoiseCaveGenerator(seed, access);
     }
 
+    public BiomeGenerator(long seed, BiomeGenerator other) {
+        this.surfaceDecorator = other.surfaceDecorator;
+        this.featureDecorator = other.featureDecorator;
+        this.noiseCaveGenerator = new NoiseCaveGenerator(seed, other.noiseCaveGenerator);
+    }
+
     public void surface(ChunkAccess chunk, WorldGenRegion region, StructureFeatureManager structures, Generator generator) {
         NoiseChunkUtil.initChunk(chunk, generator);
         generator.getVanillaGen().getVanillaGenerator().buildSurface(region, structures, chunk);

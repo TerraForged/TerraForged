@@ -27,27 +27,23 @@ package com.terraforged.mod.worldgen.cave;
 import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.asset.NoiseCaveConfig;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.chunk.ChunkAccess;
-
-import java.util.Random;
 
 public class NoiseCaveGenerator {
     protected final NoiseCaveConfig[] configs;
 
     public NoiseCaveGenerator(long seed, RegistryAccess access) {
-        this(access.registryOrThrow(ModRegistry.NOISE_CAVE));
+        var registry = access.registryOrThrow(ModRegistry.NOISE_CAVE);
+        this.configs = registry.stream().map(config -> config.withSeed(seed)).toArray(NoiseCaveConfig[]::new);
     }
 
-    public NoiseCaveGenerator(Registry<NoiseCaveConfig> registry) {
-        this(registry.stream().toArray(NoiseCaveConfig[]::new));
-    }
-
-    public NoiseCaveGenerator(NoiseCaveConfig[] configs) {
-        this.configs = configs;
+    public NoiseCaveGenerator(long seed, NoiseCaveGenerator other) {
+        this.configs = new NoiseCaveConfig[other.configs.length];
+        for (int i = 0; i < configs.length; i++) {
+            configs[i] = other.configs[i].withSeed(seed);
+        }
     }
 
     public void carve(ChunkAccess chunk, Generator generator) {
@@ -60,14 +56,5 @@ public class NoiseCaveGenerator {
         for (var config : configs) {
             NoiseCaveDecorator.decorate(chunk, region, generator, config);
         }
-    }
-
-    private static NoiseCaveConfig[] createDummyConfigs(long seed, RegistryAccess access) {
-        var random = new Random(seed);
-        var registry = access.registryOrThrow(Registry.BIOME_REGISTRY);
-        return new NoiseCaveConfig[]{
-                NoiseCaveConfig.create0(random.nextInt(), Biomes.LUSH_CAVES, registry::getOrThrow),
-                NoiseCaveConfig.create1(random.nextInt(), Biomes.DRIPSTONE_CAVES, registry::getOrThrow),
-        };
     }
 }
