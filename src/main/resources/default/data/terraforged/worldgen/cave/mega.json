@@ -5,7 +5,7 @@
       "type": "Clamp",
       "source": {
         "type": "Simplex",
-        "seed": 787101,
+        "seed": 5852,
         "gain": 0.5,
         "octaves": 2,
         "frequency": 0.033333335,
@@ -33,12 +33,13 @@
   "size": 30,
   "min_y": -16,
   "max_y": 64,
+  "seed": 5852,
   "type": "unique",
   "elevation": {
     "type": "Map",
     "source": {
       "type": "Simplex",
-      "seed": 787099,
+      "seed": 5850,
       "gain": 0.5,
       "octaves": 2,
       "frequency": 0.005,
@@ -68,7 +69,7 @@
               "type": "Bias",
               "source": {
                 "type": "Simplex",
-                "seed": 787100,
+                "seed": 5851,
                 "gain": 0.5,
                 "octaves": 3,
                 "frequency": 0.004,

@@ -5,7 +5,7 @@
       "type": "Clamp",
       "source": {
         "type": "Simplex",
-        "seed": 180515,
+        "seed": 101281,
         "gain": 0.5,
         "octaves": 2,
         "frequency": 0.05,
@@ -33,12 +33,13 @@
   "size": 15,
   "min_y": 96,
   "max_y": 384,
+  "seed": 101281,
   "type": "global",
   "elevation": {
     "type": "Map",
     "source": {
       "type": "Simplex",
-      "seed": 180512,
+      "seed": 101278,
       "gain": 0.5,
       "octaves": 3,
       "frequency": 0.0028571428,
@@ -62,7 +63,7 @@
         "type": "Warp",
         "source": {
           "type": "SimplexRidge",
-          "seed": 180513,
+          "seed": 101279,
           "gain": 0.975,
           "octaves": 3,
           "frequency": 0.0055555557,
@@ -75,7 +76,7 @@
             "type": "Map",
             "source": {
               "type": "Perlin",
-              "seed": 180514,
+              "seed": 101280,
               "gain": 0.5,
               "octaves": 1,
               "frequency": 0.05,
@@ -95,7 +96,7 @@
             "type": "Map",
             "source": {
               "type": "Perlin",
-              "seed": 180515,
+              "seed": 101281,
               "gain": 0.5,
               "octaves": 1,
               "frequency": 0.05,
