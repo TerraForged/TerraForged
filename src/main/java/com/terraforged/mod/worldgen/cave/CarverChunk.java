@@ -62,7 +62,7 @@ public class CarverChunk {
         int biomeX = x >> 2;
         int biomeZ = z >> 2;
         if (cached == null || biomeX != cachedX || biomeZ != cachedZ) {
-            cached = generator.getBiomeSource().getUnderGroundBiome(config.hashCode(), x, z, config.getType());
+            cached = generator.getBiomeSource().getUnderGroundBiome(config.getSeed(), x, z, config.getType());
             cachedX = biomeX;
             cachedZ = biomeZ;
             biomes.computeIfAbsent(config, c -> nextList()).add(cached);

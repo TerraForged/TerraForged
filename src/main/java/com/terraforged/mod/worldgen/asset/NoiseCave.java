@@ -35,6 +35,7 @@ import com.terraforged.noise.util.NoiseUtil;
 
 public class NoiseCave implements ContextSeedable<NoiseCave>  {
     public static final Codec<NoiseCave> CODEC = LazyCodec.record(instance -> instance.group(
+            Codec.INT.optionalFieldOf("seed", 0).forGetter(c -> c.seed),
             CaveType.CODEC.fieldOf("type").forGetter(c -> c.type),
             NoiseCodec.CODEC.fieldOf("elevation").forGetter(c -> c.elevation),
             NoiseCodec.CODEC.fieldOf("shape").forGetter(c -> c.shape),
@@ -44,6 +45,7 @@ public class NoiseCave implements ContextSeedable<NoiseCave>  {
             Codec.INT.fieldOf("max_y").forGetter(c -> c.maxY)
     ).apply(instance, NoiseCave::new));
 
+    private final int seed;
     private final CaveType type;
     private final Module elevation;
     private final Module shape;
@@ -53,7 +55,8 @@ public class NoiseCave implements ContextSeedable<NoiseCave>  {
     private final int maxY;
     private final int rangeY;
 
-    public NoiseCave(CaveType type, Module elevation, Module shape, Module floor, int size, int minY, int maxY) {
+    public NoiseCave(int seed, CaveType type, Module elevation, Module shape, Module floor, int size, int minY, int maxY) {
+        this.seed = seed;
         this.type = type;
         this.elevation = elevation;
         this.shape = shape;
@@ -69,7 +72,11 @@ public class NoiseCave implements ContextSeedable<NoiseCave>  {
         var elevation = withSeed(seed, this.elevation, Module.class);
         var shape = withSeed(seed, this.shape, Module.class);
         var floor = withSeed(seed, this.floor, Module.class);
-        return new NoiseCave(type, elevation, shape, floor, size, minY, maxY);
+        return new NoiseCave(this.seed, type, elevation, shape, floor, size, minY, maxY);
+    }
+
+    public int getSeed() {
+        return seed;
     }
 
     public CaveType getType() {
@@ -110,8 +117,6 @@ public class NoiseCave implements ContextSeedable<NoiseCave>  {
 
     // 30, -32, 100
     public static NoiseCave megaCave(int seed, float scale, int minY, int maxY) {
-        seed += 781249;
-
         int elevationScale = NoiseUtil.floor(200 * scale);
         int networkScale = NoiseUtil.floor(250 * scale);
         int floorScale = NoiseUtil.floor(30 * scale);
@@ -124,12 +129,10 @@ public class NoiseCave implements ContextSeedable<NoiseCave>  {
 
         var floor = Source.simplex(++seed, floorScale, 2).clamp(0.0, 0.3).map(0, 1);
 
-        return new NoiseCave(CaveType.UNIQUE, elevation, shape, floor, size, minY, maxY);
+        return new NoiseCave(seed, CaveType.UNIQUE, elevation, shape, floor, size, minY, maxY);
     }
 
     public static NoiseCave synapseCave(int seed, float scale, int minY, int maxY) {
-        seed += 79234;
-
         int elevationScale = NoiseUtil.floor(350 * scale);
         int networkScale = NoiseUtil.floor(180 * scale);
         int networkWarpScale = NoiseUtil.floor(20 * scale);
@@ -142,7 +145,6 @@ public class NoiseCave implements ContextSeedable<NoiseCave>  {
                 .warp(++seed, networkWarpScale, 1, networkWarpStrength)
                 .clamp(0.35, 0.75).map(0, 1);
         var floor = Source.simplex(++seed, floorScale, 2).clamp(0.0, 0.15).map(0, 1);
-
-        return new NoiseCave(CaveType.GLOBAL, elevation, shape, floor, size, minY, maxY);
+        return new NoiseCave(seed, CaveType.GLOBAL, elevation, shape, floor, size, minY, maxY);
     }
 }

@@ -64,21 +64,41 @@ public class NoiseCaveGenerator {
     }
 
     public void carve(ChunkAccess chunk, Generator generator) {
-        var carver = cache.computeIfAbsent(chunk.getPos(), p -> pool.take()).reset();
+        var carver = getPreCarveChunk(chunk);
 
         for (var config : caves) {
-            NoiseCaveCarver.carve(chunk, carver, generator, config, getModifier(config));
+            NoiseCaveCarver.carve(chunk, carver, generator, config, getModifier(config), true);
         }
     }
 
     public void decorate(ChunkAccess chunk, WorldGenLevel region, Generator generator) {
-        var carver = cache.remove(chunk.getPos());
+        var carver = getPostCarveChunk(chunk, generator);
 
         for (var config : caves) {
             NoiseCaveDecorator.decorate(chunk, carver, region, generator, config);
         }
 
         pool.restore(carver);
+    }
+
+    private CarverChunk getPreCarveChunk(ChunkAccess chunk) {
+        return cache.computeIfAbsent(chunk.getPos(), p -> pool.take().reset());
+    }
+
+    private CarverChunk getPostCarveChunk(ChunkAccess chunk, Generator generator) {
+        var carver = cache.remove(chunk.getPos());
+        if (carver != null) return carver;
+
+        // Chunk may have been saved in an incomplete state so need run the carve step
+        // again to populate the CarverChunk (flag set false to skip setting blocks).
+
+        carver = pool.take().reset();
+
+        for (var config : caves) {
+            NoiseCaveCarver.carve(chunk, carver, generator, config, getModifier(config), false);
+        }
+
+        return carver;
     }
 
     private Module getModifier(NoiseCave cave) {

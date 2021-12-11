@@ -84,12 +84,14 @@ public class BiomeUtil {
             case ICY -> BiomeType.TUNDRA;
             case SAVANNA -> BiomeType.SAVANNA;
             case JUNGLE -> BiomeType.TROPICAL_RAINFOREST;
-            case FOREST -> getByRain(biome, BiomeType.TEMPERATE_RAINFOREST, BiomeType.TEMPERATE_FOREST);
+            case FOREST -> getByRain(biome, BiomeType.TUNDRA, BiomeType.TEMPERATE_RAINFOREST, BiomeType.TEMPERATE_FOREST);
             default -> BiomeType.ALPINE;
         };
     }
 
-    public static BiomeType getByRain(Biome biome, BiomeType wetter, BiomeType dryer) {
+    public static BiomeType getByRain(Biome biome, BiomeType frozen, BiomeType wetter, BiomeType dryer) {
+        if (biome.getPrecipitation() == Biome.Precipitation.SNOW) return frozen;
+
         return biome.getDownfall() > 0.66 ? wetter : dryer;
     }
 

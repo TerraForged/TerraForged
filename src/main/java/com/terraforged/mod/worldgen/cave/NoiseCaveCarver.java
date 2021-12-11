@@ -35,14 +35,16 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 public class NoiseCaveCarver {
-    public static void carve(ChunkAccess chunk, CarverChunk carver, Generator generator, NoiseCave config, Module modifier) {
+    private static final int CHUNK_AREA = 16 * 16;
+
+    public static void carve(ChunkAccess chunk, CarverChunk carver, Generator generator, NoiseCave config, Module modifier, boolean carve) {
         var pos = new BlockPos.MutableBlockPos();
 
         int minY = generator.getMinY();
         int startX = chunk.getPos().getMinBlockX();
         int startZ = chunk.getPos().getMinBlockZ();
 
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < CHUNK_AREA; i++) {
             int dx = i & 15;
             int dz = i >> 4;
             int surface = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, dx, dz) - 4;
@@ -63,7 +65,9 @@ public class NoiseCaveCarver {
 
             var biome = carver.getBiome(x, z, config, generator);
 
-            carve(chunk, biome, dx, dz, bottom, top, surface, pos);
+            if (carve) {
+                carve(chunk, biome, dx, dz, bottom, top, surface, pos);
+            }
         }
     }
 

@@ -64,8 +64,7 @@ public class CaveBiomeSampler {
     }
 
     public Biome getUnderGroundBiome(int seed, int x, int z, CaveType type) {
-        seed += this.seed;
-        float noise = sample(seed, x, z, frequency);
+        float noise = sample(seed + this.seed, x, z, frequency);
         return typeMap.get(type).getValue(noise);
     }
 
