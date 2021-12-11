@@ -26,9 +26,7 @@ package com.terraforged.mod.worldgen.cave;
 
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.asset.NoiseCave;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
-import net.minecraft.data.worldgen.placement.CavePlacements;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -37,29 +35,20 @@ import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 
 public class NoiseCaveDecorator {
-    public static final BiomeGenerationSettings DEFAULTS = Util.make(() -> {
-        var genSettings = new BiomeGenerationSettings.Builder();
-        genSettings.addFeature(GenerationStep.Decoration.LOCAL_MODIFICATIONS, CavePlacements.LARGE_DRIPSTONE);
-        genSettings.addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, CavePlacements.DRIPSTONE_CLUSTER);
-        return genSettings.build();
-    });
-
     public static void decorate(ChunkAccess chunk, CarverChunk carver, WorldGenLevel region, Generator generator, NoiseCave config) {
+        var biomes = carver.getBiomes(config);
+        if (biomes == null) return;
+
         int startX = chunk.getPos().getMinBlockX();
         int startZ = chunk.getPos().getMinBlockZ();
         int startY = config.getHeight(startX, startZ);
 
         var pos = new BlockPos(startX, startY, startZ);
-        var biomes = carver.getBiomes(config);
         var random = new WorldgenRandom(new LegacyRandomSource(region.getSeed()));
 
-        if (config.getType() == CaveType.GLOBAL || biomes == null) {
-            decorate(pos, region, generator, DEFAULTS, random);
-        } else {
-            for (int i = 0; i < biomes.size(); i++) {
-                var biome = biomes.get(i);
-                decorate(pos, region, generator, biome.getGenerationSettings(), random);
-            }
+        for (int i = 0; i < biomes.size(); i++) {
+            var biome = biomes.get(i);
+            decorate(pos, region, generator, biome.getGenerationSettings(), random);
         }
     }
 
