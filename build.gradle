@@ -27,7 +27,7 @@ repositories {
 
 dependencies {
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
-    minecraft "net.minecraftforge:forge:1.18-${forge_version}"
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 }
 
 jar {
