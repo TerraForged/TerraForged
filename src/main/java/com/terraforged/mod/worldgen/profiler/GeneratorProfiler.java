@@ -143,6 +143,7 @@ public class GeneratorProfiler extends ChunkGenerator {
         var timer = stages.decoration.start();
         generator.applyBiomeDecoration(p_187712_, p_187713_, p_187714_);
         timer.punchOut();
+        stages.incrementChunks();
     }
 
     @Override

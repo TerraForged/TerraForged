@@ -27,6 +27,7 @@ package com.terraforged.mod.worldgen.profiler;
 import com.terraforged.mod.TerraForged;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ProfilerStages {
@@ -43,11 +44,17 @@ public class ProfilerStages {
     // @formatter:on
 
     private final long start = System.currentTimeMillis() + INTERVAL_MS * 2;
+    private final AtomicInteger chunkCount = new AtomicInteger();
     private final AtomicLong timestamp = new AtomicLong(0);
     private final GenStage[] stages = {starts, refs, biomes, noise, carve, surface, decoration};
 
+    public void incrementChunks() {
+        chunkCount.incrementAndGet();
+    }
+
     public void reset() {
         timestamp.set(0L);
+        chunkCount.set(0);
         for (var stage : stages) {
             stage.reset();
         }
@@ -75,7 +82,9 @@ public class ProfilerStages {
             }
 
             sumAverage = trim(sumAverage, 100);
+
             TerraForged.LOG.info(" Chunk Average = {}ms", sumAverage);
+            TerraForged.LOG.info(" Chunk Count: =  {}", chunkCount.get());
         }
     }
 
