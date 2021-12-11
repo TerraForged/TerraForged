@@ -14,11 +14,11 @@
               "type": "Alpha",
               "source": {
                 "type": "Billow",
-                "seed": 15,
+                "seed": 290502,
                 "gain": 0.5,
                 "octaves": 3,
                 "frequency": 0.0025,
-                "lacunarity": 2.0,
+                "lacunarity": 2,
                 "interpolation": "CURVE3"
               },
               "alpha": {
@@ -34,11 +34,11 @@
             "type": "Map",
             "source": {
               "type": "Perlin",
-              "seed": 16,
+              "seed": 306606,
               "gain": 0.5,
               "octaves": 3,
               "frequency": 0.033333335,
-              "lacunarity": 2.0,
+              "lacunarity": 2,
               "interpolation": "CURVE3"
             },
             "min": {
@@ -54,11 +54,11 @@
             "type": "Map",
             "source": {
               "type": "Perlin",
-              "seed": 17,
+              "seed": 306607,
               "gain": 0.5,
               "octaves": 3,
               "frequency": 0.033333335,
-              "lacunarity": 2.0,
+              "lacunarity": 2,
               "interpolation": "CURVE3"
             },
             "min": {
@@ -72,7 +72,7 @@
           },
           "distance": {
             "type": "Const",
-            "value": 20.0
+            "value": 20
           }
         }
       },
@@ -82,11 +82,11 @@
           "type": "Map",
           "source": {
             "type": "Perlin",
-            "seed": 17,
+            "seed": 340029,
             "gain": 0.5,
             "octaves": 3,
             "frequency": 0.0025,
-            "lacunarity": 2.0,
+            "lacunarity": 2,
             "interpolation": "CURVE3"
           },
           "min": {
@@ -102,11 +102,11 @@
           "type": "Map",
           "source": {
             "type": "Perlin",
-            "seed": 18,
+            "seed": 340030,
             "gain": 0.5,
             "octaves": 3,
             "frequency": 0.0025,
-            "lacunarity": 2.0,
+            "lacunarity": 2,
             "interpolation": "CURVE3"
           },
           "min": {
@@ -120,7 +120,7 @@
         },
         "distance": {
           "type": "Const",
-          "value": 200.0
+          "value": 200
         }
       }
     },

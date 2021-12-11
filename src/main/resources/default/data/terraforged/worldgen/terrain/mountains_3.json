@@ -7,10 +7,10 @@
       "type": "Warp",
       "source": {
         "type": "Valley",
-        "seed": 71,
+        "seed": 267365,
         "octaves": 2,
         "strength": 0.65,
-        "grid_size": 128.0,
+        "grid_size": 128,
         "amplitude": 0.15,
         "lacunarity": 3.1,
         "fall_off": 0.8,
@@ -30,11 +30,11 @@
                   "type": "Alpha",
                   "source": {
                     "type": "Ridge",
-                    "seed": 67,
+                    "seed": 390812,
                     "gain": 0.975,
                     "octaves": 4,
                     "frequency": 0.008,
-                    "lacunarity": 2.0,
+                    "lacunarity": 2,
                     "interpolation": "CURVE3"
                   },
                   "alpha": {
@@ -53,11 +53,11 @@
             "type": "Scale",
             "source": {
               "type": "Perlin",
-              "seed": 68,
+              "seed": 218768,
               "gain": 0.5,
               "octaves": 1,
               "frequency": 0.02,
-              "lacunarity": 2.0,
+              "lacunarity": 2,
               "interpolation": "CURVE3"
             },
             "scale": {
@@ -75,11 +75,11 @@
               "type": "Clamp",
               "source": {
                 "type": "Perlin",
-                "seed": 69,
+                "seed": 493682,
                 "gain": 0.5,
                 "octaves": 1,
                 "frequency": 0.01,
-                "lacunarity": 2.0,
+                "lacunarity": 2,
                 "interpolation": "CURVE3"
               },
               "min": {
@@ -93,11 +93,11 @@
             },
             "min": {
               "type": "Const",
-              "value": 0.0
+              "value": 0
             },
             "max": {
               "type": "Const",
-              "value": 1.0
+              "value": 1
             }
           }
         }
@@ -106,16 +106,16 @@
         "type": "DirectionWarp",
         "direction": {
           "type": "Perlin",
-          "seed": 70,
+          "seed": 41869,
           "gain": 0.5,
           "octaves": 1,
           "frequency": 0.1,
-          "lacunarity": 2.0,
+          "lacunarity": 2,
           "interpolation": "CURVE3"
         },
         "strength": {
           "type": "Const",
-          "value": 2.0
+          "value": 2
         }
       }
     },

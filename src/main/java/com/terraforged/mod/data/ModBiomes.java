@@ -24,15 +24,30 @@
 
 package com.terraforged.mod.data;
 
-import com.terraforged.mod.registry.ModRegistries;
-import com.terraforged.mod.registry.ModRegistry;
-import com.terraforged.mod.worldgen.asset.NoiseCaveConfig;
-import net.minecraft.data.BuiltinRegistries;
+import com.terraforged.mod.platform.Platform;
+import com.terraforged.mod.registry.registrar.Registrar;
+import com.terraforged.mod.worldgen.biome.biomes.ModBiome;
+import net.minecraft.core.Registry;
+import net.minecraft.data.worldgen.placement.CavePlacements;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.levelgen.GenerationStep;
 
-interface NoiseCaves extends ModRegistry {
+public interface ModBiomes {
+    ModBiome CAVE = ModBiome.of("cave", Biomes.DRIPSTONE_CAVES, builder -> {
+        var genSettings = new BiomeGenerationSettings.Builder();
+        genSettings.addFeature(GenerationStep.Decoration.LOCAL_MODIFICATIONS, CavePlacements.LARGE_DRIPSTONE);
+        genSettings.addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, CavePlacements.DRIPSTONE_CLUSTER);
+        genSettings.build();
+        builder.generationSettings(genSettings.build());
+    });
+
     static void register() {
-        ModRegistries.register(NOISE_CAVE, "lush_caves", NoiseCaveConfig.create0(0, Biomes.LUSH_CAVES, BuiltinRegistries.BIOME::getOrThrow));
-        ModRegistries.register(NOISE_CAVE, "dripstone_caves", NoiseCaveConfig.create1(0, Biomes.DRIPSTONE_CAVES, BuiltinRegistries.BIOME::getOrThrow));
+        register(Platform.ACTIVE_PLATFORM.get().getRegistrar(Registry.BIOME_REGISTRY));
+    }
+
+    static void register(Registrar<Biome> registrar) {
+        registrar.register(CAVE.key(), CAVE.create());
     }
 }

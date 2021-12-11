@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    library "com.terraforged:Engine:0.2.5"
+    library "com.terraforged:Engine:0.2.6"
 }
 
 task libraries(type: Copy) {

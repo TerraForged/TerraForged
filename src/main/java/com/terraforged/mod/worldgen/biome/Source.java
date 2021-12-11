@@ -28,11 +28,11 @@ import com.mojang.serialization.Codec;
 import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.mod.util.map.LossyCache;
 import com.terraforged.mod.worldgen.biome.util.BiomeUtil;
+import com.terraforged.mod.worldgen.cave.CaveType;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 
 import java.util.List;
@@ -42,6 +42,7 @@ public class Source extends BiomeSource {
 
     protected final long seed;
     protected final BiomeSampler biomeSampler;
+    protected final CaveBiomeSampler caveBiomeSampler;
     protected final Registry<Biome> registry;
     protected final LossyCache<Biome> cache = LossyCache.concurrent(2048, Biome[]::new);
 
@@ -50,6 +51,7 @@ public class Source extends BiomeSource {
         this.seed = seed;
         this.registry = other.registry;
         this.biomeSampler = new BiomeSampler(noise, other.registry, List.copyOf(other.possibleBiomes()));
+        this.caveBiomeSampler = new CaveBiomeSampler(seed, other.caveBiomeSampler);
     }
 
     public Source(long seed, INoiseGenerator noise, Registry<Biome> biomes) {
@@ -61,6 +63,7 @@ public class Source extends BiomeSource {
         this.seed = seed;
         this.registry = registry;
         this.biomeSampler = new BiomeSampler(noise, registry, biomes);
+        this.caveBiomeSampler = new CaveBiomeSampler(seed, 800, registry, biomes);
     }
 
     @Override
@@ -78,8 +81,8 @@ public class Source extends BiomeSource {
         return cache.computeIfAbsent(PosUtil.pack(x, z), this::compute);
     }
 
-    public Biome getCarvingBiome() {
-        return registry.getOrThrow(Biomes.LUSH_CAVES);
+    public Biome getUnderGroundBiome(int seed, int x, int z, CaveType type) {
+        return caveBiomeSampler.getUnderGroundBiome(seed, x, z, type);
     }
 
     public Registry<Biome> getRegistry() {

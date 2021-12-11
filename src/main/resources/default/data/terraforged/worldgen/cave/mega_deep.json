@@ -1,0 +1,107 @@
+{
+  "floor": {
+    "type": "Map",
+    "source": {
+      "type": "Clamp",
+      "source": {
+        "type": "Simplex",
+        "seed": 1028948,
+        "gain": 0.5,
+        "octaves": 2,
+        "frequency": 0.027777778,
+        "lacunarity": 2,
+        "interpolation": "CURVE3"
+      },
+      "min": {
+        "type": "Const",
+        "value": 0
+      },
+      "max": {
+        "type": "Const",
+        "value": 0.3
+      }
+    },
+    "min": {
+      "type": "Const",
+      "value": 0
+    },
+    "max": {
+      "type": "Const",
+      "value": 1
+    }
+  },
+  "size": 36,
+  "max_y": 48,
+  "type": "unique",
+  "elevation": {
+    "type": "Map",
+    "source": {
+      "type": "Simplex",
+      "seed": 1028946,
+      "gain": 0.5,
+      "octaves": 2,
+      "frequency": 0.004166667,
+      "lacunarity": 2,
+      "interpolation": "CURVE3"
+    },
+    "min": {
+      "type": "Const",
+      "value": 0.3
+    },
+    "max": {
+      "type": "Const",
+      "value": 0.7
+    }
+  },
+  "shape": {
+    "type": "Map",
+    "source": {
+      "type": "Clamp",
+      "source": {
+        "type": "Invert",
+        "source": {
+          "type": "Scale",
+          "source": {
+            "type": "Abs",
+            "source": {
+              "type": "Bias",
+              "source": {
+                "type": "Simplex",
+                "seed": 1028947,
+                "gain": 0.5,
+                "octaves": 3,
+                "frequency": 0.0033333334,
+                "lacunarity": 2,
+                "interpolation": "CURVE3"
+              },
+              "bias": {
+                "type": "Const",
+                "value": 0
+              }
+            }
+          },
+          "scale": {
+            "type": "Const",
+            "value": 2
+          }
+        }
+      },
+      "min": {
+        "type": "Const",
+        "value": 0.75
+      },
+      "max": {
+        "type": "Const",
+        "value": 1
+      }
+    },
+    "min": {
+      "type": "Const",
+      "value": 0
+    },
+    "max": {
+      "type": "Const",
+      "value": 1
+    }
+  }
+}

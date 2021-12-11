@@ -24,13 +24,20 @@
 
 package com.terraforged.mod.platform;
 
+import com.terraforged.mod.registry.registrar.Registrar;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 
+@SuppressWarnings("deprecation")
 public interface Platform {
     AtomicReference<Platform> ACTIVE_PLATFORM = new AtomicReference<>();
 
     Path getContainer();
+
+    <T> Registrar<T> getRegistrar(ResourceKey<Registry<T>> key);
 
     default PlatformData getData() {
         return PlatformData.DEFAULT;

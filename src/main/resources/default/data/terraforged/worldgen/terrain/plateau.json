@@ -33,11 +33,11 @@
             "type": "Scale",
             "source": {
               "type": "Perlin",
-              "seed": 38,
+              "seed": 167119,
               "gain": 0.5,
               "octaves": 3,
               "frequency": 0.05,
-              "lacunarity": 2.0,
+              "lacunarity": 2,
               "interpolation": "CURVE3"
             },
             "scale": {
@@ -51,11 +51,11 @@
               "type": "Map",
               "source": {
                 "type": "Perlin",
-                "seed": 39,
+                "seed": 473827,
                 "gain": 0.5,
                 "octaves": 2,
                 "frequency": 0.025,
-                "lacunarity": 2.0,
+                "lacunarity": 2,
                 "interpolation": "CURVE3"
               },
               "min": {
@@ -71,11 +71,11 @@
               "type": "Map",
               "source": {
                 "type": "Perlin",
-                "seed": 40,
+                "seed": 473828,
                 "gain": 0.5,
                 "octaves": 2,
                 "frequency": 0.025,
-                "lacunarity": 2.0,
+                "lacunarity": 2,
                 "interpolation": "CURVE3"
               },
               "min": {
@@ -89,7 +89,7 @@
             },
             "distance": {
               "type": "Const",
-              "value": 20.0
+              "value": 20
             }
           }
         }

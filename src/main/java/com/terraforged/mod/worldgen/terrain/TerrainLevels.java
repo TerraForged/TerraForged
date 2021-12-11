@@ -29,7 +29,10 @@ import com.terraforged.noise.util.NoiseUtil;
 
 public class TerrainLevels {
     public static final int DEFAULT_SEA_LEVEL = 63;
-    public static final int DEFAULT_GEN_DEPTH = 256;
+    public static final int DEFAULT_GEN_DEPTH = 384;
+    public static final int LEGACY_GEN_DEPTH = 256;
+
+    public static final TerrainLevels LEGACY = new TerrainLevels(DEFAULT_SEA_LEVEL, LEGACY_GEN_DEPTH);
     public static final TerrainLevels DEFAULT = new TerrainLevels(DEFAULT_SEA_LEVEL, DEFAULT_GEN_DEPTH);
 
     public final int seaLevel;
@@ -37,7 +40,7 @@ public class TerrainLevels {
     public final NoiseLevels noiseLevels;
 
     public TerrainLevels() {
-        this(DEFAULT_SEA_LEVEL, 384);
+        this(DEFAULT_SEA_LEVEL, DEFAULT_GEN_DEPTH);
     }
 
     public TerrainLevels(int seaLevel, int genDepth) {

@@ -1,6 +1,5 @@
 {
   "terrain": "flats",
-  "weight": 2.0,
   "noise": {
     "type": "Bias",
     "source": {
@@ -16,7 +15,7 @@
                 "type": "Alpha",
                 "source": {
                   "type": "Perlin",
-                  "seed": 5,
+                  "seed": 25463,
                   "gain": 0.5,
                   "octaves": 3,
                   "frequency": 0.002,
@@ -36,11 +35,11 @@
               "type": "Map",
               "source": {
                 "type": "Perlin",
-                "seed": 6,
+                "seed": 298284,
                 "gain": 0.5,
                 "octaves": 3,
                 "frequency": 0.016129032,
-                "lacunarity": 3.5,
+                "lacunarity": 3,
                 "interpolation": "CURVE3"
               },
               "min": {
@@ -56,11 +55,11 @@
               "type": "Map",
               "source": {
                 "type": "Perlin",
-                "seed": 7,
+                "seed": 494685,
                 "gain": 0.5,
                 "octaves": 3,
                 "frequency": 0.016129032,
-                "lacunarity": 3.5,
+                "lacunarity": 3,
                 "interpolation": "CURVE3"
               },
               "min": {
@@ -84,11 +83,11 @@
             "type": "Map",
             "source": {
               "type": "Perlin",
-              "seed": 9,
+              "seed": 455169,
               "gain": 0.5,
               "octaves": 1,
               "frequency": 0.00390625,
-              "lacunarity": 2.0,
+              "lacunarity": 2,
               "interpolation": "CURVE3"
             },
             "min": {
@@ -104,11 +103,11 @@
             "type": "Map",
             "source": {
               "type": "Perlin",
-              "seed": 10,
+              "seed": 455170,
               "gain": 0.5,
               "octaves": 1,
               "frequency": 0.00390625,
-              "lacunarity": 2.0,
+              "lacunarity": 2,
               "interpolation": "CURVE3"
             },
             "min": {
@@ -122,18 +121,18 @@
           },
           "distance": {
             "type": "Const",
-            "value": 256.0
+            "value": 200
           }
         }
       },
       "scale": {
         "type": "Const",
-        "value": 0.14700001
+        "value": 0.08
       }
     },
     "bias": {
       "type": "Const",
-      "value": -0.02
+      "value": 0
     }
   }
 }

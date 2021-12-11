@@ -22,27 +22,26 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod;
+package com.terraforged.mod.registry.registrar;
 
-public interface Environment {
-    boolean DEV_ENV = hasFlag("dev");
-    boolean PROFILING = DEV_ENV || hasFlag("profiling");
-    boolean UNLIMITED = DEV_ENV || hasFlag("unlimited");
-    boolean DEBUGGING = DEV_ENV || hasFlag("debugging");
-    boolean DATA_GEN = hasFlag("datagen");
-    int CORES = Runtime.getRuntime().availableProcessors();
+import net.minecraft.resources.ResourceKey;
 
-    static boolean hasFlag(String flag) {
-        return System.getProperty(flag) != null;
+import java.util.ArrayList;
+import java.util.List;
+
+public class DelayedRegistrar<T> implements Registrar<T> {
+    private final List<Entry<T>> entries = new ArrayList<>();
+
+    @Override
+    public void register(ResourceKey<T> key, T value) {
+        entries.add(new Entry<>(key, value));
     }
 
-    static void log() {
-        TerraForged.LOG.info("Environment:");
-        TerraForged.LOG.info("- Dev:       {}", DEV_ENV);
-        TerraForged.LOG.info("- Profiling: {}", PROFILING);
-        TerraForged.LOG.info("- Unlimited: {}", UNLIMITED);
-        TerraForged.LOG.info("- Debugging: {}", DEBUGGING);
-        TerraForged.LOG.info("- Data Gen:  {}", DATA_GEN);
-        TerraForged.LOG.info("- Cores:     {}", CORES);
+    public void register(Registrar<T> delegate) {
+        for (var entry : entries) {
+            delegate.register(entry.key, entry.value);
+        }
     }
+
+    protected record Entry<T>(ResourceKey<T> key, T value) {}
 }

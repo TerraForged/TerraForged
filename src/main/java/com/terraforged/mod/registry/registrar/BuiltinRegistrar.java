@@ -22,27 +22,25 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod;
+package com.terraforged.mod.registry.registrar;
 
-public interface Environment {
-    boolean DEV_ENV = hasFlag("dev");
-    boolean PROFILING = DEV_ENV || hasFlag("profiling");
-    boolean UNLIMITED = DEV_ENV || hasFlag("unlimited");
-    boolean DEBUGGING = DEV_ENV || hasFlag("debugging");
-    boolean DATA_GEN = hasFlag("datagen");
-    int CORES = Runtime.getRuntime().availableProcessors();
+import com.google.common.base.Suppliers;
+import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.resources.ResourceKey;
 
-    static boolean hasFlag(String flag) {
-        return System.getProperty(flag) != null;
+import java.util.function.Supplier;
+
+public class BuiltinRegistrar<T> implements Registrar<T> {
+    private final Supplier<Registry<T>> registry;
+
+    @SuppressWarnings("unchecked")
+    public BuiltinRegistrar(ResourceKey<Registry<T>> registryKey) {
+        registry = Suppliers.memoize(() -> (Registry<T>) BuiltinRegistries.REGISTRY.get(registryKey.location()));
     }
 
-    static void log() {
-        TerraForged.LOG.info("Environment:");
-        TerraForged.LOG.info("- Dev:       {}", DEV_ENV);
-        TerraForged.LOG.info("- Profiling: {}", PROFILING);
-        TerraForged.LOG.info("- Unlimited: {}", UNLIMITED);
-        TerraForged.LOG.info("- Debugging: {}", DEBUGGING);
-        TerraForged.LOG.info("- Data Gen:  {}", DATA_GEN);
-        TerraForged.LOG.info("- Cores:     {}", CORES);
+    @Override
+    public void register(ResourceKey<T> key, T value) {
+        BuiltinRegistries.register(registry.get(), key, value);
     }
 }

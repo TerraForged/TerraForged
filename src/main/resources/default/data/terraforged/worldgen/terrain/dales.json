@@ -18,11 +18,11 @@
               "type": "Clamp",
               "source": {
                 "type": "Perlin",
-                "seed": 12,
+                "seed": 320232,
                 "gain": 0.5,
                 "octaves": 1,
                 "frequency": 0.0025,
-                "lacunarity": 2.0,
+                "lacunarity": 2,
                 "interpolation": "CURVE3"
               },
               "min": {
@@ -36,11 +36,11 @@
             },
             "min": {
               "type": "Const",
-              "value": 0.0
+              "value": 0
             },
             "max": {
               "type": "Const",
-              "value": 1.0
+              "value": 1
             }
           },
           "lower": {
@@ -49,11 +49,11 @@
               "type": "PowCurve",
               "source": {
                 "type": "Billow",
-                "seed": 10,
+                "seed": 468513,
                 "gain": 0.8,
                 "octaves": 4,
                 "frequency": 0.0033333334,
-                "lacunarity": 4.0,
+                "lacunarity": 4,
                 "interpolation": "CURVE3"
               },
               "power": 0.5
@@ -67,11 +67,11 @@
             "type": "Pow",
             "source": {
               "type": "Billow",
-              "seed": 11,
+              "seed": 55549,
               "gain": 0.8,
               "octaves": 3,
               "frequency": 0.0028571428,
-              "lacunarity": 4.0,
+              "lacunarity": 4,
               "interpolation": "CURVE3"
             },
             "power": {
@@ -91,11 +91,11 @@
           "type": "Map",
           "source": {
             "type": "Perlin",
-            "seed": 13,
+            "seed": 161033,
             "gain": 0.5,
             "octaves": 1,
             "frequency": 0.0033333334,
-            "lacunarity": 2.0,
+            "lacunarity": 2,
             "interpolation": "CURVE3"
           },
           "min": {
@@ -111,11 +111,11 @@
           "type": "Map",
           "source": {
             "type": "Perlin",
-            "seed": 14,
+            "seed": 161034,
             "gain": 0.5,
             "octaves": 1,
             "frequency": 0.0033333334,
-            "lacunarity": 2.0,
+            "lacunarity": 2,
             "interpolation": "CURVE3"
           },
           "min": {
@@ -129,7 +129,7 @@
         },
         "distance": {
           "type": "Const",
-          "value": 100.0
+          "value": 100
         }
       }
     },

@@ -26,7 +26,7 @@ package com.terraforged.mod.worldgen.asset;
 
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.terraforged.mod.codec.LazyCodec;
 import com.terraforged.mod.util.DataUtil;
 import com.terraforged.mod.util.seed.ContextSeedable;
 import com.terraforged.mod.worldgen.biome.viability.*;
@@ -37,7 +37,7 @@ import java.util.function.Supplier;
 public class ViabilityConfig implements ContextSeedable<ViabilityConfig> {
     public static final ViabilityConfig NONE = new ViabilityConfig(Suppliers.ofInstance(BiomeTag.NONE), 1F, Viability.NONE);
 
-    public static final Codec<ViabilityConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final Codec<ViabilityConfig> CODEC = LazyCodec.record(instance -> instance.group(
             BiomeTag.CODEC.fieldOf("biomes").forGetter(ViabilityConfig::biomes),
             Codec.FLOAT.optionalFieldOf("density", 1F).forGetter(ViabilityConfig::density),
             ViabilityCodec.CODEC.fieldOf("viability").forGetter(ViabilityConfig::viability)

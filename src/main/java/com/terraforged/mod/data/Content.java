@@ -31,6 +31,8 @@ public class Content extends Init {
 
     @Override
     protected void doInit() {
-        NoiseCaves.register();
+        ModCaves.register();
+        ModBiomes.register();
+        ModTerrain.register();
     }
 }

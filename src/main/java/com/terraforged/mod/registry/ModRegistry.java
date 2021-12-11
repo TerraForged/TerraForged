@@ -26,7 +26,7 @@ package com.terraforged.mod.registry;
 
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.worldgen.asset.BiomeTag;
-import com.terraforged.mod.worldgen.asset.NoiseCaveConfig;
+import com.terraforged.mod.worldgen.asset.NoiseCave;
 import com.terraforged.mod.worldgen.asset.TerrainConfig;
 import com.terraforged.mod.worldgen.asset.ViabilityConfig;
 import net.minecraft.core.Registry;
@@ -34,7 +34,7 @@ import net.minecraft.resources.ResourceKey;
 
 public interface ModRegistry {
     ResourceKey<Registry<BiomeTag>> BIOME_TAG = TerraForged.registry("worldgen/tag/biome");
+    ResourceKey<Registry<NoiseCave>> CAVE = TerraForged.registry("worldgen/cave");
     ResourceKey<Registry<TerrainConfig>> TERRAIN = TerraForged.registry("worldgen/terrain");
     ResourceKey<Registry<ViabilityConfig>> VIABILITY = TerraForged.registry("worldgen/viability");
-    ResourceKey<Registry<NoiseCaveConfig>> NOISE_CAVE = TerraForged.registry("worldgen/noise_cave");
 }

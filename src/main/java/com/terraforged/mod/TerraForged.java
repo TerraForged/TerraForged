@@ -26,6 +26,8 @@ package com.terraforged.mod;
 
 import com.google.common.base.Suppliers;
 import com.terraforged.mod.platform.Platform;
+import com.terraforged.mod.registry.registrar.BuiltinRegistrar;
+import com.terraforged.mod.registry.registrar.Registrar;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -33,6 +35,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public abstract class TerraForged implements Platform {
@@ -41,16 +46,30 @@ public abstract class TerraForged implements Platform {
 	public static final Logger LOG = LogManager.getLogger(TITLE);
 
 	private final Supplier<Path> container;
+	private final Map<ResourceKey<? extends Registry<?>>, Registrar<?>> registrars = new HashMap<>();
 
 	protected TerraForged(Supplier<Path> containerGetter) {
 		this.container = Suppliers.memoize(containerGetter::get);
 		Platform.ACTIVE_PLATFORM.set(this);
 		Environment.log();
+		registrars.put(Registry.BIOME_REGISTRY, new BuiltinRegistrar<>(Registry.BIOME_REGISTRY));
 	}
 
 	@Override
 	public final Path getContainer() {
 		return container.get();
+	}
+
+	@Override
+	public <T> Registrar<T> getRegistrar(ResourceKey<Registry<T>> key) {
+		var registrar = registrars.get(key);
+		Objects.requireNonNull(registrar);
+		//noinspection unchecked
+		return (Registrar<T>) registrar;
+	}
+
+	protected <T> void setRegistrar(ResourceKey<? extends Registry<T>> registry, Registrar<T> registrar) {
+		registrars.put(registry, registrar);
 	}
 
 	public static Platform getPlatform() {

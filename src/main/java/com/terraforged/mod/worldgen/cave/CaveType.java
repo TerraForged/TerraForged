@@ -22,27 +22,30 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod;
+package com.terraforged.mod.worldgen.cave;
 
-public interface Environment {
-    boolean DEV_ENV = hasFlag("dev");
-    boolean PROFILING = DEV_ENV || hasFlag("profiling");
-    boolean UNLIMITED = DEV_ENV || hasFlag("unlimited");
-    boolean DEBUGGING = DEV_ENV || hasFlag("debugging");
-    boolean DATA_GEN = hasFlag("datagen");
-    int CORES = Runtime.getRuntime().availableProcessors();
+import com.mojang.serialization.Codec;
 
-    static boolean hasFlag(String flag) {
-        return System.getProperty(flag) != null;
+import java.util.Locale;
+
+public enum CaveType {
+    GLOBAL("global"),
+    UNIQUE("unique");
+
+    public static final Codec<CaveType> CODEC = Codec.STRING.xmap(CaveType::forName, CaveType::getName);
+
+    final String name;
+
+    CaveType(String name) {
+        this.name = name;
     }
 
-    static void log() {
-        TerraForged.LOG.info("Environment:");
-        TerraForged.LOG.info("- Dev:       {}", DEV_ENV);
-        TerraForged.LOG.info("- Profiling: {}", PROFILING);
-        TerraForged.LOG.info("- Unlimited: {}", UNLIMITED);
-        TerraForged.LOG.info("- Debugging: {}", DEBUGGING);
-        TerraForged.LOG.info("- Data Gen:  {}", DATA_GEN);
-        TerraForged.LOG.info("- Cores:     {}", CORES);
+    public String getName() {
+        return name;
+    }
+
+    public static CaveType forName(String name) {
+        name = name.toUpperCase(Locale.ROOT);
+        return valueOf(name);
     }
 }

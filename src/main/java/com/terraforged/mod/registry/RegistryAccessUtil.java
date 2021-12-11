@@ -153,7 +153,7 @@ public class RegistryAccessUtil {
 
         TerraForged.LOG.info(" - Registry: {}, Size: {}", registry.key().location(), registry.size());
         for (var entry : registry.entrySet()) {
-            TerraForged.LOG.info("  - {} = {}", entry.getKey().location(), entry.getValue());
+            TerraForged.LOG.info("  - {}", entry.getKey().location());
         }
     }
 }

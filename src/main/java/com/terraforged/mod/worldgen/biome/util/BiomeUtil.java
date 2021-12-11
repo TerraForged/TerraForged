@@ -52,10 +52,18 @@ public class BiomeUtil {
     }
 
     public static List<Biome> getOverworldBiomes(Registry<Biome> biomes) {
-        var sorter = getBiomeSorter(biomes);
-        return MultiNoiseBiomeSource.Preset.OVERWORLD.biomeSource(biomes).possibleBiomes().stream()
-                .sorted(sorter)
-                .toList();
+        var overworld = new ArrayList<>(MultiNoiseBiomeSource.Preset.OVERWORLD.biomeSource(biomes).possibleBiomes());
+
+        for (var biome : biomes) {
+            var name = biomes.getKey(biome);
+            if (name != null && name.getNamespace().equals(TerraForged.MODID)) {
+                overworld.add(biome);
+            }
+        }
+
+        overworld.sort(getBiomeSorter(biomes));
+
+        return overworld;
     }
 
     public static Comparator<Biome> getBiomeSorter(Registry<Biome> biomes) {

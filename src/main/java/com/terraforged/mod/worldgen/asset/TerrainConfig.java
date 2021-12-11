@@ -25,9 +25,9 @@
 package com.terraforged.mod.worldgen.asset;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.engine.world.terrain.TerrainType;
+import com.terraforged.mod.codec.LazyCodec;
 import com.terraforged.mod.util.map.WeightMap;
 import com.terraforged.mod.util.seed.ContextSeedable;
 import com.terraforged.mod.worldgen.noise.NoiseCodec;
@@ -38,7 +38,7 @@ import com.terraforged.noise.Source;
 public class TerrainConfig implements ContextSeedable<TerrainConfig>, WeightMap.Weighted {
     public static final TerrainConfig NONE = new TerrainConfig(TerrainType.NONE, 0, Source.ZERO);
 
-    public static final Codec<TerrainConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final Codec<TerrainConfig> CODEC = LazyCodec.record(instance -> instance.group(
             Codec.STRING.fieldOf("terrain").xmap(TerrainType::get, Terrain::getName).forGetter(TerrainConfig::terrain),
             Codec.FLOAT.optionalFieldOf("weight", 1F).forGetter(TerrainConfig::weight),
             NoiseCodec.CODEC.fieldOf("noise").forGetter(TerrainConfig::noise)

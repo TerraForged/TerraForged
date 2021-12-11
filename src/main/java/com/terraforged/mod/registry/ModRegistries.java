@@ -46,7 +46,7 @@ public class ModRegistries extends Init {
     @Override
     protected void doInit() {}
 
-    protected record Holder<T>(Registry<T> registry, Codec<T> direct) {
+    public record Holder<T>(Registry<T> registry, Codec<T> direct) {
         public ResourceKey<? extends Registry<T>> key() {
             return registry.key();
         }

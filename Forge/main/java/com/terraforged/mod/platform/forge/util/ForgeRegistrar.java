@@ -22,27 +22,19 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod;
+package com.terraforged.mod.platform.forge.util;
 
-public interface Environment {
-    boolean DEV_ENV = hasFlag("dev");
-    boolean PROFILING = DEV_ENV || hasFlag("profiling");
-    boolean UNLIMITED = DEV_ENV || hasFlag("unlimited");
-    boolean DEBUGGING = DEV_ENV || hasFlag("debugging");
-    boolean DATA_GEN = hasFlag("datagen");
-    int CORES = Runtime.getRuntime().availableProcessors();
+import com.terraforged.mod.registry.registrar.Registrar;
+import net.minecraft.resources.ResourceKey;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
-    static boolean hasFlag(String flag) {
-        return System.getProperty(flag) != null;
-    }
-
-    static void log() {
-        TerraForged.LOG.info("Environment:");
-        TerraForged.LOG.info("- Dev:       {}", DEV_ENV);
-        TerraForged.LOG.info("- Profiling: {}", PROFILING);
-        TerraForged.LOG.info("- Unlimited: {}", UNLIMITED);
-        TerraForged.LOG.info("- Debugging: {}", DEBUGGING);
-        TerraForged.LOG.info("- Data Gen:  {}", DATA_GEN);
-        TerraForged.LOG.info("- Cores:     {}", CORES);
+public record ForgeRegistrar<T extends IForgeRegistryEntry<T>>(IForgeRegistry<T> registry) implements Registrar<T> {
+    @Override
+    public void register(ResourceKey<T> key, T value) {
+        if (value.getRegistryName() == null) {
+            value.setRegistryName(key.location());
+        }
+        registry.register(value);
     }
 }

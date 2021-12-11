@@ -25,36 +25,76 @@
 package com.terraforged.mod.worldgen.cave;
 
 import com.terraforged.mod.registry.ModRegistry;
+import com.terraforged.mod.util.ObjectPool;
 import com.terraforged.mod.worldgen.Generator;
-import com.terraforged.mod.worldgen.asset.NoiseCaveConfig;
+import com.terraforged.mod.worldgen.asset.NoiseCave;
+import com.terraforged.noise.Module;
+import com.terraforged.noise.Source;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class NoiseCaveGenerator {
-    protected final NoiseCaveConfig[] configs;
+    protected static final int POOL_SIZE = 32;
+    protected static final float DENSITY = 0.05F;
+
+    protected final NoiseCave[] caves;
+    protected final Module uniqueCaveNoise;
+    protected final ObjectPool<CarverChunk> pool;
+    protected final Map<ChunkPos, CarverChunk> cache = new ConcurrentHashMap<>();
 
     public NoiseCaveGenerator(long seed, RegistryAccess access) {
-        var registry = access.registryOrThrow(ModRegistry.NOISE_CAVE);
-        this.configs = registry.stream().map(config -> config.withSeed(seed)).toArray(NoiseCaveConfig[]::new);
+        var global = access.registryOrThrow(ModRegistry.CAVE);
+        this.uniqueCaveNoise = createUniqueNoise((int) seed, 500, DENSITY);
+        this.caves = global.stream().map(config -> config.withSeed(seed)).toArray(NoiseCave[]::new);
+        this.pool = new ObjectPool<>(POOL_SIZE, this::createCarverChunk);
     }
 
     public NoiseCaveGenerator(long seed, NoiseCaveGenerator other) {
-        this.configs = new NoiseCaveConfig[other.configs.length];
-        for (int i = 0; i < configs.length; i++) {
-            configs[i] = other.configs[i].withSeed(seed);
+        this.caves = new NoiseCave[other.caves.length];
+        this.uniqueCaveNoise = createUniqueNoise((int) seed, 500, DENSITY);
+        this.pool = new ObjectPool<>(POOL_SIZE, this::createCarverChunk);
+        for (int i = 0; i < caves.length; i++) {
+            this.caves[i] = other.caves[i].withSeed(seed);
         }
     }
 
     public void carve(ChunkAccess chunk, Generator generator) {
-        for (var config : configs) {
-            NoiseCaveCarver.carve(chunk, generator, config);
+        var carver = cache.computeIfAbsent(chunk.getPos(), p -> pool.take()).reset();
+
+        for (var config : caves) {
+            NoiseCaveCarver.carve(chunk, carver, generator, config, getModifier(config));
         }
     }
 
     public void decorate(ChunkAccess chunk, WorldGenLevel region, Generator generator) {
-        for (var config : configs) {
-            NoiseCaveDecorator.decorate(chunk, region, generator, config);
+        var carver = cache.remove(chunk.getPos());
+
+        for (var config : caves) {
+            NoiseCaveDecorator.decorate(chunk, carver, region, generator, config);
         }
+
+        pool.restore(carver);
+    }
+
+    private Module getModifier(NoiseCave cave) {
+        return switch (cave.getType()) {
+            case GLOBAL -> Source.ONE;
+            case UNIQUE -> uniqueCaveNoise;
+        };
+    }
+
+    private CarverChunk createCarverChunk() {
+        return new CarverChunk(caves.length);
+    }
+
+    private static Module createUniqueNoise(int seed, int scale, float density) {
+        return new UniqueCaveDistributor(seed + 1286745, 1F / scale, 0.75F, density)
+                .clamp(0.2, 1.0).map(0, 1)
+                .warp(seed + 781624, 30, 1, 20);
     }
 }

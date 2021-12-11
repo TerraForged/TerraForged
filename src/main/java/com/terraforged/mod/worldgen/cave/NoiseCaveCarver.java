@@ -26,7 +26,8 @@ package com.terraforged.mod.worldgen.cave;
 
 import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.worldgen.Generator;
-import com.terraforged.mod.worldgen.asset.NoiseCaveConfig;
+import com.terraforged.mod.worldgen.asset.NoiseCave;
+import com.terraforged.noise.Module;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
@@ -34,14 +35,12 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 public class NoiseCaveCarver {
-    public static void carve(ChunkAccess chunk, Generator generator, NoiseCaveConfig config) {
+    public static void carve(ChunkAccess chunk, CarverChunk carver, Generator generator, NoiseCave config, Module modifier) {
         var pos = new BlockPos.MutableBlockPos();
 
-        var biome = config.getBiome();
+        int minY = generator.getMinY();
         int startX = chunk.getPos().getMinBlockX();
         int startZ = chunk.getPos().getMinBlockZ();
-
-        int minY = generator.getMinY();
 
         for (int i = 0; i < 256; i++) {
             int dx = i & 15;
@@ -52,7 +51,8 @@ public class NoiseCaveCarver {
             int z = startZ + dz;
             int y = config.getHeight(x, z);
 
-            int cavern = config.getCavernSize(x, z);
+            float value = modifier.getValue(x, z);
+            int cavern = config.getCavernSize(x, z, value);
             if (cavern == 0) continue;
 
             int floor = config.getFloorDepth(x, z, cavern);
@@ -60,6 +60,8 @@ public class NoiseCaveCarver {
             int bottom = MathUtil.clamp(y - floor, minY, surface);
 
             if (top - bottom < 2) continue;
+
+            var biome = carver.getBiome(x, z, config, generator);
 
             carve(chunk, biome, dx, dz, bottom, top, surface, pos);
         }

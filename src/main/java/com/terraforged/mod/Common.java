@@ -25,12 +25,13 @@
 package com.terraforged.mod;
 
 import com.terraforged.mod.data.Content;
+import com.terraforged.mod.data.gen.DataGen;
 import com.terraforged.mod.registry.ModRegistries;
 import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.util.Init;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.asset.BiomeTag;
-import com.terraforged.mod.worldgen.asset.NoiseCaveConfig;
+import com.terraforged.mod.worldgen.asset.NoiseCave;
 import com.terraforged.mod.worldgen.asset.TerrainConfig;
 import com.terraforged.mod.worldgen.asset.ViabilityConfig;
 import com.terraforged.mod.worldgen.biome.Source;
@@ -53,12 +54,14 @@ public class Common extends Init {
         ModRegistries.createRegistry(ModRegistry.BIOME_TAG, BiomeTag.DIRECT_CODEC);
         ModRegistries.createRegistry(ModRegistry.TERRAIN, TerrainConfig.CODEC);
         ModRegistries.createRegistry(ModRegistry.VIABILITY, ViabilityConfig.CODEC); // depends on BiomeTag
-        ModRegistries.createRegistry(ModRegistry.NOISE_CAVE, NoiseCaveConfig.CODEC);
+        ModRegistries.createRegistry(ModRegistry.CAVE, NoiseCave.CODEC);
 
         TerraForged.LOG.info("Locking world-gen registries");
         ModRegistries.commit();
 
         TerraForged.LOG.info("Registering world-gen content");
         Content.INSTANCE.init();
+
+        DataGen.INSTANCE.init();
     }
 }

@@ -10,7 +10,7 @@
         "type": "AdvTerrace",
         "steps": 6,
         "octaves": 1,
-        "blend_min": 0.0,
+        "blend_min": 0,
         "blend_max": 0.3,
         "source": {
           "type": "Blend",
@@ -19,11 +19,11 @@
           "interpolation": "LINEAR",
           "control": {
             "type": "Perlin",
-            "seed": 29,
+            "seed": 274682,
             "gain": 0.5,
             "octaves": 3,
             "frequency": 0.005,
-            "lacunarity": 2.0,
+            "lacunarity": 2,
             "interpolation": "CURVE3"
           },
           "lower": {
@@ -34,11 +34,11 @@
                 "type": "Warp",
                 "source": {
                   "type": "Perlin",
-                  "seed": 23,
+                  "seed": 152737,
                   "gain": 0.5,
                   "octaves": 3,
                   "frequency": 0.01,
-                  "lacunarity": 2.0,
+                  "lacunarity": 2,
                   "interpolation": "CURVE3"
                 },
                 "domain": {
@@ -47,11 +47,11 @@
                     "type": "Map",
                     "source": {
                       "type": "Perlin",
-                      "seed": 24,
+                      "seed": 474345,
                       "gain": 0.5,
                       "octaves": 1,
                       "frequency": 0.0033333334,
-                      "lacunarity": 2.0,
+                      "lacunarity": 2,
                       "interpolation": "CURVE3"
                     },
                     "min": {
@@ -67,11 +67,11 @@
                     "type": "Map",
                     "source": {
                       "type": "Perlin",
-                      "seed": 25,
+                      "seed": 474346,
                       "gain": 0.5,
                       "octaves": 1,
                       "frequency": 0.0033333334,
-                      "lacunarity": 2.0,
+                      "lacunarity": 2,
                       "interpolation": "CURVE3"
                     },
                     "min": {
@@ -85,7 +85,7 @@
                   },
                   "distance": {
                     "type": "Const",
-                    "value": 150.0
+                    "value": 150
                   }
                 }
               },
@@ -95,11 +95,11 @@
                   "type": "Map",
                   "source": {
                     "type": "Perlin",
-                    "seed": 25,
+                    "seed": 6799,
                     "gain": 0.5,
                     "octaves": 1,
                     "frequency": 0.05,
-                    "lacunarity": 2.0,
+                    "lacunarity": 2,
                     "interpolation": "CURVE3"
                   },
                   "min": {
@@ -115,11 +115,11 @@
                   "type": "Map",
                   "source": {
                     "type": "Perlin",
-                    "seed": 26,
+                    "seed": 6800,
                     "gain": 0.5,
                     "octaves": 1,
                     "frequency": 0.05,
-                    "lacunarity": 2.0,
+                    "lacunarity": 2,
                     "interpolation": "CURVE3"
                   },
                   "min": {
@@ -133,7 +133,7 @@
                 },
                 "distance": {
                   "type": "Const",
-                  "value": 40.0
+                  "value": 40
                 }
               }
             },
@@ -151,11 +151,11 @@
                 "type": "Warp",
                 "source": {
                   "type": "Perlin",
-                  "seed": 26,
+                  "seed": 316379,
                   "gain": 0.5,
                   "octaves": 4,
                   "frequency": 0.006666667,
-                  "lacunarity": 2.0,
+                  "lacunarity": 2,
                   "interpolation": "CURVE3"
                 },
                 "domain": {
@@ -164,11 +164,11 @@
                     "type": "Map",
                     "source": {
                       "type": "Perlin",
-                      "seed": 27,
+                      "seed": 292608,
                       "gain": 0.5,
                       "octaves": 1,
                       "frequency": 0.0033333334,
-                      "lacunarity": 2.0,
+                      "lacunarity": 2,
                       "interpolation": "CURVE3"
                     },
                     "min": {
@@ -184,11 +184,11 @@
                     "type": "Map",
                     "source": {
                       "type": "Perlin",
-                      "seed": 28,
+                      "seed": 292609,
                       "gain": 0.5,
                       "octaves": 1,
                       "frequency": 0.0033333334,
-                      "lacunarity": 2.0,
+                      "lacunarity": 2,
                       "interpolation": "CURVE3"
                     },
                     "min": {
@@ -202,7 +202,7 @@
                   },
                   "distance": {
                     "type": "Const",
-                    "value": 200.0
+                    "value": 200
                   }
                 }
               },
@@ -212,11 +212,11 @@
                   "type": "Map",
                   "source": {
                     "type": "Perlin",
-                    "seed": 28,
+                    "seed": 483782,
                     "gain": 0.5,
                     "octaves": 2,
                     "frequency": 0.05,
-                    "lacunarity": 2.0,
+                    "lacunarity": 2,
                     "interpolation": "CURVE3"
                   },
                   "min": {
@@ -232,11 +232,11 @@
                   "type": "Map",
                   "source": {
                     "type": "Perlin",
-                    "seed": 29,
+                    "seed": 483783,
                     "gain": 0.5,
                     "octaves": 2,
                     "frequency": 0.05,
-                    "lacunarity": 2.0,
+                    "lacunarity": 2,
                     "interpolation": "CURVE3"
                   },
                   "min": {
@@ -250,7 +250,7 @@
                 },
                 "distance": {
                   "type": "Const",
-                  "value": 20.0
+                  "value": 20
                 }
               }
             }
@@ -260,11 +260,11 @@
           "type": "Scale",
           "source": {
             "type": "Perlin",
-            "seed": 30,
+            "seed": 152366,
             "gain": 0.5,
             "octaves": 1,
             "frequency": 0.008333334,
-            "lacunarity": 2.0,
+            "lacunarity": 2,
             "interpolation": "CURVE3"
           },
           "scale": {
@@ -282,11 +282,11 @@
             "type": "Scale",
             "source": {
               "type": "Perlin",
-              "seed": 31,
+              "seed": 146295,
               "gain": 0.5,
               "octaves": 1,
               "frequency": 0.005,
-              "lacunarity": 2.0,
+              "lacunarity": 2,
               "interpolation": "CURVE3"
             },
             "scale": {
@@ -296,7 +296,7 @@
           },
           "bias": {
             "type": "Const",
-            "value": 0.5
+            "value": 0
           }
         }
       }

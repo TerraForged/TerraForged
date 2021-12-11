@@ -1,6 +1,6 @@
 {
   "terrain": "flats",
-  "weight": 1.0,
+  "weight": 2.0,
   "noise": {
     "type": "Bias",
     "source": {
@@ -16,7 +16,7 @@
                 "type": "Alpha",
                 "source": {
                   "type": "Perlin",
-                  "seed": 0,
+                  "seed": 143820,
                   "gain": 0.5,
                   "octaves": 3,
                   "frequency": 0.002,
@@ -36,11 +36,11 @@
               "type": "Map",
               "source": {
                 "type": "Perlin",
-                "seed": 1,
+                "seed": 177934,
                 "gain": 0.5,
                 "octaves": 3,
                 "frequency": 0.016129032,
-                "lacunarity": 3.0,
+                "lacunarity": 3.5,
                 "interpolation": "CURVE3"
               },
               "min": {
@@ -56,11 +56,11 @@
               "type": "Map",
               "source": {
                 "type": "Perlin",
-                "seed": 2,
+                "seed": 479661,
                 "gain": 0.5,
                 "octaves": 3,
                 "frequency": 0.016129032,
-                "lacunarity": 3.0,
+                "lacunarity": 3.5,
                 "interpolation": "CURVE3"
               },
               "min": {
@@ -84,11 +84,11 @@
             "type": "Map",
             "source": {
               "type": "Perlin",
-              "seed": 4,
+              "seed": 370780,
               "gain": 0.5,
               "octaves": 1,
               "frequency": 0.00390625,
-              "lacunarity": 2.0,
+              "lacunarity": 2,
               "interpolation": "CURVE3"
             },
             "min": {
@@ -104,11 +104,11 @@
             "type": "Map",
             "source": {
               "type": "Perlin",
-              "seed": 5,
+              "seed": 370781,
               "gain": 0.5,
               "octaves": 1,
               "frequency": 0.00390625,
-              "lacunarity": 2.0,
+              "lacunarity": 2,
               "interpolation": "CURVE3"
             },
             "min": {
@@ -122,18 +122,18 @@
           },
           "distance": {
             "type": "Const",
-            "value": 200.0
+            "value": 256
           }
         }
       },
       "scale": {
         "type": "Const",
-        "value": 0.08
+        "value": 0.14700001
       }
     },
     "bias": {
       "type": "Const",
-      "value": -0.02
+      "value": 0
     }
   }
 }

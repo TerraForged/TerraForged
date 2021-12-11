@@ -22,27 +22,20 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod;
+package com.terraforged.mod.data;
 
-public interface Environment {
-    boolean DEV_ENV = hasFlag("dev");
-    boolean PROFILING = DEV_ENV || hasFlag("profiling");
-    boolean UNLIMITED = DEV_ENV || hasFlag("unlimited");
-    boolean DEBUGGING = DEV_ENV || hasFlag("debugging");
-    boolean DATA_GEN = hasFlag("datagen");
-    int CORES = Runtime.getRuntime().availableProcessors();
+import com.terraforged.mod.registry.ModRegistries;
+import com.terraforged.mod.registry.ModRegistry;
+import com.terraforged.mod.util.seed.RandSeed;
+import com.terraforged.mod.worldgen.asset.NoiseCave;
 
-    static boolean hasFlag(String flag) {
-        return System.getProperty(flag) != null;
-    }
-
-    static void log() {
-        TerraForged.LOG.info("Environment:");
-        TerraForged.LOG.info("- Dev:       {}", DEV_ENV);
-        TerraForged.LOG.info("- Profiling: {}", PROFILING);
-        TerraForged.LOG.info("- Unlimited: {}", UNLIMITED);
-        TerraForged.LOG.info("- Debugging: {}", DEBUGGING);
-        TerraForged.LOG.info("- Data Gen:  {}", DATA_GEN);
-        TerraForged.LOG.info("- Cores:     {}", CORES);
+interface ModCaves extends ModRegistry {
+    static void register() {
+        var seed = new RandSeed(901246, 500_000);
+        ModRegistries.register(CAVE, "synapse_high", NoiseCave.synapseCave(seed.next(), 1F, 96, 384));
+        ModRegistries.register(CAVE, "synapse_mid", NoiseCave.synapseCave(seed.next(), 1.1F, 0, 256));
+        ModRegistries.register(CAVE, "synapse_low", NoiseCave.synapseCave(seed.next(), 1.2F, -32, 128));
+        ModRegistries.register(CAVE, "mega", NoiseCave.megaCave(seed.next(), 1.0F, -16, 64));
+        ModRegistries.register(CAVE, "mega_deep", NoiseCave.megaCave(seed.next(), 1.2F, -32, 48));
     }
 }

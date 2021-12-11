@@ -22,27 +22,24 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod;
+package com.terraforged.mod.util.seed;
 
-public interface Environment {
-    boolean DEV_ENV = hasFlag("dev");
-    boolean PROFILING = DEV_ENV || hasFlag("profiling");
-    boolean UNLIMITED = DEV_ENV || hasFlag("unlimited");
-    boolean DEBUGGING = DEV_ENV || hasFlag("debugging");
-    boolean DATA_GEN = hasFlag("datagen");
-    int CORES = Runtime.getRuntime().availableProcessors();
+import com.terraforged.engine.Seed;
 
-    static boolean hasFlag(String flag) {
-        return System.getProperty(flag) != null;
+import java.util.SplittableRandom;
+
+public class RandSeed extends Seed {
+    private final int range;
+    private final SplittableRandom random;
+
+    public RandSeed(long value, int range) {
+        super(value);
+        this.range = range;
+        this.random = new SplittableRandom(value);
     }
 
-    static void log() {
-        TerraForged.LOG.info("Environment:");
-        TerraForged.LOG.info("- Dev:       {}", DEV_ENV);
-        TerraForged.LOG.info("- Profiling: {}", PROFILING);
-        TerraForged.LOG.info("- Unlimited: {}", UNLIMITED);
-        TerraForged.LOG.info("- Debugging: {}", DEBUGGING);
-        TerraForged.LOG.info("- Data Gen:  {}", DATA_GEN);
-        TerraForged.LOG.info("- Cores:     {}", CORES);
+    @Override
+    public int next() {
+        return random.nextInt(range);
     }
 }

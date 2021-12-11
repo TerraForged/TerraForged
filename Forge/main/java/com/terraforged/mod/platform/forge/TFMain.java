@@ -27,9 +27,15 @@ package com.terraforged.mod.platform.forge;
 import com.terraforged.mod.Common;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.client.Client;
+import com.terraforged.mod.data.ModBiomes;
 import com.terraforged.mod.platform.PlatformData;
+import com.terraforged.mod.platform.forge.util.ForgeRegistrar;
+import com.terraforged.mod.registry.registrar.NoopRegistrar;
 import net.minecraft.core.IdMap;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -46,6 +52,10 @@ public class TFMain extends TerraForged {
         super(TFMain::getRootPath);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onInit);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientInit);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Biome.class, this::onBiomes);
+
+        // Biomes are registered via event
+        setRegistrar(Registry.BIOME_REGISTRY, NoopRegistrar.none());
     }
 
     @Override
@@ -59,6 +69,10 @@ public class TFMain extends TerraForged {
 
     void onClientInit(FMLClientSetupEvent event) {
         event.enqueueWork(Client.INSTANCE::init);
+    }
+
+    void onBiomes(RegistryEvent.Register<Biome> event) {
+        ModBiomes.register(new ForgeRegistrar<>(event.getRegistry()));
     }
 
     private static Path getRootPath() {
