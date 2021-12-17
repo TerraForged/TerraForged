@@ -85,14 +85,22 @@ public class RegistryAccessUtil {
         TerraForged.LOG.info("Injecting world-gen registry defaults");
         var context = getExtendedContext(builtin);
         for (var holder : ModRegistries.getHolders()) {
-            injectRegistry(holder, context, storage);
+            try {
+                injectRegistry(holder, context, storage);
+            } catch (Throwable t) {
+                throw new Error("Failed to inject holder: " + holder.key(), t);
+            }
         }
     }
 
     public static void load(RegistryAccess access, RegistryReadOps<?> ops) {
         TerraForged.LOG.info("Loading world-gen registry content from data");
         for (var holder : ModRegistries.getHolders()) {
-            loadData(holder, access, ops);
+            try {
+                loadData(holder, access, ops);
+            } catch (Throwable t) {
+                throw new Error("Failed to load holder: " + holder.key(), t);
+            }
         }
     }
 
@@ -102,7 +110,11 @@ public class RegistryAccessUtil {
         var registry = holder.registry();
         for (var entry : registry.entrySet()) {
             var value = entry.getValue();
-            storage.add(context, entry.getKey(), holder.direct(), registry.getId(value), value, registry.lifecycle(value));
+            try {
+                storage.add(context, entry.getKey(), holder.direct(), registry.getId(value), value, registry.lifecycle(value));
+            } catch (Throwable t) {
+                throw new Error("Failed to inject entry: " + entry.getKey() + "=" + value, t);
+            }
         }
 
         printRegistryContents(registry);

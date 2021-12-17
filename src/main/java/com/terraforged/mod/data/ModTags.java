@@ -22,33 +22,18 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.asset;
+package com.terraforged.mod.data;
 
-import com.mojang.serialization.Codec;
-import com.terraforged.mod.codec.LazyCodec;
+import com.terraforged.mod.registry.ModRegistries;
 import com.terraforged.mod.registry.ModRegistry;
-import com.terraforged.mod.worldgen.util.WorldgenTag;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
-import it.unimi.dsi.fastutil.objects.ObjectSets;
-import net.minecraft.world.level.biome.Biome;
+import com.terraforged.mod.worldgen.asset.BiomeTag;
 
-import java.util.function.Supplier;
-
-public class BiomeTag extends WorldgenTag<Biome> {
-    public static final BiomeTag NONE = new BiomeTag(ObjectSets.emptySet());
-    public static final Codec<BiomeTag> DIRECT_CODEC = WorldgenTag.codec("biomes", () -> Biome.LIST_CODEC, BiomeTag::new);
-    public static final Codec<Supplier<BiomeTag>> CODEC = LazyCodec.registry(DIRECT_CODEC, ModRegistry.BIOME_TAG);
-
-    BiomeTag(ObjectSet<Biome> biomes) {
-        super(biomes);
-    }
-
-    @Override
-    public String toString() {
-        return super.toString();
-    }
-
-    public static BiomeTag empty() {
-        return new BiomeTag(ObjectSets.emptySet());
+public interface ModTags extends ModRegistry {
+    static void register() {
+        ModRegistries.register(BIOME_TAG, "trees/copses", BiomeTag.empty());
+        ModRegistries.register(BIOME_TAG, "trees/hardy", BiomeTag.empty());
+        ModRegistries.register(BIOME_TAG, "trees/sparse", BiomeTag.empty());
+        ModRegistries.register(BIOME_TAG, "trees/sparse_jungle", BiomeTag.empty());
+        ModRegistries.register(BIOME_TAG, "trees/temperate", BiomeTag.empty());
     }
 }

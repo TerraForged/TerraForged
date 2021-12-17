@@ -24,16 +24,12 @@
 
 package com.terraforged.mod.worldgen.biome;
 
-import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.engine.world.climate.ClimateModule;
-import com.terraforged.engine.world.terrain.TerrainType;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.util.map.WeightMap;
 import com.terraforged.mod.worldgen.biome.util.BiomeUtil;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
-import com.terraforged.mod.worldgen.noise.NoiseSample;
-import com.terraforged.mod.worldgen.noise.RiverCache;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -44,17 +40,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class BiomeSampler {
+public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler {
     protected final Registry<Biome> biomes;
-    protected final INoiseGenerator noiseGenerator;
-    protected final ClimateModule climateModule;
     protected final Map<BiomeType, WeightMap<Biome>> biomeMap;
-    protected final ThreadLocal<ClimateSample> localSample = ThreadLocal.withInitial(ClimateSample::new);
 
     public BiomeSampler(INoiseGenerator noiseGenerator, Registry<Biome> registry, List<Biome> biomes) {
+        super(noiseGenerator);
         this.biomes = registry;
-        this.noiseGenerator = noiseGenerator;
-        this.climateModule = createClimate(noiseGenerator);
         this.biomeMap = getBiomeMapping(registry, biomes);
     }
 
@@ -73,7 +65,25 @@ public class BiomeSampler {
         return getBiome(biome, sample);
     }
 
-    protected ClimateSample sample(int x, int z) {
+    @Override
+    public ClimateModule getClimate() {
+        return climateModule;
+    }
+
+    @Override
+    public float getShape(int x, int z) {
+        float px = x * noiseGenerator.getLevels().frequency;
+        float pz = z * noiseGenerator.getLevels().frequency;
+
+        var sample = localSample.get().reset();
+        var cell = sample.cell;
+
+        climateModule.apply(cell, px, pz);
+
+        return sample.cell.biomeRegionEdge;
+    }
+
+    public ClimateSample sample(int x, int z) {
         float px = x * noiseGenerator.getLevels().frequency;
         float pz = z * noiseGenerator.getLevels().frequency;
 
@@ -125,7 +135,7 @@ public class BiomeSampler {
         return input;
     }
 
-    protected static ClimateModule createClimate(INoiseGenerator generator) {
+    public static ClimateModule createClimate(INoiseGenerator generator) {
         if (generator == null) return null;
         return new ClimateModule(generator.getContinent(), generator.getContinent().getContext());
     }
@@ -156,17 +166,5 @@ public class BiomeSampler {
         return biomes.stream()
                 .sorted(BiomeUtil.getBiomeSorter(registry))
                 .collect(Collectors.groupingBy(BiomeUtil::getType));
-    }
-
-    protected static class ClimateSample extends NoiseSample {
-        public final Cell cell = new Cell();
-        public final RiverCache riverCache = new RiverCache();
-
-        public ClimateSample reset() {
-            cell.reset();
-            heightNoise = 1;
-            terrainType = TerrainType.FLATS;
-            return this;
-        }
     }
 }

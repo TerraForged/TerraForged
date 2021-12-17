@@ -1,16 +1,21 @@
 {
+  "type": "global",
+  "size": 16,
+  "min_y": 0,
+  "max_y": 256,
+  "seed": 70872,
   "floor": {
     "type": "Map",
     "source": {
       "type": "Clamp",
       "source": {
         "type": "Simplex",
+        "interpolation": "CURVE3",
         "seed": 70872,
         "gain": 0.5,
         "octaves": 2,
         "frequency": 0.045454547,
-        "lacunarity": 2,
-        "interpolation": "CURVE3"
+        "lacunarity": 2
       },
       "min": {
         "type": "Const",
@@ -30,21 +35,16 @@
       "value": 1
     }
   },
-  "size": 16,
-  "min_y": 0,
-  "max_y": 256,
-  "seed": 70872,
-  "type": "global",
   "elevation": {
     "type": "Map",
     "source": {
       "type": "Simplex",
+      "interpolation": "CURVE3",
       "seed": 70869,
       "gain": 0.5,
       "octaves": 3,
       "frequency": 0.0025974025,
-      "lacunarity": 2,
-      "interpolation": "CURVE3"
+      "lacunarity": 2
     },
     "min": {
       "type": "Const",
@@ -63,12 +63,12 @@
         "type": "Warp",
         "source": {
           "type": "SimplexRidge",
+          "interpolation": "CURVE3",
           "seed": 70870,
           "gain": 0.975,
           "octaves": 3,
           "frequency": 0.005050505,
-          "lacunarity": 2,
-          "interpolation": "CURVE3"
+          "lacunarity": 2
         },
         "domain": {
           "type": "DomainWarp",
@@ -76,12 +76,12 @@
             "type": "Map",
             "source": {
               "type": "Perlin",
+              "interpolation": "CURVE3",
               "seed": 70871,
               "gain": 0.5,
               "octaves": 1,
               "frequency": 0.045454547,
-              "lacunarity": 2,
-              "interpolation": "CURVE3"
+              "lacunarity": 2
             },
             "min": {
               "type": "Const",
@@ -96,12 +96,12 @@
             "type": "Map",
             "source": {
               "type": "Perlin",
+              "interpolation": "CURVE3",
               "seed": 70872,
               "gain": 0.5,
               "octaves": 1,
               "frequency": 0.045454547,
-              "lacunarity": 2,
-              "interpolation": "CURVE3"
+              "lacunarity": 2
             },
             "min": {
               "type": "Const",

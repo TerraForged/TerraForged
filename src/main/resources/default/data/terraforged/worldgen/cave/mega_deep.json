@@ -1,16 +1,20 @@
 {
+  "type": "unique",
+  "size": 36,
+  "max_y": 48,
+  "seed": 247699,
   "floor": {
     "type": "Map",
     "source": {
       "type": "Clamp",
       "source": {
         "type": "Simplex",
+        "interpolation": "CURVE3",
         "seed": 247699,
         "gain": 0.5,
         "octaves": 2,
         "frequency": 0.027777778,
-        "lacunarity": 2,
-        "interpolation": "CURVE3"
+        "lacunarity": 2
       },
       "min": {
         "type": "Const",
@@ -30,20 +34,16 @@
       "value": 1
     }
   },
-  "size": 36,
-  "max_y": 48,
-  "seed": 247699,
-  "type": "unique",
   "elevation": {
     "type": "Map",
     "source": {
       "type": "Simplex",
+      "interpolation": "CURVE3",
       "seed": 247697,
       "gain": 0.5,
       "octaves": 2,
       "frequency": 0.004166667,
-      "lacunarity": 2,
-      "interpolation": "CURVE3"
+      "lacunarity": 2
     },
     "min": {
       "type": "Const",
@@ -68,12 +68,12 @@
               "type": "Bias",
               "source": {
                 "type": "Simplex",
+                "interpolation": "CURVE3",
                 "seed": 247698,
                 "gain": 0.5,
                 "octaves": 3,
                 "frequency": 0.0033333334,
-                "lacunarity": 2,
-                "interpolation": "CURVE3"
+                "lacunarity": 2
               },
               "bias": {
                 "type": "Const",

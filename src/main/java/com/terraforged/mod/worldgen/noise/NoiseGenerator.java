@@ -29,7 +29,7 @@ import com.terraforged.engine.world.GeneratorContext;
 import com.terraforged.engine.world.heightmap.ControlPoints;
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.engine.world.terrain.TerrainType;
-import com.terraforged.mod.worldgen.asset.TerrainConfig;
+import com.terraforged.mod.worldgen.asset.TerrainNoise;
 import com.terraforged.mod.worldgen.noise.erosion.ErodedNoiseGenerator;
 import com.terraforged.mod.worldgen.noise.erosion.NoiseTileSize;
 import com.terraforged.mod.worldgen.terrain.TerrainBlender;
@@ -41,7 +41,7 @@ import com.terraforged.noise.util.NoiseUtil;
 import java.util.function.Consumer;
 
 public class NoiseGenerator implements INoiseGenerator {
-    protected final float heightMultiplier = 1.0F / 0.98F;
+    protected final float heightMultiplier = 1.2F;
 
     protected final long seed;
     protected final NoiseLevels levels;
@@ -53,12 +53,12 @@ public class NoiseGenerator implements INoiseGenerator {
     protected final ThreadLocal<NoiseData> localChunk = ThreadLocal.withInitial(NoiseData::new);
     protected final ThreadLocal<NoiseSample> localSample = ThreadLocal.withInitial(NoiseSample::new);
 
-    public NoiseGenerator(long seed, TerrainLevels levels, TerrainConfig[] terrainConfigs) {
+    public NoiseGenerator(long seed, TerrainLevels levels, TerrainNoise[] terrainNoises) {
         this.seed = seed;
         this.levels = levels.noiseLevels;
         this.ocean = createOceanTerrain(seed);
         this.baseHeight = createBaseTerrain(seed);
-        this.land = createLandTerrain(seed, terrainConfigs);
+        this.land = createLandTerrain(seed, terrainNoises);
         this.continent = createContinentNoise(seed, levels);
         this.controlPoints = continent.getControlPoints();
     }
@@ -200,7 +200,7 @@ public class NoiseGenerator implements INoiseGenerator {
     }
 
     protected static NoiseTileSize getNoiseTileSize() {
-        return new NoiseTileSize(1);
+        return new NoiseTileSize(2);
     }
 
     protected static Module createOceanTerrain(long seed) {
@@ -211,8 +211,8 @@ public class NoiseGenerator implements INoiseGenerator {
         return Source.simplex((int) seed, 200, 2);
     }
 
-    protected static TerrainBlender createLandTerrain(long seed, TerrainConfig[] terrainConfigs) {
-        return new TerrainBlender(seed, 400, 0.8F, 0.8F, terrainConfigs);
+    protected static TerrainBlender createLandTerrain(long seed, TerrainNoise[] terrainNoises) {
+        return new TerrainBlender(seed, 400, 0.8F, 0.4F, terrainNoises);
     }
 
     protected static ContinentNoise createContinentNoise(long seed, TerrainLevels levels) {

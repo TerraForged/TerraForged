@@ -36,6 +36,7 @@ public class TerrainData implements Consumer<NoiseData> {
     protected final TerrainLevels levels;
     protected final FloatMap height = new FloatMap();
     protected final FloatMap gradient = new FloatMap();
+    protected final FloatMap water = new FloatMap();
     protected final ObjectMap<Terrain> terrain = new ObjectMap<>(Terrain[]::new);
 
     protected float min = Float.MAX_VALUE;
@@ -68,6 +69,10 @@ public class TerrainData implements Consumer<NoiseData> {
 
     public FloatMap getGradient() {
         return gradient;
+    }
+
+    public FloatMap getWater() {
+        return water;
     }
 
     public ObjectMap<Terrain> getTerrain() {
@@ -103,6 +108,7 @@ public class TerrainData implements Consumer<NoiseData> {
                 gradient.set(x, z, noiseGrad);
                 terrain.set(x, z, terrainType);
                 height.set(x, z, scaledHeight);
+                water.set(x, z, noiseData.getWater().get(x, z));
                 max = Math.max(max, scaledHeight);
                 min = Math.min(min, scaledHeight);
             }

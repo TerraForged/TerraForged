@@ -48,7 +48,7 @@ public class NoiseCaveGenerator {
     protected final Map<ChunkPos, CarverChunk> cache = new ConcurrentHashMap<>();
 
     public NoiseCaveGenerator(long seed, RegistryAccess access) {
-        var global = access.registryOrThrow(ModRegistry.CAVE);
+        var global = access.registryOrThrow(ModRegistry.CAVE.get());
         this.uniqueCaveNoise = createUniqueNoise((int) seed, 500, DENSITY);
         this.caves = global.stream().map(config -> config.withSeed(seed)).toArray(NoiseCave[]::new);
         this.pool = new ObjectPool<>(POOL_SIZE, this::createCarverChunk);

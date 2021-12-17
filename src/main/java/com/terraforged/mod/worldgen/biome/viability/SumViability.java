@@ -25,38 +25,37 @@
 package com.terraforged.mod.worldgen.biome.viability;
 
 import com.terraforged.cereal.Cereal;
-import com.terraforged.cereal.spec.Context;
 import com.terraforged.cereal.spec.DataSpec;
 import com.terraforged.cereal.value.DataValue;
-import com.terraforged.mod.worldgen.Generator;
-import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.noise.util.NoiseUtil;
 import it.unimi.dsi.fastutil.floats.FloatArrayList;
+import it.unimi.dsi.fastutil.floats.FloatList;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public record SumViability(Viability[] rules, float[] weights) implements Viability {
+public record SumViability(float initial, Viability[] rules, float[] amounts) implements Viability {
     public static final DataSpec<SumViability> SPEC = DataSpec.builder(
             "Sum",
             SumViability.class,
             (data, spec, context) -> new SumViability(
+                    spec.get("initial", data, DataValue::asFloat),
                     spec.get("rules", data, v -> getRules(v, context)),
-                    spec.get("weights", data, v -> getWeights(v, context))))
+                    spec.get("amounts", data, v -> getWeights(v, context))))
+            .add("initial", 1F, SumViability::initial)
             .addList("rules", SumViability::getRulesList)
-            .addList("weights", SumViability::getWeightList)
+            .addList("amounts", SumViability::getWeightList)
             .build();
 
     @Override
-    public float getFitness(int x, int z, TerrainData data, Generator generator) {
-        float sumValue = 0F;
-        float sumWeight = 0F;
+    public float getFitness(int x, int z, Context context) {
+        float sumValue = initial;
         for (int i = 0; i < rules.length; i++) {
-            float value = rules[i].getFitness(x, z, data, generator);
-            float weight = weights[i];
+            float value = rules[i].getFitness(x, z, context);
+            float weight = amounts[i];
             sumValue += value * weight;
-            sumWeight += weight;
         }
-        return NoiseUtil.clamp(sumValue / sumWeight, 0, 1);
+        return NoiseUtil.clamp(sumValue, 0, 1);
     }
 
     private List<Viability> getRulesList() {
@@ -64,19 +63,43 @@ public record SumViability(Viability[] rules, float[] weights) implements Viabil
     }
 
     private List<Float> getWeightList() {
-        return new FloatArrayList(weights);
+        return new FloatArrayList(amounts);
     }
 
-    public static Viability[] getRules(DataValue value, Context context) {
+    public static Viability[] getRules(DataValue value, com.terraforged.cereal.spec.Context context) {
         return Cereal.deserialize(value.asList(), Viability.class, context).toArray(Viability[]::new);
     }
 
-    public static float[] getWeights(DataValue value, Context context) {
+    public static float[] getWeights(DataValue value, com.terraforged.cereal.spec.Context context) {
         var list = value.asList();
         var weights = new float[list.size()];
         for (int i = 0; i < weights.length; i++) {
             weights[i] = list.get(i).asFloat();
         }
         return weights;
+    }
+
+    public static Builder builder(float initial) {
+        return new Builder(initial);
+    }
+
+    public static class Builder {
+        private final float initial;
+        private final List<Viability> viabilities = new ArrayList<>();
+        private final FloatList weights = new FloatArrayList();
+
+        public Builder(float initial) {
+            this.initial = initial;
+        }
+
+        public Builder with(float weight, Viability viability) {
+            viabilities.add(viability);
+            weights.add(weight);
+            return this;
+        }
+
+        public SumViability build() {
+            return new SumViability(initial, viabilities.toArray(new Viability[0]), weights.toFloatArray());
+        }
     }
 }

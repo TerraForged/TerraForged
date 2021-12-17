@@ -32,4 +32,14 @@ public class NoiseSample {
     public float heightNoise;
     public float riverNoise;
     public Terrain terrainType;
+
+    public NoiseSample() {}
+
+    public NoiseSample(NoiseSample other) {
+        continentCentre = other.continentCentre;
+        continentNoise = other.continentNoise;
+        heightNoise = other.heightNoise;
+        riverNoise = other.riverNoise;
+        terrainType = other.terrainType;
+    }
 }

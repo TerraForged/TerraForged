@@ -30,7 +30,6 @@ import com.terraforged.mod.util.seed.ContextSeedable;
 import com.terraforged.mod.worldgen.cave.CaveType;
 import com.terraforged.mod.worldgen.noise.NoiseCodec;
 import com.terraforged.noise.Module;
-import com.terraforged.noise.Source;
 import com.terraforged.noise.util.NoiseUtil;
 
 public class NoiseCave implements ContextSeedable<NoiseCave>  {
@@ -113,38 +112,5 @@ public class NoiseCave implements ContextSeedable<NoiseCave>  {
         if (range <= 0) return 0;
 
         return min + NoiseUtil.floor(noise.getValue(x, z) * range * modifier);
-    }
-
-    // 30, -32, 100
-    public static NoiseCave megaCave(int seed, float scale, int minY, int maxY) {
-        int elevationScale = NoiseUtil.floor(200 * scale);
-        int networkScale = NoiseUtil.floor(250 * scale);
-        int floorScale = NoiseUtil.floor(30 * scale);
-        int size = NoiseUtil.floor(30 *  scale);
-
-        var elevation = Source.simplex(++seed, elevationScale, 2).map(0.3, 0.7);
-        var shape = Source.simplex(++seed, networkScale, 3)
-                .bias(-0.5).abs().scale(2).invert()
-                .clamp(0.75, 1.0).map(0, 1);
-
-        var floor = Source.simplex(++seed, floorScale, 2).clamp(0.0, 0.3).map(0, 1);
-
-        return new NoiseCave(seed, CaveType.UNIQUE, elevation, shape, floor, size, minY, maxY);
-    }
-
-    public static NoiseCave synapseCave(int seed, float scale, int minY, int maxY) {
-        int elevationScale = NoiseUtil.floor(350 * scale);
-        int networkScale = NoiseUtil.floor(180 * scale);
-        int networkWarpScale = NoiseUtil.floor(20 * scale);
-        int networkWarpStrength = networkWarpScale / 2;
-        int floorScale = NoiseUtil.floor(20 * scale);
-        int size = NoiseUtil.floor(15 *  scale);
-
-        var elevation = Source.simplex(++seed, elevationScale, 3).map(0.1, 0.9);
-        var shape = Source.simplexRidge(++seed, networkScale, 3)
-                .warp(++seed, networkWarpScale, 1, networkWarpStrength)
-                .clamp(0.35, 0.75).map(0, 1);
-        var floor = Source.simplex(++seed, floorScale, 2).clamp(0.0, 0.15).map(0, 1);
-        return new NoiseCave(seed, CaveType.GLOBAL, elevation, shape, floor, size, minY, maxY);
     }
 }

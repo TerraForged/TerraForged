@@ -25,9 +25,9 @@
 package com.terraforged.mod.worldgen.biome.decorator;
 
 import com.terraforged.mod.worldgen.Generator;
-import com.terraforged.mod.worldgen.biome.vegetation.BiomeVegetation;
+import com.terraforged.mod.worldgen.biome.feature.PositionSampler;
 import com.terraforged.mod.worldgen.biome.vegetation.BiomeVegetationManager;
-import com.terraforged.mod.worldgen.biome.vegetation.TreePositionSampler;
+import com.terraforged.mod.worldgen.biome.vegetation.VegetationFeatures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.SectionPos;
@@ -82,7 +82,6 @@ public class FeatureDecorator {
         decoratePre(seed, origin, biome, chunk, level, generator, random, structures);
         decorateTrees(seed, chunk, level, generator, random);
         decorateOther(seed, origin, biome, level, generator, random);
-        decorateGrass(seed, origin, level, generator, random);
         decoratePost(seed, origin, biome, chunk, level, generator, random, structures);
     }
 
@@ -95,7 +94,7 @@ public class FeatureDecorator {
                              WorldgenRandom random,
                              StructureFeatureManager structureManager) {
 
-        VanillaDecorator.decorate(seed, 0, BiomeVegetation.STAGE - 1, origin, biome, chunk, level, generator, random, structureManager, this);
+        VanillaDecorator.decorate(seed, 0, VegetationFeatures.STAGE - 1, origin, biome, chunk, level, generator, random, structureManager, this);
     }
 
     private void decoratePost(long seed,
@@ -107,43 +106,21 @@ public class FeatureDecorator {
                               WorldgenRandom random,
                               StructureFeatureManager structureManager) {
 
-        VanillaDecorator.decorate(seed, BiomeVegetation.STAGE + 1, MAX_DECORATION_STAGE, origin, biome, chunk, level, generator, random, structureManager, this);
+        VanillaDecorator.decorate(seed, VegetationFeatures.STAGE + 1, MAX_DECORATION_STAGE, origin, biome, chunk, level, generator, random, structureManager, this);
     }
 
     private void decorateTrees(long seed, ChunkAccess chunk, WorldGenLevel level, Generator generator, WorldgenRandom random) {
-        TreePositionSampler.place(seed, 0.25F, 0.85F, chunk, level, generator, random, this);
+        PositionSampler.place(seed, chunk, level, generator, random, this);
     }
 
     private void decorateOther(long seed, BlockPos origin, Biome biome, WorldGenLevel level, Generator generator, WorldgenRandom random) {
         var vegetation = getVegetationManager().getVegetation(biome);
-        if (vegetation == BiomeVegetation.NONE) return;
+        if (vegetation.features == VegetationFeatures.NONE) return;
 
         int offset = 245889;
-        for (var other : vegetation.getOther()) {
-            random.setFeatureSeed(seed, offset++, BiomeVegetation.STAGE);
-            other.place(level, generator, random, origin);
-        }
-    }
-
-    private void decorateGrass(long seed, BlockPos origin, WorldGenLevel level, Generator generator, WorldgenRandom random) {
-        var pos = new BlockPos.MutableBlockPos();
-
-        int offset = 9813589;
-        for (int z = 0; z < 16; z++) {
-            for (int x = 0; x < 16; x++) {
-                pos.set(origin.getX() + x, origin.getY(), origin.getZ() + z);
-
-                var biome = level.getBiome(pos);
-                var vegetation = getVegetationManager().getVegetation(biome);
-                if (vegetation == BiomeVegetation.NONE) continue;
-
-                if (random.nextFloat() < 0.1F) {
-                    for (var grass : vegetation.getGrass()) {
-                        random.setFeatureSeed(seed, offset++, BiomeVegetation.STAGE);
-                        grass.place(level, generator, random, pos);
-                    }
-                }
-            }
+        for (var other : vegetation.features.other()) {
+            random.setFeatureSeed(seed, offset++, VegetationFeatures.STAGE);
+            other.placeWithBiomeCheck(level, generator, random, origin);
         }
     }
 

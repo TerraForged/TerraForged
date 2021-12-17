@@ -22,33 +22,27 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.asset;
+package com.terraforged.mod.worldgen.biome.viability;
 
-import com.mojang.serialization.Codec;
-import com.terraforged.mod.codec.LazyCodec;
-import com.terraforged.mod.registry.ModRegistry;
-import com.terraforged.mod.worldgen.util.WorldgenTag;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
-import it.unimi.dsi.fastutil.objects.ObjectSets;
-import net.minecraft.world.level.biome.Biome;
+import com.terraforged.cereal.spec.DataSpec;
+import com.terraforged.cereal.value.DataValue;
 
-import java.util.function.Supplier;
-
-public class BiomeTag extends WorldgenTag<Biome> {
-    public static final BiomeTag NONE = new BiomeTag(ObjectSets.emptySet());
-    public static final Codec<BiomeTag> DIRECT_CODEC = WorldgenTag.codec("biomes", () -> Biome.LIST_CODEC, BiomeTag::new);
-    public static final Codec<Supplier<BiomeTag>> CODEC = LazyCodec.registry(DIRECT_CODEC, ModRegistry.BIOME_TAG);
-
-    BiomeTag(ObjectSet<Biome> biomes) {
-        super(biomes);
-    }
+public record BiomeEdgeViability(float distance) implements Viability {
+    public static final DataSpec<BiomeEdgeViability> SPEC = DataSpec.builder(BiomeEdgeViability.class,
+            (data, spec, context) -> new BiomeEdgeViability(spec.get("distance", data, DataValue::asFloat)))
+            .add("distance", 1F, BiomeEdgeViability::distance)
+            .build();
 
     @Override
-    public String toString() {
-        return super.toString();
-    }
+    public float getFitness(int x, int z, Context context) {
+        if (context.edge()) {
+            var edge = context.getClimateSampler().getShape(x, z);
 
-    public static BiomeTag empty() {
-        return new BiomeTag(ObjectSets.emptySet());
+            if (edge > distance) return 0F;
+
+            return 1F - edge / distance;
+        }
+
+        return 0F;
     }
 }

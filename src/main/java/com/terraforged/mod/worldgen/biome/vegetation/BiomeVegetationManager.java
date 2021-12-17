@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.worldgen.biome.vegetation;
 
-import com.terraforged.mod.registry.ModRegistry;
-import com.terraforged.mod.worldgen.asset.ViabilityConfig;
+import com.terraforged.mod.data.ModVegetation;
+import com.terraforged.mod.worldgen.asset.VegetationConfig;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.biome.Biome;
@@ -35,33 +35,37 @@ import java.util.Map;
 
 public class BiomeVegetationManager {
     private final Map<Biome, BiomeVegetation> vegetation = new IdentityHashMap<>();
-    private final Map<Biome, ViabilityConfig> viability = new IdentityHashMap<>();
 
     public BiomeVegetationManager(RegistryAccess access) {
         var biomes = access.registryOrThrow(Registry.BIOME_REGISTRY);
-        var viabilities = access.registryOrThrow(ModRegistry.VIABILITY);
+        var configs = ModVegetation.getVegetation(access);
+
         for (var entry : biomes.entrySet()) {
             var biome = entry.getValue();
-            var vegetation = new BiomeVegetation(entry.getKey(), access);
-            var viability = getViability(biome, viabilities);
-
-            this.vegetation.put(biome, vegetation);
-
-            if (viability != null) {
-                this.viability.put(biome, viability);
-            }
+            var features = new VegetationFeatures(entry.getKey(), access);
+            var vegetation = getConfig(biome, configs);
+            this.vegetation.put(biome, new BiomeVegetation(vegetation, features));
         }
     }
 
     public BiomeVegetation getVegetation(Biome biome) {
-        return vegetation.getOrDefault(biome, BiomeVegetation.NONE);
+        return vegetation.get(biome);
     }
 
-    public ViabilityConfig getViability(Biome biome) {
-        return viability.getOrDefault(biome, ViabilityConfig.NONE);
+    private static VegetationConfig getViability(Biome biome, Registry<VegetationConfig> registry) {
+        return registry.stream().filter(vc -> vc.biomes().get().contains(biome)).findFirst().orElse(VegetationConfig.NONE);
     }
 
-    private static ViabilityConfig getViability(Biome biome, Registry<ViabilityConfig> registry) {
-        return registry.stream().filter(vc -> vc.biomes().get().contains(biome)).findFirst().orElse(null);
+    private static VegetationConfig[] getConfigs(RegistryAccess access) {
+        return ModVegetation.getVegetation(access);
+    }
+
+    private static VegetationConfig getConfig(Biome biome, VegetationConfig[] configs) {
+        for (var config : configs) {
+            if (config.biomes().get().contains(biome)) {
+                return config;
+            }
+        }
+        return VegetationConfig.NONE;
     }
 }

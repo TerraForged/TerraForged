@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.util;
+package com.terraforged.mod.util.seed;
 
 import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
@@ -34,7 +34,7 @@ import net.minecraft.world.level.dimension.LevelStem;
 
 import java.util.OptionalInt;
 
-public class GeneratorUtil {
+public class SeedUtil {
     public static MappedRegistry<LevelStem> reseed(long seed, MappedRegistry<LevelStem> registry) {
         var overworld = registry.getOrThrow(LevelStem.OVERWORLD);
         var generator = overworld.generator();

@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.mixin.common.registry;
 
-import com.terraforged.mod.util.GeneratorUtil;
+import com.terraforged.mod.util.seed.SeedUtil;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
@@ -40,6 +40,6 @@ public class MixinWorldGenSettings {
             at = @At("HEAD")
     )
     private static MappedRegistry<LevelStem> onInit(MappedRegistry<LevelStem> dimensions, long seed) {
-        return GeneratorUtil.reseed(seed, dimensions);
+        return SeedUtil.reseed(seed, dimensions);
     }
 }

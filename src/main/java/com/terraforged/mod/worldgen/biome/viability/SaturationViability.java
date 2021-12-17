@@ -22,33 +22,35 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.asset;
+package com.terraforged.mod.worldgen.biome.viability;
 
-import com.mojang.serialization.Codec;
-import com.terraforged.mod.codec.LazyCodec;
-import com.terraforged.mod.registry.ModRegistry;
-import com.terraforged.mod.worldgen.util.WorldgenTag;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
-import it.unimi.dsi.fastutil.objects.ObjectSets;
-import net.minecraft.world.level.biome.Biome;
+import com.terraforged.cereal.spec.DataSpec;
+import com.terraforged.cereal.value.DataValue;
 
-import java.util.function.Supplier;
+public record SaturationViability(float min, float max) implements Viability {
+    public static final DataSpec<SaturationViability> SPEC = DataSpec.builder(
+                    "Saturation",
+                    SaturationViability.class,
+                    (data, spec, context) -> new SaturationViability(
+                            spec.get("min", data, DataValue::asFloat),
+                            spec.get("max", data, DataValue::asFloat))
+            )
+            .add("min", 0F, SaturationViability::min)
+            .add("max", 1F, SaturationViability::max)
+            .build();
 
-public class BiomeTag extends WorldgenTag<Biome> {
-    public static final BiomeTag NONE = new BiomeTag(ObjectSets.emptySet());
-    public static final Codec<BiomeTag> DIRECT_CODEC = WorldgenTag.codec("biomes", () -> Biome.LIST_CODEC, BiomeTag::new);
-    public static final Codec<Supplier<BiomeTag>> CODEC = LazyCodec.registry(DIRECT_CODEC, ModRegistry.BIOME_TAG);
-
-    BiomeTag(ObjectSet<Biome> biomes) {
-        super(biomes);
+    public SaturationViability(float max) {
+        this(0, max);
     }
 
     @Override
-    public String toString() {
-        return super.toString();
-    }
+    public float getFitness(int x, int z, Context context) {
+        // Water mask represents distance from river/lake so invert to get saturation
+        float saturation = context.getTerrain().getWater().get(x, z);
 
-    public static BiomeTag empty() {
-        return new BiomeTag(ObjectSets.emptySet());
+        if (saturation < min) return 0F;
+        if (saturation > max) return 1F;
+
+        return (saturation - min) / (max - min);
     }
 }

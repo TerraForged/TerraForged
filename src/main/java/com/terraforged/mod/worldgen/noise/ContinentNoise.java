@@ -151,7 +151,7 @@ public class ContinentNoise extends AdvancedContinentGenerator {
 
         sample.heightNoise = cell.value;
         sample.terrainType = cell.terrain;
-        sample.riverNoise = cell.riverMask;
+        sample.riverNoise = 1 - cell.riverMask;
     }
 
     private Terrain getTerrainType(NoiseSample sample) {

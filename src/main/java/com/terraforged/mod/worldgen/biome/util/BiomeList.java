@@ -22,33 +22,54 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.asset;
+package com.terraforged.mod.worldgen.biome.util;
 
-import com.mojang.serialization.Codec;
-import com.terraforged.mod.codec.LazyCodec;
-import com.terraforged.mod.registry.ModRegistry;
-import com.terraforged.mod.worldgen.util.WorldgenTag;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
-import it.unimi.dsi.fastutil.objects.ObjectSets;
 import net.minecraft.world.level.biome.Biome;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
 
-public class BiomeTag extends WorldgenTag<Biome> {
-    public static final BiomeTag NONE = new BiomeTag(ObjectSets.emptySet());
-    public static final Codec<BiomeTag> DIRECT_CODEC = WorldgenTag.codec("biomes", () -> Biome.LIST_CODEC, BiomeTag::new);
-    public static final Codec<Supplier<BiomeTag>> CODEC = LazyCodec.registry(DIRECT_CODEC, ModRegistry.BIOME_TAG);
+public class BiomeList {
+    private int size = 0;
+    private Biome[] biomes;
 
-    BiomeTag(ObjectSet<Biome> biomes) {
-        super(biomes);
+    public BiomeList reset() {
+        size = 0;
+        return this;
     }
 
-    @Override
-    public String toString() {
-        return super.toString();
+    public int size() {
+        return size;
     }
 
-    public static BiomeTag empty() {
-        return new BiomeTag(ObjectSets.emptySet());
+    public Biome get(int i ) {
+        return biomes[i];
+    }
+
+    public boolean contains(Biome biome) {
+        if (biomes == null) return false;
+
+        for (int i = 0; i < size; i++) {
+            if (biomes[i] == biome) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void add(Biome biome) {
+        if (contains(biome)) return;
+
+        grow(size + 1);
+        biomes[size] = biome;
+        size++;
+    }
+
+    private void grow(int size) {
+        if (biomes == null) {
+            biomes = new Biome[size];
+        } else if (biomes.length <= size) {
+            biomes = Arrays.copyOf(biomes, size);
+        }
     }
 }

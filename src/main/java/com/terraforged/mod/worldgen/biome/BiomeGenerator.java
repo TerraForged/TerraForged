@@ -27,7 +27,6 @@ package com.terraforged.mod.worldgen.biome;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.biome.decorator.FeatureDecorator;
 import com.terraforged.mod.worldgen.biome.decorator.SurfaceDecorator;
-import com.terraforged.mod.worldgen.biome.surface.SurfaceRegion;
 import com.terraforged.mod.worldgen.cave.NoiseCaveGenerator;
 import com.terraforged.mod.worldgen.util.NoiseChunkUtil;
 import net.minecraft.core.RegistryAccess;
@@ -57,7 +56,7 @@ public class BiomeGenerator {
 
     public void surface(ChunkAccess chunk, WorldGenRegion region, StructureFeatureManager structures, Generator generator) {
         NoiseChunkUtil.initChunk(chunk, generator);
-        generator.getVanillaGen().getVanillaGenerator().buildSurface(SurfaceRegion.wrap(region), structures, chunk);
+        generator.getVanillaGen().getVanillaGenerator().buildSurface(region, structures, chunk);
         surfaceDecorator.decorate(chunk, generator);
     }
 

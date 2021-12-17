@@ -34,9 +34,11 @@ public class ViabilityCodec {
     ViabilityCodec() {}
 
     static {
-        DataUtil.registerSub(Viability.class, MultViability.SPEC);
+        DataUtil.registerSub(Viability.class, BiomeEdgeViability.SPEC);
         DataUtil.registerSub(Viability.class, HeightViability.SPEC);
+        DataUtil.registerSub(Viability.class, MultViability.SPEC);
         DataUtil.registerSub(Viability.class, NoiseViability.SPEC);
+        DataUtil.registerSub(Viability.class, SaturationViability.SPEC);
         DataUtil.registerSub(Viability.class, SlopeViability.SPEC);
         DataUtil.registerSub(Viability.class, SumViability.SPEC);
     }

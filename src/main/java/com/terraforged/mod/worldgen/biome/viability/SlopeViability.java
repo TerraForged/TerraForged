@@ -26,8 +26,6 @@ package com.terraforged.mod.worldgen.biome.viability;
 
 import com.terraforged.cereal.spec.DataSpec;
 import com.terraforged.cereal.value.DataValue;
-import com.terraforged.mod.worldgen.Generator;
-import com.terraforged.mod.worldgen.terrain.TerrainData;
 
 public record SlopeViability(float normalize, float max) implements Viability {
     public static final DataSpec<SlopeViability> SPEC = DataSpec.builder(
@@ -41,9 +39,12 @@ public record SlopeViability(float normalize, float max) implements Viability {
             .build();
 
     @Override
-    public float getFitness(int x, int z, TerrainData data, Generator generator) {
-        float norm = normalize * getScaler(generator);
-        float gradient = data.getGradient(x, z, norm);
-        return Viability.getFallOff(gradient, max);
+    public float getFitness(int x, int z, Context context) {
+        float norm = normalize * getScaler(context.getLevels());
+        float gradient = context.getTerrain().getGradient(x, z, norm);
+
+        if (gradient >= max) return 1F;
+
+        return gradient / max;
     }
 }

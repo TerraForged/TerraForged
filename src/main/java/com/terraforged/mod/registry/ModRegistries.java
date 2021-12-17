@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.registry;
 
+import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import com.terraforged.mod.TerraForged;
@@ -31,11 +32,13 @@ import com.terraforged.mod.util.Init;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class ModRegistries extends Init {
     public static final ModRegistries INSTANCE = new ModRegistries();
@@ -60,6 +63,10 @@ public class ModRegistries extends Init {
         return INSTANCE.holders;
     }
 
+    public static <T> void createRegistry(LazyKey<T> key, Codec<T> codec) {
+        createRegistry(key.get(), codec);
+    }
+
     public static <T> void createRegistry(ResourceKey<Registry<T>> key, Codec<T> codec) {
         if (INSTANCE.isDone()) {
             TerraForged.LOG.warn("Attempted to register extension after init: {}", key);
@@ -73,11 +80,26 @@ public class ModRegistries extends Init {
         INSTANCE.registries.put(key, registry);
     }
 
+    public static <T> ResourceKey<T> register(LazyKey<T> registryKey, String name, T value) {
+        return register(registryKey.get(), name, value);
+    }
+
     public static <T> ResourceKey<T> register(ResourceKey<Registry<T>> registryKey, String name, T value) {
         var registry = getRegistry(registryKey);
         var entryKey = ResourceKey.create(registryKey, TerraForged.location(name));
         registry.register(entryKey, value, Lifecycle.stable());
         return entryKey;
+    }
+
+    public static <T> Supplier<T> supplier(ResourceKey<Registry<T>> registry, String name) {
+        var location = TerraForged.location(name);
+        return Suppliers.memoize(() -> getEntry(registry, location));
+    }
+
+    private static <T> T getEntry(ResourceKey<Registry<T>> registry, ResourceLocation name) {
+        T t = getRegistry(registry).get(name);
+        if (t == null) throw new Error("Missing entry: " + name + ", Registry: " + registry.location());
+        return t;
     }
 
     @SuppressWarnings("unchecked")

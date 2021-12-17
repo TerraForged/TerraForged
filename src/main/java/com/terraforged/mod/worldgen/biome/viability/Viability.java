@@ -24,16 +24,35 @@
 
 package com.terraforged.mod.worldgen.biome.viability;
 
-import com.terraforged.mod.worldgen.Generator;
+import com.terraforged.mod.worldgen.biome.IBiomeSampler;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
+import com.terraforged.mod.worldgen.terrain.TerrainLevels;
+
+import java.util.Arrays;
 
 public interface Viability {
-    Viability NONE = (x, z, data, generator) -> 1F;
+    Viability NONE = (x, z, ctx) -> 1F;
 
-    float getFitness(int x, int z, TerrainData data, Generator generator);
+    float getFitness(int x, int z, Context context);
 
-    default float getScaler(Generator generator) {
-        return generator.getGenDepth() / 255F;
+    default float getScaler(TerrainLevels levels) {
+        return levels.genDepth / 255F;
+    }
+
+    default Viability mult(Viability... others) {
+        var copy = Arrays.copyOf(others, others.length + 1);
+        copy[others.length] = this;
+        return new MultViability(copy);
+    }
+
+    interface Context {
+        boolean edge();
+
+        TerrainLevels getLevels();
+
+        TerrainData getTerrain();
+
+        IBiomeSampler getClimateSampler();
     }
 
     static float getFallOff(float value, float max) {

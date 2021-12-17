@@ -57,6 +57,10 @@ public interface LazyCodec<V> extends Codec<V> {
         }
     }
 
+    static <V> LazyCodec<V> of(Supplier<Codec<V>> supplier) {
+        return new Instance<>(Suppliers.memoize(supplier::get));
+    }
+
     static <V> LazyCodec<V> record(Function<RecordCodecBuilder.Instance<V>, ? extends App<RecordCodecBuilder.Mu<V>, V>> builder) {
         return new Instance<>(Suppliers.memoize(() -> RecordCodecBuilder.create(builder)));
     }

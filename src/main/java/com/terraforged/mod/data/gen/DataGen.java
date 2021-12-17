@@ -24,8 +24,6 @@
 
 package com.terraforged.mod.data.gen;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DynamicOps;
@@ -34,6 +32,7 @@ import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.registry.ModRegistries;
 import com.terraforged.mod.util.Init;
+import com.terraforged.mod.util.json.JsonFormatter;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.RegistryWriteOps;
@@ -46,7 +45,6 @@ import java.nio.file.Paths;
 
 public class DataGen extends Init {
     public static final DataGen INSTANCE = new DataGen();
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     @Override
     protected void doInit() {
@@ -97,7 +95,7 @@ public class DataGen extends Init {
         }
 
         try (var out = Files.newBufferedWriter(file)) {
-            GSON.toJson(json, out);
+            JsonFormatter.apply(json, out);
         } catch (IOException e) {
             e.printStackTrace();
         }

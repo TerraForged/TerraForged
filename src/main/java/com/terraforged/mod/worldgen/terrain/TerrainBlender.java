@@ -29,7 +29,7 @@ import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.util.map.Object2FloatCache;
 import com.terraforged.mod.util.map.WeightMap;
 import com.terraforged.mod.util.seed.Seedable;
-import com.terraforged.mod.worldgen.asset.TerrainConfig;
+import com.terraforged.mod.worldgen.asset.TerrainNoise;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.domain.Domain;
 import com.terraforged.noise.util.NoiseUtil;
@@ -45,10 +45,10 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
     private final float blending;
 
     private final Domain warp;
-    private final WeightMap<TerrainConfig> terrains;
+    private final WeightMap<TerrainNoise> terrains;
     private final ThreadLocal<Blender> localBlender = ThreadLocal.withInitial(Blender::new);
 
-    public TerrainBlender(long seed, int scale, float jitter, float blending, TerrainConfig[] terrains) {
+    public TerrainBlender(long seed, int scale, float jitter, float blending, TerrainNoise[] terrains) {
         this.regionSeed = (int) seed + REGION_SEED_OFFSET;
         this.scale = scale;
         this.frequency = 1F / scale;
@@ -61,7 +61,7 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
     @Override
     public TerrainBlender withSeed(long seed) {
         var input = terrains.getValues();
-        var output = new TerrainConfig[input.length];
+        var output = new TerrainNoise[input.length];
         for (int i = 0; i < output.length; i++) {
             output[i] = input[i].withSeed(seed);
         }
@@ -139,7 +139,7 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
 
         protected final int[] hashes = new int[9];
         protected final float[] distances = new float[9];
-        protected final Object2FloatCache<TerrainConfig> cache = new Object2FloatCache<>(9);
+        protected final Object2FloatCache<TerrainNoise> cache = new Object2FloatCache<>(9);
 
         public float getCentreNoiseIndex() {
             return getNoiseIndex(closestIndex);
@@ -149,12 +149,12 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
             return NoiseUtil.sqrt(distances[index]);
         }
 
-        public float getCentreValue(float x, float z, WeightMap<TerrainConfig> terrains) {
+        public float getCentreValue(float x, float z, WeightMap<TerrainNoise> terrains) {
             float noise = getCentreNoiseIndex();
             return terrains.getValue(noise).noise().getValue(x, z);
         }
 
-        public float getValue(float x, float z, float blending, WeightMap<TerrainConfig> terrains) {
+        public float getValue(float x, float z, float blending, WeightMap<TerrainNoise> terrains) {
             float dist0 = getDistance(closestIndex);
             float dist1 = getDistance(closestIndex2);
 
@@ -169,7 +169,7 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
             }
         }
 
-        public float getBlendedValue(float x, float z, float nearest, float nearest2, float blendRange, WeightMap<TerrainConfig> terrains) {
+        public float getBlendedValue(float x, float z, float nearest, float nearest2, float blendRange, WeightMap<TerrainNoise> terrains) {
             cache.clear();
 
             float sumNoise = getCacheValue(closestIndex, x, z, terrains);
@@ -194,7 +194,7 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
             return NoiseUtil.clamp(sumNoise / sumWeight, 0, 1);
         }
 
-        private float getCacheValue(int index, float x, float z, WeightMap<TerrainConfig> terrains) {
+        private float getCacheValue(int index, float x, float z, WeightMap<TerrainNoise> terrains) {
             float noiseIndex = getNoiseIndex(index);
             var terrain = terrains.getValue(noiseIndex);
 

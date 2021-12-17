@@ -26,6 +26,7 @@ package com.terraforged.mod.worldgen.util;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.terraforged.mod.codec.LazyCodec;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
@@ -75,12 +76,12 @@ public abstract class WorldgenTag<T> {
     }
 
     public static <V, T extends WorldgenTag<V>> Codec<T> codec(Codec<List<Supplier<V>>> listCodec, Function<ObjectSet<V>, T> constructor) {
-        return codec("items", listCodec, constructor);
+        return codec("items", () -> listCodec, constructor);
     }
 
-    public static <V, T extends WorldgenTag<V>> Codec<T> codec(String key, Codec<List<Supplier<V>>> listCodec, Function<ObjectSet<V>, T> constructor) {
-        return RecordCodecBuilder.create(instance -> instance.group(
-                listCodec.fieldOf(key).xmap(WorldgenTag::unwrap, WorldgenTag::wrap).forGetter(WorldgenTag::items)
-        ).apply(instance, constructor));
+    public static <V, T extends WorldgenTag<V>> Codec<T> codec(String key, Supplier<Codec<List<Supplier<V>>>> listCodec, Function<ObjectSet<V>, T> constructor) {
+        return LazyCodec.of(() -> RecordCodecBuilder.create(instance -> instance.group(
+                listCodec.get().fieldOf(key).xmap(WorldgenTag::unwrap, WorldgenTag::wrap).forGetter(WorldgenTag::items)
+        ).apply(instance, constructor)));
     }
 }

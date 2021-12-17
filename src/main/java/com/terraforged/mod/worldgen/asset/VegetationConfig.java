@@ -27,40 +27,54 @@ package com.terraforged.mod.worldgen.asset;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.terraforged.mod.codec.LazyCodec;
-import com.terraforged.mod.util.DataUtil;
 import com.terraforged.mod.util.seed.ContextSeedable;
-import com.terraforged.mod.worldgen.biome.viability.*;
+import com.terraforged.mod.worldgen.biome.viability.Viability;
+import com.terraforged.mod.worldgen.biome.viability.ViabilityCodec;
 
 import java.util.function.Supplier;
 
 @SuppressWarnings("ClassCanBeRecord")
-public class ViabilityConfig implements ContextSeedable<ViabilityConfig> {
-    public static final ViabilityConfig NONE = new ViabilityConfig(Suppliers.ofInstance(BiomeTag.NONE), 1F, Viability.NONE);
+public class VegetationConfig implements ContextSeedable<VegetationConfig> {
+    public static final VegetationConfig NONE = new VegetationConfig(0F, 0F, 0F, Suppliers.ofInstance(BiomeTag.NONE), Viability.NONE);
 
-    public static final Codec<ViabilityConfig> CODEC = LazyCodec.record(instance -> instance.group(
-            BiomeTag.CODEC.fieldOf("biomes").forGetter(ViabilityConfig::biomes),
-            Codec.FLOAT.optionalFieldOf("density", 1F).forGetter(ViabilityConfig::density),
-            ViabilityCodec.CODEC.fieldOf("viability").forGetter(ViabilityConfig::viability)
-    ).apply(instance, ViabilityConfig::new));
+    public static final Codec<VegetationConfig> CODEC = LazyCodec.record(instance -> instance.group(
+            Codec.FLOAT.optionalFieldOf("frequency", 1F).forGetter(VegetationConfig::frequency),
+            Codec.FLOAT.optionalFieldOf("jitter", 1F).forGetter(VegetationConfig::jitter),
+            Codec.FLOAT.optionalFieldOf("density", 1F).forGetter(VegetationConfig::density),
+            BiomeTag.CODEC.fieldOf("biomes").forGetter(VegetationConfig::biomes),
+            ViabilityCodec.CODEC.fieldOf("viability").forGetter(VegetationConfig::viability)
+    ).apply(instance, VegetationConfig::new));
 
-    private final Supplier<BiomeTag> biomes;
+    private final float frequency;
+    private final float jitter;
     private final float density;
+    private final Supplier<BiomeTag> biomes;
     private final Viability viability;
 
-    public ViabilityConfig(Supplier<BiomeTag> biomes, float density, Viability viability) {
+    public VegetationConfig(float frequency, float jitter, float density, Supplier<BiomeTag> biomes, Viability viability) {
         this.biomes = biomes;
+        this.frequency = frequency;
+        this.jitter = jitter;
         this.density = density;
         this.viability = viability;
     }
 
     @Override
-    public ViabilityConfig withSeed(long seed) {
+    public VegetationConfig withSeed(long seed) {
         var viability = withSeed(seed, viability(), Viability.class);
-        return new ViabilityConfig(biomes, density, viability);
+        return new VegetationConfig(frequency, jitter, density, biomes, viability);
     }
 
     public Supplier<BiomeTag> biomes() {
         return biomes;
+    }
+
+    public float frequency() {
+        return frequency;
+    }
+
+    public float jitter() {
+        return jitter;
     }
 
     public float density() {
@@ -73,18 +87,12 @@ public class ViabilityConfig implements ContextSeedable<ViabilityConfig> {
 
     @Override
     public String toString() {
-        return "ViabilityConfig{" +
-                "biomes=" + biomes +
+        return "VegetationConfig{" +
+                "frequency=" + frequency +
+                ", jitter=" + jitter +
                 ", density=" + density +
+                ", biomes=" + biomes +
                 ", viability=" + viability +
                 '}';
-    }
-
-    static {
-        DataUtil.registerSub(Viability.class, MultViability.SPEC);
-        DataUtil.registerSub(Viability.class, HeightViability.SPEC);
-        DataUtil.registerSub(Viability.class, NoiseViability.SPEC);
-        DataUtil.registerSub(Viability.class, SlopeViability.SPEC);
-        DataUtil.registerSub(Viability.class, SumViability.SPEC);
     }
 }

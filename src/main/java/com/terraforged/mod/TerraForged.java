@@ -26,6 +26,7 @@ package com.terraforged.mod;
 
 import com.google.common.base.Suppliers;
 import com.terraforged.mod.platform.Platform;
+import com.terraforged.mod.registry.LazyKey;
 import com.terraforged.mod.registry.registrar.BuiltinRegistrar;
 import com.terraforged.mod.registry.registrar.Registrar;
 import net.minecraft.core.Registry;
@@ -80,7 +81,7 @@ public abstract class TerraForged implements Platform {
 		return new ResourceLocation(MODID, name);
 	}
 
-	public static <T> ResourceKey<Registry<T>> registry(String name) {
-		return ResourceKey.createRegistryKey(location(name));
+	public static <T> LazyKey<T> registry(String name) {
+		return new LazyKey<>(location(name));
 	}
 }

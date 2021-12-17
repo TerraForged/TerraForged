@@ -26,9 +26,9 @@ package com.terraforged.mod.worldgen.cave;
 
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.asset.NoiseCave;
+import com.terraforged.mod.worldgen.biome.util.BiomeList;
 import net.minecraft.world.level.biome.Biome;
 
-import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -77,51 +77,5 @@ public class CarverChunk {
             return biomeLists[i].reset();
         }
         return new BiomeList();
-    }
-
-    public static class BiomeList {
-        private int size = 0;
-        private Biome[] biomes;
-
-        public BiomeList reset() {
-            size = 0;
-            return this;
-        }
-
-        public int size() {
-            return size;
-        }
-
-        public Biome get(int i ) {
-            return biomes[i];
-        }
-
-        public boolean contains(Biome biome) {
-            if (biomes == null) return false;
-
-            for (var b : biomes) {
-                if (b == biome) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public void add(Biome biome) {
-            if (contains(biome)) return;
-
-            grow(size + 1);
-            biomes[size] = biome;
-            size++;
-        }
-
-        private void grow(int size) {
-            if (biomes == null) {
-                biomes = new Biome[size];
-            } else if (biomes.length <= size) {
-                biomes = Arrays.copyOf(biomes, size);
-            }
-        }
     }
 }

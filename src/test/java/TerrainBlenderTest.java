@@ -23,7 +23,7 @@
  */
 
 import com.terraforged.engine.world.terrain.TerrainType;
-import com.terraforged.mod.worldgen.asset.TerrainConfig;
+import com.terraforged.mod.worldgen.asset.TerrainNoise;
 import com.terraforged.mod.worldgen.terrain.TerrainBlender;
 import com.terraforged.noise.Source;
 import com.terraforged.noise.util.N2DUtil;
@@ -32,9 +32,9 @@ import java.awt.*;
 
 public class TerrainBlenderTest {
     public static void main(String[] args) {
-        var blender = new TerrainBlender(123, 80, 0.7F, 0.75F, new TerrainConfig[]{
-                new TerrainConfig(TerrainType.FLATS, 1F, Source.constant(0)),
-                new TerrainConfig(TerrainType.FLATS, 1F, Source.constant(1)),
+        var blender = new TerrainBlender(123, 80, 0.7F, 0.75F, new TerrainNoise[]{
+                new TerrainNoise(TerrainType.FLATS, 1F, Source.constant(0)),
+                new TerrainNoise(TerrainType.FLATS, 1F, Source.constant(1)),
         });
 
         N2DUtil.display(1000, 800, (x, z, img) -> {

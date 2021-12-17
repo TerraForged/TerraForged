@@ -81,6 +81,14 @@ public class Source extends BiomeSource {
         return cache.computeIfAbsent(PosUtil.pack(x, z), this::compute);
     }
 
+    public BiomeSampler getBiomeSampler() {
+        return biomeSampler;
+    }
+
+    public CaveBiomeSampler getCaveBiomeSampler() {
+        return caveBiomeSampler;
+    }
+
     public Biome getUnderGroundBiome(int seed, int x, int z, CaveType type) {
         return caveBiomeSampler.getUnderGroundBiome(seed, x, z, type);
     }

@@ -24,18 +24,75 @@
 
 package com.terraforged.mod.data;
 
+import com.terraforged.mod.Environment;
 import com.terraforged.mod.registry.ModRegistries;
 import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.util.seed.RandSeed;
 import com.terraforged.mod.worldgen.asset.NoiseCave;
+import com.terraforged.mod.worldgen.cave.CaveType;
+import com.terraforged.noise.Source;
+import com.terraforged.noise.util.NoiseUtil;
+import net.minecraft.core.RegistryAccess;
 
 interface ModCaves extends ModRegistry {
     static void register() {
         var seed = new RandSeed(901246, 500_000);
-        ModRegistries.register(CAVE, "synapse_high", NoiseCave.synapseCave(seed.next(), 1F, 96, 384));
-        ModRegistries.register(CAVE, "synapse_mid", NoiseCave.synapseCave(seed.next(), 1.1F, 0, 256));
-        ModRegistries.register(CAVE, "synapse_low", NoiseCave.synapseCave(seed.next(), 1.2F, -32, 128));
-        ModRegistries.register(CAVE, "mega", NoiseCave.megaCave(seed.next(), 1.0F, -16, 64));
-        ModRegistries.register(CAVE, "mega_deep", NoiseCave.megaCave(seed.next(), 1.2F, -32, 48));
+        ModRegistries.register(CAVE, "synapse_high", Factory.synapse(seed.next(), 1F, 96, 384));
+        ModRegistries.register(CAVE, "synapse_mid", Factory.synapse(seed.next(), 1.1F, 0, 256));
+        ModRegistries.register(CAVE, "synapse_low", Factory.synapse(seed.next(), 1.2F, -32, 128));
+        ModRegistries.register(CAVE, "mega", Factory.mega(seed.next(), 1.0F, -16, 64));
+        ModRegistries.register(CAVE, "mega_deep", Factory.mega(seed.next(), 1.2F, -32, 48));
+    }
+
+    static NoiseCave[] getCaves(RegistryAccess access) {
+        if (access == null || Environment.DEV_ENV) {
+            return Factory.getDefaults();
+        }
+        return access.ownedRegistryOrThrow(CAVE.get()).stream().toArray(NoiseCave[]::new);
+    }
+
+    class Factory {
+        static NoiseCave mega(int seed, float scale, int minY, int maxY) {
+            int elevationScale = NoiseUtil.floor(200 * scale);
+            int networkScale = NoiseUtil.floor(250 * scale);
+            int floorScale = NoiseUtil.floor(30 * scale);
+            int size = NoiseUtil.floor(30 *  scale);
+
+            var elevation = Source.simplex(++seed, elevationScale, 2).map(0.3, 0.7);
+            var shape = Source.simplex(++seed, networkScale, 3)
+                    .bias(-0.5).abs().scale(2).invert()
+                    .clamp(0.75, 1.0).map(0, 1);
+
+            var floor = Source.simplex(++seed, floorScale, 2).clamp(0.0, 0.3).map(0, 1);
+
+            return new NoiseCave(seed, CaveType.UNIQUE, elevation, shape, floor, size, minY, maxY);
+        }
+
+        static NoiseCave synapse(int seed, float scale, int minY, int maxY) {
+            int elevationScale = NoiseUtil.floor(350 * scale);
+            int networkScale = NoiseUtil.floor(180 * scale);
+            int networkWarpScale = NoiseUtil.floor(20 * scale);
+            int networkWarpStrength = networkWarpScale / 2;
+            int floorScale = NoiseUtil.floor(20 * scale);
+            int size = NoiseUtil.floor(15 *  scale);
+
+            var elevation = Source.simplex(++seed, elevationScale, 3).map(0.1, 0.9);
+            var shape = Source.simplexRidge(++seed, networkScale, 3)
+                    .warp(++seed, networkWarpScale, 1, networkWarpStrength)
+                    .clamp(0.35, 0.75).map(0, 1);
+            var floor = Source.simplex(++seed, floorScale, 2).clamp(0.0, 0.15).map(0, 1);
+            return new NoiseCave(seed, CaveType.GLOBAL, elevation, shape, floor, size, minY, maxY);
+        }
+
+        static NoiseCave[] getDefaults() {
+            var seed = new RandSeed(901246, 500_000);
+            return new NoiseCave[] {
+                    Factory.synapse(seed.next(), 1F, 96, 384),
+                    Factory.synapse(seed.next(), 1.1F, 0, 256),
+                    Factory.synapse(seed.next(), 1.2F, -32, 128),
+                    Factory.mega(seed.next(), 1.0F, -16, 64),
+                    Factory.mega(seed.next(), 1.2F, -32, 48)
+            };
+        }
     }
 }

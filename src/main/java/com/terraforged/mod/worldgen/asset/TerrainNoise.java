@@ -35,29 +35,29 @@ import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
 
 @SuppressWarnings("ClassCanBeRecord")
-public class TerrainConfig implements ContextSeedable<TerrainConfig>, WeightMap.Weighted {
-    public static final TerrainConfig NONE = new TerrainConfig(TerrainType.NONE, 0, Source.ZERO);
+public class TerrainNoise implements ContextSeedable<TerrainNoise>, WeightMap.Weighted {
+    public static final TerrainNoise NONE = new TerrainNoise(TerrainType.NONE, 0, Source.ZERO);
 
-    public static final Codec<TerrainConfig> CODEC = LazyCodec.record(instance -> instance.group(
-            Codec.STRING.fieldOf("terrain").xmap(TerrainType::get, Terrain::getName).forGetter(TerrainConfig::terrain),
-            Codec.FLOAT.optionalFieldOf("weight", 1F).forGetter(TerrainConfig::weight),
-            NoiseCodec.CODEC.fieldOf("noise").forGetter(TerrainConfig::noise)
-    ).apply(instance, TerrainConfig::new));
+    public static final Codec<TerrainNoise> CODEC = LazyCodec.record(instance -> instance.group(
+            Codec.STRING.fieldOf("terrain").xmap(TerrainType::get, Terrain::getName).forGetter(TerrainNoise::terrain),
+            Codec.FLOAT.fieldOf("weight").forGetter(TerrainNoise::weight),
+            NoiseCodec.CODEC.fieldOf("noise").forGetter(TerrainNoise::noise)
+    ).apply(instance, TerrainNoise::new));
 
     private final Terrain terrain;
     private final float weight;
     private final Module noise;
 
-    public TerrainConfig(Terrain terrain, float weight, Module noise) {
+    public TerrainNoise(Terrain terrain, float weight, Module noise) {
         this.terrain = terrain;
         this.weight = weight;
         this.noise = noise;
     }
 
     @Override
-    public TerrainConfig withSeed(long seed) {
+    public TerrainNoise withSeed(long seed) {
         var heightmap = withSeed(seed, noise(), Module.class);
-        return new TerrainConfig(terrain, weight, heightmap);
+        return new TerrainNoise(terrain, weight, heightmap);
     }
 
     @Override

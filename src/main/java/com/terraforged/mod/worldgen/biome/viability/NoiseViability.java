@@ -25,8 +25,6 @@
 package com.terraforged.mod.worldgen.biome.viability;
 
 import com.terraforged.cereal.spec.DataSpec;
-import com.terraforged.mod.worldgen.Generator;
-import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.noise.Module;
 
 public record NoiseViability(Module noise) implements Viability {
@@ -38,7 +36,7 @@ public record NoiseViability(Module noise) implements Viability {
             .build();
 
     @Override
-    public float getFitness(int x, int z, TerrainData data, Generator generator) {
+    public float getFitness(int x, int z, Context context) {
         return noise.getValue(x, z);
     }
 }

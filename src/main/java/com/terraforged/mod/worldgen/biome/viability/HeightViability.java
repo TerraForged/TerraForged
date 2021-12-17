@@ -26,8 +26,6 @@ package com.terraforged.mod.worldgen.biome.viability;
 
 import com.terraforged.cereal.spec.DataSpec;
 import com.terraforged.cereal.value.DataValue;
-import com.terraforged.mod.worldgen.Generator;
-import com.terraforged.mod.worldgen.terrain.TerrainData;
 
 public record HeightViability(float minOffset, float midOffset, float maxOffset) implements Viability {
     public static final DataSpec<HeightViability> SPEC = DataSpec.builder(
@@ -45,14 +43,22 @@ public record HeightViability(float minOffset, float midOffset, float maxOffset)
             .build();
 
     @Override
-    public float getFitness(int x, int z, TerrainData data, Generator generator) {
-        int height = data.getHeight(x, z);
+    public float getFitness(int x, int z, Context context) {
+        int height = context.getTerrain().getHeight(x, z);
 
-        float scale = getScaler(generator);
-        float min = generator.getSeaLevel() + minOffset() * scale;
-        float mid = generator.getSeaLevel() + midOffset() * scale;
-        float max = generator.getSeaLevel() + maxOffset() * scale;
+        var levels = context.getLevels();
+        float scale = getScaler(levels);
+        float min = levels.seaLevel + minOffset() * scale;
+        float mid = levels.seaLevel + midOffset() * scale;
+        float max = levels.seaLevel + maxOffset() * scale;
 
-        return Viability.getFallOff(height, min, mid, max);
+        if (height < min) return 1F;
+        if (height > max) return 1F;
+
+        if (height < mid) {
+            return (mid - height) / (mid - min);
+        }
+
+        return (height - mid) / (max - mid);
     }
 }
