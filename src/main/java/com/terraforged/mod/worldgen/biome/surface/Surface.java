@@ -64,7 +64,7 @@ public class Surface {
     }
 
     public static void applyPost(ChunkAccess chunk, TerrainData terrainData, ChunkGenerator generator) {
-        float norm = 68 * (generator.getGenDepth() / 255F);
+        float norm = 70 * (generator.getGenDepth() / 255F);
         var pos = new BlockPos.MutableBlockPos();
 
         for (int dz = 0; dz < 16; dz++) {

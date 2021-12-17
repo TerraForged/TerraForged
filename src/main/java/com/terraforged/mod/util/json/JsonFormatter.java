@@ -107,13 +107,31 @@ public class JsonFormatter {
     }
 
     private void writePrimitive(JsonPrimitive json) throws IOException {
-        if (json.isBoolean()) {
+        if (json.isNumber()) {
+            writeNumber(json);
+        } else if (json.isBoolean()) {
             jsonWriter.value(json.getAsBoolean());
-        } else if (json.isNumber()) {
-            jsonWriter.value(json.getAsNumber());
         } else if (json.isString()) {
             jsonWriter.value(json.getAsString());
         }
+    }
+
+    private void writeNumber(JsonPrimitive json) throws IOException {
+        long l = json.getAsLong();
+        double d = json.getAsDouble();
+        if (l == d) {
+            jsonWriter.value(l);
+        } else {
+            jsonWriter.value(trimDouble(d));
+        }
+    }
+
+    private static double trimDouble(double value) {
+        int factor = 1000;
+        while (value * factor < 1) {
+            factor *= 10;
+        }
+        return Math.round(value * factor) / (double) factor;
     }
 
     private static boolean isString(JsonElement json) {
@@ -122,6 +140,10 @@ public class JsonFormatter {
 
     private static boolean isPrimitive(JsonElement json) {
         return json.isJsonPrimitive() && !json.getAsJsonPrimitive().isString();
+    }
+
+    private static boolean isFloatingPoint(JsonElement json) {
+        return json.getAsInt() == json.getAsDouble();
     }
 
     private static boolean isCompactable(JsonArray array) {

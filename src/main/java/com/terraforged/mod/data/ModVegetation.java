@@ -92,7 +92,7 @@ public interface ModVegetation extends ModRegistry {
                     .with(0.25F, new SaturationViability(0.7F, 1F))
                     .with(-1.0F, new HeightViability(-100, 50, 145))
                     .with(-1.0F, new SlopeViability(80, 0.65F))
-                    .with(1F, new NoiseViability(Source.simplex(seed.next(), 120, 2).clamp(0.75, 0.9).map(0, 1)))
+                    .with(1F, new NoiseViability(Source.simplex(seed.next(), 130, 2).clamp(0.7, 0.8).map(0, 1)))
                     .build());
         }
 
@@ -126,12 +126,12 @@ public interface ModVegetation extends ModRegistry {
         }
 
         static VegetationConfig patchy(Seed seed, RegistryAccess access) {
-            return new VegetationConfig(0.34F, 0.8F, 0.75F, tag("trees/patchy", access), SumViability.builder(0.75F)
+            return new VegetationConfig(0.36F, 0.75F, 0.8F, tag("trees/patchy", access), SumViability.builder(0.75F)
                     .with(0.3F, new SaturationViability(0.97F, 1F))
                     .with(-1.0F, new HeightViability(-100, 30, 150))
                     .with(-1.0F, new SlopeViability(70, 0.65F))
                     .with(-0.8F, new BiomeEdgeViability(0.7F))
-                    .with(-0.4F, new NoiseViability(Source.simplex(seed.next(), 130, 3).clamp(0.3, 0.7).map(0, 1)))
+                    .with(-0.4F, new NoiseViability(Source.simplex(seed.next(), 130, 3).clamp(0.4, 0.7).map(0, 1)))
                     .build());
         }
 

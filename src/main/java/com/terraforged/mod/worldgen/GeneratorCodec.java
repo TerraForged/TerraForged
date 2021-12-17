@@ -26,8 +26,7 @@ package com.terraforged.mod.worldgen;
 
 import com.mojang.serialization.DynamicOps;
 import com.terraforged.mod.codec.WorldGenCodec;
-import com.terraforged.mod.registry.ModRegistry;
-import com.terraforged.mod.worldgen.asset.TerrainNoise;
+import com.terraforged.mod.data.ModTerrain;
 import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
@@ -46,9 +45,10 @@ public class GeneratorCodec implements WorldGenCodec<Generator> {
         long seed = getSeed(ops, input);
         var levels = new TerrainLevels();
         var biomes = access.registryOrThrow(Registry.BIOME_REGISTRY);
+        var terrain = ModTerrain.getTerrain(access);
 
         var biomeGenerator = new BiomeGenerator(seed, access);
-        var noiseGenerator = new NoiseGenerator(seed, levels, getTerrain(access)).withErosion();
+        var noiseGenerator = new NoiseGenerator(seed, levels, terrain).withErosion();
         var biomeSource = new Source(seed, noiseGenerator, biomes);
         var vanillaGen = getVanillaGen(seed, biomeSource, access);
         var structureConfig = getStructureSettings(access);
@@ -81,12 +81,5 @@ public class GeneratorCodec implements WorldGenCodec<Generator> {
                 .map(NoiseGeneratorSettings::structureSettings)
                 .map(StructureConfig::new)
                 .orElseThrow();
-    }
-
-    protected static TerrainNoise[] getTerrain(RegistryAccess access) {
-        var registry = access.registryOrThrow(ModRegistry.TERRAIN.get());
-        return registry.entrySet().stream()
-                .map(Map.Entry::getValue)
-                .toArray(TerrainNoise[]::new);
     }
 }

@@ -55,19 +55,20 @@ public interface ModTerrain extends ModRegistry {
         ModRegistries.register(TERRAIN, "mountains_1", Factory.create(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains));
         ModRegistries.register(TERRAIN, "mountains_2", Factory.create(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains2));
         ModRegistries.register(TERRAIN, "mountains_3", Factory.create(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains3));
+        ModRegistries.register(TERRAIN, "mountains_4", Factory.createDolomite(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS));
         ModRegistries.register(TERRAIN, "mountains_ridge_1", Factory.createNF(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains2));
         ModRegistries.register(TERRAIN, "mountains_ridge_2", Factory.createNF(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains3));
     }
 
     interface Weights {
-        float STEPPE = 1F;
-        float PLAINS = 2F;
+        float STEPPE = 1.5F;
+        float PLAINS = 2.5F;
         float HILLS = 2F;
         float DALES = 1.5F;
-        float PLATEAU = 1.5F;
-        float BADLANDS = 1F;
-        float TORRIDONIAN = 2F;
-        float MOUNTAINS = 2.25F;
+        float PLATEAU = 2F;
+        float BADLANDS = 1.75F;
+        float TORRIDONIAN = 2.5F;
+        float MOUNTAINS = 1.25F;
     }
 
     static TerrainNoise[] getTerrain(RegistryAccess access) {
@@ -91,6 +92,19 @@ public interface ModTerrain extends ModRegistry {
 
         static TerrainNoise createNF(Seed seed, Terrain type, float weight, BiFunction<LandForms, Seed, Module> factory) {
             return new TerrainNoise(type, weight, factory.apply(LAND_FORMS_NF, seed));
+        }
+
+        static TerrainNoise createDolomite(Seed seed, Terrain terrain, float weight) {
+            return new TerrainNoise(terrain, weight, Source.simplex(seed.next(), 475, 4)
+                    .clamp(0.1, 1).map(0, 1)
+                    .warp(seed.next(), 10, 2, 8)
+                    .mult(Source.build(seed.next(), 170, 5)
+                            .lacunarity(2.7)
+                            .gain(0.6)
+                            .simplexRidge()
+                            .alpha(0.425))
+                    .warp(seed.next(), 800, 3, 400)
+                    .scale(0.675));
         }
 
         static TerrainSettings settings() {
@@ -119,6 +133,7 @@ public interface ModTerrain extends ModRegistry {
                     Factory.create(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains),
                     Factory.create(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains2),
                     Factory.create(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains3),
+                    Factory.createDolomite(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS),
                     Factory.createNF(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains2),
                     Factory.createNF(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains3),
             };

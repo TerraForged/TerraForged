@@ -38,7 +38,7 @@ public interface ModBiomes {
     ModBiome CAVE = ModBiome.of("cave", Biomes.DRIPSTONE_CAVES, builder -> {
         var genSettings = new BiomeGenerationSettings.Builder();
         genSettings.addFeature(GenerationStep.Decoration.LOCAL_MODIFICATIONS, CavePlacements.LARGE_DRIPSTONE);
-        genSettings.addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, CavePlacements.DRIPSTONE_CLUSTER);
+        genSettings.addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, CavePlacements.POINTED_DRIPSTONE);
         genSettings.build();
         builder.generationSettings(genSettings.build());
     });
