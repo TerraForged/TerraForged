@@ -28,6 +28,7 @@ import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.biome.feature.PositionSampler;
 import com.terraforged.mod.worldgen.biome.vegetation.BiomeVegetationManager;
 import com.terraforged.mod.worldgen.biome.vegetation.VegetationFeatures;
+import com.terraforged.mod.worldgen.terrain.TerrainData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.SectionPos;
@@ -45,6 +46,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 public class FeatureDecorator {
@@ -73,14 +75,18 @@ public class FeatureDecorator {
         return stages.get(stage);
     }
 
-    public void decorate(ChunkAccess chunk, WorldGenLevel level, StructureFeatureManager structures, Generator generator) {
+    public void decorate(ChunkAccess chunk,
+                         WorldGenLevel level,
+                         StructureFeatureManager structures,
+                         CompletableFuture<TerrainData> terrain,
+                         Generator generator) {
         var origin = getOrigin(level, chunk);
         var biome = level.getBiome(origin);
         var random = getRandom();
         long seed = random.setDecorationSeed(level.getSeed(), origin.getX(), origin.getZ());
 
         decoratePre(seed, origin, biome, chunk, level, generator, random, structures);
-        decorateTrees(seed, chunk, level, generator, random);
+        decorateTrees(seed, chunk, level, terrain, generator, random);
         decorateOther(seed, origin, biome, level, generator, random);
         decoratePost(seed, origin, biome, chunk, level, generator, random, structures);
     }
@@ -109,8 +115,14 @@ public class FeatureDecorator {
         VanillaDecorator.decorate(seed, VegetationFeatures.STAGE + 1, MAX_DECORATION_STAGE, origin, biome, chunk, level, generator, random, structureManager, this);
     }
 
-    private void decorateTrees(long seed, ChunkAccess chunk, WorldGenLevel level, Generator generator, WorldgenRandom random) {
-        PositionSampler.place(seed, chunk, level, generator, random, this);
+    private void decorateTrees(long seed,
+                               ChunkAccess chunk,
+                               WorldGenLevel level,
+                               CompletableFuture<TerrainData> terrain,
+                               Generator generator,
+                               WorldgenRandom random) {
+
+        PositionSampler.place(seed, chunk, level, terrain, generator, random, this);
     }
 
     private void decorateOther(long seed, BlockPos origin, Biome biome, WorldGenLevel level, Generator generator, WorldgenRandom random) {

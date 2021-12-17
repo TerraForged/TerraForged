@@ -28,8 +28,11 @@ import com.mojang.serialization.Codec;
 import com.terraforged.mod.codec.LazyCodec;
 import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.worldgen.util.WorldgenTag;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.function.Supplier;
@@ -46,6 +49,15 @@ public class BiomeTag extends WorldgenTag<Biome> {
     @Override
     public String toString() {
         return super.toString();
+    }
+
+    @SafeVarargs
+    public static BiomeTag of(Registry<Biome> registry, ResourceKey<Biome>... biomes) {
+        var set = new ObjectOpenHashSet<Biome>();
+        for (var key : biomes) {
+            set.add(registry.getOrThrow(key));
+        }
+        return new BiomeTag(set);
     }
 
     public static BiomeTag empty() {

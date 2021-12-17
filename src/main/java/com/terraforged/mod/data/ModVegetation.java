@@ -47,8 +47,8 @@ public interface ModVegetation extends ModRegistry {
         ModRegistries.register(VEGETATION, "trees_patchy", Factory.patchy(seed, null));
         ModRegistries.register(VEGETATION, "trees_temperate", Factory.temperate(seed, null));
         ModRegistries.register(VEGETATION, "trees_hardy", Factory.hardy(seed, null));
-        ModRegistries.register(VEGETATION, "trees_jungle", Factory.jungle(seed, null));
-        ModRegistries.register(VEGETATION, "trees_sparse_jungle", Factory.sparseJungle(seed, null));
+        ModRegistries.register(VEGETATION, "trees_rainforest", Factory.jungle(seed, null));
+        ModRegistries.register(VEGETATION, "trees_sparse_rainforest", Factory.sparseJungle(seed, null));
     }
 
     static VegetationConfig[] getVegetation(RegistryAccess access) {
@@ -97,7 +97,7 @@ public interface ModVegetation extends ModRegistry {
         }
 
         static VegetationConfig jungle(Seed seed, RegistryAccess access) {
-            return new VegetationConfig(0.35F, 0.75F, 0.7F, tag("trees/jungle", access), SumViability.builder(0.9F)
+            return new VegetationConfig(0.35F, 0.75F, 0.7F, tag("trees/rainforest", access), SumViability.builder(0.9F)
                     .with(0.35F, new SaturationViability(0.85F, 1F))
                     .with(-1.0F, new HeightViability(-100, 40, 185))
                     .with(-1.0F, new SlopeViability(75, 0.8F))
@@ -107,7 +107,7 @@ public interface ModVegetation extends ModRegistry {
         }
 
         static VegetationConfig sparseJungle(Seed seed, RegistryAccess access) {
-            return new VegetationConfig(0.18F, 0.85F, 0.5F, tag("trees/sparse_jungle", access), SumViability.builder(0.25F)
+            return new VegetationConfig(0.18F, 0.85F, 0.5F, tag("trees/sparse_rainforest", access), SumViability.builder(0.25F)
                     .with(0.3F, new SaturationViability(0.65F, 1F))
                     .with(-1.0F, new HeightViability(-10, 30, 150))
                     .with(-1.0F, new SlopeViability(80, 0.75F))
@@ -137,11 +137,11 @@ public interface ModVegetation extends ModRegistry {
 
         static Supplier<BiomeTag> tag(String name, RegistryAccess access) {
             if (access == null) {
-                return BiomeTag::empty;
+                return ModRegistries.supplier(ModRegistry.BIOME_TAG.get(), name);
+            } else {
+                var tags = access.ownedRegistryOrThrow(BIOME_TAG.get());
+                return Suppliers.ofInstance(tags.get(TerraForged.location(name)));
             }
-
-            var tags = access.ownedRegistryOrThrow(BIOME_TAG.get());
-            return Suppliers.ofInstance(tags.get(TerraForged.location(name)));
         }
 
         static VegetationConfig[] getDefaults(RegistryAccess access) {

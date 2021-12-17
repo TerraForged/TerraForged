@@ -54,6 +54,7 @@ public class DataGen extends Init {
     }
 
     public static void export(Path dir) {
+        TerraForged.LOG.info("Generating json data");
         var registries = RegistryAccess.builtin();
         var writeOps = RegistryWriteOps.create(JsonOps.INSTANCE, registries);
         for (var holder : ModRegistries.getHolders()) {

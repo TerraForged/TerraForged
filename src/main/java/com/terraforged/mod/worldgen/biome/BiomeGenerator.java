@@ -27,6 +27,7 @@ package com.terraforged.mod.worldgen.biome;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.biome.decorator.FeatureDecorator;
 import com.terraforged.mod.worldgen.biome.decorator.SurfaceDecorator;
+import com.terraforged.mod.worldgen.biome.surface.Surface;
 import com.terraforged.mod.worldgen.cave.NoiseCaveGenerator;
 import com.terraforged.mod.worldgen.util.NoiseChunkUtil;
 import net.minecraft.core.RegistryAccess;
@@ -67,13 +68,15 @@ public class BiomeGenerator {
                       GenerationStep.Carving step,
                       Generator generator) {
 
-//        CarverUtil.applyCarvers(seed, chunk, region, biomes, step, generator);
-
         noiseCaveGenerator.carve(chunk, generator);
     }
 
     public void decorate(ChunkAccess chunk, WorldGenLevel region, StructureFeatureManager structures, Generator generator) {
-        featureDecorator.decorate(chunk, region, structures, generator);
+        var terrain = generator.getChunkDataAsync(chunk.getPos());
+
+        featureDecorator.decorate(chunk, region, structures, terrain, generator);
         noiseCaveGenerator.decorate(chunk, region, generator);
+
+        Surface.applyPost(chunk, terrain.join(), generator);
     }
 }
