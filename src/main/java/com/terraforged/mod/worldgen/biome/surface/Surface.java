@@ -25,10 +25,13 @@
 package com.terraforged.mod.worldgen.biome.surface;
 
 import com.terraforged.mod.worldgen.terrain.TerrainData;
+import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -46,7 +49,7 @@ public class Surface {
                 int y = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, dx, dz);
 
                 float gradient = terrainData.getGradient(dx, dz, norm);
-                if (y < 60 || gradient < 0.6F) continue;
+                if (y < generator.getSeaLevel() || gradient < 0.6F) continue;
 
                 var solid = findSolid(pos.set(dx, y, dz), chunk);
                 if (solid == null) continue;
@@ -60,20 +63,76 @@ public class Surface {
         }
     }
 
-    public static boolean isErodable(BlockState state) {
-        return ERODABLE.contains(state.getBlock());
+    public static void applyPost(ChunkAccess chunk, TerrainData terrainData, ChunkGenerator generator) {
+        float norm = 68 * (generator.getGenDepth() / 255F);
+        var pos = new BlockPos.MutableBlockPos();
+
+        for (int dz = 0; dz < 16; dz++) {
+            for (int dx = 0; dx < 16; dx++) {
+                int y = chunk.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, dx, dz) + 1;
+                pos.set(dx, y, dz);
+
+                var state = chunk.getBlockState(pos);
+                float gradient = terrainData.getGradient(dx, dz, norm);
+
+                if (gradient < 0.625F) {
+                    if (state.getBlock() instanceof SnowLayerBlock) {
+                        smoothSnow(pos, state, chunk, terrainData);
+                    }
+                } else {
+                    if (state.isAir()) {
+                        state = chunk.getBlockState(pos.setY(y - 1));
+                    }
+
+                    if (BlockTags.SNOW.contains(state.getBlock())) {
+                        erodeSnow(pos, chunk);
+                    }
+                }
+            }
+        }
+    }
+
+    protected static void smoothSnow(BlockPos.MutableBlockPos pos, BlockState state, ChunkAccess chunk, TerrainData terrain) {
+        float height = terrain.getHeight().get(pos.getX(), pos.getZ());
+        float delta = height - terrain.getLevels().getHeight(height);
+
+        int layers = 1 + NoiseUtil.floor(delta * 7.9999F);
+        state = state.setValue(SnowLayerBlock.LAYERS, layers);
+        chunk.setBlockState(pos, state, false);
+    }
+
+    protected static void erodeSnow(BlockPos.MutableBlockPos pos, ChunkAccess chunk) {
+        chunk.setBlockState(pos, Blocks.AIR.defaultBlockState(), false);
+
+        int y0 = pos.getY() - 1;
+        int y1 = Math.max(pos.getY() - 15, 0);
+
+        for (int y = y0; y > y1; y--) {
+            pos.setY(y);
+
+            var state = chunk.getBlockState(pos);
+            if (isErodible(state)) {
+                chunk.setBlockState(pos, Blocks.STONE.defaultBlockState(), false);
+            } else {
+                return;
+            }
+        }
+    }
+
+    public static boolean isErodible(BlockState state) {
+        return ERODABLE.contains(state.getBlock()) || BlockTags.SNOW.contains(state.getBlock());
     }
 
     protected static BlockState findSolid(BlockPos.MutableBlockPos pos, ChunkAccess chunk) {
         var state = chunk.getBlockState(pos);
 
-        if (!isErodable(state)) return null;
+        if (!isErodible(state)) return null;
 
         for (int y = pos.getY() - 1, bottom = Math.max(0, pos.getY() - 20); y > bottom; y--) {
             state = chunk.getBlockState(pos.setY(y));
 
             // Stop when we hit non-erodable material
-            if (!isErodable(state)) {
+            if (!isErodible(state)) {
                 return state;
             }
         }

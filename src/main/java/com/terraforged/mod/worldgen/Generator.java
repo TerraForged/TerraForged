@@ -27,6 +27,7 @@ package com.terraforged.mod.worldgen;
 import com.mojang.serialization.Codec;
 import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
+import com.terraforged.mod.worldgen.biome.surface.Surface;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 import com.terraforged.mod.worldgen.terrain.TerrainCache;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
@@ -202,6 +203,7 @@ public class Generator extends ChunkGenerator {
     @Override
     public void applyBiomeDecoration(WorldGenLevel region, ChunkAccess chunk, StructureFeatureManager structures) {
         biomeGenerator.decorate(chunk, region, structures, this);
+        Surface.applyPost(chunk, getChunkData(chunk.getPos()), this);
         terrainCache.drop(chunk.getPos());
     }
 
