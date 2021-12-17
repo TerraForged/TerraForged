@@ -41,15 +41,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NoiseCaveGenerator {
     protected static final int POOL_SIZE = 32;
     protected static final float DENSITY = 0.05F;
+    protected static final float BREACH_THRESHOLD = 0.7F;
 
     protected final NoiseCave[] caves;
     protected final Module uniqueCaveNoise;
+    protected final Module caveBreachNoise;
     protected final ObjectPool<CarverChunk> pool;
     protected final Map<ChunkPos, CarverChunk> cache = new ConcurrentHashMap<>();
 
     public NoiseCaveGenerator(long seed, RegistryAccess access) {
         var global = access.registryOrThrow(ModRegistry.CAVE.get());
         this.uniqueCaveNoise = createUniqueNoise((int) seed, 500, DENSITY);
+        this.caveBreachNoise = createBreachNoise((int) seed + 12, 300, BREACH_THRESHOLD);
         this.caves = global.stream().map(config -> config.withSeed(seed)).toArray(NoiseCave[]::new);
         this.pool = new ObjectPool<>(POOL_SIZE, this::createCarverChunk);
     }
@@ -57,6 +60,7 @@ public class NoiseCaveGenerator {
     public NoiseCaveGenerator(long seed, NoiseCaveGenerator other) {
         this.caves = new NoiseCave[other.caves.length];
         this.uniqueCaveNoise = createUniqueNoise((int) seed, 500, DENSITY);
+        this.caveBreachNoise = createBreachNoise((int) seed + 12, 300, BREACH_THRESHOLD);
         this.pool = new ObjectPool<>(POOL_SIZE, this::createCarverChunk);
         for (int i = 0; i < caves.length; i++) {
             this.caves[i] = other.caves[i].withSeed(seed);
@@ -67,7 +71,7 @@ public class NoiseCaveGenerator {
         var carver = getPreCarveChunk(chunk);
 
         for (var config : caves) {
-            NoiseCaveCarver.carve(chunk, carver, generator, config, getModifier(config), true);
+            NoiseCaveCarver.carve(chunk, carver, generator, config, getModifier(config), caveBreachNoise, true);
         }
     }
 
@@ -95,7 +99,7 @@ public class NoiseCaveGenerator {
         carver = pool.take().reset();
 
         for (var config : caves) {
-            NoiseCaveCarver.carve(chunk, carver, generator, config, getModifier(config), false);
+            NoiseCaveCarver.carve(chunk, carver, generator, config, getModifier(config), caveBreachNoise, false);
         }
 
         return carver;
@@ -116,5 +120,9 @@ public class NoiseCaveGenerator {
         return new UniqueCaveDistributor(seed + 1286745, 1F / scale, 0.75F, density)
                 .clamp(0.2, 1.0).map(0, 1)
                 .warp(seed + 781624, 30, 1, 20);
+    }
+
+    private static Module createBreachNoise(int seed, int scale, float threshold) {
+        return Source.simplexRidge(seed, scale, 2).clamp(threshold * 0.8F, threshold).map(0, 1);
     }
 }

@@ -28,6 +28,7 @@ import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.asset.NoiseCave;
 import com.terraforged.noise.Module;
+import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
@@ -37,7 +38,13 @@ import net.minecraft.world.level.levelgen.Heightmap;
 public class NoiseCaveCarver {
     private static final int CHUNK_AREA = 16 * 16;
 
-    public static void carve(ChunkAccess chunk, CarverChunk carver, Generator generator, NoiseCave config, Module modifier, boolean carve) {
+    public static void carve(ChunkAccess chunk,
+                             CarverChunk carver,
+                             Generator generator,
+                             NoiseCave config,
+                             Module modifier,
+                             Module surfaceMask,
+                             boolean carve) {
         var pos = new BlockPos.MutableBlockPos();
 
         int minY = generator.getMinY();
@@ -47,10 +54,10 @@ public class NoiseCaveCarver {
         for (int i = 0; i < CHUNK_AREA; i++) {
             int dx = i & 15;
             int dz = i >> 4;
-            int surface = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, dx, dz) - 4;
-
             int x = startX + dx;
             int z = startZ + dz;
+
+            int surface = getSurface(x, z, chunk, surfaceMask);
             int y = config.getHeight(x, z);
 
             float value = modifier.getValue(x, z);
@@ -89,5 +96,11 @@ public class NoiseCaveCarver {
 
             section.getBiomes().getAndSetUnchecked(biomeX, biomeY, biomeZ, biome);
         }
+    }
+
+    private static int getSurface(int x, int z, ChunkAccess chunk, Module surfaceMask) {
+        float mask = 1 - surfaceMask.getValue(x, z);
+        int surface = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) + 4;
+        return surface - NoiseUtil.floor(12 * mask);
     }
 }

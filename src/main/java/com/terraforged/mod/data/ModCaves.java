@@ -37,8 +37,8 @@ import net.minecraft.core.RegistryAccess;
 interface ModCaves extends ModRegistry {
     static void register() {
         var seed = new RandSeed(901246, 500_000);
-        ModRegistries.register(CAVE, "synapse_high", Factory.synapse(seed.next(), 1F, 96, 384));
-        ModRegistries.register(CAVE, "synapse_mid", Factory.synapse(seed.next(), 1.1F, 0, 256));
+        ModRegistries.register(CAVE, "synapse_high", Factory.synapse(seed.next(), 0.75F, 96, 384));
+        ModRegistries.register(CAVE, "synapse_mid", Factory.synapse(seed.next(), 1.0F, 0, 256));
         ModRegistries.register(CAVE, "synapse_low", Factory.synapse(seed.next(), 1.2F, -32, 128));
         ModRegistries.register(CAVE, "mega", Factory.mega(seed.next(), 1.0F, -16, 64));
         ModRegistries.register(CAVE, "mega_deep", Factory.mega(seed.next(), 1.2F, -32, 48));
@@ -55,7 +55,7 @@ interface ModCaves extends ModRegistry {
         static NoiseCave mega(int seed, float scale, int minY, int maxY) {
             int elevationScale = NoiseUtil.floor(200 * scale);
             int networkScale = NoiseUtil.floor(250 * scale);
-            int floorScale = NoiseUtil.floor(30 * scale);
+            int floorScale = NoiseUtil.floor(50 * scale);
             int size = NoiseUtil.floor(30 *  scale);
 
             var elevation = Source.simplex(++seed, elevationScale, 2).map(0.3, 0.7);
@@ -73,7 +73,7 @@ interface ModCaves extends ModRegistry {
             int networkScale = NoiseUtil.floor(180 * scale);
             int networkWarpScale = NoiseUtil.floor(20 * scale);
             int networkWarpStrength = networkWarpScale / 2;
-            int floorScale = NoiseUtil.floor(20 * scale);
+            int floorScale = NoiseUtil.floor(30 * scale);
             int size = NoiseUtil.floor(15 *  scale);
 
             var elevation = Source.simplex(++seed, elevationScale, 3).map(0.1, 0.9);
@@ -87,8 +87,8 @@ interface ModCaves extends ModRegistry {
         static NoiseCave[] getDefaults() {
             var seed = new RandSeed(901246, 500_000);
             return new NoiseCave[] {
-                    Factory.synapse(seed.next(), 1F, 96, 384),
-                    Factory.synapse(seed.next(), 1.1F, 0, 256),
+                    Factory.synapse(seed.next(), 0.75F, 96, 384),
+                    Factory.synapse(seed.next(), 1.0F, 0, 256),
                     Factory.synapse(seed.next(), 1.2F, -32, 128),
                     Factory.mega(seed.next(), 1.0F, -16, 64),
                     Factory.mega(seed.next(), 1.2F, -32, 48)
