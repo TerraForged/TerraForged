@@ -43,7 +43,9 @@ public interface ModBiomes {
         builder.generationSettings(genSettings.build());
     });
 
-    ModBiome OAK_FOREST = ModBiome.of("oak_forest", Biomes.PLAINS, builder -> {});
+    ModBiome OAK_FOREST = ModBiome.of("oak_forest", Biomes.PLAINS, builder -> {
+        builder.biomeCategory(Biome.BiomeCategory.FOREST);
+    });
 
     static void register() {
         register(Platform.ACTIVE_PLATFORM.get().getRegistrar(Registry.BIOME_REGISTRY));

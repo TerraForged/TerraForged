@@ -96,6 +96,11 @@ public class ModRegistries extends Init {
         return Suppliers.memoize(() -> getEntry(registry, location));
     }
 
+    public static <T> Supplier<T> supplier(Supplier<ResourceKey<Registry<T>>> registry, String name) {
+        var location = TerraForged.location(name);
+        return Suppliers.memoize(() -> getEntry(registry.get(), location));
+    }
+
     private static <T> T getEntry(ResourceKey<Registry<T>> registry, ResourceLocation name) {
         T t = getRegistry(registry).get(name);
         if (t == null) throw new Error("Missing entry: " + name + ", Registry: " + registry.location());

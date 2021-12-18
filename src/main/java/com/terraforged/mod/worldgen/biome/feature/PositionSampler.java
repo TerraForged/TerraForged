@@ -31,6 +31,7 @@ import com.terraforged.mod.worldgen.biome.vegetation.VegetationFeatures;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
@@ -40,6 +41,7 @@ import java.util.concurrent.CompletableFuture;
 public class PositionSampler {
     protected static final float BORDER = 6F;
     protected static final int OFFSET_START = 23189045;
+    public static final float SQUASH_FACTOR = 2F / NoiseUtil.sqrt(3);
 
     public static void place(long seed,
                              ChunkAccess chunk,
@@ -56,7 +58,7 @@ public class PositionSampler {
         context.generator = generator;
         context.viabilityContext.terrainData = terrain;
         context.viabilityContext.biomeSampler = generator.getBiomeSource().getBiomeSampler();
-        collectBiomes(context);
+        populate(context, decorator);
 
         int x = chunk.getPos().getMinBlockX();
         int z = chunk.getPos().getMinBlockZ();
@@ -73,6 +75,94 @@ public class PositionSampler {
         }
     }
 
+    public static void populate(SamplerContext context, FeatureDecorator decorator) {
+        var chunk = context.chunk;
+        int startX = chunk.getPos().getMinBlockX();
+        int startZ = chunk.getPos().getMinBlockZ();
+
+        for (int dz = 0; dz < 16; dz++) {
+            for (int dx = 0; dx < 16; dx++) {
+                int x = startX + dx;
+                int z = startZ + dz;
+                int y = context.getHeight(dx, dz);
+
+                var biome = context.getBiome(x, y, z);
+
+                var vegetation = decorator.getVegetationManager().getVegetation(biome);
+                var viability = vegetation.config.viability();
+                float value = viability.getFitness(x, z, context.viabilityContext);
+
+                context.viability.set(dx, dz, value);
+                context.biomeList.add(biome);
+            }
+        }
+    }
+
+    public static <T> boolean sample(long seed, int x, int z, float freq, float jitter, T context, Sampler<T> sampler) {
+        float freqX = freq;
+        float freqZ = freq * SQUASH_FACTOR;
+        int minX = NoiseUtil.floor((x - BORDER) * freqX);
+        int minZ = NoiseUtil.floor((z - BORDER) * freqZ);
+        int maxX = NoiseUtil.floor((x + 15 + BORDER) * freqX);
+        int maxZ = NoiseUtil.floor((z + 15 + BORDER) * freqZ);
+        return sample(seed, minX, minZ, maxX, maxZ, freqX, freqZ, jitter, context, sampler);
+    }
+
+    public static <T> boolean sample(long seed, int minX, int minZ, int maxX, int maxZ, float freqX, float freqZ, float jitter, T context, Sampler<T> sampler) {
+        int cellSeed = (int) seed;
+        int offset = OFFSET_START;
+
+        boolean result = false;
+        for (int pz = minZ; pz <= maxZ; pz++) {
+            float ox = (pz & 1) * 0.5F;
+
+            for (int px = minX; px <= maxX; px++) {
+                int hash = MathUtil.hash(cellSeed, px, pz);
+                float dx = MathUtil.randX(hash);
+                float dz = MathUtil.randZ(hash);
+
+                float sx = px + ox + (dx * jitter * 0.65F);
+                float sz = pz + (dz * jitter);
+
+                int posX = NoiseUtil.floor(sx / freqX);
+                int posZ = NoiseUtil.floor(sz / freqZ);
+
+                boolean sampleResult = sampler.sample(seed, offset++, hash, posX, posZ, context);
+                result |= sampleResult;
+            }
+        }
+
+        return result;
+    }
+
+    private static void setMaterial(int x, int y, int z, float viability, SamplerContext context) {
+        var pos = context.pos.set(x, y, z);
+        var state = context.chunk.getBlockState(pos);
+
+        if (state.getBlock() == Blocks.GRASS_BLOCK) {
+            if (viability < 0) return;
+
+//            state = Blocks.BLACK_WOOL.defaultBlockState();
+//            if (viability < 0.1) {
+//                state = Blocks.BROWN_WOOL.defaultBlockState();
+//            } else if (viability < 0.2) {
+//                state = Blocks.RED_WOOL.defaultBlockState();
+//            } else if (viability < 0.3) {
+//                state = Blocks.PINK_WOOL.defaultBlockState();
+//            } else if (viability < 0.4) {
+//                state = Blocks.GRAVEL.defaultBlockState();
+//            } else if (viability < 0.5) {
+//                state = Blocks.STONE.defaultBlockState();
+//            } else if (viability < 0.6) {
+//                state = Blocks.GRAVEL.defaultBlockState();
+//            } else if (viability < 0.7) {
+//                state = Blocks.GREEN_WOOL.defaultBlockState();
+//            }
+//
+//            context.chunk.setBlockState(pos, state, false);
+        }
+    }
+
     private static boolean placeAt(long seed, int offset, int hash, int x, int z, SamplerContext context) {
         int chunkX = x >> 4;
         int chunkZ = z >> 4;
@@ -86,10 +176,9 @@ public class PositionSampler {
         var biome = context.region.getBiome(context.pos);
         if (biome != context.biome) return false;
 
-        float viability = context.vegetation.viability().getFitness(x, z, context.viabilityContext);
-        context.maxViability = Math.max(context.maxViability, viability);
-
-        if (viability * context.vegetation.density() < MathUtil.rand(hash)) return false;
+        float viability = context.viability.get(x & 15, z & 15);
+        float noise = (1 - context.vegetation.density()) * MathUtil.rand(hash);
+        if (viability < noise) return false;
 
         for (var feature : context.features.trees()) {
             context.random.setFeatureSeed(seed, offset, VegetationFeatures.STAGE);
@@ -106,12 +195,14 @@ public class PositionSampler {
         var region = context.region;
         var generator = context.generator;
         var random = context.random;
-        var pos = context.pos;
+        var pos = context.pos.set(x, 0, z);
 
-        int y = context.getHeight(x, z);
-        pos.set(x, y, z);
+        int passes = 3;
+        passes += NoiseUtil.floor(3 * (1 - context.maxViability));
+        passes += NoiseUtil.floor(4 * context.terrainData().getWater().get(8, 8));
+        passes -= NoiseUtil.floor(5 * context.terrainData().getHeight(8, 8));
 
-        int passes = 2 + NoiseUtil.floor(3 * context.maxViability);
+        passes = Math.max(2, passes);
 
         for (int i = 0; i < passes; i++) {
             int j = 0;
@@ -120,57 +211,6 @@ public class PositionSampler {
                 random.setFeatureSeed(seed, offset + i + j, VegetationFeatures.STAGE);
                 feature.placeWithBiomeCheck(region, generator, random, pos);
                 j++;
-            }
-        }
-    }
-
-    public static <T> boolean sample(long seed, int x, int z, float freq, float jitter, T context, Sampler<T> sampler) {
-        int minX = NoiseUtil.floor((x - BORDER) * freq);
-        int minZ = NoiseUtil.floor((z - BORDER) * freq);
-        int maxX = NoiseUtil.floor((x + 15 + BORDER) * freq);
-        int maxZ = NoiseUtil.floor((z + 15 + BORDER) * freq);
-        return sample(seed, minX, minZ, maxX, maxZ, freq, jitter, context, sampler);
-    }
-
-    public static <T> boolean sample(long seed, int minX, int minZ, int maxX, int maxZ, float freq, float jitter, T context, Sampler<T> sampler) {
-        int cellSeed = (int) seed;
-        int offset = OFFSET_START;
-
-        boolean result = false;
-        for (int pz = minZ; pz <= maxZ; pz++) {
-            float ox = (pz & 1) * 0.5F;
-
-            for (int px = minX; px <= maxX; px++) {
-                int hash = MathUtil.hash(cellSeed, px, pz);
-                float dx = MathUtil.randX(hash);
-                float dz = MathUtil.randZ(hash);
-
-                float sx = px + ox + (dx * jitter * 0.65F);
-                float sz = pz + (dz * jitter);
-
-                int posX = NoiseUtil.floor(sx / freq);
-                int posZ = NoiseUtil.floor(sz / freq);
-
-                boolean sampleResult = sampler.sample(seed, offset++, hash, posX, posZ, context);
-                result |= sampleResult;
-            }
-        }
-
-        return result;
-    }
-
-    private static void collectBiomes(SamplerContext context) {
-        var chunk = context.chunk;
-        int startX = chunk.getPos().getMinBlockX();
-        int startZ = chunk.getPos().getMinBlockZ();
-        for (int dz = 0; dz < 16; dz++) {
-            for (int dx = 0; dx < 16; dx++) {
-                int x = startX + dx;
-                int z = startZ + dz;
-                int y = context.getHeight(dx, dz);
-
-                var biome = context.getBiome(x, y, z);
-                context.biomeList.add(biome);
             }
         }
     }

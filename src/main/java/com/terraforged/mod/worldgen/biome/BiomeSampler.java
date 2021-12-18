@@ -72,13 +72,10 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
 
     @Override
     public float getShape(int x, int z) {
-        float px = x * noiseGenerator.getLevels().frequency;
-        float pz = z * noiseGenerator.getLevels().frequency;
-
         var sample = localSample.get().reset();
         var cell = sample.cell;
 
-        climateModule.apply(cell, px, pz);
+        climateModule.apply(cell, x, z);
 
         return sample.cell.biomeRegionEdge;
     }
@@ -97,7 +94,7 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
         cell.riverMask = sample.riverNoise;
         cell.continentEdge = sample.continentNoise;
 
-        climateModule.apply(cell, px, pz);
+        climateModule.apply(cell, x, z);
 
         return sample;
     }

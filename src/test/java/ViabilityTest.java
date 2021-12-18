@@ -38,30 +38,31 @@ import com.terraforged.noise.util.NoiseUtil;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 
 public class ViabilityTest {
-    public static final int SEED = 1234124;
+    public static final int SEED = 6785;
 
     public static void main(String[] args) {
-        int freq = 1;
-        int width = 1200;
+        int freq = 5;
+        int width = 800;
         int height = 800;
 
         float[] hsb = new float[3];
 
         var levels = TerrainLevels.DEFAULT;
         var noise = new NoiseGenerator(SEED, levels, ModTerrain.getTerrain(null));
-        var heightmap = generate(width, height, freq, noise);
+        var heightmap = generate(width, height, freq, noise).init(freq);
 
         var context = new ViabilityContext();
         context.biomeSampler = new IBiomeSampler.Sampler(noise);
         context.terrainData = CompletableFuture.completedFuture(new TerrainData(levels));
 
         var vegetations = ModVegetation.getVegetation(null);
-        var vegetation = vegetations[2];
+        var vegetation = vegetations[7];
 
         var image = N2DUtil.render(width, height, (x, z, img) -> {
             var sample = heightmap.get(x, z);
@@ -78,7 +79,10 @@ public class ViabilityTest {
                 float elev = (scaledHeight - levels.seaLevel) / (levels.genDepth - levels.seaLevel);
                 elev = 0.25F + 0.75F * elev;
 
-                rgb = Color.HSBtoRGB(hsb[0], hsb[1], elev * hsb[2]);
+                float grad = NoiseUtil.clamp(heightmap.getGrad(x, z) * 400, 0, 1);
+                grad = 0.5F + 0.5F * grad;
+
+                rgb = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2] * elev * grad);
             }
 
             img.setRGB(x, z, rgb);
@@ -97,34 +101,44 @@ public class ViabilityTest {
                                Heightmap heightmap,
                                VegetationConfig vegetation,
                                ViabilityContext context) {
-        float f = vegetation.frequency() * freq;
+        float f = 1;
+        float fx = vegetation.frequency() * freq * f;
+        float fz = vegetation.frequency() * freq * PositionSampler.SQUASH_FACTOR * f;
         float j = vegetation.jitter();
 
         int maxX = NoiseUtil.floor(image.getWidth() * freq);
-        int maxZ = NoiseUtil.floor(image.getHeight() * freq);
+        int maxZ = NoiseUtil.floor(image.getHeight() * freq * PositionSampler.SQUASH_FACTOR);
 
-        PositionSampler.sample(SEED, 0, 0, maxX, maxZ, f, j, context, (seed, offset, hash, x, z, ctx) -> {
+        PositionSampler.sample(SEED, 0, 0, maxX, maxZ, fx, fz, j, context, (seed, offset, hash, x, z, ctx) -> {
             if (x < 0 || z < 0 || x >= heightmap.width || z >= heightmap.height) return false;
 
             var sample = heightmap.get(x, z);
             float scaledHeight = levels.getScaledHeight(sample.heightNoise);
-
             if (scaledHeight <= levels.seaLevel) return false;
+
+            setup(x, z, freq, heightmap, context);
 
             int px = x * freq;
             int pz = z * freq;
-            context.getTerrain().getHeight().set(px, pz, scaledHeight);
-            context.getTerrain().getTerrain().set(px, pz, sample.terrainType);
-            context.getTerrain().getWater().set(px, pz, sample.riverNoise);
-            context.getTerrain().getGradient().set(px, pz, 0F);
-
+            float noise = (1F - vegetation.density()) * MathUtil.rand(hash);
             float fit = vegetation.viability().getFitness(px, pz, context);
-            if (fit * vegetation.density() < MathUtil.rand(hash)) return false;
+            if (fit < noise) return false;
 
             dot(x, z, image);
 
             return true;
         });
+    }
+
+    private static void setup(int x, int z, int freq, Heightmap heightmap, ViabilityContext context) {
+        var sample = heightmap.get(x, z);
+        float scaledHeight = context.getTerrain().getLevels().getScaledHeight(sample.heightNoise);
+        int px = x * freq;
+        int pz = z * freq;
+        context.getTerrain().getHeight().set(px, pz, scaledHeight);
+        context.getTerrain().getTerrain().set(px, pz, sample.terrainType);
+        context.getTerrain().getWater().set(px, pz, sample.riverNoise);
+        context.getTerrain().getGradient().set(px, pz, heightmap.getGrad(x, z));
     }
 
     private static void dot(int x, int z, BufferedImage image) {
@@ -150,37 +164,69 @@ public class ViabilityTest {
         int ox = width >> 1;
         int oz = height >> 1;
 
+        var tasks = new ArrayList<ForkJoinTask<?>>(width * height);
         for (int z = 0; z < height; z++) {
             for (int x = 0; x < width; x++) {
                 int px = (x - ox) * freq;
                 int pz = (z - oz) * freq;
-                heightmap.set(x, z, ForkJoinPool.commonPool().submit(() -> new NoiseSample(generator.getNoiseSample(px, pz))));
+
+                final int index = heightmap.index(x, z);
+                tasks.add(ForkJoinPool.commonPool().submit(() -> {
+                    var sample = new NoiseSample(generator.getNoiseSample(px, pz));
+                    heightmap.set(index, sample);
+                    return null;
+                }));
             }
         }
+
+        ForkJoinTask.invokeAll(tasks);
 
         return heightmap;
     }
 
     private static class Heightmap {
         private final int width, height;
-        private final ForkJoinTask<NoiseSample>[] data;
+        private final NoiseSample[] data;
+        private final float[] gradient;
 
         private Heightmap(int width, int height) {
             this.width = width;
             this.height = height;
-            //noinspection unchecked
-            this.data = new ForkJoinTask[width * height];
+            this.data = new NoiseSample[width * height];
+            this.gradient = new float[width * height];
         }
 
-        public void set(int x, int z, ForkJoinTask<NoiseSample> sample) {
-            data[index(x, z)] = sample;
+        public Heightmap init(int scale) {
+            int distance = 4;
+            for (int z = 1; z < height - 2; z++) {
+                for (int x = 1; x < width - 2; x++) {
+                    var n = get(x + 0, z - 1);
+                    var s = get(x + 0, z + 1);
+                    var e = get(x + 1, z + 0);
+                    var w = get(x - 1, z + 0);
+
+                    float dx = e.heightNoise - w.heightNoise;
+                    float dy = s.heightNoise - n.heightNoise;
+                    float grad = NoiseUtil.sqrt(dx * dx + dy * dy);
+                    gradient[index(x, z)] = NoiseUtil.clamp(grad, 0, 1);
+                }
+            }
+            return this;
+        }
+
+        public void set(int index, NoiseSample sample) {
+            data[index] = sample;
         }
 
         public NoiseSample get(int x, int z) {
-            return data[index(x, z)].join();
+            return data[index(x, z)];
         }
 
-        private int index(int x, int z) {
+        public float getGrad(int x, int z) {
+            return gradient[index(x, z)];
+        }
+
+        public int index(int x, int z) {
             return z * width + x;
         }
     }

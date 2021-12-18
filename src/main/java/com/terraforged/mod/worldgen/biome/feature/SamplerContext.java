@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.worldgen.biome.feature;
 
+import com.terraforged.mod.util.map.FloatMap;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.asset.VegetationConfig;
 import com.terraforged.mod.worldgen.biome.util.BiomeList;
@@ -50,6 +51,8 @@ public class SamplerContext {
     public VegetationConfig vegetation;
     public VegetationFeatures features;
     public float maxViability = 0F;
+
+    public final FloatMap viability = new FloatMap();
 
     public final BiomeList biomeList = new BiomeList();
     public final ViabilityContext viabilityContext = new ViabilityContext();

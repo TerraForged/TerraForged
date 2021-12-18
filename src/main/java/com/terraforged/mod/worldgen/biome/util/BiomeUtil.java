@@ -30,6 +30,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 
 import java.util.*;
@@ -52,7 +53,7 @@ public class BiomeUtil {
     }
 
     public static List<Biome> getOverworldBiomes(Registry<Biome> biomes) {
-        var overworld = new ArrayList<>(MultiNoiseBiomeSource.Preset.OVERWORLD.biomeSource(biomes).possibleBiomes());
+        var overworld = getVanillaOverworldBiomes(biomes);
 
         for (var biome : biomes) {
             var name = biomes.getKey(biome);
@@ -79,7 +80,7 @@ public class BiomeUtil {
     public static BiomeType getType(Biome biome) {
         return switch (biome.getBiomeCategory()) {
             case MESA, DESERT -> BiomeType.DESERT;
-            case PLAINS -> getByTemp(biome, BiomeType.TUNDRA, BiomeType.GRASSLAND, BiomeType.STEPPE);
+            case PLAINS -> getByTemp(biome, BiomeType.COLD_STEPPE, BiomeType.GRASSLAND, BiomeType.STEPPE);
             case TAIGA -> getByTemp(biome, BiomeType.TUNDRA, BiomeType.TAIGA);
             case ICY -> BiomeType.TUNDRA;
             case SAVANNA -> BiomeType.SAVANNA;
@@ -92,7 +93,7 @@ public class BiomeUtil {
     public static BiomeType getByRain(Biome biome, BiomeType frozen, BiomeType wetter, BiomeType dryer) {
         if (biome.getPrecipitation() == Biome.Precipitation.SNOW) return frozen;
 
-        return biome.getDownfall() > 0.66 ? wetter : dryer;
+        return biome.getDownfall() > 0.75 ? wetter : dryer;
     }
 
     public static BiomeType getByTemp(Biome biome, BiomeType colder, BiomeType warmer) {
@@ -103,5 +104,11 @@ public class BiomeUtil {
         if (biome.getPrecipitation() == Biome.Precipitation.SNOW) return cold;
         if (biome.getPrecipitation() == Biome.Precipitation.NONE || biome.getBaseTemperature() > 1.0) return hot;
         return temperate;
+    }
+
+    private static List<Biome> getVanillaOverworldBiomes(Registry<Biome> biomes) {
+        var set = new HashSet<>(MultiNoiseBiomeSource.Preset.OVERWORLD.biomeSource(biomes).possibleBiomes());
+        set.add(biomes.get(Biomes.MEADOW));
+        return new ArrayList<>(set);
     }
 }

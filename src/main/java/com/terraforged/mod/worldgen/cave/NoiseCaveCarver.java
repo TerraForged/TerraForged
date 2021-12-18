@@ -100,7 +100,7 @@ public class NoiseCaveCarver {
 
     private static int getSurface(int x, int z, ChunkAccess chunk, Module surfaceMask) {
         float mask = 1 - surfaceMask.getValue(x, z);
-        int surface = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) + 4;
-        return surface - NoiseUtil.floor(12 * mask);
+        int surface = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) + 8;
+        return surface - NoiseUtil.floor(16 * mask);
     }
 }

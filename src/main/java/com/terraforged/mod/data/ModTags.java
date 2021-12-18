@@ -37,6 +37,7 @@ public interface ModTags extends ModRegistry {
         var registry = BuiltinRegistries.BIOME;
         ModRegistries.register(BIOME_TAG, "trees/copses", Trees.copses(registry));
         ModRegistries.register(BIOME_TAG, "trees/hardy", Trees.hardy(registry));
+        ModRegistries.register(BIOME_TAG, "trees/hardy_slopes", Trees.hardySlopes(registry));
         ModRegistries.register(BIOME_TAG, "trees/patchy", Trees.patchy(registry));
         ModRegistries.register(BIOME_TAG, "trees/sparse", Trees.sparse(registry));
         ModRegistries.register(BIOME_TAG, "trees/rainforest", Trees.rainforest(registry));
@@ -57,12 +58,16 @@ public interface ModTags extends ModRegistry {
             return BiomeTag.of(registry, Biomes.TAIGA, Biomes.DARK_FOREST, Biomes.WINDSWEPT_FOREST, Biomes.OLD_GROWTH_PINE_TAIGA, Biomes.OLD_GROWTH_SPRUCE_TAIGA);
         }
 
+        static BiomeTag hardySlopes(Registry<Biome> registry) {
+            return BiomeTag.of(registry, Biomes.TAIGA);
+        }
+
         static BiomeTag sparse(Registry<Biome> registry) {
             return BiomeTag.of(registry, Biomes.SAVANNA, Biomes.SAVANNA_PLATEAU, Biomes.WINDSWEPT_SAVANNA);
         }
 
         static BiomeTag rainforest(Registry<Biome> registry) {
-            return BiomeTag.of(registry, Biomes.JUNGLE, Biomes.BAMBOO_JUNGLE, Biomes.SPARSE_JUNGLE);
+            return BiomeTag.of(registry, Biomes.JUNGLE, Biomes.BAMBOO_JUNGLE);
         }
 
         static BiomeTag sparseRainforest(Registry<Biome> registry) {
