@@ -31,6 +31,7 @@ import com.mojang.serialization.JsonOps;
 import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.registry.ModRegistries;
+import com.terraforged.mod.util.FileUtil;
 import com.terraforged.mod.util.Init;
 import com.terraforged.mod.util.json.JsonFormatter;
 import net.minecraft.core.Registry;
@@ -54,6 +55,8 @@ public class DataGen extends Init {
     }
 
     public static void export(Path dir) {
+        FileUtil.delete(dir);
+
         TerraForged.LOG.info("Generating json data");
         var registries = RegistryAccess.builtin();
         var writeOps = RegistryWriteOps.create(JsonOps.INSTANCE, registries);

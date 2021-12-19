@@ -99,6 +99,17 @@ public class FileUtil {
         }
     }
 
+    public static void delete(Path dir) {
+        if (!Files.exists(dir)) return;
+
+        try {
+            walk(FileSystems.getDefault(), dir, dir, (fs, root, path) -> Files.deleteIfExists(path));
+            Files.deleteIfExists(dir);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public interface FileSystemVisitor {
         void visit(FileSystem fs, Path root, Path path) throws IOException;
     }
