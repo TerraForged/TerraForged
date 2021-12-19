@@ -103,7 +103,7 @@ public interface ModVegetation extends ModRegistry {
                     .with(0.4F, new SaturationViability(0.95F, 1F))
                     .with(-1.0F, new HeightViability(-100, 50, 175))
                     .with(-1.0F, new SlopeViability(65, 0.6F))
-                    .with(1F, new NoiseViability(Source.simplex(seed.next(), 100, 3).clamp(0.875, 0.9).map(0, 1)))
+                    .with(1F, new NoiseViability(Source.simplex(seed.next(), 100, 3).clamp(0.8, 0.85).map(0, 1)))
                     .build());
         }
 

@@ -37,6 +37,7 @@ import com.terraforged.mod.util.seed.RandSeed;
 import com.terraforged.mod.worldgen.asset.TerrainNoise;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
+import com.terraforged.noise.domain.Domain;
 import net.minecraft.core.RegistryAccess;
 
 import java.util.function.BiFunction;
@@ -55,7 +56,7 @@ public interface ModTerrain extends ModRegistry {
         ModRegistries.register(TERRAIN, "mountains_1", Factory.create(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains));
         ModRegistries.register(TERRAIN, "mountains_2", Factory.create(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains2));
         ModRegistries.register(TERRAIN, "mountains_3", Factory.create(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains3));
-        ModRegistries.register(TERRAIN, "mountains_4", Factory.createDolomite(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS));
+        ModRegistries.register(TERRAIN, "dolomites", Factory.createDolomite(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS));
         ModRegistries.register(TERRAIN, "mountains_ridge_1", Factory.createNF(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains2));
         ModRegistries.register(TERRAIN, "mountains_ridge_2", Factory.createNF(seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains3));
     }
@@ -95,16 +96,28 @@ public interface ModTerrain extends ModRegistry {
         }
 
         static TerrainNoise createDolomite(Seed seed, Terrain terrain, float weight) {
-            return new TerrainNoise(terrain, weight, Source.simplex(seed.next(), 475, 4)
-                    .clamp(0.1, 1).map(0, 1)
-                    .warp(seed.next(), 10, 2, 8)
-                    .mult(Source.build(seed.next(), 170, 5)
-                            .lacunarity(2.7)
-                            .gain(0.6)
-                            .simplexRidge()
-                            .alpha(0.425))
-                    .warp(seed.next(), 800, 3, 400)
-                    .scale(0.675));
+            // Valley floor terrain
+            var base = Source.simplex(seed.next(), 80, 4).scale(0.1);
+
+            // Controls where the ridges show up
+            var shape = Source.simplex(seed.next(), 475, 4)
+                    .clamp(0.3, 1.0).map(0, 1)
+                    .warp(seed.next(), 10, 2, 8);
+
+            // More gradual slopes up to the ridges
+            var slopes = shape.pow(2.2).scale(0.65).add(base);
+
+            // Sharp ridges
+            var peaks = Source.build(seed.next(), 400, 5).lacunarity(2.7).gain(0.6).simplexRidge()
+                    .clamp(0, 0.7).map(0, 1)
+                    .warp(Domain.warp(Source.SIMPLEX, seed.next(), 40, 5, 35))
+                    .alpha(0.9);
+
+            var noise = shape.mult(peaks).max(slopes)
+                    .warp(seed.next(), 800, 3, 300)
+                    .scale(0.75);
+
+            return new TerrainNoise(terrain, weight, noise);
         }
 
         static TerrainSettings settings() {

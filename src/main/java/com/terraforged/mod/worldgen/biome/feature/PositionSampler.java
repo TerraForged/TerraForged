@@ -197,8 +197,8 @@ public class PositionSampler {
         var random = context.random;
         var pos = context.pos.set(x, 0, z);
 
-        int passes = 3;
-        passes += NoiseUtil.floor(3 * (1 - context.maxViability));
+        int passes = 2;
+        passes += NoiseUtil.floor(2 * (1 - context.maxViability));
         passes += NoiseUtil.floor(4 * context.terrainData().getWater().get(8, 8));
         passes -= NoiseUtil.floor(5 * context.terrainData().getHeight(8, 8));
 
