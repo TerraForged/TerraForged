@@ -24,7 +24,10 @@
 
 package com.terraforged.mod.util.map;
 
+import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.mod.util.MathUtil;
+
+import java.util.function.Predicate;
 
 public class WeightMap<T> {
     protected final T[] values;
@@ -59,6 +62,29 @@ public class WeightMap<T> {
         }
 
         return null;
+    }
+
+    public T find(Predicate<T> predicate) {
+        for (var t : values) {
+            if (predicate.test(t)) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    public long getBand(T value) {
+        float lower = 0F;
+        for (int i = 0; i < values.length; i++) {
+            float upper = weights[i];
+
+            if (values[i] == value) {
+                return PosUtil.packf(lower / sumWeight, upper / sumWeight);
+            }
+
+            lower = upper;
+        }
+        return 0L;
     }
 
     public interface Weighted {

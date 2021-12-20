@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-import com.terraforged.mod.data.ModTerrain;
-import com.terraforged.mod.data.ModVegetation;
+import com.terraforged.mod.data.ModTerrains;
+import com.terraforged.mod.data.ModVegetations;
 import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.worldgen.asset.VegetationConfig;
 import com.terraforged.mod.worldgen.biome.IBiomeSampler;
@@ -54,14 +54,14 @@ public class ViabilityTest {
         float[] hsb = new float[3];
 
         var levels = TerrainLevels.DEFAULT;
-        var noise = new NoiseGenerator(SEED, levels, ModTerrain.getTerrain(null));
+        var noise = new NoiseGenerator(SEED, levels, ModTerrains.getTerrain(null));
         var heightmap = generate(width, height, freq, noise).init(freq);
 
         var context = new ViabilityContext();
         context.biomeSampler = new IBiomeSampler.Sampler(noise);
         context.terrainData = CompletableFuture.completedFuture(new TerrainData(levels));
 
-        var vegetations = ModVegetation.getVegetation(null);
+        var vegetations = ModVegetations.getVegetation(null);
         var vegetation = vegetations[7];
 
         var image = N2DUtil.render(width, height, (x, z, img) -> {

@@ -22,15 +22,15 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.registry;
+package com.terraforged.engine.world.terrain;
 
-import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.worldgen.asset.*;
+public class TerrainHelper {
+    public static Terrain getOrCreate(String name, Terrain parent) {
+        if (parent == null || parent == TerrainType.NONE) return TerrainType.NONE;
 
-public interface ModRegistry {
-    LazyKey<BiomeTag> BIOME_TAG = TerraForged.registry("worldgen/tag/biome");
-    LazyKey<NoiseCave> CAVE = TerraForged.registry("worldgen/cave");
-    LazyKey<TerrainNoise> TERRAIN = TerraForged.registry("worldgen/terrain");
-    LazyKey<TerrainType> TERRAIN_TYPE = TerraForged.registry("worldgen/terrain_type");
-    LazyKey<VegetationConfig> VEGETATION = TerraForged.registry("worldgen/vegetation");
+        var current = TerrainType.get(name);
+        if (current != null) return current;
+
+        return TerrainType.register(new Terrain(0, name, parent));
+    }
 }

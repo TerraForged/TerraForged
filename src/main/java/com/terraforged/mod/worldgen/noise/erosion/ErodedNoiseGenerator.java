@@ -26,6 +26,7 @@ package com.terraforged.mod.worldgen.noise.erosion;
 
 import com.terraforged.engine.settings.FilterSettings;
 import com.terraforged.engine.util.pos.PosUtil;
+import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.mod.util.ObjectPool;
 import com.terraforged.mod.util.map.LossyCache;
 import com.terraforged.mod.worldgen.noise.*;
@@ -82,6 +83,11 @@ public class ErodedNoiseGenerator implements INoiseGenerator {
     @Override
     public float getHeightNoise(int x, int z) {
         return generator.getHeightNoise(x, z);
+    }
+
+    @Override
+    public long find(int x, int z, int minRadius, int maxRadius, Terrain terrain) {
+        return generator.find(x, z, minRadius, maxRadius, terrain);
     }
 
     @Override

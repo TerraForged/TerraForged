@@ -26,7 +26,7 @@ package com.terraforged.mod.worldgen;
 
 import com.mojang.serialization.DynamicOps;
 import com.terraforged.mod.codec.WorldGenCodec;
-import com.terraforged.mod.data.ModTerrain;
+import com.terraforged.mod.data.ModTerrains;
 import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
@@ -45,7 +45,7 @@ public class GeneratorCodec implements WorldGenCodec<Generator> {
         long seed = getSeed(ops, input);
         var levels = new TerrainLevels();
         var biomes = access.registryOrThrow(Registry.BIOME_REGISTRY);
-        var terrain = ModTerrain.getTerrain(access);
+        var terrain = ModTerrains.getTerrain(access);
 
         var biomeGenerator = new BiomeGenerator(seed, access);
         var noiseGenerator = new NoiseGenerator(seed, levels, terrain).withErosion();

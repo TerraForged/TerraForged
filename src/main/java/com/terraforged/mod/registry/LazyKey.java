@@ -24,7 +24,9 @@
 
 package com.terraforged.mod.registry;
 
+import com.terraforged.mod.TerraForged;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
@@ -51,5 +53,17 @@ public class LazyKey<T> implements Supplier<ResourceKey<Registry<T>>> {
             }
         }
         return key;
+    }
+
+    public ResourceKey<T> element(String name) {
+        return ResourceKey.create(get(), TerraForged.location(name));
+    }
+
+    public Supplier<T> getter(RegistryAccess access, String name) {
+        if (access == null) return ModRegistries.supplier(get(), name);
+
+        var key = element(name);
+        var registry = access.ownedRegistryOrThrow(get());
+        return () -> registry.get(key);
     }
 }

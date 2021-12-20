@@ -57,7 +57,7 @@ public class NoiseCaveCarver {
             int x = startX + dx;
             int z = startZ + dz;
 
-            int surface = getSurface(x, z, chunk, surfaceMask);
+            int surface = getSurface(x, z, chunk, generator, surfaceMask);
             int y = config.getHeight(x, z);
 
             float value = modifier.getValue(x, z);
@@ -86,6 +86,9 @@ public class NoiseCaveCarver {
         int maxBiomeY = (surface - 16) >> 2;
         for (int cy = bottom; cy <= top; cy++) {
             pos.set(dx, cy, dz);
+
+            if (!chunk.getBlockState(pos).getFluidState().isEmpty()) continue;
+
             chunk.setBlockState(pos, air, false);
 
             if ((cy >> 2) >= maxBiomeY) continue;
@@ -98,9 +101,12 @@ public class NoiseCaveCarver {
         }
     }
 
-    private static int getSurface(int x, int z, ChunkAccess chunk, Module surfaceMask) {
+    private static int getSurface(int x, int z, ChunkAccess chunk, Generator generator, Module surfaceMask) {
         float mask = 1 - surfaceMask.getValue(x, z);
-        int surface = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) + 8;
+        int surface = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) - 1;
+        if (surface > generator.getSeaLevel() || surface < generator.getSeaLevel() - 16) {
+            surface += 9;
+        }
         return surface - NoiseUtil.floor(16 * mask);
     }
 }

@@ -39,8 +39,8 @@ import java.util.function.Supplier;
 
 public class BiomeTag extends WorldgenTag<Biome> {
     public static final BiomeTag NONE = new BiomeTag(ObjectSets.emptySet());
-    public static final Codec<BiomeTag> DIRECT_CODEC = WorldgenTag.codec("biomes", () -> Biome.LIST_CODEC, BiomeTag::new);
-    public static final Codec<Supplier<BiomeTag>> CODEC = LazyCodec.registry(DIRECT_CODEC, ModRegistry.BIOME_TAG);
+    public static final Codec<BiomeTag> DIRECT = WorldgenTag.codec("biomes", () -> Biome.LIST_CODEC, BiomeTag::new);
+    public static final Codec<Supplier<BiomeTag>> CODEC = LazyCodec.registry(DIRECT, ModRegistry.BIOME_TAG);
 
     BiomeTag(ObjectSet<Biome> biomes) {
         super(biomes);

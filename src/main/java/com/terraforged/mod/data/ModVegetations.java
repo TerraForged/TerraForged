@@ -39,7 +39,7 @@ import net.minecraft.core.RegistryAccess;
 
 import java.util.function.Supplier;
 
-public interface ModVegetation extends ModRegistry {
+public interface ModVegetations extends ModRegistry {
     static void register() {
         var seed = Factory.createSeed();
         ModRegistries.register(VEGETATION, "trees_copse", Factory.copse(seed, null));

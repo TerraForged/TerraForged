@@ -30,10 +30,7 @@ import com.terraforged.mod.registry.ModRegistries;
 import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.util.Init;
 import com.terraforged.mod.worldgen.Generator;
-import com.terraforged.mod.worldgen.asset.BiomeTag;
-import com.terraforged.mod.worldgen.asset.NoiseCave;
-import com.terraforged.mod.worldgen.asset.TerrainNoise;
-import com.terraforged.mod.worldgen.asset.VegetationConfig;
+import com.terraforged.mod.worldgen.asset.*;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.profiler.GeneratorProfiler;
 import net.minecraft.core.Registry;
@@ -51,8 +48,9 @@ public class Common extends Init {
         Registry.register(Registry.CHUNK_GENERATOR, TerraForged.location("profiler"), GeneratorProfiler.CODEC);
 
         TerraForged.LOG.info("Registering world-gen component codecs");
-        ModRegistries.createRegistry(ModRegistry.BIOME_TAG, BiomeTag.DIRECT_CODEC);
+        ModRegistries.createRegistry(ModRegistry.BIOME_TAG, BiomeTag.DIRECT);
         ModRegistries.createRegistry(ModRegistry.TERRAIN, TerrainNoise.CODEC);
+        ModRegistries.createRegistry(ModRegistry.TERRAIN_TYPE, TerrainType.DIRECT);
         ModRegistries.createRegistry(ModRegistry.VEGETATION, VegetationConfig.CODEC); // depends on BiomeTag
         ModRegistries.createRegistry(ModRegistry.CAVE, NoiseCave.CODEC);
 

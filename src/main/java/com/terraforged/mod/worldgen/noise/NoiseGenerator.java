@@ -25,6 +25,7 @@
 package com.terraforged.mod.worldgen.noise;
 
 import com.terraforged.engine.settings.Settings;
+import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.GeneratorContext;
 import com.terraforged.engine.world.heightmap.ControlPoints;
 import com.terraforged.engine.world.terrain.Terrain;
@@ -91,6 +92,31 @@ public class NoiseGenerator implements INoiseGenerator {
     @Override
     public float getHeightNoise(int x, int z) {;
         return getNoiseSample(x, z).heightNoise;
+    }
+
+    @Override
+    public long find(int x, int z, int minRadius, int maxRadius, Terrain terrain) {
+        float nx = getNoiseCoord(x);
+        float nz = getNoiseCoord(z);
+        var finder = land.findNearest(nx, nz, minRadius, maxRadius, terrain);
+
+        var sample = localSample.get();
+        while (finder.hasNext()) {
+            long pos = finder.next();
+            if (pos == 0L) continue;
+
+            float px = PosUtil.unpackLeftf(pos) / levels.frequency;
+            float pz = PosUtil.unpackRightf(pos) / levels.frequency;
+            continent.sampleContinent(px, pz, sample);
+
+            if (sample.continentNoise >= controlPoints.inland) {
+                int xi = NoiseUtil.floor(px);
+                int zi = NoiseUtil.floor(pz);
+                return PosUtil.pack(xi, zi);
+            }
+        }
+
+        return 0;
     }
 
     @Override
@@ -212,7 +238,7 @@ public class NoiseGenerator implements INoiseGenerator {
     }
 
     protected static TerrainBlender createLandTerrain(long seed, TerrainNoise[] terrainNoises) {
-        return new TerrainBlender(seed, 400, 0.8F, 0.4F, terrainNoises);
+        return new TerrainBlender(seed, 400, 0.8F, 0.275F, terrainNoises);
     }
 
     protected static ContinentNoise createContinentNoise(long seed, TerrainLevels levels) {

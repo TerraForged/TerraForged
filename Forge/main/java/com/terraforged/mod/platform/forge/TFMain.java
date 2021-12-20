@@ -27,6 +27,7 @@ package com.terraforged.mod.platform.forge;
 import com.terraforged.mod.Common;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.client.Client;
+import com.terraforged.mod.command.DebugCommand;
 import com.terraforged.mod.data.ModBiomes;
 import com.terraforged.mod.platform.PlatformData;
 import com.terraforged.mod.platform.forge.util.ForgeRegistrar;
@@ -35,6 +36,8 @@ import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
@@ -50,6 +53,8 @@ public class TFMain extends TerraForged {
 
     public TFMain() {
         super(TFMain::getRootPath);
+        MinecraftForge.EVENT_BUS.addListener(this::onServerStart);
+
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onInit);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientInit);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Biome.class, this::onBiomes);
@@ -69,6 +74,10 @@ public class TFMain extends TerraForged {
 
     void onClientInit(FMLClientSetupEvent event) {
         event.enqueueWork(Client.INSTANCE::init);
+    }
+
+    void onServerStart(RegisterCommandsEvent event) {
+        DebugCommand.register(event.getDispatcher());
     }
 
     void onBiomes(RegistryEvent.Register<Biome> event) {

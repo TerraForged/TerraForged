@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.worldgen.noise;
 
+import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 
 import java.util.function.Consumer;
@@ -36,6 +37,8 @@ public interface INoiseGenerator {
     ContinentNoise getContinent();
 
     float getHeightNoise(int x, int z);
+
+    long find(int x, int z, int minRadius, int maxRadius, Terrain terrain);
 
     void generate(int chunkX, int chunkZ, Consumer<NoiseData> consumer);
 

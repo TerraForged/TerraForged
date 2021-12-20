@@ -24,8 +24,10 @@
 
 package com.terraforged.mod.worldgen.terrain;
 
+import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.mod.util.MathUtil;
+import com.terraforged.mod.util.SpiralIterator;
 import com.terraforged.mod.util.map.Object2FloatCache;
 import com.terraforged.mod.util.map.WeightMap;
 import com.terraforged.mod.util.seed.Seedable;
@@ -90,9 +92,57 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
         return terrains.getValue(index).terrain();
     }
 
+    public SpiralIterator.PositionFinder findNearest(float x, float z, int minRadius, int maxRadius, Terrain type) {
+        var terrain = terrains.find(t -> t.terrain() == type);
+        if (terrain == null) return null;
+
+        long band = terrains.getBand(terrain);
+        float lower = PosUtil.unpackLeftf(band);
+        float upper = PosUtil.unpackRightf(band);
+
+        return iterator(x, z, minRadius, maxRadius).finder(it -> {
+            long pos = find(regionSeed, jitter, lower, upper, it);
+            float px = PosUtil.unpackLeftf(pos) / frequency;
+            float pz = PosUtil.unpackRightf(pos) / frequency;
+            return PosUtil.packf(px, pz);
+        });
+    }
+
+    public SpiralIterator iterator(float x, float z, int min, int max) {
+        float rx = warp.getX(x, z) * frequency;
+        float rz = warp.getY(x, z) * frequency;
+
+        int cx = NoiseUtil.floor(rx);
+        int cz = NoiseUtil.floor(rz);
+
+        return new SpiralIterator(cx, cz, min, max);
+    }
+
+    private static long find(int seed, float jitter, float lower, float upper, SpiralIterator iterator) {
+        while (iterator.hasNext()) {
+            long next = iterator.next();
+            int cx = PosUtil.unpackLeft(next);
+            int cz = PosUtil.unpackRight(next);
+
+            int hash = NoiseUtil.hash2D(seed, cx, cz);
+            float noise = MathUtil.rand(hash);
+
+            if (noise > lower && noise <= upper) {
+                float dx = MathUtil.rand(hash, NoiseUtil.X_PRIME);
+                float dz = MathUtil.rand(hash, NoiseUtil.Y_PRIME);
+
+                float px = cx + dx * jitter;
+                float pz = cz + dz * jitter;
+
+                return PosUtil.packf(px, pz);
+            }
+        }
+        return 0L;
+    }
+
     private static void getCell(int seed, float x, float z, float jitter, Blender blender) {
-        int xr = NoiseUtil.floor(x);
-        int zr = NoiseUtil.floor(z);
+        int maxX = NoiseUtil.floor(x) + 1;
+        int maxZ = NoiseUtil.floor(z) + 1;
 
         blender.closestIndex = 0;
         blender.closestIndex2 = 0;
@@ -103,8 +153,8 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
         float nearestDistance = Float.MAX_VALUE;
         float nearestDistance2 = Float.MAX_VALUE;
 
-        for (int cz = zr - 1, i = 0; cz <= zr + 1; cz++) {
-            for (int cx = xr - 1; cx <= xr + 1; cx++, i++) {
+        for (int cz = maxZ - 2, i = 0; cz <= maxZ; cz++) {
+            for (int cx = maxX - 2; cx <= maxX; cx++, i++) {
                 int hash = NoiseUtil.hash2D(seed, cx, cz);
 
                 float dx = MathUtil.rand(hash, NoiseUtil.X_PRIME);

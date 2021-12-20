@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.worldgen.biome.vegetation;
 
-import com.terraforged.mod.data.ModVegetation;
+import com.terraforged.mod.data.ModVegetations;
 import com.terraforged.mod.worldgen.asset.VegetationConfig;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -38,7 +38,7 @@ public class BiomeVegetationManager {
 
     public BiomeVegetationManager(RegistryAccess access) {
         var biomes = access.registryOrThrow(Registry.BIOME_REGISTRY);
-        var configs = ModVegetation.getVegetation(access);
+        var configs = ModVegetations.getVegetation(access);
 
         for (var entry : biomes.entrySet()) {
             var biome = entry.getValue();
@@ -57,7 +57,7 @@ public class BiomeVegetationManager {
     }
 
     private static VegetationConfig[] getConfigs(RegistryAccess access) {
-        return ModVegetation.getVegetation(access);
+        return ModVegetations.getVegetation(access);
     }
 
     private static VegetationConfig getConfig(Biome biome, VegetationConfig[] configs) {

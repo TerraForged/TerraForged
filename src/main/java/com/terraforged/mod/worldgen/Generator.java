@@ -92,16 +92,20 @@ public class Generator extends ChunkGenerator {
         this.structureGenerator = new DelegateGenerator(seed, this, structureConfig) {};
     }
 
+    public VanillaGen getVanillaGen() {
+        return vanillaGen;
+    }
+
+    public INoiseGenerator getNoiseGenerator() {
+        return noiseGenerator;
+    }
+
     public TerrainData getChunkData(ChunkPos pos) {
         return terrainCache.getNow(pos);
     }
 
     public CompletableFuture<TerrainData> getChunkDataAsync(ChunkPos pos) {
         return terrainCache.getAsync(pos);
-    }
-
-    public VanillaGen getVanillaGen() {
-        return vanillaGen;
     }
 
     @Override
