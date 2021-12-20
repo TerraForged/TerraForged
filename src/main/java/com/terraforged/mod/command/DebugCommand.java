@@ -75,7 +75,7 @@ public class DebugCommand {
             } else {
                 int x = PosUtil.unpackLeft(pos);
                 int z = PosUtil.unpackRight(pos);
-                int y = player.level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z) + 1;
+                int y = generator.getFirstFreeHeight(x, z, Heightmap.Types.MOTION_BLOCKING, player.level);
 
                 result = createTerrainTeleportMessage(at, x, y, z, terrain);
             }
@@ -103,7 +103,7 @@ public class DebugCommand {
         double distance = Math.sqrt(pos.distSqr(x, y, z, true));
         String commandText = String.format("/tp %s %s %s", x, y, z);
         String distanceText = String.format("%.1f", distance);
-        String positionText=  String.format("%s;%s;%s", x, y, z);
+        String positionText = String.format("%s;%s;%s", x, y, z);
         return new TextComponent("Found terrain: ").withStyle(ChatFormatting.GREEN)
                 .append(new TextComponent(terrain.getName()).withStyle(ChatFormatting.YELLOW))
                 .append(new TextComponent(" Distance: ").withStyle(ChatFormatting.GREEN))
