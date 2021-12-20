@@ -1,7 +1,11 @@
 echo off
 
+echo Clearing Old Resources...
+rmdir /s /q jars
+rmdir /s /q generated\resources\
+
 echo Generating Resources...
-call gradlew clearData runData
+call gradlew runData
 
 echo Building Mod Jars...
 (
@@ -10,7 +14,6 @@ echo Building Mod Jars...
 ) | set /P "="
 
 echo Collecting Mod Jars...
-rmdir /s /q jars
 mkdir jars
 xcopy /s /d /y build\libs\ jars
 xcopy /s /d /y Fabric\build\libs\ jars

@@ -30,10 +30,6 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 }
 
-task clearData(type: Delete) {
-    delete "${rootDir}/generated/resources"
-}
-
 jar {
     finalizedBy("reobfJar")
     manifest { attributes(["MixinConfigs": "terraforged.mixins.json"]) }
