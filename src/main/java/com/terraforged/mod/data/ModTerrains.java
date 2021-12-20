@@ -110,9 +110,9 @@ public interface ModTerrains extends ModRegistry {
 
             // Sharp ridges
             var peaks = Source.build(seed.next(), 400, 5).lacunarity(2.7).gain(0.6).simplexRidge()
-                    .clamp(0, 0.7).map(0, 1)
-                    .warp(Domain.warp(Source.SIMPLEX, seed.next(), 40, 5, 35))
-                    .alpha(0.9);
+                    .clamp(0, 0.675).map(0, 1)
+                    .warp(Domain.warp(Source.SIMPLEX, seed.next(), 40, 5, 30))
+                    .alpha(0.875);
 
             var noise = shape.mult(peaks).max(slopes)
                     .warp(seed.next(), 800, 3, 300)
