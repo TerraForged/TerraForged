@@ -22,17 +22,22 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.platform.fabric.client;
+package com.terraforged.mod.platform.forge.client;
 
 import com.terraforged.mod.client.Client;
 import com.terraforged.mod.util.DemoHandler;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
-public class TFClient implements ClientModInitializer {
-    @Override
-    public void onInitializeClient() {
-        Client.INSTANCE.init();
-        HudRenderCallback.EVENT.register((stack, tickDelta) -> DemoHandler.renderOverlay(stack));
+public class TFClient {
+    public static void onClientInit(FMLClientSetupEvent event) {
+        event.enqueueWork(Client.INSTANCE::init);
+
+        MinecraftForge.EVENT_BUS.addListener(TFClient::onRenderOverlay);
+    }
+
+    private static void onRenderOverlay(RenderGameOverlayEvent event) {
+        DemoHandler.renderOverlay(event.getMatrixStack());
     }
 }

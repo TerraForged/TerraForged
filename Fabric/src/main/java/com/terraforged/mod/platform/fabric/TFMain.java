@@ -24,14 +24,20 @@
 
 package com.terraforged.mod.platform.fabric;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.terraforged.mod.Common;
 import com.terraforged.mod.TerraForged;
+import com.terraforged.mod.command.DebugCommand;
+import com.terraforged.mod.util.DemoHandler;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.commands.CommandSourceStack;
 
 import java.nio.file.Path;
 
-public class TFMain extends TerraForged implements ModInitializer {
+public class TFMain extends TerraForged implements ModInitializer, CommandRegistrationCallback {
     public TFMain() {
         super(TFMain::getRootPath);
     }
@@ -39,6 +45,13 @@ public class TFMain extends TerraForged implements ModInitializer {
     @Override
     public void onInitialize() {
         Common.INSTANCE.init();
+        CommandRegistrationCallback.EVENT.register(this);
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> DemoHandler.warn(handler.player));
+    }
+
+    @Override
+    public void register(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
+        DebugCommand.register(dispatcher);
     }
 
     private static Path getRootPath() {

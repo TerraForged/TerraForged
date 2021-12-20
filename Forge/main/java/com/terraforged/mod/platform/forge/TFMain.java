@@ -26,12 +26,13 @@ package com.terraforged.mod.platform.forge;
 
 import com.terraforged.mod.Common;
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.client.Client;
 import com.terraforged.mod.command.DebugCommand;
 import com.terraforged.mod.data.ModBiomes;
 import com.terraforged.mod.platform.PlatformData;
+import com.terraforged.mod.platform.forge.client.TFClient;
 import com.terraforged.mod.platform.forge.util.ForgeRegistrar;
 import com.terraforged.mod.registry.registrar.NoopRegistrar;
+import com.terraforged.mod.util.DemoHandler;
 import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
@@ -39,11 +40,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
 
 import java.nio.file.Path;
 
@@ -54,13 +56,17 @@ public class TFMain extends TerraForged {
     public TFMain() {
         super(TFMain::getRootPath);
         MinecraftForge.EVENT_BUS.addListener(this::onServerStart);
+        MinecraftForge.EVENT_BUS.addListener(this::onJoinWorld);
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onInit);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientInit);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Biome.class, this::onBiomes);
 
         // Biomes are registered via event
         setRegistrar(Registry.BIOME_REGISTRY, NoopRegistrar.none());
+
+        if (FMLLoader.getDist().isClient()) {
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(TFClient::onClientInit);
+        }
     }
 
     @Override
@@ -72,12 +78,12 @@ public class TFMain extends TerraForged {
         event.enqueueWork(Common.INSTANCE::init);
     }
 
-    void onClientInit(FMLClientSetupEvent event) {
-        event.enqueueWork(Client.INSTANCE::init);
-    }
-
     void onServerStart(RegisterCommandsEvent event) {
         DebugCommand.register(event.getDispatcher());
+    }
+
+    void onJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {
+        DemoHandler.warn(event.getPlayer());
     }
 
     void onBiomes(RegistryEvent.Register<Biome> event) {
