@@ -1,6 +1,8 @@
 group = mod_group
 version = mod_version + "-alpha"
 
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
 configurations {
     library
     implementation.extendsFrom library

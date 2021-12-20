@@ -1,0 +1,1 @@
+mkdir jars & (gradlew clean build & xcopy /s /d build\libs\ jars) & (cd Fabric & gradlew clean build & xcopy /s /d build\libs\ ..\jars) & explorer ..\jars
