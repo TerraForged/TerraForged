@@ -25,6 +25,7 @@
 package com.terraforged.mod.mixin.client;
 
 import com.mojang.datafixers.util.Pair;
+import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.worldgen.datapack.DataPackExporter;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.server.packs.repository.PackRepository;
@@ -55,6 +56,11 @@ public abstract class MixinCreateWorldScreen {
     @Inject(method = "onCreate()V", at = @At("HEAD"))
     private void onCreate(CallbackInfo ci) {
         dataPacks = DataPackExporter.setup(getTempDataPackDir(), dataPacks);
-        tryApplyNewDataPacks(getDataPackSelectionSettings().getSecond());
+
+        var selection = getDataPackSelectionSettings().getSecond();
+        selection.setSelected(dataPacks.getEnabled());
+        tryApplyNewDataPacks(selection);
+
+        TerraForged.LOG.info("Applied datapacks: {}", selection.getSelectedIds());
     }
 }

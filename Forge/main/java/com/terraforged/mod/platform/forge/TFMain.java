@@ -34,12 +34,12 @@ import com.terraforged.mod.platform.forge.client.TFClient;
 import com.terraforged.mod.platform.forge.util.ForgeRegistrar;
 import com.terraforged.mod.registry.registrar.NoopRegistrar;
 import com.terraforged.mod.util.DemoHandler;
-import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -124,8 +124,8 @@ public class TFMain extends TerraForged {
 
     private static class ForgePlatformData implements PlatformData {
         @Override
-        public IdMap<BlockState> getBlockStateRegistry() {
-            return net.minecraftforge.registries.GameData.getBlockStateIDMap();
+        public boolean isOverworldBiome(ResourceKey<Biome> key) {
+            return BiomeDictionary.hasType(key, BiomeDictionary.Type.OVERWORLD);
         }
     }
 }

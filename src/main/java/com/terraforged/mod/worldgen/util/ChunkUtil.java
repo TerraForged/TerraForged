@@ -25,7 +25,6 @@
 package com.terraforged.mod.worldgen.util;
 
 import com.google.common.base.Suppliers;
-import com.terraforged.mod.platform.Platform;
 import com.terraforged.mod.worldgen.GeneratorResource;
 import com.terraforged.mod.worldgen.terrain.StructureTerrain;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
@@ -38,6 +37,7 @@ import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -185,7 +185,7 @@ public class ChunkUtil {
     }
 
     protected static ByteBuf createFullPalette() {
-        var stateRegistry = Platform.ACTIVE_PLATFORM.get().getData().getBlockStateRegistry();
+        var stateRegistry = Block.BLOCK_STATE_REGISTRY;
         var container = new PalettedContainer<>(stateRegistry, Blocks.STONE.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES);
 
         container.acquire();

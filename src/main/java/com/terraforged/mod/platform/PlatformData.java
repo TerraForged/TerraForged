@@ -24,15 +24,13 @@
 
 package com.terraforged.mod.platform;
 
-import net.minecraft.core.IdMap;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.biome.Biome;
 
 public interface PlatformData {
     PlatformData DEFAULT = new PlatformData(){};
 
-    @SuppressWarnings("deprecation")
-    default IdMap<BlockState> getBlockStateRegistry() {
-        return Block.BLOCK_STATE_REGISTRY;
+    default boolean isOverworldBiome(ResourceKey<Biome> key) {
+        return false;
     }
 }

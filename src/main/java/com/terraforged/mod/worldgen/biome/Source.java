@@ -30,26 +30,30 @@ import com.terraforged.mod.util.map.LossyCache;
 import com.terraforged.mod.worldgen.biome.util.BiomeUtil;
 import com.terraforged.mod.worldgen.cave.CaveType;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Climate;
 
 import java.util.List;
+import java.util.Set;
 
 public class Source extends BiomeSource {
     public static final Codec<Source> CODEC = new SourceCodec();
 
     protected final long seed;
+    protected final Set<Biome> possibleBiomes;
     protected final BiomeSampler biomeSampler;
     protected final CaveBiomeSampler caveBiomeSampler;
     protected final Registry<Biome> registry;
     protected final LossyCache<Biome> cache = LossyCache.concurrent(2048, Biome[]::new);
 
     public Source(long seed, INoiseGenerator noise, Source other) {
-        super(List.copyOf(other.possibleBiomes()));
+        super(List.of());
         this.seed = seed;
         this.registry = other.registry;
+        this.possibleBiomes = new ObjectLinkedOpenHashSet<>(other.possibleBiomes);
         this.biomeSampler = new BiomeSampler(noise, other.registry, List.copyOf(other.possibleBiomes()));
         this.caveBiomeSampler = new CaveBiomeSampler(seed, other.caveBiomeSampler);
     }
@@ -59,11 +63,25 @@ public class Source extends BiomeSource {
     }
 
     public Source(long seed, INoiseGenerator noise, Registry<Biome> registry, List<Biome> biomes) {
-        super(biomes);
+        super(List.of());
         this.seed = seed;
         this.registry = registry;
+        this.possibleBiomes = new ObjectLinkedOpenHashSet<>(biomes);
         this.biomeSampler = new BiomeSampler(noise, registry, biomes);
         this.caveBiomeSampler = new CaveBiomeSampler(seed, 800, registry, biomes);
+    }
+
+    /**
+     * Note: We provide the super-class an empty list to avoid the biome feature
+     * order dependency exceptions (wtf mojang). We do not use the featuresByStep
+     * list so order does not matter to us (thank god! Biome mods are going to
+     * get this very wrong).
+     * <p>
+     * We instead maintain our own set with the actual biomes and override here :)
+     */
+    @Override
+    public Set<Biome> possibleBiomes() {
+        return possibleBiomes;
     }
 
     @Override

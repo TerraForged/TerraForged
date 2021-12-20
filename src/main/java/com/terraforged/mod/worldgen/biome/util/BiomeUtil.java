@@ -26,6 +26,7 @@ package com.terraforged.mod.worldgen.biome.util;
 
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.mod.TerraForged;
+import com.terraforged.mod.platform.Platform;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
@@ -37,6 +38,7 @@ import java.util.*;
 
 public class BiomeUtil {
     private static final Map<BiomeType, ResourceLocation> TYPE_NAMES = new EnumMap<>(BiomeType.class);
+    private static final Set<String> KNOWN_NAMESPACES = Set.of(TerraForged.MODID, "terralith"); // TODO: Not hardcoded
 
     static {
         for (var type : BiomeType.values()) {
@@ -54,10 +56,15 @@ public class BiomeUtil {
 
     public static List<Biome> getOverworldBiomes(Registry<Biome> biomes) {
         var overworld = getVanillaOverworldBiomes(biomes);
+        var platform = Platform.ACTIVE_PLATFORM.get();
 
-        for (var biome : biomes) {
-            var name = biomes.getKey(biome);
-            if (name != null && name.getNamespace().equals(TerraForged.MODID)) {
+        for (var entry : biomes.entrySet()) {
+            var biome = entry.getValue();
+            var name = entry.getKey().location();
+
+            if (platform.getData().isOverworldBiome(entry.getKey())) {
+                overworld.add(biome);
+            } else if (KNOWN_NAMESPACES.contains(name.getNamespace())) {
                 overworld.add(biome);
             }
         }

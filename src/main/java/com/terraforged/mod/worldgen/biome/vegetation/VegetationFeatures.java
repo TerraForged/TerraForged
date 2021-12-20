@@ -83,7 +83,7 @@ public class VegetationFeatures {
 
         var biomeRegistry = access.registryOrThrow(Registry.BIOME_REGISTRY);
         var features = biomeRegistry.getOrThrow(key).getGenerationSettings().features();
-        if (features.size() >= STAGE) {
+        if (features.size() > STAGE) {
             var vegetation = features.get(STAGE);
             var featureRegistry = access.registryOrThrow(Registry.PLACED_FEATURE_REGISTRY);
 
