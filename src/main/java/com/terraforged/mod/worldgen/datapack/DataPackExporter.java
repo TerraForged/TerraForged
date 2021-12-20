@@ -24,7 +24,6 @@
 
 package com.terraforged.mod.worldgen.datapack;
 
-import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.util.FileUtil;
 import net.minecraft.world.level.DataPackConfig;
@@ -40,7 +39,6 @@ public class DataPackExporter {
 
     public static DataPackConfig setup(@Nullable Path dir, DataPackConfig config) {
         if (dir == null) throw new NullPointerException("Dir is null!");
-        if (!Environment.DEV_ENV) return config;
 
         TerraForged.LOG.info("Generating TerraForged datapack");
 
