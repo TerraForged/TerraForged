@@ -1,0 +1,1 @@
+cd Fabric & gradlew clean build & exit
