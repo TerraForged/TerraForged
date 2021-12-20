@@ -30,6 +30,10 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 }
 
+task clearData(type: Delete) {
+    delete "${rootDir}/generated/resources"
+}
+
 jar {
     finalizedBy("reobfJar")
     manifest { attributes(["MixinConfigs": "terraforged.mixins.json"]) }
@@ -49,7 +53,7 @@ minecraft {
             arg "-mixin.config=terraforged.mixins.json"
             jvmArgs "-Ddev"
             mods {
-                examplemod {
+                terraforged {
                     source sourceSets.main
                 }
             }
@@ -62,7 +66,21 @@ minecraft {
             arg "-mixin.config=terraforged.mixins.json"
             jvmArgs "-Ddev"
             mods {
-                examplemod {
+                terraforged {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file("run")
+            property "forge.logging.markers", "REGISTRIES"
+            property "forge.logging.console.level", "debug"
+            args "--mod", "terraforged", "--server", "--output", file("generated")
+            arg "-mixin.config=terraforged.mixins.json"
+            jvmArgs "-Ddev"
+            mods {
+                terraforged {
                     source sourceSets.main
                 }
             }

@@ -29,7 +29,7 @@ public interface Environment {
     boolean PROFILING = DEV_ENV || hasFlag("profiling");
     boolean UNLIMITED = DEV_ENV || hasFlag("unlimited");
     boolean DEBUGGING = DEV_ENV || hasFlag("debugging");
-    boolean DATA_GEN = DEV_ENV || hasFlag("datagen");
+    boolean DATA_GEN = hasFlag("datagen");
     int CORES = Runtime.getRuntime().availableProcessors();
 
     static boolean hasFlag(String flag) {

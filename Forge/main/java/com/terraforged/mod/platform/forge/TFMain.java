@@ -28,6 +28,7 @@ import com.terraforged.mod.Common;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.command.DebugCommand;
 import com.terraforged.mod.data.ModBiomes;
+import com.terraforged.mod.data.gen.DataGen;
 import com.terraforged.mod.platform.PlatformData;
 import com.terraforged.mod.platform.forge.client.TFClient;
 import com.terraforged.mod.platform.forge.util.ForgeRegistrar;
@@ -35,6 +36,8 @@ import com.terraforged.mod.registry.registrar.NoopRegistrar;
 import com.terraforged.mod.util.DemoHandler;
 import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.HashCache;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
@@ -46,7 +49,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 @Mod(TerraForged.MODID)
@@ -59,6 +64,7 @@ public class TFMain extends TerraForged {
         MinecraftForge.EVENT_BUS.addListener(this::onJoinWorld);
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onInit);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onGenerateData);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Biome.class, this::onBiomes);
 
         // Biomes are registered via event
@@ -88,6 +94,28 @@ public class TFMain extends TerraForged {
 
     void onBiomes(RegistryEvent.Register<Biome> event) {
         ModBiomes.register(new ForgeRegistrar<>(event.getRegistry()));
+    }
+
+    void onGenerateData(GatherDataEvent event) {
+        Common.INSTANCE.init();
+
+        var path = event.getGenerator().getOutputFolder().resolve("resources/default");
+        event.getGenerator().addProvider(new DataProvider() {
+            @Override
+            public String getName() {
+                return "TerraForged";
+            }
+
+            @Override
+            public void run(HashCache cache) throws IOException {
+                try {
+                    DataGen.export(path);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        });
+
     }
 
     private static Path getRootPath() {

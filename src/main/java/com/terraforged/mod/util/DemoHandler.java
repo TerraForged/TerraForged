@@ -26,6 +26,7 @@ package com.terraforged.mod.util;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.terraforged.mod.Environment;
+import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.profiler.GeneratorProfiler;
 import net.minecraft.ChatFormatting;
@@ -34,6 +35,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 
 public class DemoHandler {
@@ -42,6 +44,10 @@ public class DemoHandler {
 
         var client = Minecraft.getInstance();
         if (!client.isWindowActive()) return;
+
+        var player = client.player;
+        if (player == null) return;
+        if (!isTFWorld(player.level)) return;
 
         var window = client.getWindow();
         var font = client.font;
@@ -67,6 +73,10 @@ public class DemoHandler {
 
     private static final String WARNING = "This version of TerraForged has been provided for demo purposes only and may not be suitable for survival play."
             + " Please do NOT report bugs, compatibility issues, or feedback regarding this version of the mod.";
+
+    private static boolean isTFWorld(Level level) {
+        return level.dimensionType().effectsLocation().getNamespace().equals(TerraForged.MODID);
+    }
 
     private static boolean isTFGenerator(ChunkGenerator generator) {
         return generator instanceof GeneratorProfiler || generator instanceof Generator;

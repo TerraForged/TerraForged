@@ -26,7 +26,7 @@ processResources {
 }
 
 jar {
-	archivesBaseName = "${archives_base_name}-fabric-${minecraft_version}"
+	archivesBaseName = "${archives_base_name}-fabric-${project.minecraft_version}"
 }
 
 loom {
