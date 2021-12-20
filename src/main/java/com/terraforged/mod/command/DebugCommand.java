@@ -41,56 +41,62 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.*;
-import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 public class DebugCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("locateterrain")
-                .then(Commands.argument("terrain", StringArgumentType.string())
+                .then(Arg.terrainType()
                         .then(Commands.argument("radius", IntegerArgumentType.integer(1))
                                 .executes(c -> locate(c, true)))
                         .executes(c -> locate(c, false))));
     }
 
     private static int locate(CommandContext<CommandSourceStack> context, boolean withRadius) throws CommandSyntaxException {
+        var generator = getGenerator(context);
+        if (generator == null) return Command.SINGLE_SUCCESS;
+
+        String name = StringArgumentType.getString(context, "terrain");
+        var terrain = TerrainType.get(name);
+        int radius = withRadius ? IntegerArgumentType.getInteger(context, "radius") : 1;
+
         var player = context.getSource().getPlayerOrException();
-        var source = player.level.getChunkSource();
-        if (source instanceof ServerChunkCache serverSource) {
-            var chunkGenerator = serverSource.getGenerator();
-            if (chunkGenerator instanceof GeneratorProfiler profiler) {
-                chunkGenerator = profiler.getGenerator();
-            }
+        var at = player.blockPosition();
 
-            if (chunkGenerator instanceof Generator generator) {
-                var at = player.blockPosition();
+        Component result;
+        if (terrain == null) {
+            result = new TextComponent("Invalid terrain: " + name).withStyle(ChatFormatting.RED);
+        } else {
+            int maxRadius = Math.min(100, radius + 50);
+            long pos = generator.getNoiseGenerator().find(at.getX(), at.getZ(), radius, maxRadius, terrain);
 
-                String name = StringArgumentType.getString(context, "terrain");
-                var terrain = TerrainType.get(name);
+            if (pos == 0L) {
+                result = new TextComponent("Unable to locate terrain: " + name).withStyle(ChatFormatting.RED);
+            } else {
+                int x = PosUtil.unpackLeft(pos);
+                int z = PosUtil.unpackRight(pos);
+                int y = player.level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z) + 1;
 
-                Component result;
-                if (terrain == null) {
-                    result = new TextComponent("Invalid terrain: " + name).withStyle(ChatFormatting.RED);
-                } else {
-                    int radius = withRadius ? IntegerArgumentType.getInteger(context, "radius") : 1;
-                    int maxRadius = Math.min(100, radius + 50);
-                    long pos = generator.getNoiseGenerator().find(at.getX(), at.getZ(), radius, maxRadius, terrain);
-
-                    if (pos == 0L) {
-                        result = new TextComponent("Unable to locate terrain: " + name).withStyle(ChatFormatting.RED);
-                    } else {
-                        int x = PosUtil.unpackLeft(pos);
-                        int z = PosUtil.unpackRight(pos);
-                        int y = player.level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z) + 1;
-
-                        result = createTerrainTeleportMessage(at, x, y, z, terrain);
-                    }
-                }
-
-                player.sendMessage(result, ChatType.SYSTEM, Util.NIL_UUID);
+                result = createTerrainTeleportMessage(at, x, y, z, terrain);
             }
         }
+
+        player.sendMessage(result, ChatType.SYSTEM, Util.NIL_UUID);
+
         return Command.SINGLE_SUCCESS;
+    }
+
+    private static Generator getGenerator(CommandContext<CommandSourceStack> context) {
+        var level = context.getSource().getLevel();
+        var chunkGenerator = level.getChunkSource().getGenerator();
+        if (chunkGenerator instanceof GeneratorProfiler profiler) {
+            chunkGenerator = profiler.getGenerator();
+        }
+
+        if (chunkGenerator instanceof Generator generator) {
+            return generator;
+        }
+        return null;
     }
 
     private static Component createTerrainTeleportMessage(BlockPos pos, int x, int y, int z, Terrain terrain) {
