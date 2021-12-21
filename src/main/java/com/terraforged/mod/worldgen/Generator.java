@@ -216,16 +216,17 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public int getBaseHeight(int x, int z, net.minecraft.world.level.levelgen.Heightmap.Types types, LevelHeightAccessor levelHeightAccessor) {
-        int height = terrainCache.getHeight(x, z) + 1;
+        // First air block above the terrain
+        int height = terrainCache.getHeight(x, z);
         return switch (types) {
-            case WORLD_SURFACE, WORLD_SURFACE_WG, MOTION_BLOCKING, MOTION_BLOCKING_NO_LEAVES -> Math.max(getSeaLevel(), height);
-            case OCEAN_FLOOR, OCEAN_FLOOR_WG -> height;
+            case WORLD_SURFACE, WORLD_SURFACE_WG, MOTION_BLOCKING, MOTION_BLOCKING_NO_LEAVES -> Math.max(getSeaLevel(), height) + 1;
+            case OCEAN_FLOOR, OCEAN_FLOOR_WG -> height + 1;
         };
     }
 
     @Override
     public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor levelHeightAccessor) {
-        int height = terrainCache.getHeight(x, z) + 1;
+        int height = terrainCache.getHeight(x, z);
         int surface = Math.max(getSeaLevel(), height);
 
         var states = new BlockState[surface];

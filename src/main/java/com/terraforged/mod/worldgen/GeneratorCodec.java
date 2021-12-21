@@ -48,7 +48,7 @@ public class GeneratorCodec implements WorldGenCodec<Generator> {
         var terrain = ModTerrains.getTerrain(access);
 
         var biomeGenerator = new BiomeGenerator(seed, access);
-        var noiseGenerator = new NoiseGenerator(seed, levels, terrain).withErosion();
+        var noiseGenerator = new NoiseGenerator(seed, levels, terrain);//.withErosion();
         var biomeSource = new Source(seed, noiseGenerator, biomes);
         var vanillaGen = getVanillaGen(seed, biomeSource, access);
         var structureConfig = getStructureSettings(access);
