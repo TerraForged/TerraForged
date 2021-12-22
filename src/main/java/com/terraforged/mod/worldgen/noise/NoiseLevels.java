@@ -58,6 +58,6 @@ public class NoiseLevels {
     }
 
     public static float calcFrequency(int verticalRange) {
-        return (TerrainLevels.LEGACY_GEN_DEPTH - TerrainLevels.DEFAULT_SEA_LEVEL) / (float) verticalRange;
+        return (TerrainLevels.Defaults.LEGACY_GEN_DEPTH - TerrainLevels.Defaults.SEA_LEVEL) / (float) verticalRange;
     }
 }

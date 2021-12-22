@@ -22,21 +22,22 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.data;
+package com.terraforged.mod.data.gen;
 
-import com.terraforged.mod.util.Init;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.HashCache;
 
-public class Content extends Init {
-    public static final Content INSTANCE = new Content();
+import java.io.IOException;
+import java.nio.file.Path;
+
+public record BuiltinProvider(Path dir) implements DataProvider {
+    @Override
+    public String getName() {
+        return "TerraForged Builtins";
+    }
 
     @Override
-    protected void doInit() {
-        ModTerrainTypes.register();
-        ModTerrains.register();
-        ModBiomes.register();
-        ModCaves.register();
-        ModTags.register();
-        ModVegetations.register();
-        ModClimates.register();
+    public void run(HashCache cache) throws IOException {
+        DataGen.export(dir);
     }
 }

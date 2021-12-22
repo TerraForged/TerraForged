@@ -76,7 +76,7 @@ public class ViabilityTest {
                 var c = biome.getColor();
                 Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsb);
 
-                float elev = (scaledHeight - levels.seaLevel) / (levels.genDepth - levels.seaLevel);
+                float elev = (scaledHeight - levels.seaLevel) / (levels.maxY - levels.seaLevel);
                 elev = 0.25F + 0.75F * elev;
 
                 float grad = NoiseUtil.clamp(heightmap.getGrad(x, z) * 400, 0, 1);

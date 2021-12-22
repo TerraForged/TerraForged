@@ -27,37 +27,27 @@ package com.terraforged.mod.worldgen.biome;
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.engine.world.climate.ClimateModule;
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.util.map.WeightMap;
-import com.terraforged.mod.worldgen.biome.util.BiomeUtil;
+import com.terraforged.mod.worldgen.biome.util.BiomeMapManager;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
-import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler {
-    protected final Registry<Biome> biomes;
-    protected final Map<BiomeType, WeightMap<Biome>> biomeMap;
+    protected final BiomeMapManager biomeMapManager;
 
-    public BiomeSampler(INoiseGenerator noiseGenerator, Registry<Biome> registry, List<Biome> biomes) {
+    public BiomeSampler(INoiseGenerator noiseGenerator, BiomeMapManager biomeMapManager) {
         super(noiseGenerator);
-        this.biomes = registry;
-        this.biomeMap = getBiomeMapping(registry, biomes);
+        this.biomeMapManager = biomeMapManager;
     }
 
     public Biome sampleBiome(int x, int z) {
         var sample = sample(x, z);
-        var map = biomeMap.get(sample.cell.biome);
+        var map = biomeMapManager.getBiomeMap().get(sample.cell.biome);
 
         Biome biome;
         if (map == null || map.isEmpty()) {
             TerraForged.LOG.debug("Missing biome for type: {}", sample.cell.biome);
-            biome = biomes.getOrThrow(Biomes.PLAINS);
+            biome = biomeMapManager.getBiomes().getOrThrow(Biomes.PLAINS);
         } else {
             biome = map.getValue(sample.cell.biomeRegionId);
         }
@@ -106,62 +96,29 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
         if (sample.continentNoise < controls.shallowOcean) {
             if (sample.continentNoise < controls.beach) {
                 return switch (biomeType) {
-                    case TAIGA, COLD_STEPPE -> biomes.get(Biomes.DEEP_COLD_OCEAN);
-                    case TUNDRA -> biomes.get(Biomes.DEEP_FROZEN_OCEAN);
-                    case DESERT, SAVANNA, TROPICAL_RAINFOREST -> biomes.get(Biomes.DEEP_LUKEWARM_OCEAN);
-                    default -> biomes.get(Biomes.DEEP_OCEAN);
+                    case TAIGA, COLD_STEPPE -> biomeMapManager.get(Biomes.DEEP_COLD_OCEAN);
+                    case TUNDRA -> biomeMapManager.get(Biomes.DEEP_FROZEN_OCEAN);
+                    case DESERT, SAVANNA, TROPICAL_RAINFOREST -> biomeMapManager.get(Biomes.DEEP_LUKEWARM_OCEAN);
+                    default -> biomeMapManager.get(Biomes.DEEP_OCEAN);
                 };
             }
         }
 
         if (sample.continentNoise < controls.beach) {
             return switch (biomeType) {
-                case TAIGA, COLD_STEPPE -> biomes.get(Biomes.COLD_OCEAN);
-                case TUNDRA -> biomes.get(Biomes.FROZEN_OCEAN);
-                case DESERT, SAVANNA, TROPICAL_RAINFOREST -> biomes.get(Biomes.WARM_OCEAN);
-                default -> biomes.get(Biomes.OCEAN);
+                case TAIGA, COLD_STEPPE -> biomeMapManager.get(Biomes.COLD_OCEAN);
+                case TUNDRA -> biomeMapManager.get(Biomes.FROZEN_OCEAN);
+                case DESERT, SAVANNA, TROPICAL_RAINFOREST -> biomeMapManager.get(Biomes.WARM_OCEAN);
+                default -> biomeMapManager.get(Biomes.OCEAN);
             };
         }
 
         if (sample.cell.terrain.isRiver() || sample.cell.terrain.isLake()) {
             if (sample.cell.value < noiseGenerator.getLevels().heightMin) {
-                return biomeType == BiomeType.TUNDRA ? biomes.get(Biomes.FROZEN_RIVER) : biomes.get(Biomes.RIVER);
+                return biomeType == BiomeType.TUNDRA ? biomeMapManager.get(Biomes.FROZEN_RIVER) : biomeMapManager.get(Biomes.RIVER);
             }
         }
 
         return input;
-    }
-
-    public static ClimateModule createClimate(INoiseGenerator generator) {
-        if (generator == null) return null;
-        return new ClimateModule(generator.getContinent(), generator.getContinent().getContext());
-    }
-
-    protected static Map<BiomeType, WeightMap<Biome>> getBiomeMapping(Registry<Biome> registry, List<Biome> biomes) {
-        var types = getBiomeTypeMap(registry, biomes);
-        var mapping = new EnumMap<BiomeType, WeightMap<Biome>>(BiomeType.class);
-
-        for (var type : BiomeType.values()) {
-            var list = types.get(type);
-            if (list == null) continue;
-
-            var map = getWeightedMap(list);
-            mapping.put(type, map);
-        }
-
-        return mapping;
-    }
-
-    protected static WeightMap<Biome> getWeightedMap(List<Biome> biomes) {
-        var biome = biomes.toArray(Biome[]::new);
-        var weights = new float[biomes.size()];
-        Arrays.fill(weights, 1.0F);
-        return new WeightMap<>(biome, weights);
-    }
-
-    protected static Map<BiomeType, List<Biome>> getBiomeTypeMap(Registry<Biome> registry, List<Biome> biomes) {
-        return biomes.stream()
-                .sorted(BiomeUtil.getBiomeSorter(registry))
-                .collect(Collectors.groupingBy(BiomeUtil::getType));
     }
 }

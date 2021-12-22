@@ -29,6 +29,7 @@ import com.terraforged.mod.worldgen.asset.*;
 
 public interface ModRegistry {
     LazyKey<BiomeTag> BIOME_TAG = TerraForged.registry("worldgen/tag/biome");
+    LazyKey<ClimateType> CLIMATE = TerraForged.registry("worldgen/climate");
     LazyKey<NoiseCave> CAVE = TerraForged.registry("worldgen/cave");
     LazyKey<TerrainNoise> TERRAIN = TerraForged.registry("worldgen/terrain");
     LazyKey<TerrainType> TERRAIN_TYPE = TerraForged.registry("worldgen/terrain_type");

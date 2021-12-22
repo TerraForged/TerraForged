@@ -38,7 +38,10 @@ import net.minecraft.resources.ResourceKey;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public interface LazyCodec<V> extends Codec<V> {
+public interface LazyCodec<V> extends Codec<V>, Supplier<Codec<V>> {
+    @Override
+    Codec<V> get();
+
     @Override
     <T> DataResult<T> encode(V input, DynamicOps<T> ops, T prefix);
 
@@ -47,13 +50,18 @@ public interface LazyCodec<V> extends Codec<V> {
 
     record Instance<V>(Supplier<Codec<V>> supplier) implements LazyCodec<V> {
         @Override
+        public Codec<V> get() {
+            return supplier.get();
+        }
+
+        @Override
         public <T> DataResult<T> encode(V input, DynamicOps<T> ops, T prefix) {
-            return supplier.get().encode(input, ops, prefix);
+            return get().encode(input, ops, prefix);
         }
 
         @Override
         public <T> DataResult<Pair<V, T>> decode(DynamicOps<T> ops, T input) {
-            return supplier.get().decode(ops, input);
+            return get().decode(ops, input);
         }
     }
 

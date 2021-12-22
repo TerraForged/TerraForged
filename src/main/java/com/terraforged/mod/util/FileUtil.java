@@ -47,13 +47,19 @@ public class FileUtil {
     }
 
     public static void walkDir(Path root, String path, FileSystemVisitor visitor) throws IOException {
-        root = root.resolve(path);
+        if (path != null && !path.isEmpty()) {
+            root = root.resolve(path);
+        }
+
         walk(FileSystems.getDefault(), root, root, visitor);
     }
 
     public static void walkSystem(Path root, String path, FileSystemVisitor visitor) throws IOException {
         try (var fs = FileSystems.newFileSystem(root)) {
-            root = fs.getPath(path);
+            if (path != null && !path.isEmpty()) {
+                root = fs.getPath(path);
+            }
+
             walk(fs, root, root, visitor);
         }
     }
@@ -71,6 +77,27 @@ public class FileUtil {
         } else {
             visitor.visit(fs, root, file);
         }
+    }
+
+    public static Path resolve(Path root, String path) {
+        return path == null || path.isEmpty() ? root : root.resolve(path);
+    }
+
+    public static void createDirCopy(Path fromRoot, String fromPath, Path to) throws IOException {
+        walk(fromRoot, fromPath, (fs, root, file) -> {
+            var relative = root.relativize(file);
+            var dest = to.resolve(relative);
+            if (Files.exists(dest) || Files.isDirectory(file)) {
+                return;
+            }
+
+            var parent = dest.getParent();
+            if (!Files.exists(parent)) {
+                Files.createDirectories(parent);
+            }
+
+            Files.copy(file, dest);
+        });
     }
 
     public static void createZipCopy(Path from, String path, Path to) throws IOException {
@@ -99,12 +126,19 @@ public class FileUtil {
         }
     }
 
-    public static void delete(Path dir) {
-        if (!Files.exists(dir)) return;
+    public static void delete(Path path) {
+        if (!Files.exists(path)) return;
+
+        if (Files.isDirectory(path)) {
+            try {
+                Files.list(path).forEach(FileUtil::delete);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         try {
-            walk(FileSystems.getDefault(), dir, dir, (fs, root, path) -> Files.deleteIfExists(path));
-            Files.deleteIfExists(dir);
+            Files.delete(path);
         } catch (IOException e) {
             e.printStackTrace();
         }

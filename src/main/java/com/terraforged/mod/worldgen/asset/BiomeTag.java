@@ -42,7 +42,7 @@ public class BiomeTag extends WorldgenTag<Biome> {
     public static final Codec<BiomeTag> DIRECT = WorldgenTag.codec("biomes", () -> Biome.LIST_CODEC, BiomeTag::new);
     public static final Codec<Supplier<BiomeTag>> CODEC = LazyCodec.registry(DIRECT, ModRegistry.BIOME_TAG);
 
-    BiomeTag(ObjectSet<Biome> biomes) {
+    public BiomeTag(ObjectSet<Biome> biomes) {
         super(biomes);
     }
 

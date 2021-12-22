@@ -245,7 +245,7 @@ public class NoiseGenerator implements INoiseGenerator {
         var settings = new Settings();
         settings.world.seed = seed;
         settings.world.properties.seaLevel = levels.seaLevel;
-        settings.world.properties.worldHeight = levels.genDepth;
+        settings.world.properties.worldHeight = levels.maxY;
         settings.rivers.riverCount = 7;
 
         var context = new GeneratorContext(settings);

@@ -26,15 +26,14 @@ package com.terraforged.mod.worldgen.biome;
 
 import com.terraforged.mod.data.ModBiomes;
 import com.terraforged.mod.util.map.WeightMap;
+import com.terraforged.mod.worldgen.biome.util.BiomeMapManager;
 import com.terraforged.mod.worldgen.cave.CaveType;
 import com.terraforged.noise.util.Noise;
 import com.terraforged.noise.util.NoiseUtil;
-import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.Arrays;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 
 public class CaveBiomeSampler {
@@ -45,13 +44,16 @@ public class CaveBiomeSampler {
     protected final float frequency;
     protected final Map<CaveType, WeightMap<Biome>> typeMap = new EnumMap<>(CaveType.class);
 
-    public CaveBiomeSampler(long seed, int scale, Registry<Biome> registry, List<Biome> biomes) {
+    public CaveBiomeSampler(long seed, int scale, BiomeMapManager biomeMapManager) {
         this.seed = (int) seed + OFFSET;
         this.scale = scale;
         this.frequency = 1F / scale;
 
-        var global = new Biome[]{registry.getOrThrow(ModBiomes.CAVE.key())};
-        var special = biomes.stream().filter(b -> b.getBiomeCategory() == Biome.BiomeCategory.UNDERGROUND).toArray(Biome[]::new);
+        var global = new Biome[]{biomeMapManager.getBiomes().getOrThrow(ModBiomes.CAVE.key())};
+        var special = biomeMapManager.getBiomes()
+                .stream().filter(b -> b.getBiomeCategory() == Biome.BiomeCategory.UNDERGROUND)
+                .toArray(Biome[]::new);
+
         this.typeMap.put(CaveType.GLOBAL, create(global));
         this.typeMap.put(CaveType.UNIQUE, create(special));
     }

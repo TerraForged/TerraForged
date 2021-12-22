@@ -22,21 +22,19 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.data;
+package com.terraforged.mod.codec;
 
-import com.terraforged.mod.util.Init;
+import com.mojang.serialization.DynamicOps;
 
-public class Content extends Init {
-    public static final Content INSTANCE = new Content();
+import java.util.Map;
+import java.util.function.Function;
 
-    @Override
-    protected void doInit() {
-        ModTerrainTypes.register();
-        ModTerrains.register();
-        ModBiomes.register();
-        ModCaves.register();
-        ModTags.register();
-        ModVegetations.register();
-        ModClimates.register();
+public class CodecUtils {
+    public static <T, V> void put(DynamicOps<T> ops, Map<T, T> map, String key, V value, Function<V, T> mapper) {
+        map.put(ops.createString(key), mapper.apply(value));
+    }
+
+    public static <T, N extends Number> N getNum(DynamicOps<T> ops, T input, String key, N defaultValue, Function<Number, N> mapper) {
+        return ops.get(input, key).flatMap(ops::getNumberValue).map(mapper).result().orElse(defaultValue);
     }
 }

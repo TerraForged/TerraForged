@@ -44,6 +44,7 @@ import java.util.function.Supplier;
 public abstract class TerraForged implements Platform {
 	public static final String MODID = "terraforged";
 	public static final String TITLE = "TerraForged";
+	public static final String DATAPACK_VERSION = "v0";
 	public static final Logger LOG = LogManager.getLogger(TITLE);
 
 	private final Supplier<Path> container;

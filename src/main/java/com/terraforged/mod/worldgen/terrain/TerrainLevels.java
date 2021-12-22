@@ -24,36 +24,60 @@
 
 package com.terraforged.mod.worldgen.terrain;
 
+import com.mojang.serialization.Codec;
+import com.terraforged.mod.codec.LazyCodec;
+import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.worldgen.noise.NoiseLevels;
 import com.terraforged.noise.util.NoiseUtil;
+import net.minecraft.world.level.dimension.DimensionType;
 
 public class TerrainLevels {
-    public static final int DEFAULT_SEA_LEVEL = 62;
-    public static final int DEFAULT_GEN_DEPTH = 384;
-    public static final int LEGACY_GEN_DEPTH = 256;
+    public static final Codec<TerrainLevels> CODEC = LazyCodec.record(instance -> instance.group(
+            Codec.intRange(Limits.MIN_MIN_Y, Limits.MAX_MIN_Y).fieldOf("min_y").forGetter(l -> l.minY),
+            Codec.intRange(Limits.MIN_MAX_Y, Limits.MAX_MAX_Y).fieldOf("max_y").forGetter(l -> l.maxY),
+            Codec.intRange(Limits.MIN_SEA_LEVEL, Limits.MAX_SEA_LEVEL).fieldOf("sea_level").forGetter(l -> l.seaLevel)
+    ).apply(instance, TerrainLevels::new));
 
-    public static final TerrainLevels LEGACY = new TerrainLevels(DEFAULT_SEA_LEVEL, LEGACY_GEN_DEPTH);
-    public static final TerrainLevels DEFAULT = new TerrainLevels(DEFAULT_SEA_LEVEL, DEFAULT_GEN_DEPTH);
+    public static final TerrainLevels LEGACY = new TerrainLevels(Defaults.MIN_Y, Defaults.LEGACY_GEN_DEPTH, Defaults.SEA_LEVEL);
+    public static final TerrainLevels DEFAULT = new TerrainLevels(Defaults.MIN_Y, Defaults.MAXY, Defaults.SEA_LEVEL);
 
+    public final int minY;
+    public final int maxY; // Exclusive max block index
     public final int seaLevel; // Inclusive index of highest water block
-    public final int genDepth; // Exclusive max block index
     public final NoiseLevels noiseLevels;
 
-    public TerrainLevels() {
-        this(DEFAULT_SEA_LEVEL, DEFAULT_GEN_DEPTH);
+    public TerrainLevels(int minY, int maxY, int waterY) {
+        this.minY = MathUtil.clamp(minY, Limits.MIN_MIN_Y, Limits.MAX_MIN_Y);
+        this.maxY = MathUtil.clamp(maxY, Limits.MIN_MAX_Y, Limits.MAX_MAX_Y);
+        this.seaLevel = MathUtil.clamp(waterY, Limits.MIN_SEA_LEVEL, maxY >> 1);
+        this.noiseLevels = new NoiseLevels(waterY, maxY);
     }
 
-    public TerrainLevels(int waterY, int genDepth) {
-        this.seaLevel = waterY;
-        this.genDepth = genDepth;
-        this.noiseLevels = new NoiseLevels(waterY, genDepth);
+    public TerrainLevels copy() {
+        return new TerrainLevels(minY, maxY, seaLevel);
     }
 
     public float getScaledHeight(float heightNoise) {
-        return heightNoise * genDepth;
+        return heightNoise * maxY;
     }
 
     public int getHeight(float scaledHeight) {
         return NoiseUtil.floor(scaledHeight);
+    }
+
+    public static class Limits {
+        public static final int MIN_MIN_Y = DimensionType.MIN_Y;
+        public static final int MAX_MIN_Y = 0;
+        public static final int MIN_SEA_LEVEL = 32;
+        public static final int MAX_SEA_LEVEL = DimensionType.Y_SIZE;
+        public static final int MIN_MAX_Y = 128;
+        public static final int MAX_MAX_Y = DimensionType.Y_SIZE;
+    }
+
+    public static class Defaults {
+        public static final int MIN_Y = -64;
+        public static final int SEA_LEVEL = 62;
+        public static final int MAXY = 384;
+        public static final int LEGACY_GEN_DEPTH = 256;
     }
 }

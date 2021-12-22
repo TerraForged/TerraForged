@@ -24,10 +24,7 @@
 
 package com.terraforged.mod.util.json;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
@@ -35,6 +32,7 @@ import java.io.Writer;
 import java.util.function.Predicate;
 
 public class JsonFormatter {
+    private static final Gson GSON = new Gson();
     private static final String INDENT = "  ";
     private static final String COMPACT = "";
 
@@ -53,7 +51,7 @@ public class JsonFormatter {
         } else if (json.isJsonArray()) {
             writeArray(json.getAsJsonArray());
         } else if (json.isJsonPrimitive()) {
-            writePrimitive(json.getAsJsonPrimitive());
+            writePrimitive(json.getAsJsonPrimitive(), false);
         }
     }
 
@@ -89,9 +87,9 @@ public class JsonFormatter {
 
         for (int i = 0; i < array.size(); i++) {
             if (i > 0) {
-                writer.write(' ');
+                writer.write(", ");
             }
-            write(array.get(i));
+            writePrimitive(array.get(i).getAsJsonPrimitive(), true);
         }
 
         jsonWriter.endArray();
@@ -106,23 +104,47 @@ public class JsonFormatter {
         jsonWriter.endArray();
     }
 
-    private void writePrimitive(JsonPrimitive json) throws IOException {
+    private void writePrimitive(JsonPrimitive json, boolean direct) throws IOException {
         if (json.isNumber()) {
-            writeNumber(json);
+            writeNumber(json, direct);
         } else if (json.isBoolean()) {
-            jsonWriter.value(json.getAsBoolean());
+            writeBool(json, direct);
         } else if (json.isString()) {
-            jsonWriter.value(json.getAsString());
+            writeString(json, direct);
         }
     }
 
-    private void writeNumber(JsonPrimitive json) throws IOException {
+    private void writeNumber(JsonPrimitive json, boolean direct) throws IOException {
         long l = json.getAsLong();
         double d = json.getAsDouble();
         if (l == d) {
-            jsonWriter.value(l);
+            if (direct) {
+                writer.write(String.valueOf(l));
+            } else {
+                jsonWriter.value(l);
+            }
         } else {
-            jsonWriter.value(trimDouble(d));
+            if (direct) {
+                writer.write(String.valueOf(trimDouble(d)));
+            } else {
+                jsonWriter.value(trimDouble(d));
+            }
+        }
+    }
+
+    private void writeBool(JsonPrimitive json, boolean direct) throws IOException {
+        if (direct) {
+            GSON.toJson(json, writer);
+        } else {
+            jsonWriter.value(json.getAsBoolean());
+        }
+    }
+
+    private void writeString(JsonPrimitive json, boolean direct) throws IOException {
+        if (direct) {
+            GSON.toJson(json, writer);
+        } else {
+            jsonWriter.value(json.getAsString());
         }
     }
 
@@ -142,10 +164,6 @@ public class JsonFormatter {
         return json.isJsonPrimitive() && !json.getAsJsonPrimitive().isString();
     }
 
-    private static boolean isFloatingPoint(JsonElement json) {
-        return json.getAsInt() == json.getAsDouble();
-    }
-
     private static boolean isCompactable(JsonArray array) {
         int size = array.size();
         if (size == 0) return false;
@@ -154,7 +172,7 @@ public class JsonFormatter {
         if (!first.isJsonPrimitive()) return false;
 
         var prim = first.getAsJsonPrimitive();
-        return !prim.isString() || size < 4;
+        return !prim.isString() || size < 3;
     }
 
     public static void apply(JsonElement jsonElement, Writer writer) throws IOException {

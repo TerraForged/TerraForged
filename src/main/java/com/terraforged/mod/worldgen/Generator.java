@@ -25,6 +25,8 @@
 package com.terraforged.mod.worldgen;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.terraforged.mod.codec.WorldGenCodec;
 import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
@@ -60,7 +62,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public class Generator extends ChunkGenerator {
-    public static final Codec<Generator> CODEC = new GeneratorCodec().stable();
+    public static final Codec<Generator> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.LONG.optionalFieldOf("seed", 0L).forGetter(g -> g.seed),
+            TerrainLevels.CODEC.optionalFieldOf("levels", TerrainLevels.DEFAULT).forGetter(g -> g.levels),
+            WorldGenCodec.CODEC.forGetter(Generator::getRegistries)
+    ).apply(instance, instance.stable(GeneratorBuilder::build)));
 
     protected final long seed;
     protected final Source biomeSource;
@@ -90,6 +96,10 @@ public class Generator extends ChunkGenerator {
         this.noiseGenerator = noiseGenerator;
         this.terrainCache = new TerrainCache(levels, noiseGenerator);
         this.structureGenerator = new DelegateGenerator(seed, this, structureConfig) {};
+    }
+
+    protected RegistryAccess getRegistries() {
+        return biomeSource.getRegistries();
     }
 
     public VanillaGen getVanillaGen() {
@@ -124,7 +134,7 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public int getMinY() {
-        return -64;
+        return levels.minY;
     }
 
     @Override
@@ -134,7 +144,7 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public int getGenDepth() {
-        return levels.genDepth;
+        return levels.maxY;
     }
 
     @Override

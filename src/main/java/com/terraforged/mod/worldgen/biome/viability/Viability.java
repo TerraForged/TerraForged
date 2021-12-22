@@ -36,7 +36,7 @@ public interface Viability {
     float getFitness(int x, int z, Context context);
 
     default float getScaler(TerrainLevels levels) {
-        return levels.genDepth / 255F;
+        return levels.maxY / 255F;
     }
 
     default Viability mult(Viability... others) {

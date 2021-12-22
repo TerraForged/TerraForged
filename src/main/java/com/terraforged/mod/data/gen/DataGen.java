@@ -34,10 +34,14 @@ import com.terraforged.mod.registry.ModRegistries;
 import com.terraforged.mod.util.FileUtil;
 import com.terraforged.mod.util.Init;
 import com.terraforged.mod.util.json.JsonFormatter;
+import com.terraforged.mod.worldgen.GeneratorBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.RegistryWriteOps;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.dimension.LevelStem;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -60,8 +64,31 @@ public class DataGen extends Init {
         TerraForged.LOG.info("Generating json data");
         var registries = RegistryAccess.builtin();
         var writeOps = RegistryWriteOps.create(JsonOps.INSTANCE, registries);
+
+        genGenerator(dir, registries, writeOps);
+        genBuiltin(dir, registries, writeOps);
+        genBiomes(dir, registries, writeOps);
+    }
+
+    private static void genGenerator(Path dir, RegistryAccess registries, RegistryWriteOps<JsonElement> writeOps) {
+        var generator = GeneratorBuilder.getDefault(registries);
+        var json = LevelStem.CODEC.encodeStart(writeOps, generator).resultOrPartial(System.err::println).orElseThrow();
+        export(dir, Registry.DIMENSION_REGISTRY, Level.OVERWORLD, json);
+    }
+
+    private static void genBuiltin(Path dir, RegistryAccess registries, RegistryWriteOps<JsonElement> writeOps) {
         for (var holder : ModRegistries.getHolders()) {
             export(dir, holder, registries, writeOps);
+        }
+    }
+
+    private static void genBiomes(Path dir, RegistryAccess registries, RegistryWriteOps<JsonElement> writeOps) {
+        var biomes = registries.ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
+        for (var entry : biomes.entrySet()) {
+            if (!entry.getKey().location().getNamespace().equals(TerraForged.MODID)) continue;
+
+            var json = Biome.DIRECT_CODEC.encodeStart(writeOps, entry.getValue()).result().orElseThrow();
+            export(dir, biomes.key(), entry.getKey(), json);
         }
     }
 
@@ -84,7 +111,7 @@ public class DataGen extends Init {
 
     private static void export(Path dir, ResourceKey<?> registry, ResourceKey<?> key, JsonElement json) {
         var file = dir.resolve("data")
-                .resolve(registry.location().getNamespace())
+                .resolve(key.location().getNamespace())
                 .resolve(registry.location().getPath())
                 .resolve(key.location().getPath() + ".json");
 
