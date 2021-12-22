@@ -24,17 +24,33 @@
 
 package com.terraforged.mod.registry.hooks;
 
+import com.mojang.serialization.Lifecycle;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.registry.ModRegistries;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.RegistryResourceAccess;
+import net.minecraft.resources.ResourceKey;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class BuiltinHook {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static Map<? extends ResourceKey<? extends Registry<?>>, MappedRegistry<?>> addRegistries(
+            Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> registries) {
+        Map map = new HashMap<>(registries);
+        for (var holder : ModRegistries.getHolders()) {
+            map.put(holder.key(), new MappedRegistry<>(holder.key(), Lifecycle.stable()));
+        }
+        return map;
+    }
+
     public static void injectBuiltin(RegistryAccess.RegistryHolder builtin, RegistryResourceAccess.InMemoryStorage storage) {
         TerraForged.LOG.info("Injecting world-gen registry defaults");
 
-        var context = new RegistryAccess.RegistryHolder();
-        RegistryAccessUtil.extendRegistryHolder(builtin, context);
+        var context = getExtendedHolder(builtin);
 
         for (var holder : ModRegistries.getHolders()) {
             try {
@@ -59,5 +75,19 @@ public class BuiltinHook {
         }
 
         RegistryAccessUtil.printRegistryContents(registry);
+    }
+
+    private static RegistryAccess.RegistryHolder getExtendedHolder(RegistryAccess.RegistryHolder builtin) {
+        var extended = new RegistryAccess.RegistryHolder();
+
+        for (var data : RegistryAccess.knownRegistries()) {
+            RegistryAccessUtil.copy(builtin.ownedRegistryOrThrow(data.key()), extended);
+        }
+
+        for (var holder : ModRegistries.getHolders()) {
+            RegistryAccessUtil.copy(holder.registry(), extended);
+        }
+
+        return extended;
     }
 }

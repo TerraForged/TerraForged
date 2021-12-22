@@ -28,13 +28,13 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.UnboundedMapCodec;
 import com.terraforged.mod.TerraForged;
+import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 
 import java.util.Map;
-import java.util.Objects;
 
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class NetworkCodecHook {
+    @SuppressWarnings({"unchecked"})
     public static <K, V> Codec<RegistryAccess.RegistryHolder> createCodec(UnboundedMapCodec<K, V> codec) {
         TerraForged.LOG.info("Injecting safe world-gen network codec");
 
@@ -51,9 +51,12 @@ public class NetworkCodecHook {
 
     private static <K, V> RegistryAccess.RegistryHolder createHolder(Map<K, V> map) {
         var holder = new RegistryAccess.RegistryHolder();
-        Map backing = RegistryAccessUtil.getHolderMap(holder);
-        Objects.requireNonNull(backing);
-        backing.putAll(map);
+
+        for (var entry : map.entrySet()) {
+            var registry = (Registry<?>) entry.getValue();
+            RegistryAccessUtil.copy(registry, holder);
+        }
+
         return holder;
     }
 }

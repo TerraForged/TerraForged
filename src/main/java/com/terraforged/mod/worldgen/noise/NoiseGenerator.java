@@ -96,24 +96,32 @@ public class NoiseGenerator implements INoiseGenerator {
 
     @Override
     public long find(int x, int z, int minRadius, int maxRadius, Terrain terrain) {
+        if (!terrain.isOverground()) return 0L;
+
         float nx = getNoiseCoord(x);
         float nz = getNoiseCoord(z);
         var finder = land.findNearest(nx, nz, minRadius, maxRadius, terrain);
 
         var sample = localSample.get();
+        var riverCache = continent.getRiverCache();
         while (finder.hasNext()) {
             long pos = finder.next();
             if (pos == 0L) continue;
 
             float px = PosUtil.unpackLeftf(pos) / levels.frequency;
             float pz = PosUtil.unpackRightf(pos) / levels.frequency;
-            continent.sampleContinent(px, pz, sample);
 
-            if (sample.continentNoise >= controlPoints.inland) {
-                int xi = NoiseUtil.floor(px);
-                int zi = NoiseUtil.floor(pz);
-                return PosUtil.pack(xi, zi);
-            }
+            // Skip if coast or ocean
+            continent.sampleContinent(px, pz, sample);
+            if (sample.continentNoise < controlPoints.inland) continue;
+
+            // Skip if near river
+            continent.sampleRiver(px, pz, sample, riverCache);
+            if (sample.riverNoise > 0.25F) continue;
+
+            int xi = NoiseUtil.floor(px);
+            int zi = NoiseUtil.floor(pz);
+            return PosUtil.pack(xi, zi);
         }
 
         return 0;

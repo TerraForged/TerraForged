@@ -26,6 +26,7 @@ package com.terraforged.mod.mixin.common;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.UnboundedMapCodec;
+import com.terraforged.mod.registry.hooks.BuiltinHook;
 import com.terraforged.mod.registry.hooks.NetworkCodecHook;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
@@ -34,10 +35,19 @@ import net.minecraft.resources.ResourceKey;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Map;
 
 @Mixin(RegistryAccess.RegistryHolder.class)
 public class MixinRegistryHolder {
+    @ModifyVariable(method = "<init>(Ljava/util/Map;)V", at = @At("HEAD"), ordinal = 0)
+    private static Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> onInit(
+            Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> registries) {
+        return BuiltinHook.addRegistries(registries);
+    }
+
     @Inject(method = "captureMap", at = @At("HEAD"), cancellable = true)
     private static <K extends ResourceKey<? extends Registry<?>>, V extends MappedRegistry<?>> void onCaptureMap(
             UnboundedMapCodec<K, V> codec, CallbackInfoReturnable<Codec<RegistryAccess.RegistryHolder>> cir) {

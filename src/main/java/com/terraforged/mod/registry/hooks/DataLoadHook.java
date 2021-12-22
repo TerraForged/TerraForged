@@ -35,7 +35,6 @@ public class DataLoadHook {
     public static void loadData(RegistryAccess access, RegistryReadOps<?> ops) {
         TerraForged.LOG.info("Loading world-gen registry content from data");
 
-        RegistryAccessUtil.extendRegistryHolder(access, access);
         for (var holder : ModRegistries.getHolders()) {
             try {
                 loadData(holder, access, ops);

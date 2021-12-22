@@ -25,16 +25,12 @@
 package com.terraforged.mod.registry.hooks;
 
 import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.Lifecycle;
 import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.registry.ModRegistries;
 import com.terraforged.mod.util.ReflectionUtil;
-import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.RegistryReadOps;
-import net.minecraft.resources.ResourceKey;
 
 import java.lang.invoke.MethodHandle;
 import java.util.Map;
@@ -66,40 +62,10 @@ public class RegistryAccessUtil {
         }
     }
 
-    public static Map<ResourceKey<? extends Registry<?>>, MappedRegistry<?>> getHolderMap(RegistryAccess holder) {
-        return getHolderMap((RegistryAccess.RegistryHolder) holder);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Map<ResourceKey<? extends Registry<?>>, MappedRegistry<?>> getHolderMap(RegistryAccess.RegistryHolder holder) {
-        try {
-            return (Map<ResourceKey<? extends Registry<?>>, MappedRegistry<?>>) REGISTRY_HOLDER_MAP.invokeExact(holder);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static <T> MappedRegistry<T> copyRegistry(Registry<T> src) {
-        var registry = new MappedRegistry<>(src.key(), Lifecycle.stable());
-        for (var entry : src.entrySet()) {
-            registry.register(entry.getKey(), entry.getValue(), Lifecycle.stable());
-        }
-        return registry;
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    public static void extendRegistryHolder(RegistryAccess src, RegistryAccess dest) {
-        var srcMap = RegistryAccessUtil.getHolderMap((RegistryAccess.RegistryHolder) src);
-        var destMap = RegistryAccessUtil.getHolderMap((RegistryAccess.RegistryHolder) dest);
-
-        // Copy vanilla builtins
-        destMap.putAll(srcMap);
-
-        // Copy mod builtins
-        for (var holder : ModRegistries.getHolders()) {
-            var registry = copyRegistry(holder.registry());
-            destMap.put(holder.key(), registry);
+    public static <T> void copy(Registry<T> registry, RegistryAccess.RegistryHolder holder) {
+        var dest = holder.ownedRegistryOrThrow(registry.key());
+        for (var entry : registry.entrySet()) {
+            dest.register(entry.getKey(), entry.getValue(), registry.lifecycle(entry.getValue()));
         }
     }
 
