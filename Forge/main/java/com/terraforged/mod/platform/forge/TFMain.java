@@ -53,6 +53,8 @@ import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Mod(TerraForged.MODID)
 public class TFMain extends TerraForged {
@@ -113,6 +115,15 @@ public class TFMain extends TerraForged {
                 } catch (Throwable t) {
                     t.printStackTrace();
                 }
+
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        // Process hangs so force exit after completion
+                        TerraForged.LOG.warn("Forcibly shutting down datagen process");
+                        System.exit(0);
+                    }
+                }, 1_000L);
             }
         });
 

@@ -1,6 +1,0 @@
-{
-  "type": "minecraft:overworld",
-  "generator": {
-    "type": "terraforged:generator"
-  }
-}

@@ -130,8 +130,8 @@ public class FileUtil {
         if (!Files.exists(path)) return;
 
         if (Files.isDirectory(path)) {
-            try {
-                Files.list(path).forEach(FileUtil::delete);
+            try (var files = Files.list(path)) {
+                files.forEach(FileUtil::delete);
             } catch (IOException e) {
                 e.printStackTrace();
             }
