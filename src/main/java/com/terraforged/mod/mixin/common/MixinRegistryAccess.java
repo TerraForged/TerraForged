@@ -24,7 +24,8 @@
 
 package com.terraforged.mod.mixin.common;
 
-import com.terraforged.mod.registry.RegistryAccessUtil;
+import com.terraforged.mod.registry.hooks.BuiltinHook;
+import com.terraforged.mod.registry.hooks.DataLoadHook;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.RegistryReadOps;
 import net.minecraft.resources.RegistryResourceAccess;
@@ -43,11 +44,6 @@ public class MixinRegistryAccess {
     @Shadow
     private static RegistryAccess.RegistryHolder BUILTIN;
 
-    @Inject(method = "load", at = @At("RETURN"))
-    private static void onLoad(RegistryAccess access, RegistryReadOps<?> ops, CallbackInfo ci) {
-        RegistryAccessUtil.load(access, ops);
-    }
-
     @Inject(
             method = "builtin",
             at = @At(
@@ -60,6 +56,11 @@ public class MixinRegistryAccess {
     private static void onBuiltin(CallbackInfoReturnable<RegistryAccess.RegistryHolder> cir,
                                   RegistryAccess.RegistryHolder holder,
                                   RegistryResourceAccess.InMemoryStorage storage) {
-        RegistryAccessUtil.inject(BUILTIN, storage);
+        BuiltinHook.injectBuiltin(BUILTIN, storage);
+    }
+
+    @Inject(method = "load", at = @At("RETURN"))
+    private static void onLoad(RegistryAccess access, RegistryReadOps<?> ops, CallbackInfo ci) {
+        DataLoadHook.loadData(access, ops);
     }
 }

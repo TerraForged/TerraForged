@@ -32,7 +32,7 @@ import java.lang.reflect.Member;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class ReflectionUtils {
+public class ReflectionUtil {
     public static MethodHandle field(Class<?> owner, Class<?> type, String... names) {
         try {
             Field field = getField(owner, type, f -> contains(names, f.getName()));

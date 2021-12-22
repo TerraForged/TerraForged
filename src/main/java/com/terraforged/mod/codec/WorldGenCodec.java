@@ -26,7 +26,7 @@ package com.terraforged.mod.codec;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
-import com.terraforged.mod.registry.RegistryAccessUtil;
+import com.terraforged.mod.registry.hooks.RegistryAccessUtil;
 import net.minecraft.core.RegistryAccess;
 
 import java.util.stream.Stream;

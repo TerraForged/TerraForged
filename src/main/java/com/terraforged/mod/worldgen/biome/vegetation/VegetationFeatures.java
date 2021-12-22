@@ -25,7 +25,7 @@
 package com.terraforged.mod.worldgen.biome.vegetation;
 
 import com.google.common.collect.ImmutableSet;
-import com.terraforged.mod.util.ReflectionUtils;
+import com.terraforged.mod.util.ReflectionUtil;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -46,8 +46,8 @@ public class VegetationFeatures {
     public static VegetationFeatures NONE = new VegetationFeatures();
     public static final int STAGE = GenerationStep.Decoration.VEGETAL_DECORATION.ordinal();
 
-    private static final MethodHandle FEATURE_GETTER = ReflectionUtils.field(PlacedFeature.class, Supplier.class);
-    private static final MethodHandle PLACEMENTS_GETTER = ReflectionUtils.field(PlacedFeature.class, List.class);
+    private static final MethodHandle FEATURE_GETTER = ReflectionUtil.field(PlacedFeature.class, Supplier.class);
+    private static final MethodHandle PLACEMENTS_GETTER = ReflectionUtil.field(PlacedFeature.class, List.class);
 
     private static final Set<PlacementModifierType<?>> BIOME_CHECK = Set.of(PlacementModifierType.BIOME_FILTER);
 

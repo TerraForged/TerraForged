@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.worldgen.util;
 
-import com.terraforged.mod.util.ReflectionUtils;
+import com.terraforged.mod.util.ReflectionUtil;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
@@ -39,7 +39,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 public class NoiseChunkUtil {
-    private static final MethodHandle SURFACE_CACHE = ReflectionUtils.field(NoiseChunk.class, Long2IntMap.class);
+    private static final MethodHandle SURFACE_CACHE = ReflectionUtil.field(NoiseChunk.class, Long2IntMap.class);
     private static final Supplier<NoiseChunk.NoiseFiller> FILLER = () -> (x, y, z) -> 0;
 
     public static void initChunk(ChunkAccess chunk, Generator generator) {

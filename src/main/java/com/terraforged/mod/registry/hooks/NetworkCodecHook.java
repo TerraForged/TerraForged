@@ -22,25 +22,38 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.mixin.common;
+package com.terraforged.mod.registry.hooks;
 
+import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.UnboundedMapCodec;
-import com.terraforged.mod.registry.hooks.NetworkCodecHook;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.Registry;
+import com.terraforged.mod.TerraForged;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceKey;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(RegistryAccess.RegistryHolder.class)
-public class MixinRegistryHolder {
-    @Inject(method = "captureMap", at = @At("HEAD"), cancellable = true)
-    private static <K extends ResourceKey<? extends Registry<?>>, V extends MappedRegistry<?>> void onCaptureMap(
-            UnboundedMapCodec<K, V> codec, CallbackInfoReturnable<Codec<RegistryAccess.RegistryHolder>> cir) {
-        cir.setReturnValue(NetworkCodecHook.createCodec(codec));
+import java.util.Map;
+import java.util.Objects;
+
+@SuppressWarnings({"unchecked", "rawtypes"})
+public class NetworkCodecHook {
+    public static <K, V> Codec<RegistryAccess.RegistryHolder> createCodec(UnboundedMapCodec<K, V> codec) {
+        TerraForged.LOG.info("Injecting safe world-gen network codec");
+
+        return codec.xmap(NetworkCodecHook::createHolder, holder -> {
+            var builder = ImmutableMap.<K, V>builder();
+            for (var known  : RegistryAccess.knownRegistries()) {
+                if (known.sendToClient()) {
+                    builder.put((K) known.key(), (V) holder.ownedRegistryOrThrow(known.key()));
+                }
+            }
+            return builder.build();
+        });
+    }
+
+    private static <K, V> RegistryAccess.RegistryHolder createHolder(Map<K, V> map) {
+        var holder = new RegistryAccess.RegistryHolder();
+        Map backing = RegistryAccessUtil.getHolderMap(holder);
+        Objects.requireNonNull(backing);
+        backing.putAll(map);
+        return holder;
     }
 }
