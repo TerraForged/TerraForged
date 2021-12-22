@@ -47,19 +47,13 @@ public class FileUtil {
     }
 
     public static void walkDir(Path root, String path, FileSystemVisitor visitor) throws IOException {
-        if (path != null && !path.isEmpty()) {
-            root = root.resolve(path);
-        }
-
+        root = root.resolve(path);
         walk(FileSystems.getDefault(), root, root, visitor);
     }
 
     public static void walkSystem(Path root, String path, FileSystemVisitor visitor) throws IOException {
         try (var fs = FileSystems.newFileSystem(root)) {
-            if (path != null && !path.isEmpty()) {
-                root = fs.getPath(path);
-            }
-
+            root = fs.getPath(path);
             walk(fs, root, root, visitor);
         }
     }
@@ -67,26 +61,24 @@ public class FileUtil {
     public static void walk(FileSystem fs, Path root, Path path, FileSystemVisitor visitor) throws IOException {
         var file = fs.getPath(path.toString());
         if (Files.isDirectory(file)) {
-            fs.provider().newDirectoryStream(file, entry -> true).forEach(f -> {
-                try {
-                    walk(fs, root, f, visitor);
-                } catch (IOException e) {
-                    throw new Error(e);
-                }
-            });
+            try (var stream = fs.provider().newDirectoryStream(file, entry -> true)) {
+                stream.forEach(f -> {
+                    try {
+                        walk(fs, root, f, visitor);
+                    } catch (IOException e) {
+                        throw new Error(e);
+                    }
+                });
+            }
         } else {
             visitor.visit(fs, root, file);
         }
     }
 
-    public static Path resolve(Path root, String path) {
-        return path == null || path.isEmpty() ? root : root.resolve(path);
-    }
-
     public static void createDirCopy(Path fromRoot, String fromPath, Path to) throws IOException {
         walk(fromRoot, fromPath, (fs, root, file) -> {
             var relative = root.relativize(file);
-            var dest = to.resolve(relative);
+            var dest = resolve(to, relative);
             if (Files.exists(dest) || Files.isDirectory(file)) {
                 return;
             }
@@ -142,6 +134,14 @@ public class FileUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Path resolve(Path base, Path path) {
+        var result = base;
+        for (var part : path) {
+            result = result.resolve(part.getFileName().toString());
+        }
+        return result;
     }
 
     public interface FileSystemVisitor {

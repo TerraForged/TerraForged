@@ -62,7 +62,7 @@ public class DataPackExporter {
                 return Pair.of(TerraForged.getPlatform().getContainer(), "default");
             }
         }
-        return Pair.of(DEFAULT_PACK_DIR, "");
+        return Pair.of(DEFAULT_PACK_DIR, ".");
     }
 
     public static DataPackConfig setup(@Nullable Path dir, DataPackConfig config) {
