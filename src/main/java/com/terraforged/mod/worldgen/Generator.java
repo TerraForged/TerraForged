@@ -34,9 +34,7 @@ import com.terraforged.mod.worldgen.terrain.TerrainCache;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import com.terraforged.mod.worldgen.util.ChunkUtil;
-import com.terraforged.mod.worldgen.util.StructureConfig;
 import com.terraforged.mod.worldgen.util.ThreadPool;
-import com.terraforged.mod.worldgen.util.delegate.DelegateGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -51,7 +49,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.StructureSettings;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
@@ -72,7 +69,6 @@ public class Generator extends ChunkGenerator {
     protected final Source biomeSource;
     protected final TerrainLevels levels;
     protected final VanillaGen vanillaGen;
-    protected final StructureConfig structureConfig;
     protected final BiomeGenerator biomeGenerator;
     protected final INoiseGenerator noiseGenerator;
     protected final TerrainCache terrainCache;
@@ -84,18 +80,16 @@ public class Generator extends ChunkGenerator {
                      VanillaGen vanillaGen,
                      Source biomeSource,
                      BiomeGenerator biomeGenerator,
-                     INoiseGenerator noiseGenerator,
-                     StructureConfig structureConfig) {
-        super(biomeSource, biomeSource, structureConfig.copy(), seed);
+                     INoiseGenerator noiseGenerator) {
+        super(biomeSource, biomeSource, vanillaGen.getStructureSettings(), seed);
         this.seed = seed;
         this.levels = levels;
         this.vanillaGen = vanillaGen;
         this.biomeSource = biomeSource;
-        this.structureConfig = structureConfig;
         this.biomeGenerator = biomeGenerator;
         this.noiseGenerator = noiseGenerator;
         this.terrainCache = new TerrainCache(levels, noiseGenerator);
-        this.structureGenerator = new DelegateGenerator(seed, this, structureConfig) {};
+        this.structureGenerator = vanillaGen.createStructureGenerator(seed, this);
     }
 
     protected RegistryAccess getRegistries() {
@@ -129,7 +123,7 @@ public class Generator extends ChunkGenerator {
         var biomeSource = new Source(seed, noiseGenerator, this.biomeSource);
         var vanillaGen = new VanillaGen(seed, biomeSource, this.vanillaGen);
         var biomeGenerator = new BiomeGenerator(seed, this.biomeGenerator);
-        return new Generator(seed, levels, vanillaGen, biomeSource, biomeGenerator, noiseGenerator, structureConfig);
+        return new Generator(seed, levels, vanillaGen, biomeSource, biomeGenerator, noiseGenerator);
     }
 
     @Override
@@ -150,11 +144,6 @@ public class Generator extends ChunkGenerator {
     @Override
     public Source getBiomeSource() {
         return biomeSource;
-    }
-
-    @Override
-    public StructureSettings getSettings() {
-        return structureGenerator.getSettings();
     }
 
     @Override

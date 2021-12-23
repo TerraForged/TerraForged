@@ -25,31 +25,35 @@
 package com.terraforged.mod.worldgen.util.delegate;
 
 import com.mojang.serialization.Codec;
-import com.terraforged.mod.worldgen.Generator;
+import com.terraforged.mod.worldgen.util.StructureReporter;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
 import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.StructureSettings;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.blending.Blender;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 public abstract class DelegateGenerator extends ChunkGenerator {
-    private final Generator generator;
-    private final StructureSettings settings;
+    private final ChunkGenerator generator;
+    private final StructureReporter reporter;
 
-    public DelegateGenerator(long seed, Generator generator, StructureSettings settings) {
-        super(generator.getBiomeSource(), generator.getBiomeSource(), settings, seed);
+    public DelegateGenerator(long seed, ChunkGenerator generator, Supplier<NoiseGeneratorSettings> settings) {
+        super(generator.getBiomeSource(), generator.getBiomeSource(), settings.get().structureSettings(), seed);
         this.generator = generator;
-        this.settings = settings;
+        this.reporter = new StructureReporter(settings);
     }
 
     @Override
@@ -60,11 +64,6 @@ public abstract class DelegateGenerator extends ChunkGenerator {
     @Override
     public ChunkGenerator withSeed(long l) {
         return this;
-    }
-
-    @Override
-    public StructureSettings getSettings() {
-        return settings;
     }
 
     @Override
@@ -95,6 +94,17 @@ public abstract class DelegateGenerator extends ChunkGenerator {
     @Override
     public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor levelHeightAccessor) {
         return generator.getBaseColumn(x, z, levelHeightAccessor);
+    }
+
+    @Override
+    public void createStructures(RegistryAccess access, StructureFeatureManager structureFeatures, ChunkAccess chunk, StructureManager structures, long seed) {
+        reporter.init();
+        super.createStructures(access, structureFeatures, chunk, structures, seed);
+    }
+
+    @Override
+    public void createReferences(WorldGenLevel level, StructureFeatureManager structureFeatures, ChunkAccess chunk) {
+        super.createReferences(level, structureFeatures, chunk);
     }
 
     @Override

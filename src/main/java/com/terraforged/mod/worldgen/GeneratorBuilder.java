@@ -29,7 +29,6 @@ import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
-import com.terraforged.mod.worldgen.util.StructureConfig;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -45,9 +44,8 @@ public interface GeneratorBuilder {
         var noiseGenerator = new NoiseGenerator(seed, levels, terrain).withErosion();
         var biomeSource = new Source(seed, noiseGenerator, registries);
         var vanillaGen = getVanillaGen(seed, biomeSource, registries);
-        var structureConfig = getStructureSettings(registries);
 
-        return new Generator(seed, levels, vanillaGen, biomeSource, biomeGenerator, noiseGenerator, structureConfig);
+        return new Generator(seed, levels, vanillaGen, biomeSource, biomeGenerator, noiseGenerator);
     }
 
     static LevelStem getDefault(RegistryAccess registries) {
@@ -60,13 +58,5 @@ public interface GeneratorBuilder {
         var parameters = access.registryOrThrow(Registry.NOISE_REGISTRY);
         var settings = access.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
         return new VanillaGen(seed, biomes, () -> settings.getOrThrow(NoiseGeneratorSettings.OVERWORLD), parameters);
-    }
-
-    static StructureConfig getStructureSettings(RegistryAccess access) {
-        return access.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY)
-                .getOptional(NoiseGeneratorSettings.OVERWORLD)
-                .map(NoiseGeneratorSettings::structureSettings)
-                .map(StructureConfig::new)
-                .orElseThrow();
     }
 }
