@@ -46,7 +46,7 @@ public class StructureReporter extends Init {
 
         structureSettings.structureConfig().keySet().stream()
                 .sorted(Comparator.comparing(StructureFeature::getFeatureName))
-                .filter(s -> s == StructureFeature.STRONGHOLD)
+                .filter(s -> s != StructureFeature.STRONGHOLD)
                 .filter(s -> structureSettings.structures(s).isEmpty())
                 .forEach(structure -> {
                     var name = structure.getFeatureName();
