@@ -39,7 +39,7 @@ public class TerrainLevels {
             Codec.intRange(Limits.MIN_MIN_Y, Limits.MAX_MIN_Y).fieldOf("min_y").forGetter(l -> l.minY),
             Codec.intRange(Limits.MIN_MAX_Y, Limits.MAX_MAX_Y).fieldOf("max_y").forGetter(l -> l.maxY),
             Codec.intRange(Limits.MIN_SEA_LEVEL, Limits.MAX_SEA_LEVEL).fieldOf("sea_level").forGetter(l -> l.seaLevel),
-            Codec.intRange(Limits.MIN_SEA_LEVEL, Limits.MAX_SEA_LEVEL).fieldOf("sea_floor").forGetter(l -> l.seaFloor)
+            Codec.intRange(Limits.MIN_SEA_FLOOR, Limits.MAX_SEA_FLOOR).fieldOf("sea_floor").forGetter(l -> l.seaFloor)
     ).apply(instance, TerrainLevels::new));
 
     public static final TerrainLevels DEFAULT = new TerrainLevels(true, Defaults.SCALE, Defaults.MIN_Y, Defaults.MAXY, Defaults.SEA_LEVEL, Defaults.SEA_FLOOR);
@@ -55,11 +55,11 @@ public class TerrainLevels {
         this.maxY = MathUtil.clamp(maxY, Limits.MIN_MAX_Y, Limits.MAX_MAX_Y);
         this.seaLevel = MathUtil.clamp(seaLevel, Limits.MIN_SEA_LEVEL, maxY >> 1);
         this.seaFloor = MathUtil.clamp(seaFloor, this.minY, this.seaLevel - 1);
-        this.noiseLevels = new NoiseLevels(autoScale, scale, seaLevel, seaFloor, maxY);
+        this.noiseLevels = new NoiseLevels(autoScale, scale, this.seaLevel, this.seaFloor, this.maxY);
     }
 
     public TerrainLevels copy() {
-        return new TerrainLevels(noiseLevels.auto, noiseLevels.scale, minY, maxY, seaLevel, seaLevel);
+        return new TerrainLevels(noiseLevels.auto, noiseLevels.scale, minY, maxY, seaLevel, seaFloor);
     }
 
     public float getScaledHeight(float heightNoise) {
@@ -70,11 +70,24 @@ public class TerrainLevels {
         return NoiseUtil.floor(scaledHeight);
     }
 
+    @Override
+    public String toString() {
+        return "TerrainLevels{" +
+                "minY=" + minY +
+                ", maxY=" + maxY +
+                ", seaFloor=" + seaFloor +
+                ", seaLevel=" + seaLevel +
+                ", noiseLevels=" + noiseLevels +
+                '}';
+    }
+
     public static class Limits {
         public static final int MIN_MIN_Y = DimensionType.MIN_Y;
         public static final int MAX_MIN_Y = 0;
         public static final int MIN_SEA_LEVEL = 32;
         public static final int MAX_SEA_LEVEL = DimensionType.Y_SIZE;
+        public static final int MIN_SEA_FLOOR = 0;
+        public static final int MAX_SEA_FLOOR = MAX_SEA_LEVEL;
         public static final int MIN_MAX_Y = 128;
         public static final int MAX_MAX_Y = DimensionType.Y_SIZE;
     }
