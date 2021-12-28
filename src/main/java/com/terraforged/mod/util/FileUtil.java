@@ -34,6 +34,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -119,21 +120,25 @@ public class FileUtil {
     }
 
     public static void delete(Path path) {
-        if (!Files.exists(path)) return;
+        iterate(path, file -> {
+            try {
+                Files.deleteIfExists(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
+    public static void iterate(Path path, Consumer<Path> consumer) {
         if (Files.isDirectory(path)) {
             try (var files = Files.list(path)) {
-                files.forEach(FileUtil::delete);
+                files.forEach(file -> iterate(file, consumer));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-        try {
-            Files.delete(path);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        consumer.accept(path);
     }
 
     public static Path resolve(Path base, Path path) {

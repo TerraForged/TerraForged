@@ -56,19 +56,21 @@ public class JsonFormatter {
     }
 
     private void writeObject(JsonObject object) throws IOException {
+        var keys = getKeys(object);
         jsonWriter.beginObject();
-        writeEntries(object, JsonFormatter::isString);
-        writeEntries(object, JsonFormatter::isPrimitive);
-        writeEntries(object, JsonElement::isJsonArray);
-        writeEntries(object, JsonElement::isJsonObject);
+        writeEntries(keys, object, JsonFormatter::isString);
+        writeEntries(keys, object, JsonFormatter::isPrimitive);
+        writeEntries(keys, object, JsonElement::isJsonArray);
+        writeEntries(keys, object, JsonElement::isJsonObject);
         jsonWriter.endObject();
     }
 
-    private void writeEntries(JsonObject object, Predicate<JsonElement> predicate) throws IOException {
-        for (var entry : object.entrySet()) {
-            if (predicate.test(entry.getValue())) {
-                jsonWriter.name(entry.getKey());
-                write(entry.getValue());
+    private void writeEntries(String[] keys, JsonObject object, Predicate<JsonElement> predicate) throws IOException {
+        for (var key : keys) {
+            var value = object.get(key);
+            if (predicate.test(value)) {
+                jsonWriter.name(key);
+                write(value);
             }
         }
     }
@@ -173,6 +175,10 @@ public class JsonFormatter {
 
         var prim = first.getAsJsonPrimitive();
         return !prim.isString() || size < 3;
+    }
+
+    private static String[] getKeys(JsonObject json) {
+        return json.keySet().stream().sorted().toArray(String[]::new);
     }
 
     public static void apply(JsonElement jsonElement, Writer writer) throws IOException {

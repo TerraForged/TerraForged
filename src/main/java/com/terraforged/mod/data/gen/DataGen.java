@@ -47,6 +47,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class DataGen extends Init {
     public static final DataGen INSTANCE = new DataGen();
@@ -125,9 +129,17 @@ public class DataGen extends Init {
             }
         }
 
-        try (var out = Files.newBufferedWriter(file)) {
-            JsonFormatter.apply(json, out);
-        } catch (IOException e) {
+        try {
+            CompletableFuture.runAsync(() -> {
+
+                try (var out = Files.newBufferedWriter(file)) {
+                    JsonFormatter.apply(json, out);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }).get(1, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
             e.printStackTrace();
         }
     }
