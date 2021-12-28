@@ -42,9 +42,11 @@ public class DataLoadHook {
                 throw new Error("Failed to load holder: " + holder.key(), t);
             }
         }
+
+        StructureConfigHook.injectStructureConfigs(access);
     }
 
-    private static  <T> void loadData(ModRegistries.Holder<T> holder, RegistryAccess access, RegistryReadOps<?> ops) {
+    private static <T> void loadData(ModRegistries.Holder<T> holder, RegistryAccess access, RegistryReadOps<?> ops) {
         var registry = access.ownedRegistry(holder.key());
         if (registry.isEmpty()) return;
 

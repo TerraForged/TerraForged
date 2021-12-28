@@ -33,7 +33,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.engine.world.terrain.TerrainType;
+import com.terraforged.mod.data.gen.DataGen;
 import com.terraforged.mod.worldgen.Generator;
+import com.terraforged.mod.worldgen.datapack.DataPackExporter;
 import com.terraforged.mod.worldgen.profiler.GeneratorProfiler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -50,6 +52,23 @@ public class DebugCommand {
                         .then(Commands.argument("radius", IntegerArgumentType.integer(1))
                                 .executes(c -> locate(c, true)))
                         .executes(c -> locate(c, false))));
+
+        dispatcher.register(Commands.literal("export")
+                .then(Commands.literal("structures")
+                        .executes(DebugCommand::export)));
+    }
+
+    private static int export(CommandContext<CommandSourceStack> context) {
+        var access = context.getSource().registryAccess();
+        var structures = context.getSource().getLevel().getChunkSource().getGenerator().getSettings();
+        DataGen.exportStructureConfigs(DataPackExporter.DEFAULT_PACK_DIR, structures, access);
+
+        var result = new TextComponent("Exported structure settings")
+                .withStyle(s -> s.withColor(ChatFormatting.GREEN));
+
+        context.getSource().sendSuccess(result, false);
+
+        return Command.SINGLE_SUCCESS;
     }
 
     private static int locate(CommandContext<CommandSourceStack> context, boolean withRadius) throws CommandSyntaxException {

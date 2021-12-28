@@ -31,17 +31,21 @@ import com.mojang.serialization.JsonOps;
 import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.registry.ModRegistries;
+import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.util.FileUtil;
 import com.terraforged.mod.util.Init;
 import com.terraforged.mod.util.json.JsonFormatter;
 import com.terraforged.mod.worldgen.GeneratorBuilder;
+import com.terraforged.mod.worldgen.asset.StructureConfig;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.RegistryWriteOps;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.levelgen.StructureSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -72,6 +76,18 @@ public class DataGen extends Init {
         genGenerator(dir, registries, writeOps);
         genBuiltin(dir, registries, writeOps);
         genBiomes(dir, registries, writeOps);
+    }
+
+    public static void exportStructureConfigs(Path dir, StructureSettings structures, RegistryAccess access) {
+        for (var entry : structures.structureConfig().entrySet()) {
+            var structureName = Registry.STRUCTURE_FEATURE.getKey(entry.getKey());
+            if (structureName == null || structureName.getNamespace().equals("minecraft")) continue;
+
+            var structureConfig = StructureConfig.create(entry.getKey(), structures, access);
+            if (structureConfig == null) continue;
+
+            export(dir, ModRegistry.STRUCTURE_CONFIG.get(), structureName, StructureConfig.CODEC, structureConfig, JsonOps.INSTANCE);
+        }
     }
 
     private static void genGenerator(Path dir, RegistryAccess registries, RegistryWriteOps<JsonElement> writeOps) {
@@ -111,6 +127,17 @@ public class DataGen extends Init {
             var json = codec.encodeStart(ops, entry.getValue()).result().orElseThrow();
             export(dir, registry.key(), entry.getKey(), json);
         }
+    }
+
+    private static <T> void export(Path dir, ResourceKey<Registry<T>> registry, ResourceLocation name, Codec<T> codec, T value, DynamicOps<JsonElement> ops) {
+        var json = codec.encodeStart(ops, value).result().orElseThrow();
+
+        var file = dir.resolve("data")
+                .resolve(name.getNamespace())
+                .resolve(registry.location().getPath())
+                .resolve(name.getPath() + ".json");
+
+        FileUtil.write(file, json, (writer, data) -> new JsonFormatter(writer).write(data));
     }
 
     private static void export(Path dir, ResourceKey<?> registry, ResourceKey<?> key, JsonElement json) {

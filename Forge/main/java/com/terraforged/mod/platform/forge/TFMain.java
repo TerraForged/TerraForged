@@ -62,7 +62,7 @@ public class TFMain extends TerraForged {
 
     public TFMain() {
         super(TFMain::getRootPath);
-        MinecraftForge.EVENT_BUS.addListener(this::onServerStart);
+        MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
         MinecraftForge.EVENT_BUS.addListener(this::onJoinWorld);
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onInit);
@@ -86,7 +86,7 @@ public class TFMain extends TerraForged {
         event.enqueueWork(Common.INSTANCE::init);
     }
 
-    void onServerStart(RegisterCommandsEvent event) {
+    void onRegisterCommands(RegisterCommandsEvent event) {
         DebugCommand.register(event.getDispatcher());
     }
 

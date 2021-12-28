@@ -34,4 +34,5 @@ public interface ModRegistry {
     LazyKey<TerrainNoise> TERRAIN = TerraForged.registry("worldgen/terrain");
     LazyKey<TerrainType> TERRAIN_TYPE = TerraForged.registry("worldgen/terrain_type");
     LazyKey<VegetationConfig> VEGETATION = TerraForged.registry("worldgen/vegetation");
+    LazyKey<StructureConfig> STRUCTURE_CONFIG = TerraForged.registry("worldgen/structure_config");
 }

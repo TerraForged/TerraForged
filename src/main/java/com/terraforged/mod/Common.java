@@ -54,6 +54,7 @@ public class Common extends Init {
         ModRegistries.createRegistry(ModRegistry.TERRAIN, TerrainNoise.CODEC);
         ModRegistries.createRegistry(ModRegistry.TERRAIN_TYPE, TerrainType.DIRECT);
         ModRegistries.createRegistry(ModRegistry.VEGETATION, VegetationConfig.CODEC); // depends on BiomeTag
+        ModRegistries.createRegistry(ModRegistry.STRUCTURE_CONFIG, StructureConfig.CODEC);
 
         TerraForged.LOG.info("Locking mod world-gen registries");
         ModRegistries.commit();

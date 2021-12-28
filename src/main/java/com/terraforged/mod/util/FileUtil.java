@@ -27,6 +27,7 @@ package com.terraforged.mod.util;
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -39,6 +40,30 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class FileUtil {
+    public static void write(Path path, IOConsumer<BufferedWriter> consumer) {
+        write(path, null, consumer);
+    }
+
+    public static <T> void write(Path path, T context, IOBiConsumer<BufferedWriter, T> consumer) {
+        path = path.toAbsolutePath();
+
+        var parent = path.getParent();
+        if (!Files.exists(parent)) {
+            try {
+                Files.createDirectories(parent);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+
+        try (var writer = Files.newBufferedWriter(path)) {
+            consumer.accept(writer, context);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void walk(Path root, String path, FileSystemVisitor visitor) throws IOException {
         if (Files.isDirectory(root)) {
             walkDir(root, path, visitor);
@@ -147,6 +172,19 @@ public class FileUtil {
             result = result.resolve(part.getFileName().toString());
         }
         return result;
+    }
+
+    public interface IOBiConsumer<A, B> {
+        void accept(A a, B b) throws IOException;
+    }
+
+    public interface IOConsumer<T> extends IOBiConsumer<T, Void> {
+        void accept(T t) throws IOException;
+
+        @Override
+        default void accept(T t, Void unused) throws IOException {
+            accept(t);
+        }
     }
 
     public interface FileSystemVisitor {

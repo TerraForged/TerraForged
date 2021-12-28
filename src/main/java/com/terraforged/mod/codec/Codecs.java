@@ -24,13 +24,35 @@
 
 package com.terraforged.mod.codec;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 public class Codecs {
     public static <A> MapCodec<A> opt(String name, A defaultValue, Codec<A> codec) {
         return Codec.optionalField(name, codec).xmap(o -> o.orElse(defaultValue), a -> Optional.ofNullable(a));
+    }
+
+    public static <V> JsonElement encode(V v, Codec<V> codec) {
+        return codec.encodeStart(JsonOps.INSTANCE, v).result()
+                .filter(JsonElement::isJsonObject)
+                .map(JsonElement::getAsJsonObject)
+                .orElse(null);
+    }
+
+    public static <V> V modify(V v, Codec<V> codec, UnaryOperator<JsonObject> modifier) {
+        var json = encode(v, codec);
+
+        if (json == null) return v;
+
+        var result = modifier.apply(json.getAsJsonObject());
+
+        return codec.decode(JsonOps.INSTANCE, result).result().map(Pair::getFirst).orElse(v);
     }
 }
