@@ -42,9 +42,9 @@ public class BiomeVegetationManager {
 
         for (var entry : biomes.entrySet()) {
             var biome = entry.getValue();
-            var features = new VegetationFeatures(entry.getKey(), access);
-            var vegetation = getConfig(biome, configs);
-            this.vegetation.put(biome, new BiomeVegetation(vegetation, features));
+            var config = getConfig(biome, configs);
+            var features = VegetationFeatures.create(entry.getKey(), access, config);
+            this.vegetation.put(biome, new BiomeVegetation(config, features));
         }
     }
 

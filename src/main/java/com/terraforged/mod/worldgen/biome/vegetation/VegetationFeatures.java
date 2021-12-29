@@ -26,6 +26,7 @@ package com.terraforged.mod.worldgen.biome.vegetation;
 
 import com.google.common.collect.ImmutableSet;
 import com.terraforged.mod.util.ReflectionUtil;
+import com.terraforged.mod.worldgen.asset.VegetationConfig;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -76,34 +77,7 @@ public class VegetationFeatures {
         other = new PlacedFeature[0];
     }
 
-    public VegetationFeatures(ResourceKey<Biome> key, RegistryAccess access) {
-        var trees = new ArrayList<PlacedFeature>();
-        var grass = new ArrayList<PlacedFeature>();
-        var other = new ArrayList<PlacedFeature>();
-
-        var biomeRegistry = access.registryOrThrow(Registry.BIOME_REGISTRY);
-        var features = biomeRegistry.getOrThrow(key).getGenerationSettings().features();
-        if (features.size() > STAGE) {
-            var vegetation = features.get(STAGE);
-            var featureRegistry = access.registryOrThrow(Registry.PLACED_FEATURE_REGISTRY);
-
-            for (var feature : vegetation) {
-                var featureKey = featureRegistry.getKey(feature.get());
-                if (featureKey == null) {
-                    other.add(feature.get());
-                } else {
-                    var path = featureKey.getPath();
-                    if (matches(path, TREE_KEYWORDS)) {
-                        trees.add(unwrap(feature, TREE_EXCLUSIONS));
-                    } else if (matches(path, GRASS_KEYWORDS)) {
-                        grass.add(feature.get());
-                    } else {
-                        other.add(feature.get());
-                    }
-                }
-            }
-        }
-
+    public VegetationFeatures(List<PlacedFeature> trees, List<PlacedFeature> grass, List<PlacedFeature> other) {
         this.trees = trees.toArray(PlacedFeature[]::new);
         this.grass = grass.toArray(PlacedFeature[]::new);
         this.other = other.toArray(PlacedFeature[]::new);
@@ -121,6 +95,38 @@ public class VegetationFeatures {
         return other;
     }
 
+    public static VegetationFeatures create(ResourceKey<Biome> key, RegistryAccess access, VegetationConfig config) {
+        var trees = new ArrayList<PlacedFeature>();
+        var grass = new ArrayList<PlacedFeature>();
+        var other = new ArrayList<PlacedFeature>();
+        boolean custom = config != VegetationConfig.NONE;
+
+        var biomeRegistry = access.registryOrThrow(Registry.BIOME_REGISTRY);
+        var features = biomeRegistry.getOrThrow(key).getGenerationSettings().features();
+        if (features.size() > STAGE) {
+            var vegetation = features.get(STAGE);
+            var featureRegistry = access.registryOrThrow(Registry.PLACED_FEATURE_REGISTRY);
+
+            for (var feature : vegetation) {
+                var featureKey = featureRegistry.getKey(feature.get());
+                if (featureKey == null) {
+                    other.add(feature.get());
+                } else {
+                    var path = featureKey.getPath();
+                    if (matches(path, TREE_KEYWORDS)) {
+                        trees.add(unwrap(feature, TREE_EXCLUSIONS, custom));
+                    } else if (matches(path, GRASS_KEYWORDS)) {
+                        grass.add(feature.get());
+                    } else {
+                        other.add(feature.get());
+                    }
+                }
+            }
+        }
+
+        return new VegetationFeatures(trees, grass, other);
+    }
+
     protected static boolean matches(String name, String[] keywords) {
         for (var keyword : keywords) {
             if (name.contains(keyword)) {
@@ -130,11 +136,9 @@ public class VegetationFeatures {
         return false;
     }
 
-    public static PlacedFeature unwrap(Supplier<PlacedFeature> supplier) {
-        return unwrap(supplier, BIOME_CHECK);
-    }
+    public static PlacedFeature unwrap(Supplier<PlacedFeature> supplier, Set<PlacementModifierType<?>> exclusions, boolean custom) {
+        if (!custom) return supplier.get();
 
-    public static PlacedFeature unwrap(Supplier<PlacedFeature> supplier, Set<PlacementModifierType<?>> exclusions) {
         try {
             PlacedFeature placed = supplier.get();
 

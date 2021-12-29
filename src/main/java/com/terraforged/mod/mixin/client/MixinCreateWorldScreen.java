@@ -39,14 +39,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(CreateWorldScreen.class)
 public abstract class MixinCreateWorldScreen {
     @Shadow
     private DataPackConfig dataPacks;
-
-    private final AtomicBoolean tf_initialized = new AtomicBoolean(false);
 
     @Shadow
     protected abstract Path getTempDataPackDir();
@@ -57,17 +54,9 @@ public abstract class MixinCreateWorldScreen {
     @Shadow
     protected abstract void tryApplyNewDataPacks(PackRepository packRepository);
 
-    @Inject(method = "setWorldGenSettingsVisible", at = @At("RETURN"))
-    private void onSetWorldGenSettingsVisible(boolean visible, CallbackInfo ci) {
-        // Fix mods like bop overwriting the preset default
-        if (visible && tf_initialized.compareAndSet(false, true)) {
-            ScreenUtil.enforceDefaultPreset((CreateWorldScreen) (Object) this);
-        }
-    }
-
     @Inject(method = "onCreate()V", at = @At("HEAD"))
     private void onCreate(CallbackInfo ci) {
-        if (ScreenUtil.isPresetSelected(((CreateWorldScreen) (Object) this))) {
+        if (ScreenUtil.isPresetEnabled(((CreateWorldScreen) (Object) this))) {
             dataPacks = DataPackExporter.setup(getTempDataPackDir(), dataPacks);
 
             var selection = getDataPackSelectionSettings().getSecond();

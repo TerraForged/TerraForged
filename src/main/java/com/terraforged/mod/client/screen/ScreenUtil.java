@@ -24,46 +24,66 @@
 
 package com.terraforged.mod.client.screen;
 
+import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.platform.ClientAPI;
 import com.terraforged.mod.worldgen.GeneratorPreset;
+import net.minecraft.Util;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldPreset;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+
+import java.util.function.Predicate;
 
 public class ScreenUtil {
     private static final String WORLD_TYPE = "selectWorld.mapType";
+    private static final Predicate<String> TF_PRESET = s -> s.equals(GeneratorPreset.TRANSLATION_KEY);
+    private static final Predicate<String> DEFAULT_PRESET = s -> s.equals(GeneratorPreset.TRANSLATION_KEY);
 
-    public static void enforceDefaultPreset(CreateWorldScreen screen) {
-        if (!ClientAPI.get().isDefaultPreset()) return;
-
+    public static void enforceDefaultPreset(CreateWorldScreen screen, String name) {
         var button = getPresetButton(screen);
         if (button == null) return;
 
         var start = button.getValue();
+        var keyPredicate = createKeyPredicate(name);
 
-        while (!isPresetSelected(button, GeneratorPreset.TRANSLATION_KEY)) {
+        while (!isPresetSelected(button, keyPredicate)) {
             button.onPress();
             // Stop if we've looped all the way around
             if (button.getValue() == start) return;
         }
     }
 
-    public static boolean isPresetSelected(CreateWorldScreen screen) {
+    public static boolean isPresetEnabled(CreateWorldScreen screen) {
         var button = getPresetButton(screen);
         if (button == null) return false;
 
-        if (!ClientAPI.get().hasPreset()) return isPresetSelected(button, "generator.default");
+        if (!ClientAPI.get().hasPreset()) return isPresetSelected(button, DEFAULT_PRESET);
 
-        return isPresetSelected(button, GeneratorPreset.TRANSLATION_KEY);
+        return isPresetSelected(button, TF_PRESET);
     }
 
-    private static boolean isPresetSelected(CycleButton<?> button, String key) {
+    private static Predicate<String> createKeyPredicate(String name) {
+        if (name.equals(TerraForged.MODID)) return TF_PRESET;
+
+        var location = new ResourceLocation(name);
+        var key = Util.makeDescriptionId("generator", location);
+
+        if (location.getNamespace().equals("minecraft")) {
+            var key0 = "generator." + location.getPath();
+            return s -> s.equals(key) || s.equals(key0);
+        }
+
+        return s -> s.equals(key);
+    }
+
+    private static boolean isPresetSelected(CycleButton<?> button, Predicate<String> predicate) {
         var preset = (WorldPreset) button.getValue();
         if (preset.description() instanceof TranslatableComponent description) {
-            return description.getKey().equals(key);
+            return predicate.test(description.getKey());
         }
         return false;
     }
