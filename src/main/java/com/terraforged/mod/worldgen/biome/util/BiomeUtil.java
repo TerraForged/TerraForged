@@ -26,7 +26,7 @@ package com.terraforged.mod.worldgen.biome.util;
 
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.platform.Platform;
+import com.terraforged.mod.platform.CommonAPI;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
@@ -56,13 +56,12 @@ public class BiomeUtil {
 
     public static List<Biome> getOverworldBiomes(Registry<Biome> biomes) {
         var overworld = getVanillaOverworldBiomes(biomes);
-        var platform = Platform.ACTIVE_PLATFORM.get();
 
         for (var entry : biomes.entrySet()) {
             var biome = entry.getValue();
             var name = entry.getKey().location();
 
-            if (platform.getData().isOverworldBiome(entry.getKey())) {
+            if (CommonAPI.get().isOverworldBiome(entry.getKey())) {
                 overworld.add(biome);
             } else if (KNOWN_NAMESPACES.contains(name.getNamespace())) {
                 overworld.add(biome);

@@ -35,7 +35,7 @@ import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.util.FileUtil;
 import com.terraforged.mod.util.Init;
 import com.terraforged.mod.util.json.JsonFormatter;
-import com.terraforged.mod.worldgen.GeneratorBuilder;
+import com.terraforged.mod.worldgen.GeneratorPreset;
 import com.terraforged.mod.worldgen.asset.StructureConfig;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -91,7 +91,7 @@ public class DataGen extends Init {
     }
 
     private static void genGenerator(Path dir, RegistryAccess registries, RegistryWriteOps<JsonElement> writeOps) {
-        var generator = GeneratorBuilder.getDefault(registries);
+        var generator = GeneratorPreset.getDefault(registries);
         var json = LevelStem.CODEC.encodeStart(writeOps, generator).resultOrPartial(System.err::println).orElseThrow();
         export(dir, Registry.DIMENSION_REGISTRY, Level.OVERWORLD, json);
     }

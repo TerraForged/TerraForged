@@ -24,17 +24,24 @@
 
 package com.terraforged.mod.platform;
 
-import com.terraforged.mod.registry.registrar.Registrar;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 
-import java.nio.file.Path;
-import java.util.concurrent.atomic.AtomicReference;
+public interface ClientAPI {
+    ApiHolder<ClientAPI> HOLDER = new ApiHolder<>(new ClientAPI() {});
 
-public interface Platform {
-    AtomicReference<Platform> ACTIVE_PLATFORM = new AtomicReference<>();
+    default boolean hasPreset() {
+        return false;
+    }
 
-    Path getContainer();
+    default boolean isDefaultPreset() {
+        return false;
+    }
 
-    <T> Registrar<T> getRegistrar(ResourceKey<Registry<T>> key);
+    default boolean isPresetSelected(CreateWorldScreen screen) {
+        return true;
+    }
+
+    static ClientAPI get() {
+        return HOLDER.get();
+    }
 }

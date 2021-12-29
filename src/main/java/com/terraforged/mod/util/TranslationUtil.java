@@ -22,19 +22,13 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.platform;
+package com.terraforged.mod.util;
 
-import com.terraforged.mod.registry.registrar.Registrar;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.Util;
+import net.minecraft.resources.ResourceLocation;
 
-import java.nio.file.Path;
-import java.util.concurrent.atomic.AtomicReference;
-
-public interface Platform {
-    AtomicReference<Platform> ACTIVE_PLATFORM = new AtomicReference<>();
-
-    Path getContainer();
-
-    <T> Registrar<T> getRegistrar(ResourceKey<Registry<T>> key);
+public class TranslationUtil {
+    public static String key(String type, ResourceLocation location) {
+        return Util.makeDescriptionId(type, location);
+    }
 }

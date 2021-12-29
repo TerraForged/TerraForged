@@ -63,7 +63,7 @@ public class Generator extends ChunkGenerator {
             Codec.LONG.optionalFieldOf("seed", 0L).forGetter(g -> g.seed),
             TerrainLevels.CODEC.optionalFieldOf("levels", TerrainLevels.DEFAULT).forGetter(g -> g.levels),
             WorldGenCodec.CODEC.forGetter(Generator::getRegistries)
-    ).apply(instance, instance.stable(GeneratorBuilder::build)));
+    ).apply(instance, instance.stable(GeneratorPreset::build)));
 
     protected final long seed;
     protected final Source biomeSource;

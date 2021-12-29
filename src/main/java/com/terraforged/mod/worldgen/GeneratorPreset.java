@@ -24,20 +24,26 @@
 
 package com.terraforged.mod.worldgen;
 
+import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.data.ModTerrains;
+import com.terraforged.mod.util.TranslationUtil;
 import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 
-public interface GeneratorBuilder {
-    static Generator build(long seed, TerrainLevels levels, RegistryAccess registries) {
+public class GeneratorPreset {
+    public static final ResourceLocation PRESET_NAME = TerraForged.location("preset");
+    public static final String TRANSLATION_KEY = TranslationUtil.key("generator", PRESET_NAME);
+
+    public static Generator build(long seed, TerrainLevels levels, RegistryAccess registries) {
         var terrain = ModTerrains.getTerrain(registries);
 
         var biomeGenerator = new BiomeGenerator(seed, registries);
@@ -48,13 +54,13 @@ public interface GeneratorBuilder {
         return new Generator(seed, levels, vanillaGen, biomeSource, biomeGenerator, noiseGenerator);
     }
 
-    static LevelStem getDefault(RegistryAccess registries) {
+    public static LevelStem getDefault(RegistryAccess registries) {
         var generator = build(0L, TerrainLevels.DEFAULT.copy(), registries);
         var type = registries.ownedRegistryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
         return new LevelStem(() -> type.getOrThrow(DimensionType.OVERWORLD_LOCATION), generator);
     }
 
-    static VanillaGen getVanillaGen(long seed, BiomeSource biomes, RegistryAccess access) {
+    public static VanillaGen getVanillaGen(long seed, BiomeSource biomes, RegistryAccess access) {
         var parameters = access.registryOrThrow(Registry.NOISE_REGISTRY);
         var settings = access.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
         return new VanillaGen(seed, biomes, () -> settings.getOrThrow(NoiseGeneratorSettings.OVERWORLD), parameters);

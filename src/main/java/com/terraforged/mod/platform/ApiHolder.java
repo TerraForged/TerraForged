@@ -24,13 +24,28 @@
 
 package com.terraforged.mod.platform;
 
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.biome.Biome;
+import com.terraforged.mod.TerraForged;
+import com.terraforged.mod.util.Init;
 
-public interface PlatformData {
-    PlatformData DEFAULT = new PlatformData(){};
+public class ApiHolder<T> extends Init {
+    private volatile T value;
 
-    default boolean isOverworldBiome(ResourceKey<Biome> key) {
-        return false;
+    public ApiHolder(T defaultValue) {
+        this.value = defaultValue;
+    }
+
+    @Override
+    protected void doInit() {
+        TerraForged.LOG.info("Set TerraForged API: {}", value.getClass().getSimpleName());
+    }
+
+    public void set(T value) {
+        if (isDone()) return;
+        this.value = value;
+        init();
+    }
+
+    T get() {
+        return value;
     }
 }

@@ -22,19 +22,35 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.platform;
+package com.terraforged.mod.platform.forge.util;
 
-import com.terraforged.mod.registry.registrar.Registrar;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.registries.GameData;
+import net.minecraftforge.registries.IForgeRegistryEntry;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.nio.file.Path;
-import java.util.concurrent.atomic.AtomicReference;
+public class ForgeUtil {
+    public static <T extends IForgeRegistryEntry<T>> T withName(T t, String name) {
+        if (t.getRegistryName() != null) return t;
 
-public interface Platform {
-    AtomicReference<Platform> ACTIVE_PLATFORM = new AtomicReference<>();
+        var logger = LogManager.getLogger(GameData.class);
+        var level = logger.getLevel();
 
-    Path getContainer();
+        try {
+            setLevel(logger, Level.OFF);
+            t.setRegistryName(new ResourceLocation("minecraft", name));
+        } finally {
+            setLevel(logger, level);
+        }
 
-    <T> Registrar<T> getRegistrar(ResourceKey<Registry<T>> key);
+        return t;
+    }
+
+    private static void setLevel(Logger logger, Level level) {
+        if (logger instanceof org.apache.logging.log4j.core.Logger l) {
+            l.setLevel(level);
+        }
+    }
 }

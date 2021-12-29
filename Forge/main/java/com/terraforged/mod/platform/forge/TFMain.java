@@ -29,8 +29,9 @@ import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.command.DebugCommand;
 import com.terraforged.mod.data.ModBiomes;
 import com.terraforged.mod.data.gen.DataGen;
-import com.terraforged.mod.platform.PlatformData;
+import com.terraforged.mod.platform.CommonAPI;
 import com.terraforged.mod.platform.forge.client.TFClient;
+import com.terraforged.mod.platform.forge.client.TFPreset;
 import com.terraforged.mod.platform.forge.util.ForgeRegistrar;
 import com.terraforged.mod.registry.registrar.NoopRegistrar;
 import com.terraforged.mod.util.DemoHandler;
@@ -41,6 +42,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.world.ForgeWorldPreset;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -58,28 +60,24 @@ import java.util.TimerTask;
 
 @Mod(TerraForged.MODID)
 public class TFMain extends TerraForged {
-    private final PlatformData platformData = new ForgePlatformData();
-
     public TFMain() {
         super(TFMain::getRootPath);
+        CommonAPI.HOLDER.set(new ForgeCommonAPI());
+
         MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
         MinecraftForge.EVENT_BUS.addListener(this::onJoinWorld);
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onInit);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onGenerateData);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Biome.class, this::onBiomes);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(ForgeWorldPreset.class, this::onPresets);
 
         // Biomes are registered via event
         setRegistrar(Registry.BIOME_REGISTRY, NoopRegistrar.none());
 
         if (FMLLoader.getDist().isClient()) {
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(TFClient::onClientInit);
+            new TFClient();
         }
-    }
-
-    @Override
-    public PlatformData getData() {
-        return platformData;
     }
 
     void onInit(FMLCommonSetupEvent event) {
@@ -96,6 +94,11 @@ public class TFMain extends TerraForged {
 
     void onBiomes(RegistryEvent.Register<Biome> event) {
         ModBiomes.register(new ForgeRegistrar<>(event.getRegistry()));
+    }
+
+    void onPresets(RegistryEvent.Register<ForgeWorldPreset> event) {
+        TerraForged.LOG.debug("Registering world-preset");
+        event.getRegistry().register(TFPreset.create());
     }
 
     void onGenerateData(GatherDataEvent event) {
@@ -133,7 +136,7 @@ public class TFMain extends TerraForged {
         return ModList.get().getModContainerById(MODID).orElseThrow().getModInfo().getOwningFile().getFile().getFilePath();
     }
 
-    private static class ForgePlatformData implements PlatformData {
+    private static class ForgeCommonAPI implements CommonAPI {
         @Override
         public boolean isOverworldBiome(ResourceKey<Biome> key) {
             return BiomeDictionary.hasType(key, BiomeDictionary.Type.OVERWORLD);

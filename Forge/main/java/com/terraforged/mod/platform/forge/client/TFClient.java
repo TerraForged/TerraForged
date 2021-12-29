@@ -24,20 +24,48 @@
 
 package com.terraforged.mod.platform.forge.client;
 
+import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.client.Client;
+import com.terraforged.mod.client.screen.ScreenUtil;
+import com.terraforged.mod.platform.ClientAPI;
 import com.terraforged.mod.util.DemoHandler;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 public class TFClient {
-    public static void onClientInit(FMLClientSetupEvent event) {
-        event.enqueueWork(Client.INSTANCE::init);
-
-        MinecraftForge.EVENT_BUS.addListener(TFClient::onRenderOverlay);
+    public TFClient() {
+        ClientAPI.HOLDER.set(new ForgeClientAPI());
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientInit);
+        MinecraftForge.EVENT_BUS.addListener(this::onRenderOverlay);
     }
 
-    private static void onRenderOverlay(RenderGameOverlayEvent event) {
+    void onClientInit(FMLClientSetupEvent event) {
+        event.enqueueWork(Client.INSTANCE::init);
+        event.enqueueWork(TFPreset::makeDefault);
+    }
+
+    void onRenderOverlay(RenderGameOverlayEvent event) {
         DemoHandler.renderOverlay(event.getMatrixStack());
+    }
+
+    private static class ForgeClientAPI implements ClientAPI {
+        @Override
+        public boolean hasPreset() {
+            return true;
+        }
+
+        @Override
+        public boolean isDefaultPreset() {
+            return ForgeConfig.COMMON.defaultWorldType.get().equals(TerraForged.MODID);
+        }
+
+        @Override
+        public boolean isPresetSelected(CreateWorldScreen screen) {
+            return ScreenUtil.isPresetSelected(screen);
+        }
     }
 }

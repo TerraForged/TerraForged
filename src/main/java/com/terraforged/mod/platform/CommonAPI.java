@@ -24,17 +24,17 @@
 
 package com.terraforged.mod.platform;
 
-import com.terraforged.mod.registry.registrar.Registrar;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.biome.Biome;
 
-import java.nio.file.Path;
-import java.util.concurrent.atomic.AtomicReference;
+public interface CommonAPI {
+    ApiHolder<CommonAPI> HOLDER = new ApiHolder<>(new CommonAPI() {});
 
-public interface Platform {
-    AtomicReference<Platform> ACTIVE_PLATFORM = new AtomicReference<>();
+    default boolean isOverworldBiome(ResourceKey<Biome> key) {
+        return false;
+    }
 
-    Path getContainer();
-
-    <T> Registrar<T> getRegistrar(ResourceKey<Registry<T>> key);
+    static CommonAPI get() {
+        return HOLDER.get();
+    }
 }
