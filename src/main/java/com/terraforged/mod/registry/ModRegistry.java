@@ -31,8 +31,8 @@ public interface ModRegistry {
     LazyKey<BiomeTag> BIOME_TAG = TerraForged.registry("worldgen/tag/biome");
     LazyKey<ClimateType> CLIMATE = TerraForged.registry("worldgen/climate");
     LazyKey<NoiseCave> CAVE = TerraForged.registry("worldgen/cave");
-    LazyKey<TerrainNoise> TERRAIN = TerraForged.registry("worldgen/terrain");
-    LazyKey<TerrainType> TERRAIN_TYPE = TerraForged.registry("worldgen/terrain_type");
+    LazyKey<TerrainNoise> TERRAIN = TerraForged.registry("worldgen/terrain/noise");
+    LazyKey<TerrainType> TERRAIN_TYPE = TerraForged.registry("worldgen/terrain/type");
     LazyKey<VegetationConfig> VEGETATION = TerraForged.registry("worldgen/vegetation");
     LazyKey<StructureConfig> STRUCTURE_CONFIG = TerraForged.registry("worldgen/structure_config");
 }
