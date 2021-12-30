@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.biome.feature;
+package com.terraforged.mod.worldgen.biome.decorator;
 
 import com.terraforged.mod.util.map.FloatMap;
 import com.terraforged.mod.worldgen.Generator;

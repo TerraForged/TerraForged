@@ -28,6 +28,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.terraforged.engine.util.pos.PosUtil;
@@ -35,6 +36,7 @@ import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.engine.world.terrain.TerrainType;
 import com.terraforged.mod.data.gen.DataGen;
 import com.terraforged.mod.worldgen.Generator;
+import com.terraforged.mod.worldgen.Regenerator;
 import com.terraforged.mod.worldgen.datapack.DataPackExporter;
 import com.terraforged.mod.worldgen.profiler.GeneratorProfiler;
 import net.minecraft.ChatFormatting;
@@ -43,19 +45,49 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.*;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.Heightmap;
 
-public class DebugCommand {
+public class TFCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal("locateterrain")
+        dispatcher.register(getLocateTerrainCommand());
+        dispatcher.register(getTFCommand());
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> root(String name) {
+        return Commands.literal(name).requires(s -> s.hasPermission(2));
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> getLocateTerrainCommand() {
+        return root("locateterrain")
                 .then(Arg.terrainType()
                         .then(Commands.argument("radius", IntegerArgumentType.integer(1))
                                 .executes(c -> locate(c, true)))
-                        .executes(c -> locate(c, false))));
+                        .executes(c -> locate(c, false)));
+    }
 
-        dispatcher.register(Commands.literal("export")
-                .then(Commands.literal("structures")
-                        .executes(DebugCommand::export)));
+    private static LiteralArgumentBuilder<CommandSourceStack> getTFCommand() {
+        return root("tf")
+                .then(Commands.literal("export")
+                        .then(Commands.literal("structures")
+                                .executes(TFCommands::export)))
+                .then(Commands.literal("regen")
+                        .then(net.minecraft.commands.Commands.argument("radius", IntegerArgumentType.integer(1))
+                                .executes(TFCommands::regen)));
+    }
+
+    private static int regen(CommandContext<CommandSourceStack> context) {
+        try {
+            int radius = IntegerArgumentType.getInteger(context, "radius");
+            var pos = context.getSource().getPosition();
+            var chunk = new ChunkPos(((int) pos.x) >> 4, ((int) pos.z) >> 4);
+            Regenerator.regenerateChunks(chunk, radius, context.getSource().getLevel(), context.getSource());
+
+            return Command.SINGLE_SUCCESS;
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return Command.SINGLE_SUCCESS;
+        }
     }
 
     private static int export(CommandContext<CommandSourceStack> context) {

@@ -25,7 +25,6 @@
 package com.terraforged.mod.worldgen.biome.decorator;
 
 import com.terraforged.mod.worldgen.Generator;
-import com.terraforged.mod.worldgen.biome.feature.PositionSampler;
 import com.terraforged.mod.worldgen.biome.vegetation.BiomeVegetationManager;
 import com.terraforged.mod.worldgen.biome.vegetation.VegetationFeatures;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
@@ -86,8 +85,7 @@ public class FeatureDecorator {
         long seed = random.setDecorationSeed(level.getSeed(), origin.getX(), origin.getZ());
 
         decoratePre(seed, origin, biome, chunk, level, generator, random, structures);
-        decorateTrees(seed, chunk, level, terrain, generator, random);
-        decorateOther(seed, origin, biome, level, generator, random);
+        decorateVegetation(seed, origin, biome, chunk, level, generator, random, terrain);
         decoratePost(seed, origin, biome, chunk, level, generator, random, structures);
     }
 
@@ -115,25 +113,16 @@ public class FeatureDecorator {
         VanillaDecorator.decorate(seed, VegetationFeatures.STAGE + 1, MAX_DECORATION_STAGE, origin, biome, chunk, level, generator, random, structureManager, this);
     }
 
-    private void decorateTrees(long seed,
-                               ChunkAccess chunk,
-                               WorldGenLevel level,
-                               CompletableFuture<TerrainData> terrain,
-                               Generator generator,
-                               WorldgenRandom random) {
+    private void decorateVegetation(long seed,
+                                    BlockPos origin,
+                                    Biome biome,
+                                    ChunkAccess chunk,
+                                    WorldGenLevel level,
+                                    Generator generator,
+                                    WorldgenRandom random,
+                                    CompletableFuture<TerrainData> terrain) {
 
-        PositionSampler.place(seed, chunk, level, terrain, generator, random, this);
-    }
-
-    private void decorateOther(long seed, BlockPos origin, Biome biome, WorldGenLevel level, Generator generator, WorldgenRandom random) {
-        var vegetation = getVegetationManager().getVegetation(biome);
-        if (vegetation.features == VegetationFeatures.NONE) return;
-
-        int offset = 245889;
-        for (var other : vegetation.features.other()) {
-            random.setFeatureSeed(seed, offset++, VegetationFeatures.STAGE);
-            other.placeWithBiomeCheck(level, generator, random, origin);
-        }
+        PositionSampler.placeVegetation(seed, origin, biome, chunk, level, generator, random, terrain, this);
     }
 
     private static BlockPos getOrigin(WorldGenLevel level, ChunkAccess chunk) {

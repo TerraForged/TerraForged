@@ -22,16 +22,17 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.biome.feature;
+package com.terraforged.mod.worldgen.biome.decorator;
 
 import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.asset.VegetationConfig;
-import com.terraforged.mod.worldgen.biome.decorator.FeatureDecorator;
 import com.terraforged.mod.worldgen.biome.vegetation.VegetationFeatures;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.noise.util.NoiseUtil;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
@@ -40,16 +41,30 @@ import java.util.concurrent.CompletableFuture;
 
 public class PositionSampler {
     protected static final float BORDER = 6F;
-    protected static final int OFFSET_START = 23189045;
     public static final float SQUASH_FACTOR = 2F / NoiseUtil.sqrt(3);
 
-    public static void place(long seed,
-                             ChunkAccess chunk,
-                             WorldGenLevel level,
-                             CompletableFuture<TerrainData> terrain,
-                             Generator generator,
-                             WorldgenRandom random,
-                             FeatureDecorator decorator) {
+    public static void placeVegetation(long seed,
+                                      BlockPos origin,
+                                      Biome biome,
+                                      ChunkAccess chunk,
+                                      WorldGenLevel level,
+                                      Generator generator,
+                                      WorldgenRandom random,
+                                      CompletableFuture<TerrainData> terrain,
+                                      FeatureDecorator decorator) {
+
+        int offset = placeTreesAndGrass(seed, chunk, level, terrain, generator, random, decorator);
+
+        placeOther(seed, offset, origin, biome, level, generator, random, decorator);
+    }
+
+    public static int placeTreesAndGrass(long seed,
+                                         ChunkAccess chunk,
+                                         WorldGenLevel level,
+                                         CompletableFuture<TerrainData> terrain,
+                                         Generator generator,
+                                         WorldgenRandom random,
+                                         FeatureDecorator decorator) {
 
         var context = SamplerContext.get();
         context.chunk = chunk;
@@ -60,9 +75,9 @@ public class PositionSampler {
         context.viabilityContext.biomeSampler = generator.getBiomeSource().getBiomeSampler();
         populate(context, decorator);
 
+        int offset = 0;
         int x = chunk.getPos().getMinBlockX();
         int z = chunk.getPos().getMinBlockZ();
-        int offset = OFFSET_START;
 
         for (int i = 0; i < context.biomeList.size(); i++) {
             var biome = context.biomeList.get(i);
@@ -71,10 +86,32 @@ public class PositionSampler {
             context.push(biome, vegetation);
 
             if (config == VegetationConfig.NONE) {
-                offset = placeAt(seed, OFFSET_START, x, z, context);
+                offset = placeAt(seed, offset + i, x, z, context);
             } else {
-                offset = sample(seed, offset, x, z, config.frequency(), config.jitter(), context, PositionSampler::placeAt);
-                offset = placeGrassAt(seed, offset, x, z, context);
+                offset = sample(seed, offset + i, x, z, config.frequency(), config.jitter(), context, PositionSampler::placeAt);
+                offset = placeGrassAt(seed, offset + i, x, z, context);
+            }
+        }
+
+        return offset;
+    }
+
+    public static void placeOther(long seed,
+                                  int offset,
+                                  BlockPos origin,
+                                  Biome biome,
+                                  WorldGenLevel level,
+                                  Generator generator,
+                                  WorldgenRandom random,
+                                  FeatureDecorator decorator) {
+
+        var vegetation = decorator.getVegetationManager().getVegetation(biome);
+        if (vegetation.features == VegetationFeatures.NONE) return;
+
+        for (var other : vegetation.features.other()) {
+            random.setFeatureSeed(seed, offset, VegetationFeatures.STAGE);
+            if (other.placeWithBiomeCheck(level, generator, random, origin)) {
+                offset++;
             }
         }
     }
@@ -147,15 +184,19 @@ public class PositionSampler {
         context.pos.set(x, y, z);
 
         for (var feature : context.features.trees()) {
-            context.random.setFeatureSeed(seed, offset++, VegetationFeatures.STAGE);
+            context.random.setFeatureSeed(seed, offset, VegetationFeatures.STAGE);
 
-            feature.placeWithBiomeCheck(context.region, context.generator, context.random, context.pos);
+            if (feature.placeWithBiomeCheck(context.region, context.generator, context.random, context.pos)) {
+                offset++;
+            }
         }
 
         for (var feature : context.features.grass()) {
-            context.random.setFeatureSeed(seed, offset++, VegetationFeatures.STAGE);
+            context.random.setFeatureSeed(seed, offset, VegetationFeatures.STAGE);
 
-            feature.placeWithBiomeCheck(context.region, context.generator, context.random, context.pos);
+            if (feature.placeWithBiomeCheck(context.region, context.generator, context.random, context.pos)) {
+                offset++;
+            }
         }
 
         return offset;
@@ -177,9 +218,11 @@ public class PositionSampler {
         if (viability < noise) return offset;
 
         for (var feature : context.features.trees()) {
-            context.random.setFeatureSeed(seed, offset++, VegetationFeatures.STAGE);
+            context.random.setFeatureSeed(seed, offset, VegetationFeatures.STAGE);
 
-            feature.placeWithBiomeCheck(context.region, context.generator, context.random, context.pos);
+            if (feature.placeWithBiomeCheck(context.region, context.generator, context.random, context.pos)) {
+                offset++;
+            }
         }
 
         return offset;
@@ -200,8 +243,10 @@ public class PositionSampler {
 
         for (int i = 0; i < passes; i++) {
             for (var feature : context.features.grass()) {
-                random.setFeatureSeed(seed, offset++, VegetationFeatures.STAGE);
-                feature.placeWithBiomeCheck(region, generator, random, pos);
+                random.setFeatureSeed(seed, offset + i, VegetationFeatures.STAGE);
+                if (feature.placeWithBiomeCheck(region, generator, random, pos)) {
+                    offset++;
+                }
             }
         }
 

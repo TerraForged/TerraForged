@@ -45,58 +45,58 @@ import java.util.function.Supplier;
 
 public class VanillaDecorator {
     public static void decorate(long seed,
-                                int from, int to,
-                                BlockPos origin,
-                                Biome biome,
-                                ChunkAccess chunk,
-                                WorldGenLevel level,
-                                Generator generator,
-                                WorldgenRandom random,
-                                StructureFeatureManager structureManager,
-                                FeatureDecorator decorator) {
+                               int from, int to,
+                               BlockPos origin,
+                               Biome biome,
+                               ChunkAccess chunk,
+                               WorldGenLevel level,
+                               Generator generator,
+                               WorldgenRandom random,
+                               StructureFeatureManager structureManager,
+                               FeatureDecorator decorator) {
 
         for (int stage = from; stage <= to; stage++) {
             var structures = decorator.getStageStructures(stage);
             var features = decorator.getStageFeatures(stage, biome);
-            int offset = structures.size();
 
             placeStructures(seed, stage, chunk, level, generator, random, structureManager, structures);
 
-            placeFeatures(seed, offset, stage, origin, level, generator, random, features);
+            placeFeatures(seed, structures.size(), stage, origin, level, generator, random, features);
         }
     }
 
     private static void placeStructures(long seed,
-                                        int stage,
-                                        ChunkAccess chunk,
-                                        WorldGenLevel level,
-                                        Generator generator,
-                                        WorldgenRandom random,
-                                        StructureFeatureManager structureManager,
-                                        List<Supplier<StructureFeature<?>>> structures) {
+                                       int stage,
+                                       ChunkAccess chunk,
+                                       WorldGenLevel level,
+                                       Generator generator,
+                                       WorldgenRandom random,
+                                       StructureFeatureManager structureManager,
+                                       List<Supplier<StructureFeature<?>>> structures) {
 
         var chunkPos = chunk.getPos();
         var sectionPos = SectionPos.of(chunkPos, level.getMinSection());
 
-        for (int i = 0; i < structures.size(); i++) {
-            random.setFeatureSeed(seed, i, stage);
+        for (int structureIndex = 0; structureIndex < structures.size(); structureIndex++) {
+            random.setFeatureSeed(seed, structureIndex, stage);
 
-            var structure = structures.get(i).get();
-
-            structureManager.startsForFeature(sectionPos, structure).forEach(start -> {
+            var structure = structures.get(structureIndex).get();
+            var starts = structureManager.startsForFeature(sectionPos, structure);
+            for (int startIndex = 0; startIndex < starts.size(); startIndex++) {
+                var start = starts.get(startIndex);
                 start.placeInChunk(level, structureManager, generator, random, getWritableArea(chunk), chunkPos);
-            });
+            }
         }
     }
 
     private static void placeFeatures(long seed,
-                                      int offset,
-                                      int stage,
-                                      BlockPos origin,
-                                      WorldGenLevel level,
-                                      Generator generator,
-                                      WorldgenRandom random,
-                                      List<Supplier<PlacedFeature>> features) {
+                                     int offset,
+                                     int stage,
+                                     BlockPos origin,
+                                     WorldGenLevel level,
+                                     Generator generator,
+                                     WorldgenRandom random,
+                                     List<Supplier<PlacedFeature>> features) {
 
         for (int i = 0; i < features.size(); i++) {
             random.setFeatureSeed(seed, offset + i, stage);

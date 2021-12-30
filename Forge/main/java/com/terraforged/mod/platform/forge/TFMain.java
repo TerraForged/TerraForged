@@ -26,7 +26,7 @@ package com.terraforged.mod.platform.forge;
 
 import com.terraforged.mod.Common;
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.command.DebugCommand;
+import com.terraforged.mod.command.TFCommands;
 import com.terraforged.mod.data.ModBiomes;
 import com.terraforged.mod.data.gen.DataGen;
 import com.terraforged.mod.platform.CommonAPI;
@@ -85,7 +85,7 @@ public class TFMain extends TerraForged {
     }
 
     void onRegisterCommands(RegisterCommandsEvent event) {
-        DebugCommand.register(event.getDispatcher());
+        TFCommands.register(event.getDispatcher());
     }
 
     void onJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {

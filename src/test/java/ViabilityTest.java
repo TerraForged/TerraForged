@@ -27,7 +27,7 @@ import com.terraforged.mod.data.ModVegetations;
 import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.worldgen.asset.VegetationConfig;
 import com.terraforged.mod.worldgen.biome.IBiomeSampler;
-import com.terraforged.mod.worldgen.biome.feature.PositionSampler;
+import com.terraforged.mod.worldgen.biome.decorator.PositionSampler;
 import com.terraforged.mod.worldgen.biome.viability.ViabilityContext;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
@@ -109,12 +109,12 @@ public class ViabilityTest {
         int maxX = NoiseUtil.floor(image.getWidth() * freq);
         int maxZ = NoiseUtil.floor(image.getHeight() * freq * PositionSampler.SQUASH_FACTOR);
 
-        PositionSampler.sample(SEED, 0, 0, maxX, maxZ, fx, fz, j, context, (seed, offset, hash, x, z, ctx) -> {
-            if (x < 0 || z < 0 || x >= heightmap.width || z >= heightmap.height) return false;
+        PositionSampler.sample(SEED, 0, 0, 0, maxX, maxZ, fx, fz, j, context, (seed, offset, hash, x, z, ctx) -> {
+            if (x < 0 || z < 0 || x >= heightmap.width || z >= heightmap.height) return 0;
 
             var sample = heightmap.get(x, z);
             float scaledHeight = levels.getScaledHeight(sample.heightNoise);
-            if (scaledHeight <= levels.seaLevel) return false;
+            if (scaledHeight <= levels.seaLevel) return 0;
 
             setup(x, z, freq, heightmap, context);
 
@@ -122,11 +122,11 @@ public class ViabilityTest {
             int pz = z * freq;
             float noise = (1F - vegetation.density()) * MathUtil.rand(hash);
             float fit = vegetation.viability().getFitness(px, pz, context);
-            if (fit < noise) return false;
+            if (fit < noise) return 0;
 
             dot(x, z, image);
 
-            return true;
+            return 0;
         });
     }
 
