@@ -29,7 +29,6 @@ import com.terraforged.mod.platform.ClientAPI;
 import com.terraforged.mod.util.DemoHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 
 public class TFClient implements ClientModInitializer {
     @Override
@@ -39,10 +38,5 @@ public class TFClient implements ClientModInitializer {
         HudRenderCallback.EVENT.register((stack, tickDelta) -> DemoHandler.renderOverlay(stack));
     }
 
-    private static class FabricClientAPI implements ClientAPI {
-        @Override
-        public boolean isPresetSelected(CreateWorldScreen screen) {
-            return true;
-        }
-    }
+    private static class FabricClientAPI implements ClientAPI {}
 }

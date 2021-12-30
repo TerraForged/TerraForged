@@ -57,6 +57,7 @@ public class DelegateRegion extends WorldGenRegion {
         private ChunkStatus status;
         private final List<ChunkAccess> chunks = new ArrayList<>(17 * 17);
 
+        @SuppressWarnings("deprecation")
         public Builder source(WorldGenRegion region) {
             this.chunks.clear();
             this.level = region.getLevel();

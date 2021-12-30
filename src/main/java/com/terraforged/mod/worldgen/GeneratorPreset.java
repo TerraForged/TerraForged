@@ -30,14 +30,18 @@ import com.terraforged.mod.util.TranslationUtil;
 import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
+import com.terraforged.mod.worldgen.profiler.GeneratorProfiler;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
 
 public class GeneratorPreset {
     public static final ResourceLocation PRESET_NAME = TerraForged.location("preset");
@@ -64,5 +68,30 @@ public class GeneratorPreset {
         var parameters = access.registryOrThrow(Registry.NOISE_REGISTRY);
         var settings = access.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
         return new VanillaGen(seed, biomes, () -> settings.getOrThrow(NoiseGeneratorSettings.OVERWORLD), parameters);
+    }
+
+    public static boolean isTerraForgedWorld(WorldGenSettings settings) {
+        var stem = settings.dimensions().getOrThrow(LevelStem.OVERWORLD);
+        return getGenerator(stem.generator()) != null;
+    }
+
+    public static boolean isTerraForgedWorld(ServerLevel level) {
+        return getGenerator(level) != null;
+    }
+
+    public static Generator getGenerator(ServerLevel level) {
+        return getGenerator(level.getChunkSource().getGenerator());
+    }
+
+    private static Generator getGenerator(ChunkGenerator chunkGenerator) {
+        if (chunkGenerator instanceof GeneratorProfiler profiler) {
+            chunkGenerator = profiler.getGenerator();
+        }
+
+        if (chunkGenerator instanceof Generator generator) {
+            return generator;
+        }
+
+        return null;
     }
 }

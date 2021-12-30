@@ -27,7 +27,7 @@ package com.terraforged.mod.platform.fabric;
 import com.mojang.brigadier.CommandDispatcher;
 import com.terraforged.mod.Common;
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.command.DebugCommand;
+import com.terraforged.mod.command.TFCommands;
 import com.terraforged.mod.util.DemoHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
@@ -51,7 +51,7 @@ public class TFMain extends TerraForged implements ModInitializer, CommandRegist
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
-        DebugCommand.register(dispatcher);
+        TFCommands.register(dispatcher);
     }
 
     private static Path getRootPath() {

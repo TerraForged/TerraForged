@@ -35,10 +35,9 @@ import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.engine.world.terrain.TerrainType;
 import com.terraforged.mod.data.gen.DataGen;
-import com.terraforged.mod.worldgen.Generator;
+import com.terraforged.mod.worldgen.GeneratorPreset;
 import com.terraforged.mod.worldgen.Regenerator;
 import com.terraforged.mod.worldgen.datapack.DataPackExporter;
-import com.terraforged.mod.worldgen.profiler.GeneratorProfiler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
@@ -104,7 +103,7 @@ public class TFCommands {
     }
 
     private static int locate(CommandContext<CommandSourceStack> context, boolean withRadius) throws CommandSyntaxException {
-        var generator = getGenerator(context);
+        var generator = GeneratorPreset.getGenerator(context.getSource().getLevel());
         if (generator == null) return Command.SINGLE_SUCCESS;
 
         String name = StringArgumentType.getString(context, "terrain");
@@ -135,19 +134,6 @@ public class TFCommands {
         player.sendMessage(result, ChatType.SYSTEM, Util.NIL_UUID);
 
         return Command.SINGLE_SUCCESS;
-    }
-
-    private static Generator getGenerator(CommandContext<CommandSourceStack> context) {
-        var level = context.getSource().getLevel();
-        var chunkGenerator = level.getChunkSource().getGenerator();
-        if (chunkGenerator instanceof GeneratorProfiler profiler) {
-            chunkGenerator = profiler.getGenerator();
-        }
-
-        if (chunkGenerator instanceof Generator generator) {
-            return generator;
-        }
-        return null;
     }
 
     private static Component createTerrainTeleportMessage(BlockPos pos, int x, int y, int z, Terrain terrain) {

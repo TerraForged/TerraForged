@@ -11,6 +11,7 @@
     "common.MixinWorldGenSettings"
   ],
   "client": [
+    "client.MixinPrimaryLevelData",
     "client.MixinCreateWorldScreen"
   ],
   "injectors": {

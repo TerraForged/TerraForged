@@ -24,7 +24,6 @@
 
 package com.terraforged.mod.platform.forge.client;
 
-import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.client.Client;
 import com.terraforged.mod.client.screen.ScreenUtil;
 import com.terraforged.mod.platform.ClientAPI;
@@ -67,16 +66,6 @@ public class TFClient {
         @Override
         public boolean hasPreset() {
             return true;
-        }
-
-        @Override
-        public boolean isDefaultPreset() {
-            return ForgeConfig.COMMON.defaultWorldType.get().equals(TerraForged.MODID);
-        }
-
-        @Override
-        public boolean isPresetSelected(CreateWorldScreen screen) {
-            return ScreenUtil.isPresetEnabled(screen);
         }
     }
 }

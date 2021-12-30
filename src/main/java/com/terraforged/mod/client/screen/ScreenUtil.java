@@ -40,8 +40,9 @@ import java.util.function.Predicate;
 
 public class ScreenUtil {
     private static final String WORLD_TYPE = "selectWorld.mapType";
+    private static final String DEFAULT_PRESET_KEY = "generator.default";
     private static final Predicate<String> TF_PRESET = s -> s.equals(GeneratorPreset.TRANSLATION_KEY);
-    private static final Predicate<String> DEFAULT_PRESET = s -> s.equals(GeneratorPreset.TRANSLATION_KEY);
+    private static final Predicate<String> DEFAULT_PRESET = s -> s.equals(DEFAULT_PRESET_KEY);
 
     public static void enforceDefaultPreset(CreateWorldScreen screen, String name) {
         var button = getPresetButton(screen);
