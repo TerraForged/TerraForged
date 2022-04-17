@@ -36,6 +36,8 @@ public interface INoiseGenerator {
 
     ContinentNoise getContinent();
 
+    NoiseSample getNoiseSample(int x, int z);
+
     float getHeightNoise(int x, int z);
 
     long find(int x, int z, int minRadius, int maxRadius, Terrain terrain);

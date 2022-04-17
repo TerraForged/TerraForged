@@ -233,6 +233,13 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public void addDebugScreenInfo(List<String> lines, BlockPos pos) {
+        var terrainSample = terrainCache.getSample(pos.getX(), pos.getZ());
+        var climateSample = biomeSource.getBiomeSampler().sample(pos.getX(), pos.getZ());
 
+        var terrainType = terrainSample.terrainType;
+        var climateType = climateSample.cell.biome;
+
+        lines.add("Terrain Type: " + terrainType.getName());
+        lines.add("Climate Type: " + climateType.name());
     }
 }

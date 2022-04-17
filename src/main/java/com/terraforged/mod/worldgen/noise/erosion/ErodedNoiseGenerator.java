@@ -81,6 +81,11 @@ public class ErodedNoiseGenerator implements INoiseGenerator {
     }
 
     @Override
+    public NoiseSample getNoiseSample(int x, int z) {
+        return generator.getNoiseSample(x, z);
+    }
+
+    @Override
     public float getHeightNoise(int x, int z) {
         return generator.getHeightNoise(x, z);
     }

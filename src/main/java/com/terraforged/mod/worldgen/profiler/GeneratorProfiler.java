@@ -221,7 +221,7 @@ public class GeneratorProfiler extends ChunkGenerator {
 
     @Override
     public void addDebugScreenInfo(List<String> lines, BlockPos pos) {
-
+        generator.addDebugScreenInfo(lines, pos);
     }
 
     @SuppressWarnings("unchecked")

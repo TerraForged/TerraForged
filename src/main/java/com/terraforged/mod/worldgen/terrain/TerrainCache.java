@@ -25,6 +25,7 @@
 package com.terraforged.mod.worldgen.terrain;
 
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
+import com.terraforged.mod.worldgen.noise.NoiseSample;
 import com.terraforged.mod.worldgen.util.ThreadPool;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -57,6 +58,10 @@ public class TerrainCache {
 
     public int getHeight(int x, int z) {
         return generator.getHeight(x, z);
+    }
+
+    public NoiseSample getSample(int x, int z) {
+        return generator.getNoiseGenerator().getNoiseSample(x, z);
     }
 
     public TerrainData getNow(ChunkPos pos) {
