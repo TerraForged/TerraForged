@@ -25,6 +25,7 @@
 package com.terraforged.mod.worldgen.biome.util;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
@@ -35,7 +36,7 @@ public class BufferedBiomeManager extends DelegateBiomeManager {
     protected int misses;
     protected int requests;
     protected ChunkPos chunkPos;
-    protected final Biome[] buffer = new Biome[16 * 16];
+    protected final Holder<Biome>[] buffer = new Holder[16 * 16];
     protected final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
     void set(ChunkPos chunkPos, BiomeManager biomeManager) {
@@ -58,7 +59,7 @@ public class BufferedBiomeManager extends DelegateBiomeManager {
     }
 
     @Override
-    public Biome getBiome(BlockPos pos) {
+    public Holder<Biome> getBiome(BlockPos pos) {
         requests++;
         int x = pos.getX() >> 4;
         int z = pos.getZ() >> 4;

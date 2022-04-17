@@ -31,6 +31,7 @@ import com.terraforged.mod.worldgen.terrain.TerrainData;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.StructureFeatureManager;
@@ -73,7 +74,7 @@ public class ChunkUtil {
         }
     }
 
-    private static void fillNoiseBiomes(LevelChunkSection section, Biome[] biomeBuffer) {
+    private static void fillNoiseBiomes(LevelChunkSection section, Holder<Biome>[] biomeBuffer) {
         var biomes = section.getBiomes();
         biomes.acquire();
         for (int dz = 0; dz < 4; dz++) {

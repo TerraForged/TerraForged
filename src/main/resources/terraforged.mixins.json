@@ -5,14 +5,13 @@
   "refmap": "terraforged.mixins.refmap.json",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "common.MixinRegistryAccess",
-    "common.MixinRegistryHolder",
-    "common.MixinStructureFeatures",
+    "common.MixinRegistryOps",
+    "common.MixinTagNetworkSerialization",
     "common.MixinWorldGenSettings"
   ],
   "client": [
-    "client.MixinPrimaryLevelData",
-    "client.MixinCreateWorldScreen"
+    "client.MixinCreateWorldScreen",
+    "client.MixinPrimaryLevelData"
   ],
   "injectors": {
     "defaultRequire": 1

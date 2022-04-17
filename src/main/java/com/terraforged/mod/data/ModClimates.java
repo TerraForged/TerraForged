@@ -30,6 +30,7 @@ import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.worldgen.asset.ClimateType;
 import com.terraforged.mod.worldgen.biome.util.BiomeUtil;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -53,22 +54,23 @@ public interface ModClimates extends ModRegistry {
     }
 
     class Factory {
-        static ClimateType create(BiomeType type, List<Biome> biomes, Registry<Biome> registry) {
+        static ClimateType create(BiomeType type, List<Holder<Biome>> biomes, Registry<Biome> registry) {
             var weights = new Object2FloatOpenHashMap<ResourceLocation>();
 
             for (var biome : biomes) {
                 var biomeType = BiomeUtil.getType(biome);
                 if (biomeType == null || biomeType != type) continue;
 
-                var key = registry.getResourceKey(biome).orElseThrow();
+                var key = biome.unwrapKey().orElseThrow();
+
                 weights.put(key.location(), getWeight(key, biome));
             }
 
             return new ClimateType(weights);
         }
 
-        static float getWeight(ResourceKey<Biome> key, Biome biome) {
-            if (biome.getBiomeCategory() == Biome.BiomeCategory.MUSHROOM) return RARE;
+        static float getWeight(ResourceKey<Biome> key, Holder<Biome> biome) {
+            if (Biome.getBiomeCategory(biome) == Biome.BiomeCategory.MUSHROOM) return RARE;
             if (key == Biomes.ICE_SPIKES) return RARE;
             return NORMAL;
         }

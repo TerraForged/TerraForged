@@ -141,6 +141,9 @@ public class FileUtil {
                     output.closeEntry();
                 }
             });
+
+            output.finish();
+            output.flush();
         }
     }
 

@@ -36,22 +36,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.NoiseEffect;
-import net.minecraft.world.level.levelgen.feature.StructureFeature;
-import net.minecraft.world.level.levelgen.feature.structures.JigsawJunction;
-import net.minecraft.world.level.levelgen.feature.structures.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
+import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
+
+import java.util.Comparator;
 
 public class StructureTerrain {
-    private static final int MIN_RADIUS = 4;
-    private static final int MAX_RADIUS = 10;
     private static final int RADIUS = 20;
+    private static final Comparator<StructurePiece> PIECE_SORTER = Comparator.comparing(o -> o.getBoundingBox().minY());
 
     private final ObjectList<StructurePiece> rigids = new ObjectArrayList<>(10);
-    private final ObjectList<JigsawJunction> junctions = new ObjectArrayList<>(32);
     protected final ObjectListIterator<StructurePiece> pieceIterator;
-    protected final ObjectListIterator<JigsawJunction> junctionIterator;
 
     protected final BlockState air = Blocks.AIR.defaultBlockState();
     protected final BlockState solid = Blocks.STONE.defaultBlockState();
@@ -60,37 +57,25 @@ public class StructureTerrain {
     public StructureTerrain(ChunkAccess chunk, StructureFeatureManager manager) {
         var chunkPos = chunk.getPos();
         var sectionPos = SectionPos.bottomOf(chunk);
-        int x = chunkPos.getMinBlockX();
-        int z = chunkPos.getMinBlockZ();
 
-        for (var feature : StructureFeature.NOISE_AFFECTING_FEATURES) {
-            manager.startsForFeature(sectionPos, feature).forEach(start -> {
-                for (var piece : start.getPieces()) {
-                    if (!piece.isCloseToChunk(chunkPos, RADIUS)) continue;
-                    if (piece.getNoiseEffect() != NoiseEffect.BEARD) continue;
+        manager.startsForFeature(sectionPos, cf -> cf.adaptNoise).forEach(start -> {
+            for (var piece : start.getPieces()) {
+                if (!piece.isCloseToChunk(chunkPos, RADIUS)) continue;
+                if (piece.getNoiseEffect() != NoiseEffect.BEARD) continue;
 
-                    if (piece instanceof PoolElementStructurePiece element) {
-                        var projection = element.getElement().getProjection();
-                        if (projection == StructureTemplatePool.Projection.RIGID) {
-                            this.rigids.add(element);
-                        }
-
-                        for (var junction : element.getJunctions()) {
-                            int sx = junction.getSourceX();
-                            int sz = junction.getSourceZ();
-                            if (sx > x - RADIUS && sz > z - RADIUS && sx < x + 15 + RADIUS && sz < z + 15 + RADIUS) {
-                                this.junctions.add(junction);
-                            }
-                        }
-                    } else {
-                        this.rigids.add(piece);
+                if (piece instanceof PoolElementStructurePiece element) {
+                    var projection = element.getElement().getProjection();
+                    if (projection == StructureTemplatePool.Projection.RIGID) {
+                        this.rigids.add(element);
                     }
+                } else {
+                    this.rigids.add(piece);
                 }
-            });
-        }
+            }
+        });
 
+        this.rigids.sort(PIECE_SORTER);
         this.pieceIterator = rigids.iterator();
-        this.junctionIterator = junctions.iterator();
     }
 
     public void modify(int x, int z, ChunkAccess chunk, TerrainData terrainData) {
@@ -166,7 +151,6 @@ public class StructureTerrain {
 
     protected void reset() {
         pieceIterator.back(rigids.size());
-        junctionIterator.back(rigids.size());
     }
 
     private static float raise(int x, int z, BoundingBox bounds, float level, float surface, float borderRadius) {
@@ -201,13 +185,6 @@ public class StructureTerrain {
         return NoiseUtil.sqrt(d2 / radius2);
     }
 
-    protected static int getOffset(StructurePiece piece) {
-        if (piece instanceof PoolElementStructurePiece element) {
-            return element.getGroundLevelDelta();
-        }
-        return 0;
-    }
-
     protected static int getPieceY(StructurePiece piece) {
         int y = piece.getBoundingBox().minY();
         if (piece instanceof PoolElementStructurePiece element) {
@@ -218,76 +195,5 @@ public class StructureTerrain {
 
     protected static int getDist(int pos, int min, int max) {
         return Math.max(0, Math.max(min - pos, pos - max));
-    }
-
-    protected static class Backup extends StructureTerrain {
-        public Backup(ChunkAccess chunk, StructureFeatureManager manager) {
-            super(chunk, manager);
-        }
-
-        public void modify(int x, int z, TerrainData terrain) {
-            float height = terrain.getHeight().get(x, z);
-            float raised = height;
-            float lowered = height;
-
-            while (pieceIterator.hasNext()) {
-                var piece = pieceIterator.next();
-                if (piece.getNoiseEffect() != NoiseEffect.BEARD) continue;
-
-                float contribution = getPieceHeight(x, z, height, piece);
-                raised = Math.max(raised, contribution);
-                lowered = Math.min(lowered, contribution);
-            }
-
-            while (junctionIterator.hasNext()) {
-                var junction = junctionIterator.next();
-                float contribution = getJunctionHeight(x, z, height, junction);
-                raised = Math.max(raised, contribution);
-            }
-
-            if (lowered < height) {
-                terrain.getHeight().set(x, z, lowered);
-            } else if (raised > height) {
-                terrain.getHeight().set(x, z, raised);
-            }
-
-            reset();
-        }
-
-        protected static float getPieceHeight(int x, int z, float height, StructurePiece piece) {
-            var bounds = piece.getBoundingBox();
-            int pieceY = getPieceY(piece);
-
-            int length = Math.max(bounds.getXSpan(), bounds.getZSpan());
-            float radius = Math.max(4, 24 - length);
-
-            float alpha = getDistAlpha(x, z, bounds, radius * radius);
-
-            if (pieceY > height) {
-                return NoiseUtil.lerp(pieceY, height, alpha);
-            } else if (pieceY < height && alpha == 0) {
-                return pieceY;
-            } else {
-                return height;
-            }
-        }
-
-        protected static float getJunctionHeight(int x, int z, float height, JigsawJunction junction) {
-            int pieceY = junction.getSourceGroundY() - 1;
-            float alpha = getDistAlpha(x, z, junction.getSourceX(), junction.getSourceZ(), MIN_RADIUS);
-            if (pieceY > height) {
-                float fade = 1 - alpha;
-                fade *= fade;
-                fade = 1 - fade;
-                return NoiseUtil.lerp(pieceY, height, fade);
-            }
-            return height;
-        }
-
-        protected static float getDistAlpha(int x, int z, int px, int pz, float radius2) {
-            int dx = x - px;
-            int dz = z - pz;
-            return getDistAlpha(dx, dz, radius2);
-        }
     }
 }

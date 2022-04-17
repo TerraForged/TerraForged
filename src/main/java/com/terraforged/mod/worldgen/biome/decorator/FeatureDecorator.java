@@ -28,9 +28,7 @@ import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.biome.vegetation.BiomeVegetationManager;
 import com.terraforged.mod.worldgen.biome.vegetation.VegetationFeatures;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.SectionPos;
+import net.minecraft.core.*;
 import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
@@ -39,21 +37,19 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.RandomSupport;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
-import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 public class FeatureDecorator {
     public static final GenerationStep.Decoration[] STAGES = GenerationStep.Decoration.values();
     private static final int MAX_DECORATION_STAGE = GenerationStep.Decoration.TOP_LAYER_MODIFICATION.ordinal();
 
     private final BiomeVegetationManager vegetation;
-    private final Map<GenerationStep.Decoration, List<Supplier<StructureFeature<?>>>> structures;
+    private final Map<GenerationStep.Decoration, List<Holder<ConfiguredStructureFeature<?, ?>>>> structures;
 
     public FeatureDecorator(RegistryAccess access) {
         this.vegetation = new BiomeVegetationManager(access);
@@ -64,13 +60,13 @@ public class FeatureDecorator {
         return vegetation;
     }
 
-    public List<Supplier<StructureFeature<?>>> getStageStructures(int stage) {
+    public List<Holder<ConfiguredStructureFeature<?, ?>>> getStageStructures(int stage) {
         return structures.get(STAGES[stage]);
     }
 
-    public List<Supplier<PlacedFeature>> getStageFeatures(int stage, Biome biome) {
+    public HolderSet<PlacedFeature> getStageFeatures(int stage, Biome biome) {
         var stages = biome.getGenerationSettings().features();
-        if (stage >= stages.size()) return Collections.emptyList();
+        if (stage >= stages.size()) return null;
         return stages.get(stage);
     }
 
@@ -91,7 +87,7 @@ public class FeatureDecorator {
 
     private void decoratePre(long seed,
                              BlockPos origin,
-                             Biome biome,
+                             Holder<Biome> biome,
                              ChunkAccess chunk,
                              WorldGenLevel level,
                              Generator generator,
@@ -103,7 +99,7 @@ public class FeatureDecorator {
 
     private void decoratePost(long seed,
                               BlockPos origin,
-                              Biome biome,
+                              Holder<Biome> biome,
                               ChunkAccess chunk,
                               WorldGenLevel level,
                               Generator generator,
@@ -115,7 +111,7 @@ public class FeatureDecorator {
 
     private void decorateVegetation(long seed,
                                     BlockPos origin,
-                                    Biome biome,
+                                    Holder<Biome> biome,
                                     ChunkAccess chunk,
                                     WorldGenLevel level,
                                     Generator generator,

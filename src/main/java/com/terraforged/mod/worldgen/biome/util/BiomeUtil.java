@@ -27,18 +27,20 @@ package com.terraforged.mod.worldgen.biome.util;
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.platform.CommonAPI;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 
 import java.util.*;
 
 public class BiomeUtil {
     private static final Map<BiomeType, ResourceLocation> TYPE_NAMES = new EnumMap<>(BiomeType.class);
-    private static final Set<String> KNOWN_NAMESPACES = Set.of(TerraForged.MODID, "terralith"); // TODO: Not hardcoded
+
+    private static final Comparator<ResourceKey<?>> KEY_COMPARATOR = Comparator.comparing(ResourceKey::location);
 
     static {
         for (var type : BiomeType.values()) {
@@ -50,48 +52,45 @@ public class BiomeUtil {
         return TYPE_NAMES.get(type);
     }
 
-    public static List<Biome> getOverworldBiomes(RegistryAccess access) {
+    public static List<Holder<Biome>> getOverworldBiomes(RegistryAccess access) {
         return getOverworldBiomes(access.registryOrThrow(Registry.BIOME_REGISTRY));
     }
 
-    public static List<Biome> getOverworldBiomes(Registry<Biome> biomes) {
+    public static List<Holder<Biome>> getOverworldBiomes(Registry<Biome> biomes) {
         var overworld = getVanillaOverworldBiomes(biomes);
+        var matcher = CommonAPI.get().getOverworldMatcher();
 
-        for (var entry : biomes.entrySet()) {
-            var biome = entry.getValue();
-            var name = entry.getKey().location();
-
-            if (CommonAPI.get().isOverworldBiome(entry.getKey())) {
-                overworld.add(biome);
-            } else if (KNOWN_NAMESPACES.contains(name.getNamespace())) {
-                overworld.add(biome);
+        for (var holder : biomes.asHolderIdMap()) {
+            if (!overworld.contains(holder) && matcher.test(holder)) {
+                overworld.add(holder);
             }
         }
 
-        overworld.sort(getBiomeSorter(biomes));
+        var result = new ArrayList<>(overworld);
+        result.sort(getBiomeSorter(biomes));
 
-        return overworld;
+        return result;
     }
 
-    public static Comparator<Biome> getBiomeSorter(Registry<Biome> biomes) {
+    public static Comparator<Holder<Biome>> getBiomeSorter(Registry<Biome> biomes) {
         return (o1, o2) -> {
-            var k1 = biomes.getKey(o1);
-            var k2 = biomes.getKey(o2);
+            var k1 = o1.unwrapKey().orElseThrow();
+            var k2 = o2.unwrapKey().orElseThrow();
             Objects.requireNonNull(k1);
             Objects.requireNonNull(k2);
-            return k1.compareTo(k2);
+            return KEY_COMPARATOR.compare(k1, k2);
         };
     }
 
-    public static BiomeType getType(Biome biome) {
-        return switch (biome.getBiomeCategory()) {
+    public static BiomeType getType(Holder<Biome> biome) {
+        return switch (Biome.getBiomeCategory(biome)) {
             case MESA, DESERT -> BiomeType.DESERT;
-            case PLAINS -> getByTemp(biome, BiomeType.COLD_STEPPE, BiomeType.GRASSLAND, BiomeType.STEPPE);
-            case TAIGA -> getByTemp(biome, BiomeType.TUNDRA, BiomeType.TAIGA);
+            case PLAINS -> getByTemp(biome.value(), BiomeType.COLD_STEPPE, BiomeType.GRASSLAND, BiomeType.STEPPE);
+            case TAIGA -> getByTemp(biome.value(), BiomeType.TUNDRA, BiomeType.TAIGA);
             case ICY -> BiomeType.TUNDRA;
             case SAVANNA -> BiomeType.SAVANNA;
             case JUNGLE -> BiomeType.TROPICAL_RAINFOREST;
-            case FOREST -> getByRain(biome, BiomeType.TUNDRA, BiomeType.TEMPERATE_RAINFOREST, BiomeType.TEMPERATE_FOREST);
+            case FOREST -> getByRain(biome.value(), BiomeType.TUNDRA, BiomeType.TEMPERATE_RAINFOREST, BiomeType.TEMPERATE_FOREST);
             case MOUNTAIN -> BiomeType.ALPINE;
             default -> null;
         };
@@ -113,9 +112,7 @@ public class BiomeUtil {
         return temperate;
     }
 
-    private static List<Biome> getVanillaOverworldBiomes(Registry<Biome> biomes) {
-        var set = new HashSet<>(MultiNoiseBiomeSource.Preset.OVERWORLD.biomeSource(biomes).possibleBiomes());
-        set.add(biomes.get(Biomes.MEADOW));
-        return new ArrayList<>(set);
+    private static Set<Holder<Biome>> getVanillaOverworldBiomes(Registry<Biome> biomes) {
+        return new HashSet<>(MultiNoiseBiomeSource.Preset.OVERWORLD.biomeSource(biomes).possibleBiomes());
     }
 }

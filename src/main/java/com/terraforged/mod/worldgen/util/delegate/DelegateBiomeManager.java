@@ -25,6 +25,7 @@
 package com.terraforged.mod.worldgen.util.delegate;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 
@@ -46,22 +47,22 @@ public class DelegateBiomeManager extends BiomeManager {
     }
 
     @Override
-    public Biome getBiome(BlockPos pos) {
+    public Holder<Biome> getBiome(BlockPos pos) {
         return delegate.getBiome(pos);
     }
 
     @Override
-    public Biome getNoiseBiomeAtPosition(double x, double y, double z) {
+    public Holder<Biome> getNoiseBiomeAtPosition(double x, double y, double z) {
         return delegate.getNoiseBiomeAtPosition(x, y, z);
     }
 
     @Override
-    public Biome getNoiseBiomeAtPosition(BlockPos pos) {
+    public Holder<Biome> getNoiseBiomeAtPosition(BlockPos pos) {
         return delegate.getNoiseBiomeAtPosition(pos);
     }
 
     @Override
-    public Biome getNoiseBiomeAtQuart(int x, int y, int z) {
+    public Holder<Biome> getNoiseBiomeAtQuart(int x, int y, int z) {
         return delegate.getNoiseBiomeAtQuart(x, y, z);
     }
 }

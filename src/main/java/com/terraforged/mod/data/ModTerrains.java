@@ -38,10 +38,10 @@ import com.terraforged.mod.worldgen.asset.TerrainNoise;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
 import com.terraforged.noise.domain.Domain;
+import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 public interface ModTerrains extends ModRegistry {
     static void register() {
@@ -121,8 +121,10 @@ public interface ModTerrains extends ModRegistry {
             return new TerrainNoise(getType(access, type), weight, noise);
         }
 
-        static Supplier<com.terraforged.mod.worldgen.asset.TerrainType> getType(RegistryAccess access, Terrain terrain) {
-            return TERRAIN_TYPE.getter(access, terrain.getName());
+        static Holder<com.terraforged.mod.worldgen.asset.TerrainType> getType(RegistryAccess access, Terrain terrain) {
+            if (access == null) return Holder.direct(com.terraforged.mod.worldgen.asset.TerrainType.of(terrain));
+            
+            return TERRAIN_TYPE.holder(access, terrain.getName());
         }
 
         static TerrainSettings settings() {

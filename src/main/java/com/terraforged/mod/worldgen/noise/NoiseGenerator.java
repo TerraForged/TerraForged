@@ -246,7 +246,7 @@ public class NoiseGenerator implements INoiseGenerator {
     }
 
     protected static TerrainBlender createLandTerrain(long seed, TerrainNoise[] terrainNoises) {
-        return new TerrainBlender(seed, 400, 0.8F, 0.275F, terrainNoises);
+        return new TerrainBlender(seed, 800, 0.8F, 0.4F /*0.275F*/, terrainNoises);
     }
 
     protected static ContinentNoise createContinentNoise(long seed, TerrainLevels levels) {

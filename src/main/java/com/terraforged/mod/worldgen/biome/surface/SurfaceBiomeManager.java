@@ -26,6 +26,7 @@ package com.terraforged.mod.worldgen.biome.surface;
 
 import com.terraforged.mod.worldgen.util.delegate.DelegateBiomeManager;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
@@ -34,7 +35,7 @@ public class SurfaceBiomeManager extends DelegateBiomeManager {
     private static final ThreadLocal<SurfaceBiomeManager> LOCAL_SURFACE_MANAGER = ThreadLocal.withInitial(SurfaceBiomeManager::new);
 
     protected ChunkPos chunkPos;
-    protected final Biome[] surfaceCache = new Biome[16 * 16];
+    protected final Holder<Biome>[] surfaceCache = new Holder[16 * 16];
     protected final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
     SurfaceBiomeManager set(ChunkPos chunkPos, BiomeManager biomeManager) {
@@ -53,7 +54,7 @@ public class SurfaceBiomeManager extends DelegateBiomeManager {
     }
 
     @Override
-    public Biome getBiome(BlockPos pos) {
+    public Holder<Biome> getBiome(BlockPos pos) {
         int chunkX = pos.getX() >> 4;
         int chunkZ = pos.getZ() >> 4;
 

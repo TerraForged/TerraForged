@@ -24,11 +24,11 @@
 
 package com.terraforged.mod.registry;
 
-import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.util.Init;
+import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -38,18 +38,17 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class ModRegistries extends Init {
     public static final ModRegistries INSTANCE = new ModRegistries();
 
-    private final List<Holder<?>> holders = new ArrayList<>();
+    private final List<HolderEntry<?>> holders = new ArrayList<>();
     private final Map<ResourceKey<? extends Registry<?>>, MappedRegistry<?>> registries = new IdentityHashMap<>();
 
     @Override
     protected void doInit() {}
 
-    public record Holder<T>(Registry<T> registry, Codec<T> direct) {
+    public record HolderEntry<T>(Registry<T> registry, Codec<T> direct) {
         public ResourceKey<? extends Registry<T>> key() {
             return registry.key();
         }
@@ -59,11 +58,11 @@ public class ModRegistries extends Init {
         INSTANCE.init();
     }
 
-    public static List<Holder<?>> getHolders() {
+    public static List<HolderEntry<?>> getHolders() {
         return INSTANCE.holders;
     }
 
-    public static <T> void createRegistry(LazyKey<T> key, Codec<T> codec) {
+    public static <T> void createRegistry(Key.LazyRegistry<T> key, Codec<T> codec) {
         createRegistry(key.get(), codec);
     }
 
@@ -73,14 +72,14 @@ public class ModRegistries extends Init {
             return;
         }
 
-        var registry = new MappedRegistry<>(key, Lifecycle.stable());
-        var holder = new Holder<>(registry, codec);
+        var registry = new MappedRegistry<>(key, Lifecycle.stable(), null);
+        var holder = new HolderEntry<>(registry, codec);
 
         INSTANCE.holders.add(holder);
         INSTANCE.registries.put(key, registry);
     }
 
-    public static <T> ResourceKey<T> register(LazyKey<T> registryKey, String name, T value) {
+    public static <T> ResourceKey<T> register(Key.LazyRegistry<T> registryKey, String name, T value) {
         return register(registryKey.get(), name, value);
     }
 
@@ -91,14 +90,10 @@ public class ModRegistries extends Init {
         return entryKey;
     }
 
-    public static <T> Supplier<T> supplier(ResourceKey<Registry<T>> registry, String name) {
+    public static <T> Holder<T> holder(ResourceKey<Registry<T>> registry, String name) {
         var location = TerraForged.location(name);
-        return Suppliers.memoize(() -> getEntry(registry, location));
-    }
-
-    public static <T> Supplier<T> supplier(Supplier<ResourceKey<Registry<T>>> registry, String name) {
-        var location = TerraForged.location(name);
-        return Suppliers.memoize(() -> getEntry(registry.get(), location));
+        var key = ResourceKey.create(registry, location);
+        return Holder.Reference.createStandAlone(getRegistry(registry), key);
     }
 
     private static <T> T getEntry(ResourceKey<Registry<T>> registry, ResourceLocation name) {

@@ -54,9 +54,10 @@ public record ModBiome(ResourceKey<Biome> key, Supplier<Biome> factory) {
 
     private static Biome.BiomeBuilder builderOf(ResourceKey<Biome> parent) {
         var biome = BuiltinRegistries.BIOME.getOrThrow(parent);
+        var holder = BuiltinRegistries.BIOME.getHolderOrThrow(parent);
         var builder = new Biome.BiomeBuilder();
         builder.downfall(biome.getDownfall());
-        builder.biomeCategory(biome.getBiomeCategory());
+        builder.biomeCategory(Biome.getBiomeCategory(holder));
         builder.temperature(biome.getBaseTemperature());
         builder.mobSpawnSettings(biome.getMobSettings());
         builder.precipitation(biome.getPrecipitation());

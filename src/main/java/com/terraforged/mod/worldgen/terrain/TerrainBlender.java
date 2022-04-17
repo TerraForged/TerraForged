@@ -33,6 +33,7 @@ import com.terraforged.mod.util.map.WeightMap;
 import com.terraforged.mod.util.seed.Seedable;
 import com.terraforged.mod.worldgen.asset.TerrainNoise;
 import com.terraforged.noise.Module;
+import com.terraforged.noise.Source;
 import com.terraforged.noise.domain.Domain;
 import com.terraforged.noise.util.NoiseUtil;
 
@@ -57,7 +58,7 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
         this.jitter = jitter;
         this.blending = blending;
         this.terrains = WeightMap.of(terrains);
-        this.warp = Domain.warp((int) seed + WARP_SEED_OFFSET, scale / 2, 3,scale / 2F);
+        this.warp = Domain.warp(Source.SIMPLEX, (int) seed + WARP_SEED_OFFSET, scale, 3,scale / 2.5F);
     }
 
     @Override

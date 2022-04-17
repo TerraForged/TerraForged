@@ -43,7 +43,7 @@ import java.nio.file.Path;
 @Mixin(CreateWorldScreen.class)
 public abstract class MixinCreateWorldScreen {
     @Shadow
-    private DataPackConfig dataPacks;
+    protected DataPackConfig dataPacks;
 
     @Shadow
     protected abstract Path getTempDataPackDir();

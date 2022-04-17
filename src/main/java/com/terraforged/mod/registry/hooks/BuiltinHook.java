@@ -24,70 +24,44 @@
 
 package com.terraforged.mod.registry.hooks;
 
-import com.mojang.serialization.Lifecycle;
-import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.registry.ModRegistries;
-import net.minecraft.core.MappedRegistry;
+import com.terraforged.mod.util.ReflectionUtil;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.RegistryResourceAccess;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 
-import java.util.HashMap;
+import java.lang.invoke.MethodHandle;
 import java.util.Map;
 
 public class BuiltinHook {
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static Map<? extends ResourceKey<? extends Registry<?>>, MappedRegistry<?>> addRegistries(
-            Map<? extends ResourceKey<? extends Registry<?>>, ? extends MappedRegistry<?>> registries) {
-        Map map = new HashMap<>(registries);
+    private static final MethodHandle REGISTRY_GETTER = ReflectionUtil.field(RegistryAccess.WritableRegistryAccess.class, Map.class);
+
+    public static <T> void load(RegistryAccess.Writable writable, RegistryOps<T> ops) {
+        if (ops.registryLoader().isEmpty()) return;
+
+        var backing = getBacking(writable);
         for (var holder : ModRegistries.getHolders()) {
-            map.put(holder.key(), new MappedRegistry<>(holder.key(), Lifecycle.stable()));
-        }
-        return map;
-    }
-
-    public static void injectBuiltin(RegistryAccess.RegistryHolder builtin, RegistryResourceAccess.InMemoryStorage storage) {
-        TerraForged.LOG.info("Injecting world-gen registry defaults");
-
-        var context = getExtendedHolder(builtin);
-
-        for (var holder : ModRegistries.getHolders()) {
-            try {
-                injectRegistry(holder, context, storage);
-            } catch (Throwable t) {
-                throw new Error("Failed to inject holder: " + holder.key(), t);
-            }
-        }
-    }
-
-    private static <T> void injectRegistry(ModRegistries.Holder<T> holder,
-                                           RegistryAccess.RegistryHolder context,
-                                           RegistryResourceAccess.InMemoryStorage storage) {
-        var registry = holder.registry();
-        for (var entry : registry.entrySet()) {
-            var value = entry.getValue();
-            try {
-                storage.add(context, entry.getKey(), holder.direct(), registry.getId(value), value, registry.lifecycle(value));
-            } catch (Throwable t) {
-                throw new Error("Failed to inject entry: " + entry.getKey() + "=" + value, t);
-            }
-        }
-
-        RegistryAccessUtil.printRegistryContents(registry);
-    }
-
-    private static RegistryAccess.RegistryHolder getExtendedHolder(RegistryAccess.RegistryHolder builtin) {
-        var extended = new RegistryAccess.RegistryHolder();
-
-        for (var data : RegistryAccess.knownRegistries()) {
-            RegistryAccessUtil.copy(builtin.ownedRegistryOrThrow(data.key()), extended);
+            backing.put(holder.key(), RegistryAccessUtil.copy(holder.registry()));
         }
 
         for (var holder : ModRegistries.getHolders()) {
-            RegistryAccessUtil.copy(holder.registry(), extended);
+            loadHolder(holder, ops);
         }
+    }
+    private static <T, E> void loadHolder(ModRegistries.HolderEntry<T> holder, RegistryOps<E> ops) {
+        var loader = ops.registryLoader().orElseThrow();
+        var result = loader.overrideRegistryFromResources(holder.key(), holder.direct(), ops.getAsJson());
+        RegistryAccessUtil.printRegistryContents(result.result().get());
+    }
 
-        return extended;
+    @SuppressWarnings("unchecked")
+    private static Map<ResourceKey<?>, Registry<?>> getBacking(RegistryAccess.Writable writable) {
+        try {
+            return (Map<ResourceKey<?>, Registry<?>>) REGISTRY_GETTER.invokeExact((RegistryAccess.WritableRegistryAccess) writable);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return Map.of();
+        }
     }
 }

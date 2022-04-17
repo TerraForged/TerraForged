@@ -27,9 +27,7 @@ package com.terraforged.mod.worldgen.util;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.util.Init;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.feature.StructureFeature;
 
-import java.util.Comparator;
 import java.util.function.Supplier;
 
 public class StructureReporter extends Init {
@@ -42,7 +40,7 @@ public class StructureReporter extends Init {
     @Override
     protected void doInit() {
         TerraForged.LOG.info("Validating structure configs:");
-        var structureSettings = settings.get().structureSettings();
+/*        var structureSettings = settings.get().structureSettings();
 
         structureSettings.structureConfig().keySet().stream()
                 .sorted(Comparator.comparing(StructureFeature::getFeatureName))
@@ -52,7 +50,7 @@ public class StructureReporter extends Init {
                     var name = structure.getFeatureName();
                     var mod = getNamespace(name);
                     TerraForged.LOG.error("- [{}] Invalid - Structure has not been assigned to any biomes so it cannot generate. Mod: {}", name, mod);
-                });
+                });*/
     }
 
     private static String getNamespace(String name) {

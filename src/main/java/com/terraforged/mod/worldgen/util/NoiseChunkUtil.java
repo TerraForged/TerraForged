@@ -31,16 +31,38 @@ import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import net.minecraft.core.QuartPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.levelgen.DensityFunction;
+import net.minecraft.world.level.levelgen.DensityFunctions;
 import net.minecraft.world.level.levelgen.NoiseChunk;
 import net.minecraft.world.level.levelgen.blending.Blender;
 
 import java.lang.invoke.MethodHandle;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 public class NoiseChunkUtil {
     private static final MethodHandle SURFACE_CACHE = ReflectionUtil.field(NoiseChunk.class, Long2IntMap.class);
-    private static final Supplier<NoiseChunk.NoiseFiller> FILLER = () -> (x, y, z) -> 0;
+    private static final DensityFunctions.BeardifierOrMarker BEARDO = new DensityFunctions.BeardifierOrMarker() {
+        @Override
+        public double compute(DensityFunction.FunctionContext p_208515_) {
+            return 0.0D;
+        }
+
+        @Override
+        public void fillArray(double[] p_208517_, DensityFunction.ContextProvider p_208518_) {
+            Arrays.fill(p_208517_, 0.0D);
+        }
+
+        @Override
+        public double minValue() {
+            return 0.0D;
+        }
+
+        @Override
+        public double maxValue() {
+            return 0.0D;
+        }
+    };
 
     public static void initChunk(ChunkAccess chunk, Generator generator) {
         getNoiseChunk(chunk, generator);
@@ -49,7 +71,7 @@ public class NoiseChunkUtil {
     public static NoiseChunk getNoiseChunk(ChunkAccess chunk, Generator generator) {
         var vanilla = generator.getVanillaGen();
         var fluidPicker = vanilla.getGlobalFluidPicker();
-        var noiseChunk = chunk.getOrCreateNoiseChunk(vanilla.getNoiseSampler(), FILLER, vanilla.getSettings().get(), fluidPicker, Blender.empty());
+        var noiseChunk = chunk.getOrCreateNoiseChunk(vanilla.getNoiseRouter(), () -> BEARDO, vanilla.getSettings().value(), fluidPicker, Blender.empty());
         initChunk(chunk, noiseChunk, generator);
         return noiseChunk;
     }
@@ -69,7 +91,10 @@ public class NoiseChunkUtil {
 
         int startX = chunkPos.getMinBlockX();
         int startZ = chunkPos.getMinBlockZ();
-        int lowest = Integer.MAX_VALUE;
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+
+        cache.clear();
 
         for (int dz = 0; dz < 16; dz++) {
             for (int dx = 0; dx < 16; dx++) {
@@ -77,12 +102,9 @@ public class NoiseChunkUtil {
                 int qx = QuartPos.fromBlock(startX + dx);
                 int qz = QuartPos.fromBlock(startZ + dz);
                 long index = ChunkPos.asLong(qx, qz);
-
-                int current = cache.getOrDefault(index, Integer.MAX_VALUE);
-                if (height < current) {
-                    cache.put(index, height);
-                    lowest = Math.min(lowest, height);
-                }
+                cache.put(index, height);
+                min = Math.min(min, height);
+                max = Math.max(max, height);
             }
         }
 
@@ -99,7 +121,7 @@ public class NoiseChunkUtil {
                 int qz = QuartPos.fromBlock(startZ + dz);
                 long index = ChunkPos.asLong(qx, qz);
 
-                cache.put(index, lowest);
+                cache.put(index, min);
             }
         }
     }

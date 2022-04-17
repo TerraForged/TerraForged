@@ -31,6 +31,7 @@ import com.terraforged.mod.worldgen.biome.vegetation.VegetationFeatures;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -44,14 +45,14 @@ public class PositionSampler {
     public static final float SQUASH_FACTOR = 2F / NoiseUtil.sqrt(3);
 
     public static void placeVegetation(long seed,
-                                      BlockPos origin,
-                                      Biome biome,
-                                      ChunkAccess chunk,
-                                      WorldGenLevel level,
-                                      Generator generator,
-                                      WorldgenRandom random,
-                                      CompletableFuture<TerrainData> terrain,
-                                      FeatureDecorator decorator) {
+                                       BlockPos origin,
+                                       Holder<Biome> biome,
+                                       ChunkAccess chunk,
+                                       WorldGenLevel level,
+                                       Generator generator,
+                                       WorldgenRandom random,
+                                       CompletableFuture<TerrainData> terrain,
+                                       FeatureDecorator decorator) {
 
         int offset = placeTreesAndGrass(seed, chunk, level, terrain, generator, random, decorator);
 
@@ -83,7 +84,7 @@ public class PositionSampler {
             var biome = context.biomeList.get(i);
             var vegetation = decorator.getVegetationManager().getVegetation(biome);
             var config = vegetation.config;
-            context.push(biome, vegetation);
+            context.push(biome.value(), vegetation);
 
             if (config == VegetationConfig.NONE) {
                 offset = placeAt(seed, offset + i, x, z, context);
@@ -99,7 +100,7 @@ public class PositionSampler {
     public static void placeOther(long seed,
                                   int offset,
                                   BlockPos origin,
-                                  Biome biome,
+                                  Holder<Biome> biome,
                                   WorldGenLevel level,
                                   Generator generator,
                                   WorldgenRandom random,
@@ -211,7 +212,7 @@ public class PositionSampler {
         context.pos.set(x, y, z);
 
         var biome = context.region.getBiome(context.pos);
-        if (biome != context.biome) return offset;
+        if (biome.value() != context.biome) return offset;
 
         float viability = context.viability.get(x & 15, z & 15);
         float noise = (1 - context.vegetation.density()) * MathUtil.rand(hash);

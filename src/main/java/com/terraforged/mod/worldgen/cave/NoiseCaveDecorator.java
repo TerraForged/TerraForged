@@ -48,7 +48,7 @@ public class NoiseCaveDecorator {
 
         for (int i = 0; i < biomes.size(); i++) {
             var biome = biomes.get(i);
-            decorate(pos, region, generator, biome.getGenerationSettings(), random);
+            decorate(pos, region, generator, biome.value().getGenerationSettings(), random);
         }
     }
 
@@ -68,7 +68,7 @@ public class NoiseCaveDecorator {
             for (int featureIndex = 0; featureIndex < stage.size(); featureIndex++) {
                 random.setFeatureSeed(baseSeed, featureIndex, stageIndex);
 
-                var feature = stage.get(featureIndex).get();
+                var feature = stage.get(featureIndex).value();
                 feature.placeWithBiomeCheck(region, generator, random, pos);
             }
         }

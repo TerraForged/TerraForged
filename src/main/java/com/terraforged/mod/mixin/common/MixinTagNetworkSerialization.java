@@ -24,22 +24,17 @@
 
 package com.terraforged.mod.mixin.common;
 
-import com.terraforged.mod.registry.hooks.StructureConfigHook;
-import net.minecraft.data.worldgen.StructureFeatures;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import com.terraforged.mod.registry.hooks.NetworkRegistryAccess;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.tags.TagNetworkSerialization;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-import java.util.function.BiConsumer;
-
-@Mixin(StructureFeatures.class)
-public class MixinStructureFeatures {
-    @Inject(method = "registerStructures", at = @At("TAIL"))
-    private static void onRegisterStructures(BiConsumer<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> consumer, CallbackInfo ci) {
-        StructureConfigHook.injectStructureBiomeConfigs(consumer);
+@Mixin(TagNetworkSerialization.class)
+public class MixinTagNetworkSerialization {
+    @ModifyVariable(method = "serializeTagsToNetwork", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    private static RegistryAccess onSerializeTagsToNetwork(RegistryAccess access) {
+        return new NetworkRegistryAccess(access);
     }
 }

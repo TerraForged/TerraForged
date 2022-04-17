@@ -24,20 +24,19 @@
 
 package com.terraforged.mod.data;
 
-import com.google.common.base.Suppliers;
 import com.terraforged.engine.Seed;
 import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.registry.ModRegistries;
 import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.util.seed.RandSeed;
-import com.terraforged.mod.worldgen.asset.BiomeTag;
 import com.terraforged.mod.worldgen.asset.VegetationConfig;
 import com.terraforged.mod.worldgen.biome.viability.*;
 import com.terraforged.noise.Source;
+import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-
-import java.util.function.Supplier;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.biome.Biome;
 
 public interface ModVegetations extends ModRegistry {
     static void register() {
@@ -146,13 +145,8 @@ public interface ModVegetations extends ModRegistry {
                     .build());
         }
 
-        static Supplier<BiomeTag> tag(String name, RegistryAccess access) {
-            if (access == null) {
-                return ModRegistries.supplier(ModRegistry.BIOME_TAG, name);
-            } else {
-                var tags = access.ownedRegistryOrThrow(BIOME_TAG.get());
-                return Suppliers.ofInstance(tags.get(TerraForged.location(name)));
-            }
+        static TagKey<Biome> tag(String name, RegistryAccess access) {
+            return TagKey.create(Registry.BIOME_REGISTRY, TerraForged.location(name));
         }
 
         static VegetationConfig[] getDefaults(RegistryAccess access) {

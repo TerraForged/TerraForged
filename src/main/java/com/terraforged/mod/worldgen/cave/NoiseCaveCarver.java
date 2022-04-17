@@ -30,6 +30,7 @@ import com.terraforged.mod.worldgen.asset.NoiseCave;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -78,7 +79,7 @@ public class NoiseCaveCarver {
         }
     }
 
-    private static void carve(ChunkAccess chunk, Biome biome, int dx, int dz, int bottom, int top, int surface, BlockPos.MutableBlockPos pos) {
+    private static void carve(ChunkAccess chunk, Holder<Biome> biome, int dx, int dz, int bottom, int top, int surface, BlockPos.MutableBlockPos pos) {
         var air = Blocks.AIR.defaultBlockState();
 
         int biomeX = dx >> 2;

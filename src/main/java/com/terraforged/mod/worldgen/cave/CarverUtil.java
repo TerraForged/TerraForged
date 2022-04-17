@@ -26,6 +26,7 @@ package com.terraforged.mod.worldgen.cave;
 
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.util.NoiseChunkUtil;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -34,6 +35,9 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.RandomSupport;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
+import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
+
+import java.util.List;
 
 public class CarverUtil {
     public static void applyCarvers(long seed,
@@ -62,11 +66,11 @@ public class CarverUtil {
                 int x = chunkPos.getMinBlockX();
                 int z = chunkPos.getMinBlockZ();
                 var biome = biomeManager.getNoiseBiomeAtQuart(x >> 2, 0, z >> 2);
-                var settings = biome.getGenerationSettings();
+                var settings = biome.value().getGenerationSettings();
 
-                var carvers = settings.getCarvers(step);
+                var carvers = (List<Holder<ConfiguredWorldCarver<?>>>) settings.getCarvers(step);
                 for (int i = 0; i < carvers.size(); i++) {
-                    var carver = carvers.get(i).get();
+                    var carver = carvers.get(i).value();
 
                     random.setLargeFeatureSeed(seed + i, chunkPos.x, chunkPos.z);
                     if (random.nextFloat() < 0.5F && carver.isStartChunk(random)) {

@@ -40,4 +40,6 @@ public class NoiseCodec {
         NoiseSpec.init();
         DataSpecs.register(Ridge.spec());
     }
+
+    public static void init() {}
 }

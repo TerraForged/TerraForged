@@ -24,7 +24,6 @@
 
 package com.terraforged.mod.worldgen.asset;
 
-import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.mod.codec.LazyCodec;
@@ -33,11 +32,10 @@ import com.terraforged.mod.util.seed.ContextSeedable;
 import com.terraforged.mod.worldgen.noise.NoiseCodec;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
-
-import java.util.function.Supplier;
+import net.minecraft.core.Holder;
 
 public class TerrainNoise implements ContextSeedable<TerrainNoise>, WeightMap.Weighted {
-    public static final TerrainNoise NONE = new TerrainNoise(Suppliers.ofInstance(TerrainType.NONE), 0, Source.ZERO);
+    public static final TerrainNoise NONE = new TerrainNoise(Holder.direct(TerrainType.NONE), 0, Source.ZERO);
 
     public static final Codec<TerrainNoise> CODEC = LazyCodec.record(instance -> instance.group(
             TerrainType.CODEC.fieldOf("type").forGetter(TerrainNoise::type),
@@ -45,20 +43,20 @@ public class TerrainNoise implements ContextSeedable<TerrainNoise>, WeightMap.We
             NoiseCodec.CODEC.fieldOf("noise").forGetter(TerrainNoise::noise)
     ).apply(instance, TerrainNoise::new));
 
-    private final Supplier<TerrainType> type;
+    private final Holder<TerrainType> type;
     private final float weight;
     private final Module noise;
-    private final Supplier<Terrain> terrain;
+    private final Holder<Terrain> terrain;
 
     public TerrainNoise(TerrainType type, float weight, Module noise) {
-        this(Suppliers.ofInstance(type), weight, noise);
+        this(Holder.direct(type), weight, noise);
     }
 
-    public TerrainNoise(Supplier<TerrainType> type, float weight, Module noise) {
+    public TerrainNoise(Holder<TerrainType> type, float weight, Module noise) {
         this.type = type;
         this.weight = weight;
         this.noise = noise;
-        this.terrain = Suppliers.memoize(() -> type.get().getTerrain());
+        this.terrain = Holder.direct(type.value().getTerrain());
     }
 
     @Override
@@ -72,12 +70,12 @@ public class TerrainNoise implements ContextSeedable<TerrainNoise>, WeightMap.We
         return weight;
     }
 
-    public Supplier<TerrainType> type() {
+    public Holder<TerrainType> type() {
         return type;
     }
 
     public Terrain terrain() {
-        return terrain.get();
+        return terrain.value();
     }
 
     public Module noise() {
@@ -91,5 +89,9 @@ public class TerrainNoise implements ContextSeedable<TerrainNoise>, WeightMap.We
                 ", weight=" + weight +
                 ", noise=" + noise +
                 '}';
+    }
+
+    static {
+        NoiseCodec.init();
     }
 }

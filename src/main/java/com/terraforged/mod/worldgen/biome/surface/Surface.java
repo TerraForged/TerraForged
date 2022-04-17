@@ -28,7 +28,7 @@ import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SnowLayerBlock;
@@ -38,7 +38,7 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 public class Surface {
-    protected static final Tag<Block> ERODABLE = BlockTags.DIRT;
+    protected static final TagKey<Block> ERODIBLE = BlockTags.DIRT;
 
     public static void apply(TerrainData terrainData, ChunkAccess chunk, ChunkGenerator generator) {
         float norm = 55 * (generator.getGenDepth() / 255F);
@@ -84,7 +84,7 @@ public class Surface {
                         state = chunk.getBlockState(pos.setY(y - 1));
                     }
 
-                    if (BlockTags.SNOW.contains(state.getBlock())) {
+                    if (state.is(BlockTags.SNOW)) {
                         erodeSnow(pos, chunk);
                     }
                 }
@@ -120,7 +120,7 @@ public class Surface {
     }
 
     public static boolean isErodible(BlockState state) {
-        return ERODABLE.contains(state.getBlock()) || BlockTags.SNOW.contains(state.getBlock());
+        return state.is(ERODIBLE) ||state.is(BlockTags.SNOW);
     }
 
     protected static BlockState findSolid(BlockPos.MutableBlockPos pos, ChunkAccess chunk) {

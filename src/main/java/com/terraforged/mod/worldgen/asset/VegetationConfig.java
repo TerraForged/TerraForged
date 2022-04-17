@@ -24,38 +24,38 @@
 
 package com.terraforged.mod.worldgen.asset;
 
-import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.terraforged.mod.codec.LazyCodec;
 import com.terraforged.mod.util.seed.ContextSeedable;
 import com.terraforged.mod.worldgen.biome.viability.Viability;
 import com.terraforged.mod.worldgen.biome.viability.ViabilityCodec;
-
-import java.util.function.Supplier;
+import net.minecraft.core.Registry;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.biome.Biome;
 
 @SuppressWarnings("ClassCanBeRecord")
 public class VegetationConfig implements ContextSeedable<VegetationConfig> {
-    public static final VegetationConfig NONE = new VegetationConfig(0F, 0F, 0F, Suppliers.ofInstance(BiomeTag.NONE), Viability.NONE);
+    public static final VegetationConfig NONE = new VegetationConfig(0F, 0F, 0F, null, Viability.NONE);
 
     public static final Codec<VegetationConfig> CODEC = LazyCodec.record(instance -> instance.group(
             Codec.FLOAT.optionalFieldOf("frequency", 1F).forGetter(VegetationConfig::frequency),
             Codec.FLOAT.optionalFieldOf("jitter", 1F).forGetter(VegetationConfig::jitter),
             Codec.FLOAT.optionalFieldOf("density", 1F).forGetter(VegetationConfig::density),
-            BiomeTag.CODEC.fieldOf("biomes").forGetter(VegetationConfig::biomes),
+            TagKey.hashedCodec(Registry.BIOME_REGISTRY).fieldOf("biomes").forGetter(VegetationConfig::biomes),
             ViabilityCodec.CODEC.fieldOf("viability").forGetter(VegetationConfig::viability)
     ).apply(instance, VegetationConfig::new));
 
     private final float frequency;
     private final float jitter;
     private final float density;
-    private final Supplier<BiomeTag> biomes;
+    private final TagKey<Biome> biomes;
     private final Viability viability;
 
-    public VegetationConfig(float frequency, float jitter, float density, Supplier<BiomeTag> biomes, Viability viability) {
-        this.biomes = biomes;
+    public VegetationConfig(float frequency, float jitter, float density, TagKey<Biome> biomes, Viability viability) {
         this.frequency = frequency;
         this.jitter = jitter;
         this.density = density;
+        this.biomes = biomes;
         this.viability = viability;
     }
 
@@ -65,7 +65,7 @@ public class VegetationConfig implements ContextSeedable<VegetationConfig> {
         return new VegetationConfig(frequency, jitter, density, biomes, viability);
     }
 
-    public Supplier<BiomeTag> biomes() {
+    public TagKey<Biome> biomes() {
         return biomes;
     }
 

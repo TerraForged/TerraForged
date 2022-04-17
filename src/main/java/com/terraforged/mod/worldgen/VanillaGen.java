@@ -24,8 +24,7 @@
 
 package com.terraforged.mod.worldgen;
 
-import com.terraforged.mod.worldgen.util.StructureConfig;
-import com.terraforged.mod.worldgen.util.delegate.DelegateGenerator;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -34,15 +33,14 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.carver.CarvingContext;
+import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
-import java.util.function.Supplier;
-
 public class VanillaGen {
-    protected final StructureConfig structureConfig;
-    protected final NoiseSampler noiseSampler;
+    protected final NoiseRouter noiseRouter;
+    protected final Registry<StructureSet> structureSets;
     protected final NoiseBasedChunkGenerator vanillaGenerator;
-    protected final Supplier<NoiseGeneratorSettings> settings;
+    protected final Holder<NoiseGeneratorSettings> settings;
     protected final Registry<NormalNoise.NoiseParameters> parameters;
 
     protected final int lavaLevel;
@@ -51,35 +49,39 @@ public class VanillaGen {
     protected final Aquifer.FluidPicker globalFluidPicker;
 
     public VanillaGen(long seed, BiomeSource biomeSource, VanillaGen other) {
-        this(seed, biomeSource, other.settings, other.parameters);
+        this(seed, biomeSource, other.settings, other.parameters, other.structureSets);
     }
 
-    public VanillaGen(long seed, BiomeSource biomeSource, Supplier<NoiseGeneratorSettings> settings, Registry<NormalNoise.NoiseParameters> parameters) {
+    public VanillaGen(long seed, BiomeSource biomeSource, Holder<NoiseGeneratorSettings> settings, Registry<NormalNoise.NoiseParameters> parameters, Registry<StructureSet> structures) {
         this.settings = settings;
         this.parameters = parameters;
-        this.structureConfig = new StructureConfig(settings.get().structureSettings());
-        this.vanillaGenerator = new NoiseBasedChunkGenerator(parameters, biomeSource, seed, settings);
-        this.noiseSampler = new NoiseSampler(settings.get().noiseSettings(), settings.get().isNoiseCavesEnabled(), seed, parameters, settings.get().getRandomSource());
-        this.lavaLevel = Math.min(-54, settings.get().seaLevel());
+        this.structureSets = structures;
+        this.vanillaGenerator = new NoiseBasedChunkGenerator(structures, parameters, biomeSource, seed, settings);
+        this.noiseRouter = settings.value().createNoiseRouter(parameters, seed);
+        this.lavaLevel = Math.min(-54, settings.value().seaLevel());
         this.fluidStatus1 = new Aquifer.FluidStatus(-54, Blocks.LAVA.defaultBlockState());
-        this.fluidStatus2 = new Aquifer.FluidStatus(settings.get().seaLevel(), settings.get().getDefaultFluid());
+        this.fluidStatus2 = new Aquifer.FluidStatus(settings.value().seaLevel(), settings.value().defaultFluid());
         this.globalFluidPicker = (x, y, z) -> y < lavaLevel ? fluidStatus1 : fluidStatus2;
     }
 
-    public Supplier<NoiseGeneratorSettings> getSettings() {
+    public Holder<NoiseGeneratorSettings> getSettings() {
         return settings;
     }
 
-    public StructureSettings getStructureSettings() {
-        return new StructureConfig(getSettings().get().structureSettings()).copy();
+    public Registry<StructureSet> getStructureSets() {
+        return structureSets;
     }
+
+    public NoiseRouter getNoiseRouter() {
+        return noiseRouter;
+    }
+
+//    public StructureSettings getStructureSettings() {
+//        return new StructureConfig(getSettings().get().structureSettings()).copy();
+//    }
 
     public Aquifer.FluidPicker getGlobalFluidPicker() {
         return globalFluidPicker;
-    }
-
-    public NoiseSampler getNoiseSampler() {
-        return noiseSampler;
     }
 
     public ChunkGenerator getVanillaGenerator() {
@@ -87,7 +89,8 @@ public class VanillaGen {
     }
 
     public ChunkGenerator createStructureGenerator(long seed, Generator generator) {
-        return new DelegateGenerator(seed, generator, settings) {};
+        return null;
+//        return new DelegateGenerator(seed, generator, settings) {};
     }
 
     public CarvingContext createCarvingContext(WorldGenRegion region, ChunkAccess chunk, NoiseChunk noiseChunk) {

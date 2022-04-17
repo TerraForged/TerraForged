@@ -27,9 +27,9 @@ package com.terraforged.mod.worldgen.biome.vegetation;
 import com.google.common.collect.ImmutableSet;
 import com.terraforged.mod.util.ReflectionUtil;
 import com.terraforged.mod.worldgen.asset.VegetationConfig;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -41,13 +41,12 @@ import java.lang.invoke.MethodHandle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 
 public class VegetationFeatures {
     public static VegetationFeatures NONE = new VegetationFeatures();
     public static final int STAGE = GenerationStep.Decoration.VEGETAL_DECORATION.ordinal();
 
-    private static final MethodHandle FEATURE_GETTER = ReflectionUtil.field(PlacedFeature.class, Supplier.class);
+    private static final MethodHandle FEATURE_GETTER = ReflectionUtil.field(PlacedFeature.class, Holder.class);
     private static final MethodHandle PLACEMENTS_GETTER = ReflectionUtil.field(PlacedFeature.class, List.class);
 
     private static final Set<PlacementModifierType<?>> BIOME_CHECK = Set.of(PlacementModifierType.BIOME_FILTER);
@@ -95,30 +94,29 @@ public class VegetationFeatures {
         return other;
     }
 
-    public static VegetationFeatures create(ResourceKey<Biome> key, RegistryAccess access, VegetationConfig config) {
+    public static VegetationFeatures create(Biome biome, RegistryAccess access, VegetationConfig config) {
         var trees = new ArrayList<PlacedFeature>();
         var grass = new ArrayList<PlacedFeature>();
         var other = new ArrayList<PlacedFeature>();
         boolean custom = config != VegetationConfig.NONE;
 
-        var biomeRegistry = access.registryOrThrow(Registry.BIOME_REGISTRY);
-        var features = biomeRegistry.getOrThrow(key).getGenerationSettings().features();
+        var features = biome.getGenerationSettings().features();
         if (features.size() > STAGE) {
             var vegetation = features.get(STAGE);
             var featureRegistry = access.registryOrThrow(Registry.PLACED_FEATURE_REGISTRY);
 
             for (var feature : vegetation) {
-                var featureKey = featureRegistry.getKey(feature.get());
+                var featureKey = featureRegistry.getKey(feature.value());
                 if (featureKey == null) {
-                    other.add(feature.get());
+                    other.add(feature.value());
                 } else {
                     var path = featureKey.getPath();
                     if (matches(path, TREE_KEYWORDS)) {
                         trees.add(unwrap(feature, TREE_EXCLUSIONS, custom));
                     } else if (matches(path, GRASS_KEYWORDS)) {
-                        grass.add(feature.get());
+                        grass.add(feature.value());
                     } else {
-                        other.add(feature.get());
+                        other.add(feature.value());
                     }
                 }
             }
@@ -136,11 +134,11 @@ public class VegetationFeatures {
         return false;
     }
 
-    public static PlacedFeature unwrap(Supplier<PlacedFeature> supplier, Set<PlacementModifierType<?>> exclusions, boolean custom) {
-        if (!custom) return supplier.get();
+    public static PlacedFeature unwrap(Holder<PlacedFeature> supplier, Set<PlacementModifierType<?>> exclusions, boolean custom) {
+        if (!custom) return supplier.value();
 
         try {
-            PlacedFeature placed = supplier.get();
+            PlacedFeature placed = supplier.value();
 
             var feature = getFeature(placed);
             var placements = new ArrayList<>(getPlacements(placed));
@@ -149,13 +147,13 @@ public class VegetationFeatures {
             return new PlacedFeature(feature, placements);
         } catch (Throwable t) {
             t.printStackTrace();
-            return supplier.get();
+            return supplier.value();
         }
     }
 
     @SuppressWarnings("unchecked")
-    protected static Supplier<ConfiguredFeature<?, ?>> getFeature(PlacedFeature feature) throws Throwable {
-        return (Supplier<ConfiguredFeature<?, ?>>) FEATURE_GETTER.invokeExact(feature);
+    protected static Holder<ConfiguredFeature<?, ?>> getFeature(PlacedFeature feature) throws Throwable {
+        return (Holder<ConfiguredFeature<?, ?>>) FEATURE_GETTER.invokeExact(feature);
     }
 
     @SuppressWarnings("unchecked")

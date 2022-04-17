@@ -28,11 +28,9 @@ import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.worldgen.asset.*;
 
 public interface ModRegistry {
-    LazyKey<BiomeTag> BIOME_TAG = TerraForged.registry("worldgen/tag/biome");
-    LazyKey<ClimateType> CLIMATE = TerraForged.registry("worldgen/climate");
-    LazyKey<NoiseCave> CAVE = TerraForged.registry("worldgen/cave");
-    LazyKey<TerrainNoise> TERRAIN = TerraForged.registry("worldgen/terrain/noise");
-    LazyKey<TerrainType> TERRAIN_TYPE = TerraForged.registry("worldgen/terrain/type");
-    LazyKey<VegetationConfig> VEGETATION = TerraForged.registry("worldgen/vegetation");
-    LazyKey<StructureConfig> STRUCTURE_CONFIG = TerraForged.registry("worldgen/structure_config");
+    Key.LazyRegistry<ClimateType> CLIMATE = TerraForged.registry("worldgen/climate");
+    Key.LazyRegistry<NoiseCave> CAVE = TerraForged.registry("worldgen/cave");
+    Key.LazyRegistry<TerrainNoise> TERRAIN = TerraForged.registry("worldgen/terrain/noise");
+    Key.LazyRegistry<TerrainType> TERRAIN_TYPE = TerraForged.registry("worldgen/terrain/type");
+    Key.LazyRegistry<VegetationConfig> VEGETATION = TerraForged.registry("worldgen/vegetation");
 }

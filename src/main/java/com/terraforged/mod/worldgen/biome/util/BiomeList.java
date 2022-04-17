@@ -24,13 +24,14 @@
 
 package com.terraforged.mod.worldgen.biome.util;
 
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.Arrays;
 
 public class BiomeList {
     private int size = 0;
-    private Biome[] biomes;
+    private Holder<Biome>[] biomes;
 
     public BiomeList reset() {
         size = 0;
@@ -41,11 +42,11 @@ public class BiomeList {
         return size;
     }
 
-    public Biome get(int i ) {
+    public Holder<Biome> get(int i ) {
         return biomes[i];
     }
 
-    public boolean contains(Biome biome) {
+    public boolean contains(Holder<Biome> biome) {
         if (biomes == null) return false;
 
         for (int i = 0; i < size; i++) {
@@ -57,7 +58,7 @@ public class BiomeList {
         return false;
     }
 
-    public void add(Biome biome) {
+    public void add(Holder<Biome> biome) {
         if (contains(biome)) return;
 
         grow(size + 1);
@@ -67,7 +68,7 @@ public class BiomeList {
 
     private void grow(int size) {
         if (biomes == null) {
-            biomes = new Biome[size];
+            biomes = new Holder[size];
         } else if (biomes.length <= size) {
             biomes = Arrays.copyOf(biomes, size);
         }

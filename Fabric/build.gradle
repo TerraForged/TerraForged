@@ -8,6 +8,7 @@ apply from: file("../common.gradle")
 sourceSets {
 	main.java { srcDirs += "../src/main/java" }
 	main.resources { srcDirs += "../src/main/resources" }
+	main.resources { srcDirs += "../generated/resources" }
 }
 
 dependencies {

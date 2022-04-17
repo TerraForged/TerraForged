@@ -22,48 +22,30 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.registry;
+package com.terraforged.mod.registry.hooks;
 
-import com.terraforged.mod.TerraForged;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 
-import java.util.function.Supplier;
+import java.util.Optional;
+import java.util.stream.Stream;
 
-public class LazyKey<T> implements Supplier<ResourceKey<Registry<T>>> {
-    private final ResourceLocation name;
-    private volatile ResourceKey<Registry<T>> key;
+public record NetworkRegistryAccess(RegistryAccess registryAccess) implements RegistryAccess {
+    @Override
+    public <E> Optional<Registry<E>> ownedRegistry(ResourceKey<? extends Registry<? extends E>> key) {
+        if (!REGISTRIES.containsKey(key)) return Optional.empty();
 
-    public LazyKey(ResourceLocation name) {
-        this.name = name;
+        return registryAccess.ownedRegistry(key);
     }
 
     @Override
-    public ResourceKey<Registry<T>> get() {
-        var key = this.key;
-        if (key == null) {
-            synchronized (name) {
-                key = this.key;
-                if (this.key == null) {
-                    key = ResourceKey.createRegistryKey(name);
-                    this.key = key;
-                }
-            }
-        }
-        return key;
+    public Stream<RegistryEntry<?>> ownedRegistries() {
+        return registryAccess.ownedRegistries().filter(e -> REGISTRIES.containsKey(e.key()));
     }
 
-    public ResourceKey<T> element(String name) {
-        return ResourceKey.create(get(), TerraForged.location(name));
-    }
-
-    public Supplier<T> getter(RegistryAccess access, String name) {
-        if (access == null) return ModRegistries.supplier(get(), name);
-
-        var key = element(name);
-        var registry = access.ownedRegistryOrThrow(get());
-        return () -> registry.get(key);
+    @Override
+    public Stream<RegistryEntry<?>> networkSafeRegistries() {
+        return RegistryAccess.super.networkSafeRegistries().filter(e -> REGISTRIES.containsKey(e.key()));
     }
 }

@@ -61,13 +61,15 @@ public class GeneratorPreset {
     public static LevelStem getDefault(RegistryAccess registries) {
         var generator = build(0L, TerrainLevels.DEFAULT.copy(), registries);
         var type = registries.ownedRegistryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
-        return new LevelStem(() -> type.getOrThrow(DimensionType.OVERWORLD_LOCATION), generator);
+        return new LevelStem(type.getHolderOrThrow(DimensionType.OVERWORLD_LOCATION), generator);
     }
 
     public static VanillaGen getVanillaGen(long seed, BiomeSource biomes, RegistryAccess access) {
+        var structures = access.ownedRegistryOrThrow(Registry.STRUCTURE_SET_REGISTRY);
         var parameters = access.registryOrThrow(Registry.NOISE_REGISTRY);
-        var settings = access.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
-        return new VanillaGen(seed, biomes, () -> settings.getOrThrow(NoiseGeneratorSettings.OVERWORLD), parameters);
+        var settings = access.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY)
+                .getHolderOrThrow(NoiseGeneratorSettings.OVERWORLD);
+        return new VanillaGen(seed, biomes, settings, parameters, structures);
     }
 
     public static boolean isTerraForgedWorld(WorldGenSettings settings) {

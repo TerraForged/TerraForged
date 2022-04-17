@@ -32,6 +32,7 @@ import com.terraforged.mod.worldgen.asset.ClimateType;
 import it.unimi.dsi.fastutil.objects.Object2FloatLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -48,8 +49,8 @@ public class BiomeMapManager {
 
     private final Registry<Biome> biomes;
     private final Registry<ClimateType> climateTypes;
-    private final List<Biome> overworldBiomes;
-    private final Map<BiomeType, WeightMap<Biome>> biomeMap;
+    private final List<Holder<Biome>> overworldBiomes;
+    private final Map<BiomeType, WeightMap<Holder<Biome>>> biomeMap;
 
     public BiomeMapManager(RegistryAccess access) {
         biomes = access.ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
@@ -58,28 +59,28 @@ public class BiomeMapManager {
         biomeMap = buildBiomeMap();
     }
 
-    public Biome get(ResourceKey<Biome> key) {
-        return biomes.get(key);
+    public Holder<Biome> get(ResourceKey<Biome> key) {
+        return biomes.getHolderOrThrow(key);
     }
 
     public Registry<Biome> getBiomes() {
         return biomes;
     }
 
-    public List<Biome> getOverworldBiomes() {
+    public List<Holder<Biome>> getOverworldBiomes() {
         return overworldBiomes;
     }
 
-    public Map<BiomeType, WeightMap<Biome>> getBiomeMap() {
+    public Map<BiomeType, WeightMap<Holder<Biome>>> getBiomeMap() {
         return biomeMap;
     }
 
-    private Map<BiomeType, WeightMap<Biome>> buildBiomeMap() {
+    private Map<BiomeType, WeightMap<Holder<Biome>>> buildBiomeMap() {
         var map = getWeightsMap();
 
-        var result = new EnumMap<BiomeType, WeightMap<Biome>>(BiomeType.class);
+        var result = new EnumMap<BiomeType, WeightMap<Holder<Biome>>>(BiomeType.class);
         for (var entry : map.entrySet()) {
-            var values = entry.getValue().keySet().toArray(Biome[]::new);
+            var values = (Holder<Biome>[]) entry.getValue().keySet().toArray(Holder[]::new);
             var weights = entry.getValue().values().toFloatArray();
             result.put(entry.getKey(), new WeightMap<>(values, weights));
         }
@@ -87,9 +88,9 @@ public class BiomeMapManager {
         return result;
     }
 
-    private Map<BiomeType, Object2FloatMap<Biome>> getWeightsMap() {
-        var map = new HashMap<BiomeType, Object2FloatMap<Biome>>();
-        var registered = new ObjectOpenHashSet<Biome>();
+    private Map<BiomeType, Object2FloatMap<Holder<Biome>>> getWeightsMap() {
+        var map = new HashMap<BiomeType, Object2FloatMap<Holder<Biome>>>();
+        var registered = new ObjectOpenHashSet<Holder<Biome>>();
 
         for (var typeHolder : HOLDERS) {
             var biomeType = climateTypes.get(typeHolder.name);
@@ -113,13 +114,12 @@ public class BiomeMapManager {
         return map;
     }
 
-    private static Object2FloatMap<Biome> getBiomeWeights(ClimateType type, Registry<Biome> biomes, Consumer<Biome> registered) {
+    private static Object2FloatMap<Holder<Biome>> getBiomeWeights(ClimateType type, Registry<Biome> biomes, Consumer<Holder<Biome>> registered) {
         var map = newMutableWeightMap();
 
         for (var entry : type.getWeights().object2FloatEntrySet()) {
-            var biome = biomes.get(entry.getKey());
-            if (biome == null) continue;
-
+            var key = biomes.getResourceKey(biomes.getOptional(entry.getKey()).orElseThrow()).orElseThrow();
+            var biome = biomes.getHolderOrThrow(key);
             map.put(biome, entry.getFloatValue());
             registered.accept(biome);
         }
@@ -127,14 +127,14 @@ public class BiomeMapManager {
         return map;
     }
 
-    private static List<Biome> getOverworldBiomes(Registry<Biome> biomes, Registry<ClimateType> biomeTypes) {
+    private static List<Holder<Biome>> getOverworldBiomes(Registry<Biome> biomes, Registry<ClimateType> biomeTypes) {
         var list = BiomeUtil.getOverworldBiomes(biomes);
         var added = new ObjectOpenHashSet<>(list);
 
         for (var type : biomeTypes) {
-            for (var key : type.getWeights().keySet()) {
-                var biome = biomes.get(key);
-                if (biome == null) continue;
+            for (var name : type.getWeights().keySet()) {
+                var key = ResourceKey.create(Registry.BIOME_REGISTRY, name);
+                var biome = biomes.getHolderOrThrow(key);
 
                 if (added.add(biome)) {
                     list.add(biome);
@@ -147,7 +147,7 @@ public class BiomeMapManager {
         return list;
     }
 
-    private static Object2FloatMap<Biome> newMutableWeightMap() {
+    private static Object2FloatMap<Holder<Biome>> newMutableWeightMap() {
         return new Object2FloatLinkedOpenHashMap<>();
     }
 

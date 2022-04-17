@@ -24,58 +24,20 @@
 
 package com.terraforged.mod.data;
 
-import com.terraforged.mod.registry.ModRegistries;
-import com.terraforged.mod.registry.ModRegistry;
-import com.terraforged.mod.worldgen.asset.BiomeTag;
-import net.minecraft.core.Registry;
-import net.minecraft.data.BuiltinRegistries;
+import com.terraforged.mod.TerraForged;
+import com.terraforged.mod.registry.Key;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
 
-public interface ModTags extends ModRegistry {
-    static void register() {
-        var registry = BuiltinRegistries.BIOME;
-        ModRegistries.register(BIOME_TAG, "trees/copses", Trees.copses(registry));
-        ModRegistries.register(BIOME_TAG, "trees/hardy", Trees.hardy(registry));
-        ModRegistries.register(BIOME_TAG, "trees/hardy_slopes", Trees.hardySlopes(registry));
-        ModRegistries.register(BIOME_TAG, "trees/patchy", Trees.patchy(registry));
-        ModRegistries.register(BIOME_TAG, "trees/sparse", Trees.sparse(registry));
-        ModRegistries.register(BIOME_TAG, "trees/rainforest", Trees.rainforest(registry));
-        ModRegistries.register(BIOME_TAG, "trees/sparse_rainforest", Trees.sparseRainforest(registry));
-        ModRegistries.register(BIOME_TAG, "trees/temperate", Trees.temperate(registry));
-    }
+public interface ModTags {
+    Key.LazyTag<Biome> OVERWORLD = TerraForged.biomeTag("overworld");
 
-    class Trees {
-        static BiomeTag copses(Registry<Biome> registry) {
-            return BiomeTag.of(registry, Biomes.PLAINS, Biomes.MEADOW, Biomes.SNOWY_PLAINS, Biomes.SUNFLOWER_PLAINS);
-        }
-
-        static BiomeTag patchy(Registry<Biome> registry) {
-            return BiomeTag.of(registry, Biomes.WOODED_BADLANDS, ModBiomes.OAK_FOREST.key());
-        }
-
-        static BiomeTag hardy(Registry<Biome> registry) {
-            return BiomeTag.of(registry, Biomes.TAIGA, Biomes.DARK_FOREST, Biomes.WINDSWEPT_FOREST, Biomes.OLD_GROWTH_PINE_TAIGA, Biomes.OLD_GROWTH_SPRUCE_TAIGA);
-        }
-
-        static BiomeTag hardySlopes(Registry<Biome> registry) {
-            return BiomeTag.of(registry, Biomes.TAIGA);
-        }
-
-        static BiomeTag sparse(Registry<Biome> registry) {
-            return BiomeTag.of(registry, Biomes.SAVANNA, Biomes.SAVANNA_PLATEAU, Biomes.WINDSWEPT_SAVANNA);
-        }
-
-        static BiomeTag rainforest(Registry<Biome> registry) {
-            return BiomeTag.of(registry, Biomes.JUNGLE, Biomes.BAMBOO_JUNGLE);
-        }
-
-        static BiomeTag sparseRainforest(Registry<Biome> registry) {
-            return BiomeTag.of(registry, Biomes.SPARSE_JUNGLE);
-        }
-
-        static BiomeTag temperate(Registry<Biome> registry) {
-            return BiomeTag.of(registry, Biomes.FOREST, Biomes.BIRCH_FOREST, Biomes.FLOWER_FOREST, Biomes.OLD_GROWTH_BIRCH_FOREST);
-        }
-    }
+    // Trees
+    Key.LazyTag<Biome> COPSES = TerraForged.biomeTag("trees/copses");
+    Key.LazyTag<Biome> HARDY = TerraForged.biomeTag("trees/hardy");
+    Key.LazyTag<Biome> HARDY_SLOPES = TerraForged.biomeTag("trees/hardy_slopes");
+    Key.LazyTag<Biome> PATCHY = TerraForged.biomeTag("trees/patchy");
+    Key.LazyTag<Biome> RAINFOREST = TerraForged.biomeTag("trees/rainforest");
+    Key.LazyTag<Biome> SPARSE = TerraForged.biomeTag("trees/sparse");
+    Key.LazyTag<Biome> SPARSE_RAINFOREST = TerraForged.biomeTag("trees/sparse_rainforest");
+    Key.LazyTag<Biome> TEMPERATE = TerraForged.biomeTag("trees/temperate");
 }

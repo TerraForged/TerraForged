@@ -30,9 +30,10 @@ import com.terraforged.mod.codec.LazyCodec;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -59,27 +60,23 @@ public abstract class WorldgenTag<T> {
                 '}';
     }
 
-    private static <T> ObjectSet<T> unwrap(List<Supplier<T>> list) {
+    private static <T> ObjectSet<T> unwrap(HolderSet<T> list) {
         var set = new ObjectOpenHashSet<T>(list.size());
         for (var item : list) {
-            set.add(item.get());
+            set.add(item.value());
         }
         return set;
     }
 
-    private static <T> List<Supplier<T>> wrap(Set<T> set) {
-        var list = new ArrayList<Supplier<T>>(set.size());
-        for (var item : set) {
-            list.add(() -> item);
-        }
-        return list;
+    private static <T> HolderSet<T> wrap(Set<T> set) {
+        return HolderSet.direct(Holder::direct, new ArrayList<>(set));
     }
 
-    public static <V, T extends WorldgenTag<V>> Codec<T> codec(Codec<List<Supplier<V>>> listCodec, Function<ObjectSet<V>, T> constructor) {
+    public static <V, T extends WorldgenTag<V>> Codec<T> codec(Codec<HolderSet<V>> listCodec, Function<ObjectSet<V>, T> constructor) {
         return codec("items", () -> listCodec, constructor);
     }
 
-    public static <V, T extends WorldgenTag<V>> Codec<T> codec(String key, Supplier<Codec<List<Supplier<V>>>> listCodec, Function<ObjectSet<V>, T> constructor) {
+    public static <V, T extends WorldgenTag<V>> Codec<T> codec(String key, Supplier<Codec<HolderSet<V>>> listCodec, Function<ObjectSet<V>, T> constructor) {
         return LazyCodec.of(() -> RecordCodecBuilder.create(instance -> instance.group(
                 listCodec.get().fieldOf(key).xmap(WorldgenTag::unwrap, WorldgenTag::wrap).forGetter(WorldgenTag::items)
         ).apply(instance, constructor)));

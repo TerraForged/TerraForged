@@ -31,21 +31,19 @@ import com.mojang.serialization.JsonOps;
 import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.registry.ModRegistries;
-import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.util.FileUtil;
 import com.terraforged.mod.util.Init;
 import com.terraforged.mod.util.json.JsonFormatter;
 import com.terraforged.mod.worldgen.GeneratorPreset;
-import com.terraforged.mod.worldgen.asset.StructureConfig;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.RegistryWriteOps;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.StructureSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -70,15 +68,16 @@ public class DataGen extends Init {
         FileUtil.delete(dir);
 
         TerraForged.LOG.info("Generating json data");
-        var registries = RegistryAccess.builtin();
-        var writeOps = RegistryWriteOps.create(JsonOps.INSTANCE, registries);
+        var registries = RegistryAccess.builtinCopy();
+        var writeOps = RegistryOps.create(JsonOps.INSTANCE, registries);
 
+//        genDimensionType(dir, registries, writeOps);
         genGenerator(dir, registries, writeOps);
         genBuiltin(dir, registries, writeOps);
         genBiomes(dir, registries, writeOps);
     }
 
-    public static void exportStructureConfigs(Path dir, StructureSettings structures, RegistryAccess access) {
+    /*public static void exportStructureConfigs(Path dir, StructureSettings structures, RegistryAccess access) {
         for (var entry : structures.structureConfig().entrySet()) {
             var structureName = Registry.STRUCTURE_FEATURE.getKey(entry.getKey());
             if (structureName == null || structureName.getNamespace().equals("minecraft")) continue;
@@ -88,21 +87,25 @@ public class DataGen extends Init {
 
             export(dir, ModRegistry.STRUCTURE_CONFIG.get(), structureName, StructureConfig.CODEC, structureConfig, JsonOps.INSTANCE);
         }
-    }
+    }*/
 
-    private static void genGenerator(Path dir, RegistryAccess registries, RegistryWriteOps<JsonElement> writeOps) {
+    private static void genGenerator(Path dir, RegistryAccess registries, RegistryOps<JsonElement> writeOps) {
         var generator = GeneratorPreset.getDefault(registries);
         var json = LevelStem.CODEC.encodeStart(writeOps, generator).resultOrPartial(System.err::println).orElseThrow();
         export(dir, Registry.DIMENSION_REGISTRY, Level.OVERWORLD, json);
     }
 
-    private static void genBuiltin(Path dir, RegistryAccess registries, RegistryWriteOps<JsonElement> writeOps) {
+    private static void genDimensionType(Path dir, RegistryAccess registries, RegistryOps<JsonElement> writeOps) {
+        export(dir, Registry.DIMENSION_TYPE_REGISTRY, DimensionType.DIRECT_CODEC, registries, writeOps);
+    }
+
+    private static void genBuiltin(Path dir, RegistryAccess registries, RegistryOps<JsonElement> writeOps) {
         for (var holder : ModRegistries.getHolders()) {
             export(dir, holder, registries, writeOps);
         }
     }
 
-    private static void genBiomes(Path dir, RegistryAccess registries, RegistryWriteOps<JsonElement> writeOps) {
+    private static void genBiomes(Path dir, RegistryAccess registries, RegistryOps<JsonElement> writeOps) {
         var biomes = registries.ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
         for (var entry : biomes.entrySet()) {
             if (!entry.getKey().location().getNamespace().equals(TerraForged.MODID)) continue;
@@ -112,7 +115,7 @@ public class DataGen extends Init {
         }
     }
 
-    private static <T> void export(Path dir, ModRegistries.Holder<T> holder, RegistryAccess access, DynamicOps<JsonElement> ops) {
+    private static <T> void export(Path dir, ModRegistries.HolderEntry<T> holder, RegistryAccess access, DynamicOps<JsonElement> ops) {
         export(dir, holder.key(), holder.direct(), access, ops);
     }
 
@@ -124,8 +127,12 @@ public class DataGen extends Init {
     private static <T> void export(Path dir, Registry<T> registry, Codec<T> codec, DynamicOps<JsonElement> ops) {
         TerraForged.LOG.info("Exporting registry: {}", registry.key());
         for (var entry : registry.entrySet()) {
-            var json = codec.encodeStart(ops, entry.getValue()).result().orElseThrow();
-            export(dir, registry.key(), entry.getKey(), json);
+            try {
+                var json = codec.encodeStart(ops, entry.getValue()).result().orElseThrow();
+                export(dir, registry.key(), entry.getKey(), json);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
         }
     }
 

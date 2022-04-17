@@ -28,32 +28,32 @@ import com.mojang.serialization.DynamicOps;
 import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.util.ReflectionUtil;
+import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.RegistryReadOps;
+import net.minecraft.core.WritableRegistry;
+import net.minecraft.resources.RegistryOps;
 
 import java.lang.invoke.MethodHandle;
-import java.util.Map;
 import java.util.Optional;
 
 public class RegistryAccessUtil {
-    private static final MethodHandle REGISTRY_ACCESS_GETTER = ReflectionUtil.field(RegistryReadOps.class, RegistryAccess.class);
-    private static final MethodHandle REGISTRY_HOLDER_MAP = ReflectionUtil.field(RegistryAccess.RegistryHolder.class, Map.class);
+    private static final MethodHandle REGISTRY_ACCESS_GETTER = ReflectionUtil.field(RegistryOps.class, RegistryAccess.class);
 
     public static Optional<RegistryAccess> getRegistryAccess(DynamicOps<?> ops) {
-        if (!(ops instanceof RegistryReadOps)) {
+        if (!(ops instanceof RegistryOps<?>)) {
             return Optional.empty();
         }
 
         try {
-            return Optional.ofNullable(getRegistryAccess((RegistryReadOps<?>) ops));
+            return Optional.ofNullable(getRegistryAccess((RegistryOps<?>) ops));
         } catch (Throwable t) {
             t.printStackTrace();
             return Optional.empty();
         }
     }
 
-    public static RegistryAccess getRegistryAccess(RegistryReadOps<?> ops) {
+    public static RegistryAccess getRegistryAccess(RegistryOps<?> ops) {
         try {
             return (RegistryAccess) REGISTRY_ACCESS_GETTER.invokeExact(ops);
         } catch (Throwable e) {
@@ -62,8 +62,16 @@ public class RegistryAccessUtil {
         }
     }
 
-    public static <T> void copy(Registry<T> registry, RegistryAccess.RegistryHolder holder) {
-        var dest = holder.ownedRegistryOrThrow(registry.key());
+    public static <T> MappedRegistry<T> copy(Registry<T> input) {
+        var copy = new MappedRegistry<>(input.key(), input.lifecycle(), null);
+        for (var e : input.entrySet()) {
+            copy.register(e.getKey(), e.getValue(), input.lifecycle(e.getValue()));
+        }
+        return copy;
+    }
+
+    public static <T> void copy(Registry<T> registry, RegistryAccess.Writable holder) {
+        var dest = (WritableRegistry<T>) holder.ownedRegistryOrThrow(registry.key());
         for (var entry : registry.entrySet()) {
             dest.register(entry.getKey(), entry.getValue(), registry.lifecycle(entry.getValue()));
         }

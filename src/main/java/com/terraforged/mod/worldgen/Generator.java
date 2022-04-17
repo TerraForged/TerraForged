@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.worldgen;
 
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.terraforged.mod.codec.WorldGenCodec;
@@ -35,9 +36,7 @@ import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import com.terraforged.mod.worldgen.util.ChunkUtil;
 import com.terraforged.mod.worldgen.util.ThreadPool;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.*;
@@ -50,11 +49,13 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.blending.Blender;
-import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -72,7 +73,6 @@ public class Generator extends ChunkGenerator {
     protected final BiomeGenerator biomeGenerator;
     protected final INoiseGenerator noiseGenerator;
     protected final TerrainCache terrainCache;
-    protected final ChunkGenerator structureGenerator;
     protected final ThreadLocal<GeneratorResource> localResource = ThreadLocal.withInitial(GeneratorResource::new);
 
     public Generator(long seed,
@@ -81,7 +81,7 @@ public class Generator extends ChunkGenerator {
                      Source biomeSource,
                      BiomeGenerator biomeGenerator,
                      INoiseGenerator noiseGenerator) {
-        super(biomeSource, biomeSource, vanillaGen.getStructureSettings(), seed);
+        super(vanillaGen.getStructureSets(), Optional.empty(), biomeSource, biomeSource, seed);
         this.seed = seed;
         this.levels = levels;
         this.vanillaGen = vanillaGen;
@@ -89,7 +89,6 @@ public class Generator extends ChunkGenerator {
         this.biomeGenerator = biomeGenerator;
         this.noiseGenerator = noiseGenerator;
         this.terrainCache = new TerrainCache(levels, noiseGenerator);
-        this.structureGenerator = vanillaGen.createStructureGenerator(seed, this);
     }
 
     protected RegistryAccess getRegistries() {
@@ -148,29 +147,24 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public Climate.Sampler climateSampler() {
-        return Source.NoopSampler.INSTANCE;
-    }
-
-    @Override
-    public boolean hasStronghold(ChunkPos pos) {
-        return structureGenerator.hasStronghold(pos);
+        return Source.NOOP_CLIMATE_SAMPLER;
     }
 
     @Nullable
-    public BlockPos findNearestMapFeature(ServerLevel server, StructureFeature<?> feature, BlockPos pos, int i, boolean first) {
-        return structureGenerator.findNearestMapFeature(server, feature, pos, i, first);
+    public Pair<BlockPos, Holder<ConfiguredStructureFeature<?, ?>>> findNearestMapFeature(ServerLevel server, HolderSet<ConfiguredStructureFeature<?, ?>> feature, BlockPos pos, int i, boolean first) {
+        return super.findNearestMapFeature(server, feature, pos, i, first);
     }
 
     @Override
     public void createStructures(RegistryAccess access, StructureFeatureManager structureFeatures, ChunkAccess chunk, StructureManager structures, long seed) {
         terrainCache.hint(chunk.getPos());
-        structureGenerator.createStructures(access, structureFeatures, chunk, structures, seed);
+        super.createStructures(access, structureFeatures, chunk, structures, seed);
     }
 
     @Override
     public void createReferences(WorldGenLevel level, StructureFeatureManager structureFeatures, ChunkAccess chunk) {
         terrainCache.hint(chunk.getPos());
-        structureGenerator.createReferences(level, structureFeatures, chunk);
+        super.createReferences(level, structureFeatures, chunk);
     }
 
     @Override
@@ -235,5 +229,10 @@ public class Generator extends ChunkGenerator {
         }
 
         return new NoiseColumn(height, states);
+    }
+
+    @Override
+    public void addDebugScreenInfo(List<String> lines, BlockPos pos) {
+
     }
 }

@@ -34,10 +34,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.engine.world.terrain.TerrainType;
-import com.terraforged.mod.data.gen.DataGen;
 import com.terraforged.mod.worldgen.GeneratorPreset;
 import com.terraforged.mod.worldgen.Regenerator;
-import com.terraforged.mod.worldgen.datapack.DataPackExporter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
@@ -91,8 +89,8 @@ public class TFCommands {
 
     private static int export(CommandContext<CommandSourceStack> context) {
         var access = context.getSource().registryAccess();
-        var structures = context.getSource().getLevel().getChunkSource().getGenerator().getSettings();
-        DataGen.exportStructureConfigs(DataPackExporter.DEFAULT_PACK_DIR, structures, access);
+//        var structures = context.getSource().getLevel().getChunkSource().getGenerator().getSettings();
+//        DataGen.exportStructureConfigs(DataPackExporter.DEFAULT_PACK_DIR, structures, access);
 
         var result = new TextComponent("Exported structure settings")
                 .withStyle(s -> s.withColor(ChatFormatting.GREEN));
@@ -137,7 +135,7 @@ public class TFCommands {
     }
 
     private static Component createTerrainTeleportMessage(BlockPos pos, int x, int y, int z, Terrain terrain) {
-        double distance = Math.sqrt(pos.distSqr(x, y, z, true));
+        double distance = Math.sqrt(pos.distToCenterSqr(x, y, z));
         String commandText = String.format("/tp %s %s %s", x, y, z);
         String distanceText = String.format("%.1f", distance);
         String positionText = String.format("%s;%s;%s", x, y, z);

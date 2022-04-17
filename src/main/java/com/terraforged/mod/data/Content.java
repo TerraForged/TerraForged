@@ -31,12 +31,15 @@ public class Content extends Init {
 
     @Override
     protected void doInit() {
-        ModTerrainTypes.register();
-        ModTerrains.register();
-        ModBiomes.register();
-        ModCaves.register();
-        ModTags.register();
-        ModVegetations.register();
-        ModClimates.register();
+        try {
+            ModTerrainTypes.register();
+            ModTerrains.register();
+            ModBiomes.register();
+            ModCaves.register();
+            ModVegetations.register();
+            ModClimates.register();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 }

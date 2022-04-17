@@ -24,31 +24,33 @@
 
 package com.terraforged.mod.worldgen.profiler;
 
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.util.random.WeightedRandomList;
-import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.level.*;
-import net.minecraft.world.level.biome.*;
+import net.minecraft.world.level.LevelHeightAccessor;
+import net.minecraft.world.level.NoiseColumn;
+import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeManager;
+import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.StructureSettings;
 import net.minecraft.world.level.levelgen.blending.Blender;
-import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Predicate;
 
 public class GeneratorProfiler extends ChunkGenerator {
     public static final Codec<GeneratorProfiler> CODEC = ChunkGenerator.CODEC.xmap(GeneratorProfiler::new, GeneratorProfiler::getGenerator);
@@ -58,7 +60,7 @@ public class GeneratorProfiler extends ChunkGenerator {
     protected final ProfilerStages stages = new ProfilerStages();
 
     private GeneratorProfiler(ChunkGenerator generator) {
-        super(generator.getBiomeSource(), generator.getSettings());
+        super(null, null, generator.getBiomeSource());
         this.generator = generator;
     }
 
@@ -87,7 +89,7 @@ public class GeneratorProfiler extends ChunkGenerator {
     }
 
     @Override
-    public Biome getNoiseBiome(int p_187755_, int p_187756_, int p_187757_) {
+    public Holder<Biome> getNoiseBiome(int p_187755_, int p_187756_, int p_187757_) {
         return generator.getNoiseBiome(p_187755_, p_187756_, p_187757_);
     }
 
@@ -147,18 +149,13 @@ public class GeneratorProfiler extends ChunkGenerator {
     }
 
     @Override
-    public BlockPos findNearestMapFeature(ServerLevel p_62162_, StructureFeature<?> p_62163_, BlockPos p_62164_, int p_62165_, boolean p_62166_) {
+    public Pair<BlockPos, Holder<ConfiguredStructureFeature<?, ?>>> findNearestMapFeature(ServerLevel p_62162_, HolderSet<ConfiguredStructureFeature<?, ?>> p_62163_, BlockPos p_62164_, int p_62165_, boolean p_62166_) {
         return generator.findNearestMapFeature(p_62162_, p_62163_, p_62164_, p_62165_, p_62166_);
     }
 
     @Override
     public void spawnOriginalMobs(WorldGenRegion p_62167_) {
         generator.spawnOriginalMobs(p_62167_);
-    }
-
-    @Override
-    public StructureSettings getSettings() {
-        return generator.getSettings();
     }
 
     @Override
@@ -176,7 +173,7 @@ public class GeneratorProfiler extends ChunkGenerator {
         return generator.getGenDepth();
     }
 
-    @Override
+/*    @Override
     public WeightedRandomList<MobSpawnSettings.SpawnerData> getMobsAt(Biome p_156158_, StructureFeatureManager p_156159_, MobCategory p_156160_, BlockPos p_156161_) {
         return generator.getMobsAt(p_156158_, p_156159_, p_156160_, p_156161_);
     }
@@ -184,7 +181,7 @@ public class GeneratorProfiler extends ChunkGenerator {
     @Override
     public boolean validBiome(Registry<Biome> p_187736_, Predicate<ResourceKey<Biome>> p_187737_, Biome p_187738_) {
         return p_187736_.getResourceKey(p_187738_).filter(p_187737_).isPresent();
-    }
+    }*/
 
     @Override
     public int getSeaLevel() {
@@ -217,8 +214,8 @@ public class GeneratorProfiler extends ChunkGenerator {
     }
 
     @Override
-    public boolean hasStronghold(ChunkPos p_62173_) {
-        return generator.hasStronghold(p_62173_);
+    public void addDebugScreenInfo(List<String> lines, BlockPos pos) {
+
     }
 
     public static ChunkGenerator wrap(ChunkGenerator generator) {

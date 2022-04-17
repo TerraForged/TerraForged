@@ -27,13 +27,14 @@ package com.terraforged.mod.worldgen.cave;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.asset.NoiseCave;
 import com.terraforged.mod.worldgen.biome.util.BiomeList;
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
 
 public class CarverChunk {
-    private Biome cached;
+    private Holder<Biome> cached;
     private int cachedX, cachedZ;
 
     private int biomeListIndex = -1;
@@ -58,7 +59,7 @@ public class CarverChunk {
         return biomes.get(config);
     }
 
-    public Biome getBiome(int x, int z, NoiseCave config, Generator generator) {
+    public Holder<Biome> getBiome(int x, int z, NoiseCave config, Generator generator) {
         int biomeX = x >> 2;
         int biomeZ = z >> 2;
         if (cached == null || biomeX != cachedX || biomeZ != cachedZ) {

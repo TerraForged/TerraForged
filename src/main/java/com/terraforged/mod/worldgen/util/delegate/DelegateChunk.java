@@ -28,6 +28,7 @@ import com.mojang.serialization.Lifecycle;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.shorts.ShortList;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -51,7 +52,7 @@ import net.minecraft.world.level.gameevent.GameEventDispatcher;
 import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
-import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
@@ -70,7 +71,7 @@ import java.util.stream.Stream;
 
 public abstract class DelegateChunk extends ChunkAccess {
     private static final LevelHeightAccessor ZERO_HEIGHT = new ZeroHeight();
-    private static final Registry<Biome> EMPTY_REGISTRY = new MappedRegistry<>(Registry.BIOME_REGISTRY, Lifecycle.stable());
+    private static final Registry<Biome> EMPTY_REGISTRY = new MappedRegistry<>(Registry.BIOME_REGISTRY, Lifecycle.stable(), null);
 
     protected ChunkAccess delegate;
 
@@ -158,42 +159,42 @@ public abstract class DelegateChunk extends ChunkAccess {
     }
 
     @Override
-    public StructureStart<?> getStartForFeature(StructureFeature<?> p_187648_) {
-        return delegate.getStartForFeature(p_187648_);
+    public StructureStart getStartForFeature(ConfiguredStructureFeature<?, ?> p_207944_) {
+        return delegate.getStartForFeature(p_207944_);
     }
 
     @Override
-    public void setStartForFeature(StructureFeature<?> p_187653_, StructureStart<?> p_187654_) {
-        delegate.setStartForFeature(p_187653_, p_187654_);
+    public void setStartForFeature(ConfiguredStructureFeature<?, ?> p_207949_, StructureStart p_207950_) {
+        delegate.setStartForFeature(p_207949_, p_207950_);
     }
 
     @Override
-    public Map<StructureFeature<?>, StructureStart<?>> getAllStarts() {
+    public Map<ConfiguredStructureFeature<?, ?>, StructureStart> getAllStarts() {
         return delegate.getAllStarts();
     }
 
     @Override
-    public void setAllStarts(Map<StructureFeature<?>, StructureStart<?>> p_62090_) {
+    public void setAllStarts(Map<ConfiguredStructureFeature<?, ?>, StructureStart> p_62090_) {
         delegate.setAllStarts(p_62090_);
     }
 
     @Override
-    public LongSet getReferencesForFeature(StructureFeature<?> p_187661_) {
-        return delegate.getReferencesForFeature(p_187661_);
+    public LongSet getReferencesForFeature(ConfiguredStructureFeature<?, ?> p_207952_) {
+        return delegate.getReferencesForFeature(p_207952_);
     }
 
     @Override
-    public void addReferenceForFeature(StructureFeature<?> p_187650_, long p_187651_) {
-        delegate.addReferenceForFeature(p_187650_, p_187651_);
+    public void addReferenceForFeature(ConfiguredStructureFeature<?, ?> p_207946_, long p_207947_) {
+        delegate.addReferenceForFeature(p_207946_, p_207947_);
     }
 
     @Override
-    public Map<StructureFeature<?>, LongSet> getAllReferences() {
+    public Map<ConfiguredStructureFeature<?, ?>, LongSet> getAllReferences() {
         return delegate.getAllReferences();
     }
 
     @Override
-    public void setAllReferences(Map<StructureFeature<?>, LongSet> p_187663_) {
+    public void setAllReferences(Map<ConfiguredStructureFeature<?, ?>, LongSet> p_187663_) {
         delegate.setAllReferences(p_187663_);
     }
 
@@ -328,19 +329,19 @@ public abstract class DelegateChunk extends ChunkAccess {
     }
 
     @Override
-    public NoiseChunk getOrCreateNoiseChunk(NoiseSampler p_187641_, Supplier<NoiseChunk.NoiseFiller> p_187642_, NoiseGeneratorSettings p_187643_, Aquifer.FluidPicker p_187644_, Blender p_187645_) {
-        return delegate.getOrCreateNoiseChunk(p_187641_, p_187642_, p_187643_, p_187644_, p_187645_);
+    public NoiseChunk getOrCreateNoiseChunk(NoiseRouter p_207938_, Supplier<DensityFunctions.BeardifierOrMarker> p_207939_, NoiseGeneratorSettings p_207940_, Aquifer.FluidPicker p_207941_, Blender p_207942_) {
+        return delegate.getOrCreateNoiseChunk(p_207938_, p_207939_, p_207940_, p_207941_, p_207942_);
     }
 
     @Override
     @Deprecated
-    public Biome carverBiome(Supplier<Biome> p_187656_) {
-        return delegate.carverBiome(p_187656_);
+    public Holder<Biome> carverBiome(Supplier<Holder<Biome>> p_204345_) {
+        return delegate.carverBiome(p_204345_);
     }
 
     @Override
-    public Biome getNoiseBiome(int p_187671_, int p_187672_, int p_187673_) {
-        return delegate.getNoiseBiome(p_187671_, p_187672_, p_187673_);
+    public Holder<Biome> getNoiseBiome(int p_204347_, int p_204348_, int p_204349_) {
+        return delegate.getNoiseBiome(p_204347_, p_204348_, p_204349_);
     }
 
     @Override

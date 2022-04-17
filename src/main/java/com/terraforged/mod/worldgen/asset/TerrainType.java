@@ -29,8 +29,7 @@ import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.engine.world.terrain.TerrainHelper;
 import com.terraforged.mod.codec.LazyCodec;
 import com.terraforged.mod.registry.ModRegistry;
-
-import java.util.function.Supplier;
+import net.minecraft.core.Holder;
 
 public class TerrainType {
     public static final TerrainType NONE = new TerrainType("none", com.terraforged.engine.world.terrain.TerrainType.NONE);
@@ -40,7 +39,7 @@ public class TerrainType {
             Codec.STRING.fieldOf("parent").xmap(TerrainType::forName, Terrain::getName).forGetter(TerrainType::getParentType)
     ).apply(instance, TerrainType::new));
 
-    public static final Codec<Supplier<TerrainType>> CODEC = LazyCodec.registry(DIRECT, ModRegistry.TERRAIN_TYPE);
+    public static final Codec<Holder<TerrainType>> CODEC = LazyCodec.registry(DIRECT, ModRegistry.TERRAIN_TYPE);
 
     private final String name;
     private final Terrain parentType;

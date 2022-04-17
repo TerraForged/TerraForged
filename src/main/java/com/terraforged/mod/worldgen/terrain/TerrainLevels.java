@@ -82,6 +82,7 @@ public class TerrainLevels {
     }
 
     public static class Limits {
+
         public static final int MIN_MIN_Y = DimensionType.MIN_Y;
         public static final int MAX_MIN_Y = 0;
         public static final int MIN_SEA_LEVEL = 32;

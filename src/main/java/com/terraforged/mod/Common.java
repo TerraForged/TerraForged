@@ -25,6 +25,7 @@
 package com.terraforged.mod;
 
 import com.terraforged.mod.data.Content;
+import com.terraforged.mod.data.gen.DataGen;
 import com.terraforged.mod.registry.ModRegistries;
 import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.util.Init;
@@ -50,17 +51,17 @@ public class Common extends Init {
         TerraForged.LOG.info("Registering world-gen component codecs");
         ModRegistries.createRegistry(ModRegistry.CAVE, NoiseCave.CODEC);
         ModRegistries.createRegistry(ModRegistry.CLIMATE, ClimateType.CODEC);
-        ModRegistries.createRegistry(ModRegistry.BIOME_TAG, BiomeTag.DIRECT);
         ModRegistries.createRegistry(ModRegistry.TERRAIN, TerrainNoise.CODEC);
         ModRegistries.createRegistry(ModRegistry.TERRAIN_TYPE, TerrainType.DIRECT);
-        ModRegistries.createRegistry(ModRegistry.VEGETATION, VegetationConfig.CODEC); // depends on BiomeTag
-        ModRegistries.createRegistry(ModRegistry.STRUCTURE_CONFIG, StructureConfig.CODEC);
+        ModRegistries.createRegistry(ModRegistry.VEGETATION, VegetationConfig.CODEC);
 
         TerraForged.LOG.info("Locking mod world-gen registries");
         ModRegistries.commit();
 
         TerraForged.LOG.info("Registering world-gen content");
         Content.INSTANCE.init();
+
+        DataGen.INSTANCE.init();
 
         DataPackExporter.extractDefaultPack();
     }

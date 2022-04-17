@@ -30,6 +30,7 @@ import com.terraforged.mod.worldgen.biome.util.BiomeMapManager;
 import com.terraforged.mod.worldgen.cave.CaveType;
 import com.terraforged.noise.util.Noise;
 import com.terraforged.noise.util.NoiseUtil;
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.Arrays;
@@ -42,17 +43,18 @@ public class CaveBiomeSampler {
     protected final int seed;
     protected final int scale;
     protected final float frequency;
-    protected final Map<CaveType, WeightMap<Biome>> typeMap = new EnumMap<>(CaveType.class);
+    protected final Map<CaveType, WeightMap<Holder<Biome>>> typeMap = new EnumMap<>(CaveType.class);
 
     public CaveBiomeSampler(long seed, int scale, BiomeMapManager biomeMapManager) {
         this.seed = (int) seed + OFFSET;
         this.scale = scale;
         this.frequency = 1F / scale;
 
-        var global = new Biome[]{biomeMapManager.getBiomes().getOrThrow(ModBiomes.CAVE.key())};
-        var special = biomeMapManager.getBiomes()
-                .stream().filter(b -> b.getBiomeCategory() == Biome.BiomeCategory.UNDERGROUND)
-                .toArray(Biome[]::new);
+        Holder<Biome>[] global = new Holder[]{biomeMapManager.getBiomes().getHolderOrThrow(ModBiomes.CAVE.key())};
+        Holder<Biome>[] special = biomeMapManager.getBiomes()
+                .holders()
+                .filter(b -> Biome.getBiomeCategory(b) == Biome.BiomeCategory.UNDERGROUND)
+                .toArray(Holder[]::new);
 
         this.typeMap.put(CaveType.GLOBAL, create(global));
         this.typeMap.put(CaveType.UNIQUE, create(special));
@@ -65,7 +67,7 @@ public class CaveBiomeSampler {
         this.typeMap.putAll(other.typeMap);
     }
 
-    public Biome getUnderGroundBiome(int seed, int x, int z, CaveType type) {
+    public Holder<Biome> getUnderGroundBiome(int seed, int x, int z, CaveType type) {
         float noise = sample(seed + this.seed, x, z, frequency);
         return typeMap.get(type).getValue(noise);
     }
@@ -77,7 +79,7 @@ public class CaveBiomeSampler {
         return NoiseUtil.clamp(noise, 0F, 1F);
     }
 
-    protected static WeightMap<Biome> create(Biome[] biomes) {
+    protected static WeightMap<Holder<Biome>> create(Holder<Biome>[] biomes) {
         var weights = new float[biomes.length];
         Arrays.fill(weights, 1);
         return new WeightMap<>(biomes, weights);

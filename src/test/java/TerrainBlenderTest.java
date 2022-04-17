@@ -22,31 +22,33 @@
  * SOFTWARE.
  */
 
-import com.google.common.base.Suppliers;
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.engine.world.terrain.TerrainType;
 import com.terraforged.mod.worldgen.asset.TerrainNoise;
 import com.terraforged.mod.worldgen.terrain.TerrainBlender;
 import com.terraforged.noise.Source;
 import com.terraforged.noise.util.N2DUtil;
+import net.minecraft.core.Holder;
 
 import java.awt.*;
-import java.util.function.Supplier;
 
 public class TerrainBlenderTest {
     public static void main(String[] args) {
-        var blender = new TerrainBlender(123, 80, 0.7F, 0.3F, new TerrainNoise[]{
-                new TerrainNoise(type(TerrainType.FLATS), 1F, Source.constant(0)),
-                new TerrainNoise(type(TerrainType.FLATS), 1F, Source.constant(1)),
+        var blender = new TerrainBlender(123, 100, 0.8F, 0.5F, new TerrainNoise[]{
+                new TerrainNoise(type(TerrainType.FLATS), 1F, Source.constant(0.00)),
+                new TerrainNoise(type(TerrainType.FLATS), 1F, Source.constant(0.33)),
+                new TerrainNoise(type(TerrainType.FLATS), 1F, Source.constant(0.66)),
+                new TerrainNoise(type(TerrainType.FLATS), 1F, Source.constant(1.00)),
         });
 
         N2DUtil.display(1000, 800, (x, z, img) -> {
             float noise = blender.getValue(x, z);
+
             img.setRGB(x, z, Color.HSBtoRGB(0, 0, noise));
         }).setVisible(true);
     }
 
-    private static Supplier<com.terraforged.mod.worldgen.asset.TerrainType> type(Terrain terrain) {
-        return Suppliers.ofInstance(new com.terraforged.mod.worldgen.asset.TerrainType(terrain.getName(), terrain));
+    private static Holder<com.terraforged.mod.worldgen.asset.TerrainType> type(Terrain terrain) {
+        return Holder.direct(new com.terraforged.mod.worldgen.asset.TerrainType(terrain.getName(), terrain));
     }
 }

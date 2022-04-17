@@ -81,7 +81,7 @@ public class Regenerator {
 
     private static void regenerateChunks(ServerLevel level) {
         var chunkSource = level.getChunkSource();
-        chunkSource.tick(() -> true);
+        chunkSource.tick(() -> true, false); // false - tickChunks?
     }
 
     private static Long2ObjectLinkedOpenHashMap<?>[] getCaches(ChunkMap chunkMap) {

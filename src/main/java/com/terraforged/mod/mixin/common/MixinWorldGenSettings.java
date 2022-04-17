@@ -25,7 +25,7 @@
 package com.terraforged.mod.mixin.common;
 
 import com.terraforged.mod.util.seed.SeedUtil;
-import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,12 +34,11 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(WorldGenSettings.class)
 public class MixinWorldGenSettings {
-
     @ModifyVariable(
-            method = "<init>(JZZLnet/minecraft/core/MappedRegistry;Ljava/util/Optional;)V",
-            at = @At("HEAD")
-    )
-    private static MappedRegistry<LevelStem> onInit(MappedRegistry<LevelStem> dimensions, long seed) {
+            method = "<init>(JZZLnet/minecraft/core/Registry;Ljava/util/Optional;)V",
+            at = @At("HEAD"),
+            argsOnly = true)
+    private static Registry<LevelStem> onInit(Registry<LevelStem> dimensions, long seed) {
         return SeedUtil.reseed(seed, dimensions);
     }
 }

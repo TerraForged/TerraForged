@@ -25,10 +25,7 @@
 package com.terraforged.mod.worldgen.biome.decorator;
 
 import com.terraforged.mod.worldgen.Generator;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.SectionPos;
+import net.minecraft.core.*;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.WorldGenLevel;
@@ -36,28 +33,28 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
-import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
 import java.util.*;
-import java.util.function.Supplier;
 
 public class VanillaDecorator {
     public static void decorate(long seed,
-                               int from, int to,
-                               BlockPos origin,
-                               Biome biome,
-                               ChunkAccess chunk,
-                               WorldGenLevel level,
-                               Generator generator,
-                               WorldgenRandom random,
-                               StructureFeatureManager structureManager,
-                               FeatureDecorator decorator) {
+                                int from, int to,
+                                BlockPos origin,
+                                Holder<Biome> biome,
+                                ChunkAccess chunk,
+                                WorldGenLevel level,
+                                Generator generator,
+                                WorldgenRandom random,
+                                StructureFeatureManager structureManager,
+                                FeatureDecorator decorator) {
 
         for (int stage = from; stage <= to; stage++) {
             var structures = decorator.getStageStructures(stage);
-            var features = decorator.getStageFeatures(stage, biome);
+            var features = decorator.getStageFeatures(stage, biome.value());
+            if (features == null) continue;
 
             placeStructures(seed, stage, chunk, level, generator, random, structureManager, structures);
 
@@ -66,13 +63,13 @@ public class VanillaDecorator {
     }
 
     private static void placeStructures(long seed,
-                                       int stage,
-                                       ChunkAccess chunk,
-                                       WorldGenLevel level,
-                                       Generator generator,
-                                       WorldgenRandom random,
-                                       StructureFeatureManager structureManager,
-                                       List<Supplier<StructureFeature<?>>> structures) {
+                                        int stage,
+                                        ChunkAccess chunk,
+                                        WorldGenLevel level,
+                                        Generator generator,
+                                        WorldgenRandom random,
+                                        StructureFeatureManager structureManager,
+                                        List<Holder<ConfiguredStructureFeature<?, ?>>> structures) {
 
         var chunkPos = chunk.getPos();
         var sectionPos = SectionPos.of(chunkPos, level.getMinSection());
@@ -80,8 +77,8 @@ public class VanillaDecorator {
         for (int structureIndex = 0; structureIndex < structures.size(); structureIndex++) {
             random.setFeatureSeed(seed, structureIndex, stage);
 
-            var structure = structures.get(structureIndex).get();
-            var starts = structureManager.startsForFeature(sectionPos, structure);
+            var structure = structures.get(structureIndex);
+            var starts = structureManager.startsForFeature(sectionPos, structure.value());
             for (int startIndex = 0; startIndex < starts.size(); startIndex++) {
                 var start = starts.get(startIndex);
                 start.placeInChunk(level, structureManager, generator, random, getWritableArea(chunk), chunkPos);
@@ -90,30 +87,30 @@ public class VanillaDecorator {
     }
 
     private static void placeFeatures(long seed,
-                                     int offset,
-                                     int stage,
-                                     BlockPos origin,
-                                     WorldGenLevel level,
-                                     Generator generator,
-                                     WorldgenRandom random,
-                                     List<Supplier<PlacedFeature>> features) {
+                                      int offset,
+                                      int stage,
+                                      BlockPos origin,
+                                      WorldGenLevel level,
+                                      Generator generator,
+                                      WorldgenRandom random,
+                                      HolderSet<PlacedFeature> features) {
 
         for (int i = 0; i < features.size(); i++) {
             random.setFeatureSeed(seed, offset + i, stage);
 
-            var feature = features.get(i).get();
+            var feature = features.get(i).value();
             feature.placeWithBiomeCheck(level, generator, random, origin);
         }
     }
 
-    public static Map<GenerationStep.Decoration, List<Supplier<StructureFeature<?>>>> buildStructureMap(RegistryAccess access) {
-        final var map = new EnumMap<GenerationStep.Decoration, List<Supplier<StructureFeature<?>>>>(GenerationStep.Decoration.class);
-        final var registry = access.registryOrThrow(Registry.STRUCTURE_FEATURE_REGISTRY);
+    public static Map<GenerationStep.Decoration, List<Holder<ConfiguredStructureFeature<?, ?>>>> buildStructureMap(RegistryAccess access) {
+        final var map = new EnumMap<GenerationStep.Decoration, List<Holder<ConfiguredStructureFeature<?, ?>>>>(GenerationStep.Decoration.class);
+        final var registry = access.registryOrThrow(Registry.CONFIGURED_STRUCTURE_FEATURE_REGISTRY);
 
         for (var entry : registry.entrySet()) {
             var key = entry.getKey();
             var value = entry.getValue();
-            map.computeIfAbsent(value.step(), s -> new ArrayList<>()).add(() -> registry.get(key));
+            map.computeIfAbsent(value.feature.step(), s -> new ArrayList<>()).add(registry.getHolderOrThrow(key));
         }
 
         for (var stage : FeatureDecorator.STAGES) {

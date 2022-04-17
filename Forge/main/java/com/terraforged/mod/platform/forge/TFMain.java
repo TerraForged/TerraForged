@@ -28,17 +28,21 @@ import com.terraforged.mod.Common;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.command.TFCommands;
 import com.terraforged.mod.data.ModBiomes;
+import com.terraforged.mod.data.ModTags;
 import com.terraforged.mod.data.gen.DataGen;
 import com.terraforged.mod.platform.CommonAPI;
 import com.terraforged.mod.platform.forge.client.TFClient;
 import com.terraforged.mod.platform.forge.client.TFPreset;
 import com.terraforged.mod.platform.forge.util.ForgeRegistrar;
+import com.terraforged.mod.registry.Key;
 import com.terraforged.mod.registry.registrar.NoopRegistrar;
 import com.terraforged.mod.util.DemoHandler;
+import com.terraforged.mod.worldgen.biome.util.matcher.BiomeMatcher;
+import com.terraforged.mod.worldgen.biome.util.matcher.BiomeTagMatcher;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
@@ -137,9 +141,21 @@ public class TFMain extends TerraForged {
     }
 
     private static class ForgeCommonAPI implements CommonAPI {
+        public static final Key.LazyTag<Biome> FORGE_OVERWORLD = Key.biomeTag("forge:overworld");
+
         @Override
-        public boolean isOverworldBiome(ResourceKey<Biome> key) {
-            return BiomeDictionary.hasType(key, BiomeDictionary.Type.OVERWORLD);
+        public BiomeMatcher getOverworldMatcher() {
+            return new BiomeTagMatcher(FORGE_OVERWORLD.get(), ModTags.OVERWORLD.get()) {
+                @Override
+                public boolean test(Holder<Biome> biome) {
+                    return super.test(biome) || testDictionary(biome);
+                }
+
+                @Deprecated
+                private boolean testDictionary(Holder<Biome> biome) {
+                    return BiomeDictionary.hasType(biome.unwrapKey().orElseThrow(), BiomeDictionary.Type.OVERWORLD);
+                }
+            };
         }
     }
 }

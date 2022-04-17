@@ -31,6 +31,7 @@ import com.terraforged.mod.worldgen.biome.util.BiomeMapManager;
 import com.terraforged.mod.worldgen.cave.CaveType;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.biome.Biome;
@@ -42,14 +43,15 @@ import java.util.Set;
 
 public class Source extends BiomeSource {
     public static final Codec<Source> CODEC = new SourceCodec();
+    public static final Climate.Sampler NOOP_CLIMATE_SAMPLER = Climate.empty();
 
     protected final long seed;
     protected final RegistryAccess registries;
-    protected final Set<Biome> possibleBiomes;
+    protected final Set<Holder<Biome>> possibleBiomes;
     protected final BiomeSampler biomeSampler;
     protected final BiomeMapManager biomeMapManager;
     protected final CaveBiomeSampler caveBiomeSampler;
-    protected final LossyCache<Biome> cache = LossyCache.concurrent(2048, Biome[]::new);
+    protected final LossyCache<Holder<Biome>> cache = LossyCache.concurrent(2048, i -> (Holder<Biome>[]) new Holder[i]);
 
     public Source(long seed, INoiseGenerator noise, Source other) {
         super(List.of());
@@ -80,7 +82,7 @@ public class Source extends BiomeSource {
      * We instead maintain our own set with the actual biomes and override here :)
      */
     @Override
-    public Set<Biome> possibleBiomes() {
+    public Set<Holder<Biome>> possibleBiomes() {
         return possibleBiomes;
     }
 
@@ -95,7 +97,7 @@ public class Source extends BiomeSource {
     }
 
     @Override
-    public Biome getNoiseBiome(int x, int y, int z, Climate.Sampler sampler) {
+    public Holder<Biome> getNoiseBiome(int x, int y, int z, Climate.Sampler sampler) {
         return cache.computeIfAbsent(PosUtil.pack(x, z), this::compute);
     }
 
@@ -111,7 +113,7 @@ public class Source extends BiomeSource {
         return caveBiomeSampler;
     }
 
-    public Biome getUnderGroundBiome(int seed, int x, int z, CaveType type) {
+    public Holder<Biome> getUnderGroundBiome(int seed, int x, int z, CaveType type) {
         return caveBiomeSampler.getUnderGroundBiome(seed, x, z, type);
     }
 
@@ -119,19 +121,9 @@ public class Source extends BiomeSource {
         return biomeMapManager.getBiomes();
     }
 
-    protected Biome compute(long index) {
+    protected Holder<Biome> compute(long index) {
         int x = PosUtil.unpackLeft(index) << 2;
         int z = PosUtil.unpackRight(index) << 2;
         return biomeSampler.sampleBiome(x, z);
-    }
-
-    public static class NoopSampler implements Climate.Sampler {
-        public static final NoopSampler INSTANCE = new NoopSampler();
-        public static final Climate.TargetPoint DEFAULT_POINT = new Climate.TargetPoint(0, 0, 0, 0, 0, 0);
-
-        @Override
-        public Climate.TargetPoint sample(int i, int i1, int i2) {
-            return DEFAULT_POINT;
-        }
     }
 }

@@ -29,6 +29,7 @@ import com.terraforged.engine.world.climate.ClimateModule;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.worldgen.biome.util.BiomeMapManager;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 
@@ -40,14 +41,14 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
         this.biomeMapManager = biomeMapManager;
     }
 
-    public Biome sampleBiome(int x, int z) {
+    public Holder<Biome> sampleBiome(int x, int z) {
         var sample = sample(x, z);
         var map = biomeMapManager.getBiomeMap().get(sample.cell.biome);
 
-        Biome biome;
+        Holder<Biome> biome;
         if (map == null || map.isEmpty()) {
             TerraForged.LOG.debug("Missing biome for type: {}", sample.cell.biome);
-            biome = biomeMapManager.getBiomes().getOrThrow(Biomes.PLAINS);
+            biome = biomeMapManager.getBiomes().getHolderOrThrow(Biomes.PLAINS);
         } else {
             biome = map.getValue(sample.cell.biomeRegionId);
         }
@@ -89,7 +90,7 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
         return sample;
     }
 
-    protected Biome getBiome(Biome input, ClimateSample sample) {
+    protected Holder<Biome> getBiome(Holder<Biome> input, ClimateSample sample) {
         var biomeType = sample.cell.biome;
         var controls = noiseGenerator.getContinent().getControlPoints();
 

@@ -26,43 +26,39 @@ package com.terraforged.mod.worldgen.biome.vegetation;
 
 import com.terraforged.mod.data.ModVegetations;
 import com.terraforged.mod.worldgen.asset.VegetationConfig;
-import net.minecraft.core.Registry;
+import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.biome.Biome;
 
-import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BiomeVegetationManager {
-    private final Map<Biome, BiomeVegetation> vegetation = new IdentityHashMap<>();
+    private final RegistryAccess access;
+    private final VegetationConfig[] configs;
+    private final Map<Holder<Biome>, BiomeVegetation> vegetation = new ConcurrentHashMap<>();
 
     public BiomeVegetationManager(RegistryAccess access) {
-        var biomes = access.registryOrThrow(Registry.BIOME_REGISTRY);
-        var configs = ModVegetations.getVegetation(access);
-
-        for (var entry : biomes.entrySet()) {
-            var biome = entry.getValue();
-            var config = getConfig(biome, configs);
-            var features = VegetationFeatures.create(entry.getKey(), access, config);
-            this.vegetation.put(biome, new BiomeVegetation(config, features));
-        }
+        this.access = access;
+        this.configs = ModVegetations.getVegetation(access);
     }
 
-    public BiomeVegetation getVegetation(Biome biome) {
-        return vegetation.get(biome);
+    public BiomeVegetation getVegetation(Holder<Biome> biome) {
+        return vegetation.computeIfAbsent(biome, this::compute);
     }
 
-    private static VegetationConfig getViability(Biome biome, Registry<VegetationConfig> registry) {
-        return registry.stream().filter(vc -> vc.biomes().get().contains(biome)).findFirst().orElse(VegetationConfig.NONE);
+    /**
+     * Note: Must be lazily computed because tags load after world-gen
+     */
+    private BiomeVegetation compute(Holder<Biome> biome) {
+        var config = getConfig(biome, configs);
+        var features = VegetationFeatures.create(biome.value(), access, config);
+        return new BiomeVegetation(config, features);
     }
 
-    private static VegetationConfig[] getConfigs(RegistryAccess access) {
-        return ModVegetations.getVegetation(access);
-    }
-
-    private static VegetationConfig getConfig(Biome biome, VegetationConfig[] configs) {
+    private static VegetationConfig getConfig(Holder<Biome> biome, VegetationConfig[] configs) {
         for (var config : configs) {
-            if (config.biomes().get().contains(biome)) {
+            if (biome.is(config.biomes())) {
                 return config;
             }
         }

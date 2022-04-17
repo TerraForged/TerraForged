@@ -33,6 +33,7 @@ import com.terraforged.mod.worldgen.biome.vegetation.VegetationFeatures;
 import com.terraforged.mod.worldgen.biome.viability.ViabilityContext;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -62,7 +63,7 @@ public class SamplerContext {
         return chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z);
     }
 
-    public Biome getBiome(int x, int y, int z) {
+    public Holder<Biome> getBiome(int x, int y, int z) {
         return region.getBiome(pos.set(x, y, z));
     }
 
