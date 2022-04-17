@@ -26,6 +26,7 @@ package com.terraforged.mod.worldgen.profiler;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.terraforged.mod.util.ReflectionUtil;
 import net.minecraft.core.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -44,8 +45,10 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 
+import java.lang.invoke.MethodHandle;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -53,14 +56,17 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GeneratorProfiler extends ChunkGenerator {
-    public static final Codec<GeneratorProfiler> CODEC = ChunkGenerator.CODEC.xmap(GeneratorProfiler::new, GeneratorProfiler::getGenerator);
+    public static final Codec<GeneratorProfiler> CODEC = ChunkGenerator.CODEC.xmap(GeneratorProfiler::wrap, GeneratorProfiler::getGenerator);
     public static final AtomicBoolean PROFILING = new AtomicBoolean(true);
+
+    protected static final MethodHandle STRUCTURE_REGISTRY = ReflectionUtil.field(ChunkGenerator.class, Registry.class);
+    protected static final MethodHandle STRUCTURE_OVERRIDES = ReflectionUtil.field(ChunkGenerator.class, Optional.class);
 
     protected final ChunkGenerator generator;
     protected final ProfilerStages stages = new ProfilerStages();
 
-    private GeneratorProfiler(ChunkGenerator generator) {
-        super(null, null, generator.getBiomeSource());
+    private GeneratorProfiler(Registry<StructureSet> structures, Optional<HolderSet<StructureSet>> overrides, ChunkGenerator generator) {
+        super(structures, overrides, generator.getBiomeSource());
         this.generator = generator;
     }
 
@@ -218,10 +224,32 @@ public class GeneratorProfiler extends ChunkGenerator {
 
     }
 
-    public static ChunkGenerator wrap(ChunkGenerator generator) {
+    @SuppressWarnings("unchecked")
+    private static Registry<StructureSet> getStructures(ChunkGenerator generator) {
+        try {
+            return (Registry<StructureSet>) STRUCTURE_REGISTRY.invokeExact(generator);
+        } catch (Throwable t) {
+            throw new Error(t);
+        }
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private static Optional<HolderSet<StructureSet>> getOverrides(ChunkGenerator generator) {
+        try {
+            return (Optional<HolderSet<StructureSet>>) STRUCTURE_OVERRIDES.invokeExact(generator);
+        } catch (Throwable t) {
+            throw new Error(t);
+        }
+    }
+
+    public static GeneratorProfiler wrap(ChunkGenerator generator) {
         if (generator instanceof GeneratorProfiler profiler) {
             generator = profiler.getGenerator();
         }
-        return new GeneratorProfiler(generator);
+
+        var structures = getStructures(generator);
+        var overrides = getOverrides(generator);
+
+        return new GeneratorProfiler(structures, overrides, generator);
     }
 }

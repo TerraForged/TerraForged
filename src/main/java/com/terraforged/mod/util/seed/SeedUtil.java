@@ -64,7 +64,7 @@ public class SeedUtil {
 
     public static ChunkGenerator withProfiler(ChunkGenerator generator) {
         if (GeneratorProfiler.PROFILING.get()) {
-//            return GeneratorProfiler.wrap(generator);
+            return GeneratorProfiler.wrap(generator);
         }
         return generator;
     }
