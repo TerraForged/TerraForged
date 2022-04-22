@@ -1,0 +1,121 @@
+{
+  "type": "terraforged:mountains",
+  "weight": 1.25,
+  "noise": {
+    "type": "Scale",
+    "scale": {
+      "type": "Const",
+      "value": 0.7
+    },
+    "source": {
+      "type": "Warp",
+      "domain": {
+        "type": "DirectionWarp",
+        "direction": {
+          "interpolation": "CURVE3",
+          "type": "Perlin",
+          "frequency": 0.1,
+          "gain": 0.5,
+          "lacunarity": 2,
+          "octaves": 1,
+          "seed": 432470
+        },
+        "strength": {
+          "type": "Const",
+          "value": 2
+        }
+      },
+      "source": {
+        "blend": "CONSTANT",
+        "type": "Valley",
+        "amplitude": 0.15,
+        "fall_off": 0.8,
+        "grid_size": 128,
+        "lacunarity": 3.1,
+        "octaves": 2,
+        "seed": 310154,
+        "strength": 0.65,
+        "source": {
+          "type": "Warp",
+          "domain": {
+            "type": "DomainWarp",
+            "distance": {
+              "type": "Const",
+              "value": 150
+            },
+            "x": {
+              "type": "Map",
+              "max": {
+                "type": "Const",
+                "value": 0.5
+              },
+              "min": {
+                "type": "Const",
+                "value": -0.5
+              },
+              "source": {
+                "interpolation": "CURVE3",
+                "type": "Perlin",
+                "frequency": 0.003,
+                "gain": 0.5,
+                "lacunarity": 2,
+                "octaves": 1,
+                "seed": 181119
+              }
+            },
+            "y": {
+              "type": "Map",
+              "max": {
+                "type": "Const",
+                "value": 0.5
+              },
+              "min": {
+                "type": "Const",
+                "value": -0.5
+              },
+              "source": {
+                "interpolation": "CURVE3",
+                "type": "Perlin",
+                "frequency": 0.003,
+                "gain": 0.5,
+                "lacunarity": 2,
+                "octaves": 1,
+                "seed": 181120
+              }
+            }
+          },
+          "source": {
+            "type": "Mult",
+            "modules": [
+              {
+                "interpolation": "CURVE3",
+                "type": "Ridge",
+                "frequency": 0.002,
+                "gain": 1.15,
+                "lacunarity": 2.35,
+                "octaves": 4,
+                "seed": 493683
+              },
+              {
+                "type": "Alpha",
+                "alpha": {
+                  "type": "Const",
+                  "value": 0.075
+                },
+                "source": {
+                  "interpolation": "CURVE3",
+                  "type": "Perlin",
+                  "frequency": 0.042,
+                  "gain": 0.5,
+                  "lacunarity": 2,
+                  "octaves": 4,
+                  "seed": 191460
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

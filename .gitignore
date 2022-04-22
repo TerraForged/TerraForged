@@ -27,7 +27,7 @@ hs_err_pid*
 run/
 out/
 build/
-generated/
+generated/.cache
 .idea/
 .gradle/
 .cache/

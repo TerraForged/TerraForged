@@ -1,0 +1,67 @@
+{
+  "biomes": "#terraforged:trees/patchy",
+  "density": 0.5,
+  "frequency": 0.2,
+  "jitter": 0.75,
+  "viability": {
+    "type": "Sum",
+    "initial": 0.65,
+    "amounts": [0.2, -1, -1, -0.75, -0.4500000005499189],
+    "rules": [
+      {
+        "type": "Saturation",
+        "max": 1,
+        "min": 0.9
+      },
+      {
+        "type": "Height",
+        "max": 165,
+        "mid": 40,
+        "min": -100
+      },
+      {
+        "type": "Slope",
+        "max": 0.65,
+        "normalize": 60
+      },
+      {
+        "type": "BiomeEdgeViability",
+        "distance": 0.8
+      },
+      {
+        "type": "Noise",
+        "noise": {
+          "type": "Map",
+          "max": {
+            "type": "Const",
+            "value": 1
+          },
+          "min": {
+            "type": "Const",
+            "value": 0
+          },
+          "source": {
+            "type": "Clamp",
+            "max": {
+              "type": "Const",
+              "value": 0.7
+            },
+            "min": {
+              "type": "Const",
+              "value": 0.4
+            },
+            "source": {
+              "interpolation": "CURVE3",
+              "type": "Simplex",
+              "frequency": 0.007,
+              "gain": 0.5,
+              "lacunarity": 2,
+              "octaves": 3,
+              "seed": 47384
+            }
+          }
+        }
+      }
+    ]
+  }
+}

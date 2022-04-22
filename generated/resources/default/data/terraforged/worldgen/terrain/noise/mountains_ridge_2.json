@@ -1,0 +1,198 @@
+{
+  "type": "terraforged:mountains",
+  "weight": 1.25,
+  "noise": {
+    "type": "Scale",
+    "scale": {
+      "type": "Const",
+      "value": 0.645
+    },
+    "source": {
+      "type": "AdvTerrace",
+      "blend_max": 0.45,
+      "blend_min": 0.2,
+      "octaves": 1,
+      "steps": 24,
+      "mask": {
+        "type": "Map",
+        "max": {
+          "type": "Const",
+          "value": 1
+        },
+        "min": {
+          "type": "Const",
+          "value": 0
+        },
+        "source": {
+          "type": "Clamp",
+          "max": {
+            "type": "Const",
+            "value": 0.95
+          },
+          "min": {
+            "type": "Const",
+            "value": 0.5
+          },
+          "source": {
+            "interpolation": "CURVE3",
+            "type": "Perlin",
+            "frequency": 0.01,
+            "gain": 0.5,
+            "lacunarity": 2,
+            "octaves": 1,
+            "seed": 280434
+          }
+        }
+      },
+      "modulation": {
+        "type": "Scale",
+        "scale": {
+          "type": "Const",
+          "value": 0.5
+        },
+        "source": {
+          "interpolation": "CURVE3",
+          "type": "Perlin",
+          "frequency": 0.02,
+          "gain": 0.5,
+          "lacunarity": 2,
+          "octaves": 1,
+          "seed": 44137
+        }
+      },
+      "slope": {
+        "type": "Const",
+        "value": 0.45
+      },
+      "source": {
+        "type": "Pow",
+        "power": {
+          "type": "Const",
+          "value": 1.1
+        },
+        "source": {
+          "type": "Mult",
+          "modules": [
+            {
+              "type": "Mult",
+              "modules": [
+                {
+                  "type": "Warp",
+                  "domain": {
+                    "type": "DomainWarp",
+                    "distance": {
+                      "type": "Const",
+                      "value": 100
+                    },
+                    "x": {
+                      "type": "Map",
+                      "max": {
+                        "type": "Const",
+                        "value": 0.5
+                      },
+                      "min": {
+                        "type": "Const",
+                        "value": -0.5
+                      },
+                      "source": {
+                        "interpolation": "CURVE3",
+                        "type": "Perlin",
+                        "frequency": 0.005,
+                        "gain": 0.5,
+                        "lacunarity": 2,
+                        "octaves": 2,
+                        "seed": 253699
+                      }
+                    },
+                    "y": {
+                      "type": "Map",
+                      "max": {
+                        "type": "Const",
+                        "value": 0.5
+                      },
+                      "min": {
+                        "type": "Const",
+                        "value": -0.5
+                      },
+                      "source": {
+                        "interpolation": "CURVE3",
+                        "type": "Perlin",
+                        "frequency": 0.005,
+                        "gain": 0.5,
+                        "lacunarity": 2,
+                        "octaves": 2,
+                        "seed": 253700
+                      }
+                    }
+                  },
+                  "source": {
+                    "type": "Clamp",
+                    "max": {
+                      "type": "Const",
+                      "value": 1
+                    },
+                    "min": {
+                      "type": "Const",
+                      "value": 0
+                    },
+                    "source": {
+                      "type": "Scale",
+                      "scale": {
+                        "type": "Const",
+                        "value": 1.2
+                      },
+                      "source": {
+                        "dist_func": "EUCLIDEAN",
+                        "edge_func": "DISTANCE_2",
+                        "interpolation": "CURVE3",
+                        "type": "CellEdge",
+                        "distance": 1,
+                        "frequency": 0.003,
+                        "gain": 0.5,
+                        "lacunarity": 2,
+                        "octaves": 1,
+                        "seed": 128413
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "Alpha",
+                  "alpha": {
+                    "type": "Const",
+                    "value": 0.025
+                  },
+                  "source": {
+                    "interpolation": "CURVE3",
+                    "type": "Perlin",
+                    "frequency": 0.1,
+                    "gain": 0.5,
+                    "lacunarity": 2,
+                    "octaves": 1,
+                    "seed": 185667
+                  }
+                }
+              ]
+            },
+            {
+              "type": "Alpha",
+              "alpha": {
+                "type": "Const",
+                "value": 0.37
+              },
+              "source": {
+                "interpolation": "CURVE3",
+                "type": "Ridge",
+                "frequency": 0.008,
+                "gain": 0.975,
+                "lacunarity": 2,
+                "octaves": 4,
+                "seed": 120078
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
