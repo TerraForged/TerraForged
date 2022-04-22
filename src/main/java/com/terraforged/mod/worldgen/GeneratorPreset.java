@@ -59,7 +59,7 @@ public class GeneratorPreset {
     }
 
     public static LevelStem getDefault(RegistryAccess registries) {
-        var generator = build(0L, TerrainLevels.DEFAULT.copy(), registries);
+        var generator = build(0L, TerrainLevels.DEFAULT.get().copy(), registries);
         var type = registries.ownedRegistryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
         return new LevelStem(type.getHolderOrThrow(DimensionType.OVERWORLD_LOCATION), generator);
     }

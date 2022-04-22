@@ -26,70 +26,80 @@ package com.terraforged.mod.worldgen.profiler;
 
 import com.terraforged.mod.TerraForged;
 
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ProfilerStages {
-    private static final long INTERVAL_MS = TimeUnit.SECONDS.toMillis(10);
-
     // @formatter:off
-    public final GenStage starts     = new GenStage("starts    ");
-    public final GenStage refs       = new GenStage("refs      ");
-    public final GenStage biomes     = new GenStage("biomes    ");
-    public final GenStage noise      = new GenStage("noise/fill");
-    public final GenStage carve      = new GenStage("carve     ");
-    public final GenStage surface    = new GenStage("surface   ");
-    public final GenStage decoration = new GenStage("decoration");
+    public final GenStage starts     = new GenStage("Starts:    ");
+    public final GenStage refs       = new GenStage("Refs:      ");
+    public final GenStage biomes     = new GenStage("Biomes:    ");
+    public final GenStage noise      = new GenStage("Noise:     ");
+    public final GenStage carve      = new GenStage("Carvers: ");
+    public final GenStage surface    = new GenStage("Surface: ");
+    public final GenStage decoration = new GenStage("Features:");
     // @formatter:on
 
-    private final long start = System.currentTimeMillis() + INTERVAL_MS * 2;
+    private final long start = System.currentTimeMillis() + 10_000;
     private final AtomicInteger chunkCount = new AtomicInteger();
     private final AtomicLong timestamp = new AtomicLong(0);
     private final GenStage[] stages = {starts, refs, biomes, noise, carve, surface, decoration};
+
+    private final List<String> debugInfoCache = new ArrayList<>();
 
     public void incrementChunks() {
         chunkCount.incrementAndGet();
     }
 
     public void reset() {
-        timestamp.set(0L);
         chunkCount.set(0);
+
         for (var stage : stages) {
             stage.reset();
         }
     }
 
-    public void tick() {
+    public void tick(long interval) {
+        tick(interval, debugInfoCache);
+
+        for (var line : debugInfoCache) {
+            TerraForged.LOG.info(line);
+        }
+    }
+
+    public void addDebugInfo(long interval, List<String> lines) {
+        tick(interval, debugInfoCache);
+
+        lines.addAll(debugInfoCache);
+    }
+
+    private void tick(long interval, List<String> lines) {
         long time = timestamp.get();
         long now = System.currentTimeMillis();
 
         if (time == 0L) {
-            timestamp.set(now + INTERVAL_MS * 2);
+            timestamp.set(now + interval * 2);
             if (now > start) reset();
             return;
         }
 
-        if (now > time && timestamp.compareAndSet(time, now + INTERVAL_MS)) {
-            TerraForged.LOG.info("Timings:");
+        if (now > time && timestamp.compareAndSet(time, now + interval)) {
+            lines.clear();
+            lines.add("");
+            lines.add("[World-Gen Performance]");
 
             double sumAverage = 0;
             for (var stage : stages) {
                 double average = stage.getAverageMS();
                 sumAverage += average;
-                average = trim(average, 100);
-                TerraForged.LOG.info(" - {} = {}ms", stage.name(), average);
+                lines.add(String.format("%s %.2fms", stage.name(), average));
             }
 
-            sumAverage = trim(sumAverage, 100);
-
-            TerraForged.LOG.info(" Chunk Average = {}ms", sumAverage);
-            TerraForged.LOG.info(" Chunk Count: =  {}", chunkCount.get());
+            lines.add(String.format("Chunk Average: %.2fms", sumAverage));
+            lines.add(String.format("Chunk Count:   %s", chunkCount.get()));
+            lines.add("");
         }
-    }
-
-    private static double trim(double d, int dp) {
-        d = Math.round(d * dp);
-        return d / dp;
     }
 }

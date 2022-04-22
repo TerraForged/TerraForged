@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GeneratorProfiler extends ChunkGenerator {
@@ -61,6 +62,9 @@ public class GeneratorProfiler extends ChunkGenerator {
 
     protected static final MethodHandle STRUCTURE_REGISTRY = ReflectionUtil.field(ChunkGenerator.class, Registry.class);
     protected static final MethodHandle STRUCTURE_OVERRIDES = ReflectionUtil.field(ChunkGenerator.class, Optional.class);
+
+    private static final long LOG_INTERVAL_MS = TimeUnit.SECONDS.toMillis(10);
+    private static final long DEBUG_INTERVAL_MS = TimeUnit.SECONDS.toMillis(1);
 
     protected final ChunkGenerator generator;
     protected final ProfilerStages stages = new ProfilerStages();
@@ -104,8 +108,6 @@ public class GeneratorProfiler extends ChunkGenerator {
         var timer = stages.starts.start();
         generator.createStructures(p_62200_, p_62201_, p_62202_, p_62203_, p_62204_);
         timer.punchOut();
-
-        stages.tick();
     }
 
     @Override
@@ -222,6 +224,7 @@ public class GeneratorProfiler extends ChunkGenerator {
     @Override
     public void addDebugScreenInfo(List<String> lines, BlockPos pos) {
         generator.addDebugScreenInfo(lines, pos);
+        stages.addDebugInfo(DEBUG_INTERVAL_MS, lines);
     }
 
     @SuppressWarnings("unchecked")

@@ -35,12 +35,12 @@ import java.util.List;
 public class DelegateRegion extends WorldGenRegion {
     public static final ThreadLocal<Builder> LOCAL_BUILDER = ThreadLocal.withInitial(Builder::new);
 
-    public DelegateRegion(ServerLevel level, List<ChunkAccess> chunks, ChunkStatus status) {
-        super(level, chunks, status, getCutoffRadius(status));
+    public DelegateRegion(ServerLevel level, List<ChunkAccess> chunks, ChunkStatus status, ChunkStatus stage) {
+        super(level, chunks, status, getCutoffRadius(stage));
     }
 
     public interface Factory<T extends WorldGenRegion> {
-        T build(ServerLevel level, List<ChunkAccess> chunks, ChunkStatus centerStatus);
+        T build(ServerLevel level, List<ChunkAccess> chunks, ChunkStatus centerStatus, ChunkStatus stage);
     }
 
     public static int getCutoffRadius(ChunkStatus status) {
@@ -83,8 +83,8 @@ public class DelegateRegion extends WorldGenRegion {
             return this;
         }
 
-        public <T extends WorldGenRegion> T build(Factory<T> factory) {
-            return factory.build(level, chunks, status);
+        public <T extends WorldGenRegion> T build(ChunkStatus stage, Factory<T> factory) {
+            return factory.build(level, chunks, status, stage);
         }
     }
 }

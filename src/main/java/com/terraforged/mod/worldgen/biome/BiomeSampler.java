@@ -26,7 +26,6 @@ package com.terraforged.mod.worldgen.biome;
 
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.engine.world.climate.ClimateModule;
-import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.worldgen.biome.util.BiomeMapManager;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 import net.minecraft.core.Holder;
@@ -47,7 +46,7 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
 
         Holder<Biome> biome;
         if (map == null || map.isEmpty()) {
-            TerraForged.LOG.debug("Missing biome for type: {}", sample.cell.biome);
+//            TerraForged.LOG.debug("Missing biome for type: {}", sample.cell.biome);
             biome = biomeMapManager.getBiomes().getHolderOrThrow(Biomes.PLAINS);
         } else {
             biome = map.getValue(sample.cell.biomeRegionId);

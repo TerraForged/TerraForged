@@ -51,8 +51,8 @@ public class Common extends Init {
         TerraForged.LOG.info("Registering world-gen component codecs");
         ModRegistries.createRegistry(ModRegistry.CAVE, NoiseCave.CODEC);
         ModRegistries.createRegistry(ModRegistry.CLIMATE, ClimateType.CODEC);
-        ModRegistries.createRegistry(ModRegistry.TERRAIN, TerrainNoise.CODEC);
         ModRegistries.createRegistry(ModRegistry.TERRAIN_TYPE, TerrainType.DIRECT);
+        ModRegistries.createRegistry(ModRegistry.TERRAIN, TerrainNoise.CODEC);
         ModRegistries.createRegistry(ModRegistry.VEGETATION, VegetationConfig.CODEC);
 
         TerraForged.LOG.info("Locking mod world-gen registries");

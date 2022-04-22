@@ -41,7 +41,7 @@ public class TerrainBlenderTest {
                 new TerrainNoise(type(TerrainType.FLATS), 1F, Source.constant(1.00)),
         });
 
-        N2DUtil.display(1000, 800, (x, z, img) -> {
+        N2DUtil.display(2000, 1200, (x, z, img) -> {
             float noise = blender.getValue(x, z);
 
             img.setRGB(x, z, Color.HSBtoRGB(0, 0, noise));

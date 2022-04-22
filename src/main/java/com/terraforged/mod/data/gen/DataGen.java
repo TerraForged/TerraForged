@@ -128,10 +128,14 @@ public class DataGen extends Init {
         TerraForged.LOG.info("Exporting registry: {}", registry.key());
         for (var entry : registry.entrySet()) {
             try {
-                var json = codec.encodeStart(ops, entry.getValue()).result().orElseThrow();
+                var json = codec.encodeStart(ops, entry.getValue())
+                        .mapError(DataGen::logError)
+                        .result()
+                        .orElseThrow();
+
                 export(dir, registry.key(), entry.getKey(), json);
             } catch (Throwable t) {
-                t.printStackTrace();
+                new EncodingException(entry.getKey(), t).printStackTrace();
             }
         }
     }
@@ -176,5 +180,10 @@ public class DataGen extends Init {
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             e.printStackTrace();
         }
+    }
+
+    private static String logError(String s) {
+        TerraForged.LOG.warn(s);
+        return s;
     }
 }

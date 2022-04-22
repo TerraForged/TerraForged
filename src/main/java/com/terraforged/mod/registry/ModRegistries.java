@@ -27,6 +27,7 @@ package com.terraforged.mod.registry;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import com.terraforged.mod.TerraForged;
+import com.terraforged.mod.registry.lazy.LazyRegistry;
 import com.terraforged.mod.util.Init;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
@@ -62,7 +63,7 @@ public class ModRegistries extends Init {
         return INSTANCE.holders;
     }
 
-    public static <T> void createRegistry(Key.LazyRegistry<T> key, Codec<T> codec) {
+    public static <T> void createRegistry(LazyRegistry<T> key, Codec<T> codec) {
         createRegistry(key.get(), codec);
     }
 
@@ -79,7 +80,7 @@ public class ModRegistries extends Init {
         INSTANCE.registries.put(key, registry);
     }
 
-    public static <T> ResourceKey<T> register(Key.LazyRegistry<T> registryKey, String name, T value) {
+    public static <T> ResourceKey<T> register(LazyRegistry<T> registryKey, String name, T value) {
         return register(registryKey.get(), name, value);
     }
 
@@ -103,7 +104,7 @@ public class ModRegistries extends Init {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> MappedRegistry<T> getRegistry(ResourceKey<Registry<T>> key) {
+    public static <T> MappedRegistry<T> getRegistry(ResourceKey<Registry<T>> key) {
         var registry = INSTANCE.registries.get(key);
         if (registry == null) throw new Error("Missing registry: " + key);
         return (MappedRegistry<T>) registry;

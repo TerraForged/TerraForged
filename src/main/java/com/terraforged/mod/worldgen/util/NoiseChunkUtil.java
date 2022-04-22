@@ -31,38 +31,14 @@ import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import net.minecraft.core.QuartPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.DensityFunction;
-import net.minecraft.world.level.levelgen.DensityFunctions;
 import net.minecraft.world.level.levelgen.NoiseChunk;
 import net.minecraft.world.level.levelgen.blending.Blender;
 
 import java.lang.invoke.MethodHandle;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 public class NoiseChunkUtil {
     private static final MethodHandle SURFACE_CACHE = ReflectionUtil.field(NoiseChunk.class, Long2IntMap.class);
-    private static final DensityFunctions.BeardifierOrMarker BEARDO = new DensityFunctions.BeardifierOrMarker() {
-        @Override
-        public double compute(DensityFunction.FunctionContext p_208515_) {
-            return 0.0D;
-        }
-
-        @Override
-        public void fillArray(double[] p_208517_, DensityFunction.ContextProvider p_208518_) {
-            Arrays.fill(p_208517_, 0.0D);
-        }
-
-        @Override
-        public double minValue() {
-            return 0.0D;
-        }
-
-        @Override
-        public double maxValue() {
-            return 0.0D;
-        }
-    };
 
     public static void initChunk(ChunkAccess chunk, Generator generator) {
         getNoiseChunk(chunk, generator);
@@ -71,16 +47,19 @@ public class NoiseChunkUtil {
     public static NoiseChunk getNoiseChunk(ChunkAccess chunk, Generator generator) {
         var vanilla = generator.getVanillaGen();
         var fluidPicker = vanilla.getGlobalFluidPicker();
-        var noiseChunk = chunk.getOrCreateNoiseChunk(vanilla.getNoiseRouter(), () -> BEARDO, vanilla.getSettings().value(), fluidPicker, Blender.empty());
-        initChunk(chunk, noiseChunk, generator);
+        var settings = vanilla.getSettings().value();
+
+        var terrainData = generator.getChunkDataAsync(chunk.getPos());
+        var noiseChunk = chunk.getOrCreateNoiseChunk(NoopNoise.ROUTER, NoopNoise.BEARDIFIER, settings, fluidPicker, Blender.empty());
+
+        initChunk(chunk, noiseChunk, terrainData);
+
         return noiseChunk;
     }
 
-    private static void initChunk(ChunkAccess chunk, NoiseChunk noiseChunk, Generator generator) {
+    private static void initChunk(ChunkAccess chunk, NoiseChunk noiseChunk, CompletableFuture<TerrainData> terrainData) {
         var cache = getCache(noiseChunk);
         if (!cache.isEmpty()) return;
-
-        var terrainData = generator.getChunkDataAsync(chunk.getPos());
 
         initSurfaceCache(chunk, cache, terrainData);
     }

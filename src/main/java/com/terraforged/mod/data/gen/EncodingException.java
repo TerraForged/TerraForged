@@ -22,21 +22,12 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.data;
+package com.terraforged.mod.data.gen;
 
-import com.terraforged.mod.registry.lazy.LazyTag;
-import net.minecraft.world.level.biome.Biome;
+import net.minecraft.resources.ResourceKey;
 
-public interface ModTags {
-    LazyTag<Biome> OVERWORLD = LazyTag.biome("overworld");
-
-    // Trees
-    LazyTag<Biome> COPSES = LazyTag.biome("trees/copses");
-    LazyTag<Biome> HARDY = LazyTag.biome("trees/hardy");
-    LazyTag<Biome> HARDY_SLOPES = LazyTag.biome("trees/hardy_slopes");
-    LazyTag<Biome> PATCHY = LazyTag.biome("trees/patchy");
-    LazyTag<Biome> RAINFOREST = LazyTag.biome("trees/rainforest");
-    LazyTag<Biome> SPARSE = LazyTag.biome("trees/sparse");
-    LazyTag<Biome> SPARSE_RAINFOREST = LazyTag.biome("trees/sparse_rainforest");
-    LazyTag<Biome> TEMPERATE = LazyTag.biome("trees/temperate");
+public class EncodingException extends RuntimeException {
+    public EncodingException(ResourceKey<?> key, Throwable t) {
+        super("Failed to encode: " + key, t);
+    }
 }

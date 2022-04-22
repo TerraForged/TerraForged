@@ -44,10 +44,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkStatus;
-import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.chunk.UpgradeData;
+import net.minecraft.world.level.chunk.*;
 import net.minecraft.world.level.gameevent.GameEventDispatcher;
 import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.blending.Blender;
@@ -69,14 +66,14 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public abstract class DelegateChunk extends ChunkAccess {
+public abstract class DelegateChunk extends ProtoChunk {
     private static final LevelHeightAccessor ZERO_HEIGHT = new ZeroHeight();
     private static final Registry<Biome> EMPTY_REGISTRY = new MappedRegistry<>(Registry.BIOME_REGISTRY, Lifecycle.stable(), null);
 
     protected ChunkAccess delegate;
 
     protected DelegateChunk() {
-        super(ChunkPos.ZERO, UpgradeData.EMPTY, ZERO_HEIGHT, EMPTY_REGISTRY, 0L, null, null);
+        super(ChunkPos.ZERO, UpgradeData.EMPTY, ZERO_HEIGHT, EMPTY_REGISTRY, null);
     }
 
     protected void set(ChunkAccess chunk) {

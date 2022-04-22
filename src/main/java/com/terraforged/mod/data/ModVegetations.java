@@ -26,16 +26,14 @@ package com.terraforged.mod.data;
 
 import com.terraforged.engine.Seed;
 import com.terraforged.mod.Environment;
-import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.registry.ModRegistries;
 import com.terraforged.mod.registry.ModRegistry;
+import com.terraforged.mod.registry.lazy.LazyTag;
 import com.terraforged.mod.util.seed.RandSeed;
 import com.terraforged.mod.worldgen.asset.VegetationConfig;
 import com.terraforged.mod.worldgen.biome.viability.*;
 import com.terraforged.noise.Source;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 
 public interface ModVegetations extends ModRegistry {
@@ -145,8 +143,8 @@ public interface ModVegetations extends ModRegistry {
                     .build());
         }
 
-        static TagKey<Biome> tag(String name, RegistryAccess access) {
-            return TagKey.create(Registry.BIOME_REGISTRY, TerraForged.location(name));
+        static LazyTag<Biome> tag(String name, RegistryAccess access) {
+            return LazyTag.biome(name);
         }
 
         static VegetationConfig[] getDefaults(RegistryAccess access) {

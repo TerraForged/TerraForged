@@ -47,14 +47,14 @@ public class ViabilityTest {
     public static final int SEED = 6785;
 
     public static void main(String[] args) {
-        int freq = 5;
+        int freq = 1;
         int width = 800;
         int height = 800;
 
         float[] hsb = new float[3];
 
-        var levels = TerrainLevels.DEFAULT;
-        var noise = new NoiseGenerator(SEED, levels, ModTerrains.getTerrain(null));
+        var levels = new TerrainLevels();
+        var noise = new NoiseGenerator(SEED, levels, ModTerrains.Factory.getDefault(null));
         var heightmap = generate(width, height, freq, noise).init(freq);
 
         var context = new ViabilityContext();
@@ -62,7 +62,7 @@ public class ViabilityTest {
         context.terrainData = CompletableFuture.completedFuture(new TerrainData(levels));
 
         var vegetations = ModVegetations.getVegetation(null);
-        var vegetation = vegetations[7];
+        var vegetation = vegetations[6];
 
         var image = N2DUtil.render(width, height, (x, z, img) -> {
             var sample = heightmap.get(x, z);

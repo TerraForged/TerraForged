@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.worldgen.terrain;
 
+import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.terraforged.mod.codec.Codecs;
 import com.terraforged.mod.codec.LazyCodec;
@@ -31,6 +32,8 @@ import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.worldgen.noise.NoiseLevels;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.world.level.dimension.DimensionType;
+
+import java.util.function.Supplier;
 
 public class TerrainLevels {
     public static final Codec<TerrainLevels> CODEC = LazyCodec.record(instance -> instance.group(
@@ -42,13 +45,21 @@ public class TerrainLevels {
             Codec.intRange(Limits.MIN_SEA_FLOOR, Limits.MAX_SEA_FLOOR).fieldOf("sea_floor").forGetter(l -> l.seaFloor)
     ).apply(instance, TerrainLevels::new));
 
-    public static final TerrainLevels DEFAULT = new TerrainLevels(true, Defaults.SCALE, Defaults.MIN_Y, Defaults.MAXY, Defaults.SEA_LEVEL, Defaults.SEA_FLOOR);
+    public static final Supplier<TerrainLevels> DEFAULT = Suppliers.memoize(() -> new TerrainLevels(true, Defaults.SCALE, Defaults.MIN_Y, Defaults.MAXY, Defaults.SEA_LEVEL, Defaults.SEA_FLOOR));
 
     public final int minY;
     public final int maxY; // Exclusive max block index
     public final int seaFloor;
     public final int seaLevel; // Inclusive index of highest water block
     public final NoiseLevels noiseLevels;
+
+    public TerrainLevels() {
+        this.minY = -64;
+        this.maxY = 320;
+        this.seaFloor = 24;
+        this.seaLevel = 64;
+        this.noiseLevels = new NoiseLevels(false, Defaults.SCALE, seaLevel, seaFloor, maxY);
+    }
 
     public TerrainLevels(boolean autoScale, float scale, int minY, int maxY, int seaLevel, int seaFloor) {
         this.minY = MathUtil.clamp(minY, Limits.MIN_MIN_Y, Limits.MAX_MIN_Y);

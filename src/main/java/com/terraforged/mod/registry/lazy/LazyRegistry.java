@@ -22,21 +22,32 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.data;
+package com.terraforged.mod.registry.lazy;
 
-import com.terraforged.mod.registry.lazy.LazyTag;
-import net.minecraft.world.level.biome.Biome;
+import com.terraforged.mod.TerraForged;
+import com.terraforged.mod.registry.ModRegistries;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
-public interface ModTags {
-    LazyTag<Biome> OVERWORLD = LazyTag.biome("overworld");
+import java.util.function.Supplier;
 
-    // Trees
-    LazyTag<Biome> COPSES = LazyTag.biome("trees/copses");
-    LazyTag<Biome> HARDY = LazyTag.biome("trees/hardy");
-    LazyTag<Biome> HARDY_SLOPES = LazyTag.biome("trees/hardy_slopes");
-    LazyTag<Biome> PATCHY = LazyTag.biome("trees/patchy");
-    LazyTag<Biome> RAINFOREST = LazyTag.biome("trees/rainforest");
-    LazyTag<Biome> SPARSE = LazyTag.biome("trees/sparse");
-    LazyTag<Biome> SPARSE_RAINFOREST = LazyTag.biome("trees/sparse_rainforest");
-    LazyTag<Biome> TEMPERATE = LazyTag.biome("trees/temperate");
+public class LazyRegistry<T> extends LazyValue<ResourceKey<Registry<T>>>{
+    public LazyRegistry(ResourceLocation name) {
+        super(name);
+    }
+
+    public LazyKey<T> element(String name) {
+        return new LazyKey<>(this, TerraForged.location(name));
+    }
+
+    @Override
+    protected ResourceKey<Registry<T>> compute() {
+        return ResourceKey.createRegistryKey(name);
+    }
+
+    protected  Supplier<Registry<T>> registry(RegistryAccess access) {
+        return access == null ? () -> ModRegistries.getRegistry(get()) : () -> access.registryOrThrow(get());
+    }
 }

@@ -37,6 +37,7 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.WorldGenerationContext;
 
 public class BiomeGenerator {
     private final SurfaceDecorator surfaceDecorator;
@@ -55,10 +56,9 @@ public class BiomeGenerator {
         this.noiseCaveGenerator = new NoiseCaveGenerator(seed, other.noiseCaveGenerator);
     }
 
-    public void surface(ChunkAccess chunk, WorldGenRegion region, StructureFeatureManager structures, Generator generator) {
-        NoiseChunkUtil.initChunk(chunk, generator);
-        generator.getVanillaGen().getVanillaGenerator().buildSurface(region, structures, chunk);
-        surfaceDecorator.decorate(chunk, generator);
+    public void surface(ChunkAccess chunk, WorldGenRegion region, Generator generator) {
+        surfaceDecorator.decorate(chunk, region, generator);
+        surfaceDecorator.decoratePost(chunk, generator);
     }
 
     public void carve(long seed,
@@ -78,5 +78,17 @@ public class BiomeGenerator {
         noiseCaveGenerator.decorate(chunk, region, generator);
 
         Surface.applyPost(chunk, terrain.join(), generator);
+    }
+
+    protected static void buildVanillaSurface(ChunkAccess chunk, WorldGenRegion region, Generator generator) {
+        var context = new WorldGenerationContext(generator, region);
+        var noiseChunk = NoiseChunkUtil.getNoiseChunk(chunk, generator);
+
+        var biomes = generator.getBiomeSource().getRegistry();
+        var biomeManager = region.getBiomeManager();
+
+        var surface = generator.getVanillaGen().getSurfaceSystem();
+        var surfaceRules = generator.getVanillaGen().getSettings().value().surfaceRule();
+        surface.buildSurface(biomeManager, biomes, false, context, chunk, noiseChunk, surfaceRules);
     }
 }

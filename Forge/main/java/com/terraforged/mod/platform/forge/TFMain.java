@@ -34,7 +34,7 @@ import com.terraforged.mod.platform.CommonAPI;
 import com.terraforged.mod.platform.forge.client.TFClient;
 import com.terraforged.mod.platform.forge.client.TFPreset;
 import com.terraforged.mod.platform.forge.util.ForgeRegistrar;
-import com.terraforged.mod.registry.Key;
+import com.terraforged.mod.registry.lazy.LazyTag;
 import com.terraforged.mod.registry.registrar.NoopRegistrar;
 import com.terraforged.mod.util.DemoHandler;
 import com.terraforged.mod.worldgen.biome.util.matcher.BiomeMatcher;
@@ -141,7 +141,7 @@ public class TFMain extends TerraForged {
     }
 
     private static class ForgeCommonAPI implements CommonAPI {
-        public static final Key.LazyTag<Biome> FORGE_OVERWORLD = Key.biomeTag("forge:overworld");
+        public static final LazyTag<Biome> FORGE_OVERWORLD = LazyTag.biome("forge:overworld");
 
         @Override
         public BiomeMatcher getOverworldMatcher() {

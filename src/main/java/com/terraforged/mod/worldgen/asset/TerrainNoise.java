@@ -46,17 +46,11 @@ public class TerrainNoise implements ContextSeedable<TerrainNoise>, WeightMap.We
     private final Holder<TerrainType> type;
     private final float weight;
     private final Module noise;
-    private final Holder<Terrain> terrain;
-
-    public TerrainNoise(TerrainType type, float weight, Module noise) {
-        this(Holder.direct(type), weight, noise);
-    }
 
     public TerrainNoise(Holder<TerrainType> type, float weight, Module noise) {
         this.type = type;
         this.weight = weight;
         this.noise = noise;
-        this.terrain = Holder.direct(type.value().getTerrain());
     }
 
     @Override
@@ -75,7 +69,7 @@ public class TerrainNoise implements ContextSeedable<TerrainNoise>, WeightMap.We
     }
 
     public Terrain terrain() {
-        return terrain.value();
+        return type().value().getTerrain();
     }
 
     public Module noise() {
@@ -85,7 +79,7 @@ public class TerrainNoise implements ContextSeedable<TerrainNoise>, WeightMap.We
     @Override
     public String toString() {
         return "TerrainConfig{" +
-                "terrain=" + terrain +
+                "type=" + type +
                 ", weight=" + weight +
                 ", noise=" + noise +
                 '}';

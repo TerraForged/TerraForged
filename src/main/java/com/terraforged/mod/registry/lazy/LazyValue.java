@@ -22,33 +22,40 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.biome.surface;
+package com.terraforged.mod.registry.lazy;
 
-import com.terraforged.mod.worldgen.util.delegate.DelegateRegion;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.world.level.biome.BiomeManager;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.resources.ResourceLocation;
 
-import java.util.List;
+import java.util.function.Supplier;
 
-public class SurfaceRegion extends DelegateRegion {
-    protected final BiomeManager biomeManager;
+public abstract class LazyValue<T> implements Supplier<T> {
+    protected final ResourceLocation name;
+    protected volatile T value;
 
-    public SurfaceRegion(ServerLevel level, List<ChunkAccess> chunks, ChunkStatus status) {
-        super(level, chunks, status);
-        this.biomeManager = SurfaceBiomeManager.assign(getCenter(), super.getBiomeManager());
+    protected LazyValue(ResourceLocation name) {
+        this.name = name;
     }
 
     @Override
-    public BiomeManager getBiomeManager() {
-        return biomeManager;
+    public T get() {
+        var value = this.value;
+        if (value != null) return value;
+
+        synchronized (name) {
+            value = this.value;
+            if (value == null) {
+                value = compute();
+                this.value = value;
+            }
+        }
+
+        return value;
     }
 
-    public static SurfaceRegion wrap(WorldGenRegion region) {
-        var builder = DelegateRegion.LOCAL_BUILDER.get();
-        builder.source(region);
-        return builder.build(SurfaceRegion::new);
+    protected void set(T value) {
+        if (this.value != null) return;
+        this.value = value;
     }
+
+    protected abstract T compute();
 }

@@ -54,7 +54,7 @@ public class ErodedNoiseGenerator implements INoiseGenerator {
 
     public ErodedNoiseGenerator(long seed, NoiseTileSize tileSize, NoiseGenerator generator) {
         var settings = new FilterSettings.Erosion();
-        settings.dropletsPerChunk = 200;
+        settings.dropletsPerChunk = 350;
 
         this.tileSize = tileSize;
         this.generator = generator;

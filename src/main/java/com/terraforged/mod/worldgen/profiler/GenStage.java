@@ -59,7 +59,8 @@ public class GenStage {
     }
 
     public double getAverageNanos() {
-        return time.get() / (double) count.get();
+        double average = time.get() / (double) count.get();
+        return Double.isNaN(average) ? 0.0 : average;
     }
 
     public double getAverageMS() {

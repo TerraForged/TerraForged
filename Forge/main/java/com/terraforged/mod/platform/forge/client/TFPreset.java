@@ -43,7 +43,7 @@ import java.nio.file.Files;
 public class TFPreset implements ForgeWorldPreset.IBasicChunkGeneratorFactory {
     @Override
     public ChunkGenerator createChunkGenerator(RegistryAccess registryAccess, long seed) {
-        return GeneratorPreset.build(seed, TerrainLevels.DEFAULT, registryAccess);
+        return GeneratorPreset.build(seed, TerrainLevels.DEFAULT.get(), registryAccess);
     }
 
     public static ForgeWorldPreset create() {

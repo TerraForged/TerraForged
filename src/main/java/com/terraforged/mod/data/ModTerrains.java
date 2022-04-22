@@ -30,9 +30,9 @@ import com.terraforged.engine.world.heightmap.Levels;
 import com.terraforged.engine.world.terrain.LandForms;
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.engine.world.terrain.TerrainType;
-import com.terraforged.mod.Environment;
 import com.terraforged.mod.registry.ModRegistries;
 import com.terraforged.mod.registry.ModRegistry;
+import com.terraforged.mod.registry.lazy.LazyHolder;
 import com.terraforged.mod.util.seed.RandSeed;
 import com.terraforged.mod.worldgen.asset.TerrainNoise;
 import com.terraforged.noise.Module;
@@ -74,10 +74,9 @@ public interface ModTerrains extends ModRegistry {
     }
 
     static TerrainNoise[] getTerrain(RegistryAccess access) {
-        if (access == null || Environment.DEV_ENV) {
-            return Factory.getDefault(access);
-        }
-        return access.ownedRegistryOrThrow(TERRAIN.get()).stream().toArray(TerrainNoise[]::new);
+        var registry = access == null ? ModRegistries.getRegistry(TERRAIN.get()) : access.ownedRegistryOrThrow(TERRAIN.get());
+
+        return registry.stream().toArray(TerrainNoise[]::new);
     }
 
     class Factory {
@@ -122,9 +121,10 @@ public interface ModTerrains extends ModRegistry {
         }
 
         static Holder<com.terraforged.mod.worldgen.asset.TerrainType> getType(RegistryAccess access, Terrain terrain) {
-            if (access == null) return Holder.direct(com.terraforged.mod.worldgen.asset.TerrainType.of(terrain));
-            
-            return TERRAIN_TYPE.holder(access, terrain.getName());
+            var key = TERRAIN_TYPE.element(terrain.getName());
+            if (access == null) return new LazyHolder<>(com.terraforged.mod.worldgen.asset.TerrainType.of(terrain), key);
+
+            return access.ownedRegistryOrThrow(TERRAIN_TYPE.get()).getHolderOrThrow(key.get());
         }
 
         static TerrainSettings settings() {
@@ -139,7 +139,7 @@ public interface ModTerrains extends ModRegistry {
             return settings;
         }
 
-        static TerrainNoise[] getDefault(RegistryAccess access) {
+        public static TerrainNoise[] getDefault(RegistryAccess access) {
             var seed = Factory.createSeed();
             return new TerrainNoise[] {
                     Factory.create(access, seed, TerrainType.FLATS, Weights.STEPPE, LandForms::steppe),

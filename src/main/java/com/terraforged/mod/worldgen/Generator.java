@@ -48,6 +48,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
+import net.minecraft.world.level.levelgen.RandomSupport;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
@@ -62,7 +65,7 @@ import java.util.concurrent.Executor;
 public class Generator extends ChunkGenerator {
     public static final Codec<Generator> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.LONG.optionalFieldOf("seed", 0L).forGetter(g -> g.seed),
-            TerrainLevels.CODEC.optionalFieldOf("levels", TerrainLevels.DEFAULT).forGetter(g -> g.levels),
+            TerrainLevels.CODEC.optionalFieldOf("levels", TerrainLevels.DEFAULT.get()).forGetter(g -> g.levels),
             WorldGenCodec.CODEC.forGetter(Generator::getRegistries)
     ).apply(instance, instance.stable(GeneratorPreset::build)));
 
@@ -188,7 +191,7 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public void buildSurface(WorldGenRegion region, StructureFeatureManager structures, ChunkAccess chunk) {
-        biomeGenerator.surface(chunk, region, structures, this);
+        biomeGenerator.surface(chunk, region, this);
     }
 
     @Override
@@ -204,7 +207,18 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public void spawnOriginalMobs(WorldGenRegion region) {
-        vanillaGen.getVanillaGenerator().spawnOriginalMobs(region);
+        // See NoiseBasedChunkGenerator
+        var settings = vanillaGen.getSettings().value();
+        if (settings.disableMobGeneration()) return;
+
+        var chunkPos = region.getCenter();
+        var position = chunkPos.getWorldPosition().atY(region.getMaxBuildHeight() - 1);
+
+        var holder = region.getBiome(position);
+        var random = new WorldgenRandom(new LegacyRandomSource(RandomSupport.seedUniquifier()));
+        random.setDecorationSeed(region.getSeed(), chunkPos.getMinBlockX(), chunkPos.getMinBlockZ());
+
+        NaturalSpawner.spawnMobsForChunkGeneration(region, holder, chunkPos, random);
     }
 
     @Override

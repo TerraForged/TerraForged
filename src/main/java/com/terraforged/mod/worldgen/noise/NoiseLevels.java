@@ -59,7 +59,7 @@ public class NoiseLevels {
     }
 
     public static NoiseLevels getDefault() {
-        return TerrainLevels.DEFAULT.noiseLevels;
+        return TerrainLevels.DEFAULT.get().noiseLevels;
     }
 
     public static float calcFrequency(int verticalRange, boolean auto, float scale) {
