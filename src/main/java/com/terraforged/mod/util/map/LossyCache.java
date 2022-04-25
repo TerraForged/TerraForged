@@ -98,53 +98,76 @@ public class LossyCache<T> {
         }
 
         @Override
-        public T computeIfAbsent(long key, Long2ObjectFunction<T> function) {
-            int hash = hash(key);
-            int index = hash & mask;
+        public T computeIfAbsent(long key, Long2ObjectFunction<T> allocator) {
+            final int hash = hash(key);
+            final int index = hash & mask;
 
-            // Try reading without locking
-            long optStamp = lock.tryOptimisticRead();
-            long currentKey = keys[index];
-            T currentValue = values[index];
+            // Try lock-free read first
+            final long optiRead = lock.tryOptimisticRead();
+            final T optiValue = read(key, index);
 
-            if (lock.validate(optStamp)) {
-                // Safely read so check if the keys match and the value is non-null
-                if (currentKey == key && currentValue != null) {
-                    return currentValue;
-                }
-                // Otherwise we need to overwrite the current key/value
+            if (lock.validate(optiRead)) {
+                // Non-null if entry exists for key
+                if (optiValue != null) return optiValue;
+
+                // No value present so allocate/store a new one
+                return write(optiRead, key, index, allocator);
             } else {
-                // A write occurred during the optimistic read so obtain a full read lock
-                long read = lock.readLock();
+                // Obtain full read-lock and check again
+                final long read = lock.readLock();
+                final T value = read(key, index);
 
-                try {
-                    currentKey = keys[index];
-                    currentValue = values[index];
-                } finally {
+                // Non-null if entry exists for key
+                if (value != null) {
                     lock.unlockRead(read);
+                    return value;
                 }
 
-                // Keys match and value is non-null
-                if (currentKey == key && currentValue != null) {
-                    return currentValue;
-                }
+                // No value present so allocate/store a new one
+                return write(read, key, index, allocator);
             }
-
-            // Keys mismatched or current value is null
-            return write(key, index, currentValue, function);
         }
 
-        protected T write(long key, int index, T currentValue, Long2ObjectFunction<T> function) {
-            long write = lock.writeLock();
+        protected T write(long read, long key, int index, Long2ObjectFunction<T> allocator) {
+            // Try to convert the read to a full write-lock
+            long write = lock.tryConvertToWriteLock(read);
+
             try {
-                T newValue = function.apply(key);
+                if (!lock.validate(write)) {
+                    // Manually release the read-lock and obtain a write-lock
+                    write = upgradeToWriteLock(read);
+
+                    // Check if write occurred during the upgrade
+                    T value = read(key, index);
+
+                    // Non-null if entry now exists
+                    if (value != null) return value;
+                }
+
+                // Notify removal of the current value
+                onRemove(values[index]);
+
+                // Allocate and store a new value
+                T value = allocator.apply(key);
                 keys[index] = key;
-                values[index] = newValue;
-                return newValue;
+                values[index] = value;
+
+                return value;
             } finally {
                 lock.unlockWrite(write);
-                onRemove(currentValue);
             }
+        }
+
+        protected T read(long key, int index) {
+            // Value at index is valid only if the key at the same index matches
+            return key == keys[index] ? values[index] : null;
+        }
+
+        protected long upgradeToWriteLock(long read) {
+            if (lock.validate(read)) {
+                lock.unlockRead(read);
+            }
+            return lock.writeLock();
         }
     }
 }
