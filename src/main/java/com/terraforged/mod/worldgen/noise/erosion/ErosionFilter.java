@@ -36,10 +36,10 @@ public class ErosionFilter {
     private static final int GRAD_Y = 2;
 
     private static final int erosionRadius = 7;
-    private static final float inertia = 0.01f; // At zero, water will instantly change direction to flow downhill. At 1, water will never change direction.
+    private static final float inertia = 0.001f; // At zero, water will instantly change direction to flow downhill. At 1, water will never change direction.
     private static final float sedimentCapacityFactor = 8F; // Multiplier for how much sediment a droplet can carry
     private static final float minSedimentCapacity = 0.01f; // Used to prevent carry capacity getting too close to zero on flatter terrain
-    private static final float evaporateSpeed = 0.025f;
+    private static final float evaporateSpeed = 0.45f;
     private static final float gravity = 2.5F;
 
     private final float erodeSpeed;
@@ -133,7 +133,7 @@ public class ErosionFilter {
             }
 
             // Find the droplet's new height and calculate the deltaHeight
-            float falloff = getFalloff(map[dropletIndex]);
+            float falloff = 1;//getFalloff(map[dropletIndex]);
             float newHeight = grad(map, mapSize, posX, posY, resource.grad2)[HEIGHT];
             float deltaHeight = (newHeight - gradient[HEIGHT]) * falloff;
 

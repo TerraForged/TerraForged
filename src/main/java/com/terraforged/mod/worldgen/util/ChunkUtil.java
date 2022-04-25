@@ -89,8 +89,9 @@ public class ChunkUtil {
     }
 
     public static void fillChunk(int seaLevel, ChunkAccess chunk, TerrainData terrainData, FillerBlock filler, GeneratorResource resource) {
-        int min = getLowestSection(terrainData);
-        int max = getHighestColumn(seaLevel, terrainData);
+        int limit = chunk.getMaxBuildHeight();
+        int min = Math.min(limit, getLowestSection(terrainData));
+        int max = Math.min(limit, getHighestColumn(seaLevel, terrainData));
 
         // @Optimization Note:
         // Here, we've precomputed a full stone chunk section and written it to a bytebuffer

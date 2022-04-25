@@ -33,6 +33,8 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 
 public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler {
+    protected static final float EPSILON = 0.95f;
+
     protected final BiomeMapManager biomeMapManager;
 
     public BiomeSampler(INoiseGenerator noiseGenerator, BiomeMapManager biomeMapManager) {
@@ -93,18 +95,16 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
         var biomeType = sample.cell.biome;
         var controls = noiseGenerator.getContinent().getControlPoints();
 
-        if (sample.continentNoise < controls.shallowOcean) {
-            if (sample.continentNoise < controls.beach) {
-                return switch (biomeType) {
-                    case TAIGA, COLD_STEPPE -> biomeMapManager.get(Biomes.DEEP_COLD_OCEAN);
-                    case TUNDRA -> biomeMapManager.get(Biomes.DEEP_FROZEN_OCEAN);
-                    case DESERT, SAVANNA, TROPICAL_RAINFOREST -> biomeMapManager.get(Biomes.DEEP_LUKEWARM_OCEAN);
-                    default -> biomeMapManager.get(Biomes.DEEP_OCEAN);
-                };
-            }
+        if (sample.continentNoise * EPSILON <= controls.shallowOcean) {
+            return switch (biomeType) {
+                case TAIGA, COLD_STEPPE -> biomeMapManager.get(Biomes.DEEP_COLD_OCEAN);
+                case TUNDRA -> biomeMapManager.get(Biomes.DEEP_FROZEN_OCEAN);
+                case DESERT, SAVANNA, TROPICAL_RAINFOREST -> biomeMapManager.get(Biomes.DEEP_LUKEWARM_OCEAN);
+                default -> biomeMapManager.get(Biomes.DEEP_OCEAN);
+            };
         }
 
-        if (sample.continentNoise < controls.beach) {
+        if (sample.continentNoise * EPSILON <= controls.beach) {
             return switch (biomeType) {
                 case TAIGA, COLD_STEPPE -> biomeMapManager.get(Biomes.COLD_OCEAN);
                 case TUNDRA -> biomeMapManager.get(Biomes.FROZEN_OCEAN);

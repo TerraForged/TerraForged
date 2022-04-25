@@ -24,27 +24,18 @@
 
 package com.terraforged.mod.worldgen.noise;
 
-import com.terraforged.engine.world.terrain.Terrain;
-import com.terraforged.mod.worldgen.terrain.TerrainLevels;
+import com.terraforged.engine.world.GeneratorContext;
+import com.terraforged.engine.world.continent.Continent;
+import com.terraforged.engine.world.heightmap.ControlPoints;
 
-import java.util.function.Consumer;
+public interface IContinentNoise extends Continent {
+    GeneratorContext getContext();
 
-public interface INoiseGenerator {
-    INoiseGenerator with(long seed, TerrainLevels levels);
+    RiverCache getRiverCache();
 
-    NoiseLevels getLevels();
+    ControlPoints getControlPoints();
 
-    IContinentNoise getContinent();
+    void sampleContinent(float x, float y, NoiseSample sample);
 
-    NoiseSample getNoiseSample(int x, int z);
-
-    float getHeightNoise(int x, int z);
-
-    long find(int x, int z, int minRadius, int maxRadius, Terrain terrain);
-
-    void generate(int chunkX, int chunkZ, Consumer<NoiseData> consumer);
-
-    default float getNoiseCoord(int coord) {
-        return coord * getLevels().frequency;
-    }
+    void sampleRiver(float x, float z, NoiseSample sample, RiverCache cache);
 }

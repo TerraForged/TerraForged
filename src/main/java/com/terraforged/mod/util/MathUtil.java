@@ -24,15 +24,20 @@
 
 package com.terraforged.mod.util;
 
+import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.noise.util.NoiseUtil;
+
+import java.awt.geom.Line2D;
 
 public class MathUtil {
     public static final float EPSILON = 0.99999F;
 
     public static int clamp(int value, int min, int max) {
-        if (value < min) return min;
-        if (value > max) return max;
-        return value;
+        return value < min ? min : value > max ? max : value;
+    }
+
+    public static float clamp(float value, float min, float max) {
+        return value < min ? min : value > max ? max : value;
     }
 
     public static int hash(int seed, int x) {
@@ -41,6 +46,16 @@ public class MathUtil {
 
     public static int hash(int seed, int x, int z) {
         return NoiseUtil.hash2D(seed, x, z);
+    }
+
+    public static float getPosX(int hash, int cx, float jitter) {
+        float offset = rand(hash, NoiseUtil.X_PRIME);
+        return cx + offset * jitter;
+    }
+
+    public static float getPosY(int hash, int cy, float jitter) {
+        float offset = rand(hash, NoiseUtil.Y_PRIME);
+        return cy + offset * jitter;
     }
 
     public static float randX(int hash) {
@@ -68,5 +83,41 @@ public class MathUtil {
             sum += value;
         }
         return sum;
+    }
+
+    public static long getIntersection(float x, float y, float ax, float ay, float bx, float by) {
+        float dx = bx - ax;
+        float dy = by - ay;
+
+        float v = (x - ax) * dx + (y - ay) * dy;
+        v /= dx * dx + dy * dy;
+
+        float px = ax + dx * v;
+        float py = ay + dy * v;
+
+        return PosUtil.packf(px, py);
+    }
+
+    public static long getIntersection(float ax, float ay, float bx, float by, float cx, float cy, float dx, float dy) {
+        float a1 = by - ay;
+        float b1 = ax - bx;
+
+        float a2 = dy - cy;
+        float b2 = cx - dx;
+
+        float det = a1 * b2 - a2 * b1;
+        if (det == 0) return Long.MAX_VALUE;
+
+        float c1 = a1 * (ax) + b1 * (ay);
+        float c2 = a2 * (cx) + b2 * (cy);
+
+        float x = (b2 * c1 - b1 * c2) / det;
+        float y = (a1 * c2 - a2 * c1) / det;
+
+        return PosUtil.packf(x, y);
+    }
+
+    public static boolean intersects(float ax, float ay, float bx, float by, float cx, float cy, float dx, float dy) {
+        return Line2D.linesIntersect(ax, ay, bx, by, cx, cy, dx, dy);
     }
 }

@@ -253,7 +253,11 @@ public class Generator extends ChunkGenerator {
         var terrainType = terrainSample.terrainType;
         var climateType = climateSample.cell.biome;
 
+        lines.add("");
+        lines.add("[TerraForged]");
         lines.add("Terrain Type: " + terrainType.getName());
         lines.add("Climate Type: " + climateType.name());
+        lines.add("Continent Edge: " + climateSample.continentNoise);
+        lines.add("River Proximity: " + (1 - climateSample.riverNoise));
     }
 }

@@ -35,7 +35,7 @@ import com.terraforged.noise.source.Line;
 import com.terraforged.noise.util.NoiseUtil;
 import com.terraforged.noise.util.Vec2f;
 
-public class ContinentNoise extends AdvancedContinentGenerator {
+public class ContinentNoise extends AdvancedContinentGenerator implements IContinentNoise {
     protected final float offsetX;
     protected final float offsetZ;
     protected final GeneratorContext context;
@@ -49,18 +49,22 @@ public class ContinentNoise extends AdvancedContinentGenerator {
         this.offsetZ = (centre.y  * jitter) / frequency;
     }
 
+    @Override
     public GeneratorContext getContext() {
         return context;
     }
 
+    @Override
     public RiverCache getRiverCache() {
         return localRiverCache.get();
     }
 
+    @Override
     public ControlPoints getControlPoints() {
         return controlPoints;
     }
 
+    @Override
     public void sampleContinent(float x, float y, NoiseSample sample) {
         x += offsetX;
         y += offsetZ;
@@ -136,6 +140,7 @@ public class ContinentNoise extends AdvancedContinentGenerator {
         sample.terrainType = getTerrainType(sample);
     }
 
+    @Override
     public void sampleRiver(float x, float z, NoiseSample sample, RiverCache cache) {
         if (sample.continentNoise <= 0) return;
 
