@@ -133,7 +133,7 @@ public class LossyCache<T> {
             long write = lock.tryConvertToWriteLock(read);
 
             try {
-                if (!lock.validate(write)) {
+                if (write == 0) {
                     // Manually release the read-lock and obtain a write-lock
                     write = upgradeToWriteLock(read);
 
@@ -164,7 +164,7 @@ public class LossyCache<T> {
         }
 
         protected long upgradeToWriteLock(long read) {
-            if (lock.validate(read)) {
+            if (StampedLock.isReadLockStamp​(read)) {
                 lock.unlockRead(read);
             }
             return lock.writeLock();
