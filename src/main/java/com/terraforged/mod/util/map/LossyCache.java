@@ -107,14 +107,8 @@ public class LossyCache<T> {
             long currentKey = keys[index];
             T currentValue = values[index];
 
-            if (lock.validate(optStamp)) {
-                // Safely read so check if the keys match and the value is non-null
-                if (currentKey == key && currentValue != null) {
-                    return currentValue;
-                }
-                // Otherwise we need to overwrite the current key/value
-            } else {
-                // A write occurred during the optimistic read so obtain a full read lock
+            if (!lock.validate(optStamp)) {
+                // Write occurred during the optimistic read so obtain a full read lock
                 long read = lock.readLock();
 
                 try {
@@ -123,11 +117,10 @@ public class LossyCache<T> {
                 } finally {
                     lock.unlockRead(read);
                 }
+            }
 
-                // Keys match and value is non-null
-                if (currentKey == key && currentValue != null) {
-                    return currentValue;
-                }
+            if (currentKey == key && currentValue != null) {
+                return currentValue;
             }
 
             // Keys mismatched or current value is null

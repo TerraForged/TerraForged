@@ -36,6 +36,7 @@ import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import com.terraforged.noise.util.N2DUtil;
 import com.terraforged.noise.util.NoiseUtil;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -44,12 +45,34 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 
 public class ViabilityTest {
-    public static final int SEED = 6785;
+    public static final int SEED = 1345;
+    public static final Type TYPE = Type.HARDY;
 
     public static void main(String[] args) {
-        int freq = 1;
-        int width = 800;
-        int height = 800;
+        var frame = new JFrame();
+        frame.add(new JPanel() {
+            {
+                setPreferredSize(new Dimension(1000, 800));
+            }
+
+            @Override
+            public void paint(Graphics g) {
+                super.paint(g);
+
+                var image = render(getWidth(), getHeight());
+
+                g.drawImage(image, 0, 0, null);
+            }
+        });
+
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+
+    private static BufferedImage render(int width, int height) {
+        int freq = 20;
 
         float[] hsb = new float[3];
 
@@ -62,7 +85,7 @@ public class ViabilityTest {
         context.terrainData = CompletableFuture.completedFuture(new TerrainData(levels));
 
         var vegetations = ModVegetations.getVegetation(null);
-        var vegetation = vegetations[6];
+        var vegetation = vegetations[Type.TEMPERATE.ordinal()];
 
         var image = N2DUtil.render(width, height, (x, z, img) -> {
             var sample = heightmap.get(x, z);
@@ -90,9 +113,7 @@ public class ViabilityTest {
 
         points(freq, image, levels, heightmap, vegetation, context);
 
-        N2DUtil.display(width, height, (x, z, img) -> {
-            return image.getRGB(x, z);
-        }).setVisible(true);
+        return image;
     }
 
     private static void points(int freq,
@@ -137,7 +158,7 @@ public class ViabilityTest {
         int pz = z * freq;
         context.getTerrain().getHeight().set(px, pz, scaledHeight);
         context.getTerrain().getTerrain().set(px, pz, sample.terrainType);
-        context.getTerrain().getWater().set(px, pz, sample.riverNoise);
+        context.getTerrain().getRiver().set(px, pz, sample.riverNoise);
         context.getTerrain().getGradient().set(px, pz, heightmap.getGrad(x, z));
     }
 
@@ -229,5 +250,16 @@ public class ViabilityTest {
         public int index(int x, int z) {
             return z * width + x;
         }
+    }
+
+    public enum Type {
+        COPSE,
+        HARDY,
+        HARDY_SLOPES,
+        SPARSE,
+        RAINFOREST,
+        SPARSE_RAINFOREST,
+        TEMPERATE,
+        PATCHY
     }
 }

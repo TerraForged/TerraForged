@@ -29,8 +29,11 @@ import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -92,6 +95,60 @@ public class Surface {
         }
     }
 
+    public static void smoothWater(ChunkAccess chunk, WorldGenLevel region) {
+        var pos = new BlockPos.MutableBlockPos();
+
+        int iterations = 3;
+        int minX = chunk.getPos().getMinBlockX();
+        int minZ = chunk.getPos().getMinBlockZ();
+
+        for (int i = 0; i < iterations; i++) {
+            int level = (i + 1) * 2;
+            for (int dz = 0; dz < 16; dz++) {
+                for (int dx = 0; dx < 16; dx++) {
+                    int x = minX + dx;
+                    int z = minZ + dz;
+                    int y = chunk.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, dx, dz) + 1;
+
+                    for (int minY = y - 3; y >= minY; y--) {
+                        var state = chunk.getBlockState(pos.set(x, y, z));
+
+                        if (!state.is(Blocks.WATER)) continue;
+                        if (state.getValue(LiquidBlock.LEVEL) != 0) break;
+
+                        if (shouldSmooth(x, y, z, chunk, region, pos)) {
+                            state = state.setValue(LiquidBlock.LEVEL, level);
+                            chunk.setBlockState(pos.set(x, y, z), state, false);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected static boolean shouldSmooth(int x, int y, int z, ChunkAccess chunk, WorldGenLevel region, BlockPos.MutableBlockPos pos) {
+        for (int dz = -1; dz <= 1; dz++) {
+            for (int dx = -1; dx <= 1; dx++) {
+                if (dx * dx + dz * dz != 1) continue;
+
+                pos.set(x + dx, y, z + dz);
+
+                var world = sameChunk(pos, chunk.getPos()) ? chunk : region;
+                var state = world.getBlockState(pos);
+
+                if (state.isAir()) {
+                    return true;
+                }
+
+                if (state.is(Blocks.WATER) && state.getValue(LiquidBlock.LEVEL) != 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     protected static void smoothSnow(BlockPos.MutableBlockPos pos, BlockState state, ChunkAccess chunk, TerrainData terrain) {
         float height = terrain.getHeight().get(pos.getX(), pos.getZ());
         float delta = height - terrain.getLevels().getHeight(height);
@@ -121,6 +178,10 @@ public class Surface {
 
     public static boolean isErodible(BlockState state) {
         return state.is(ERODIBLE) ||state.is(BlockTags.SNOW);
+    }
+
+    protected static boolean sameChunk(BlockPos pos, ChunkPos chunk) {
+        return pos.getX() >> 4 == chunk.x && pos.getZ() >> 4 == chunk.z;
     }
 
     protected static BlockState findSolid(BlockPos.MutableBlockPos pos, ChunkAccess chunk) {

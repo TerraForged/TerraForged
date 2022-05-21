@@ -1,4 +1,4 @@
-package com.terraforged.mod.worldgen.noise.continent;/*
+/*
  * MIT License
  *
  * Copyright (c) 2021 TerraForged
@@ -22,187 +22,143 @@ package com.terraforged.mod.worldgen.noise.continent;/*
  * SOFTWARE.
  */
 
+package com.terraforged.mod.worldgen.noise.continent;
+
 import com.terraforged.engine.util.pos.PosUtil;
+import com.terraforged.engine.world.heightmap.ControlPoints;
 import com.terraforged.mod.util.MathUtil;
+import com.terraforged.mod.util.ObjectPool;
 import com.terraforged.mod.util.SpiralIterator;
 import com.terraforged.mod.util.map.LossyCache;
-import com.terraforged.noise.Module;
-import com.terraforged.noise.Source;
-import com.terraforged.noise.util.NoiseUtil;
+import com.terraforged.mod.worldgen.noise.NoiseLevels;
+import com.terraforged.mod.worldgen.noise.continent.cell.CellPoint;
+import com.terraforged.mod.worldgen.noise.continent.cell.CellShape;
+import com.terraforged.mod.worldgen.noise.continent.cell.CellSource;
+import com.terraforged.mod.worldgen.noise.continent.river.RiverGenerator;
+import com.terraforged.mod.worldgen.noise.continent.shape.ShapeGenerator;
+import com.terraforged.noise.util.Vec2f;
 
 public class ContinentGenerator {
-    private final int seed;
-    private final float jitter;
-    private final float threshold;
-    private final Module falloff;
-    private final float centreX, centreY;
-    private final ThreadLocal<long[]> buffer = ThreadLocal.withInitial(() -> new long[25]);
-    private final LossyCache<Mesh> meshCache = new LossyCache.Concurrent<>(1024, Mesh[]::new, m -> {});
+    protected static final int SAMPLE_SEED_OFFSET = 6569;
+    protected static final int VALID_SPAWN_RADIUS = 3;
+    protected static final int SPAWN_SEARCH_RADIUS = 100_000;
+    protected static final int CELL_POINT_CACHE_SIZE = 2048;
 
-    public ContinentGenerator(int seed, float jitter, float threshold, Module falloff) {
-        long centre = findCentre(100_000, seed, jitter, threshold);
+    public final int seed;
+    public final float jitter;
+    public final int sampleSeed;
+    public final NoiseLevels levels;
+    public final ControlPoints controlPoints;
 
-        this.seed = seed;
-        this.jitter = jitter;
-        this.threshold = threshold;
-        this.falloff = falloff;
+    public final CellShape cellShape;
+    public final CellSource cellSource;
+    public final RiverGenerator riverGenerator;
+    public final ShapeGenerator shapeGenerator;
 
-        this.centreX = PosUtil.unpackLeftf(centre);
-        this.centreY = PosUtil.unpackRightf(centre);
+    private final ObjectPool<CellPoint> cellPool = new ObjectPool<>(CELL_POINT_CACHE_SIZE, CellPoint::new);
+    private final LossyCache<CellPoint> cellCache = new LossyCache.Concurrent<>(CELL_POINT_CACHE_SIZE, CellPoint[]::new, cellPool::restore);
+
+    public ContinentGenerator(ContinentConfig config, NoiseLevels levels, ControlPoints controlPoints) {
+        this.levels = levels;
+        this.controlPoints = controlPoints;
+
+        this.seed = config.shape.seed0;
+        this.sampleSeed = config.shape.seed1 + SAMPLE_SEED_OFFSET;
+        this.jitter = config.shape.jitter;
+        this.cellShape = config.shape.cellShape;
+        this.cellSource = config.shape.cellSource;
+        this.riverGenerator = new RiverGenerator(this, config);
+        this.shapeGenerator = new ShapeGenerator(this, config, controlPoints);
     }
 
-    public float getEdgeValue(float x, float y) {
-        x += centreX;
-        y += centreY;
+    public Vec2f getWorldOffset() {
+        var iterator = new SpiralIterator(0, 0, 0, SPAWN_SEARCH_RADIUS);
+        var cell = new CellPoint();
 
-        int ix = NoiseUtil.floor(x);
-        int iy = NoiseUtil.floor(y);
+        while (iterator.hasNext()) {
+            long pos = iterator.next();
+            computeCell(pos, 0, 0, cell);
 
-        float min0 = Float.MAX_VALUE;
-        float min1 = Float.MAX_VALUE;
-        var data = buffer.get();
+            if (shapeGenerator.getThresholdValue(cell) == 0) {
+                continue;
+            }
 
-        for (int cy = iy - 2, i = 0; cy <= iy + 2; cy++) {
-            for (int cx = ix - 2; cx <= ix + 2; cx++, i++) {
-                int hash = MathUtil.hash(seed, cx, cy);
-                float px = MathUtil.getPosX(hash, cx, jitter);
-                float py = MathUtil.getPosY(hash, cy, jitter);
-
-                float value = getDensity(hash, threshold);
-                float dist = NoiseUtil.sqrt(NoiseUtil.dist2(x, y, px, py));
-
-                data[i] = PosUtil.packf(value, dist);
-
-                if (dist < min0) {
-                    min1 = min0;
-                    min0 = dist;
-                } else if (dist < min1) {
-                    min1 = dist;
-                }
+            float px = cell.px;
+            float py = cell.py;
+            if (isValidSpawn(pos, VALID_SPAWN_RADIUS, cell)) {
+                return new Vec2f(px, py);
             }
         }
 
-        float value = Source.simplex(seed + 12963845, 5, 1).clamp(0.1, 0.9).map(0.01, 0.5).getValue(x, y);
-
-        return getEdge(min0, min1, value, data);
+        return Vec2f.ZERO;
     }
 
-    public float getRiverValue(float x, float y) {
-        return getRiverValue(x, y, getNearest(x, y));
+    public CellPoint getCell(int cx, int cy) {
+        long index = PosUtil.pack(cx, cy);
+        return cellCache.computeIfAbsent(index, this::computeCell);
     }
 
-    public float getRiverValue(float x, float y, long index) {
-        if (index == Long.MAX_VALUE) return 1f;
-
-        x += centreX;
-        y += centreY;
-
-        final float radiusB = 0.25f;
-        final float radiusA = 0.25f;
-
-        float distance = Float.MAX_VALUE;
-        for (var edge : getMesh(index).rivers) {
-            float d2 = edge.distance(x, y, radiusA, radiusB);
-            distance = Math.min(distance, d2);
-        }
-
-        return NoiseUtil.clamp(distance, 0, 1);
+    private CellPoint computeCell(long index) {
+        return computeCell(index, 0, 0, cellPool.take());
     }
 
-    public long getNearest(float x, float y) {
-        x += centreX;
-        y += centreY;
-
-        int xi = NoiseUtil.floor(x);
-        int yi = NoiseUtil.floor(y);
-
-        int nx = 0, ny = 0, nHash = 0;
-        float distance2 = Float.MAX_VALUE;
-
-        for (int cy = yi - 1; cy <= yi + 1; cy++) {
-            for (int cx = xi - 1; cx <= xi + 1; cx++) {
-                int hash = MathUtil.hash(seed, cx, cy);
-                float px = MathUtil.getPosX(hash, cx, jitter);
-                float py = MathUtil.getPosY(hash, cy, jitter);
-                float d2 = NoiseUtil.dist2(x, y, px, py);
-
-                if (d2 < distance2) {
-                    distance2 = d2;
-                    nHash = hash;
-                    nx = cx;
-                    ny = cy;
-                }
-            }
-        }
-
-        if (getDensity(nHash, threshold) == 0) return Long.MAX_VALUE;
-
-        return PosUtil.pack(nx, ny);
-    }
-
-    public Mesh computeMesh(long index) {
-        int cx = PosUtil.unpackLeft(index);
-        int cy = PosUtil.unpackRight(index);
+    private CellPoint computeCell(long index, int ox, int oy, CellPoint cell) {
+        int cx = PosUtil.unpackLeft(index) + ox;
+        int cy = PosUtil.unpackRight(index) + oy;
 
         int hash = MathUtil.hash(seed, cx, cy);
-        float px = MathUtil.getPosX(hash, cx, jitter);
-        float py = MathUtil.getPosY(hash, cy, jitter);
+        float px = cellShape.getCellX(hash, cx, cy, jitter);
+        float py = cellShape.getCellY(hash, cx, cy, jitter);
 
-        var mesh = new Mesh(hash, cx, cy, px, py);
-        mesh.init(seed, jitter, threshold);
+        cell.cx = cx;
+        cell.cy = cy;
+        cell.px = px;
+        cell.py = py;
 
-        return mesh;
+        sampleCell(sampleSeed, px, py,  cellSource,2, 0.075f, 2.5f, 0.3f, cell);
+
+        return cell;
     }
 
-    public Mesh getMesh(long index) {
-        return meshCache.computeIfAbsent(index, this::computeMesh);
-    }
+    private static void sampleCell(int seed, float x, float y, CellSource cellSource, int octaves, float frequency, float lacunarity, float gain, CellPoint cell) {
+        x *= frequency;
+        y *= frequency;
 
-    public static int getDensity(int hash, float threshold) {
-        return MathUtil.rand(hash) > threshold ? 1 : 0;
-    }
+        float sum = cellSource.getValue(seed, x, y);
+        float amp = 1.0F;
+        float sumAmp = amp;
 
-    private static float getEdge(float min0, float min1, float falloff, long[] data) {
-        float borderDistance = (min0 + min1) * 0.5F;
-        float blendRadius = borderDistance * falloff;
+        cell.noise0 = sum;
 
-        float sumValue = 0f;
-        float sumWeight = 0f;
+        for(int i = 1; i < octaves; ++i) {
+            amp *= gain;
+            x *= lacunarity;
+            y *= lacunarity;
 
-        for (long l : data) {
-            float value = PosUtil.unpackLeftf(l);
-            float distance = PosUtil.unpackRightf(l);
-            float weight = getWeight(distance, min0, blendRadius);
-            sumValue += value * weight;
-            sumWeight += weight;
+            sum += cellSource.getValue(seed, x, y) * amp;
+            sumAmp += amp;
         }
 
-        return NoiseUtil.clamp(sumValue / sumWeight, 0, 1);
+        cell.noise = sum / sumAmp;
     }
 
-    public static long findCentre(int radius, int seed, float jitter, float threshold) {
-        var iter = new SpiralIterator(0, 0, 0, radius);
+    private boolean isValidSpawn(long pos, int radius, CellPoint cell) {
+        int radius2 = radius * radius;
 
-        while (iter.hasNext()) {
-            long next = iter.next();
+        for (int dy = -radius; dy <= radius; dy++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                int d2 = dx * dx + dy * dy;
 
-            int x = PosUtil.unpackLeft(next);
-            int y = PosUtil.unpackRight(next);
-            int hash = MathUtil.hash(seed, x, y);
-            if (getDensity(hash, threshold) == 1) {
-                float px = MathUtil.getPosX(hash, x, jitter);
-                float py = MathUtil.getPosY(hash, y, jitter);
-                return PosUtil.packf(px, py);
+                if (dy < 1 || d2 >= radius2) continue;
+
+                computeCell(pos, dx, dy, cell);
+
+                if (shapeGenerator.getThresholdValue(cell) == 0) {
+                    return false;
+                }
             }
         }
 
-        return 0L;
-    }
-
-    private static float getWeight(float dist, float origin, float blendRange) {
-        float delta = dist - origin;
-        if (delta <= 0) return 1F;
-        if (delta >= blendRange) return 0F;
-        return 1 - (delta / blendRange);
+        return true;
     }
 }

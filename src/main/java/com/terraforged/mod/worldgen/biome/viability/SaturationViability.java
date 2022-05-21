@@ -46,7 +46,7 @@ public record SaturationViability(float min, float max) implements Viability {
     @Override
     public float getFitness(int x, int z, Context context) {
         // Water mask represents distance from river/lake so invert to get saturation
-        float saturation = context.getTerrain().getWater().get(x, z);
+        float saturation = 1f - context.getTerrain().getRiver().get(x, z);
 
         if (saturation < min) return 0F;
         if (saturation > max) return 1F;

@@ -36,11 +36,13 @@ public class TerrainData implements Consumer<NoiseData> {
     protected final TerrainLevels levels;
     protected final FloatMap height = new FloatMap();
     protected final FloatMap gradient = new FloatMap();
-    protected final FloatMap water = new FloatMap();
+    protected final FloatMap river = new FloatMap();
+    protected final FloatMap baseHeight = new FloatMap();
     protected final ObjectMap<Terrain> terrain = new ObjectMap<>(Terrain[]::new);
 
     protected float min = Float.MAX_VALUE;
     protected float max = Float.MIN_VALUE;
+    protected float maxBase = Float.MIN_VALUE;
 
     public TerrainData(TerrainLevels levels) {
         this.levels = levels;
@@ -54,9 +56,18 @@ public class TerrainData implements Consumer<NoiseData> {
         return levels.getHeight(max);
     }
 
+    public int getMaxBase() {
+        return levels.getHeight(maxBase);
+    }
+
     public int getHeight(int x, int z) {
         float scaledHeight = height.get(x, z);
         return levels.getHeight(scaledHeight);
+    }
+
+    public int getWaterLevel(int x, int z) {
+        float scaledLevel = baseHeight.get(x, z);
+        return levels.getHeight(scaledLevel);
     }
 
     public TerrainLevels getLevels() {
@@ -67,12 +78,16 @@ public class TerrainData implements Consumer<NoiseData> {
         return height;
     }
 
+    public FloatMap getBaseHeight() {
+        return baseHeight;
+    }
+
     public FloatMap getGradient() {
         return gradient;
     }
 
-    public FloatMap getWater() {
-        return water;
+    public FloatMap getRiver() {
+        return river;
     }
 
     public ObjectMap<Terrain> getTerrain() {
@@ -86,19 +101,22 @@ public class TerrainData implements Consumer<NoiseData> {
 
     @Override
     public void accept(NoiseData noiseData) {
-        var noiseMap = noiseData.getHeight();
+        var basemap = noiseData.getBase();
+        var heightmap = noiseData.getHeight();
         var terrainMap = noiseData.getTerrain();
 
         for (int z = 0; z < 16; z++) {
             for (int x = 0; x < 16; x++) {
-                float heightNoise = noiseMap.get(x, z);
+                float heightNoise = heightmap.get(x, z);
+                float baseLevelNoise = basemap.get(x, z);
                 float scaledHeight = levels.getScaledHeight(heightNoise);
+                float scaledBaseLevel = levels.getScaledBaseLevel(baseLevelNoise);
                 var terrainType = terrainMap.get(x, z);
 
-                float n = noiseMap.get(x, z - 1);
-                float s = noiseMap.get(x, z + 1);
-                float e = noiseMap.get(x + 1, z);
-                float w = noiseMap.get(x - 1, z);
+                float n = heightmap.get(x, z - 1);
+                float s = heightmap.get(x, z + 1);
+                float e = heightmap.get(x + 1, z);
+                float w = heightmap.get(x - 1, z);
 
                 float dx = e - w;
                 float dz = s - n;
@@ -108,9 +126,11 @@ public class TerrainData implements Consumer<NoiseData> {
                 gradient.set(x, z, noiseGrad);
                 terrain.set(x, z, terrainType);
                 height.set(x, z, scaledHeight);
-                water.set(x, z, noiseData.getWater().get(x, z));
+                baseHeight.set(x, z, scaledBaseLevel);
+                river.set(x, z, noiseData.getRiver().get(x, z));
                 max = Math.max(max, scaledHeight);
                 min = Math.min(min, scaledHeight);
+                maxBase = Math.max(maxBase, scaledBaseLevel);
             }
         }
     }

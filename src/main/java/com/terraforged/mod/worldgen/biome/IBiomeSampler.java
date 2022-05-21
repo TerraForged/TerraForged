@@ -26,11 +26,9 @@ package com.terraforged.mod.worldgen.biome;
 
 import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.world.climate.ClimateModule;
-import com.terraforged.engine.world.terrain.TerrainType;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 import com.terraforged.mod.worldgen.noise.NoiseLevels;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
-import com.terraforged.mod.worldgen.noise.RiverCache;
 
 public interface IBiomeSampler {
     ClimateModule getClimate();
@@ -67,7 +65,7 @@ public interface IBiomeSampler {
 
             var sample = localSample.get().reset();
             noiseGenerator.getContinent().sampleContinent(px, pz, sample);
-            noiseGenerator.getContinent().sampleRiver(px, pz, sample, sample.riverCache);
+            noiseGenerator.getContinent().sampleRiver(px, pz, sample);
 
             var cell = sample.cell;
             cell.value = sample.heightNoise;
@@ -96,12 +94,10 @@ public interface IBiomeSampler {
 
     class ClimateSample extends NoiseSample {
         public final Cell cell = new Cell();
-        public final RiverCache riverCache = new RiverCache();
 
         public ClimateSample reset() {
+            super.reset();
             cell.reset();
-            heightNoise = 1;
-            terrainType = TerrainType.FLATS;
             return this;
         }
     }

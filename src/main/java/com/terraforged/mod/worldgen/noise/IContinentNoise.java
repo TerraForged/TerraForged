@@ -30,12 +30,9 @@ import com.terraforged.engine.world.heightmap.ControlPoints;
 
 public interface IContinentNoise extends Continent {
     GeneratorContext getContext();
-
-    RiverCache getRiverCache();
-
     ControlPoints getControlPoints();
 
     void sampleContinent(float x, float y, NoiseSample sample);
 
-    void sampleRiver(float x, float z, NoiseSample sample, RiverCache cache);
+    void sampleRiver(float x, float z, NoiseSample sample);
 }

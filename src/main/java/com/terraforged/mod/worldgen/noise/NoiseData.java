@@ -36,7 +36,8 @@ public class NoiseData {
 
     protected final NoiseSample sample = new NoiseSample();
     protected final FloatMap height = new FloatMap(BORDER);
-    protected final FloatMap water = new FloatMap(BORDER);
+    protected final FloatMap river = new FloatMap(BORDER);
+    protected final FloatMap base = new FloatMap(BORDER);
     protected final ObjectMap<Terrain> terrain = new ObjectMap<>(BORDER, Terrain[]::new);
 
     public int min() {
@@ -59,8 +60,12 @@ public class NoiseData {
         return height;
     }
 
-    public FloatMap getWater() {
-        return water;
+    public FloatMap getBase() {
+        return base;
+    }
+
+    public FloatMap getRiver() {
+        return river;
     }
 
     public ObjectMap<Terrain> getTerrain() {
@@ -75,7 +80,8 @@ public class NoiseData {
     public void setNoise(int index, NoiseSample sample) {
         terrain.set(index, sample.terrainType);
         height.set(index, sample.heightNoise);
-        water.set(index, sample.riverNoise);
+        base.set(index, sample.baseNoise);
+        river.set(index, sample.riverNoise);
     }
 
     public static boolean isInsideChunk(int x, int z) {

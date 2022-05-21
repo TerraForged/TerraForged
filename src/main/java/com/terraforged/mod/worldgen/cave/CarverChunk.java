@@ -27,6 +27,8 @@ package com.terraforged.mod.worldgen.cave;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.asset.NoiseCave;
 import com.terraforged.mod.worldgen.biome.util.BiomeList;
+import com.terraforged.mod.worldgen.terrain.TerrainData;
+import com.terraforged.noise.Module;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 
@@ -40,6 +42,10 @@ public class CarverChunk {
     private int biomeListIndex = -1;
     private final BiomeList[] biomeLists;
     private final Map<NoiseCave, BiomeList> biomes = new IdentityHashMap<>();
+
+    public Module mask;
+    public Module modifier;
+    public TerrainData terrainData;
 
     public CarverChunk(int size) {
         biomeLists = new BiomeList[size];
@@ -69,6 +75,12 @@ public class CarverChunk {
             biomes.computeIfAbsent(config, c -> nextList()).add(cached);
         }
         return cached;
+    }
+
+    public float getCarvingMask(int x, int z) {
+        float noise = mask.getValue(x, z);
+        float river = terrainData.getRiver().get(x, z);
+        return 1f - noise * river;
     }
 
     private BiomeList nextList() {

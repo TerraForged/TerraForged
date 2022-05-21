@@ -194,7 +194,7 @@ public class ErodedNoiseGenerator implements INoiseGenerator {
                 var sample = resource.chunkSample.get(chunkIndex);
                 sample.heightNoise = height;
 
-                generator.sampleRiver(nx, nz, sample, resource.riverCache);
+                generator.sampleRiver(nx, nz, sample);
 
                 resource.chunk.setNoise(chunkIndex, sample);
             }

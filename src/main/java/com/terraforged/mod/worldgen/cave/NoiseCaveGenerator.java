@@ -69,9 +69,13 @@ public class NoiseCaveGenerator {
 
     public void carve(ChunkAccess chunk, Generator generator) {
         var carver = getPreCarveChunk(chunk);
+        carver.terrainData = generator.getChunkData(chunk.getPos());
+        carver.mask = caveBreachNoise;
 
         for (var config : caves) {
-            NoiseCaveCarver.carve(chunk, carver, generator, config, getModifier(config), caveBreachNoise, true);
+            carver.modifier = getModifier(config);
+
+            NoiseCaveCarver.carve(chunk, carver, generator, config, true);
         }
     }
 
@@ -98,8 +102,13 @@ public class NoiseCaveGenerator {
 
         carver = pool.take().reset();
 
+        carver.mask = caveBreachNoise;
+        carver.terrainData = generator.getChunkData(chunk.getPos());
+
         for (var config : caves) {
-            NoiseCaveCarver.carve(chunk, carver, generator, config, getModifier(config), caveBreachNoise, false);
+            carver.modifier = getModifier(config);
+
+            NoiseCaveCarver.carve(chunk, carver, generator, config, false);
         }
 
         return carver;

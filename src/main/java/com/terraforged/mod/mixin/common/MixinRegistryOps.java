@@ -25,7 +25,7 @@
 package com.terraforged.mod.mixin.common;
 
 import com.mojang.serialization.DynamicOps;
-import com.terraforged.mod.registry.hooks.BuiltinHook;
+import com.terraforged.mod.hooks.BuiltinHook;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.RegistryResourceAccess;

@@ -28,7 +28,6 @@ import com.terraforged.engine.util.FastRandom;
 import com.terraforged.mod.util.map.ObjectMap;
 import com.terraforged.mod.worldgen.noise.NoiseData;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
-import com.terraforged.mod.worldgen.noise.RiverCache;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -36,7 +35,6 @@ public class NoiseResource {
     public final FastRandom random = new FastRandom();
 
     public final NoiseData chunk = new NoiseData();
-    public final RiverCache riverCache = new RiverCache();
     public final ErosionFilter.Resource erosionResource = new ErosionFilter.Resource();
 
     public final float[] heightmap;

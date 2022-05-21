@@ -91,7 +91,7 @@ public class ChunkUtil {
     public static void fillChunk(int seaLevel, ChunkAccess chunk, TerrainData terrainData, FillerBlock filler, GeneratorResource resource) {
         int limit = chunk.getMaxBuildHeight();
         int min = Math.min(limit, getLowestSection(terrainData));
-        int max = Math.min(limit, getHighestColumn(seaLevel, terrainData));
+        int max = Math.min(limit, getHighestSection(terrainData));
 
         // @Optimization Note:
         // Here, we've precomputed a full stone chunk section and written it to a bytebuffer
@@ -107,8 +107,8 @@ public class ChunkUtil {
             section.recalcBlockCounts();
         }
 
-        // Here we fill the chunk section by the block
-        for (int sy = min; sy < max; sy += 16) {
+        // Here we fill the chunk section bh the block
+        for (int sy = min; sy <= max; sy += 16) {
             int index = chunk.getSectionIndex(sy);
             var section = chunk.getSection(index);
             fillSection(sy, seaLevel, terrainData, chunk, section, filler);
@@ -143,16 +143,18 @@ public class ChunkUtil {
         }
     }
 
-    private static void fillSection(int startY, int waterY, TerrainData terrainData, ChunkAccess chunk, LevelChunkSection section, FillerBlock filler) {
+    private static void fillSection(int startY, int seaLevel, TerrainData terrainData, ChunkAccess chunk, LevelChunkSection section, FillerBlock filler) {
         section.acquire();
 
         int sectionMaxY = startY + 16;
         for (int z = 0, i = 0; z < 16; z++) {
             for (int x = 0; x < 16; x++, i++) {
                 int solidY = terrainData.getHeight(x, z);
-                int firstAirY = Math.max(solidY, waterY) + 1;
+                int waterY = getWaterLevel(x, z, seaLevel, terrainData);
 
+                int firstAirY = Math.max(solidY, waterY) + 1;
                 int exclusiveMaxY = Math.min(sectionMaxY, firstAirY);
+
                 for (int y = startY; y < exclusiveMaxY; y++) {
                     var state = filler.getState(y, solidY);
 
@@ -176,13 +178,19 @@ public class ChunkUtil {
         return y <= surfaceSolid ? Blocks.STONE.defaultBlockState() : Blocks.WATER.defaultBlockState();
     }
 
-    protected static int getHighestColumn(int waterMaxY, TerrainData terrainData) {
-        return Math.max(waterMaxY, terrainData.getMax() + 1);
+    protected static int getHighestSection(TerrainData terrainData) {
+        int y = Math.max(terrainData.getMaxBase(), terrainData.getMax());
+        return (y >> 4) << 4;
     }
 
     protected static int getLowestSection(TerrainData terrainData) {
         int y = terrainData.getMin();
         return (y >> 4) << 4;
+    }
+
+    protected static int getWaterLevel(int x, int z, int seaLevel, TerrainData terrainData) {
+        float river = terrainData.getRiver().get(x, z);
+        return river >= 1.0f ? seaLevel : terrainData.getWaterLevel(x, z);
     }
 
     protected static ByteBuf createFullPalette() {

@@ -25,21 +25,35 @@
 package com.terraforged.mod.worldgen.noise;
 
 import com.terraforged.engine.world.terrain.Terrain;
+import com.terraforged.mod.worldgen.asset.TerrainType;
 
 public class NoiseSample {
-    public long continentCentre;
-    public float continentNoise;
-    public float heightNoise;
-    public float riverNoise;
-    public Terrain terrainType;
+    private static final NoiseSample DEFAULT = new NoiseSample();
+
+    public long continentCentre = 0;
+    public float continentNoise = 1;
+    public float baseNoise = 0;
+    public float heightNoise = 0;
+    public float riverNoise = 1;
+    public Terrain terrainType = TerrainType.NONE.getTerrain();
 
     public NoiseSample() {}
 
     public NoiseSample(NoiseSample other) {
+        copy(other);
+    }
+
+    public NoiseSample reset() {
+        return copy(DEFAULT);
+    }
+
+    public NoiseSample copy(NoiseSample other) {
         continentCentre = other.continentCentre;
         continentNoise = other.continentNoise;
         heightNoise = other.heightNoise;
+        baseNoise = other.baseNoise;
         riverNoise = other.riverNoise;
         terrainType = other.terrainType;
+        return this;
     }
 }

@@ -27,9 +27,7 @@ package com.terraforged.mod.platform.forge.client;
 import com.terraforged.mod.client.Client;
 import com.terraforged.mod.client.screen.ScreenUtil;
 import com.terraforged.mod.platform.ClientAPI;
-import com.terraforged.mod.util.DemoHandler;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.common.MinecraftForge;
@@ -41,17 +39,12 @@ public class TFClient {
     public TFClient() {
         ClientAPI.HOLDER.set(new ForgeClientAPI());
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientInit);
-        MinecraftForge.EVENT_BUS.addListener(this::onRenderOverlay);
         MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, this::onScreenOpen);
     }
 
     void onClientInit(FMLClientSetupEvent event) {
         event.enqueueWork(Client.INSTANCE::init);
         event.enqueueWork(TFPreset::makeDefault);
-    }
-
-    void onRenderOverlay(RenderGameOverlayEvent event) {
-        DemoHandler.renderOverlay(event.getMatrixStack());
     }
 
     void onScreenOpen(ScreenEvent.InitScreenEvent.Post event) {

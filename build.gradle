@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath group: "org.spongepowered", name: "mixingradle", version: "0.7.32", changing: true
-        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "5.1.33", changing: true
+        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "5.1.+", changing: true // 5.1.33
     }
 }
 

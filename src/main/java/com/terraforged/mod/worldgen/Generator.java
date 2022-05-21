@@ -62,7 +62,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-public class Generator extends ChunkGenerator {
+public class Generator extends ChunkGenerator implements IGenerator {
     public static final Codec<Generator> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.LONG.optionalFieldOf("seed", 0L).forGetter(g -> g.seed),
             TerrainLevels.CODEC.optionalFieldOf("levels", TerrainLevels.DEFAULT.get()).forGetter(g -> g.levels),
@@ -94,6 +94,10 @@ public class Generator extends ChunkGenerator {
         this.terrainCache = new TerrainCache(levels, noiseGenerator);
     }
 
+    public long getSeed() {
+        return seed;
+    }
+
     protected RegistryAccess getRegistries() {
         return biomeSource.getRegistries();
     }
@@ -120,7 +124,7 @@ public class Generator extends ChunkGenerator {
     }
 
     @Override
-    public ChunkGenerator withSeed(long seed) {
+    public Generator withSeed(long seed) {
         var noiseGenerator = this.noiseGenerator.with(seed, levels);
         var biomeSource = new Source(seed, noiseGenerator, this.biomeSource);
         var vanillaGen = new VanillaGen(seed, biomeSource, this.vanillaGen);
@@ -223,18 +227,27 @@ public class Generator extends ChunkGenerator {
 
     @Override
     public int getBaseHeight(int x, int z, net.minecraft.world.level.levelgen.Heightmap.Types types, LevelHeightAccessor levelHeightAccessor) {
-        // First air block above the terrain
-        int height = terrainCache.getHeight(x, z);
+        var sample = terrainCache.getSample(x, z);
+        float scaledBase = levels.getScaledBaseLevel(sample.baseNoise);
+        float scaledHeight = levels.getScaledHeight(sample.heightNoise);
+        int base = levels.getHeight(scaledBase);
+        int height = levels.getHeight(scaledHeight);
+
         return switch (types) {
-            case WORLD_SURFACE, WORLD_SURFACE_WG, MOTION_BLOCKING, MOTION_BLOCKING_NO_LEAVES -> Math.max(getSeaLevel(), height) + 1;
+            case WORLD_SURFACE, WORLD_SURFACE_WG, MOTION_BLOCKING, MOTION_BLOCKING_NO_LEAVES -> Math.max(base, height) + 1;
             case OCEAN_FLOOR, OCEAN_FLOOR_WG -> height + 1;
         };
     }
 
     @Override
     public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor levelHeightAccessor) {
-        int height = terrainCache.getHeight(x, z);
-        int surface = Math.max(getSeaLevel(), height);
+        var sample = terrainCache.getSample(x, z);
+        float scaledBase = levels.getScaledBaseLevel(sample.baseNoise);
+        float scaledHeight = levels.getScaledHeight(sample.heightNoise);
+
+        int base = levels.getHeight(scaledBase);
+        int height = levels.getHeight(scaledHeight);
+        int surface = Math.max(base, height);
 
         var states = new BlockState[surface];
         Arrays.fill(states, 0, height, Blocks.STONE.defaultBlockState());
@@ -258,6 +271,7 @@ public class Generator extends ChunkGenerator {
         lines.add("Terrain Type: " + terrainType.getName());
         lines.add("Climate Type: " + climateType.name());
         lines.add("Continent Edge: " + climateSample.continentNoise);
+        lines.add("Base Level: " + terrainSample.baseNoise);
         lines.add("River Proximity: " + (1 - climateSample.riverNoise));
     }
 }

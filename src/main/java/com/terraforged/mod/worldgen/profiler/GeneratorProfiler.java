@@ -27,6 +27,7 @@ package com.terraforged.mod.worldgen.profiler;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.terraforged.mod.util.ReflectionUtil;
+import com.terraforged.mod.worldgen.IGenerator;
 import net.minecraft.core.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -56,7 +57,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class GeneratorProfiler extends ChunkGenerator {
+public class GeneratorProfiler extends ChunkGenerator implements IGenerator {
     public static final Codec<GeneratorProfiler> CODEC = ChunkGenerator.CODEC.xmap(GeneratorProfiler::wrap, GeneratorProfiler::getGenerator);
     public static final AtomicBoolean PROFILING = new AtomicBoolean(true);
 
@@ -84,13 +85,13 @@ public class GeneratorProfiler extends ChunkGenerator {
     }
 
     @Override
-    public Optional<ResourceKey<Codec<? extends ChunkGenerator>>> getTypeNameForDataFixer() {
-        return generator.getTypeNameForDataFixer();
+    public ChunkGenerator withSeed(long seed) {
+        return new GeneratorProfiler(structureSets, structureOverrides, generator.withSeed(seed));
     }
 
     @Override
-    public ChunkGenerator withSeed(long p_62156_) {
-        return generator.withSeed(p_62156_);
+    public Optional<ResourceKey<Codec<? extends ChunkGenerator>>> getTypeNameForDataFixer() {
+        return generator.getTypeNameForDataFixer();
     }
 
     @Override

@@ -77,6 +77,7 @@ public class BiomeGenerator {
         featureDecorator.decorate(chunk, region, structures, terrain, generator);
         noiseCaveGenerator.decorate(chunk, region, generator);
 
+        Surface.smoothWater(chunk, region);
         Surface.applyPost(chunk, terrain.join(), generator);
     }
 

@@ -27,7 +27,6 @@ package com.terraforged.mod.worldgen.cave;
 import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.asset.NoiseCave;
-import com.terraforged.noise.Module;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -43,8 +42,6 @@ public class NoiseCaveCarver {
                              CarverChunk carver,
                              Generator generator,
                              NoiseCave config,
-                             Module modifier,
-                             Module surfaceMask,
                              boolean carve) {
         var pos = new BlockPos.MutableBlockPos();
 
@@ -58,10 +55,10 @@ public class NoiseCaveCarver {
             int x = startX + dx;
             int z = startZ + dz;
 
-            int surface = getSurface(x, z, chunk, generator, surfaceMask);
+            int surface = getSurface(x, z, chunk, generator, carver);
             int y = config.getHeight(x, z);
 
-            float value = modifier.getValue(x, z);
+            float value = carver.modifier.getValue(x, z);
             int cavern = config.getCavernSize(x, z, value);
             if (cavern == 0) continue;
 
@@ -102,8 +99,8 @@ public class NoiseCaveCarver {
         }
     }
 
-    private static int getSurface(int x, int z, ChunkAccess chunk, Generator generator, Module surfaceMask) {
-        float mask = 1 - surfaceMask.getValue(x, z);
+    private static int getSurface(int x, int z, ChunkAccess chunk, Generator generator, CarverChunk carverChunk) {
+        float mask = carverChunk.getCarvingMask(x, z);
         int surface = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) - 1;
         if (surface > generator.getSeaLevel() || surface < generator.getSeaLevel() - 16) {
             surface += 9;

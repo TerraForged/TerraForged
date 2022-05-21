@@ -34,14 +34,19 @@ import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
 import net.minecraft.core.Holder;
 
+import java.util.Comparator;
+
 public class TerrainNoise implements ContextSeedable<TerrainNoise>, WeightMap.Weighted {
     public static final TerrainNoise NONE = new TerrainNoise(Holder.direct(TerrainType.NONE), 0, Source.ZERO);
+    public static final Comparator<TerrainNoise> COMPARATOR = Comparator.comparing(t -> t.terrain().getName());
 
     public static final Codec<TerrainNoise> CODEC = LazyCodec.record(instance -> instance.group(
             TerrainType.CODEC.fieldOf("type").forGetter(TerrainNoise::type),
             Codec.FLOAT.fieldOf("weight").forGetter(TerrainNoise::weight),
             NoiseCodec.CODEC.fieldOf("noise").forGetter(TerrainNoise::noise)
     ).apply(instance, TerrainNoise::new));
+
+    private static final double MIN_NOISE = 5.0 / 255.0;
 
     private final Holder<TerrainType> type;
     private final float weight;
@@ -50,7 +55,7 @@ public class TerrainNoise implements ContextSeedable<TerrainNoise>, WeightMap.We
     public TerrainNoise(Holder<TerrainType> type, float weight, Module noise) {
         this.type = type;
         this.weight = weight;
-        this.noise = noise;
+        this.noise = noise.minValue() < MIN_NOISE ? noise.bias(MIN_NOISE).clamp(0, 1) : noise;
     }
 
     @Override

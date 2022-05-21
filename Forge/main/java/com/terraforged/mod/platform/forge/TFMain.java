@@ -36,7 +36,6 @@ import com.terraforged.mod.platform.forge.client.TFPreset;
 import com.terraforged.mod.platform.forge.util.ForgeRegistrar;
 import com.terraforged.mod.registry.lazy.LazyTag;
 import com.terraforged.mod.registry.registrar.NoopRegistrar;
-import com.terraforged.mod.util.DemoHandler;
 import com.terraforged.mod.worldgen.biome.util.matcher.BiomeMatcher;
 import com.terraforged.mod.worldgen.biome.util.matcher.BiomeTagMatcher;
 import net.minecraft.core.Holder;
@@ -49,7 +48,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.world.ForgeWorldPreset;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -69,7 +67,6 @@ public class TFMain extends TerraForged {
         CommonAPI.HOLDER.set(new ForgeCommonAPI());
 
         MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
-        MinecraftForge.EVENT_BUS.addListener(this::onJoinWorld);
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onInit);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onGenerateData);
@@ -90,10 +87,6 @@ public class TFMain extends TerraForged {
 
     void onRegisterCommands(RegisterCommandsEvent event) {
         TFCommands.register(event.getDispatcher());
-    }
-
-    void onJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {
-        DemoHandler.warn(event.getPlayer());
     }
 
     void onBiomes(RegistryEvent.Register<Biome> event) {

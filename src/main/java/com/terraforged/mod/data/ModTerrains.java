@@ -75,8 +75,7 @@ public interface ModTerrains extends ModRegistry {
 
     static TerrainNoise[] getTerrain(RegistryAccess access) {
         var registry = access == null ? ModRegistries.getRegistry(TERRAIN.get()) : access.ownedRegistryOrThrow(TERRAIN.get());
-
-        return registry.stream().toArray(TerrainNoise[]::new);
+        return ModRegistry.entries(registry, TerrainNoise[]::new);
     }
 
     class Factory {

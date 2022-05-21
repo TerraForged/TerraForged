@@ -48,7 +48,7 @@ interface ModCaves extends ModRegistry {
         if (access == null || Environment.DEV_ENV) {
             return Factory.getDefaults();
         }
-        return access.ownedRegistryOrThrow(CAVE.get()).stream().toArray(NoiseCave[]::new);
+        return ModRegistry.entries(access, CAVE.get(), NoiseCave[]::new);
     }
 
     class Factory {

@@ -25,6 +25,7 @@
 package com.terraforged.mod.util;
 
 import com.terraforged.engine.util.pos.PosUtil;
+import com.terraforged.noise.source.Line;
 import com.terraforged.noise.util.NoiseUtil;
 
 import java.awt.geom.Line2D;
@@ -38,6 +39,12 @@ public class MathUtil {
 
     public static float clamp(float value, float min, float max) {
         return value < min ? min : value > max ? max : value;
+    }
+
+    public static float map(float value, float min0, float max0, float min1, float max1) {
+        float alpha = NoiseUtil.map(value, min0, max0, max0 - min0);
+
+        return NoiseUtil.lerp(min1, max1, alpha);
     }
 
     public static int hash(int seed, int x) {
@@ -56,6 +63,16 @@ public class MathUtil {
     public static float getPosY(int hash, int cy, float jitter) {
         float offset = rand(hash, NoiseUtil.Y_PRIME);
         return cy + offset * jitter;
+    }
+
+    public static float getPosX(int hash, int cx, float ox, float jitter) {
+        float offset = rand(hash, NoiseUtil.X_PRIME);
+        return cx + ox + offset * jitter;
+    }
+
+    public static float getPosY(int hash, int cy, float oy, float jitter) {
+        float offset = rand(hash, NoiseUtil.Y_PRIME);
+        return cy + oy + offset * jitter;
     }
 
     public static float randX(int hash) {
@@ -83,6 +100,22 @@ public class MathUtil {
             sum += value;
         }
         return sum;
+    }
+
+    protected static float getLineDistance(float x, float y, float ax, float ay, float bx, float by, float ar, float br) {
+        float dx = bx - ax;
+        float dy = by - ay;
+        float v = (x - ax) * dx + (y - ay) * dy;
+        v /= dx * dx + dy * dy;
+        v = v < 0 ? 0 : v > 1 ? 1 : v;
+
+        float tx = ax + dx * v;
+        float ty = ay + dy * v;
+        float tr = ar + (br - ar) * v;
+        float tr2 = tr * tr;
+        float d2 = Line.dist2(x, y, tx, ty);
+
+        return d2 < tr2 ? 1f - NoiseUtil.sqrt(d2) / tr : 0f;
     }
 
     public static long getIntersection(float x, float y, float ax, float ay, float bx, float by) {

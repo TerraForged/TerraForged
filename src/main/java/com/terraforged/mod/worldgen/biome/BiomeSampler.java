@@ -28,14 +28,14 @@ import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.engine.world.climate.ClimateModule;
 import com.terraforged.mod.worldgen.biome.util.BiomeMapManager;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
+import com.terraforged.mod.worldgen.noise.continent.ContinentPoints;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 
 public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler {
-    protected static final float EPSILON = 0.95f;
-
     protected final BiomeMapManager biomeMapManager;
+    protected final float beachSize = 0.005f;
 
     public BiomeSampler(INoiseGenerator noiseGenerator, BiomeMapManager biomeMapManager) {
         super(noiseGenerator);
@@ -78,7 +78,7 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
 
         var sample = localSample.get().reset();
         noiseGenerator.getContinent().sampleContinent(px, pz, sample);
-        noiseGenerator.getContinent().sampleRiver(px, pz, sample, sample.riverCache);
+        noiseGenerator.getContinent().sampleRiver(px, pz, sample);
 
         var cell = sample.cell;
         cell.value = sample.heightNoise;
@@ -86,16 +86,15 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
         cell.riverMask = sample.riverNoise;
         cell.continentEdge = sample.continentNoise;
 
-        climateModule.apply(cell, x, z);
+        climateModule.apply(cell, x, z, false);
 
         return sample;
     }
 
     protected Holder<Biome> getBiome(Holder<Biome> input, ClimateSample sample) {
         var biomeType = sample.cell.biome;
-        var controls = noiseGenerator.getContinent().getControlPoints();
 
-        if (sample.continentNoise * EPSILON <= controls.shallowOcean) {
+        if (sample.continentNoise <= ContinentPoints.SHALLOW_OCEAN) {
             return switch (biomeType) {
                 case TAIGA, COLD_STEPPE -> biomeMapManager.get(Biomes.DEEP_COLD_OCEAN);
                 case TUNDRA -> biomeMapManager.get(Biomes.DEEP_FROZEN_OCEAN);
@@ -104,7 +103,7 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
             };
         }
 
-        if (sample.continentNoise * EPSILON <= controls.beach) {
+        if (sample.continentNoise <= ContinentPoints.BEACH) {
             return switch (biomeType) {
                 case TAIGA, COLD_STEPPE -> biomeMapManager.get(Biomes.COLD_OCEAN);
                 case TUNDRA -> biomeMapManager.get(Biomes.FROZEN_OCEAN);
@@ -113,7 +112,15 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
             };
         }
 
-        if (sample.cell.terrain.isRiver() || sample.cell.terrain.isLake()) {
+        if (sample.continentNoise <= ContinentPoints.BEACH + beachSize) {
+            return switch (biomeType) {
+                case TUNDRA -> biomeMapManager.get(Biomes.SNOWY_BEACH);
+                case COLD_STEPPE -> biomeMapManager.get(Biomes.STONY_SHORE);
+                default -> biomeMapManager.get(Biomes.BEACH);
+            };
+        }
+
+        if (sample.terrainType.isRiver() || sample.terrainType.isLake()) {
             if (sample.cell.value < noiseGenerator.getLevels().heightMin) {
                 return biomeType == BiomeType.TUNDRA ? biomeMapManager.get(Biomes.FROZEN_RIVER) : biomeMapManager.get(Biomes.RIVER);
             }

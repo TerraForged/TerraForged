@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.mixin.common;
 
-import com.terraforged.mod.registry.hooks.NetworkRegistryAccess;
+import com.terraforged.mod.hooks.NetworkRegistryAccess;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.tags.TagNetworkSerialization;
 import org.spongepowered.asm.mixin.Mixin;

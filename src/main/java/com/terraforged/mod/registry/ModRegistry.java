@@ -27,6 +27,13 @@ package com.terraforged.mod.registry;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.registry.lazy.LazyRegistry;
 import com.terraforged.mod.worldgen.asset.*;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
+
+import java.util.Comparator;
+import java.util.Map;
+import java.util.function.IntFunction;
 
 public interface ModRegistry {
     LazyRegistry<ClimateType> CLIMATE = TerraForged.registry("worldgen/climate");
@@ -34,4 +41,15 @@ public interface ModRegistry {
     LazyRegistry<TerrainNoise> TERRAIN = TerraForged.registry("worldgen/terrain/noise");
     LazyRegistry<TerrainType> TERRAIN_TYPE = TerraForged.registry("worldgen/terrain/type");
     LazyRegistry<VegetationConfig> VEGETATION = TerraForged.registry("worldgen/vegetation");
+
+    static <T> T[] entries(RegistryAccess access, ResourceKey<Registry<T>> key, IntFunction<T[]> arrayFunc) {
+        return entries(access.ownedRegistryOrThrow(key), arrayFunc);
+    }
+
+    static <T> T[] entries(Registry<T> registry, IntFunction<T[]> arrayFunc) {
+        return registry.entrySet().stream()
+                .sorted(Comparator.comparing(e -> e.getKey().location()))
+                .map(Map.Entry::getValue)
+                .toArray(arrayFunc);
+    }
 }

@@ -25,10 +25,12 @@
 package com.terraforged.mod.worldgen.noise;
 
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
+import com.terraforged.noise.util.NoiseUtil;
 
 public class NoiseLevels {
     public final boolean auto;
     public final float scale;
+    public final float unit;
 
     public final float depthMin;
     public final float depthRange;
@@ -39,15 +41,20 @@ public class NoiseLevels {
 
     public final float frequency;
 
-    public NoiseLevels(boolean autoScale, float scale, int seaLevel, int seaFloor, int genDepth) {
+    public NoiseLevels(boolean autoScale, float scale, int seaLevel, int seaFloor, int worldHeight, int baseHeight) {
         this.auto = autoScale;
         this.scale = scale;
-        this.depthMin = seaFloor / (float) genDepth;
-        this.heightMin = seaLevel / (float) genDepth;
-        this.baseRange = (genDepth * 0.15F) / genDepth;
+        this.unit = 1.0f / worldHeight;
+        this.depthMin = seaFloor / (float) worldHeight;
+        this.heightMin = seaLevel / (float) worldHeight;
+        this.baseRange = baseHeight / (float) worldHeight;
         this.heightRange = 1F - (heightMin + baseRange);
         this.depthRange = heightMin - depthMin;
-        this.frequency = calcFrequency(genDepth - seaLevel, auto, scale);
+        this.frequency = calcFrequency(worldHeight - seaLevel, auto, scale);
+    }
+
+    public float scale(int level) {
+        return level * unit;
     }
 
     public float toDepthNoise(float noise) {
@@ -56,6 +63,10 @@ public class NoiseLevels {
 
     public float toHeightNoise(float baseNoise, float heightNoise) {
         return heightMin + baseRange * baseNoise + heightRange * heightNoise;
+    }
+
+    public float floor(float value) {
+        return NoiseUtil.floor(value / unit) * unit;
     }
 
     public static NoiseLevels getDefault() {

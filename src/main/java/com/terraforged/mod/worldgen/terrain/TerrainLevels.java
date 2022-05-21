@@ -41,40 +41,48 @@ public class TerrainLevels {
             Codecs.opt("horizontal_scale", 1F, Codec.floatRange(0F, 10F)).forGetter(l -> l.noiseLevels.scale),
             Codec.intRange(Limits.MIN_MIN_Y, Limits.MAX_MIN_Y).fieldOf("min_y").forGetter(l -> l.minY),
             Codec.intRange(Limits.MIN_MAX_Y, Limits.MAX_MAX_Y).fieldOf("max_y").forGetter(l -> l.maxY),
+            Codec.intRange(Limits.MAX_MIN_Y, Limits.MAX_MAX_Y).fieldOf("base_height").forGetter(l -> l.baseHeight),
             Codec.intRange(Limits.MIN_SEA_LEVEL, Limits.MAX_SEA_LEVEL).fieldOf("sea_level").forGetter(l -> l.seaLevel),
             Codec.intRange(Limits.MIN_SEA_FLOOR, Limits.MAX_SEA_FLOOR).fieldOf("sea_floor").forGetter(l -> l.seaFloor)
     ).apply(instance, TerrainLevels::new));
 
-    public static final Supplier<TerrainLevels> DEFAULT = Suppliers.memoize(() -> new TerrainLevels(true, Defaults.SCALE, Defaults.MIN_Y, Defaults.MAXY, Defaults.SEA_LEVEL, Defaults.SEA_FLOOR));
+    public static final Supplier<TerrainLevels> DEFAULT = Suppliers.memoize(() -> new TerrainLevels(true, Defaults.SCALE, Defaults.MIN_Y, Defaults.MAX_Y, Defaults.MAX_BASE_HEIGHT, Defaults.SEA_LEVEL, Defaults.SEA_FLOOR));
 
     public final int minY;
     public final int maxY; // Exclusive max block index
+    public final int baseHeight;
     public final int seaFloor;
     public final int seaLevel; // Inclusive index of highest water block
     public final NoiseLevels noiseLevels;
 
     public TerrainLevels() {
-        this.minY = -64;
-        this.maxY = 320;
-        this.seaFloor = 24;
-        this.seaLevel = 64;
-        this.noiseLevels = new NoiseLevels(false, Defaults.SCALE, seaLevel, seaFloor, maxY);
+        this.minY = -Defaults.MIN_Y;
+        this.maxY = Defaults.MAX_Y;
+        this.baseHeight = Defaults.MAX_BASE_HEIGHT;
+        this.seaFloor = Defaults.SEA_FLOOR;
+        this.seaLevel = Defaults.SEA_LEVEL;
+        this.noiseLevels = new NoiseLevels(false, Defaults.SCALE, seaLevel, seaFloor, maxY, baseHeight);
     }
 
-    public TerrainLevels(boolean autoScale, float scale, int minY, int maxY, int seaLevel, int seaFloor) {
+    public TerrainLevels(boolean autoScale, float scale, int minY, int maxY, int baseHeight, int seaLevel, int seaFloor) {
         this.minY = MathUtil.clamp(minY, Limits.MIN_MIN_Y, Limits.MAX_MIN_Y);
         this.maxY = MathUtil.clamp(maxY, Limits.MIN_MAX_Y, Limits.MAX_MAX_Y);
         this.seaLevel = MathUtil.clamp(seaLevel, Limits.MIN_SEA_LEVEL, maxY >> 1);
         this.seaFloor = MathUtil.clamp(seaFloor, this.minY, this.seaLevel - 1);
-        this.noiseLevels = new NoiseLevels(autoScale, scale, this.seaLevel, this.seaFloor, this.maxY);
+        this.baseHeight = MathUtil.clamp(baseHeight, this.seaLevel, this.maxY);
+        this.noiseLevels = new NoiseLevels(autoScale, scale, this.seaLevel, this.seaFloor, this.maxY, this.baseHeight);
     }
 
     public TerrainLevels copy() {
-        return new TerrainLevels(noiseLevels.auto, noiseLevels.scale, minY, maxY, seaLevel, seaFloor);
+        return new TerrainLevels(noiseLevels.auto, noiseLevels.scale, minY, maxY, baseHeight, seaLevel, seaFloor);
     }
 
     public float getScaledHeight(float heightNoise) {
         return heightNoise * maxY;
+    }
+
+    public float getScaledBaseLevel(float waterLevelNoise) {
+        return noiseLevels.toHeightNoise(waterLevelNoise, 0f) * maxY;
     }
 
     public int getHeight(float scaledHeight) {
@@ -93,7 +101,6 @@ public class TerrainLevels {
     }
 
     public static class Limits {
-
         public static final int MIN_MIN_Y = DimensionType.MIN_Y;
         public static final int MAX_MIN_Y = 0;
         public static final int MIN_SEA_LEVEL = 32;
@@ -107,9 +114,10 @@ public class TerrainLevels {
     public static class Defaults {
         public static final float SCALE = 1;
         public static final int MIN_Y = -64;
+        public static final int MAX_Y = 480;
+        public static final int MAX_BASE_HEIGHT = 128;
         public static final int SEA_LEVEL = 62;
         public static final int SEA_FLOOR = SEA_LEVEL - 40;
-        public static final int MAXY = 384;
         public static final int LEGACY_GEN_DEPTH = 256;
     }
 }

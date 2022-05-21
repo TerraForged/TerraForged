@@ -237,7 +237,7 @@ public class PositionSampler {
 
         int passes = 2;
         passes += NoiseUtil.floor(2 * (1 - context.maxViability));
-        passes += NoiseUtil.floor(4 * context.terrainData().getWater().get(8, 8));
+        passes += NoiseUtil.floor(4 * context.terrainData().getRiver().get(8, 8));
         passes -= NoiseUtil.floor(5 * context.terrainData().getHeight(8, 8));
 
         passes = Math.max(2, passes);
