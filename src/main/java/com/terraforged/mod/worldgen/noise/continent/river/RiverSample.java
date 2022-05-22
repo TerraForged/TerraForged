@@ -25,15 +25,16 @@
 package com.terraforged.mod.worldgen.noise.continent.river;
 
 public class RiverSample {
-    public float projection;
-    public float distance;
-    public float radius;
-    public float level;
+    public float projection = 0;
+    public float distance = Float.NaN;;
+    public float radius = 0;
+    public float level = 0;
 
     public RiverSample reset() {
         projection = 0;
-        distance = 0;
+        distance = Float.NaN;;
         radius = 0;
+        level = 0;
         return this;
     }
 }

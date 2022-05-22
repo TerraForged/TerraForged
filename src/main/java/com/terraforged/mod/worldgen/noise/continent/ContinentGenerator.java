@@ -36,6 +36,7 @@ import com.terraforged.mod.worldgen.noise.continent.cell.CellShape;
 import com.terraforged.mod.worldgen.noise.continent.cell.CellSource;
 import com.terraforged.mod.worldgen.noise.continent.river.RiverGenerator;
 import com.terraforged.mod.worldgen.noise.continent.shape.ShapeGenerator;
+import com.terraforged.noise.util.NoiseUtil;
 import com.terraforged.noise.util.Vec2f;
 
 public class ContinentGenerator {
@@ -98,6 +99,35 @@ public class ContinentGenerator {
         return cellCache.computeIfAbsent(index, this::computeCell);
     }
 
+    public long getNearestCell(float x, float y) {
+        x = cellShape.adjustX(x);
+        y = cellShape.adjustY(y);
+
+        int minX = NoiseUtil.floor(x) - 1;
+        int minY = NoiseUtil.floor(y) - 1;
+        int maxX = minX + 2;
+        int maxY = minY + 2;
+
+        int nearestX = 0;
+        int nearestY = 0;
+        float distance = Float.MAX_VALUE;
+
+        for (int cy = minY, i = 0; cy <= maxY; cy++) {
+            for (int cx = minX; cx <= maxX; cx++, i++) {
+                var cell = getCell(cx, cy);
+                float dist2 = NoiseUtil.dist2(x, y, cell.px, cell.py);
+
+                if (dist2 < distance) {
+                    distance = dist2;
+                    nearestX = cx;
+                    nearestY = cy;
+                }
+            }
+        }
+
+        return PosUtil.pack(nearestX, nearestY);
+    }
+
     private CellPoint computeCell(long index) {
         return computeCell(index, 0, 0, cellPool.take());
     }
@@ -110,8 +140,6 @@ public class ContinentGenerator {
         float px = cellShape.getCellX(hash, cx, cy, jitter);
         float py = cellShape.getCellY(hash, cx, cy, jitter);
 
-        cell.cx = cx;
-        cell.cy = cy;
         cell.px = px;
         cell.py = py;
 

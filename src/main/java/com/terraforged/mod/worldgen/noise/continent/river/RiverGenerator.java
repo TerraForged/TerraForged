@@ -87,21 +87,26 @@ public class RiverGenerator {
     }
 
     public void sample(float x, float y, RiverSample sample) {
-        var centre = continent.shapeGenerator.getNearestCell(x, y);
+        var centre = continent.getNearestCell(x, y);
+        int centreX = PosUtil.unpackLeft(centre);
+        int centreY = PosUtil.unpackRight(centre);
 
+        // Note: Must adjust inputs AFTER getting nearest cell
         x = continent.cellShape.adjustX(x);
         y = continent.cellShape.adjustY(y);
 
-        int maxX = centre.cx + 1;
-        int maxY = centre.cy + 1;
+        int minX = centreX - 1;
+        int minY = centreY - 1;
+        int maxX = centreX + 1;
+        int maxY = centreY + 1;
 
         RiverNode nearest = null;
 
         float projection = 0;
         float distance2 = Float.MAX_VALUE;
 
-        for (int cy = maxY - 2; cy <= maxY; cy++) {
-            for (int cx = maxX - 2; cx <= maxX; cx++) {
+        for (int cy = minY; cy <= maxY; cy++) {
+            for (int cx = minX; cx <= maxX; cx++) {
                 var nodes = getNodes(cx, cy);
 
                 for (var node : nodes) {
@@ -125,10 +130,7 @@ public class RiverGenerator {
             sample.radius = radius;
             sample.level = continent.shapeGenerator.getBaseNoise(level);
         } else {
-            sample.projection = 0;
-            sample.distance = Float.NaN;
-            sample.level = 0;
-            sample.radius = 0;
+            sample.reset();
         }
     }
 
@@ -207,38 +209,48 @@ public class RiverGenerator {
     }
 
     private RiverNode[] computeNodes(long index) {
-        int x = PosUtil.unpackLeft(index);
-        int y = PosUtil.unpackRight(index);
+        int ax = PosUtil.unpackLeft(index);
+        int ay = PosUtil.unpackRight(index);
 
-        var a = continent.getCell(x, y);
+        var a = continent.getCell(ax, ay);
         var min = a;
 
         float ah = getHeight(a.noise(), 0, 1);
         float ar = getRadius(a.noise(), minRadius, maxRadius);
 
+        boolean isSource = true;
+
         var list = localBuilder.get();
         for (var dir : DIRS) {
-            // Local to cells grid
-            int cx = a.cx + dir.x;
-            int cy = a.cy + dir.y;
-            var b = continent.getCell(cx, cy);
+            int bx = ax + dir.x;
+            int by = ay + dir.y;
+            var b = continent.getCell(bx, by);
 
+            // Track the lowest neighbour as the candidate to connect A to
             if (b.noise() < min.noise()) {
                 min = b;
                 continue;
             }
 
-            if (connects(a, b, dir.x, dir.y)) {
+            // Check if B is higher and A is its lowest neighbour
+            if (connects(a, b, ax, ay, dir.x, dir.y)) {
                 float bh = getHeight(b.noise(), 0, 1);
                 float br = getRadius(b.noise(), minRadius, maxRadius);
                 list.add(RiverNode.of(a, b, ah, bh, ar, br));
+                isSource = false;
             }
         }
 
+        // Add connection if we found a neighbour that is lower than A
+        // TODO: add a lake if there is no lower neighbour
         if (min != a) {
             float bh = getHeight(min.noise(), 0, 1);
             float br = getRadius(min.noise(), minRadius, maxRadius);
             list.add(RiverNode.of(a, min, ah, bh, ar, br));
+        }
+
+        if (isSource) {
+            // TODO: add a lake if no rivers flow into A
         }
 
         var nodes = list.toArray(RiverNode[]::new);
@@ -248,16 +260,16 @@ public class RiverGenerator {
         return nodes;
     }
 
-    private boolean connects(CellPoint a, CellPoint b, int dx, int dy) {
+    private boolean connects(CellPoint a, CellPoint b, int x, int y, int dx, int dy) {
         var connection = b;
 
         for (var dir : DIRS) {
-            int px = a.cx + dx + dir.x;
-            int py = a.cy + dy + dir.y;
+            int cx = x + dx + dir.x;
+            int cy = y + dy + dir.y;
 
-            if (px == b.cx && py == b.cy) continue;
+            if (cx == x && cy == y) continue;
 
-            var c = continent.getCell(px, py);
+            var c = continent.getCell(cx, cy);
             if (c.noise() < connection.noise()) {
                 connection = c;
             }

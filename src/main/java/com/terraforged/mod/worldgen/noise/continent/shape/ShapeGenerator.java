@@ -71,20 +71,24 @@ public class ShapeGenerator {
     }
 
     public float getValue(float x, float y) {
-        var centre = getNearestCell(x, y);
+        var centre = continent.getNearestCell(x, y);
+        int centreX = PosUtil.unpackLeft(centre);
+        int centreY = PosUtil.unpackRight(centre);
 
         x = continent.cellShape.adjustX(x);
         y = continent.cellShape.adjustY(y);
 
-        int ix = centre.cx;
-        int iy = centre.cy;
+        int minX = centreX - RADIUS;
+        int minY = centreY - RADIUS;
+        int maxX = centreX + RADIUS;
+        int maxY = centreY + RADIUS;
 
         float min0 = Float.MAX_VALUE;
         float min1 = Float.MAX_VALUE;
         var data = edgeBuffer.get();
 
-        for (int cy = iy - 1, i = 0; cy <= iy + 1; cy++) {
-            for (int cx = ix - 1; cx <= ix + 1; cx++, i++) {
+        for (int cy = minY, i = 0; cy <= maxY; cy++) {
+            for (int cx = minX; cx <= maxX; cx++, i++) {
                 var cell = continent.getCell(cx, cy);
 
                 float value = getThresholdValue(cell);
@@ -104,17 +108,21 @@ public class ShapeGenerator {
         return getFalloff(getEdge(min0, min1, continentFalloff, data));
     }
 
-    public void sample(float x, float y, NoiseSample sample) {
-        var centre = getNearestCell(x, y);
+    public NoiseSample sample(float x, float y, NoiseSample sample) {
+        var centre = continent.getNearestCell(x, y);
+        int centreX = PosUtil.unpackLeft(centre);
+        int centreY = PosUtil.unpackRight(centre);
 
+        // Note: Must adjust inputs AFTER getting nearest cell
         x = continent.cellShape.adjustX(x);
         y = continent.cellShape.adjustY(y);
 
-        int minX = centre.cx - RADIUS;
-        int minY = centre.cy - RADIUS;
-        int maxX = centre.cx + RADIUS;
-        int maxY = centre.cy + RADIUS;
+        int minX = centreX - RADIUS;
+        int minY = centreY - RADIUS;
+        int maxX = centreX + RADIUS;
+        int maxY = centreY + RADIUS;
 
+        int closest = -1;
         float min0 = Float.MAX_VALUE;
         float min1 = Float.MAX_VALUE;
         var buffer = cellBuffer.get();
@@ -132,40 +140,14 @@ public class ShapeGenerator {
                 if (distance < min0) {
                     min1 = min0;
                     min0 = distance;
+                    closest = i;
                 } else if (distance < min1) {
                     min1 = distance;
                 }
             }
         }
 
-        sampleEdges(min0, min1, buffer, sample);
-    }
-
-    public CellPoint getNearestCell(float x, float y) {
-        x = continent.cellShape.adjustX(x);
-        y = continent.cellShape.adjustY(y);
-
-        int minX = NoiseUtil.floor(x) - 1;
-        int minY = NoiseUtil.floor(y) - 1;
-        int maxX = minX + 2;
-        int maxY = minY + 2;
-
-        CellPoint nearest = null;
-        float distance = Float.MAX_VALUE;
-
-        for (int cy = minY, i = 0; cy <= maxY; cy++) {
-            for (int cx = minX; cx <= maxX; cx++, i++) {
-                var cell = continent.getCell(cx, cy);
-                float dist2 = NoiseUtil.dist2(x, y, cell.px, cell.py);
-
-                if (dist2 < distance) {
-                    distance = dist2;
-                    nearest = cell;
-                }
-            }
-        }
-
-        return nearest;
+        return sampleEdges(closest, min0, min1, buffer, sample);
     }
 
     private float getEdge(float min0, float min1, float falloff, long[] data) {
@@ -187,7 +169,7 @@ public class ShapeGenerator {
         return NoiseUtil.clamp(sumValue / sumWeight, 0, 1);
     }
 
-    private void sampleEdges(float min0, float min1, CellLocal[] buffer, NoiseSample sample) {
+    private NoiseSample sampleEdges(int index, float min0, float min1, CellLocal[] buffer, NoiseSample sample) {
         float borderDistance = (min0 + min1) * 0.5F;
         float baseBlend = borderDistance * baseFalloff;
         float continentBlend = borderDistance * continentFalloff;
@@ -215,6 +197,8 @@ public class ShapeGenerator {
 
         sample.baseNoise = getBaseNoise(sumBase / sumBaseWeight);
         sample.continentNoise = getFalloff(sumContinent / sumContinentWeight);
+
+        return sample;
     }
 
     private static float getWeight(float dist, float origin, float blendRange) {

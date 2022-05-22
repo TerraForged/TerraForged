@@ -25,7 +25,6 @@
 package com.terraforged.mod.worldgen.noise.continent.cell;
 
 public class CellPoint {
-    public int cx, cy;
     public float px, py;
     public float noise;
     public float noise0;
