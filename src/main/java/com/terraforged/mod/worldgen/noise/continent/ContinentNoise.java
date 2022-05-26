@@ -31,6 +31,7 @@ import com.terraforged.engine.world.rivermap.Rivermap;
 import com.terraforged.mod.worldgen.noise.IContinentNoise;
 import com.terraforged.mod.worldgen.noise.NoiseLevels;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
+import com.terraforged.mod.worldgen.noise.continent.config.ContinentConfig;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import com.terraforged.noise.Source;
 import com.terraforged.noise.domain.Domain;
@@ -55,32 +56,30 @@ public class ContinentNoise implements IContinentNoise {
 
         this.frequency = 1F / context.settings.world.continent.continentScale;
 
-        int scale = 110;
-        int octaves = 2;
-        double gain = 0.24;
-        double lacunarity = 2.2;
-        double strength = 25;
+        double strength = 0.25;
+
+        var builder = Source.builder()
+                .octaves(2)
+                .lacunarity(2.2)
+                .frequency(2)
+                .gain(0.3);
 
         this.warp = Domain.warp(
-                Source.build(context.seed.next(), scale, octaves)
-                        .gain(gain)
-                        .lacunarity(lacunarity)
-                        .build(Source.SIMPLEX2),
-                Source.build(context.seed.next(), scale, octaves)
-                        .gain(gain)
-                        .lacunarity(lacunarity)
-                        .build(Source.SIMPLEX2),
+                builder.seed(context.seed.next())
+                        .build(Source.PERLIN2),
+                builder.seed(context.seed.next())
+                        .build(Source.PERLIN2),
                 Source.constant(strength)
         );
     }
 
     @Override
     public float getEdgeValue(float x, float y) {
+        x *= frequency;
+        y *= frequency;
+
         float px = warp.getX(x, y);
         float py = warp.getY(x, y);
-
-        px *= frequency;
-        py *= frequency;
 
         px += offset.x;
         py += offset.y;
@@ -105,11 +104,11 @@ public class ContinentNoise implements IContinentNoise {
 
     @Override
     public void sampleContinent(float x, float y, NoiseSample sample) {
+        x *= frequency;
+        y *= frequency;
+
         float px = warp.getX(x, y);
         float py = warp.getY(x, y);
-
-        px *= frequency;
-        py *= frequency;
 
         px += offset.x;
         py += offset.y;
@@ -121,16 +120,16 @@ public class ContinentNoise implements IContinentNoise {
 
     @Override
     public void sampleRiver(float x, float y, NoiseSample sample) {
+        x *= frequency;
+        y *= frequency;
+
         float px = warp.getX(x, y);
         float py = warp.getY(x, y);
-
-        px *= frequency;
-        py *= frequency;
 
         px += offset.x;
         py += offset.y;
 
-        generator.riverGenerator.carve(px, py, sample);
+        generator.riverGenerator.sample(px, py, sample);
     }
 
     @Override
@@ -145,9 +144,9 @@ public class ContinentNoise implements IContinentNoise {
 
     protected static ContinentGenerator createContinent(GeneratorContext context, ControlPoints controlPoints, NoiseLevels levels) {
         var config = new ContinentConfig();
+        config.shape.scale = context.settings.world.continent.continentScale;
         config.shape.seed0 = context.seed.next();
         config.shape.seed1 = context.seed.next();
-        config.shape.jitter = context.settings.world.continent.continentJitter;
         return new ContinentGenerator(config, levels, controlPoints);
     }
 }

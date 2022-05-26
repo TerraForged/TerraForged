@@ -24,11 +24,11 @@
 
 package com.terraforged.mod.worldgen.noise.continent.river;
 
-import com.terraforged.mod.worldgen.noise.continent.cell.CellPoint;
+import com.terraforged.noise.func.Interpolation;
 import com.terraforged.noise.source.Line;
 import com.terraforged.noise.util.NoiseUtil;
 
-public record RiverNode(float ax, float ay, float bx, float by, float ah, float bh, float ar, float br) {
+public record RiverNode(float ax, float ay, float bx, float by, float ah, float bh, float ar, float br, float displacement) {
     public float getProjection(float x, float y) {
         float dx = bx - ax;
         float dy = by - ay;
@@ -38,14 +38,26 @@ public record RiverNode(float ax, float ay, float bx, float by, float ah, float 
     }
 
     public float getDistance2(float x, float y, float t) {
+        float pad = 0.05f;
+
+        float alpha = NoiseUtil.map(t, pad, 1.0f - pad, 1.0f - pad * 2);
+        alpha = alpha < 0.5f ? alpha / 0.5f : (1.0f - alpha) / 0.5f;
+        alpha = Interpolation.CURVE3.apply(alpha);
+        alpha *= displacement;
+
         float tx = getX(t);
         float ty = getY(t);
-        return Line.dist2(x, y, tx, ty);
+
+        float px = tx - (by - ay) * alpha;
+        float py = ty + (bx - ax) * alpha;
+
+
+        return Line.dist2(x, y, px, py);
     }
 
     public float getDistance(float x, float y, float t) {
         float d2 = getDistance2(x, y, t);
-        return getDistance(t, d2);
+        return NoiseUtil.sqrt(d2);
     }
 
     public float getDistance(float t, float d2) {
@@ -68,9 +80,5 @@ public record RiverNode(float ax, float ay, float bx, float by, float ah, float 
 
     public float getRadius(float t) {
         return ar + t * (br - ar);
-    }
-
-    public static RiverNode of(CellPoint a, CellPoint b, float ah, float bh, float ar, float br) {
-        return new RiverNode(a.px, a.py, b.px, b.py, ah, bh, ar, br);
     }
 }

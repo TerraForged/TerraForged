@@ -22,40 +22,35 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.noise.continent.cell;
+package com.terraforged.mod.worldgen.noise.continent.river;
 
-import com.terraforged.mod.util.MathUtil;
+import com.terraforged.engine.world.terrain.Terrain;
 
-public enum CellShape {
-    SQUARE,
-    HEXAGON {
-        @Override
-        public float adjustY(float y) {
-            return y * 1.2f; // rough
-        }
+public class NodeSample {
+    public float projection = 0;
+    public float distance = Float.NaN;;
+    public float position = 0;
+    public float level = 0;
+    public final Terrain type;
 
-        @Override
-        public float getCellX(int hash, int cx, int cy, float jitter) {
-            float ox = (cy & 1) * 0.5f;
-            float jx = ox > 0 ? jitter * 0.5f: jitter;
-            return MathUtil.getPosX(hash, cx, jx) + ox;
-        }
-    },
-    ;
-
-    public float adjustX(float x) {
-        return x;
+    public NodeSample(Terrain type) {
+        this.type = type;
     }
 
-    public float adjustY(float y) {
-        return y;
+    public boolean isInvalid() {
+        return Float.isNaN(distance);
     }
 
-    public float getCellX(int hash, int cx, int cy, float jitter) {
-        return MathUtil.getPosX(hash, cx, jitter);
+    public NodeSample reset() {
+        distance = Float.MAX_VALUE;
+        projection = 0;
+        position = 0;
+        level = 0;
+        return this;
     }
 
-    public float getCellY(int hash, int cx, int cy, float jitter) {
-        return MathUtil.getPosY(hash, cy, jitter);
+    public NodeSample invalidate() {
+        distance = Float.NaN;
+        return this;
     }
 }

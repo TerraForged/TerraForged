@@ -24,17 +24,15 @@
 
 package com.terraforged.mod.worldgen.noise.continent.river;
 
-public class RiverSample {
-    public float projection = 0;
-    public float distance = Float.NaN;;
-    public float radius = 0;
-    public float level = 0;
+import com.terraforged.engine.world.terrain.TerrainType;
 
-    public RiverSample reset() {
-        projection = 0;
-        distance = Float.NaN;;
-        radius = 0;
-        level = 0;
+public class CarverSample {
+    public final NodeSample river = new NodeSample(TerrainType.RIVER);
+    public final NodeSample lake = new NodeSample(TerrainType.LAKE);
+
+    public CarverSample reset() {
+        river.reset();
+        lake.reset();
         return this;
     }
 }

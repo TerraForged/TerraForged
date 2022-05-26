@@ -25,16 +25,20 @@
 package com.terraforged.mod.worldgen.noise.continent;
 
 import com.terraforged.engine.settings.WorldSettings;
-import com.terraforged.engine.world.heightmap.ControlPoints;
+import com.terraforged.mod.data.ModTerrains;
 import com.terraforged.mod.util.ui.Previewer;
-import com.terraforged.mod.worldgen.noise.NoiseLevels;
-import com.terraforged.mod.worldgen.noise.NoiseSample;
+import com.terraforged.mod.worldgen.noise.NoiseGenerator;
+import com.terraforged.mod.worldgen.noise.continent.config.ContinentConfig;
+import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import com.terraforged.noise.Module;
-import com.terraforged.noise.util.Vec2f;
+import com.terraforged.noise.util.NoiseUtil;
 
 import java.awt.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ContinentPreview {
+    public static int SEED = ThreadLocalRandom.current().nextInt();
+
     public static void main(String[] args) {
         Previewer.launch(() -> {
             var noise = create();
@@ -53,9 +57,6 @@ public class ContinentPreview {
     }
 
     private static Module create() {
-        float scale = 1 / 500f;
-
-        var levels = new NoiseLevels(false, 1.0f, 63, 48, 480, 160);
         var controls = new WorldSettings.ControlPoints();
         controls.deepOcean = 0.05f;
         controls.shallowOcean = 0.3f;
@@ -64,29 +65,29 @@ public class ContinentPreview {
         controls.inland = 0.80f;
 
         var config = new ContinentConfig();
-        config.shape.seed0 = 234342;
-        config.shape.seed1 = 432;
+        config.shape.seed0 = SEED;
+        config.shape.seed1 = SEED + 39674;
         config.shape.threshold = 0.525f;
         config.shape.thresholdFalloff = 0.6f;
 
-        var continent = new ContinentGenerator(config, levels, new ControlPoints(controls));
+        var terrainLevels = new TerrainLevels();
 
-        return new Noise(continent, continent.getWorldOffset()).freq(scale, scale);
+        var generator = new NoiseGenerator(SEED, terrainLevels, ModTerrains.Factory.getDefault(null));
+
+        return new Noise(generator);
     }
 
-    public record Noise(ContinentGenerator continent, Vec2f offset) implements Module {
+    public record Noise(NoiseGenerator generator) implements Module {
         @Override
         public float getValue(float x, float y) {
-            x += offset.x;
-            y += offset.y;
+            var sample = generator.getContinentNoiseSample((int) x, (int) y);
 
-            var sample = new NoiseSample();
-            continent.shapeGenerator.sample(x, y, sample);
-//            continent.riverNoise.carve(x, y, sample);
+//            if (true) return sample.baseNoise;
 
-//            if (sample.continentNoise < ContinentPoints.BEACH) return 1f;
+            float a = sample.baseNoise * NoiseUtil.map(sample.riverNoise, 0.5f, 1.0f, 0.5f);
+            float b = sample.continentNoise * NoiseUtil.map(sample.riverNoise, 0.5f, 1.0f, 0.5f);
 
-            return sample.continentNoise;// * NoiseUtil.map(sample.riverNoise, 0.5f, 1.0f, 0.5f);
+            return NoiseUtil.lerp(a, b, 0.4f);
         }
     }
 }

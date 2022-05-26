@@ -23,11 +23,15 @@ sourceSets {
 
 repositories {
     maven { url "https://repo.spongepowered.org/maven" }
+
+    flatDir { dirs "lib" }
 }
 
 dependencies {
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    implementation fg.deobf("unused:journeymap:1.18.2-5.8.4:forge")
 }
 
 jar {

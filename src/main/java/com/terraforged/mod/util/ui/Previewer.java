@@ -24,13 +24,16 @@
 
 package com.terraforged.mod.util.ui;
 
+import com.terraforged.mod.worldgen.noise.continent.ContinentPreview;
 import com.terraforged.noise.Module;
+import com.terraforged.noise.util.NoiseUtil;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
 public class Previewer extends JPanel {
@@ -81,6 +84,15 @@ public class Previewer extends JPanel {
                     shader = Previewer.this.shaderSupplier.get();
                     redraw();
                 }
+                if (e.getKeyChar() == 't') {
+                    zoom = 1.0f;
+                    redraw();
+                }
+                if (e.getKeyChar() == 's') {
+                    ContinentPreview.SEED = ThreadLocalRandom.current().nextInt();
+                    shader = Previewer.this.shaderSupplier.get();
+                    redraw();
+                }
             }
         });
 
@@ -107,6 +119,13 @@ public class Previewer extends JPanel {
         each(ox, oy, zoom, 0, 0, w, h, shader, image).join();
 
         g.drawImage(image, 0, 0, w, h, null);
+
+
+        int width = NoiseUtil.floor(w * zoom);
+        int height = NoiseUtil.floor(h * zoom);
+
+        g.setColor(Color.WHITE);
+        g.drawString(String.format("%sx%s", width, height), 2, 12);
     }
 
     public static void display(Supplier<Module> supplier) {

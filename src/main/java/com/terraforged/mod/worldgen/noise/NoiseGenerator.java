@@ -31,6 +31,7 @@ import com.terraforged.engine.world.heightmap.ControlPoints;
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.engine.world.terrain.TerrainType;
 import com.terraforged.mod.worldgen.asset.TerrainNoise;
+import com.terraforged.mod.worldgen.noise.continent.ContinentGenerator;
 import com.terraforged.mod.worldgen.noise.continent.ContinentNoise;
 import com.terraforged.mod.worldgen.noise.continent.ContinentPoints;
 import com.terraforged.mod.worldgen.noise.erosion.ErodedNoiseGenerator;
@@ -111,11 +112,11 @@ public class NoiseGenerator implements INoiseGenerator {
 
             // Skip if coast or ocean
             continent.sampleContinent(px, pz, sample);
-            if (sample.continentNoise < ContinentPoints.COAST) continue;
+            if (sample.continentNoise < ContinentPoints.BEACH) continue;
 
             // Skip if near river
             continent.sampleRiver(px, pz, sample);
-            if (sample.riverNoise > 0.25F) continue;
+            if (!terrain.isRiver() && sample.riverNoise < 0.75F) continue;
 
             int xi = NoiseUtil.floor(px);
             int zi = NoiseUtil.floor(pz);
@@ -155,10 +156,20 @@ public class NoiseGenerator implements INoiseGenerator {
         return land.getBlenderResource();
     }
 
+    @Override
     public NoiseSample getNoiseSample(int x, int z) {
         var sample = localSample.get().reset();
         var blender = land.getBlenderResource();
         return sample(x, z, sample, blender);
+    }
+
+    public NoiseSample getContinentNoiseSample(int x, int z) {
+        float nx = getNoiseCoord(x);
+        float nz = getNoiseCoord(z);
+        var sample = localSample.get().reset();
+        continent.sampleContinent(nx, nz, sample);
+        continent.sampleRiver(nx, nz, sample);
+        return sample;
     }
 
     public NoiseSample sample(int x, int z, NoiseSample sample, TerrainBlender.Blender blender) {
@@ -257,7 +268,7 @@ public class NoiseGenerator implements INoiseGenerator {
 
         var context = new GeneratorContext(settings);
 
-        settings.world.continent.continentScale = 500;
+        settings.world.continent.continentScale = ContinentGenerator.CONTINENT_SAMPLE_SCALE;
         settings.world.controlPoints.deepOcean = 0.05f;
         settings.world.controlPoints.shallowOcean = 0.3f;
         settings.world.controlPoints.beach = 0.45f;

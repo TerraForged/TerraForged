@@ -22,37 +22,31 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.noise.continent;
+package com.terraforged.mod.worldgen.noise.continent.config;
 
-import com.terraforged.mod.worldgen.noise.continent.cell.CellShape;
-import com.terraforged.mod.worldgen.noise.continent.cell.CellSource;
+import com.terraforged.noise.util.NoiseUtil;
 
-public class ContinentConfig {
-    public final Shape shape = new Shape();
-    public final Noise noise = new Noise();
-    public final Rivers rivers = new Rivers();
+public class FloatRange {
+    public float min, max;
 
-    public static class Shape {
-        public int seed0;
-        public int seed1;
-        public float jitter = 0.8f;
-        public float threshold = 0.525f;
-        public float thresholdFalloff = 0.5f;
-        public CellShape cellShape = CellShape.HEXAGON;
-        public CellSource cellSource = CellSource.PERLIN;
-
-        public float getThresholdMax() {
-            return threshold + (1 - threshold) * (1 - thresholdFalloff);
-        }
+    public FloatRange(float min, float max) {
+        this.min = min;
+        this.max = max;
     }
 
-    public static class Noise {
-        public float baseNoiseFalloff = 1.5f;
-        public float continentNoiseFalloff = 1.0f;
+    public float at(float alpha) {
+        return NoiseUtil.lerp(min, max, alpha);
     }
 
-    public static class Rivers {
-        public float riverMinRadius = 0.05f;
-        public float riverMaxRadius = 0.225f;
+    public FloatRange copy(FloatRange other) {
+        this.min = other.min;
+        this.max = other.max;
+        return this;
+    }
+
+    public FloatRange scale(float factor) {
+        min *= factor;
+        max *= factor;
+        return this;
     }
 }

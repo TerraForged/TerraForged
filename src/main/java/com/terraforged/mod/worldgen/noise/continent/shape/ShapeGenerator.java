@@ -27,10 +27,10 @@ package com.terraforged.mod.worldgen.noise.continent.shape;
 import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.heightmap.ControlPoints;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
-import com.terraforged.mod.worldgen.noise.continent.ContinentConfig;
 import com.terraforged.mod.worldgen.noise.continent.ContinentGenerator;
 import com.terraforged.mod.worldgen.noise.continent.ContinentPoints;
 import com.terraforged.mod.worldgen.noise.continent.cell.CellPoint;
+import com.terraforged.mod.worldgen.noise.continent.config.ContinentConfig;
 import com.terraforged.noise.util.NoiseUtil;
 
 public class ShapeGenerator {
@@ -78,10 +78,10 @@ public class ShapeGenerator {
         x = continent.cellShape.adjustX(x);
         y = continent.cellShape.adjustY(y);
 
-        int minX = centreX - RADIUS;
-        int minY = centreY - RADIUS;
-        int maxX = centreX + RADIUS;
-        int maxY = centreY + RADIUS;
+        int minX = centreX - 1;
+        int minY = centreY - 1;
+        int maxX = centreX + 1;
+        int maxY = centreY + 1;
 
         float min0 = Float.MAX_VALUE;
         float min1 = Float.MAX_VALUE;

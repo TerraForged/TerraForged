@@ -87,6 +87,10 @@ public class MathUtil {
         return rand(hash(seed, offset));
     }
 
+    public static float rand(int seed, int x, int y) {
+        return rand(hash(seed, x, y));
+    }
+
     public static float rand(int n) {
         n ^= 1619;
         n ^= 31337;

@@ -95,32 +95,27 @@ public class Surface {
         }
     }
 
-    public static void smoothWater(ChunkAccess chunk, WorldGenLevel region) {
+    public static void smoothWater(ChunkAccess chunk, WorldGenLevel region, TerrainData terrainData) {
         var pos = new BlockPos.MutableBlockPos();
 
-        int iterations = 3;
         int minX = chunk.getPos().getMinBlockX();
         int minZ = chunk.getPos().getMinBlockZ();
 
-        for (int i = 0; i < iterations; i++) {
-            int level = (i + 1) * 2;
-            for (int dz = 0; dz < 16; dz++) {
-                for (int dx = 0; dx < 16; dx++) {
-                    int x = minX + dx;
-                    int z = minZ + dz;
-                    int y = chunk.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, dx, dz) + 1;
+        var riverMask = terrainData.getRiver();
+        var waterState = Blocks.WATER.defaultBlockState().setValue(LiquidBlock.LEVEL, 2);
 
-                    for (int minY = y - 3; y >= minY; y--) {
-                        var state = chunk.getBlockState(pos.set(x, y, z));
+        for (int dz = 0; dz < 16; dz++) {
+            for (int dx = 0; dx < 16; dx++) {
+                if (riverMask.get(dx, dz) > 0.0f) continue;
 
-                        if (!state.is(Blocks.WATER)) continue;
-                        if (state.getValue(LiquidBlock.LEVEL) != 0) break;
+                int x = minX + dx;
+                int z = minZ + dz;
+                int y = chunk.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, dx, dz);
 
-                        if (shouldSmooth(x, y, z, chunk, region, pos)) {
-                            state = state.setValue(LiquidBlock.LEVEL, level);
-                            chunk.setBlockState(pos.set(x, y, z), state, false);
-                            break;
-                        }
+                var state = chunk.getBlockState(pos.set(x, y, z));
+                if (state.is(Blocks.WATER) && state.getValue(LiquidBlock.LEVEL) == 0) {
+                    if (shouldSmooth(x, y, z, chunk, region, pos)) {
+                        chunk.setBlockState(pos.set(x, y, z), waterState, false);
                     }
                 }
             }
@@ -128,9 +123,13 @@ public class Surface {
     }
 
     protected static boolean shouldSmooth(int x, int y, int z, ChunkAccess chunk, WorldGenLevel region, BlockPos.MutableBlockPos pos) {
-        for (int dz = -1; dz <= 1; dz++) {
-            for (int dx = -1; dx <= 1; dx++) {
-                if (dx * dx + dz * dz != 1) continue;
+        int radius = 6;
+        int radius2 = radius * radius;
+
+        for (int dz = -radius; dz <= radius; dz++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                int d2 = dx * dx + dz * dz;
+                if (d2 == 0 || d2 > radius2) continue;
 
                 pos.set(x + dx, y, z + dz);
 
@@ -138,10 +137,6 @@ public class Surface {
                 var state = world.getBlockState(pos);
 
                 if (state.isAir()) {
-                    return true;
-                }
-
-                if (state.is(Blocks.WATER) && state.getValue(LiquidBlock.LEVEL) != 0) {
                     return true;
                 }
             }

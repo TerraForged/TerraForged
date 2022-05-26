@@ -270,7 +270,7 @@ public class Generator extends ChunkGenerator implements IGenerator {
         lines.add("[TerraForged]");
         lines.add("Terrain Type: " + terrainType.getName());
         lines.add("Climate Type: " + climateType.name());
-        lines.add("Continent Edge: " + climateSample.continentNoise);
+        lines.add("Continent Edge: " + terrainSample.continentNoise);
         lines.add("Base Level: " + terrainSample.baseNoise);
         lines.add("River Proximity: " + (1 - climateSample.riverNoise));
     }

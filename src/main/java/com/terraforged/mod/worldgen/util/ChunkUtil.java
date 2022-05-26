@@ -190,7 +190,7 @@ public class ChunkUtil {
 
     protected static int getWaterLevel(int x, int z, int seaLevel, TerrainData terrainData) {
         float river = terrainData.getRiver().get(x, z);
-        return river >= 1.0f ? seaLevel : terrainData.getWaterLevel(x, z);
+        return river > 0f ? seaLevel : terrainData.getWaterLevel(x, z);
     }
 
     protected static ByteBuf createFullPalette() {

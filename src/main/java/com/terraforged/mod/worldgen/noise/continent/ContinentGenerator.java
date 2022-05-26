@@ -34,12 +34,15 @@ import com.terraforged.mod.worldgen.noise.NoiseLevels;
 import com.terraforged.mod.worldgen.noise.continent.cell.CellPoint;
 import com.terraforged.mod.worldgen.noise.continent.cell.CellShape;
 import com.terraforged.mod.worldgen.noise.continent.cell.CellSource;
+import com.terraforged.mod.worldgen.noise.continent.config.ContinentConfig;
 import com.terraforged.mod.worldgen.noise.continent.river.RiverGenerator;
 import com.terraforged.mod.worldgen.noise.continent.shape.ShapeGenerator;
 import com.terraforged.noise.util.NoiseUtil;
 import com.terraforged.noise.util.Vec2f;
 
 public class ContinentGenerator {
+    public static final int CONTINENT_SAMPLE_SCALE = 400;
+
     protected static final int SAMPLE_SEED_OFFSET = 6569;
     protected static final int VALID_SPAWN_RADIUS = 3;
     protected static final int SPAWN_SEARCH_RADIUS = 100_000;
@@ -143,7 +146,10 @@ public class ContinentGenerator {
         cell.px = px;
         cell.py = py;
 
-        sampleCell(sampleSeed, px, py,  cellSource,2, 0.075f, 2.5f, 0.3f, cell);
+        float target = 4000f;
+        float freq = (CONTINENT_SAMPLE_SCALE / target);
+
+        sampleCell(sampleSeed, px, py,  cellSource,2, freq, 2.75f, 0.3f, cell);
 
         return cell;
     }

@@ -94,7 +94,7 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
     }
 
     public SpiralIterator.PositionFinder findNearest(float x, float z, int minRadius, int maxRadius, Terrain type) {
-        var terrain = terrains.find(t -> t.terrain() == type);
+        var terrain = terrains.find(t -> t.terrain().getName().equals(type.getName()));
         if (terrain == null) return null;
 
         long band = terrains.getBand(terrain);

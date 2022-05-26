@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.worldgen.noise;
 
+import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import com.terraforged.noise.util.NoiseUtil;
 
@@ -51,6 +52,8 @@ public class NoiseLevels {
         this.heightRange = 1F - (heightMin + baseRange);
         this.depthRange = heightMin - depthMin;
         this.frequency = calcFrequency(worldHeight - seaLevel, auto, scale);
+
+        TerraForged.LOG.debug("Sea Level: {}, Base Height:  {}, World Height: {}", seaLevel, baseHeight, worldHeight);
     }
 
     public float scale(int level) {
@@ -67,6 +70,10 @@ public class NoiseLevels {
 
     public float floor(float value) {
         return NoiseUtil.floor(value / unit) * unit;
+    }
+
+    public float ceil(float value) {
+        return unit + NoiseUtil.floor(value / unit) * unit;
     }
 
     public static NoiseLevels getDefault() {
