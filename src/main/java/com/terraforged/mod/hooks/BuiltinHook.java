@@ -52,7 +52,7 @@ public class BuiltinHook {
     private static <T, E> void loadHolder(ModRegistries.HolderEntry<T> holder, RegistryOps<E> ops) {
         var loader = ops.registryLoader().orElseThrow();
         var result = loader.overrideRegistryFromResources(holder.key(), holder.direct(), ops.getAsJson());
-        RegistryAccessUtil.printRegistryContents(result.result().get());
+        RegistryAccessUtil.printRegistryContents(result.result().orElseThrow());
     }
 
     @SuppressWarnings("unchecked")

@@ -1,0 +1,188 @@
+{
+  "type": "terraforged:mountains",
+  "weight": 1.25,
+  "noise": {
+    "type": "Clamp",
+    "max": {
+      "type": "Const",
+      "value": 1
+    },
+    "min": {
+      "type": "Const",
+      "value": 0
+    },
+    "source": {
+      "type": "Bias",
+      "bias": {
+        "type": "Const",
+        "value": 0.02
+      },
+      "source": {
+        "type": "Scale",
+        "scale": {
+          "type": "Const",
+          "value": 0.645
+        },
+        "source": {
+          "type": "Warp",
+          "domain": {
+            "type": "DirectionWarp",
+            "direction": {
+              "interpolation": "CURVE3",
+              "type": "Perlin",
+              "frequency": 0.1,
+              "gain": 0.5,
+              "lacunarity": 2,
+              "octaves": 1,
+              "seed": 329485
+            },
+            "strength": {
+              "type": "Const",
+              "value": 2
+            }
+          },
+          "source": {
+            "blend": "CONSTANT",
+            "type": "Valley",
+            "amplitude": 0.15,
+            "fall_off": 0.8,
+            "grid_size": 128,
+            "lacunarity": 3.1,
+            "octaves": 2,
+            "seed": 310371,
+            "strength": 0.65,
+            "source": {
+              "type": "Pow",
+              "power": {
+                "type": "Const",
+                "value": 1.1
+              },
+              "source": {
+                "type": "Mult",
+                "modules": [
+                  {
+                    "type": "Mult",
+                    "modules": [
+                      {
+                        "type": "Warp",
+                        "domain": {
+                          "type": "DomainWarp",
+                          "distance": {
+                            "type": "Const",
+                            "value": 100
+                          },
+                          "x": {
+                            "type": "Map",
+                            "max": {
+                              "type": "Const",
+                              "value": 0.5
+                            },
+                            "min": {
+                              "type": "Const",
+                              "value": -0.5
+                            },
+                            "source": {
+                              "interpolation": "CURVE3",
+                              "type": "Perlin",
+                              "frequency": 0.005,
+                              "gain": 0.5,
+                              "lacunarity": 2,
+                              "octaves": 2,
+                              "seed": 155500
+                            }
+                          },
+                          "y": {
+                            "type": "Map",
+                            "max": {
+                              "type": "Const",
+                              "value": 0.5
+                            },
+                            "min": {
+                              "type": "Const",
+                              "value": -0.5
+                            },
+                            "source": {
+                              "interpolation": "CURVE3",
+                              "type": "Perlin",
+                              "frequency": 0.005,
+                              "gain": 0.5,
+                              "lacunarity": 2,
+                              "octaves": 2,
+                              "seed": 155501
+                            }
+                          }
+                        },
+                        "source": {
+                          "type": "Clamp",
+                          "max": {
+                            "type": "Const",
+                            "value": 1
+                          },
+                          "min": {
+                            "type": "Const",
+                            "value": 0
+                          },
+                          "source": {
+                            "type": "Scale",
+                            "scale": {
+                              "type": "Const",
+                              "value": 1.2
+                            },
+                            "source": {
+                              "dist_func": "EUCLIDEAN",
+                              "edge_func": "DISTANCE_2",
+                              "interpolation": "CURVE3",
+                              "type": "CellEdge",
+                              "distance": 1,
+                              "frequency": 0.003,
+                              "gain": 0.5,
+                              "lacunarity": 2,
+                              "octaves": 1,
+                              "seed": 478252
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "type": "Alpha",
+                        "alpha": {
+                          "type": "Const",
+                          "value": 0.025
+                        },
+                        "source": {
+                          "interpolation": "CURVE3",
+                          "type": "Perlin",
+                          "frequency": 0.1,
+                          "gain": 0.5,
+                          "lacunarity": 2,
+                          "octaves": 1,
+                          "seed": 120946
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Alpha",
+                    "alpha": {
+                      "type": "Const",
+                      "value": 0.37
+                    },
+                    "source": {
+                      "interpolation": "CURVE3",
+                      "type": "Ridge",
+                      "frequency": 0.008,
+                      "gain": 0.975,
+                      "lacunarity": 2,
+                      "octaves": 4,
+                      "seed": 456183
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

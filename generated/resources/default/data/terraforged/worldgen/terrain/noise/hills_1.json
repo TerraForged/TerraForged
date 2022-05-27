@@ -1,0 +1,159 @@
+{
+  "type": "terraforged:hills",
+  "weight": 2,
+  "noise": {
+    "type": "Clamp",
+    "max": {
+      "type": "Const",
+      "value": 1
+    },
+    "min": {
+      "type": "Const",
+      "value": 0
+    },
+    "source": {
+      "type": "Bias",
+      "bias": {
+        "type": "Const",
+        "value": 0.02
+      },
+      "source": {
+        "type": "Scale",
+        "scale": {
+          "type": "Const",
+          "value": 0.6
+        },
+        "source": {
+          "type": "Warp",
+          "domain": {
+            "type": "DomainWarp",
+            "distance": {
+              "type": "Const",
+              "value": 200
+            },
+            "x": {
+              "type": "Map",
+              "max": {
+                "type": "Const",
+                "value": 0.5
+              },
+              "min": {
+                "type": "Const",
+                "value": -0.5
+              },
+              "source": {
+                "interpolation": "CURVE3",
+                "type": "Perlin",
+                "frequency": 0.003,
+                "gain": 0.5,
+                "lacunarity": 2,
+                "octaves": 3,
+                "seed": 340029
+              }
+            },
+            "y": {
+              "type": "Map",
+              "max": {
+                "type": "Const",
+                "value": 0.5
+              },
+              "min": {
+                "type": "Const",
+                "value": -0.5
+              },
+              "source": {
+                "interpolation": "CURVE3",
+                "type": "Perlin",
+                "frequency": 0.003,
+                "gain": 0.5,
+                "lacunarity": 2,
+                "octaves": 3,
+                "seed": 340030
+              }
+            }
+          },
+          "source": {
+            "type": "Warp",
+            "domain": {
+              "type": "DomainWarp",
+              "distance": {
+                "type": "Const",
+                "value": 20
+              },
+              "x": {
+                "type": "Map",
+                "max": {
+                  "type": "Const",
+                  "value": 0.5
+                },
+                "min": {
+                  "type": "Const",
+                  "value": -0.5
+                },
+                "source": {
+                  "interpolation": "CURVE3",
+                  "type": "Perlin",
+                  "frequency": 0.033,
+                  "gain": 0.5,
+                  "lacunarity": 2,
+                  "octaves": 3,
+                  "seed": 306606
+                }
+              },
+              "y": {
+                "type": "Map",
+                "max": {
+                  "type": "Const",
+                  "value": 0.5
+                },
+                "min": {
+                  "type": "Const",
+                  "value": -0.5
+                },
+                "source": {
+                  "interpolation": "CURVE3",
+                  "type": "Perlin",
+                  "frequency": 0.033,
+                  "gain": 0.5,
+                  "lacunarity": 2,
+                  "octaves": 3,
+                  "seed": 306607
+                }
+              }
+            },
+            "source": {
+              "type": "Mult",
+              "modules": [
+                {
+                  "interpolation": "CURVE3",
+                  "type": "Perlin",
+                  "frequency": 0.005,
+                  "gain": 0.5,
+                  "lacunarity": 2,
+                  "octaves": 3,
+                  "seed": 207451
+                },
+                {
+                  "type": "Alpha",
+                  "alpha": {
+                    "type": "Const",
+                    "value": 0.5
+                  },
+                  "source": {
+                    "interpolation": "CURVE3",
+                    "type": "Billow",
+                    "frequency": 0.003,
+                    "gain": 0.5,
+                    "lacunarity": 2,
+                    "octaves": 3,
+                    "seed": 290502
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

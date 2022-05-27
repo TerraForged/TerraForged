@@ -1,0 +1,166 @@
+{
+  "type": "terraforged:flats",
+  "weight": 1.5,
+  "noise": {
+    "type": "Clamp",
+    "max": {
+      "type": "Const",
+      "value": 1
+    },
+    "min": {
+      "type": "Const",
+      "value": 0
+    },
+    "source": {
+      "type": "Bias",
+      "bias": {
+        "type": "Const",
+        "value": 0.02
+      },
+      "source": {
+        "type": "Bias",
+        "bias": {
+          "type": "Const",
+          "value": -0.01999999950507298
+        },
+        "source": {
+          "type": "Scale",
+          "scale": {
+            "type": "Const",
+            "value": 0.08
+          },
+          "source": {
+            "type": "Warp",
+            "domain": {
+              "type": "DomainWarp",
+              "distance": {
+                "type": "Const",
+                "value": 200
+              },
+              "x": {
+                "type": "Map",
+                "max": {
+                  "type": "Const",
+                  "value": 0.5
+                },
+                "min": {
+                  "type": "Const",
+                  "value": -0.5
+                },
+                "source": {
+                  "interpolation": "CURVE3",
+                  "type": "Perlin",
+                  "frequency": 0.004,
+                  "gain": 0.5,
+                  "lacunarity": 2,
+                  "octaves": 1,
+                  "seed": 455169
+                }
+              },
+              "y": {
+                "type": "Map",
+                "max": {
+                  "type": "Const",
+                  "value": 0.5
+                },
+                "min": {
+                  "type": "Const",
+                  "value": -0.5
+                },
+                "source": {
+                  "interpolation": "CURVE3",
+                  "type": "Perlin",
+                  "frequency": 0.004,
+                  "gain": 0.5,
+                  "lacunarity": 2,
+                  "octaves": 1,
+                  "seed": 455170
+                }
+              }
+            },
+            "source": {
+              "type": "Warp",
+              "domain": {
+                "type": "DomainWarp",
+                "distance": {
+                  "type": "Const",
+                  "value": 62.5
+                },
+                "x": {
+                  "type": "Map",
+                  "max": {
+                    "type": "Const",
+                    "value": 0.5
+                  },
+                  "min": {
+                    "type": "Const",
+                    "value": -0.5
+                  },
+                  "source": {
+                    "interpolation": "CURVE3",
+                    "type": "Perlin",
+                    "frequency": 0.016,
+                    "gain": 0.5,
+                    "lacunarity": 3,
+                    "octaves": 3,
+                    "seed": 298284
+                  }
+                },
+                "y": {
+                  "type": "Map",
+                  "max": {
+                    "type": "Const",
+                    "value": 0.5
+                  },
+                  "min": {
+                    "type": "Const",
+                    "value": -0.5
+                  },
+                  "source": {
+                    "interpolation": "CURVE3",
+                    "type": "Perlin",
+                    "frequency": 0.016,
+                    "gain": 0.5,
+                    "lacunarity": 3,
+                    "octaves": 3,
+                    "seed": 494685
+                  }
+                }
+              },
+              "source": {
+                "type": "Mult",
+                "modules": [
+                  {
+                    "interpolation": "CURVE3",
+                    "type": "Perlin",
+                    "frequency": 0.004,
+                    "gain": 0.5,
+                    "lacunarity": 2,
+                    "octaves": 1,
+                    "seed": 352526
+                  },
+                  {
+                    "type": "Alpha",
+                    "alpha": {
+                      "type": "Const",
+                      "value": 0.45
+                    },
+                    "source": {
+                      "interpolation": "CURVE3",
+                      "type": "Perlin",
+                      "frequency": 0.002,
+                      "gain": 0.5,
+                      "lacunarity": 3.75,
+                      "octaves": 3,
+                      "seed": 25463
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
