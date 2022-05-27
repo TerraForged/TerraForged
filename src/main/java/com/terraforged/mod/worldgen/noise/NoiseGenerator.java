@@ -164,17 +164,26 @@ public class NoiseGenerator implements INoiseGenerator {
     @Override
     public NoiseSample getNoiseSample(int x, int z) {
         var sample = localSample.get().reset();
-        var blender = land.getBlenderResource();
-        return sample(x, z, sample, blender);
+        sample(x, z, sample);
+        return sample;
     }
 
-    public NoiseSample getContinentNoiseSample(int x, int z) {
+    @Override
+    public void sample(int x, int z, NoiseSample sample) {
+        var blender = land.getBlenderResource();
+        sample(x, z, sample, blender);
+    }
+
+    public void sampleContinentNoise(int x, int z, NoiseSample sample) {
         float nx = getNoiseCoord(x);
         float nz = getNoiseCoord(z);
-        var sample = localSample.get().reset();
         continent.sampleContinent(nx, nz, sample);
+    }
+
+    public void sampleRiverNoise(int x, int z, NoiseSample sample) {
+        float nx = getNoiseCoord(x);
+        float nz = getNoiseCoord(z);
         continent.sampleRiver(nx, nz, sample);
-        return sample;
     }
 
     public NoiseSample sample(int x, int z, NoiseSample sample, TerrainBlender.Blender blender) {
@@ -271,7 +280,11 @@ public class NoiseGenerator implements INoiseGenerator {
         settings.world.properties.seaLevel = levels.seaLevel;
         settings.world.properties.worldHeight = levels.maxY;
 
-        settings.climate.biomeShape.biomeSize = 300;
+        settings.climate.biomeShape.biomeSize = 230;
+        settings.climate.temperature.falloff = 2;
+        settings.climate.temperature.bias = 0.1f;
+        settings.climate.moisture.falloff = 1;
+        settings.climate.moisture.bias = -0.05f;
 
         var context = new GeneratorContext(settings);
 

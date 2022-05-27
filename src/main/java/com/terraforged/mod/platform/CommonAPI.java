@@ -32,7 +32,7 @@ public interface CommonAPI {
     ApiHolder<CommonAPI> HOLDER = new ApiHolder<>(new CommonAPI() {});
 
     default BiomeMatcher getOverworldMatcher() {
-        return new BiomeTagMatcher(ModTags.OVERWORLD.get());
+        return new BiomeTagMatcher.Overworld(ModTags.OVERWORLD.get());
     }
 
     static CommonAPI get() {

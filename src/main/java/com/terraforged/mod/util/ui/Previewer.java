@@ -33,11 +33,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
 public class Previewer extends JPanel {
     private final Supplier<Shader> shaderSupplier;
+    private final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     private Shader shader;
     private int lastX = 0;
@@ -166,7 +169,7 @@ public class Previewer extends JPanel {
                 int minX = x0 + tx * tileSizeX;
                 int maxX = Math.min(minX + tileSizeX, x1);
                 var worker = new Worker<>(ox, oy, zoom, minX, minY, maxX, maxY, shader, image);
-                tasks[ty * tileDivs + tx] = CompletableFuture.runAsync(worker);
+                tasks[ty * tileDivs + tx] = CompletableFuture.runAsync(worker, executor);
             }
         }
 

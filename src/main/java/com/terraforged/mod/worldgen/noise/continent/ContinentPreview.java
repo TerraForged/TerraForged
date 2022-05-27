@@ -28,12 +28,12 @@ import com.terraforged.engine.settings.WorldSettings;
 import com.terraforged.mod.data.ModTerrains;
 import com.terraforged.mod.util.ui.Previewer;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
+import com.terraforged.mod.worldgen.noise.NoiseSample;
+import com.terraforged.mod.worldgen.noise.climate.ClimateNoise;
+import com.terraforged.mod.worldgen.noise.climate.ClimateSample;
 import com.terraforged.mod.worldgen.noise.continent.config.ContinentConfig;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
-import com.terraforged.noise.Module;
-import com.terraforged.noise.util.NoiseUtil;
 
-import java.awt.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ContinentPreview {
@@ -43,20 +43,16 @@ public class ContinentPreview {
         Previewer.launch(() -> {
             var noise = create();
             return (x, y) -> {
-                float value = noise.getValue(x, y);
-
-                if (true) return Color.HSBtoRGB(0, 0, value);
-
-                if (value > ContinentPoints.COAST) return Color.GREEN.getRGB();
-                if (value > ContinentPoints.BEACH) return Color.YELLOW.getRGB();
-                if (value > ContinentPoints.SHALLOW_OCEAN) return Color.BLUE.getRGB();
-                if (value > ContinentPoints.DEEP_OCEAN) return Color.DARK_GRAY.getRGB();
-                return Color.BLACK.getRGB();
+                var sample = noise.getSample(x, y);
+                if (sample.continentNoise <= ContinentPoints.SHALLOW_OCEAN) return 0x0066DD;
+                if (sample.continentNoise <= ContinentPoints.BEACH) return 0x0099DD;
+                if (sample.riverNoise <= 0) return 0x0099DD;
+                return sample.climateType.getColor().getRGB();
             };
         });
     }
 
-    private static Module create() {
+    private static Noise create() {
         var controls = new WorldSettings.ControlPoints();
         controls.deepOcean = 0.05f;
         controls.shallowOcean = 0.3f;
@@ -74,20 +70,23 @@ public class ContinentPreview {
 
         var generator = new NoiseGenerator(SEED, terrainLevels, ModTerrains.Factory.getDefault(null));
 
-        return new Noise(generator);
+        return new Noise(generator, new ClimateNoise(generator.getContinent().getContext()));
     }
 
-    public record Noise(NoiseGenerator generator) implements Module {
-        @Override
-        public float getValue(float x, float y) {
-            var sample = generator.getContinentNoiseSample((int) x, (int) y);
+    public record Noise(NoiseGenerator generator, ClimateNoise climate) {
+        public ClimateSample getSample(float x, float y) {
+            var sample = climate.getSample(x, y);
+            sampleContinent(x, y, sample);
+            sampleRivers(x, y, sample);
+            return sample;
+        }
 
-//            if (true) return sample.baseNoise;
+        public void sampleContinent(float x, float y, NoiseSample sample) {
+            generator.sampleContinentNoise((int) x, (int) y, sample);
+        }
 
-            float a = sample.baseNoise * NoiseUtil.map(sample.riverNoise, 0.5f, 1.0f, 0.5f);
-            float b = sample.continentNoise * NoiseUtil.map(sample.riverNoise, 0.5f, 1.0f, 0.5f);
-
-            return NoiseUtil.lerp(a, b, 0.4f);
+        public void sampleRivers(float x, float y, NoiseSample sample) {
+            generator.sampleRiverNoise((int) x, (int) y, sample);
         }
     }
 }

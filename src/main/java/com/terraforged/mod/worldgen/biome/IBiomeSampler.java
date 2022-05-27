@@ -24,29 +24,32 @@
 
 package com.terraforged.mod.worldgen.biome;
 
-import com.terraforged.engine.cell.Cell;
-import com.terraforged.engine.world.climate.ClimateModule;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 import com.terraforged.mod.worldgen.noise.NoiseLevels;
-import com.terraforged.mod.worldgen.noise.NoiseSample;
+import com.terraforged.mod.worldgen.noise.climate.ClimateNoise;
+import com.terraforged.mod.worldgen.noise.climate.ClimateSample;
 
 public interface IBiomeSampler {
-    ClimateModule getClimate();
-
-    ClimateSample sample(int x, int z);
+    ClimateSample getSample(int x, int z);
 
     float getShape(int x, int z);
 
+    void sample(int x, int z, ClimateSample sample);
+
     class Sampler implements IBiomeSampler {
         protected final NoiseLevels levels;
-        protected final ClimateModule climateModule;
+        protected final ClimateNoise climateNoise;
         protected final INoiseGenerator noiseGenerator;
         protected final ThreadLocal<ClimateSample> localSample = ThreadLocal.withInitial(ClimateSample::new);
 
         public Sampler(INoiseGenerator noiseGenerator) {
             this.levels = noiseGenerator.getLevels();
-            this.climateModule = createClimate(noiseGenerator);
+            this.climateNoise = createClimate(noiseGenerator);
             this.noiseGenerator = noiseGenerator;
+        }
+
+        public ClimateSample getSample() {
+            return localSample.get().reset();
         }
 
         public INoiseGenerator getNoiseGenerator() {
@@ -54,26 +57,14 @@ public interface IBiomeSampler {
         }
 
         @Override
-        public ClimateModule getClimate() {
-            return climateModule;
-        }
-
-        @Override
-        public ClimateSample sample(int x, int z) {
+        public ClimateSample getSample(int x, int z) {
             float px = x * levels.frequency;
             float pz = z * levels.frequency;
 
             var sample = localSample.get().reset();
             noiseGenerator.getContinent().sampleContinent(px, pz, sample);
             noiseGenerator.getContinent().sampleRiver(px, pz, sample);
-
-            var cell = sample.cell;
-            cell.value = sample.heightNoise;
-            cell.terrain = sample.terrainType;
-            cell.riverMask = sample.riverNoise;
-            cell.continentEdge = sample.continentNoise;
-
-            climateModule.apply(cell, px, pz);
+            climateNoise.sample(px, pz, sample);
 
             return sample;
         }
@@ -84,26 +75,22 @@ public interface IBiomeSampler {
             float pz = z * levels.frequency;
 
             var sample = localSample.get().reset();
-            var cell = sample.cell;
 
-            climateModule.apply(cell, px, pz);
+            climateNoise.sample(px, pz, sample);
 
-            return sample.cell.biomeRegionEdge;
+            return sample.biomeEdgeNoise;
+        }
+
+        @Override
+        public void sample(int x, int z, ClimateSample sample) {
+            float px = x * levels.frequency;
+            float pz = z * levels.frequency;
+            climateNoise.sample(px, pz, sample);
         }
     }
 
-    class ClimateSample extends NoiseSample {
-        public final Cell cell = new Cell();
-
-        public ClimateSample reset() {
-            super.reset();
-            cell.reset();
-            return this;
-        }
-    }
-
-    static ClimateModule createClimate(INoiseGenerator generator) {
+    static ClimateNoise createClimate(INoiseGenerator generator) {
         if (generator == null) return null;
-        return new ClimateModule(generator.getContinent(), generator.getContinent().getContext());
+        return new ClimateNoise(generator.getContinent().getContext());
     }
 }

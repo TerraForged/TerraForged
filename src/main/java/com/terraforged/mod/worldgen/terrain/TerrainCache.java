@@ -61,7 +61,11 @@ public class TerrainCache {
     }
 
     public NoiseSample getSample(int x, int z) {
-        return generator.getNoiseGenerator().getNoiseSample(x, z);
+        return generator.noiseGenerator.getNoiseSample(x, z);
+    }
+
+    public void sample(int x, int z, NoiseSample sample) {
+        generator.getNoiseGenerator().sample(x, z, sample);
     }
 
     public TerrainData getNow(ChunkPos pos) {

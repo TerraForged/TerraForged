@@ -25,9 +25,9 @@
 package com.terraforged.mod.worldgen.biome;
 
 import com.terraforged.engine.world.biome.type.BiomeType;
-import com.terraforged.engine.world.climate.ClimateModule;
 import com.terraforged.mod.worldgen.biome.util.BiomeMapManager;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
+import com.terraforged.mod.worldgen.noise.climate.ClimateSample;
 import com.terraforged.mod.worldgen.noise.continent.ContinentPoints;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
@@ -43,56 +43,21 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
     }
 
     public Holder<Biome> sampleBiome(int x, int z) {
-        var sample = sample(x, z);
-        var map = biomeMapManager.getBiomeMap().get(sample.cell.biome);
+        var sample = getSample(x, z);
+        var biome = getInitialBiome(sample.biomeNoise, sample.climateType);
+        return getBiomeOverride(biome, sample);
+    }
 
-        Holder<Biome> biome;
+    private Holder<Biome> getInitialBiome(float noise, BiomeType climateType) {
+        var map = biomeMapManager.getBiomeMap().get(climateType);
         if (map == null || map.isEmpty()) {
-//            TerraForged.LOG.debug("Missing biome for type: {}", sample.cell.biome);
-            biome = biomeMapManager.getBiomes().getHolderOrThrow(Biomes.PLAINS);
-        } else {
-            biome = map.getValue(sample.cell.biomeRegionId);
+            return biomeMapManager.getBiomes().getHolderOrThrow(Biomes.PLAINS);
         }
-
-        return getBiome(biome, sample);
+        return map.getValue(noise);
     }
 
-    @Override
-    public ClimateModule getClimate() {
-        return climateModule;
-    }
-
-    @Override
-    public float getShape(int x, int z) {
-        var sample = localSample.get().reset();
-        var cell = sample.cell;
-
-        climateModule.apply(cell, x, z);
-
-        return sample.cell.biomeRegionEdge;
-    }
-
-    public ClimateSample sample(int x, int z) {
-        float px = x * noiseGenerator.getLevels().frequency;
-        float pz = z * noiseGenerator.getLevels().frequency;
-
-        var sample = localSample.get().reset();
-        noiseGenerator.getContinent().sampleContinent(px, pz, sample);
-        noiseGenerator.getContinent().sampleRiver(px, pz, sample);
-
-        var cell = sample.cell;
-        cell.value = sample.heightNoise;
-        cell.terrain = sample.terrainType;
-        cell.riverMask = sample.riverNoise;
-        cell.continentEdge = sample.continentNoise;
-
-        climateModule.apply(cell, x, z, false);
-
-        return sample;
-    }
-
-    protected Holder<Biome> getBiome(Holder<Biome> input, ClimateSample sample) {
-        var biomeType = sample.cell.biome;
+    protected Holder<Biome> getBiomeOverride(Holder<Biome> input, ClimateSample sample) {
+        var biomeType = sample.climateType;
 
         if (sample.continentNoise <= ContinentPoints.SHALLOW_OCEAN) {
             return switch (biomeType) {

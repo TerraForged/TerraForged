@@ -169,7 +169,7 @@ public class RiverGenerator {
             float value = getBaseValue(b);
 
             // Track the lowest neighbour as the candidate to connect A to
-            if (value < minValue) {
+            if (value <= minValue) {
                 min = b;
                 minValue = value;
                 continue;
@@ -210,9 +210,6 @@ public class RiverGenerator {
     }
 
     private void addRiverNodes(CellPoint a, CellPoint b, float ah, float bh, float ar, float br, int hash, RiverPieces pieces) {
-        boolean connect = br < 0;
-        br = connect ? -br : br;
-
         // Mid-point on border between cell points A & B
         float mx = (a.px + b.px) * 0.5f;
         float my = (a.py + b.py) * 0.5f;
@@ -249,7 +246,7 @@ public class RiverGenerator {
         // If B is an ocean cell then extend the connection all the way to prevent
         // rivers stopping short at the coast/beach. Note: we must use the 'b.noise'
         // here and not the low-octave 'b.noise()'.
-        if (connect || b.noise < continent.shapeGenerator.threshold) {
+        if (b.noise < continent.shapeGenerator.threshold) {
             pieces.addRiver(new RiverNode(mx, my, b.px, b.py, mh, bh, mr, br, warp1));
         }
     }

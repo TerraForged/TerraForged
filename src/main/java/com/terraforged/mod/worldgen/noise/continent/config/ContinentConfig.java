@@ -40,7 +40,7 @@ public class ContinentConfig {
         public float jitter = 0.8f;
         public float threshold = 0.525f;
         public float thresholdFalloff = 0.5f;
-        public CellShape cellShape = CellShape.SQUARE;
+        public CellShape cellShape = CellShape.HEXAGON;
         public CellSource cellSource = CellSource.PERLIN;
 
         public float getThresholdMax() {

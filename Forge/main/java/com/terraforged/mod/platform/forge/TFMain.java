@@ -138,7 +138,7 @@ public class TFMain extends TerraForged {
 
         @Override
         public BiomeMatcher getOverworldMatcher() {
-            return new BiomeTagMatcher(FORGE_OVERWORLD.get(), ModTags.OVERWORLD.get()) {
+            return new BiomeTagMatcher.Overworld(FORGE_OVERWORLD.get(), ModTags.OVERWORLD.get()) {
                 @Override
                 public boolean test(Holder<Biome> biome) {
                     return super.test(biome) || testDictionary(biome);

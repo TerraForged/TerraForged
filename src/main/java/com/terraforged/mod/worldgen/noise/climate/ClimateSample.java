@@ -22,33 +22,20 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.worldgen.noise;
+package com.terraforged.mod.worldgen.noise.climate;
 
-import com.terraforged.engine.world.terrain.Terrain;
-import com.terraforged.mod.worldgen.terrain.TerrainLevels;
+import com.terraforged.engine.world.biome.type.BiomeType;
+import com.terraforged.mod.worldgen.noise.NoiseSample;
 
-import java.util.function.Consumer;
+public class ClimateSample extends NoiseSample {
+    public float biomeNoise;
+    public float biomeEdgeNoise;
+    public float moisture;
+    public float temperature;
+    public BiomeType climateType = BiomeType.GRASSLAND;
 
-public interface INoiseGenerator {
-    INoiseGenerator with(long seed, TerrainLevels levels);
-
-    NoiseLevels getLevels();
-
-    TerrainLevels getTerrainLevels();
-
-    IContinentNoise getContinent();
-
-    NoiseSample getNoiseSample(int x, int z);
-
-    void sample(int x, int z, NoiseSample sample);
-
-    float getHeightNoise(int x, int z);
-
-    long find(int x, int z, int minRadius, int maxRadius, Terrain terrain);
-
-    void generate(int chunkX, int chunkZ, Consumer<NoiseData> consumer);
-
-    default float getNoiseCoord(int coord) {
-        return coord * getLevels().frequency;
+    public ClimateSample reset() {
+        super.reset();
+        return this;
     }
 }

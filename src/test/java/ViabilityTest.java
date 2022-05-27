@@ -90,7 +90,7 @@ public class ViabilityTest {
         var image = N2DUtil.render(width, height, (x, z, img) -> {
             var sample = heightmap.get(x, z);
             float scaledHeight = levels.getScaledHeight(sample.heightNoise);
-            var biome = context.getClimateSampler().sample(x, z).cell.biome;
+            var biome = context.getClimateSampler().getSample(x, z).climateType;
 
             int rgb;
             if (scaledHeight <= levels.seaLevel) {

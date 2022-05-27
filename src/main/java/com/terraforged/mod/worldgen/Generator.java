@@ -260,18 +260,24 @@ public class Generator extends ChunkGenerator implements IGenerator {
 
     @Override
     public void addDebugScreenInfo(List<String> lines, BlockPos pos) {
-        var terrainSample = terrainCache.getSample(pos.getX(), pos.getZ());
-        var climateSample = biomeSource.getBiomeSampler().sample(pos.getX(), pos.getZ());
-
-        var terrainType = terrainSample.terrainType;
-        var climateType = climateSample.cell.biome;
+        var sample = biomeSource.getBiomeSampler().getSample();
+        terrainCache.sample(pos.getX(), pos.getZ(), sample);
+        biomeSource.getBiomeSampler().sample(pos.getX(), pos.getZ(), sample);
 
         lines.add("");
         lines.add("[TerraForged]");
-        lines.add("Terrain Type: " + terrainType.getName());
-        lines.add("Climate Type: " + climateType.name());
-        lines.add("Continent Edge: " + terrainSample.continentNoise);
-        lines.add("Base Level: " + terrainSample.baseNoise);
-        lines.add("River Proximity: " + (1 - climateSample.riverNoise));
+        lines.add("Terrain Type: " + sample.terrainType.getName());
+        lines.add("Climate Type: " + sample.climateType.name());
+
+        lines.add("Base Noise: " + sample.baseNoise);
+        lines.add("Height Noise: " + sample.heightNoise);
+
+        lines.add("Temperature Noise: " + sample.temperature);
+        lines.add("Moisture Noise: " + sample.moisture);
+        lines.add("Biome Noise: " + sample.biomeNoise);
+        lines.add("Biome Edge Noise: " + sample.biomeEdgeNoise);
+
+        lines.add("Ocean Proximity: " + (1 - sample.continentNoise));
+        lines.add("River Proximity: " + (1 - sample.riverNoise));
     }
 }
