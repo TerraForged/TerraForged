@@ -42,6 +42,14 @@ public class BiomeUtil {
 
     private static final Comparator<ResourceKey<?>> KEY_COMPARATOR = Comparator.comparing(ResourceKey::location);
 
+    public static Comparator<Holder<Biome>> BIOME_SORTER = (o1, o2) -> {
+        var k1 = o1.unwrapKey().orElseThrow();
+        var k2 = o2.unwrapKey().orElseThrow();
+        Objects.requireNonNull(k1);
+        Objects.requireNonNull(k2);
+        return KEY_COMPARATOR.compare(k1, k2);
+    };
+
     static {
         for (var type : BiomeType.values()) {
             TYPE_NAMES.put(type, TerraForged.location(type.name().toLowerCase(Locale.ROOT)));
@@ -67,19 +75,9 @@ public class BiomeUtil {
         }
 
         var result = new ArrayList<>(overworld);
-        result.sort(getBiomeSorter(biomes));
+        result.sort(BIOME_SORTER);
 
         return result;
-    }
-
-    public static Comparator<Holder<Biome>> getBiomeSorter(Registry<Biome> biomes) {
-        return (o1, o2) -> {
-            var k1 = o1.unwrapKey().orElseThrow();
-            var k2 = o2.unwrapKey().orElseThrow();
-            Objects.requireNonNull(k1);
-            Objects.requireNonNull(k2);
-            return KEY_COMPARATOR.compare(k1, k2);
-        };
     }
 
     public static BiomeType getType(Holder<Biome> biome) {
@@ -90,7 +88,8 @@ public class BiomeUtil {
             case ICY -> BiomeType.TUNDRA;
             case SAVANNA -> BiomeType.SAVANNA;
             case JUNGLE -> BiomeType.TROPICAL_RAINFOREST;
-            case FOREST -> getByRain(biome.value(), BiomeType.TUNDRA, BiomeType.TEMPERATE_RAINFOREST, BiomeType.TEMPERATE_FOREST);
+            case FOREST ->
+                    getByRain(biome.value(), BiomeType.TUNDRA, BiomeType.TEMPERATE_RAINFOREST, BiomeType.TEMPERATE_FOREST);
             case MOUNTAIN -> BiomeType.ALPINE;
             default -> null;
         };

@@ -76,6 +76,11 @@ public class ErodedNoiseGenerator implements INoiseGenerator {
     }
 
     @Override
+    public TerrainLevels getTerrainLevels() {
+        return generator.getTerrainLevels();
+    }
+
+    @Override
     public IContinentNoise getContinent() {
         return generator.getContinent();
     }

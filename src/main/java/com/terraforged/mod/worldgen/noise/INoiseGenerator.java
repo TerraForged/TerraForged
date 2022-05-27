@@ -34,6 +34,8 @@ public interface INoiseGenerator {
 
     NoiseLevels getLevels();
 
+    TerrainLevels getTerrainLevels();
+
     IContinentNoise getContinent();
 
     NoiseSample getNoiseSample(int x, int z);

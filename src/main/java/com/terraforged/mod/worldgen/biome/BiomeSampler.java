@@ -121,9 +121,7 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
         }
 
         if (sample.terrainType.isRiver() || sample.terrainType.isLake()) {
-            if (sample.cell.value < noiseGenerator.getLevels().heightMin) {
-                return biomeType == BiomeType.TUNDRA ? biomeMapManager.get(Biomes.FROZEN_RIVER) : biomeMapManager.get(Biomes.RIVER);
-            }
+            return biomeType == BiomeType.TUNDRA ? biomeMapManager.get(Biomes.FROZEN_RIVER) : biomeMapManager.get(Biomes.RIVER);
         }
 
         return input;

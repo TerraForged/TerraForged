@@ -142,7 +142,7 @@ public class BiomeMapManager {
             }
         }
 
-        list.sort(BiomeUtil.getBiomeSorter(biomes));
+        list.sort(BiomeUtil.BIOME_SORTER);
 
         return list;
     }

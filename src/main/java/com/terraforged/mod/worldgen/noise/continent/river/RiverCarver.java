@@ -85,20 +85,21 @@ public class RiverCarver {
         float bankLevel = baseLevel + bankDepth * levels.unit;
 
         float valleyAlpha = getValleyAlpha(distance, bankWidth, valleyWidth, sample.baseNoise);
-        if (valleyAlpha < 1 && bankLevel < height) {
+        if (valleyAlpha < 1.0f) {
+            float level = Math.min(bankLevel, height);
             float modifier = getErosionModifier(erosion * config.erosion, valleyAlpha);
-            height = NoiseUtil.lerp(bankLevel, height, valleyAlpha * modifier);
+            height = NoiseUtil.lerp(level, height, valleyAlpha * modifier);
+            sample.riverNoise *= getAlpha(distance, bankWidth, valleyWidth);
         }
 
         float riverAlpha = getAlpha(distance, bedWidth, bankWidth);
-        if (riverAlpha < 1.0f && bedLevel < height) {
-            height = NoiseUtil.lerp(bedLevel, height, riverAlpha);
+        if (riverAlpha < 1.0f) {
+            float level = Math.min(bedLevel, height);
+            height = NoiseUtil.lerp(level, height, riverAlpha);
             sample.terrainType = nodeSample.type;
             sample.riverNoise = 0;
         }
 
-        sample.riverNoise *= getAlpha(distance, bankWidth, valleyWidth);
-        sample.riverNoise *= riverAlpha;
         sample.heightNoise = height;
     }
 

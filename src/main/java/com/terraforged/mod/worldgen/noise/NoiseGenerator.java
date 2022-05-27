@@ -48,7 +48,7 @@ public class NoiseGenerator implements INoiseGenerator {
     protected final float heightMultiplier = 1.2F;
 
     protected final long seed;
-    protected final NoiseLevels levels;
+    protected final TerrainLevels levels;
     protected final Module ocean;
     protected final TerrainBlender land;
     protected final IContinentNoise continent;
@@ -58,7 +58,7 @@ public class NoiseGenerator implements INoiseGenerator {
 
     public NoiseGenerator(long seed, TerrainLevels levels, TerrainNoise[] terrainNoises) {
         this.seed = seed;
-        this.levels = levels.noiseLevels;
+        this.levels = levels;
         this.ocean = createOceanTerrain(seed);
         this.land = createLandTerrain(seed, terrainNoises);
         this.continent = createContinentNoise(seed, levels);
@@ -67,7 +67,7 @@ public class NoiseGenerator implements INoiseGenerator {
 
     public NoiseGenerator(long seed, TerrainLevels levels, NoiseGenerator other) {
         this.seed = seed;
-        this.levels = levels.noiseLevels;
+        this.levels = levels;
         this.land = other.land.withSeed(seed);
         this.ocean = createOceanTerrain(seed);
         this.continent = createContinentNoise(seed, levels);
@@ -81,6 +81,11 @@ public class NoiseGenerator implements INoiseGenerator {
 
     @Override
     public NoiseLevels getLevels() {
+        return levels.noiseLevels;
+    }
+
+    @Override
+    public TerrainLevels getTerrainLevels() {
         return levels;
     }
 
@@ -107,8 +112,8 @@ public class NoiseGenerator implements INoiseGenerator {
             long pos = finder.next();
             if (pos == 0L) continue;
 
-            float px = PosUtil.unpackLeftf(pos) / levels.frequency;
-            float pz = PosUtil.unpackRightf(pos) / levels.frequency;
+            float px = PosUtil.unpackLeftf(pos) / levels.noiseLevels.frequency;
+            float pz = PosUtil.unpackRightf(pos) / levels.noiseLevels.frequency;
 
             // Skip if coast or ocean
             continent.sampleContinent(px, pz, sample);
@@ -203,7 +208,7 @@ public class NoiseGenerator implements INoiseGenerator {
     protected void getOcean(float x, float z, NoiseSample sample, TerrainBlender.Blender blender) {
         float rawNoise = ocean.getValue(x, z);
 
-        sample.heightNoise = levels.toDepthNoise(rawNoise);
+        sample.heightNoise = levels.noiseLevels.toDepthNoise(rawNoise);
         sample.terrainType = TerrainType.DEEP_OCEAN;
     }
 
@@ -211,25 +216,25 @@ public class NoiseGenerator implements INoiseGenerator {
         float baseNoise = sample.baseNoise;
         float heightNoise = land.getValue(x, z, blender) * heightMultiplier;
 
-        sample.heightNoise = levels.toHeightNoise(baseNoise, heightNoise);
+        sample.heightNoise = levels.noiseLevels.toHeightNoise(baseNoise, heightNoise);
         sample.terrainType = land.getTerrain(blender);
     }
 
     protected void getBlend(float x, float z, NoiseSample sample, TerrainBlender.Blender blender) {
         if (sample.continentNoise < ContinentPoints.BEACH) {
             float lowerRaw = ocean.getValue(x, z);
-            float lower = levels.toDepthNoise(lowerRaw);
+            float lower = levels.noiseLevels.toDepthNoise(lowerRaw);
 
-            float upper = levels.heightMin;
+            float upper = levels.noiseLevels.heightMin;
             float alpha = (sample.continentNoise - ContinentPoints.SHALLOW_OCEAN) / (ContinentPoints.BEACH - ContinentPoints.SHALLOW_OCEAN);
 
             sample.heightNoise = NoiseUtil.lerp(lower, upper, alpha);
         } else if (sample.continentNoise < ContinentPoints.COAST) {
-            float lower = levels.heightMin;
+            float lower = levels.noiseLevels.heightMin;
 
             float baseNoise = sample.baseNoise;
             float upperRaw = land.getValue(x, z, blender) * heightMultiplier;
-            float upper = levels.toHeightNoise(baseNoise, upperRaw);
+            float upper = levels.noiseLevels.toHeightNoise(baseNoise, upperRaw);
 
             float alpha = (sample.continentNoise - ContinentPoints.BEACH) / (ContinentPoints.COAST - ContinentPoints.BEACH);
 
@@ -239,7 +244,7 @@ public class NoiseGenerator implements INoiseGenerator {
     }
 
     protected Terrain getTerrain(float value, TerrainBlender.Blender blender) {
-        if (value < levels.heightMin) return TerrainType.SHALLOW_OCEAN;
+        if (value < levels.noiseLevels.heightMin) return TerrainType.SHALLOW_OCEAN;
 
         return land.getTerrain(blender);
     }
