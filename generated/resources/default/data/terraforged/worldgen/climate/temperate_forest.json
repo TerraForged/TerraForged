@@ -1,4 +1,5 @@
 {
   "minecraft:birch_forest": 5,
-  "minecraft:old_growth_birch_forest": 5
+  "minecraft:old_growth_birch_forest": 5,
+  "terraforged:oak_forest": 5
 }

@@ -280,7 +280,7 @@ public class NoiseGenerator implements INoiseGenerator {
         settings.world.properties.seaLevel = levels.seaLevel;
         settings.world.properties.worldHeight = levels.maxY;
 
-        settings.climate.biomeShape.biomeSize = 230;
+        settings.climate.biomeShape.biomeSize = 220;
         settings.climate.temperature.falloff = 2;
         settings.climate.temperature.bias = 0.1f;
         settings.climate.moisture.falloff = 1;

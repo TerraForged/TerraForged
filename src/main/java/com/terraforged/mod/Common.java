@@ -34,7 +34,6 @@ import com.terraforged.mod.worldgen.asset.*;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.datapack.DataPackExporter;
 import com.terraforged.mod.worldgen.profiler.GeneratorProfiler;
-import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import net.minecraft.core.Registry;
 
 public class Common extends Init {
@@ -65,9 +64,5 @@ public class Common extends Init {
         DataGen.INSTANCE.init();
 
         DataPackExporter.extractDefaultPack();
-
-        System.out.println(TerrainLevels.Limits.MAX_MAX_Y);
-        System.out.println(TerrainLevels.Limits.MAX_MAX_Y);
-        System.out.println(TerrainLevels.Limits.MAX_MAX_Y);
     }
 }

@@ -41,6 +41,7 @@ public class ClimateNoise {
     private static final float MOISTURE_SIZE = 2.5F;
 
     private final int seed;
+    private final float jitter = 0.9f;
     private final float frequency;
     private final CellShape cellShape = CellShape.HEXAGON;
 
@@ -82,9 +83,9 @@ public class ClimateNoise {
                 .warp(tempSeed.next(), tempScale, 1, tempScale);
 
         this.warp = Domain.warp(
-                Source.simplex(seed.next(), warpScale * 2, 3).bias(-0.5),
-                Source.simplex(seed.next(), warpScale * 2, 3).bias(-0.5),
-                Source.constant(settings.climate.biomeShape.biomeWarpStrength * 1.5)
+                Source.simplex(seed.next(), warpScale * 2, 4).bias(-0.5),
+                Source.simplex(seed.next(), warpScale * 2, 4).bias(-0.5),
+                Source.constant(settings.climate.biomeShape.biomeWarpStrength * 1.65)
         );
     }
 
@@ -100,6 +101,9 @@ public class ClimateNoise {
 
         px *= frequency;
         py *= frequency;
+
+        px = cellShape.adjustX(px);
+        py = cellShape.adjustY(py);
 
         sampleBiome(px, py, sample);
 
@@ -126,8 +130,8 @@ public class ClimateNoise {
         for (int cy = minY; cy <= maxY; cy++) {
             for (int cx = minX; cx <= maxX; cx++) {
                 int hash = MathUtil.hash(seed, cx, cy);
-                float px = cellShape.getCellX(hash, cx, cy, 0.9f);
-                float py = cellShape.getCellY(hash, cx, cy, 0.9f);
+                float px = cellShape.getCellX(hash, cx, cy, jitter);
+                float py = cellShape.getCellY(hash, cx, cy, jitter);
                 float d2 = NoiseUtil.dist2(x, y, px, py);
 
                 if (d2 < distance) {
