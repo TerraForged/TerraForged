@@ -6,8 +6,8 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "common.MixinBoat",
+    "common.MixinRegistryAccess",
     "common.MixinRegistryOps",
-    "common.MixinTagNetworkSerialization",
     "common.MixinWorldGenSettings"
   ],
   "client": [

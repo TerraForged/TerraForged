@@ -65,7 +65,7 @@ public class TerrainData implements Consumer<NoiseData> {
         return levels.getHeight(scaledHeight);
     }
 
-    public int getWaterLevel(int x, int z) {
+    public int getBaseHeight(int x, int z) {
         float scaledLevel = baseHeight.get(x, z);
         return levels.getHeight(scaledLevel);
     }

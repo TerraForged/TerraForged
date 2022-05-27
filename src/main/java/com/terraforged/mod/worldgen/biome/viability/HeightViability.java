@@ -44,7 +44,7 @@ public record HeightViability(float minOffset, float midOffset, float maxOffset)
 
     @Override
     public float getFitness(int x, int z, Context context) {
-        int base = context.getTerrain().getWaterLevel(x, z);
+        int base = context.getTerrain().getBaseHeight(x, z);
         int height = context.getTerrain().getHeight(x, z);
 
         var levels = context.getLevels();

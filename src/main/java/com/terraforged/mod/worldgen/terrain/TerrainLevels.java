@@ -100,6 +100,12 @@ public class TerrainLevels {
                 '}';
     }
 
+    public static int getWaterLevel(int x, int z, int seaLevel, TerrainData terrainData) {
+        float river = terrainData.getRiver().get(x, z);
+        var terrain = terrainData.getTerrain().get(x, z);
+        return (terrain.isRiver() || terrain.isLake()) && river == 0f ? terrainData.getBaseHeight(x, z) : seaLevel;
+    }
+
     public static class Limits {
         public static final int MIN_MIN_Y = DimensionType.MIN_Y;
         public static final int MAX_MIN_Y = 0;

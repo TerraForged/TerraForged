@@ -28,6 +28,7 @@ import com.google.common.base.Suppliers;
 import com.terraforged.mod.worldgen.GeneratorResource;
 import com.terraforged.mod.worldgen.terrain.StructureTerrain;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
+import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
@@ -150,7 +151,7 @@ public class ChunkUtil {
         for (int z = 0, i = 0; z < 16; z++) {
             for (int x = 0; x < 16; x++, i++) {
                 int solidY = terrainData.getHeight(x, z);
-                int waterY = getWaterLevel(x, z, seaLevel, terrainData);
+                int waterY = TerrainLevels.getWaterLevel(x, z, seaLevel, terrainData);
 
                 int firstAirY = Math.max(solidY, waterY) + 1;
                 int exclusiveMaxY = Math.min(sectionMaxY, firstAirY);
@@ -186,11 +187,6 @@ public class ChunkUtil {
     protected static int getLowestSection(TerrainData terrainData) {
         int y = terrainData.getMin();
         return (y >> 4) << 4;
-    }
-
-    protected static int getWaterLevel(int x, int z, int seaLevel, TerrainData terrainData) {
-        float river = terrainData.getRiver().get(x, z);
-        return river > 0f ? seaLevel : terrainData.getWaterLevel(x, z);
     }
 
     protected static ByteBuf createFullPalette() {

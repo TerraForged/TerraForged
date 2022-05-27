@@ -271,6 +271,8 @@ public class NoiseGenerator implements INoiseGenerator {
         settings.world.properties.seaLevel = levels.seaLevel;
         settings.world.properties.worldHeight = levels.maxY;
 
+        settings.climate.biomeShape.biomeSize = 300;
+
         var context = new GeneratorContext(settings);
 
         settings.world.continent.continentScale = ContinentGenerator.CONTINENT_SAMPLE_SCALE;

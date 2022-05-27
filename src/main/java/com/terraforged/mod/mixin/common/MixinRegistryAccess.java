@@ -24,17 +24,18 @@
 
 package com.terraforged.mod.mixin.common;
 
-import com.terraforged.mod.hooks.NetworkRegistryAccess;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.tags.TagNetworkSerialization;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(TagNetworkSerialization.class)
-public class MixinTagNetworkSerialization {
-    @ModifyVariable(method = "serializeTagsToNetwork", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    private static RegistryAccess onSerializeTagsToNetwork(RegistryAccess access) {
-        return new NetworkRegistryAccess(access);
+import java.util.stream.Stream;
+
+@Mixin(RegistryAccess.ImmutableRegistryAccess.class)
+public class MixinRegistryAccess {
+    @Inject(method = "ownedRegistries", at = @At("RETURN"), cancellable = true)
+    private void onOwnedRegistries(CallbackInfoReturnable<Stream<RegistryAccess.RegistryEntry<?>>> cir) {
+        cir.setReturnValue(cir.getReturnValue().filter(e -> RegistryAccess.REGISTRIES.containsKey(e.key())));
     }
 }

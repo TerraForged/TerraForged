@@ -101,12 +101,11 @@ public class Surface {
         int minX = chunk.getPos().getMinBlockX();
         int minZ = chunk.getPos().getMinBlockZ();
 
-        var riverMask = terrainData.getRiver();
         var waterState = Blocks.WATER.defaultBlockState().setValue(LiquidBlock.LEVEL, 2);
 
         for (int dz = 0; dz < 16; dz++) {
             for (int dx = 0; dx < 16; dx++) {
-                if (riverMask.get(dx, dz) > 0.0f) continue;
+                if (!isSmoothable(dx, dz, terrainData)) continue;
 
                 int x = minX + dx;
                 int z = minZ + dz;
@@ -142,6 +141,12 @@ public class Surface {
             }
         }
         return false;
+    }
+
+    protected static boolean isSmoothable(int x, int z, TerrainData terrainData) {
+        float river = terrainData.getRiver().get(x, z);
+        var terrain = terrainData.getTerrain().get(x, z);
+        return (terrain.isRiver() || terrain.isLake()) && river == 0;
     }
 
     protected static void smoothSnow(BlockPos.MutableBlockPos pos, BlockState state, ChunkAccess chunk, TerrainData terrain) {
