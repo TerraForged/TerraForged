@@ -27,8 +27,8 @@ package com.terraforged.mod.worldgen.noise.continent.config;
 public class RiverConfig {
     public float erosion = 0.075f;
     public final FloatRange bedWidth = new FloatRange(1, 7);
-    public final FloatRange bankWidth = new FloatRange(4, 30);
-    public final FloatRange valleyWidth = new FloatRange(75, 150);
+    public final FloatRange bankWidth = new FloatRange(3, 30);
+    public final FloatRange valleyWidth = new FloatRange(80, 200);
 
     public final FloatRange bedDepth = new FloatRange(1.25f, 5f);
     public final FloatRange bankDepth = new FloatRange(1.25f, 3f);

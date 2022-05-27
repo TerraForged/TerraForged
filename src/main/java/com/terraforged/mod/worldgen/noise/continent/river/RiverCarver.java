@@ -139,7 +139,7 @@ public class RiverCarver {
 
     private static float getValleyAlpha(float distance, float bankWidth, float valleyWidth, float baseValue) {
         float alpha = getAlpha(distance, bankWidth, valleyWidth);
-        float shapeAlpha = getAlpha(baseValue, 0.4f, 0.7f);
+        float shapeAlpha = getAlpha(baseValue, 0.4f, 0.6f);
 
         // Lerp between U-shaped falloff and linear
         return NoiseUtil.lerp(alpha * alpha, alpha, shapeAlpha);

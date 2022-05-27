@@ -1,6 +1,6 @@
 project.ext.minecraft_version = "1.18.2"
 project.ext.mod_version = "0.3.1"
-project.ext.mod_classifier = "-alpha-1"
+project.ext.mod_classifier = "-alpha-2"
 project.ext.mod_group = "com.terraforged"
 project.ext.archives_base_name = "TerraForged"
 
