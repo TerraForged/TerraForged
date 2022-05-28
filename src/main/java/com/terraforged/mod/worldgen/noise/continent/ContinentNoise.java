@@ -56,12 +56,12 @@ public class ContinentNoise implements IContinentNoise {
 
         this.frequency = 1F / context.settings.world.continent.continentScale;
 
-        double strength = 0.25;
+        double strength = 0.2;
 
         var builder = Source.builder()
                 .octaves(2)
                 .lacunarity(2.2)
-                .frequency(2)
+                .frequency(4)
                 .gain(0.3);
 
         this.warp = Domain.warp(

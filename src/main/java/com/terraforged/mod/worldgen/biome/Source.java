@@ -26,6 +26,7 @@ package com.terraforged.mod.worldgen.biome;
 
 import com.mojang.serialization.Codec;
 import com.terraforged.engine.util.pos.PosUtil;
+import com.terraforged.mod.util.map.LongCache;
 import com.terraforged.mod.util.map.LossyCache;
 import com.terraforged.mod.worldgen.biome.util.BiomeMapManager;
 import com.terraforged.mod.worldgen.cave.CaveType;
@@ -51,7 +52,7 @@ public class Source extends BiomeSource {
     protected final BiomeSampler biomeSampler;
     protected final BiomeMapManager biomeMapManager;
     protected final CaveBiomeSampler caveBiomeSampler;
-    protected final LossyCache<Holder<Biome>> cache = LossyCache.concurrent(2048, i -> (Holder<Biome>[]) new Holder[i]);
+    protected final LongCache<Holder<Biome>> cache = LossyCache.concurrent(2048, i -> (Holder<Biome>[]) new Holder[i]);
 
     public Source(long seed, INoiseGenerator noise, Source other) {
         super(List.of());
@@ -98,6 +99,8 @@ public class Source extends BiomeSource {
 
     @Override
     public Holder<Biome> getNoiseBiome(int x, int y, int z, Climate.Sampler sampler) {
+        if (true) return compute(PosUtil.pack(x, z));
+
         return cache.computeIfAbsent(PosUtil.pack(x, z), this::compute);
     }
 

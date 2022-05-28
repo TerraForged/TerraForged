@@ -27,6 +27,7 @@ package com.terraforged.mod.worldgen.noise.continent.river;
 import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.util.ObjectPool;
+import com.terraforged.mod.util.map.LongCache;
 import com.terraforged.mod.util.map.LossyCache;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
 import com.terraforged.mod.worldgen.noise.continent.ContinentGenerator;
@@ -44,7 +45,6 @@ public class RiverGenerator {
     private static final int Y_OFFSET = 5123678;
 
     private static final int RIVER_CACHE_SIZE = 1024;
-    private static final int RIVER_POOL_SIZE = RIVER_CACHE_SIZE + 1;
 
     private final int seed;
     private final float lakeDensity;
@@ -53,8 +53,8 @@ public class RiverGenerator {
     private final Domain riverWarp;
     private final ThreadLocal<CarverSample> localRiverSample = ThreadLocal.withInitial(CarverSample::new);
 
-    private final ObjectPool<RiverPieces> pool = new ObjectPool<>(RIVER_POOL_SIZE, RiverPieces::new);
-    private final LossyCache<RiverPieces> cache = new LossyCache.Concurrent<>(RIVER_CACHE_SIZE, RiverPieces[]::new, pool::restore);
+    private final ObjectPool<RiverPieces> pool = ObjectPool.forCacheSize(RIVER_CACHE_SIZE, RiverPieces::new);
+    private final LongCache<RiverPieces> cache = LossyCache.concurrent(RIVER_CACHE_SIZE, RiverPieces[]::new, pool);
 
     public RiverGenerator(ContinentGenerator continent, ContinentConfig config) {
         this.continent = continent;
@@ -232,7 +232,7 @@ public class RiverGenerator {
         float amp1 = 0.5f + MathUtil.rand(seed + 4561, hash) * 0.5f;
 
         // Displace point C perpendicularly to AC
-        float displacement = 0.4f * amp0;
+        float displacement = 0.4f * dir0 * amp0;
         cx += nx * displacement;
         cy += ny * displacement;
 

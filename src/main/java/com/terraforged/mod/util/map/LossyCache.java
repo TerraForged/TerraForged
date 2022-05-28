@@ -24,6 +24,8 @@
 
 package com.terraforged.mod.util.map;
 
+import com.terraforged.mod.Environment;
+import com.terraforged.noise.util.NoiseUtil;
 import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.longs.Long2ObjectFunction;
 import net.minecraft.util.Mth;
@@ -33,7 +35,7 @@ import java.util.concurrent.locks.StampedLock;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 
-public class LossyCache<T> {
+public class LossyCache<T> implements LongCache<T> {
     protected final long[] keys;
     protected final T[] values;
     protected final int mask;
@@ -48,6 +50,7 @@ public class LossyCache<T> {
         Arrays.fill(this.keys, Long.MIN_VALUE);
     }
 
+    @Override
     public T computeIfAbsent(long key, Long2ObjectFunction<T> function) {
         int hash = hash(key);
         int index = hash & mask;
@@ -70,30 +73,34 @@ public class LossyCache<T> {
         }
     }
 
-    private static int hash(long l) {
+    protected static int hash(long l) {
         return (int) HashCommon.mix(l);
     }
 
-    public static <T> LossyCache<T> of(int capacity, IntFunction<T[]> constructor) {
+    public static <T> LongCache<T> of(int capacity, IntFunction<T[]> constructor) {
         return of(capacity, constructor, t -> {});
     }
 
-    public static <T> LossyCache<T> of(int capacity, IntFunction<T[]> constructor, Consumer<T> removalListener) {
+    public static <T> LongCache<T> of(int capacity, IntFunction<T[]> constructor, Consumer<T> removalListener) {
         return new LossyCache<>(capacity, constructor, removalListener);
     }
 
-    public static <T> LossyCache<T> concurrent(int capacity, IntFunction<T[]> constructor) {
+    public static <T> LongCache<T> concurrent(int capacity, IntFunction<T[]> constructor) {
         return concurrent(capacity, constructor, t -> {});
     }
 
-    public static <T> LossyCache<T> concurrent(int capacity, IntFunction<T[]> constructor, Consumer<T> removalListener) {
-        return new LossyCache.Concurrent<>(capacity, constructor, removalListener);
+    public static <T> LongCache<T> concurrent(int capacity, IntFunction<T[]> constructor, Consumer<T> removalListener) {
+        return concurrent(capacity, Environment.CORES, constructor, removalListener);
     }
 
-    public static class Concurrent<T> extends LossyCache<T> {
+    public static <T> LongCache<T> concurrent(int capacity, int concurrency, IntFunction<T[]> constructor, Consumer<T> removalListener) {
+        return new Concurrent<>(capacity, concurrency, constructor, removalListener);
+    }
+
+    public static class Stamped<T> extends LossyCache<T> {
         protected final StampedLock lock = new StampedLock();
 
-        public Concurrent(int capacity, IntFunction<T[]> constructor, Consumer<T> removalListener) {
+        public Stamped(int capacity, IntFunction<T[]> constructor, Consumer<T> removalListener) {
             super(capacity, constructor, removalListener);
         }
 
@@ -138,6 +145,39 @@ public class LossyCache<T> {
                 lock.unlockWrite(write);
                 onRemove(currentValue);
             }
+        }
+    }
+
+    public static class Concurrent<T> implements LongCache<T> {
+        protected static final int HASH_BITS = 0x7fffffff;
+
+        protected final int mask;
+        protected final Stamped<T>[] buckets;
+
+        public Concurrent(int capacity, int concurrency, IntFunction<T[]> constructor, Consumer<T> removalListener) {
+            concurrency = Mth.smallestEncompassingPowerOfTwo(concurrency);
+            capacity = NoiseUtil.floor(((float) capacity / concurrency));
+
+            this.mask = concurrency - 1;
+            //noinspection unchecked
+            this.buckets = new Stamped[concurrency];
+
+            for (int i = 0; i < concurrency; i++) {
+                this.buckets[i] = new Stamped<>(capacity, constructor, removalListener);
+            }
+        }
+
+        @Override
+        public T computeIfAbsent(long key, Long2ObjectFunction<T> function) {
+            return buckets[index(key)].computeIfAbsent(key, function);
+        }
+
+        protected int index(long key) {
+            return spread(key) & mask;
+        }
+
+        protected static int spread(long h) {
+            return (int) (h ^ (h >>> 16)) & HASH_BITS;
         }
     }
 }

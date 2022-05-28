@@ -37,15 +37,12 @@ public class ContinentConfig {
         public int seed0;
         public int seed1;
         public int scale = CONTINENT_SAMPLE_SCALE;
-        public float jitter = 0.8f;
+        public float jitter = 0.75f;
         public float threshold = 0.525f;
-        public float thresholdFalloff = 0.5f;
-        public CellShape cellShape = CellShape.HEXAGON;
+        public float baseFalloffMin = 0.01f;
+        public float baseFalloffMax = 0.25f;
+        public CellShape cellShape = CellShape.SQUARE;
         public CellSource cellSource = CellSource.PERLIN;
-
-        public float getThresholdMax() {
-            return threshold + (1 - threshold) * (1 - thresholdFalloff);
-        }
     }
 
     public static class Noise {

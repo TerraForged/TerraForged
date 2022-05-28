@@ -25,14 +25,16 @@
 package com.terraforged.mod.util;
 
 import com.terraforged.mod.Environment;
+import com.terraforged.noise.util.NoiseUtil;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
 
-public class ObjectPool<T> {
+public class ObjectPool<T> implements Consumer<T> {
     protected final int capacity;
     protected final int maxIndex;
     protected final Supplier<T> factory;
@@ -73,9 +75,19 @@ public class ObjectPool<T> {
     }
 
     @Override
+    public void accept(T t) {
+        restore(t);
+    }
+
+    @Override
     public String toString() {
         return "ObjectPool{" +
                 "pool=" + pool +
                 '}';
+    }
+
+    public static <T> ObjectPool<T> forCacheSize(int cacheSize, Supplier<T> supplier) {
+        int poolSize = NoiseUtil.floor(cacheSize * 1.75f);
+        return new ObjectPool<>(poolSize, supplier);
     }
 }

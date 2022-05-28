@@ -85,7 +85,7 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
             };
         }
 
-        if (sample.terrainType.isRiver() || sample.terrainType.isLake()) {
+        if ((sample.terrainType.isRiver() || sample.terrainType.isLake()) && sample.riverNoise == 0) {
             return biomeType == BiomeType.TUNDRA ? biomeMapManager.get(Biomes.FROZEN_RIVER) : biomeMapManager.get(Biomes.RIVER);
         }
 

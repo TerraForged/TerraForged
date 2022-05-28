@@ -37,8 +37,8 @@ public class ErosionFilter {
 
     private static final int erosionRadius = 7;
     private static final float inertia = 0.005f; // At zero, water will instantly change direction to flow downhill. At 1, water will never change direction.
-    private static final float sedimentCapacityFactor = 8F; // Multiplier for how much sediment a droplet can carry
-    private static final float minSedimentCapacity = 0.01f; // Used to prevent carry capacity getting too close to zero on flatter terrain
+    private static final float sedimentCapacityFactor = 7F; // Multiplier for how much sediment a droplet can carry
+    private static final float minSedimentCapacity = 0.008f; // Used to prevent carry capacity getting too close to zero on flatter terrain
     private static final float evaporateSpeed = 0.35f;
     private static final float gravity = 2.5F;
 

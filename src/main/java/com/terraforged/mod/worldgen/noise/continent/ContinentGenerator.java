@@ -29,6 +29,7 @@ import com.terraforged.engine.world.heightmap.ControlPoints;
 import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.util.ObjectPool;
 import com.terraforged.mod.util.SpiralIterator;
+import com.terraforged.mod.util.map.LongCache;
 import com.terraforged.mod.util.map.LossyCache;
 import com.terraforged.mod.worldgen.noise.NoiseLevels;
 import com.terraforged.mod.worldgen.noise.continent.cell.CellPoint;
@@ -59,8 +60,8 @@ public class ContinentGenerator {
     public final RiverGenerator riverGenerator;
     public final ShapeGenerator shapeGenerator;
 
-    private final ObjectPool<CellPoint> cellPool = new ObjectPool<>(CELL_POINT_CACHE_SIZE, CellPoint::new);
-    private final LossyCache<CellPoint> cellCache = new LossyCache.Concurrent<>(CELL_POINT_CACHE_SIZE, CellPoint[]::new, cellPool::restore);
+    private final ObjectPool<CellPoint> cellPool = ObjectPool.forCacheSize(CELL_POINT_CACHE_SIZE, CellPoint::new);
+    private final LongCache<CellPoint> cellCache = LossyCache.concurrent(CELL_POINT_CACHE_SIZE, CellPoint[]::new, cellPool);
 
     public ContinentGenerator(ContinentConfig config, NoiseLevels levels, ControlPoints controlPoints) {
         this.levels = levels;

@@ -41,9 +41,9 @@ public class ClimateNoise {
     private static final float MOISTURE_SIZE = 2.5F;
 
     private final int seed;
-    private final float jitter = 0.9f;
+    private final float jitter = 0.8f;
     private final float frequency;
-    private final CellShape cellShape = CellShape.HEXAGON;
+    private final CellShape cellShape = CellShape.SQUARE;
 
     private final Domain warp;
     private final Module moisture;
@@ -82,10 +82,11 @@ public class ClimateNoise {
                 .warp(tempSeed.next(), tempScale * 4, 2, tempScale * 4)
                 .warp(tempSeed.next(), tempScale, 1, tempScale);
 
+
         this.warp = Domain.warp(
-                Source.simplex(seed.next(), warpScale * 2, 4).bias(-0.5),
-                Source.simplex(seed.next(), warpScale * 2, 4).bias(-0.5),
-                Source.constant(settings.climate.biomeShape.biomeWarpStrength * 1.65)
+                Source.build(seed.next(), warpScale, 3).lacunarity(2.4).gain(0.3).simplex2(),
+                Source.build(seed.next(), warpScale, 3).lacunarity(2.4).gain(0.3).simplex2(),
+                Source.constant(settings.climate.biomeShape.biomeWarpStrength * 0.75)
         );
     }
 

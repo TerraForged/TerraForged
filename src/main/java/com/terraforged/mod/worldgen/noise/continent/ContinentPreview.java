@@ -26,6 +26,7 @@ package com.terraforged.mod.worldgen.noise.continent;
 
 import com.terraforged.engine.settings.WorldSettings;
 import com.terraforged.mod.data.ModTerrains;
+import com.terraforged.mod.util.ColorUtil;
 import com.terraforged.mod.util.ui.Previewer;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
@@ -44,10 +45,8 @@ public class ContinentPreview {
             var noise = create();
             return (x, y) -> {
                 var sample = noise.getSample(x, y);
-                if (sample.continentNoise <= ContinentPoints.SHALLOW_OCEAN) return 0x0066DD;
-                if (sample.continentNoise <= ContinentPoints.BEACH) return 0x0099DD;
-                if (sample.riverNoise <= 0) return 0x0099DD;
-                return sample.climateType.getColor().getRGB();
+
+                return ColorUtil.getBiomeColor(sample, 0.2f);
             };
         });
     }
@@ -64,9 +63,10 @@ public class ContinentPreview {
         config.shape.seed0 = SEED;
         config.shape.seed1 = SEED + 39674;
         config.shape.threshold = 0.525f;
-        config.shape.thresholdFalloff = 0.6f;
 
         var terrainLevels = new TerrainLevels();
+
+        // -385290196
 
         var generator = new NoiseGenerator(SEED, terrainLevels, ModTerrains.Factory.getDefault(null));
 

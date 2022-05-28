@@ -36,6 +36,8 @@ import com.terraforged.noise.util.NoiseUtil;
 public class RiverCarver {
     private static final int SEED_OFFSET = 21221;
     private static final double EROSION_FREQ = 128;
+    private static final float BORDER_OFFSET = 0.05f;
+    private static final float BORDER_RANGE = 1f - BORDER_OFFSET;
 
     private final float blendRadius;
     private final NoiseLevels levels;
@@ -89,7 +91,7 @@ public class RiverCarver {
             float level = Math.min(bankLevel, height);
             float modifier = getErosionModifier(erosion * config.erosion, valleyAlpha);
             height = NoiseUtil.lerp(level, height, valleyAlpha * modifier);
-            sample.riverNoise *= getAlpha(distance, bankWidth, valleyWidth);
+            sample.riverNoise *= getValleyNoise(distance, bankWidth, valleyWidth);
         }
 
         float riverAlpha = getAlpha(distance, bedWidth, bankWidth);
@@ -97,7 +99,7 @@ public class RiverCarver {
             float level = Math.min(bedLevel, height);
             height = NoiseUtil.lerp(level, height, riverAlpha);
             sample.terrainType = nodeSample.type;
-            sample.riverNoise = 0;
+            sample.riverNoise *= getRiverNoise(height, baseLevel, bankLevel);
         }
 
         sample.heightNoise = height;
@@ -130,6 +132,16 @@ public class RiverCarver {
         float erosionFade = 1f - NoiseUtil.map(valleyAlpha, 0.975f, 1.0f, 0.025f);
 
         return 1.0f - (erosionNoise * erosionFade);
+    }
+
+    private float getValleyNoise(float distance, float bankWidth, float valleyWidth) {
+        // Add offset so the falloff noise doesn't quite reach zero at the top of the river banks
+        return BORDER_OFFSET + getAlpha(distance, bankWidth, valleyWidth) / BORDER_RANGE;
+    }
+
+    private float getRiverNoise(float height, float waterLevel, float bankLevel) {
+        // Fall from the top of the river banks to water level
+        return getAlpha(height, waterLevel, bankLevel);
     }
 
     private static float clipRiverNoise(NoiseSample sample) {

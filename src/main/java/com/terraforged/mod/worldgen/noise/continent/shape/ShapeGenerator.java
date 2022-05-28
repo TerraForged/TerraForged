@@ -40,7 +40,8 @@ public class ShapeGenerator {
     private final float continentFalloff;
 
     public final float threshold;
-    public final float thresholdMax;
+    public final float baseFalloffMin;
+    public final float baseFalloffMax;
 
     private final ContinentGenerator continent;
     private final FalloffPoint[] falloffPoints;
@@ -53,7 +54,8 @@ public class ShapeGenerator {
         this.continentFalloff = config.noise.continentNoiseFalloff;
         this.falloffPoints = ContinentPoints.getFalloff(controlPoints);
         this.threshold = config.shape.threshold;
-        this.thresholdMax = config.shape.getThresholdMax();
+        this.baseFalloffMin = config.shape.threshold + config.shape.baseFalloffMin;
+        this.baseFalloffMax = config.shape.threshold + config.shape.baseFalloffMax;
     }
 
     public float getThresholdValue(CellPoint cell) {
@@ -65,8 +67,8 @@ public class ShapeGenerator {
     }
 
     public float getBaseNoise(float value) {
-        float min = threshold;
-        float max = thresholdMax;
+        float min = baseFalloffMin;
+        float max = baseFalloffMax;
         return NoiseUtil.map(value, min, max, max - min);
     }
 
