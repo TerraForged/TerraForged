@@ -25,6 +25,7 @@
 package com.terraforged.mod.util.map;
 
 import com.terraforged.mod.Environment;
+import com.terraforged.mod.util.LockUtil;
 import com.terraforged.noise.util.NoiseUtil;
 import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.longs.Long2ObjectFunction;
@@ -106,43 +107,43 @@ public class LossyCache<T> implements LongCache<T> {
 
         @Override
         public T computeIfAbsent(long key, Long2ObjectFunction<T> function) {
-            int hash = hash(key);
-            int index = hash & mask;
+            final int index = hash(key) & mask;
 
             // Try reading without locking
-            long optStamp = lock.tryOptimisticRead();
+            long readStamp = lock.tryOptimisticRead();
             long currentKey = keys[index];
             T currentValue = values[index];
 
-            if (!lock.validate(optStamp)) {
+            if (!lock.validate(readStamp)) {
                 // Write occurred during the optimistic read so obtain a full read lock
-                long read = lock.readLock();
-
-                try {
-                    currentKey = keys[index];
-                    currentValue = values[index];
-                } finally {
-                    lock.unlockRead(read);
-                }
+                readStamp = lock.readLock();
+                currentKey = keys[index];
+                currentValue = values[index];
             }
 
             if (currentKey == key && currentValue != null) {
+                LockUtil.unlockIfRead(lock, readStamp);
                 return currentValue;
             }
 
-            // Keys mismatched or current value is null
-            return write(key, index, currentValue, function);
-        }
-
-        protected T write(long key, int index, T currentValue, Long2ObjectFunction<T> function) {
-            long write = lock.writeLock();
+            long writeStamp = lock.tryConvertToWriteLock(readStamp);
             try {
+                if (writeStamp == 0L) {
+                    writeStamp = LockUtil.convertToWrite(lock, readStamp);
+
+                    // Write may have occurred between unlocking read & obtaining write
+                    if (keys[index] == key && values[index] != null) {
+                        return values[index];
+                    }
+                }
+
                 T newValue = function.apply(key);
                 keys[index] = key;
                 values[index] = newValue;
+
                 return newValue;
             } finally {
-                lock.unlockWrite(write);
+                lock.unlockWrite(writeStamp);
                 onRemove(currentValue);
             }
         }
