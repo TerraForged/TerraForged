@@ -24,10 +24,8 @@
 
 package com.terraforged.mod.worldgen.noise.continent;
 
-import com.terraforged.engine.cell.Cell;
 import com.terraforged.engine.world.GeneratorContext;
 import com.terraforged.engine.world.heightmap.ControlPoints;
-import com.terraforged.engine.world.rivermap.Rivermap;
 import com.terraforged.mod.worldgen.noise.IContinentNoise;
 import com.terraforged.mod.worldgen.noise.NoiseLevels;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
@@ -59,47 +57,16 @@ public class ContinentNoise implements IContinentNoise {
         double strength = 0.2;
 
         var builder = Source.builder()
-                .octaves(2)
+                .octaves(3)
                 .lacunarity(2.2)
-                .frequency(4)
+                .frequency(3)
                 .gain(0.3);
 
         this.warp = Domain.warp(
-                builder.seed(context.seed.next())
-                        .build(Source.PERLIN2),
-                builder.seed(context.seed.next())
-                        .build(Source.PERLIN2),
+                builder.seed(context.seed.next()).perlin2(),
+                builder.seed(context.seed.next()).perlin2(),
                 Source.constant(strength)
         );
-    }
-
-    @Override
-    public float getEdgeValue(float x, float y) {
-        x *= frequency;
-        y *= frequency;
-
-        float px = warp.getX(x, y);
-        float py = warp.getY(x, y);
-
-        px += offset.x;
-        py += offset.y;
-
-        return generator.shapeGenerator.getValue(px, py);
-    }
-
-    @Override
-    public long getNearestCenter(float x, float z) {
-        return 0L;
-    }
-
-    @Override
-    public Rivermap getRivermap(int x, int z) {
-        return null;
-    }
-
-    @Override
-    public void apply(Cell cell, float x, float y) {
-
     }
 
     @Override

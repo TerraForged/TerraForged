@@ -32,6 +32,7 @@ import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.noise.util.NoiseUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -82,6 +83,10 @@ public class PositionSampler {
 
         for (int i = 0; i < context.biomeList.size(); i++) {
             var biome = context.biomeList.get(i);
+
+            // Remove annoying river trees!
+            if (biome.is(BiomeTags.IS_RIVER)) continue;
+
             var vegetation = decorator.getVegetationManager().getVegetation(biome);
             var config = vegetation.config;
             context.push(biome.value(), vegetation);

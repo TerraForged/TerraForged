@@ -99,8 +99,6 @@ public class Source extends BiomeSource {
 
     @Override
     public Holder<Biome> getNoiseBiome(int x, int y, int z, Climate.Sampler sampler) {
-        if (true) return compute(PosUtil.pack(x, z));
-
         return cache.computeIfAbsent(PosUtil.pack(x, z), this::compute);
     }
 

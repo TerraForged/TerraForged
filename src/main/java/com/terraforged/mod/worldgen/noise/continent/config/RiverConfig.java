@@ -55,17 +55,20 @@ public class RiverConfig {
 
     public static RiverConfig lake() {
         var config = new RiverConfig();
-        config.bankWidth.min = 0.55f;
-        config.bankWidth.max = 0.55f;
+        config.bankWidth.min = 30;
+        config.bankWidth.max = 45;
 
-        config.bedWidth.min = 0.02f;
-        config.bedWidth.max = 0.05f;
+        config.bankDepth.min = 1f;
+        config.bankDepth.max = 1.5f;
 
-        config.bankDepth.min = 2f;
-        config.bankDepth.max = 3f;
+        config.bedWidth.min = 8;
+        config.bedWidth.max = 15;
 
-        config.valleyWidth.min = 0.6f;
-        config.valleyWidth.max = 0.6f;
+        config.bedDepth.min = 2f;
+        config.bedDepth.max = 8f;
+
+        config.valleyWidth.min = 80;
+        config.valleyWidth.max = 120;
 
         return config;
     }

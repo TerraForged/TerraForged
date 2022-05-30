@@ -25,10 +25,9 @@
 package com.terraforged.mod.worldgen.noise;
 
 import com.terraforged.engine.world.GeneratorContext;
-import com.terraforged.engine.world.continent.Continent;
 import com.terraforged.engine.world.heightmap.ControlPoints;
 
-public interface IContinentNoise extends Continent {
+public interface IContinentNoise {
     GeneratorContext getContext();
     ControlPoints getControlPoints();
 

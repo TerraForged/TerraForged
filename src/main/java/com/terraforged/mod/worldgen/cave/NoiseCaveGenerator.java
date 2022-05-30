@@ -35,6 +35,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -42,6 +43,7 @@ public class NoiseCaveGenerator {
     protected static final int POOL_SIZE = 32;
     protected static final float DENSITY = 0.05F;
     protected static final float BREACH_THRESHOLD = 0.7F;
+    protected static final int GLOBAL_CAVE_REPS = 2;
 
     protected final NoiseCave[] caves;
     protected final Module uniqueCaveNoise;
@@ -50,21 +52,17 @@ public class NoiseCaveGenerator {
     protected final Map<ChunkPos, CarverChunk> cache = new ConcurrentHashMap<>();
 
     public NoiseCaveGenerator(long seed, RegistryAccess access) {
-        var global = access.registryOrThrow(ModRegistry.CAVE.get());
         this.uniqueCaveNoise = createUniqueNoise((int) seed, 500, DENSITY);
         this.caveBreachNoise = createBreachNoise((int) seed + 12, 300, BREACH_THRESHOLD);
-        this.caves = global.stream().map(config -> config.withSeed(seed)).toArray(NoiseCave[]::new);
+        this.caves = createArray(seed, access.registryOrThrow(ModRegistry.CAVE.get()));
         this.pool = new ObjectPool<>(POOL_SIZE, this::createCarverChunk);
     }
 
     public NoiseCaveGenerator(long seed, NoiseCaveGenerator other) {
-        this.caves = new NoiseCave[other.caves.length];
+        this.caves = copyOf(seed, other.caves);
         this.uniqueCaveNoise = createUniqueNoise((int) seed, 500, DENSITY);
         this.caveBreachNoise = createBreachNoise((int) seed + 12, 300, BREACH_THRESHOLD);
         this.pool = new ObjectPool<>(POOL_SIZE, this::createCarverChunk);
-        for (int i = 0; i < caves.length; i++) {
-            this.caves[i] = other.caves[i].withSeed(seed);
-        }
     }
 
     public void carve(ChunkAccess chunk, Generator generator) {
@@ -133,5 +131,36 @@ public class NoiseCaveGenerator {
 
     private static Module createBreachNoise(int seed, int scale, float threshold) {
         return Source.simplexRidge(seed, scale, 2).clamp(threshold * 0.8F, threshold).map(0, 1);
+    }
+
+    private static NoiseCave[] copyOf(long seed, NoiseCave[] other) {
+        var array = Arrays.copyOf(other, other.length);
+        for (int i = 0; i < array.length; i++) {
+            array[i] = array[i].withSeed(seed);
+        }
+        return array;
+    }
+
+    private static NoiseCave[] createArray(long seed, Iterable<NoiseCave> source) {
+        int length = 0;
+        for (var cave : source) {
+            length += getCount(cave);
+        }
+
+        var array = new NoiseCave[length];
+
+        int i = 0;
+        for (var cave : source) {
+            int count = getCount(cave);
+            for (int j = 0; j < count; j++) {
+                array[i++] = cave.withSeed(seed + (j * 0xFA90C2L));
+            }
+        }
+
+        return array;
+    }
+
+    private static int getCount(NoiseCave cave) {
+        return cave.getType() == CaveType.GLOBAL ? GLOBAL_CAVE_REPS : 1;
     }
 }

@@ -35,6 +35,7 @@ public interface ContinentPoints {
     float SHALLOW_OCEAN = 0.25f;
     float BEACH = 0.5f;
     float COAST = 0.55f;
+    float INLAND = 0.6f;
 
     static Terrain getTerrainType(float continentNoise) {
         if (continentNoise < ContinentPoints.SHALLOW_OCEAN) {

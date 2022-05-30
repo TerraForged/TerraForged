@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.worldgen.noise.continent.river;
 
+import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.worldgen.noise.NoiseLevels;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
 import com.terraforged.mod.worldgen.noise.continent.ContinentPoints;
@@ -60,14 +61,24 @@ public class RiverCarver {
 
     public void carve(float x, float y, NoiseSample sample, CarverSample carverSample) {
         float erosion = erosionNoise.getValue(x, y);
-        float baseNoise = getBaseNoise(sample, carverSample.river);
-        float baseLevel = levels.toHeightNoise(baseNoise, 0f);
+        float baseModifier = getBaseModifier(sample);
 
-        carve(baseLevel, erosion, sample, carverSample.river, riverConfig);
-        carve(baseLevel, erosion, sample, carverSample.lake, lakeConfig);
+        float baseNoise = sample.baseNoise * baseModifier;
+        baseNoise = carve(sample, carverSample.river, riverConfig, baseNoise, baseModifier, erosion);
+        baseNoise = carve(sample, carverSample.lake, lakeConfig, baseNoise, baseModifier, erosion);
 
         sample.baseNoise = baseNoise;
         sample.riverNoise = clipRiverNoise(sample);
+    }
+
+    private float carve(NoiseSample sample, NodeSample nodeSample, RiverConfig config, float baseNoise, float baseModifier, float erosion) {
+        float modifiedBaseNoise = getBaseNoise(sample, nodeSample, config, baseModifier);
+        if (modifiedBaseNoise == -1f) return baseNoise;
+
+        float baseLevel = levels.toHeightNoise(modifiedBaseNoise, 0f);
+        carve(baseLevel, erosion, sample, nodeSample, config);
+
+        return modifiedBaseNoise;
     }
 
     private void carve(float baseLevel, float erosion, NoiseSample sample, NodeSample nodeSample, RiverConfig config) {
@@ -105,21 +116,20 @@ public class RiverCarver {
         sample.heightNoise = height;
     }
 
-    private float getBaseNoise(NoiseSample sample, NodeSample nodeSample) {
-        float level = sample.baseNoise;
-        float modifier = getBaseModifier(sample);
-
-        if (nodeSample.isInvalid()) return level * modifier;
+    private float getBaseNoise(NoiseSample sample, NodeSample nodeSample, RiverConfig config, float modifier) {
+        if (nodeSample.isInvalid()) return -1f;
 
         float distance = nodeSample.distance;
-        float nodeLevel = nodeSample.level;
-        float nodeRadius = nodeSample.position;
+        float position = nodeSample.position;
 
-        if (distance >= blendRadius) return level * modifier;
-        if (distance <= nodeRadius) return nodeLevel * modifier;
+        float valleyRadius = config.valleyWidth.at(position);
+        if (distance >= valleyRadius) return -1f;
 
-        float alpha = (distance - nodeRadius) / (blendRadius - nodeRadius);
-        return NoiseUtil.lerp(nodeLevel, level, alpha) * modifier;
+        float bankRadius = config.bankWidth.at(position);
+        if (distance <= bankRadius) return nodeSample.level * modifier;
+
+        float alpha = (distance - bankRadius) / (valleyRadius - bankRadius);
+        return NoiseUtil.lerp(nodeSample.level, sample.baseNoise, alpha) * modifier;
     }
 
     private float getBaseModifier(NoiseSample sample) {
@@ -136,12 +146,14 @@ public class RiverCarver {
 
     private float getValleyNoise(float distance, float bankWidth, float valleyWidth) {
         // Add offset so the falloff noise doesn't quite reach zero at the top of the river banks
-        return BORDER_OFFSET + getAlpha(distance, bankWidth, valleyWidth) / BORDER_RANGE;
+        float value = BORDER_OFFSET + getAlpha(distance, bankWidth, valleyWidth) / BORDER_RANGE;
+        return MathUtil.clamp(value, 0f, 1f);
     }
 
     private float getRiverNoise(float height, float waterLevel, float bankLevel) {
         // Fall from the top of the river banks to water level
-        return getAlpha(height, waterLevel, bankLevel);
+        float value = getAlpha(height, waterLevel, bankLevel);
+        return MathUtil.clamp(value, 0f, 1f);
     }
 
     private static float clipRiverNoise(NoiseSample sample) {

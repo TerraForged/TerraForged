@@ -52,7 +52,7 @@ public class ContinentConfig {
 
     public static class Rivers {
         public int seed = 0;
-        public float lakeDensity = 0.55f;
+        public float lakeDensity = 0.75f;
         public final RiverConfig rivers = new RiverConfig();
         public final RiverConfig lakes = RiverConfig.lake();
     }

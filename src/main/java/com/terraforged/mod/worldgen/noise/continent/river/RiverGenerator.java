@@ -43,6 +43,10 @@ public class RiverGenerator {
 
     private static final int X_OFFSET = 8657124;
     private static final int Y_OFFSET = 5123678;
+    private static final int DIR_OFFSET = 20107;
+    private static final int SIZE_A_OFFSET = 9803;
+    private static final int SIZE_B_OFFSET = 28387;
+    private static final int LAKE_CHANCE_OFFSET = 37171;
 
     private static final int RIVER_CACHE_SIZE = 1024;
 
@@ -195,7 +199,7 @@ public class RiverGenerator {
         }
 
         // Cull tiny chode-rivers
-        if (isSource && pieces.riverCount() == 0) {
+        if (isSource && pieces.riverCount() == 0 && minValue <= 0) {
             pool.restore(pieces);
             return RiverPieces.NONE;
         }
@@ -205,6 +209,10 @@ public class RiverGenerator {
         int hash = MathUtil.hash(seed + 827614, ax, ay);
 
         addRiverNodes(a, min, ah, bh, ar, br, hash, pieces);
+
+        if (isSource && hasLake(a, hash)) {
+            addLakeNodes(a, min, ah, hash, pieces);
+        }
 
         return pieces;
     }
@@ -226,17 +234,16 @@ public class RiverGenerator {
         float nx = -(cy - a.py);
         float ny = (cx - a.px);
 
-        float dir0 = MathUtil.rand(seed + 2112413, hash) < 0.5f ? -1f : 1f;
-        float dir1 = MathUtil.rand(seed + 9873542, hash) < 0.5f ? -1f : 1f;
-        float amp0 = 0.5f + MathUtil.rand(seed + 8794, hash) * 0.5f;
-        float amp1 = 0.5f + MathUtil.rand(seed + 4561, hash) * 0.5f;
+        float dir = MathUtil.rand(seed + DIR_OFFSET, hash) < 0.5f ? -1f : 1f;
+        float amp0 = 0.7f + MathUtil.rand(seed + SIZE_A_OFFSET, hash) * 0.3f;
+        float amp1 = 0.7f + MathUtil.rand(seed + SIZE_B_OFFSET, hash) * 0.3f;
 
         // Displace point C perpendicularly to AC
-        float displacement = 0.4f * dir0 * amp0;
+        float displacement = 0.35f * dir * amp0;
         cx += nx * displacement;
         cy += ny * displacement;
 
-        float warpStrength = 0.3f * dir1 * amp1;
+        float warpStrength = 0.275f * -dir * amp1;
         float warp1 = warpStrength * NoiseUtil.map(a.noise, 0.4f, 0.6f, 0.2f);
         float warp2 = -warpStrength * NoiseUtil.map(b.noise, 0.4f, 0.6f, 0.2f);
 
@@ -251,11 +258,14 @@ public class RiverGenerator {
         }
     }
 
-    private void addLakeNodes(CellPoint a, CellPoint b, float ah, float ar, RiverPieces pieces) {
+    private void addLakeNodes(CellPoint a, CellPoint b, float ah, int hash, RiverPieces pieces) {
+        float size = (0.5f + MathUtil.rand(seed + SIZE_A_OFFSET, hash) * 0.5f) * 0.12f;
+
         float dx = a.px - b.px;
         float dy = a.py - b.py;
-        float cx = a.px + dx * 0.001f;
-        float cy = a.py + dy * 0.001f;
+        float cx = a.px + dx * size;
+        float cy = a.py + dy * size;
+
         pieces.addLake(new RiverNode(a.px, a.py, cx, cy, ah, ah, 1, 1, 0));
     }
 
@@ -277,6 +287,11 @@ public class RiverGenerator {
         }
 
         return minX == ax && minY == ay;
+    }
+
+    private boolean hasLake(CellPoint cell, int hash) {
+        return MathUtil.rand(hash + LAKE_CHANCE_OFFSET) <= lakeDensity
+                || continent.shapeGenerator.getBaseNoise(cell.noise()) < 0.25f;
     }
 
     private float getBaseValue(CellPoint point) {
