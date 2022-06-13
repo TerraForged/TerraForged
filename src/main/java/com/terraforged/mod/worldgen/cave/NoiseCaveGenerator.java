@@ -24,8 +24,8 @@
 
 package com.terraforged.mod.worldgen.cave;
 
-import com.terraforged.mod.registry.ModRegistry;
-import com.terraforged.mod.util.ObjectPool;
+import com.terraforged.mod.TerraForged;
+import com.terraforged.mod.util.storage.ObjectPool;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.asset.NoiseCave;
 import com.terraforged.noise.Module;
@@ -51,34 +51,34 @@ public class NoiseCaveGenerator {
     protected final ObjectPool<CarverChunk> pool;
     protected final Map<ChunkPos, CarverChunk> cache = new ConcurrentHashMap<>();
 
-    public NoiseCaveGenerator(long seed, RegistryAccess access) {
-        this.uniqueCaveNoise = createUniqueNoise((int) seed, 500, DENSITY);
-        this.caveBreachNoise = createBreachNoise((int) seed + 12, 300, BREACH_THRESHOLD);
-        this.caves = createArray(seed, access.registryOrThrow(ModRegistry.CAVE.get()));
+    public NoiseCaveGenerator(RegistryAccess access) {
+        this.uniqueCaveNoise = createUniqueNoise(500, DENSITY);
+        this.caveBreachNoise = createBreachNoise(300, BREACH_THRESHOLD);
+        this.caves = createArray(access.registryOrThrow(TerraForged.CAVES.get()));
         this.pool = new ObjectPool<>(POOL_SIZE, this::createCarverChunk);
     }
 
-    public NoiseCaveGenerator(long seed, NoiseCaveGenerator other) {
-        this.caves = copyOf(seed, other.caves);
-        this.uniqueCaveNoise = createUniqueNoise((int) seed, 500, DENSITY);
-        this.caveBreachNoise = createBreachNoise((int) seed + 12, 300, BREACH_THRESHOLD);
+    public NoiseCaveGenerator(NoiseCaveGenerator other) {
+        this.caves = other.caves;
+        this.uniqueCaveNoise = createUniqueNoise(500, DENSITY);
+        this.caveBreachNoise = createBreachNoise(300, BREACH_THRESHOLD);
         this.pool = new ObjectPool<>(POOL_SIZE, this::createCarverChunk);
     }
 
-    public void carve(ChunkAccess chunk, Generator generator) {
+    public void carve(int seed, ChunkAccess chunk, Generator generator) {
         var carver = getPreCarveChunk(chunk);
-        carver.terrainData = generator.getChunkData(chunk.getPos());
+        carver.terrainData = generator.getChunkData(seed, chunk.getPos());
         carver.mask = caveBreachNoise;
 
         for (var config : caves) {
             carver.modifier = getModifier(config);
 
-            NoiseCaveCarver.carve(chunk, carver, generator, config, true);
+            NoiseCaveCarver.carve(seed, chunk, carver, generator, config, true);
         }
     }
 
-    public void decorate(ChunkAccess chunk, WorldGenLevel region, Generator generator) {
-        var carver = getPostCarveChunk(chunk, generator);
+    public void decorate(int seed, ChunkAccess chunk, WorldGenLevel region, Generator generator) {
+        var carver = getPostCarveChunk(seed, chunk, generator);
 
         for (var config : caves) {
             NoiseCaveDecorator.decorate(chunk, carver, region, generator, config);
@@ -91,7 +91,7 @@ public class NoiseCaveGenerator {
         return cache.computeIfAbsent(chunk.getPos(), p -> pool.take().reset());
     }
 
-    private CarverChunk getPostCarveChunk(ChunkAccess chunk, Generator generator) {
+    private CarverChunk getPostCarveChunk(int seed, ChunkAccess chunk, Generator generator) {
         var carver = cache.remove(chunk.getPos());
         if (carver != null) return carver;
 
@@ -101,12 +101,12 @@ public class NoiseCaveGenerator {
         carver = pool.take().reset();
 
         carver.mask = caveBreachNoise;
-        carver.terrainData = generator.getChunkData(chunk.getPos());
+        carver.terrainData = generator.getChunkData(seed, chunk.getPos());
 
         for (var config : caves) {
             carver.modifier = getModifier(config);
 
-            NoiseCaveCarver.carve(chunk, carver, generator, config, false);
+            NoiseCaveCarver.carve(seed, chunk, carver, generator, config, false);
         }
 
         return carver;
@@ -123,14 +123,14 @@ public class NoiseCaveGenerator {
         return new CarverChunk(caves.length);
     }
 
-    private static Module createUniqueNoise(int seed, int scale, float density) {
-        return new UniqueCaveDistributor(seed + 1286745, 1F / scale, 0.75F, density)
+    private static Module createUniqueNoise(int scale, float density) {
+        return new UniqueCaveDistributor(1286745, 1F / scale, 0.75F, density)
                 .clamp(0.2, 1.0).map(0, 1)
-                .warp(seed + 781624, 30, 1, 20);
+                .warp(781624, 30, 1, 20);
     }
 
-    private static Module createBreachNoise(int seed, int scale, float threshold) {
-        return Source.simplexRidge(seed, scale, 2).clamp(threshold * 0.8F, threshold).map(0, 1);
+    private static Module createBreachNoise(int scale, float threshold) {
+        return Source.simplexRidge(1567328, scale, 2).clamp(threshold * 0.8F, threshold).map(0, 1);
     }
 
     private static NoiseCave[] copyOf(long seed, NoiseCave[] other) {
@@ -141,7 +141,7 @@ public class NoiseCaveGenerator {
         return array;
     }
 
-    private static NoiseCave[] createArray(long seed, Iterable<NoiseCave> source) {
+    private static NoiseCave[] createArray(Iterable<NoiseCave> source) {
         int length = 0;
         for (var cave : source) {
             length += getCount(cave);
@@ -153,7 +153,7 @@ public class NoiseCaveGenerator {
         for (var cave : source) {
             int count = getCount(cave);
             for (int j = 0; j < count; j++) {
-                array[i++] = cave.withSeed(seed + (j * 0xFA90C2L));
+                array[i++] = cave.withSeed(j * 0xFA90C2L);
             }
         }
 

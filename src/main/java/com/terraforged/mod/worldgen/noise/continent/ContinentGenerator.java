@@ -27,10 +27,10 @@ package com.terraforged.mod.worldgen.noise.continent;
 import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.heightmap.ControlPoints;
 import com.terraforged.mod.util.MathUtil;
-import com.terraforged.mod.util.ObjectPool;
 import com.terraforged.mod.util.SpiralIterator;
-import com.terraforged.mod.util.map.LongCache;
-import com.terraforged.mod.util.map.LossyCache;
+import com.terraforged.mod.util.storage.LongCache;
+import com.terraforged.mod.util.storage.LossyCache;
+import com.terraforged.mod.util.storage.ObjectPool;
 import com.terraforged.mod.worldgen.noise.NoiseLevels;
 import com.terraforged.mod.worldgen.noise.continent.cell.CellPoint;
 import com.terraforged.mod.worldgen.noise.continent.cell.CellShape;
@@ -63,6 +63,8 @@ public class ContinentGenerator {
     private final ObjectPool<CellPoint> cellPool = ObjectPool.forCacheSize(CELL_POINT_CACHE_SIZE, CellPoint::new);
     private final LongCache<CellPoint> cellCache = LossyCache.concurrent(CELL_POINT_CACHE_SIZE, CellPoint[]::new, cellPool);
 
+    private volatile Vec2f offset = null;
+
     public ContinentGenerator(ContinentConfig config, NoiseLevels levels, ControlPoints controlPoints) {
         this.levels = levels;
         this.controlPoints = controlPoints;
@@ -76,34 +78,20 @@ public class ContinentGenerator {
         this.shapeGenerator = new ShapeGenerator(this, config, controlPoints);
     }
 
-    public Vec2f getWorldOffset() {
-        var iterator = new SpiralIterator(0, 0, 0, SPAWN_SEARCH_RADIUS);
-        var cell = new CellPoint();
-
-        while (iterator.hasNext()) {
-            long pos = iterator.next();
-            computeCell(pos, 0, 0, cell);
-
-            if (shapeGenerator.getThresholdValue(cell) == 0) {
-                continue;
-            }
-
-            float px = cell.px;
-            float py = cell.py;
-            if (isValidSpawn(pos, VALID_SPAWN_RADIUS, cell)) {
-                return new Vec2f(px, py);
-            }
+    public Vec2f getWorldOffset(int seed) {
+        var offset = this.offset;
+        if (offset == null) {
+            this.offset = offset = computeWorldOffset(seed);
         }
-
-        return Vec2f.ZERO;
+        return offset;
     }
 
-    public CellPoint getCell(int cx, int cy) {
+    public CellPoint getCell(int seed, int cx, int cy) {
         long index = PosUtil.pack(cx, cy);
-        return cellCache.computeIfAbsent(index, this::computeCell);
+        return cellCache.computeIfAbsent(seed, index, this::computeCell);
     }
 
-    public long getNearestCell(float x, float y) {
+    public long getNearestCell(int seed, float x, float y) {
         x = cellShape.adjustX(x);
         y = cellShape.adjustY(y);
 
@@ -118,7 +106,7 @@ public class ContinentGenerator {
 
         for (int cy = minY, i = 0; cy <= maxY; cy++) {
             for (int cx = minX; cx <= maxX; cx++, i++) {
-                var cell = getCell(cx, cy);
+                var cell = getCell(seed, cx, cy);
                 float dist2 = NoiseUtil.dist2(x, y, cell.px, cell.py);
 
                 if (dist2 < distance) {
@@ -132,15 +120,15 @@ public class ContinentGenerator {
         return PosUtil.pack(nearestX, nearestY);
     }
 
-    private CellPoint computeCell(long index) {
-        return computeCell(index, 0, 0, cellPool.take());
+    private CellPoint computeCell(int seed, long index) {
+        return computeCell(seed, index, 0, 0, cellPool.take());
     }
 
-    private CellPoint computeCell(long index, int ox, int oy, CellPoint cell) {
+    private CellPoint computeCell(int seed, long index, int ox, int oy, CellPoint cell) {
         int cx = PosUtil.unpackLeft(index) + ox;
         int cy = PosUtil.unpackRight(index) + oy;
 
-        int hash = MathUtil.hash(seed, cx, cy);
+        int hash = MathUtil.hash(this.seed + seed, cx, cy);
         float px = cellShape.getCellX(hash, cx, cy, jitter);
         float py = cellShape.getCellY(hash, cx, cy, jitter);
 
@@ -150,7 +138,7 @@ public class ContinentGenerator {
         float target = 4000f;
         float freq = (CONTINENT_SAMPLE_SCALE / target);
 
-        sampleCell(sampleSeed, px, py,  cellSource,2, freq, 2.75f, 0.3f, cell);
+        sampleCell(seed + sampleSeed, px, py,  cellSource,2, freq, 2.75f, 0.3f, cell);
 
         return cell;
     }
@@ -177,7 +165,29 @@ public class ContinentGenerator {
         cell.noise = sum / sumAmp;
     }
 
-    private boolean isValidSpawn(long pos, int radius, CellPoint cell) {
+    private Vec2f computeWorldOffset(int seed) {
+        var iterator = new SpiralIterator(0, 0, 0, SPAWN_SEARCH_RADIUS);
+        var cell = new CellPoint();
+
+        while (iterator.hasNext()) {
+            long pos = iterator.next();
+            computeCell(seed, pos, 0, 0, cell);
+
+            if (shapeGenerator.getThresholdValue(cell) == 0) {
+                continue;
+            }
+
+            float px = cell.px;
+            float py = cell.py;
+            if (isValidSpawn(seed, pos, VALID_SPAWN_RADIUS, cell)) {
+                return new Vec2f(px, py);
+            }
+        }
+
+        return Vec2f.ZERO;
+    }
+
+    private boolean isValidSpawn(int seed, long pos, int radius, CellPoint cell) {
         int radius2 = radius * radius;
 
         for (int dy = -radius; dy <= radius; dy++) {
@@ -186,7 +196,7 @@ public class ContinentGenerator {
 
                 if (dy < 1 || d2 >= radius2) continue;
 
-                computeCell(pos, dx, dy, cell);
+                computeCell(seed, pos, dx, dy, cell);
 
                 if (shapeGenerator.getThresholdValue(cell) == 0) {
                     return false;

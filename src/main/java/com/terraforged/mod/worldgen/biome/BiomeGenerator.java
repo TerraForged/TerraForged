@@ -25,40 +25,40 @@
 package com.terraforged.mod.worldgen.biome;
 
 import com.terraforged.mod.worldgen.Generator;
+import com.terraforged.mod.worldgen.Seeds;
 import com.terraforged.mod.worldgen.biome.decorator.FeatureDecorator;
 import com.terraforged.mod.worldgen.biome.decorator.SurfaceDecorator;
 import com.terraforged.mod.worldgen.biome.surface.Surface;
 import com.terraforged.mod.worldgen.cave.NoiseCaveGenerator;
-import com.terraforged.mod.worldgen.util.NoiseChunkUtil;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.WorldGenerationContext;
+import net.minecraft.world.level.levelgen.RandomState;
 
 public class BiomeGenerator {
     private final SurfaceDecorator surfaceDecorator;
     private final FeatureDecorator featureDecorator;
     private final NoiseCaveGenerator noiseCaveGenerator;
 
-    public BiomeGenerator(long seed, RegistryAccess access) {
+    public BiomeGenerator(RegistryAccess access) {
         this.surfaceDecorator = new SurfaceDecorator();
         this.featureDecorator = new FeatureDecorator(access);
-        this.noiseCaveGenerator = new NoiseCaveGenerator(seed, access);
+        this.noiseCaveGenerator = new NoiseCaveGenerator(access);
     }
 
-    public BiomeGenerator(long seed, BiomeGenerator other) {
+    public BiomeGenerator(BiomeGenerator other) {
         this.surfaceDecorator = other.surfaceDecorator;
         this.featureDecorator = other.featureDecorator;
-        this.noiseCaveGenerator = new NoiseCaveGenerator(seed, other.noiseCaveGenerator);
+        this.noiseCaveGenerator = new NoiseCaveGenerator(other.noiseCaveGenerator);
     }
 
-    public void surface(ChunkAccess chunk, WorldGenRegion region, Generator generator) {
-        surfaceDecorator.decorate(chunk, region, generator);
-        surfaceDecorator.decoratePost(chunk, generator);
+    public void surface(ChunkAccess chunk, WorldGenRegion region, RandomState state, Generator generator) {
+        surfaceDecorator.decorate(chunk, region, generator, state);
+        surfaceDecorator.decoratePost(chunk, region, generator);
     }
 
     public void carve(long seed,
@@ -68,28 +68,17 @@ public class BiomeGenerator {
                       GenerationStep.Carving step,
                       Generator generator) {
 
-        noiseCaveGenerator.carve(chunk, generator);
+        noiseCaveGenerator.carve((int) seed, chunk, generator);
     }
 
-    public void decorate(ChunkAccess chunk, WorldGenLevel region, StructureFeatureManager structures, Generator generator) {
-        var terrain = generator.getChunkDataAsync(chunk.getPos());
+    public void decorate(ChunkAccess chunk, WorldGenLevel region, StructureManager structures, Generator generator) {
+        int seed = Seeds.get(region.getSeed());
+        var terrain = generator.getChunkDataAsync(seed, chunk.getPos());
 
         featureDecorator.decorate(chunk, region, structures, terrain, generator);
-        noiseCaveGenerator.decorate(chunk, region, generator);
+        noiseCaveGenerator.decorate((int) seed, chunk, region, generator);
 
         Surface.smoothWater(chunk, region, terrain.join());
         Surface.applyPost(chunk, terrain.join(), generator);
-    }
-
-    protected static void buildVanillaSurface(ChunkAccess chunk, WorldGenRegion region, Generator generator) {
-        var context = new WorldGenerationContext(generator, region);
-        var noiseChunk = NoiseChunkUtil.getNoiseChunk(chunk, generator);
-
-        var biomes = generator.getBiomeSource().getRegistry();
-        var biomeManager = region.getBiomeManager();
-
-        var surface = generator.getVanillaGen().getSurfaceSystem();
-        var surfaceRules = generator.getVanillaGen().getSettings().value().surfaceRule();
-        surface.buildSurface(biomeManager, biomes, false, context, chunk, noiseChunk, surfaceRules);
     }
 }

@@ -30,7 +30,6 @@ import com.terraforged.mod.util.TranslationUtil;
 import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
-import com.terraforged.mod.worldgen.profiler.GeneratorProfiler;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -38,7 +37,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
@@ -47,29 +46,29 @@ public class GeneratorPreset {
     public static final ResourceLocation PRESET_NAME = TerraForged.location("preset");
     public static final String TRANSLATION_KEY = TranslationUtil.key("generator", PRESET_NAME);
 
-    public static Generator build(long seed, TerrainLevels levels, RegistryAccess registries) {
+    public static Generator build(TerrainLevels levels, RegistryAccess registries) {
         var terrain = ModTerrains.getTerrain(registries);
 
-        var biomeGenerator = new BiomeGenerator(seed, registries);
-        var noiseGenerator = new NoiseGenerator(seed, levels, terrain).withErosion();
-        var biomeSource = new Source(seed, noiseGenerator, registries);
-        var vanillaGen = getVanillaGen(seed, biomeSource, registries);
+        var biomeGenerator = new BiomeGenerator(registries);
+        var noiseGenerator = new NoiseGenerator(levels, terrain).withErosion();
+        var biomeSource = new Source(noiseGenerator, registries);
+        var vanillaGen = getVanillaGen(biomeSource, registries);
 
-        return new Generator(seed, levels, vanillaGen, biomeSource, biomeGenerator, noiseGenerator);
+        return new Generator(levels, vanillaGen, biomeSource, biomeGenerator, noiseGenerator);
     }
 
     public static LevelStem getDefault(RegistryAccess registries) {
-        var generator = build(0L, TerrainLevels.DEFAULT.get().copy(), registries);
+        var generator = build(TerrainLevels.DEFAULT.get().copy(), registries);
         var type = registries.ownedRegistryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
-        return new LevelStem(type.getHolderOrThrow(DimensionType.OVERWORLD_LOCATION), generator);
+        return new LevelStem(type.getHolderOrThrow(BuiltinDimensionTypes.OVERWORLD), generator);
     }
 
-    public static VanillaGen getVanillaGen(long seed, BiomeSource biomes, RegistryAccess access) {
+    public static VanillaGen getVanillaGen(BiomeSource biomes, RegistryAccess access) {
         var structures = access.ownedRegistryOrThrow(Registry.STRUCTURE_SET_REGISTRY);
         var parameters = access.registryOrThrow(Registry.NOISE_REGISTRY);
         var settings = access.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY)
                 .getHolderOrThrow(NoiseGeneratorSettings.OVERWORLD);
-        return new VanillaGen(seed, biomes, settings, parameters, structures);
+        return new VanillaGen(biomes, settings, parameters, structures);
     }
 
     public static boolean isTerraForgedWorld(WorldGenSettings settings) {
@@ -86,9 +85,9 @@ public class GeneratorPreset {
     }
 
     private static Generator getGenerator(ChunkGenerator chunkGenerator) {
-        if (chunkGenerator instanceof GeneratorProfiler profiler) {
-            chunkGenerator = profiler.getGenerator();
-        }
+//        if (chunkGenerator instanceof GeneratorProfiler profiler) {
+//            chunkGenerator = profiler.getGenerator();
+//        }
 
         if (chunkGenerator instanceof Generator generator) {
             return generator;

@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.worldgen.biome.decorator;
 
-import com.terraforged.mod.util.map.FloatMap;
+import com.terraforged.mod.util.storage.FloatMap;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.asset.VegetationConfig;
 import com.terraforged.mod.worldgen.biome.util.BiomeList;

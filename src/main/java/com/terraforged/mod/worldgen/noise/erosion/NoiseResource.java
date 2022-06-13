@@ -25,7 +25,7 @@
 package com.terraforged.mod.worldgen.noise.erosion;
 
 import com.terraforged.engine.util.FastRandom;
-import com.terraforged.mod.util.map.ObjectMap;
+import com.terraforged.mod.util.storage.ObjectMap;
 import com.terraforged.mod.worldgen.noise.NoiseData;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
 

@@ -28,12 +28,13 @@ import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
+import com.terraforged.mod.CommonAPI;
 import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.registry.ModRegistries;
+import com.terraforged.mod.data.util.JsonFormatter;
+import com.terraforged.mod.lifecycle.Init;
+import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.util.FileUtil;
-import com.terraforged.mod.util.Init;
-import com.terraforged.mod.util.json.JsonFormatter;
 import com.terraforged.mod.worldgen.GeneratorPreset;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -100,8 +101,9 @@ public class DataGen extends Init {
     }
 
     private static void genBuiltin(Path dir, RegistryAccess registries, RegistryOps<JsonElement> writeOps) {
-        for (var holder : ModRegistries.getHolders()) {
-            export(dir, holder, registries, writeOps);
+        var registryManager = CommonAPI.get().getRegistryManager();
+        for (var registry : registryManager.getModRegistries()) {
+            export(dir, registry, registries, writeOps);
         }
     }
 
@@ -115,8 +117,8 @@ public class DataGen extends Init {
         }
     }
 
-    private static <T> void export(Path dir, ModRegistries.HolderEntry<T> holder, RegistryAccess access, DynamicOps<JsonElement> ops) {
-        export(dir, holder.key(), holder.direct(), access, ops);
+    private static <T> void export(Path dir, ModRegistry<T> registry, RegistryAccess access, DynamicOps<JsonElement> ops) {
+        export(dir, registry.key().get(), registry.codec(), access, ops);
     }
 
     private static <T> void export(Path dir, ResourceKey<? extends Registry<T>> key, Codec<T> codec, RegistryAccess access, DynamicOps<JsonElement> ops) {

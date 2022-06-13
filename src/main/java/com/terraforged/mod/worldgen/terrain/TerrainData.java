@@ -25,8 +25,8 @@
 package com.terraforged.mod.worldgen.terrain;
 
 import com.terraforged.engine.world.terrain.Terrain;
-import com.terraforged.mod.util.map.FloatMap;
-import com.terraforged.mod.util.map.ObjectMap;
+import com.terraforged.mod.util.storage.FloatMap;
+import com.terraforged.mod.util.storage.ObjectMap;
 import com.terraforged.mod.worldgen.noise.NoiseData;
 import com.terraforged.noise.util.NoiseUtil;
 

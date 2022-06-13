@@ -77,8 +77,8 @@ public class CarverChunk {
         return cached;
     }
 
-    public float getCarvingMask(int x, int z) {
-        float noise = mask.getValue(x, z);
+    public float getCarvingMask(int seed, int x, int z) {
+        float noise = mask.getValue(seed, x, z);
         float river = terrainData.getRiver().get(x, z);
         return 1f - noise * river;
     }

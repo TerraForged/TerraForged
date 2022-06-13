@@ -27,9 +27,9 @@ package com.terraforged.mod.worldgen.noise.erosion;
 import com.terraforged.engine.settings.FilterSettings;
 import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.terrain.Terrain;
-import com.terraforged.mod.util.ObjectPool;
-import com.terraforged.mod.util.map.LongCache;
-import com.terraforged.mod.util.map.LossyCache;
+import com.terraforged.mod.util.storage.LongCache;
+import com.terraforged.mod.util.storage.LossyCache;
+import com.terraforged.mod.util.storage.ObjectPool;
 import com.terraforged.mod.worldgen.noise.*;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import com.terraforged.mod.worldgen.util.ThreadPool;
@@ -53,22 +53,17 @@ public class ErodedNoiseGenerator implements INoiseGenerator {
     protected final ObjectPool<float[]> pool;
     protected final LongCache<CompletableFuture<float[]>> cache;
 
-    public ErodedNoiseGenerator(long seed, NoiseTileSize tileSize, NoiseGenerator generator) {
+    public ErodedNoiseGenerator(NoiseTileSize tileSize, NoiseGenerator generator) {
         var settings = new FilterSettings.Erosion();
         settings.dropletsPerChunk = 350;
 
         this.tileSize = tileSize;
         this.generator = generator;
-        this.erosion = new ErosionFilter((int) seed, tileSize.regionLength, settings);
+        this.erosion = new ErosionFilter(tileSize.regionLength, settings);
         this.localSample = ThreadLocal.withInitial(NoiseSample::new);
         this.localResource = ThreadLocal.withInitial(() -> new NoiseResource(tileSize));
         this.pool = ObjectPool.forCacheSize(CACHE_SIZE, CHUNK_ALLOCATOR);
         this.cache = LossyCache.concurrent(CACHE_SIZE, CHUNK_TASK_ALLOCATOR, this::restore);
-    }
-
-    @Override
-    public INoiseGenerator with(long seed, TerrainLevels levels) {
-        return generator.with(seed, levels).withErosion();
     }
 
     @Override
@@ -87,36 +82,36 @@ public class ErodedNoiseGenerator implements INoiseGenerator {
     }
 
     @Override
-    public NoiseSample getNoiseSample(int x, int z) {
-        return generator.getNoiseSample(x, z);
+    public NoiseSample getNoiseSample(int seed, int x, int z) {
+        return generator.getNoiseSample(seed, x, z);
     }
 
     @Override
-    public void sample(int x, int z, NoiseSample sample) {
-        generator.sample(x, z, sample);
+    public void sample(int seed, int x, int z, NoiseSample sample) {
+        generator.sample(seed, x, z, sample);
     }
 
     @Override
-    public float getHeightNoise(int x, int z) {
-        return generator.getHeightNoise(x, z);
+    public float getHeightNoise(int seed, int x, int z) {
+        return generator.getHeightNoise(seed, x, z);
     }
 
     @Override
-    public long find(int x, int z, int minRadius, int maxRadius, Terrain terrain) {
-        return generator.find(x, z, minRadius, maxRadius, terrain);
+    public long find(int seed, int x, int z, int minRadius, int maxRadius, Terrain terrain) {
+        return generator.find(seed, x, z, minRadius, maxRadius, terrain);
     }
 
     @Override
-    public void generate(int chunkX, int chunkZ, Consumer<NoiseData> consumer) {
+    public void generate(int seed, int chunkX, int chunkZ, Consumer<NoiseData> consumer) {
         try {
             var resource = localResource.get();
 
-            collectNeighbours(chunkX, chunkZ, resource);
-            generateCenterChunk(chunkX, chunkZ, resource);
+            collectNeighbours(seed, chunkX, chunkZ, resource);
+            generateCenterChunk(seed, chunkX, chunkZ, resource);
             awaitNeighbours(resource);
 
-            generateErosion(chunkX, chunkZ, resource);
-            generateRivers(chunkX, chunkZ, resource);
+            generateErosion(seed, chunkX, chunkZ, resource);
+            generateRivers(seed, chunkX, chunkZ, resource);
 
             consumer.accept(resource.chunk);
         } catch (Throwable t) {
@@ -124,7 +119,7 @@ public class ErodedNoiseGenerator implements INoiseGenerator {
         }
     }
 
-    protected void collectNeighbours(int chunkX, int chunkZ, NoiseResource resource) {
+    protected void collectNeighbours(int seed, int chunkX, int chunkZ, NoiseResource resource) {
         for (int dz = tileSize.chunkMin; dz < tileSize.chunkMax; dz++) {
             for (int dx = tileSize.chunkMin; dx < tileSize.chunkMax; dx++) {
                 if (dx == 0 && dz == 0) continue;
@@ -133,12 +128,12 @@ public class ErodedNoiseGenerator implements INoiseGenerator {
 
                 int cx = chunkX + dx;
                 int cz = chunkZ + dz;
-                resource.chunkCache[tileIndex] = getChunk(cx, cz);
+                resource.chunkCache[tileIndex] = getChunk(seed, cx, cz);
             }
         }
     }
 
-    protected void generateCenterChunk(int chunkX, int chunkZ, NoiseResource resource) {
+    protected void generateCenterChunk(int seed, int chunkX, int chunkZ, NoiseResource resource) {
         var blender = generator.getBlenderResource();
 
         int startX = chunkX << 4;
@@ -154,7 +149,7 @@ public class ErodedNoiseGenerator implements INoiseGenerator {
                 float nx = getNoiseCoord(startX + dx);
 
                 var sample = resource.chunkSample.get(dx, dz);
-                generator.sampleTerrain(nx, nz, sample, blender);
+                generator.sampleTerrain(seed, nx, nz, sample, blender);
 
                 int tileIndex = tileSize.indexOfRel(dx, dz);
                 resource.heightmap[tileIndex] = sample.heightNoise;
@@ -182,11 +177,11 @@ public class ErodedNoiseGenerator implements INoiseGenerator {
         }
     }
 
-    protected void generateErosion(int chunkX, int chunkZ, NoiseResource resource) {
-        erosion.apply(resource.heightmap, chunkX, chunkZ, tileSize, resource.erosionResource, resource.random);
+    protected void generateErosion(int seed, int chunkX, int chunkZ, NoiseResource resource) {
+        erosion.apply(seed, chunkX, chunkZ, tileSize, resource.erosionResource, resource.random, resource.heightmap);
     }
 
-    protected void generateRivers(int chunkX, int chunkZ, NoiseResource resource) {
+    protected void generateRivers(int seed, int chunkX, int chunkZ, NoiseResource resource) {
         int startX = chunkX << 4;
         int startZ = chunkZ << 4;
 
@@ -205,7 +200,7 @@ public class ErodedNoiseGenerator implements INoiseGenerator {
                 var sample = resource.chunkSample.get(chunkIndex);
                 sample.heightNoise = height;
 
-                generator.sampleRiver(nx, nz, sample);
+                generator.sampleRiver(seed, nx, nz, sample);
 
                 resource.chunk.setNoise(chunkIndex, sample);
             }
@@ -216,11 +211,11 @@ public class ErodedNoiseGenerator implements INoiseGenerator {
         task.thenAccept(pool::restore);
     }
 
-    protected CompletableFuture<float[]> getChunk(int x, int z) {
-        return cache.computeIfAbsent(PosUtil.pack(x, z), this::generateChunk);
+    protected CompletableFuture<float[]> getChunk(int seed, int x, int z) {
+        return cache.computeIfAbsent(seed, PosUtil.pack(x, z), this::generateChunk);
     }
 
-    protected CompletableFuture<float[]> generateChunk(final long key) {
+    protected CompletableFuture<float[]> generateChunk(final int seed, final long key) {
         return CompletableFuture.supplyAsync(() -> {
             int chunkX = PosUtil.unpackLeft(key);
             int chunkZ = PosUtil.unpackRight(key);
@@ -238,7 +233,7 @@ public class ErodedNoiseGenerator implements INoiseGenerator {
 
                 float nx = getNoiseCoord(startX + dx);
                 float nz = getNoiseCoord(startZ + dz);
-                height[i] = generator.sampleTerrain(nx, nz, sample, blender).heightNoise;
+                height[i] = generator.sampleTerrain(seed, nx, nz, sample, blender).heightNoise;
             }
 
             return height;

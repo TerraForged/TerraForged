@@ -50,11 +50,9 @@ public class ErosionFilter {
     private final int[][] erosionBrushIndices;
     private final float[][] erosionBrushWeights;
 
-    private final int seed;
     private final int iterations;
 
-    public ErosionFilter(int seed, int mapSize, FilterSettings.Erosion settings) {
-        this.seed = seed;
+    public ErosionFilter(int mapSize, FilterSettings.Erosion settings) {
         this.iterations = settings.dropletsPerChunk;
         this.erodeSpeed = settings.erosionRate;
         this.depositSpeed = settings.depositeRate;
@@ -66,10 +64,10 @@ public class ErosionFilter {
         initBrushes(mapSize, erosionRadius);
     }
 
-    public void apply(float[] map, int chunkX, int chunkZ, NoiseTileSize size, Resource resource, FastRandom random) {
+    public void apply(int seed, int chunkX, int chunkZ, NoiseTileSize size, Resource resource, FastRandom random, float[] map) {
         int maxIndex = size.regionLength - 2;
         for (int i = 0; i < iterations; i++) {
-            long iterationSeed = NoiseUtil.seed(this.seed, i);
+            long iterationSeed = NoiseUtil.seed(seed, i);
 
             for (int dz = size.chunkMin; dz < size.chunkMax; dz++) {
                 int startZ = (dz - size.chunkMin) << 4;

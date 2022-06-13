@@ -37,6 +37,6 @@ public record NoiseViability(Module noise) implements Viability {
 
     @Override
     public float getFitness(int x, int z, Context context) {
-        return noise.getValue(x, z);
+        return noise.getValue(context.seed(), x, z);
     }
 }

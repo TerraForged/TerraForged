@@ -30,11 +30,11 @@ import com.terraforged.mod.worldgen.noise.climate.ClimateNoise;
 import com.terraforged.mod.worldgen.noise.climate.ClimateSample;
 
 public interface IBiomeSampler {
-    ClimateSample getSample(int x, int z);
+    ClimateSample getSample(int seed, int x, int z);
 
-    float getShape(int x, int z);
+    float getShape(int seed, int x, int z);
 
-    void sample(int x, int z, ClimateSample sample);
+    void sample(int seed, int x, int z, ClimateSample sample);
 
     class Sampler implements IBiomeSampler {
         protected final NoiseLevels levels;
@@ -57,35 +57,35 @@ public interface IBiomeSampler {
         }
 
         @Override
-        public ClimateSample getSample(int x, int z) {
+        public ClimateSample getSample(int seed, int x, int z) {
             float px = x * levels.frequency;
             float pz = z * levels.frequency;
 
             var sample = localSample.get().reset();
-            noiseGenerator.getContinent().sampleContinent(px, pz, sample);
-            noiseGenerator.getContinent().sampleRiver(px, pz, sample);
-            climateNoise.sample(px, pz, sample);
+            noiseGenerator.getContinent().sampleContinent(seed, px, pz, sample);
+            noiseGenerator.getContinent().sampleRiver(seed, px, pz, sample);
+            climateNoise.sample(seed, px, pz, sample);
 
             return sample;
         }
 
         @Override
-        public float getShape(int x, int z) {
+        public float getShape(int seed, int x, int z) {
             float px = x * levels.frequency;
             float pz = z * levels.frequency;
 
             var sample = localSample.get().reset();
 
-            climateNoise.sample(px, pz, sample);
+            climateNoise.sample(seed, px, pz, sample);
 
             return sample.biomeEdgeNoise;
         }
 
         @Override
-        public void sample(int x, int z, ClimateSample sample) {
+        public void sample(int seed, int x, int z, ClimateSample sample) {
             float px = x * levels.frequency;
             float pz = z * levels.frequency;
-            climateNoise.sample(px, pz, sample);
+            climateNoise.sample(seed, px, pz, sample);
         }
     }
 

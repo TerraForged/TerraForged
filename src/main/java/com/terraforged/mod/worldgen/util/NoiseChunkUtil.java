@@ -26,12 +26,14 @@ package com.terraforged.mod.worldgen.util;
 
 import com.terraforged.mod.util.ReflectionUtil;
 import com.terraforged.mod.worldgen.Generator;
+import com.terraforged.mod.worldgen.Seeds;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import net.minecraft.core.QuartPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.NoiseChunk;
+import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.blending.Blender;
 
 import java.lang.invoke.MethodHandle;
@@ -40,17 +42,15 @@ import java.util.concurrent.CompletableFuture;
 public class NoiseChunkUtil {
     private static final MethodHandle SURFACE_CACHE = ReflectionUtil.field(NoiseChunk.class, Long2IntMap.class);
 
-    public static void initChunk(ChunkAccess chunk, Generator generator) {
-        getNoiseChunk(chunk, generator);
-    }
+    public static NoiseChunk getNoiseChunk(ChunkAccess chunk, RandomState state, Generator generator) {
+        var terrainData = generator.getChunkDataAsync(Seeds.get(state), chunk.getPos());
 
-    public static NoiseChunk getNoiseChunk(ChunkAccess chunk, Generator generator) {
-        var vanilla = generator.getVanillaGen();
-        var fluidPicker = vanilla.getGlobalFluidPicker();
-        var settings = vanilla.getSettings().value();
-
-        var terrainData = generator.getChunkDataAsync(chunk.getPos());
-        var noiseChunk = chunk.getOrCreateNoiseChunk(NoopNoise.ROUTER, NoopNoise.BEARDIFIER, settings, fluidPicker, Blender.empty());
+        var noiseChunk = chunk.getOrCreateNoiseChunk(c -> {
+            var vanilla = generator.getVanillaGen();
+            var fluidPicker = vanilla.getGlobalFluidPicker();
+            var settings = vanilla.getSettings().value();
+            return NoiseChunk.forChunk(c, state, NoopNoise.BEARDIFIER, settings, fluidPicker, Blender.empty());
+        });
 
         initChunk(chunk, noiseChunk, terrainData);
 

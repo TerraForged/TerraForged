@@ -72,46 +72,8 @@ public class ShapeGenerator {
         return NoiseUtil.map(value, min, max, max - min);
     }
 
-    public float getValue(float x, float y) {
-        var centre = continent.getNearestCell(x, y);
-        int centreX = PosUtil.unpackLeft(centre);
-        int centreY = PosUtil.unpackRight(centre);
-
-        x = continent.cellShape.adjustX(x);
-        y = continent.cellShape.adjustY(y);
-
-        int minX = centreX - 1;
-        int minY = centreY - 1;
-        int maxX = centreX + 1;
-        int maxY = centreY + 1;
-
-        float min0 = Float.MAX_VALUE;
-        float min1 = Float.MAX_VALUE;
-        var data = edgeBuffer.get();
-
-        for (int cy = minY, i = 0; cy <= maxY; cy++) {
-            for (int cx = minX; cx <= maxX; cx++, i++) {
-                var cell = continent.getCell(cx, cy);
-
-                float value = getThresholdValue(cell);
-                float distance = NoiseUtil.sqrt(NoiseUtil.dist2(x, y, cell.px, cell.py));
-
-                data[i] = PosUtil.packf(value, distance);
-
-                if (distance < min0) {
-                    min1 = min0;
-                    min0 = distance;
-                } else if (distance < min1) {
-                    min1 = distance;
-                }
-            }
-        }
-
-        return getFalloff(getEdge(min0, min1, continentFalloff, data));
-    }
-
-    public NoiseSample sample(float x, float y, NoiseSample sample) {
-        var centre = continent.getNearestCell(x, y);
+    public NoiseSample sample(int seed, float x, float y, NoiseSample sample) {
+        var centre = continent.getNearestCell(seed, x, y);
         int centreX = PosUtil.unpackLeft(centre);
         int centreY = PosUtil.unpackRight(centre);
 
@@ -131,7 +93,7 @@ public class ShapeGenerator {
 
         for (int cy = minY, i = 0; cy <= maxY; cy++) {
             for (int cx = minX; cx <= maxX; cx++, i++) {
-                var cell = continent.getCell(cx, cy);
+                var cell = continent.getCell(seed, cx, cy);
                 var local = buffer[i];
 
                 float distance = NoiseUtil.sqrt(NoiseUtil.dist2(x, y, cell.px, cell.py));
@@ -150,25 +112,6 @@ public class ShapeGenerator {
         }
 
         return sampleEdges(closest, min0, min1, buffer, sample);
-    }
-
-    private float getEdge(float min0, float min1, float falloff, long[] data) {
-        float borderDistance = (min0 + min1) * 0.5F;
-        float blendRadius = borderDistance * falloff;
-
-        float sumValue = 0f;
-        float sumWeight = 0f;
-
-        for (long l : data) {
-            float value = PosUtil.unpackLeftf(l);
-            float distance = PosUtil.unpackRightf(l);
-            float weight = getWeight(distance, min0, blendRadius);
-
-            sumValue += value * weight;
-            sumWeight += weight;
-        }
-
-        return NoiseUtil.clamp(sumValue / sumWeight, 0, 1);
     }
 
     private NoiseSample sampleEdges(int index, float min0, float min1, CellLocal[] buffer, NoiseSample sample) {

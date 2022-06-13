@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.worldgen.terrain;
 
+import com.terraforged.mod.util.storage.ObjectPool;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
 import com.terraforged.mod.worldgen.util.ThreadPool;
@@ -36,62 +37,131 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 public class TerrainCache {
     private final TerrainGenerator generator;
-    private final Map<ChunkPos, CompletableFuture<TerrainData>> cache = new ConcurrentHashMap<>();
+    private final Map<CacheKey, CacheValue> cache = new ConcurrentHashMap<>(512);
+
+    private final ThreadLocal<CacheKey> localKey = ThreadLocal.withInitial(CacheKey::new);
+    private final ObjectPool<CacheKey> keyPool = new ObjectPool<>(512, CacheKey::new);
+    private final ObjectPool<CacheValue> valuePool = new ObjectPool<>(512, CacheValue::new);
 
     public TerrainCache(TerrainLevels levels, INoiseGenerator noiseGenerator) {
         this.generator = new TerrainGenerator(levels, noiseGenerator);
     }
 
-    public void drop(ChunkPos pos) {
-        var task = cache.remove(pos);
-        if (task == null || task.isDone()) return;
-
-        generator.restore(task.join());
+    protected CacheKey allocPos(int seed, ChunkPos pos) {
+        return keyPool.take().set(seed, pos.x, pos.z);
     }
 
-    public void hint(ChunkPos pos) {
-        getAsync(pos);
+    protected CacheKey lookupPos(int seed, ChunkPos pos) {
+        return localKey.get().set(seed, pos.x, pos.z);
     }
 
-    public int getHeight(int x, int z) {
-        return generator.getHeight(x, z);
+    public void drop(int seed, ChunkPos pos) {
+        var key = lookupPos(seed, pos);
+        var value = cache.remove(key);
+
+        if (value == null || value.task == null) return;
+
+        generator.restore(value.task.join());
+
+        keyPool.restore(value.key);
+
+        valuePool.restore(value.reset());
     }
 
-    public NoiseSample getSample(int x, int z) {
-        return generator.noiseGenerator.getNoiseSample(x, z);
+    public void hint(int seed, ChunkPos pos) {
+        getAsync(seed, pos);
     }
 
-    public void sample(int x, int z, NoiseSample sample) {
-        generator.getNoiseGenerator().sample(x, z, sample);
+    public int getHeight(int seed, int x, int z) {
+        return generator.getHeight(seed, x, z);
     }
 
-    public TerrainData getNow(ChunkPos pos) {
-        return getAsync(pos).join();
+    public NoiseSample getSample(int seed, int x, int z) {
+        return generator.noiseGenerator.getNoiseSample(seed, x, z);
+    }
+
+    public void sample(int seed, int x, int z, NoiseSample sample) {
+        generator.getNoiseGenerator().sample(seed, x, z, sample);
+    }
+
+    public TerrainData getNow(int seed, ChunkPos pos) {
+        return getAsync(seed, pos).join();
     }
 
     @Nullable
-    public TerrainData getIfReady(ChunkPos pos) {
-        var task = cache.get(pos);
-        if (task == null || !task.isDone()) return null;
+    public TerrainData getIfReady(int seed, ChunkPos pos) {
+        var key = allocPos(seed, pos);
+        var value = cache.get(key);
 
-        return task.join();
+        if (value == null || !value.task.isDone()) return null;
+
+        return value.task.join();
     }
 
-    public CompletableFuture<TerrainData> getAsync(ChunkPos pos) {
-        return cache.computeIfAbsent(pos, this::generate);
+    public CompletableFuture<TerrainData> getAsync(int seed, ChunkPos pos) {
+        var key = allocPos(seed, pos);
+        return cache.computeIfAbsent(key, this::generate).task;
     }
 
     public <T> CompletableFuture<ChunkAccess> combineAsync(Executor executor,
+                                                           int seed,
                                                            ChunkAccess chunk,
                                                            BiFunction<ChunkAccess, TerrainData, ChunkAccess> function) {
 
-        return getAsync(chunk.getPos()).thenApplyAsync(terrainData -> function.apply(chunk, terrainData), executor);
+        return getAsync(seed, chunk.getPos()).thenApplyAsync(terrainData -> function.apply(chunk, terrainData), executor);
     }
 
-    protected CompletableFuture<TerrainData> generate(ChunkPos pos) {
-        return CompletableFuture.supplyAsync(() -> generator.generate(pos.x, pos.z), ThreadPool.EXECUTOR);
+    protected CacheValue generate(CacheKey key) {
+        var value = valuePool.take();
+        value.key = key;
+        value.generator = generator;
+        value.task = CompletableFuture.supplyAsync(value, ThreadPool.EXECUTOR);
+        return value;
+    }
+
+    protected static class CacheKey {
+        protected int seed, x, z;
+
+        public CacheKey set(int seed, int x, int y) {
+            this.seed = seed;
+            this.x = x;
+            this.z = y;
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof CacheKey pos && seed == pos.seed && x == pos.x && z == pos.z;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = seed;
+            result = 31 * result + x;
+            result = 31 * result + z;
+            return result;
+        }
+    }
+
+    protected static class CacheValue implements Supplier<TerrainData> {
+        protected CacheKey key;
+        protected TerrainGenerator generator;
+        protected CompletableFuture<TerrainData> task;
+
+        public CacheValue reset() {
+            key = null;
+            task = null;
+            generator = null;
+            return this;
+        }
+
+        @Override
+        public TerrainData get() {
+            return generator.generate(key.seed, key.x, key.z);
+        }
     }
 }

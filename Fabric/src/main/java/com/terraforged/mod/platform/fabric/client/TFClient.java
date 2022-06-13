@@ -26,16 +26,13 @@ package com.terraforged.mod.platform.fabric.client;
 
 import com.terraforged.mod.client.Client;
 import com.terraforged.mod.platform.ClientAPI;
-import com.terraforged.mod.util.DemoHandler;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 
 public class TFClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientAPI.HOLDER.set(new FabricClientAPI());
         Client.INSTANCE.init();
-        HudRenderCallback.EVENT.register((stack, tickDelta) -> DemoHandler.renderOverlay(stack));
     }
 
     private static class FabricClientAPI implements ClientAPI {}

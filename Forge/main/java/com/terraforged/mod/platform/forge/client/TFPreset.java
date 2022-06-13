@@ -25,14 +25,14 @@
 package com.terraforged.mod.platform.forge.client;
 
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.platform.forge.util.ForgeUtil;
 import com.terraforged.mod.worldgen.GeneratorPreset;
 import com.terraforged.mod.worldgen.datapack.DataPackExporter;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -43,11 +43,11 @@ import java.nio.file.Files;
 public class TFPreset implements ForgeWorldPreset.IBasicChunkGeneratorFactory {
     @Override
     public ChunkGenerator createChunkGenerator(RegistryAccess registryAccess, long seed) {
-        return GeneratorPreset.build(seed, TerrainLevels.DEFAULT.get(), registryAccess);
+        return GeneratorPreset.build(TerrainLevels.DEFAULT.get(), registryAccess);
     }
 
     public static ForgeWorldPreset create() {
-        return ForgeUtil.withName(new ForgeWorldPreset(new TFPreset()) {
+        return new ForgeWorldPreset(new TFPreset()) {
             @Override
             public String getTranslationKey() {
                 return GeneratorPreset.TRANSLATION_KEY;
@@ -55,9 +55,10 @@ public class TFPreset implements ForgeWorldPreset.IBasicChunkGeneratorFactory {
 
             @Override
             public Component getDisplayName() {
-                return new TranslatableComponent(getTranslationKey()).withStyle(s -> s.withColor(ChatFormatting.GREEN));
+                return MutableComponent.create(new TranslatableContents(getTranslationKey()))
+                        .withStyle(s -> s.withColor(ChatFormatting.GREEN));
             }
-        }, TerraForged.MODID);
+        };
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

@@ -29,16 +29,15 @@ import com.terraforged.mod.worldgen.biome.vegetation.BiomeVegetationManager;
 import com.terraforged.mod.worldgen.biome.vegetation.VegetationFeatures;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import net.minecraft.core.*;
-import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
-import net.minecraft.world.level.levelgen.RandomSupport;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
-import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.structure.Structure;
 
 import java.util.List;
 import java.util.Map;
@@ -49,7 +48,7 @@ public class FeatureDecorator {
     private static final int MAX_DECORATION_STAGE = GenerationStep.Decoration.TOP_LAYER_MODIFICATION.ordinal();
 
     private final BiomeVegetationManager vegetation;
-    private final Map<GenerationStep.Decoration, List<Holder<ConfiguredStructureFeature<?, ?>>>> structures;
+    private final Map<GenerationStep.Decoration, List<Holder<Structure>>> structures;
 
     public FeatureDecorator(RegistryAccess access) {
         this.vegetation = new BiomeVegetationManager(access);
@@ -60,7 +59,7 @@ public class FeatureDecorator {
         return vegetation;
     }
 
-    public List<Holder<ConfiguredStructureFeature<?, ?>>> getStageStructures(int stage) {
+    public List<Holder<Structure>> getStageStructures(int stage) {
         return structures.get(STAGES[stage]);
     }
 
@@ -72,12 +71,12 @@ public class FeatureDecorator {
 
     public void decorate(ChunkAccess chunk,
                          WorldGenLevel level,
-                         StructureFeatureManager structures,
+                         StructureManager structures,
                          CompletableFuture<TerrainData> terrain,
                          Generator generator) {
         var origin = getOrigin(level, chunk);
         var biome = level.getBiome(origin);
-        var random = getRandom();
+        var random = getRandom(level.getSeed());
         long seed = random.setDecorationSeed(level.getSeed(), origin.getX(), origin.getZ());
 
         decoratePre(seed, origin, biome, chunk, level, generator, random, structures);
@@ -92,7 +91,7 @@ public class FeatureDecorator {
                              WorldGenLevel level,
                              Generator generator,
                              WorldgenRandom random,
-                             StructureFeatureManager structureManager) {
+                             StructureManager structureManager) {
 
         VanillaDecorator.decorate(seed, 0, VegetationFeatures.STAGE - 1, origin, biome, chunk, level, generator, random, structureManager, this);
     }
@@ -104,7 +103,7 @@ public class FeatureDecorator {
                               WorldGenLevel level,
                               Generator generator,
                               WorldgenRandom random,
-                              StructureFeatureManager structureManager) {
+                              StructureManager structureManager) {
 
         VanillaDecorator.decorate(seed, VegetationFeatures.STAGE + 1, MAX_DECORATION_STAGE, origin, biome, chunk, level, generator, random, structureManager, this);
     }
@@ -127,7 +126,7 @@ public class FeatureDecorator {
         return sectionPos.origin();
     }
 
-    private static WorldgenRandom getRandom() {
-        return new WorldgenRandom(new LegacyRandomSource(RandomSupport.seedUniquifier()));
+    private static WorldgenRandom getRandom(long seed) {
+        return new WorldgenRandom(new LegacyRandomSource(seed));
     }
 }

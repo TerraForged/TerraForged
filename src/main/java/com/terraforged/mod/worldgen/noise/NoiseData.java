@@ -25,9 +25,9 @@
 package com.terraforged.mod.worldgen.noise;
 
 import com.terraforged.engine.world.terrain.Terrain;
-import com.terraforged.mod.util.map.FloatMap;
-import com.terraforged.mod.util.map.Index;
-import com.terraforged.mod.util.map.ObjectMap;
+import com.terraforged.mod.util.storage.FloatMap;
+import com.terraforged.mod.util.storage.Index;
+import com.terraforged.mod.util.storage.ObjectMap;
 
 public class NoiseData {
     protected static final int BORDER = 1;

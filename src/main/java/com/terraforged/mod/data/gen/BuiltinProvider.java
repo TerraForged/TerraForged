@@ -24,20 +24,32 @@
 
 package com.terraforged.mod.data.gen;
 
+import com.terraforged.mod.TerraForged;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.HashCache;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public record BuiltinProvider(Path dir) implements DataProvider {
     @Override
-    public String getName() {
-        return "TerraForged Builtins";
+    public void run(CachedOutput cachedOutput) throws IOException {
+        DataGen.export(dir);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                // Process hangs so force exit after completion
+                TerraForged.LOG.warn("Forcibly shutting down datagen process");
+                System.exit(0);
+            }
+        }, 1_000L);
     }
 
     @Override
-    public void run(HashCache cache) throws IOException {
-        DataGen.export(dir);
+    public String getName() {
+        return "TerraForged Builtins";
     }
 }

@@ -59,8 +59,8 @@ public class RiverCarver {
                 .ridge();
     }
 
-    public void carve(float x, float y, NoiseSample sample, CarverSample carverSample) {
-        float erosion = erosionNoise.getValue(x, y);
+    public void carve(int seed, float x, float y, NoiseSample sample, CarverSample carverSample) {
+        float erosion = erosionNoise.getValue(seed, x, y);
         float baseModifier = getBaseModifier(sample);
 
         float baseNoise = sample.baseNoise * baseModifier;

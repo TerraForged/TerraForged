@@ -36,12 +36,16 @@ import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.engine.world.terrain.TerrainType;
 import com.terraforged.mod.worldgen.GeneratorPreset;
 import com.terraforged.mod.worldgen.Regenerator;
+import com.terraforged.mod.worldgen.Seeds;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.Heightmap;
 
@@ -92,7 +96,7 @@ public class TFCommands {
 //        var structures = context.getSource().getLevel().getChunkSource().getGenerator().getSettings();
 //        DataGen.exportStructureConfigs(DataPackExporter.DEFAULT_PACK_DIR, structures, access);
 
-        var result = new TextComponent("Exported structure settings")
+        var result = MutableComponent.create(new LiteralContents("Exported structure settings"))
                 .withStyle(s -> s.withColor(ChatFormatting.GREEN));
 
         context.getSource().sendSuccess(result, false);
@@ -110,26 +114,28 @@ public class TFCommands {
 
         var player = context.getSource().getPlayerOrException();
         var at = player.blockPosition();
+        var state = player.getLevel().getChunkSource().randomState();
 
         Component result;
         if (terrain == null) {
-            result = new TextComponent("Invalid terrain: " + name).withStyle(ChatFormatting.RED);
+            result = text("Invalid terrain: " + name).withStyle(ChatFormatting.RED);
         } else {
+            int seed = Seeds.get(state.legacyLevelSeed());
             int maxRadius = Math.min(100, radius + 50);
-            long pos = generator.getNoiseGenerator().find(at.getX(), at.getZ(), radius, maxRadius, terrain);
+            long pos = generator.getNoiseGenerator().find(seed, at.getX(), at.getZ(), radius, maxRadius, terrain);
 
             if (pos == 0L) {
-                result = new TextComponent("Unable to locate terrain: " + name).withStyle(ChatFormatting.RED);
+                result = text("Unable to locate terrain: " + name).withStyle(ChatFormatting.RED);
             } else {
                 int x = PosUtil.unpackLeft(pos);
                 int z = PosUtil.unpackRight(pos);
-                int y = generator.getFirstFreeHeight(x, z, Heightmap.Types.MOTION_BLOCKING, player.level);
+                int y = generator.getFirstFreeHeight(x, z, Heightmap.Types.MOTION_BLOCKING, player.level, state);
 
                 result = createTerrainTeleportMessage(at, x, y, z, terrain);
             }
         }
 
-        player.sendMessage(result, ChatType.SYSTEM, Util.NIL_UUID);
+        player.sendSystemMessage(result);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -139,17 +145,21 @@ public class TFCommands {
         String commandText = String.format("/tp %s %s %s", x, y, z);
         String distanceText = String.format("%.1f", distance);
         String positionText = String.format("%s;%s;%s", x, y, z);
-        return new TextComponent("Found terrain: ").withStyle(ChatFormatting.GREEN)
-                .append(new TextComponent(terrain.getName()).withStyle(ChatFormatting.YELLOW))
-                .append(new TextComponent(" Distance: ").withStyle(ChatFormatting.GREEN))
-                .append(new TextComponent(distanceText).withStyle(ChatFormatting.YELLOW))
-                .append(new TextComponent(". ").withStyle(ChatFormatting.GREEN))
-                .append(new TextComponent("Teleport")
+        return text("Found terrain: ").withStyle(ChatFormatting.GREEN)
+                .append(text(terrain.getName()).withStyle(ChatFormatting.YELLOW))
+                .append(text(" Distance: ").withStyle(ChatFormatting.GREEN))
+                .append(text(distanceText).withStyle(ChatFormatting.YELLOW))
+                .append(text(". ").withStyle(ChatFormatting.GREEN))
+                .append(text("Teleport")
                         .withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE)
                         .withStyle(style -> style
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandText))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                        new TextComponent("Location: ").withStyle(ChatFormatting.GREEN)
-                                                .append(new TextComponent(positionText).withStyle(ChatFormatting.YELLOW))))));
+                                        text("Location: ").withStyle(ChatFormatting.GREEN)
+                                                .append(text(positionText).withStyle(ChatFormatting.YELLOW))))));
+    }
+
+    private static MutableComponent text(String message) {
+        return MutableComponent.create(new LiteralContents(message));
     }
 }

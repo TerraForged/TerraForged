@@ -24,30 +24,24 @@
 
 package com.terraforged.mod.platform.forge;
 
-import com.terraforged.mod.Common;
+import com.google.common.base.Suppliers;
+import com.terraforged.mod.CommonAPI;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.command.TFCommands;
-import com.terraforged.mod.data.ModBiomes;
 import com.terraforged.mod.data.ModTags;
-import com.terraforged.mod.data.gen.DataGen;
-import com.terraforged.mod.platform.CommonAPI;
+import com.terraforged.mod.data.gen.BuiltinProvider;
+import com.terraforged.mod.lifecycle.CommonSetup;
+import com.terraforged.mod.lifecycle.DataSetup;
+import com.terraforged.mod.lifecycle.RegistrySetup;
 import com.terraforged.mod.platform.forge.client.TFClient;
-import com.terraforged.mod.platform.forge.client.TFPreset;
-import com.terraforged.mod.platform.forge.util.ForgeRegistrar;
-import com.terraforged.mod.registry.lazy.LazyTag;
-import com.terraforged.mod.registry.registrar.NoopRegistrar;
+import com.terraforged.mod.platform.forge.registry.ForgeModRegistry;
+import com.terraforged.mod.platform.forge.registry.ForgeRegistry;
+import com.terraforged.mod.registry.RegistryManager;
 import com.terraforged.mod.worldgen.biome.util.matcher.BiomeMatcher;
 import com.terraforged.mod.worldgen.biome.util.matcher.BiomeTagMatcher;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.data.DataProvider;
-import net.minecraft.data.HashCache;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
+import net.minecraft.tags.BiomeTags;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.world.ForgeWorldPreset;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -55,100 +49,61 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.function.Supplier;
 
 @Mod(TerraForged.MODID)
-public class TFMain extends TerraForged {
+public class TFMain extends TerraForged implements CommonAPI {
+    private final Supplier<Path> container = Suppliers.memoize(TFMain::getRootPath);
+    private final RegistryManager registryManager = new RegistryManager(ForgeRegistry::new, ForgeModRegistry::new);
+
     public TFMain() {
-        super(TFMain::getRootPath);
-        CommonAPI.HOLDER.set(new ForgeCommonAPI());
+        CommonAPI.HOLDER.set(this);
 
         MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
-
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onInit);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onGenerateData);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Biome.class, this::onBiomes);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(ForgeWorldPreset.class, this::onPresets);
-
-        // Biomes are registered via event
-        setRegistrar(Registry.BIOME_REGISTRY, NoopRegistrar.none());
 
         if (FMLLoader.getDist().isClient()) {
             new TFClient();
         }
     }
 
+    @Override
+    public Path getContainer() {
+        return container.get();
+    }
+
+    @Override
+    public RegistryManager getRegistryManager() {
+        return registryManager;
+    }
+
+    @Override
+    public BiomeMatcher getOverworldMatcher() {
+        return new BiomeTagMatcher.Overworld(BiomeTags.IS_OVERWORLD, ModTags.OVERWORLD.get());
+    }
+
     void onInit(FMLCommonSetupEvent event) {
-        event.enqueueWork(Common.INSTANCE::init);
+        event.enqueueWork(CommonSetup.INSTANCE::init);
     }
 
     void onRegisterCommands(RegisterCommandsEvent event) {
         TFCommands.register(event.getDispatcher());
     }
 
-    void onBiomes(RegistryEvent.Register<Biome> event) {
-        ModBiomes.register(new ForgeRegistrar<>(event.getRegistry()));
-    }
-
-    void onPresets(RegistryEvent.Register<ForgeWorldPreset> event) {
-        TerraForged.LOG.debug("Registering world-preset");
-        event.getRegistry().register(TFPreset.create());
-    }
-
     void onGenerateData(GatherDataEvent event) {
-        Common.INSTANCE.init();
+        // Init everything necessary to data-gen
+        RegistrySetup.INSTANCE.init();
+        CommonSetup.INSTANCE.init();
+        DataSetup.INSTANCE.init();
 
         var path = event.getGenerator().getOutputFolder().resolve("resources/default");
-        event.getGenerator().addProvider(new DataProvider() {
-            @Override
-            public String getName() {
-                return "TerraForged";
-            }
 
-            @Override
-            public void run(HashCache cache) throws IOException {
-                try {
-                    DataGen.export(path);
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                }
-
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        // Process hangs so force exit after completion
-                        TerraForged.LOG.warn("Forcibly shutting down datagen process");
-                        System.exit(0);
-                    }
-                }, 1_000L);
-            }
-        });
-
+        event.getGenerator().addProvider(true, new BuiltinProvider(path));
     }
 
     private static Path getRootPath() {
         return ModList.get().getModContainerById(MODID).orElseThrow().getModInfo().getOwningFile().getFile().getFilePath();
-    }
-
-    private static class ForgeCommonAPI implements CommonAPI {
-        public static final LazyTag<Biome> FORGE_OVERWORLD = LazyTag.biome("forge:overworld");
-
-        @Override
-        public BiomeMatcher getOverworldMatcher() {
-            return new BiomeTagMatcher.Overworld(FORGE_OVERWORLD.get(), ModTags.OVERWORLD.get()) {
-                @Override
-                public boolean test(Holder<Biome> biome) {
-                    return super.test(biome) || testDictionary(biome);
-                }
-
-                @Deprecated
-                private boolean testDictionary(Holder<Biome> biome) {
-                    return BiomeDictionary.hasType(biome.unwrapKey().orElseThrow(), BiomeDictionary.Type.OVERWORLD);
-                }
-            };
-        }
     }
 }

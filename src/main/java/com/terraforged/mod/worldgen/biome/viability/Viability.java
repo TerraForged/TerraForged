@@ -46,6 +46,8 @@ public interface Viability {
     }
 
     interface Context {
+        int seed();
+
         boolean edge();
 
         TerrainLevels getLevels();

@@ -25,7 +25,7 @@
 package com.terraforged.mod.worldgen.asset;
 
 import com.mojang.serialization.Codec;
-import com.terraforged.mod.codec.LazyCodec;
+import com.terraforged.mod.data.codec.LazyCodec;
 import com.terraforged.mod.util.seed.ContextSeedable;
 import com.terraforged.mod.worldgen.cave.CaveType;
 import com.terraforged.mod.worldgen.noise.NoiseCodec;
@@ -82,16 +82,16 @@ public class NoiseCave implements ContextSeedable<NoiseCave>  {
         return type;
     }
 
-    public int getHeight(int x, int z) {
-        return getScaleValue(x, z, 1F, minY, rangeY, elevation);
+    public int getHeight(int seed, int x, int z) {
+        return getScaleValue(seed, x, z, 1F, minY, rangeY, elevation);
     }
 
-    public int getCavernSize(int x, int z, float modifier) {
-        return getScaleValue(x, z, modifier, 0, size, shape);
+    public int getCavernSize(int seed, int x, int z, float modifier) {
+        return getScaleValue(seed, x, z, modifier, 0, size, shape);
     }
 
-    public int getFloorDepth(int x, int z, int size) {
-        return getScaleValue(x, z, 1F, 0, size, floor);
+    public int getFloorDepth(int seed, int x, int z, int size) {
+        return getScaleValue(seed, x, z, 1F, 0, size, floor);
     }
 
     @Override
@@ -108,9 +108,9 @@ public class NoiseCave implements ContextSeedable<NoiseCave>  {
                 '}';
     }
 
-    private static int getScaleValue(int x, int z, float modifier, int min, int range, Module noise) {
+    private static int getScaleValue(int seed, int x, int z, float modifier, int min, int range, Module noise) {
         if (range <= 0) return 0;
 
-        return min + NoiseUtil.floor(noise.getValue(x, z) * range * modifier);
+        return min + NoiseUtil.floor(noise.getValue(seed, x, z) * range * modifier);
     }
 }

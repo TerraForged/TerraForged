@@ -36,7 +36,7 @@ public record BiomeEdgeViability(float distance) implements Viability {
     @Override
     public float getFitness(int x, int z, Context context) {
         if (context.edge()) {
-            var edge = context.getClimateSampler().getShape(x, z);
+            var edge = context.getClimateSampler().getShape(context.seed(), x, z);
 
             if (edge > distance) return 0F;
 

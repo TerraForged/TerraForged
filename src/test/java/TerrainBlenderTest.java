@@ -42,7 +42,7 @@ public class TerrainBlenderTest {
         });
 
         N2DUtil.display(2000, 1200, (x, z, img) -> {
-            float noise = blender.getValue(x, z);
+            float noise = blender.getValue(12839476, x, z);
 
             img.setRGB(x, z, Color.HSBtoRGB(0, 0, noise));
         }).setVisible(true);

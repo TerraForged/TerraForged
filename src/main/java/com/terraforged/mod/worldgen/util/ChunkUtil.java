@@ -26,19 +26,17 @@ package com.terraforged.mod.worldgen.util;
 
 import com.google.common.base.Suppliers;
 import com.terraforged.mod.worldgen.GeneratorResource;
+import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.terrain.StructureTerrain;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.StructureFeatureManager;
-import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -54,7 +52,7 @@ public class ChunkUtil {
     public static final FillerBlock FILLER = ChunkUtil::getFiller;
     public static final Supplier<ByteBuf> FULL_SECTION = Suppliers.memoize(ChunkUtil::createFullPalette);
 
-    public static void fillNoiseBiomes(ChunkAccess chunk, BiomeSource source, Climate.Sampler sampler, GeneratorResource resource) {
+    public static void fillNoiseBiomes(ChunkAccess chunk, BiomeSource source, GeneratorResource resource) {
         var pos = chunk.getPos();
         int biomeX = QuartPos.fromBlock(pos.getMinBlockX());
         int biomeZ = QuartPos.fromBlock(pos.getMinBlockZ());
@@ -63,30 +61,15 @@ public class ChunkUtil {
         var biomeBuffer = resource.biomeBuffer2D;
         for (int dz = 0; dz < 4; dz++) {
             for (int dx = 0; dx < 4; dx++) {
-                var biome = source.getNoiseBiome(biomeX + dx, -1, biomeZ + dz, sampler);
-
-                biomeBuffer[dz << 2 | dx] = biome;
+                var biome = source.getNoiseBiome(biomeX + dx, -1, biomeZ + dz, Source.NOOP_CLIMATE_SAMPLER);
+                biomeBuffer.set(dx, dz, biome);
             }
         }
 
         for(int i = heightAccessor.getMinSection(); i < heightAccessor.getMaxSection(); ++i) {
             var chunkSection = chunk.getSection(chunk.getSectionIndexFromSectionY(i));
-            fillNoiseBiomes(chunkSection, biomeBuffer);
+            chunkSection.fillBiomesFromNoise(biomeBuffer, Source.NOOP_CLIMATE_SAMPLER, 0, 0);
         }
-    }
-
-    private static void fillNoiseBiomes(LevelChunkSection section, Holder<Biome>[] biomeBuffer) {
-        var biomes = section.getBiomes();
-        biomes.acquire();
-        for (int dz = 0; dz < 4; dz++) {
-            for (int dx = 0; dx < 4; dx++) {
-                var biome = biomeBuffer[dz << 2 | dx];
-                for (int dy = 0; dy < 4; dy++) {
-                    biomes.getAndSetUnchecked(dx, dy, dz, biome);
-                }
-            }
-        }
-        biomes.release();
     }
 
     public static void fillChunk(int seaLevel, ChunkAccess chunk, TerrainData terrainData, FillerBlock filler, GeneratorResource resource) {
@@ -132,7 +115,7 @@ public class ChunkUtil {
         }
     }
 
-    public static void buildStructureTerrain(ChunkAccess chunk, TerrainData terrainData, StructureFeatureManager structureFeatures) {
+    public static void buildStructureTerrain(ChunkAccess chunk, TerrainData terrainData, StructureManager structureFeatures) {
         int x = chunk.getPos().getMinBlockX();
         int z = chunk.getPos().getMinBlockZ();
         var operation = new StructureTerrain(chunk, structureFeatures);

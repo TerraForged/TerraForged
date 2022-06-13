@@ -24,9 +24,9 @@
 
 package com.terraforged.mod.platform.forge.client;
 
-import com.terraforged.mod.client.Client;
+import com.terraforged.mod.client.ClientAPI;
 import com.terraforged.mod.client.screen.ScreenUtil;
-import com.terraforged.mod.platform.ClientAPI;
+import com.terraforged.mod.lifecycle.ClientSetup;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.ForgeConfig;
@@ -43,7 +43,7 @@ public class TFClient {
     }
 
     void onClientInit(FMLClientSetupEvent event) {
-        event.enqueueWork(Client.INSTANCE::init);
+        event.enqueueWork(ClientSetup.INSTANCE::init);
         event.enqueueWork(TFPreset::makeDefault);
     }
 

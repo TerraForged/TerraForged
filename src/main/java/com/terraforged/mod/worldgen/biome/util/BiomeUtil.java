@@ -25,8 +25,8 @@
 package com.terraforged.mod.worldgen.biome.util;
 
 import com.terraforged.engine.world.biome.type.BiomeType;
+import com.terraforged.mod.CommonAPI;
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.platform.CommonAPI;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -36,6 +36,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BiomeUtil {
     private static final Map<BiomeType, ResourceLocation> TYPE_NAMES = new EnumMap<>(BiomeType.class);
@@ -81,18 +82,19 @@ public class BiomeUtil {
     }
 
     public static BiomeType getType(Holder<Biome> biome) {
-        return switch (Biome.getBiomeCategory(biome)) {
-            case MESA, DESERT -> BiomeType.DESERT;
-            case PLAINS -> getByTemp(biome.value(), BiomeType.COLD_STEPPE, BiomeType.GRASSLAND, BiomeType.STEPPE);
-            case TAIGA -> getByTemp(biome.value(), BiomeType.TUNDRA, BiomeType.TAIGA);
-            case ICY -> BiomeType.TUNDRA;
-            case SAVANNA -> BiomeType.SAVANNA;
-            case JUNGLE -> BiomeType.TROPICAL_RAINFOREST;
-            case FOREST ->
-                    getByRain(biome.value(), BiomeType.TUNDRA, BiomeType.TEMPERATE_RAINFOREST, BiomeType.TEMPERATE_FOREST);
-            case MOUNTAIN -> BiomeType.ALPINE;
-            default -> null;
-        };
+//        return switch (Biome.getBiomeCategory(biome)) {
+//            case MESA, DESERT -> BiomeType.DESERT;
+//            case PLAINS -> getByTemp(biome.value(), BiomeType.COLD_STEPPE, BiomeType.GRASSLAND, BiomeType.STEPPE);
+//            case TAIGA -> getByTemp(biome.value(), BiomeType.TUNDRA, BiomeType.TAIGA);
+//            case ICY -> BiomeType.TUNDRA;
+//            case SAVANNA -> BiomeType.SAVANNA;
+//            case JUNGLE -> BiomeType.TROPICAL_RAINFOREST;
+//            case FOREST ->
+//                    getByRain(biome.value(), BiomeType.TUNDRA, BiomeType.TEMPERATE_RAINFOREST, BiomeType.TEMPERATE_FOREST);
+//            case MOUNTAIN -> BiomeType.ALPINE;
+//            default -> null;
+//        };
+        return BiomeType.TAIGA;
     }
 
     public static BiomeType getByRain(Biome biome, BiomeType frozen, BiomeType wetter, BiomeType dryer) {
@@ -112,6 +114,8 @@ public class BiomeUtil {
     }
 
     private static Set<Holder<Biome>> getVanillaOverworldBiomes(Registry<Biome> biomes) {
-        return new HashSet<>(MultiNoiseBiomeSource.Preset.OVERWORLD.biomeSource(biomes).possibleBiomes());
+        return MultiNoiseBiomeSource.Preset.OVERWORLD.possibleBiomes()
+                .map(biomes::getOrCreateHolderOrThrow)
+                .collect(Collectors.toSet());
     }
 }

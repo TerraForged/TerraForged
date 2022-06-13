@@ -25,7 +25,7 @@
 package com.terraforged.mod.worldgen.biome;
 
 import com.terraforged.mod.data.ModBiomes;
-import com.terraforged.mod.util.map.WeightMap;
+import com.terraforged.mod.util.storage.WeightMap;
 import com.terraforged.mod.worldgen.biome.util.BiomeMapManager;
 import com.terraforged.mod.worldgen.cave.CaveType;
 import com.terraforged.noise.util.Noise;
@@ -40,35 +40,32 @@ import java.util.Map;
 public class CaveBiomeSampler {
     public static final int OFFSET = 124897;
 
-    protected final int seed;
     protected final int scale;
     protected final float frequency;
     protected final Map<CaveType, WeightMap<Holder<Biome>>> typeMap = new EnumMap<>(CaveType.class);
 
-    public CaveBiomeSampler(long seed, int scale, BiomeMapManager biomeMapManager) {
-        this.seed = (int) seed + OFFSET;
+    public CaveBiomeSampler(int scale, BiomeMapManager biomeMapManager) {
         this.scale = scale;
         this.frequency = 1F / scale;
 
-        Holder<Biome>[] global = new Holder[]{biomeMapManager.getBiomes().getHolderOrThrow(ModBiomes.CAVE.key())};
+        Holder<Biome>[] global = new Holder[]{biomeMapManager.getBiomes().getHolderOrThrow(ModBiomes.CAVE.get())};
         Holder<Biome>[] special = biomeMapManager.getBiomes()
                 .holders()
-                .filter(b -> Biome.getBiomeCategory(b) == Biome.BiomeCategory.UNDERGROUND)
+//                .filter(b -> Biome.getBiomeCategory(b) == Biome.BiomeCategory.UNDERGROUND) TODO
                 .toArray(Holder[]::new);
 
         this.typeMap.put(CaveType.GLOBAL, create(global));
         this.typeMap.put(CaveType.UNIQUE, create(special));
     }
 
-    public CaveBiomeSampler(long seed, CaveBiomeSampler other) {
-        this.seed = (int) seed + OFFSET;
+    public CaveBiomeSampler(CaveBiomeSampler other) {
         this.scale = other.scale;
         this.frequency = 1F / other.scale;
         this.typeMap.putAll(other.typeMap);
     }
 
     public Holder<Biome> getUnderGroundBiome(int seed, int x, int z, CaveType type) {
-        float noise = sample(seed + this.seed, x, z, frequency);
+        float noise = sample(seed + OFFSET, x, z, frequency);
         return typeMap.get(type).getValue(noise);
     }
 

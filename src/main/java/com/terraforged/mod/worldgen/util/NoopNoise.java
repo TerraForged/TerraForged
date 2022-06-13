@@ -24,39 +24,13 @@
 
 package com.terraforged.mod.worldgen.util;
 
-import com.google.common.base.Suppliers;
 import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraft.world.level.levelgen.DensityFunctions;
-import net.minecraft.world.level.levelgen.NoiseRouter;
-import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.function.Supplier;
 
 public class NoopNoise {
-    public static final NoiseRouter ROUTER = new NoiseRouter(
-            DensityFunctions.zero(),
-            DensityFunctions.zero(),
-            DensityFunctions.zero(),
-            DensityFunctions.zero(),
-            new XoroshiroRandomSource.XoroshiroPositionalRandomFactory(0L, 0L),
-            new XoroshiroRandomSource.XoroshiroPositionalRandomFactory(0L, 0L),
-            DensityFunctions.zero(),
-            DensityFunctions.zero(),
-            DensityFunctions.zero(),
-            DensityFunctions.zero(),
-            DensityFunctions.zero(),
-            DensityFunctions.zero(),
-            DensityFunctions.zero(),
-            DensityFunctions.zero(),
-            DensityFunctions.zero(),
-            DensityFunctions.zero(),
-            DensityFunctions.zero(),
-            List.of()
-    );
-
-    public static final Supplier<DensityFunctions.BeardifierOrMarker> BEARDIFIER = Suppliers.ofInstance(new DensityFunctions.BeardifierOrMarker() {
+    public static final DensityFunctions.BeardifierOrMarker BEARDIFIER = new DensityFunctions.BeardifierOrMarker() {
         @Override
         public double compute(DensityFunction.FunctionContext ctx) {
             return 0.0D;
@@ -76,5 +50,5 @@ public class NoopNoise {
         public double maxValue() {
             return 0.0D;
         }
-    });
+    };
 }

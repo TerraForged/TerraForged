@@ -25,15 +25,16 @@
 package com.terraforged.mod.worldgen.noise.continent;
 
 import com.terraforged.engine.settings.WorldSettings;
+import com.terraforged.mod.client.ui.Previewer;
 import com.terraforged.mod.data.ModTerrains;
 import com.terraforged.mod.util.ColorUtil;
-import com.terraforged.mod.util.ui.Previewer;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
 import com.terraforged.mod.worldgen.noise.climate.ClimateNoise;
 import com.terraforged.mod.worldgen.noise.climate.ClimateSample;
 import com.terraforged.mod.worldgen.noise.continent.config.ContinentConfig;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
+import com.terraforged.noise.util.NoiseUtil;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -44,7 +45,7 @@ public class ContinentPreview {
         Previewer.launch(() -> {
             var noise = create();
             return (x, y) -> {
-                var sample = noise.getSample(x, y);
+                var sample = noise.getSample(273651, x, y);
 
                 return ColorUtil.getBiomeColor(sample, 0.2f);
             };
@@ -68,25 +69,25 @@ public class ContinentPreview {
 
         // -385290196
 
-        var generator = new NoiseGenerator(SEED, terrainLevels, ModTerrains.Factory.getDefault(null));
+        var generator = new NoiseGenerator(terrainLevels, ModTerrains.Factory.getDefault(null));
 
         return new Noise(generator, new ClimateNoise(generator.getContinent().getContext()));
     }
 
     public record Noise(NoiseGenerator generator, ClimateNoise climate) {
-        public ClimateSample getSample(float x, float y) {
-            var sample = climate.getSample(x, y);
-            sampleContinent(x, y, sample);
-            sampleRivers(x, y, sample);
+        public ClimateSample getSample(int seed, float x, float y) {
+            var sample = climate.getSample(seed, x, y);
+            sampleContinent(seed, x, y, sample);
+            sampleRivers(seed, x, y, sample);
             return sample;
         }
 
-        public void sampleContinent(float x, float y, NoiseSample sample) {
-            generator.sampleContinentNoise((int) x, (int) y, sample);
+        public void sampleContinent(int seed, float x, float y, NoiseSample sample) {
+            generator.sampleContinentNoise(seed, NoiseUtil.floor(x), NoiseUtil.floor(y), sample);
         }
 
-        public void sampleRivers(float x, float y, NoiseSample sample) {
-            generator.sampleRiverNoise((int) x, (int) y, sample);
+        public void sampleRivers(int seed, float x, float y, NoiseSample sample) {
+            generator.sampleRiverNoise(seed, NoiseUtil.floor(x), NoiseUtil.floor(y), sample);
         }
     }
 }

@@ -24,58 +24,31 @@
 
 package com.terraforged.mod;
 
-import com.google.common.base.Suppliers;
-import com.terraforged.mod.platform.Platform;
-import com.terraforged.mod.registry.lazy.LazyRegistry;
-import com.terraforged.mod.registry.registrar.BuiltinRegistrar;
-import com.terraforged.mod.registry.registrar.Registrar;
+import com.terraforged.mod.lifecycle.RegistrySetup;
+import com.terraforged.mod.registry.key.RegistryKey;
+import com.terraforged.mod.worldgen.asset.*;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Supplier;
-
-public abstract class TerraForged implements Platform {
+public abstract class TerraForged {
 	public static final String MODID = "terraforged";
 	public static final String TITLE = "TerraForged";
 	public static final String DATAPACK_VERSION = "v0.1";
 	public static final Logger LOG = LogManager.getLogger(TITLE);
 
-	private final Supplier<Path> container;
-	private final Map<ResourceKey<? extends Registry<?>>, Registrar<?>> registrars = new HashMap<>();
+	public static final RegistryKey<Biome> BIOMES = RegistryKey.builtin(() -> Registry.BIOME_REGISTRY);
+	public static final RegistryKey<ClimateType> CLIMATES = registry("worldgen/climate");
+	public static final RegistryKey<NoiseCave> CAVES = registry("worldgen/cave");
+	public static final RegistryKey<TerrainNoise> TERRAINS = registry("worldgen/terrain/noise");
+	public static final RegistryKey<TerrainType> TERRAIN_TYPES = registry("worldgen/terrain/type");
+	public static final RegistryKey<VegetationConfig> VEGETATIONS = registry("worldgen/vegetation");
 
-	protected TerraForged(Supplier<Path> containerGetter) {
-		this.container = Suppliers.memoize(containerGetter::get);
-		Platform.ACTIVE_PLATFORM.set(this);
+	protected TerraForged() {
 		Environment.log();
-		registrars.put(Registry.BIOME_REGISTRY, new BuiltinRegistrar<>(Registry.BIOME_REGISTRY));
-	}
-
-	@Override
-	public final Path getContainer() {
-		return container.get();
-	}
-
-	@Override
-	public <T> Registrar<T> getRegistrar(ResourceKey<Registry<T>> key) {
-		var registrar = registrars.get(key);
-		Objects.requireNonNull(registrar);
-		//noinspection unchecked
-		return (Registrar<T>) registrar;
-	}
-
-	protected <T> void setRegistrar(ResourceKey<? extends Registry<T>> registry, Registrar<T> registrar) {
-		registrars.put(registry, registrar);
-	}
-
-	public static Platform getPlatform() {
-		return Platform.ACTIVE_PLATFORM.get();
+		RegistrySetup.INSTANCE.init();
 	}
 
 	public static ResourceLocation location(String name) {
@@ -84,7 +57,7 @@ public abstract class TerraForged implements Platform {
 		return new ResourceLocation(MODID, name);
 	}
 
-	public static <T> LazyRegistry<T> registry(String name) {
-		return new LazyRegistry<>(location(name));
+	public static <T> RegistryKey<T> registry(String name) {
+		return new RegistryKey<>(location(name));
 	}
 }

@@ -27,7 +27,7 @@ package com.terraforged.mod.command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.terraforged.engine.world.terrain.TerrainType;
-import com.terraforged.mod.registry.ModRegistry;
+import com.terraforged.mod.TerraForged;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
@@ -35,7 +35,7 @@ public class Arg {
     public static RequiredArgumentBuilder<CommandSourceStack, String> terrainType() {
         return Commands.argument("terrain", StringArgumentType.string()).suggests((context, builder) -> {
             var registries = context.getSource().getServer().registryAccess();
-            var terrainTypes = registries.ownedRegistry(ModRegistry.TERRAIN_TYPE.get());
+            var terrainTypes = registries.ownedRegistry(TerraForged.TERRAIN_TYPES.get());
             if (terrainTypes.isEmpty()) {
                 TerrainType.forEach(type -> builder.suggest(type.getName()));
             } else {

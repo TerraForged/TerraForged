@@ -46,13 +46,11 @@ public class VanillaGen {
     protected final Aquifer.FluidStatus fluidStatus2;
     protected final Aquifer.FluidPicker globalFluidPicker;
 
-    protected final SurfaceSystem surfaceSystem;
-
-    public VanillaGen(long seed, BiomeSource biomeSource, VanillaGen other) {
-        this(seed, biomeSource, other.settings, other.parameters, other.structureSets);
+    public VanillaGen(BiomeSource biomeSource, VanillaGen other) {
+        this(biomeSource, other.settings, other.parameters, other.structureSets);
     }
 
-    public VanillaGen(long seed, BiomeSource biomeSource, Holder<NoiseGeneratorSettings> settings, Registry<NormalNoise.NoiseParameters> parameters, Registry<StructureSet> structures) {
+    public VanillaGen(BiomeSource biomeSource, Holder<NoiseGeneratorSettings> settings, Registry<NormalNoise.NoiseParameters> parameters, Registry<StructureSet> structures) {
         this.settings = settings;
         this.parameters = parameters;
         this.structureSets = structures;
@@ -60,13 +58,7 @@ public class VanillaGen {
         this.fluidStatus1 = new Aquifer.FluidStatus(-54, Blocks.LAVA.defaultBlockState());
         this.fluidStatus2 = new Aquifer.FluidStatus(settings.value().seaLevel(), settings.value().defaultFluid());
         this.globalFluidPicker = (x, y, z) -> y < lavaLevel ? fluidStatus1 : fluidStatus2;
-
-        int seaLevel = settings.value().seaLevel();
-        var defaultBlock = settings.value().defaultBlock();
-        var randomSource = settings.value().getRandomSource();
-
-        this.surfaceSystem = new SurfaceSystem(parameters, defaultBlock, seaLevel, seed, randomSource);
-        this.vanillaGenerator = new NoiseBasedChunkGenerator(structures, parameters, biomeSource, seed, settings);
+        this.vanillaGenerator = new NoiseBasedChunkGenerator(structures, parameters, biomeSource, settings);
     }
 
     public Holder<NoiseGeneratorSettings> getSettings() {
@@ -81,11 +73,7 @@ public class VanillaGen {
         return globalFluidPicker;
     }
 
-    public SurfaceSystem getSurfaceSystem() {
-        return surfaceSystem;
-    }
-
-    public CarvingContext createCarvingContext(WorldGenRegion region, ChunkAccess chunk, NoiseChunk noiseChunk) {
-        return new CarvingContext(vanillaGenerator, region.registryAccess(), chunk.getHeightAccessorForGeneration(), noiseChunk);
+    public CarvingContext createCarvingContext(WorldGenRegion region, ChunkAccess chunk, NoiseChunk noiseChunk, RandomState state) {
+        return new CarvingContext(vanillaGenerator, region.registryAccess(), chunk.getHeightAccessorForGeneration(), noiseChunk, state, null);
     }
 }

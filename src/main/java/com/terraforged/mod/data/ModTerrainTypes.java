@@ -25,19 +25,17 @@
 package com.terraforged.mod.data;
 
 import com.terraforged.engine.world.terrain.Terrain;
-import com.terraforged.engine.world.terrain.TerrainHelper;
-import com.terraforged.mod.registry.ModRegistries;
-import com.terraforged.mod.registry.ModRegistry;
+import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.worldgen.asset.TerrainType;
 
-public interface ModTerrainTypes extends ModRegistry {
-    Terrain TORRIDONIAN = TerrainHelper.getOrCreate("torridonian", com.terraforged.engine.world.terrain.TerrainType.HILLS);
-    Terrain DOLOMITES = TerrainHelper.getOrCreate("dolomites", com.terraforged.engine.world.terrain.TerrainType.MOUNTAINS);
+public interface ModTerrainTypes {
+    Terrain TORRIDONIAN = com.terraforged.engine.world.terrain.TerrainType.getOrCreate("torridonian", com.terraforged.engine.world.terrain.TerrainType.HILLS);
+    Terrain DOLOMITES = com.terraforged.engine.world.terrain.TerrainType.getOrCreate("dolomites", com.terraforged.engine.world.terrain.TerrainType.MOUNTAINS);
 
     static void register() {
         com.terraforged.engine.world.terrain.TerrainType.forEach(terrain -> {
             var type = TerrainType.of(terrain);
-            ModRegistries.register(TERRAIN_TYPE, terrain.getName(), type);
+            TerraForged.TERRAIN_TYPES.register(terrain.getName(), type);
         });
     }
 }

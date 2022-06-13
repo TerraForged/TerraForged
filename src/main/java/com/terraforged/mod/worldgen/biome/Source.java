@@ -26,8 +26,8 @@ package com.terraforged.mod.worldgen.biome;
 
 import com.mojang.serialization.Codec;
 import com.terraforged.engine.util.pos.PosUtil;
-import com.terraforged.mod.util.map.LongCache;
-import com.terraforged.mod.util.map.LossyCache;
+import com.terraforged.mod.util.storage.LongCache;
+import com.terraforged.mod.util.storage.LossyCache;
 import com.terraforged.mod.worldgen.biome.util.BiomeMapManager;
 import com.terraforged.mod.worldgen.cave.CaveType;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
@@ -46,7 +46,7 @@ public class Source extends BiomeSource {
     public static final Codec<Source> CODEC = new SourceCodec();
     public static final Climate.Sampler NOOP_CLIMATE_SAMPLER = Climate.empty();
 
-    protected final long seed;
+    protected int seed;
     protected final RegistryAccess registries;
     protected final Set<Holder<Biome>> possibleBiomes;
     protected final BiomeSampler biomeSampler;
@@ -54,24 +54,17 @@ public class Source extends BiomeSource {
     protected final CaveBiomeSampler caveBiomeSampler;
     protected final LongCache<Holder<Biome>> cache = LossyCache.concurrent(2048, i -> (Holder<Biome>[]) new Holder[i]);
 
-    public Source(long seed, INoiseGenerator noise, Source other) {
+    public Source(INoiseGenerator noise, RegistryAccess access) {
         super(List.of());
-        this.seed = seed;
-        this.registries = other.registries;
-        this.biomeMapManager = other.biomeMapManager;
-        this.possibleBiomes = new ObjectLinkedOpenHashSet<>(other.possibleBiomes);
-        this.biomeSampler = new BiomeSampler(noise, other.biomeMapManager);
-        this.caveBiomeSampler = new CaveBiomeSampler(seed, other.caveBiomeSampler);
-    }
-
-    public Source(long seed, INoiseGenerator noise, RegistryAccess access) {
-        super(List.of());
-        this.seed = seed;
         this.registries = access;
         this.biomeMapManager = new BiomeMapManager(access);
         this.possibleBiomes = new ObjectLinkedOpenHashSet<>(biomeMapManager.getOverworldBiomes());
         this.biomeSampler = new BiomeSampler(noise, biomeMapManager);
-        this.caveBiomeSampler = new CaveBiomeSampler(seed, 800, biomeMapManager);
+        this.caveBiomeSampler = new CaveBiomeSampler(800, biomeMapManager);
+    }
+
+    public void withSeed(long seed) {
+        this.seed = (int) seed;
     }
 
     /**
@@ -93,13 +86,8 @@ public class Source extends BiomeSource {
     }
 
     @Override
-    public Source withSeed(long l) {
-        return this;
-    }
-
-    @Override
     public Holder<Biome> getNoiseBiome(int x, int y, int z, Climate.Sampler sampler) {
-        return cache.computeIfAbsent(PosUtil.pack(x, z), this::compute);
+        return cache.computeIfAbsent(seed, PosUtil.pack(x, z), this::compute);
     }
 
     public RegistryAccess getRegistries() {
@@ -115,16 +103,16 @@ public class Source extends BiomeSource {
     }
 
     public Holder<Biome> getUnderGroundBiome(int seed, int x, int z, CaveType type) {
-        return caveBiomeSampler.getUnderGroundBiome(seed, x, z, type);
+        return caveBiomeSampler.getUnderGroundBiome(this.seed + seed, x, z, type);
     }
 
     public Registry<Biome> getRegistry() {
         return biomeMapManager.getBiomes();
     }
 
-    protected Holder<Biome> compute(long index) {
+    protected Holder<Biome> compute(int seed, long index) {
         int x = PosUtil.unpackLeft(index) << 2;
         int z = PosUtil.unpackRight(index) << 2;
-        return biomeSampler.sampleBiome(x, z);
+        return biomeSampler.sampleBiome(seed, x, z);
     }
 }

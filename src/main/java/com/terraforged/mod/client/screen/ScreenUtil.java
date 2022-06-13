@@ -25,15 +25,13 @@
 package com.terraforged.mod.client.screen;
 
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.platform.ClientAPI;
+import com.terraforged.mod.client.ClientAPI;
 import com.terraforged.mod.worldgen.GeneratorPreset;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
-import net.minecraft.client.gui.screens.worldselection.WorldPreset;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Predicate;
@@ -82,10 +80,6 @@ public class ScreenUtil {
     }
 
     private static boolean isPresetSelected(CycleButton<?> button, Predicate<String> predicate) {
-        var preset = (WorldPreset) button.getValue();
-        if (preset.description() instanceof TranslatableComponent description) {
-            return predicate.test(description.getKey());
-        }
         return false;
     }
 
@@ -101,13 +95,13 @@ public class ScreenUtil {
     }
 
     private static boolean isPresetButtonText(Component component) {
-        if (component instanceof TranslatableComponent translatable) {
-            if (translatable.getKey().equals(WORLD_TYPE)) return true;
-
-            for (var arg : translatable.getArgs()) {
-                if (arg instanceof Component argText && isPresetButtonText(argText)) return true;
-            }
-        }
+//        if (component instanceof TranslatableComponent translatable) {
+//            if (translatable.getKey().equals(WORLD_TYPE)) return true;
+//
+//            for (var arg : translatable.getArgs()) {
+//                if (arg instanceof Component argText && isPresetButtonText(argText)) return true;
+//            }
+//        }
         return false;
     }
 }

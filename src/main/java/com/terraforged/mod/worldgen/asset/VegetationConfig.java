@@ -25,7 +25,7 @@
 package com.terraforged.mod.worldgen.asset;
 
 import com.mojang.serialization.Codec;
-import com.terraforged.mod.codec.LazyCodec;
+import com.terraforged.mod.data.codec.LazyCodec;
 import com.terraforged.mod.registry.lazy.LazyTag;
 import com.terraforged.mod.util.seed.ContextSeedable;
 import com.terraforged.mod.worldgen.biome.viability.Viability;

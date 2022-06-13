@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.worldgen.datapack;
 
+import com.terraforged.mod.CommonAPI;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.util.FileUtil;
 import net.minecraft.world.level.DataPackConfig;
@@ -46,7 +47,7 @@ public class DataPackExporter {
         try {
             TerraForged.LOG.info("Extracting default datapack to {}", DEFAULT_PACK_DIR);
 
-            var root = TerraForged.getPlatform().getContainer();
+            var root = CommonAPI.get().getContainer();
             FileUtil.createDirCopy(root, "default", DEFAULT_PACK_DIR);
         } catch (IOException e) {
             e.printStackTrace();
@@ -59,7 +60,7 @@ public class DataPackExporter {
 
             if (!Files.exists(DEFAULT_PACK_DIR)) {
                 TerraForged.LOG.warn("Failed to extract default datapack to {}", DEFAULT_PACK_DIR);
-                return Pair.of(TerraForged.getPlatform().getContainer(), "default");
+                return Pair.of(CommonAPI.get().getContainer(), "default");
             }
         }
         return Pair.of(DEFAULT_PACK_DIR, ".");

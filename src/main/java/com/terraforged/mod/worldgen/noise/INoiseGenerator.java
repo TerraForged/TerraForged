@@ -30,23 +30,21 @@ import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import java.util.function.Consumer;
 
 public interface INoiseGenerator {
-    INoiseGenerator with(long seed, TerrainLevels levels);
-
     NoiseLevels getLevels();
 
     TerrainLevels getTerrainLevels();
 
     IContinentNoise getContinent();
 
-    NoiseSample getNoiseSample(int x, int z);
+    NoiseSample getNoiseSample(int seed, int x, int z);
 
-    void sample(int x, int z, NoiseSample sample);
+    void sample(int seed, int x, int z, NoiseSample sample);
 
-    float getHeightNoise(int x, int z);
+    float getHeightNoise(int seed, int x, int z);
 
-    long find(int x, int z, int minRadius, int maxRadius, Terrain terrain);
+    long find(int seed, int x, int z, int minRadius, int maxRadius, Terrain terrain);
 
-    void generate(int chunkX, int chunkZ, Consumer<NoiseData> consumer);
+    void generate(int seed, int chunkX, int chunkZ, Consumer<NoiseData> consumer);
 
     default float getNoiseCoord(int coord) {
         return coord * getLevels().frequency;

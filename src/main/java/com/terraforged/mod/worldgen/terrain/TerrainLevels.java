@@ -26,8 +26,8 @@ package com.terraforged.mod.worldgen.terrain;
 
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
-import com.terraforged.mod.codec.Codecs;
-import com.terraforged.mod.codec.LazyCodec;
+import com.terraforged.mod.data.codec.Codecs;
+import com.terraforged.mod.data.codec.LazyCodec;
 import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.worldgen.noise.NoiseLevels;
 import com.terraforged.noise.util.NoiseUtil;

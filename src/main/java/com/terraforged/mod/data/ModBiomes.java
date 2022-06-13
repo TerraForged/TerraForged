@@ -24,10 +24,9 @@
 
 package com.terraforged.mod.data;
 
-import com.terraforged.mod.platform.Platform;
-import com.terraforged.mod.registry.registrar.Registrar;
+import com.terraforged.mod.TerraForged;
+import com.terraforged.mod.registry.key.EntryKey;
 import com.terraforged.mod.worldgen.biome.biomes.ModBiome;
-import net.minecraft.core.Registry;
 import net.minecraft.data.worldgen.placement.CavePlacements;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
@@ -35,24 +34,20 @@ import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
 public interface ModBiomes {
-    ModBiome CAVE = ModBiome.of("cave", Biomes.DRIPSTONE_CAVES, builder -> {
-        var genSettings = new BiomeGenerationSettings.Builder();
-        genSettings.addFeature(GenerationStep.Decoration.LOCAL_MODIFICATIONS, CavePlacements.LARGE_DRIPSTONE);
-        genSettings.addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, CavePlacements.POINTED_DRIPSTONE);
-        genSettings.build();
-        builder.generationSettings(genSettings.build());
-    });
-
-    ModBiome OAK_FOREST = ModBiome.of("oak_forest", Biomes.PLAINS, builder -> {
-        builder.biomeCategory(Biome.BiomeCategory.FOREST);
-    });
+    EntryKey<Biome> CAVE = TerraForged.BIOMES.entryKey("cave");
+    EntryKey<Biome> OAK_FOREST = TerraForged.BIOMES.entryKey("oak_forest");
 
     static void register() {
-        register(Platform.ACTIVE_PLATFORM.get().getRegistrar(Registry.BIOME_REGISTRY));
-    }
+        TerraForged.BIOMES.register(CAVE.get(), ModBiome.create(Biomes.DRIPSTONE_CAVES, builder -> {
+            var genSettings = new BiomeGenerationSettings.Builder();
+            genSettings.addFeature(GenerationStep.Decoration.LOCAL_MODIFICATIONS, CavePlacements.LARGE_DRIPSTONE);
+            genSettings.addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, CavePlacements.POINTED_DRIPSTONE);
+            genSettings.build();
+            builder.generationSettings(genSettings.build());
+        }));
 
-    static void register(Registrar<Biome> registrar) {
-        registrar.register(CAVE.key(), CAVE.create());
-        registrar.register(OAK_FOREST.key(), OAK_FOREST.create());
+        TerraForged.BIOMES.register(OAK_FOREST.get(), ModBiome.create(Biomes.PLAINS, builder -> {
+//        builder.biomeCategory(Biome.BiomeCategory.FOREST);
+        }));
     }
 }

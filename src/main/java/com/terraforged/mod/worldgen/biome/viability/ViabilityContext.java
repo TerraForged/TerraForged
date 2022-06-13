@@ -24,17 +24,21 @@
 
 package com.terraforged.mod.worldgen.biome.viability;
 
-import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.biome.IBiomeSampler;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
-import net.minecraft.world.level.ChunkPos;
 
 import java.util.concurrent.CompletableFuture;
 
 public class ViabilityContext implements Viability.Context {
+    public int seed;
     public CompletableFuture<TerrainData> terrainData;
     public IBiomeSampler biomeSampler;
+
+    @Override
+    public int seed() {
+        return seed;
+    }
 
     @Override
     public boolean edge() {
@@ -54,10 +58,5 @@ public class ViabilityContext implements Viability.Context {
     @Override
     public IBiomeSampler getClimateSampler() {
         return biomeSampler;
-    }
-
-    public void assign(ChunkPos pos, Generator generator) {
-        terrainData = generator.getChunkDataAsync(pos);
-        biomeSampler = generator.getBiomeSource().getBiomeSampler();
     }
 }

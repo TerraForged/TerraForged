@@ -42,8 +42,8 @@ public class BiomeSampler extends IBiomeSampler.Sampler implements IBiomeSampler
         this.biomeMapManager = biomeMapManager;
     }
 
-    public Holder<Biome> sampleBiome(int x, int z) {
-        var sample = getSample(x, z);
+    public Holder<Biome> sampleBiome(int seed, int x, int z) {
+        var sample = getSample(seed, x, z);
         var biome = getInitialBiome(sample.biomeNoise, sample.climateType);
         return getBiomeOverride(biome, sample);
     }

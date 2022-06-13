@@ -24,7 +24,8 @@
 
 package com.terraforged.mod.hooks;
 
-import com.terraforged.mod.registry.ModRegistries;
+import com.terraforged.mod.CommonAPI;
+import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.util.ReflectionUtil;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -41,17 +42,19 @@ public class BuiltinHook {
         if (ops.registryLoader().isEmpty()) return;
 
         var backing = getBacking(writable);
-        for (var holder : ModRegistries.getHolders()) {
-            backing.put(holder.key(), RegistryAccessUtil.copy(holder.registry()));
+        for (var registry : CommonAPI.get().getRegistryManager().getModRegistries()) {
+            backing.put(registry.key().get(), registry.copy());
         }
 
-        for (var holder : ModRegistries.getHolders()) {
-            loadHolder(holder, ops);
+        for (var registry : CommonAPI.get().getRegistryManager().getModRegistries()) {
+            loadRegistry(registry, ops);
         }
     }
-    private static <T, E> void loadHolder(ModRegistries.HolderEntry<T> holder, RegistryOps<E> ops) {
+    private static <T, E> void loadRegistry(ModRegistry<T> registry, RegistryOps<E> ops) {
+        var key = registry.key().get();
+        var codec = registry.codec();
         var loader = ops.registryLoader().orElseThrow();
-        var result = loader.overrideRegistryFromResources(holder.key(), holder.direct(), ops.getAsJson());
+        var result = loader.overrideRegistryFromResources(key, codec, ops.getAsJson());
         RegistryAccessUtil.printRegistryContents(result.result().orElseThrow());
     }
 

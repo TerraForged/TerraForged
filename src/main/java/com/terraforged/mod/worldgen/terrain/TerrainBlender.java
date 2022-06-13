@@ -28,9 +28,9 @@ import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.util.SpiralIterator;
-import com.terraforged.mod.util.map.Object2FloatCache;
-import com.terraforged.mod.util.map.WeightMap;
 import com.terraforged.mod.util.seed.Seedable;
+import com.terraforged.mod.util.storage.Object2FloatCache;
+import com.terraforged.mod.util.storage.WeightMap;
 import com.terraforged.mod.worldgen.asset.TerrainNoise;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;
@@ -41,7 +41,6 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
     private static final int REGION_SEED_OFFSET = 21491124;
     private static final int WARP_SEED_OFFSET = 12678;
 
-    private final int regionSeed;
     private final int scale;
     private final float frequency;
     private final float jitter;
@@ -52,7 +51,6 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
     private final ThreadLocal<Blender> localBlender = ThreadLocal.withInitial(Blender::new);
 
     public TerrainBlender(long seed, int scale, float jitter, float blending, TerrainNoise[] terrains) {
-        this.regionSeed = (int) seed + REGION_SEED_OFFSET;
         this.scale = scale;
         this.frequency = 1F / scale;
         this.jitter = jitter;
@@ -72,16 +70,16 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
     }
 
     @Override
-    public float getValue(float x, float z) {
+    public float getValue(int seed, float x, float z) {
         var blender = localBlender.get();
-        return getValue(x, z, blender);
+        return getValue(seed, x, z, blender);
     }
 
-    public float getValue(float x, float z, Blender blender) {
-        float rx = warp.getX(x, z) * frequency;
-        float rz = warp.getY(x, z) * frequency;
-        getCell(regionSeed, rx, rz, jitter, blender);
-        return blender.getValue(x, z, blending, terrains);
+    public float getValue(int seed, float x, float z, Blender blender) {
+        float rx = warp.getX(seed, x, z) * frequency;
+        float rz = warp.getY(seed, x, z) * frequency;
+        getCell(seed + REGION_SEED_OFFSET, rx, rz, jitter, blender);
+        return blender.getValue(seed, x, z, blending, terrains);
     }
 
     public Blender getBlenderResource() {
@@ -93,7 +91,7 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
         return terrains.getValue(index).terrain();
     }
 
-    public SpiralIterator.PositionFinder findNearest(float x, float z, int minRadius, int maxRadius, Terrain type) {
+    public SpiralIterator.PositionFinder findNearest(int seed, float x, float z, int minRadius, int maxRadius, Terrain type) {
         var terrain = terrains.find(t -> t.terrain().getName().equals(type.getName()));
         if (terrain == null) return null;
 
@@ -101,17 +99,17 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
         float lower = PosUtil.unpackLeftf(band);
         float upper = PosUtil.unpackRightf(band);
 
-        return iterator(x, z, minRadius, maxRadius).finder(it -> {
-            long pos = find(regionSeed, jitter, lower, upper, it);
+        return iterator(seed, x, z, minRadius, maxRadius).finder(it -> {
+            long pos = find(seed + REGION_SEED_OFFSET, jitter, lower, upper, it);
             float px = PosUtil.unpackLeftf(pos) / frequency;
             float pz = PosUtil.unpackRightf(pos) / frequency;
             return PosUtil.packf(px, pz);
         });
     }
 
-    public SpiralIterator iterator(float x, float z, int min, int max) {
-        float rx = warp.getX(x, z) * frequency;
-        float rz = warp.getY(x, z) * frequency;
+    public SpiralIterator iterator(int seed, float x, float z, int min, int max) {
+        float rx = warp.getX(seed, x, z) * frequency;
+        float rz = warp.getY(seed, x, z) * frequency;
 
         int cx = NoiseUtil.floor(rx);
         int cz = NoiseUtil.floor(rz);
@@ -200,12 +198,12 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
             return NoiseUtil.sqrt(distances[index]);
         }
 
-        public float getCentreValue(float x, float z, WeightMap<TerrainNoise> terrains) {
+        public float getCentreValue(int seed, float x, float z, WeightMap<TerrainNoise> terrains) {
             float noise = getCentreNoiseIndex();
-            return terrains.getValue(noise).noise().getValue(x, z);
+            return terrains.getValue(noise).noise().getValue(seed, x, z);
         }
 
-        public float getValue(float x, float z, float blending, WeightMap<TerrainNoise> terrains) {
+        public float getValue(int seed, float x, float z, float blending, WeightMap<TerrainNoise> terrains) {
             float dist0 = getDistance(closestIndex);
             float dist1 = getDistance(closestIndex2);
 
@@ -214,21 +212,21 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
             float blendStart = borderDistance - blendRadius;
 
             if (dist0 <= blendStart) {
-                return getCentreValue(x, z, terrains);
+                return getCentreValue(seed, x, z, terrains);
             } else {
-                return getBlendedValue(x, z, dist0, dist1, blendRadius, terrains);
+                return getBlendedValue(seed, x, z, dist0, dist1, blendRadius, terrains);
             }
         }
 
-        public float getBlendedValue(float x, float z, float nearest, float nearest2, float blendRange, WeightMap<TerrainNoise> terrains) {
+        public float getBlendedValue(int seed, float x, float z, float nearest, float nearest2, float blendRange, WeightMap<TerrainNoise> terrains) {
             cache.clear();
 
-            float sumNoise = getCacheValue(closestIndex, x, z, terrains);
+            float sumNoise = getCacheValue(seed, closestIndex, x, z, terrains);
             float sumWeight = getWeight(nearest, nearest, blendRange);
 
             float nearestWeight2 = getWeight(nearest2, nearest, blendRange);
             if (nearestWeight2 > 0) {
-                sumNoise += getCacheValue(closestIndex2, x, z, terrains) * nearestWeight2;
+                sumNoise += getCacheValue(seed, closestIndex2, x, z, terrains) * nearestWeight2;
                 sumWeight += nearestWeight2;
             }
 
@@ -237,7 +235,7 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
 
                 float weight = getWeight(getDistance(i), nearest, blendRange);
                 if (weight > 0) {
-                    sumNoise += getCacheValue(i, x, z, terrains) * weight;
+                    sumNoise += getCacheValue(seed, i, x, z, terrains) * weight;
                     sumWeight += weight;
                 }
             }
@@ -245,13 +243,13 @@ public class TerrainBlender implements Module, Seedable<TerrainBlender> {
             return NoiseUtil.clamp(sumNoise / sumWeight, 0, 1);
         }
 
-        private float getCacheValue(int index, float x, float z, WeightMap<TerrainNoise> terrains) {
+        private float getCacheValue(int seed, int index, float x, float z, WeightMap<TerrainNoise> terrains) {
             float noiseIndex = getNoiseIndex(index);
             var terrain = terrains.getValue(noiseIndex);
 
             float value = cache.get(terrain);
             if (Float.isNaN(value)) {
-                value = terrain.noise().getValue(x, z);
+                value = terrain.noise().getValue(seed, x, z);
                 cache.put(terrain, value);
             }
 

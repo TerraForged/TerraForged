@@ -26,9 +26,9 @@ package com.terraforged.mod.worldgen.asset;
 
 import com.mojang.serialization.Codec;
 import com.terraforged.engine.world.terrain.Terrain;
-import com.terraforged.mod.codec.LazyCodec;
-import com.terraforged.mod.util.map.WeightMap;
+import com.terraforged.mod.data.codec.LazyCodec;
 import com.terraforged.mod.util.seed.ContextSeedable;
+import com.terraforged.mod.util.storage.WeightMap;
 import com.terraforged.mod.worldgen.noise.NoiseCodec;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.Source;

@@ -33,12 +33,14 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 public class NoiseCaveCarver {
     private static final int CHUNK_AREA = 16 * 16;
 
-    public static void carve(ChunkAccess chunk,
+    public static void carve(int seed,
+                             ChunkAccess chunk,
                              CarverChunk carver,
                              Generator generator,
                              NoiseCave config,
@@ -55,14 +57,14 @@ public class NoiseCaveCarver {
             int x = startX + dx;
             int z = startZ + dz;
 
-            int surface = getSurface(x, z, chunk, generator, carver);
-            int y = config.getHeight(x, z);
+            int surface = getSurface(seed, x, z, chunk, generator, carver);
+            int y = config.getHeight(seed, x, z);
 
-            float value = carver.modifier.getValue(x, z);
-            int cavern = config.getCavernSize(x, z, value);
+            float value = carver.modifier.getValue(seed, x, z);
+            int cavern = config.getCavernSize(seed, x, z, value);
             if (cavern == 0) continue;
 
-            int floor = config.getFloorDepth(x, z, cavern);
+            int floor = config.getFloorDepth(seed, x, z, cavern);
             int top = MathUtil.clamp(y + cavern, minY, surface);
             int bottom = MathUtil.clamp(y - floor, minY, surface);
 
@@ -82,6 +84,7 @@ public class NoiseCaveCarver {
         int biomeX = dx >> 2;
         int biomeZ = dz >> 2;
         int maxBiomeY = (surface - 16) >> 2;
+
         for (int cy = bottom; cy <= top; cy++) {
             pos.set(dx, cy, dz);
 
@@ -95,12 +98,14 @@ public class NoiseCaveCarver {
             int sectionIndex = chunk.getSectionIndex(cy);
             var section = chunk.getSection(sectionIndex);
 
-            section.getBiomes().getAndSetUnchecked(biomeX, biomeY, biomeZ, biome);
+            // TODO:
+            var container = (PalettedContainer<Holder<Biome>>) section.getBiomes();
+            container.set(biomeX, biomeY, biomeZ, biome);
         }
     }
 
-    private static int getSurface(int x, int z, ChunkAccess chunk, Generator generator, CarverChunk carverChunk) {
-        float mask = carverChunk.getCarvingMask(x, z);
+    private static int getSurface(int seed, int x, int z, ChunkAccess chunk, Generator generator, CarverChunk carverChunk) {
+        float mask = carverChunk.getCarvingMask(seed, x, z);
         int surface = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) - 1;
         if (surface > generator.getSeaLevel() || surface < generator.getSeaLevel() - 16) {
             surface += 9;

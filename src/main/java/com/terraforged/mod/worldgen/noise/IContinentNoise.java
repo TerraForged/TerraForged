@@ -31,7 +31,7 @@ public interface IContinentNoise {
     GeneratorContext getContext();
     ControlPoints getControlPoints();
 
-    void sampleContinent(float x, float y, NoiseSample sample);
+    void sampleContinent(int seed, float x, float y, NoiseSample sample);
 
-    void sampleRiver(float x, float z, NoiseSample sample);
+    void sampleRiver(int seed, float x, float z, NoiseSample sample);
 }

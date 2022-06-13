@@ -77,7 +77,7 @@ public class ViabilityTest {
         float[] hsb = new float[3];
 
         var levels = new TerrainLevels();
-        var noise = new NoiseGenerator(SEED, levels, ModTerrains.Factory.getDefault(null));
+        var noise = new NoiseGenerator(levels, ModTerrains.Factory.getDefault(null));
         var heightmap = generate(width, height, freq, noise).init(freq);
 
         var context = new ViabilityContext();
@@ -90,7 +90,7 @@ public class ViabilityTest {
         var image = N2DUtil.render(width, height, (x, z, img) -> {
             var sample = heightmap.get(x, z);
             float scaledHeight = levels.getScaledHeight(sample.heightNoise);
-            var biome = context.getClimateSampler().getSample(x, z).climateType;
+            var biome = context.getClimateSampler().getSample(SEED, x, z).climateType;
 
             int rgb;
             if (scaledHeight <= levels.seaLevel) {
@@ -193,7 +193,7 @@ public class ViabilityTest {
 
                 final int index = heightmap.index(x, z);
                 tasks.add(ForkJoinPool.commonPool().submit(() -> {
-                    var sample = new NoiseSample(generator.getNoiseSample(px, pz));
+                    var sample = new NoiseSample(generator.getNoiseSample(SEED, px, pz));
                     heightmap.set(index, sample);
                     return null;
                 }));

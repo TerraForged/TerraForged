@@ -27,7 +27,7 @@ package com.terraforged.mod.worldgen.noise;
 import com.mojang.serialization.Codec;
 import com.terraforged.cereal.spec.DataSpecs;
 import com.terraforged.engine.module.Ridge;
-import com.terraforged.mod.codec.SuperCodec;
+import com.terraforged.mod.data.codec.SuperCodec;
 import com.terraforged.noise.Module;
 import com.terraforged.noise.util.NoiseSpec;
 

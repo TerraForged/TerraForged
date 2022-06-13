@@ -90,15 +90,15 @@ public class ClimateNoise {
         );
     }
 
-    public ClimateSample getSample(float x, float y) {
+    public ClimateSample getSample(int seed, float x, float y) {
         var sample = localSample.get().reset();
-        sample(x, y, sample);
+        sample(seed, x, y, sample);
         return sample;
     }
 
-    public void sample(float x, float y, ClimateSample sample) {
-        float px = warp.getX(x, y);
-        float py = warp.getY(x, y);
+    public void sample(int seed, float x, float y, ClimateSample sample) {
+        float px = warp.getX(seed, x, y);
+        float py = warp.getY(seed, x, y);
 
         px *= frequency;
         py *= frequency;
@@ -106,7 +106,7 @@ public class ClimateNoise {
         px = cellShape.adjustX(px);
         py = cellShape.adjustY(py);
 
-        sampleBiome(px, py, sample);
+        sampleBiome(seed, px, py, sample);
 
         sample.climateType = BiomeType.get(sample.temperature, sample.moisture);
 
@@ -116,7 +116,7 @@ public class ClimateNoise {
         }
     }
 
-    private void sampleBiome(float x, float y, ClimateSample sample) {
+    private void sampleBiome(int seed, float x, float y, ClimateSample sample) {
         int minX = NoiseUtil.floor(x) - 1;
         int minY = NoiseUtil.floor(y) - 1;
         int maxX = NoiseUtil.floor(x) + 2;
@@ -149,7 +149,7 @@ public class ClimateNoise {
 
         sample.biomeNoise = MathUtil.rand(nearestHash, 1236785);
         sample.biomeEdgeNoise = 1f - NoiseUtil.sqrt(distance / distance2);
-        sample.moisture = this.moisture.getValue(nearestX, nearestY);
-        sample.temperature = this.temperature.getValue(nearestX, nearestY);
+        sample.moisture = this.moisture.getValue(seed, nearestX, nearestY);
+        sample.temperature = this.temperature.getValue(seed, nearestX, nearestY);
     }
 }

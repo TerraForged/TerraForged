@@ -25,8 +25,7 @@
 package com.terraforged.mod.data;
 
 import com.terraforged.engine.world.biome.type.BiomeType;
-import com.terraforged.mod.registry.ModRegistries;
-import com.terraforged.mod.registry.ModRegistry;
+import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.worldgen.asset.ClimateType;
 import com.terraforged.mod.worldgen.biome.util.BiomeUtil;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
@@ -41,7 +40,7 @@ import net.minecraft.world.level.biome.Biomes;
 import java.util.List;
 import java.util.Locale;
 
-public interface ModClimates extends ModRegistry {
+public interface ModClimates {
     float RARE = 1F;
     float NORMAL = 5F;
 
@@ -49,7 +48,7 @@ public interface ModClimates extends ModRegistry {
         var registry = BuiltinRegistries.BIOME;
         var biomes = BiomeUtil.getOverworldBiomes(registry);
         for (var type : BiomeType.values()) {
-            ModRegistries.register(CLIMATE, type.name().toLowerCase(Locale.ROOT), Factory.create(type, biomes, registry));
+            TerraForged.CLIMATES.register(type.name().toLowerCase(Locale.ROOT), Factory.create(type, biomes, registry));
         }
     }
 
@@ -70,7 +69,7 @@ public interface ModClimates extends ModRegistry {
         }
 
         static float getWeight(ResourceKey<Biome> key, Holder<Biome> biome) {
-            if (Biome.getBiomeCategory(biome) == Biome.BiomeCategory.MUSHROOM) return RARE;
+//            if (Biome.getBiomeCategory(biome) == Biome.BiomeCategory.MUSHROOM) return RARE;
             if (key == Biomes.ICE_SPIKES) return RARE;
             return NORMAL;
         }

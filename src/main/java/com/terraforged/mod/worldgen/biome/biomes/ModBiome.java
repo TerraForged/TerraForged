@@ -57,12 +57,18 @@ public record ModBiome(ResourceKey<Biome> key, Supplier<Biome> factory) {
         var holder = BuiltinRegistries.BIOME.getHolderOrThrow(parent);
         var builder = new Biome.BiomeBuilder();
         builder.downfall(biome.getDownfall());
-        builder.biomeCategory(Biome.getBiomeCategory(holder));
+//        builder.biomeCategory(Biome.getBiomeCategory(holder));
         builder.temperature(biome.getBaseTemperature());
         builder.mobSpawnSettings(biome.getMobSettings());
         builder.precipitation(biome.getPrecipitation());
         builder.specialEffects(biome.getSpecialEffects());
         builder.generationSettings(biome.getGenerationSettings());
         return builder;
+    }
+
+    public static Biome create(ResourceKey<Biome> parent, Consumer<Biome.BiomeBuilder> modifier) {
+        var builder = builderOf(parent);
+        modifier.accept(builder);
+        return builder.build();
     }
 }

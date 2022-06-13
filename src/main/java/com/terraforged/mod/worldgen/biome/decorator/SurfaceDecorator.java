@@ -25,27 +25,30 @@
 package com.terraforged.mod.worldgen.biome.decorator;
 
 import com.terraforged.mod.worldgen.Generator;
+import com.terraforged.mod.worldgen.Seeds;
 import com.terraforged.mod.worldgen.biome.surface.Surface;
 import com.terraforged.mod.worldgen.util.NoiseChunkUtil;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.WorldGenerationContext;
 
 public class SurfaceDecorator {
-    public void decorate(ChunkAccess chunk, WorldGenRegion region, Generator generator) {
+    public void decorate(ChunkAccess chunk, WorldGenRegion region, Generator generator, RandomState state) {
         var context = new WorldGenerationContext(generator, region);
-        var noiseChunk = NoiseChunkUtil.getNoiseChunk(chunk, generator);
+        var noiseChunk = NoiseChunkUtil.getNoiseChunk(chunk, state, generator);
 
         var biomes = generator.getBiomeSource().getRegistry();
         var biomeManager = region.getBiomeManager();
 
-        var surface = generator.getVanillaGen().getSurfaceSystem();
+        var surface = state.surfaceSystem();
         var surfaceRules = generator.getVanillaGen().getSettings().value().surfaceRule();
-        surface.buildSurface(biomeManager, biomes, false, context, chunk, noiseChunk, surfaceRules);
+        surface.buildSurface(state, biomeManager, biomes, false, context, chunk, noiseChunk, surfaceRules);
     }
 
-    public void decoratePost(ChunkAccess chunk, Generator generator) {
-        var chunkData = generator.getChunkData(chunk.getPos());
+    public void decoratePost(ChunkAccess chunk, WorldGenRegion region, Generator generator) {
+        int seed = Seeds.get(region.getSeed());
+        var chunkData = generator.getChunkData(seed, chunk.getPos());
         Surface.apply(chunkData, chunk, generator);
     }
 }

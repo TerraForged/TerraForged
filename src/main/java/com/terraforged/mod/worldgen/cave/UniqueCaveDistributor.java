@@ -44,7 +44,7 @@ public class UniqueCaveDistributor implements Module {
     }
 
     @Override
-    public float getValue(float x, float y) {
+    public float getValue(int seed, float x, float y) {
         x *= frequency;
         y *= frequency;
 
@@ -94,7 +94,7 @@ public class UniqueCaveDistributor implements Module {
                 .warp(12312, 30, 1, 20);
 
         N2DUtil.display(1000, 1000, (x, y, img) -> {
-            return Color.HSBtoRGB(0, 0, noise.getValue(x, y));
+            return Color.HSBtoRGB(0, 0, noise.getValue(2132, x, y));
         }).setVisible(true);
     }
 }

@@ -29,16 +29,15 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.SectionPos;
-import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.feature.NoiseEffect;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
+import net.minecraft.world.level.levelgen.structure.TerrainAdjustment;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 
 import java.util.Comparator;
@@ -54,14 +53,14 @@ public class StructureTerrain {
     protected final BlockState solid = Blocks.STONE.defaultBlockState();
     protected final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
-    public StructureTerrain(ChunkAccess chunk, StructureFeatureManager manager) {
+    public StructureTerrain(ChunkAccess chunk, StructureManager manager) {
         var chunkPos = chunk.getPos();
-        var sectionPos = SectionPos.bottomOf(chunk);
 
-        manager.startsForFeature(sectionPos, cf -> cf.adaptNoise).forEach(start -> {
+        // TODO: Handle different TerrainAdjustment types
+        manager.startsForStructure(chunkPos, cf -> cf.terrainAdaptation() != TerrainAdjustment.BEARD_BOX).forEach(start -> {
             for (var piece : start.getPieces()) {
                 if (!piece.isCloseToChunk(chunkPos, RADIUS)) continue;
-                if (piece.getNoiseEffect() != NoiseEffect.BEARD) continue;
+//                if (piece..getNoiseEffect() != NoiseEffect.BEARD) continue;
 
                 if (piece instanceof PoolElementStructurePiece element) {
                     var projection = element.getElement().getProjection();

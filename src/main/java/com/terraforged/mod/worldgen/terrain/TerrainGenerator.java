@@ -24,7 +24,7 @@
 
 package com.terraforged.mod.worldgen.terrain;
 
-import com.terraforged.mod.util.ObjectPool;
+import com.terraforged.mod.util.storage.ObjectPool;
 import com.terraforged.mod.worldgen.noise.INoiseGenerator;
 
 public class TerrainGenerator {
@@ -46,14 +46,14 @@ public class TerrainGenerator {
         terrainDataPool.restore(terrainData);
     }
 
-    public TerrainData generate(int chunkX, int chunkZ) {
+    public TerrainData generate(int seed, int chunkX, int chunkZ) {
         var terrainData = terrainDataPool.take();
-        noiseGenerator.generate(chunkX, chunkZ, terrainData);
+        noiseGenerator.generate(seed, chunkX, chunkZ, terrainData);
         return terrainData;
     }
 
-    public int getHeight(int x, int z) {
-        float heightNoise = noiseGenerator.getHeightNoise(x, z);
+    public int getHeight(int seed, int x, int z) {
+        float heightNoise = noiseGenerator.getHeightNoise(seed, x, z);
         float scaledHeight = levels.getScaledHeight(heightNoise);
         return levels.getHeight(scaledHeight);
     }

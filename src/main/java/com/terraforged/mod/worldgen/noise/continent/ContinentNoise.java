@@ -33,7 +33,6 @@ import com.terraforged.mod.worldgen.noise.continent.config.ContinentConfig;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import com.terraforged.noise.Source;
 import com.terraforged.noise.domain.Domain;
-import com.terraforged.noise.util.Vec2f;
 
 public class ContinentNoise implements IContinentNoise {
     protected final TerrainLevels levels;
@@ -42,7 +41,6 @@ public class ContinentNoise implements IContinentNoise {
     protected final ContinentGenerator generator;
 
     protected final Domain warp;
-    protected final Vec2f offset;
     protected final float frequency;
 
     public ContinentNoise(TerrainLevels levels, GeneratorContext context) {
@@ -50,7 +48,6 @@ public class ContinentNoise implements IContinentNoise {
         this.context = context;
         this.controlPoints = new ControlPoints(context.settings.world.controlPoints);
         this.generator = createContinent(context, controlPoints, levels.noiseLevels);
-        this.offset = generator.getWorldOffset();
 
         this.frequency = 1F / context.settings.world.continent.continentScale;
 
@@ -70,33 +67,35 @@ public class ContinentNoise implements IContinentNoise {
     }
 
     @Override
-    public void sampleContinent(float x, float y, NoiseSample sample) {
+    public void sampleContinent(int seed, float x, float y, NoiseSample sample) {
         x *= frequency;
         y *= frequency;
 
-        float px = warp.getX(x, y);
-        float py = warp.getY(x, y);
+        float px = warp.getX(seed, x, y);
+        float py = warp.getY(seed, x, y);
 
+        var offset = generator.getWorldOffset(seed);
         px += offset.x;
         py += offset.y;
 
-        generator.shapeGenerator.sample(px, py, sample);
+        generator.shapeGenerator.sample(seed, px, py, sample);
 
         sample.terrainType = ContinentPoints.getTerrainType(sample.continentNoise);
     }
 
     @Override
-    public void sampleRiver(float x, float y, NoiseSample sample) {
+    public void sampleRiver(int seed, float x, float y, NoiseSample sample) {
         x *= frequency;
         y *= frequency;
 
-        float px = warp.getX(x, y);
-        float py = warp.getY(x, y);
+        float px = warp.getX(seed, x, y);
+        float py = warp.getY(seed, x, y);
 
+        var offset = generator.getWorldOffset(seed);
         px += offset.x;
         py += offset.y;
 
-        generator.riverGenerator.sample(px, py, sample);
+        generator.riverGenerator.sample(seed, px, py, sample);
     }
 
     @Override

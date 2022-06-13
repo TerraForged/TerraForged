@@ -26,8 +26,7 @@ package com.terraforged.mod.worldgen.biome.util;
 
 import com.terraforged.engine.world.biome.type.BiomeType;
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.registry.ModRegistry;
-import com.terraforged.mod.util.map.WeightMap;
+import com.terraforged.mod.util.storage.WeightMap;
 import com.terraforged.mod.worldgen.asset.ClimateType;
 import it.unimi.dsi.fastutil.objects.Object2FloatLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
@@ -54,7 +53,7 @@ public class BiomeMapManager {
 
     public BiomeMapManager(RegistryAccess access) {
         biomes = access.ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
-        climateTypes = access.ownedRegistryOrThrow(ModRegistry.CLIMATE.get());
+        climateTypes = access.ownedRegistryOrThrow(TerraForged.CLIMATES.get());
         overworldBiomes = getOverworldBiomes(biomes, climateTypes);
         biomeMap = buildBiomeMap();
     }

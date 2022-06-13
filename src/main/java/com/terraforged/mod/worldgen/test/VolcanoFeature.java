@@ -112,7 +112,7 @@ public class VolcanoFeature extends Feature<VolcanoConfig> {
     }
 
     private static boolean test(int x, int z, FeaturePlaceContext<VolcanoConfig> context) {
-        int y = context.chunkGenerator().getBaseHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG, context.level());
+        int y = context.chunkGenerator().getBaseHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG, context.level(), context.level().getLevel().getChunkSource().randomState());
 
         if (true) return y < 180;
 

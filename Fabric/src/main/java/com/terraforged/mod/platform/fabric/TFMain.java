@@ -24,33 +24,38 @@
 
 package com.terraforged.mod.platform.fabric;
 
+import com.google.common.base.Suppliers;
 import com.mojang.brigadier.CommandDispatcher;
-import com.terraforged.mod.Common;
+import com.terraforged.mod.CommonAPI;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.command.TFCommands;
-import com.terraforged.mod.util.DemoHandler;
+import com.terraforged.mod.lifecycle.CommonSetup;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 
 import java.nio.file.Path;
+import java.util.function.Supplier;
 
-public class TFMain extends TerraForged implements ModInitializer, CommandRegistrationCallback {
-    public TFMain() {
-        super(TFMain::getRootPath);
+public class TFMain extends TerraForged implements CommonAPI, ModInitializer, CommandRegistrationCallback {
+    private final Supplier<Path> container = Suppliers.memoize(TFMain::getRootPath);
+
+    @Override
+    public Path getContainer() {
+        return container.get();
     }
 
     @Override
     public void onInitialize() {
-        Common.INSTANCE.init();
+        CommonSetup.INSTANCE.init();
         CommandRegistrationCallback.EVENT.register(this);
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> DemoHandler.warn(handler.player));
     }
 
     @Override
-    public void register(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
+    public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment) {
         TFCommands.register(dispatcher);
     }
 

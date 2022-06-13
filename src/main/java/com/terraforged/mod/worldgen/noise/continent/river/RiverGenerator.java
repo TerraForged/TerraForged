@@ -26,9 +26,9 @@ package com.terraforged.mod.worldgen.noise.continent.river;
 
 import com.terraforged.engine.util.pos.PosUtil;
 import com.terraforged.mod.util.MathUtil;
-import com.terraforged.mod.util.ObjectPool;
-import com.terraforged.mod.util.map.LongCache;
-import com.terraforged.mod.util.map.LossyCache;
+import com.terraforged.mod.util.storage.LongCache;
+import com.terraforged.mod.util.storage.LossyCache;
+import com.terraforged.mod.util.storage.ObjectPool;
 import com.terraforged.mod.worldgen.noise.NoiseSample;
 import com.terraforged.mod.worldgen.noise.continent.ContinentGenerator;
 import com.terraforged.mod.worldgen.noise.continent.cell.CellPoint;
@@ -50,7 +50,6 @@ public class RiverGenerator {
 
     private static final int RIVER_CACHE_SIZE = 1024;
 
-    private final int seed;
     private final float lakeDensity;
     private final ContinentGenerator continent;
     private final RiverCarver riverCarver;
@@ -62,29 +61,28 @@ public class RiverGenerator {
 
     public RiverGenerator(ContinentGenerator continent, ContinentConfig config) {
         this.continent = continent;
-        this.seed = config.rivers.seed;
         this.lakeDensity = config.rivers.lakeDensity;
         this.riverCarver = new RiverCarver(continent.levels, config);
         this.riverWarp = Domain.warp(
-                Source.builder().seed(seed + X_OFFSET).frequency(30).simplex(),
-                Source.builder().seed(seed + Y_OFFSET).frequency(30).simplex(),
+                Source.builder().seed(X_OFFSET).frequency(30).simplex(),
+                Source.builder().seed(Y_OFFSET).frequency(30).simplex(),
                 Source.constant(0.004)
         );
     }
 
-    public void sample(float x, float y, NoiseSample sample) {
-        float px = riverWarp.getX(x, y);
-        float py = riverWarp.getY(x, y);
+    public void sample(int seed, float x, float y, NoiseSample sample) {
+        float px = riverWarp.getX(seed, x, y);
+        float py = riverWarp.getY(seed, x, y);
 
         var nodeSample = localRiverSample.get().reset();
 
-        sample(px, py, nodeSample);
+        sample(seed, px, py, nodeSample);
 
-        riverCarver.carve(px, py, sample, nodeSample);
+        riverCarver.carve(seed, px, py, sample, nodeSample);
     }
 
-    private void sample(float x, float y, CarverSample sample) {
-        var centre = continent.getNearestCell(x, y);
+    private void sample(int seed, float x, float y, CarverSample sample) {
+        var centre = continent.getNearestCell(seed, x, y);
         int centreX = PosUtil.unpackLeft(centre);
         int centreY = PosUtil.unpackRight(centre);
 
@@ -102,7 +100,7 @@ public class RiverGenerator {
 
         for (int cy = minY; cy <= maxY; cy++) {
             for (int cx = minX; cx <= maxX; cx++) {
-                var pieces = getNodes(cx, cy);
+                var pieces = getNodes(seed, cx, cy);
 
                 for (int i = 0; i < pieces.riverCount(); i++) {
                     var node = pieces.river(i);
@@ -145,16 +143,16 @@ public class RiverGenerator {
         }
     }
 
-    private RiverPieces getNodes(int x, int y) {
+    private RiverPieces getNodes(int seed, int x, int y) {
         long index = PosUtil.pack(x, y);
-        return cache.computeIfAbsent(index, this::computeNodes);
+        return cache.computeIfAbsent(seed, index, this::computeNodes);
     }
 
-    private RiverPieces computeNodes(long index) {
+    private RiverPieces computeNodes(int seed, long index) {
         int ax = PosUtil.unpackLeft(index);
         int ay = PosUtil.unpackRight(index);
 
-        var a = continent.getCell(ax, ay);
+        var a = continent.getCell(seed, ax, ay);
         if (continent.shapeGenerator.getThresholdValue(a) <= 0) return RiverPieces.NONE;
 
         var min = a;
@@ -168,7 +166,7 @@ public class RiverGenerator {
         for (var dir : DIRS) {
             int bx = ax + dir.x;
             int by = ay + dir.y;
-            var b = continent.getCell(bx, by);
+            var b = continent.getCell(seed, bx, by);
 
             float value = getBaseValue(b);
 
@@ -182,12 +180,12 @@ public class RiverGenerator {
             if (value <= 0) continue;
 
             // Check if B is higher and A is its lowest neighbour
-            if (connects(ax, ay, bx, by, value)) {
+            if (connects(seed, ax, ay, bx, by, value)) {
                 float bh = getHeight(b.noise(), 0, 1);
                 float br = getRadius(b.noise(), 0, 1);
                 int hash = MathUtil.hash(seed + 827614, bx, by);
 
-                addRiverNodes(a, b, ah, bh, ar, br, hash, pieces);
+                addRiverNodes(a, b, seed, ah, bh, ar, br, hash, pieces);
 
                 isSource = false;
             }
@@ -208,16 +206,16 @@ public class RiverGenerator {
         float br = getRadius(min.noise(), 0, 1);
         int hash = MathUtil.hash(seed + 827614, ax, ay);
 
-        addRiverNodes(a, min, ah, bh, ar, br, hash, pieces);
+        addRiverNodes(a, min, seed, ah, bh, ar, br, hash, pieces);
 
         if (isSource && hasLake(a, hash)) {
-            addLakeNodes(a, min, ah, hash, pieces);
+            addLakeNodes(a, min, seed, ah, hash, pieces);
         }
 
         return pieces;
     }
 
-    private void addRiverNodes(CellPoint a, CellPoint b, float ah, float bh, float ar, float br, int hash, RiverPieces pieces) {
+    private void addRiverNodes(CellPoint a, CellPoint b, int seed, float ah, float bh, float ar, float br, int hash, RiverPieces pieces) {
         // Mid-point on border between cell points A & B
         float mx = (a.px + b.px) * 0.5f;
         float my = (a.py + b.py) * 0.5f;
@@ -258,7 +256,7 @@ public class RiverGenerator {
         }
     }
 
-    private void addLakeNodes(CellPoint a, CellPoint b, float ah, int hash, RiverPieces pieces) {
+    private void addLakeNodes(CellPoint a, CellPoint b, int seed, float ah, int hash, RiverPieces pieces) {
         float size = (0.5f + MathUtil.rand(seed + SIZE_A_OFFSET, hash) * 0.5f) * 0.12f;
 
         float dx = a.px - b.px;
@@ -269,14 +267,14 @@ public class RiverGenerator {
         pieces.addLake(new RiverNode(a.px, a.py, cx, cy, ah, ah, 1, 1, 0));
     }
 
-    private boolean connects(int ax, int ay, int bx, int by, float minValue) {
+    private boolean connects(int seed, int ax, int ay, int bx, int by, float minValue) {
         int minY = bx;
         int minX = by;
 
         for (var dir : DIRS) {
             int cx = bx + dir.x;
             int cy = by + dir.y;
-            var c = continent.getCell(cx, cy);
+            var c = continent.getCell(seed, cx, cy);
             float value = getBaseValue(c);
 
             if (value < minValue) {
