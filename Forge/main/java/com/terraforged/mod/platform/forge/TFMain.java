@@ -28,15 +28,14 @@ import com.google.common.base.Suppliers;
 import com.terraforged.mod.CommonAPI;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.command.TFCommands;
-import com.terraforged.mod.data.ModTags;
-import com.terraforged.mod.data.gen.BuiltinProvider;
+import com.terraforged.mod.data.gen.TerraForgedDataProvider;
 import com.terraforged.mod.lifecycle.CommonSetup;
 import com.terraforged.mod.lifecycle.DataSetup;
 import com.terraforged.mod.lifecycle.RegistrySetup;
 import com.terraforged.mod.platform.forge.client.TFClient;
-import com.terraforged.mod.platform.forge.registry.ForgeModRegistry;
 import com.terraforged.mod.platform.forge.registry.ForgeRegistry;
 import com.terraforged.mod.registry.RegistryManager;
+import com.terraforged.mod.registry.builtin.ModBuiltinRegistry;
 import com.terraforged.mod.worldgen.biome.util.matcher.BiomeMatcher;
 import com.terraforged.mod.worldgen.biome.util.matcher.BiomeTagMatcher;
 import net.minecraft.tags.BiomeTags;
@@ -55,10 +54,12 @@ import java.util.function.Supplier;
 @Mod(TerraForged.MODID)
 public class TFMain extends TerraForged implements CommonAPI {
     private final Supplier<Path> container = Suppliers.memoize(TFMain::getRootPath);
-    private final RegistryManager registryManager = new RegistryManager(ForgeRegistry::new, ForgeModRegistry::new);
+    private final RegistryManager registryManager = new RegistryManager(ForgeRegistry::new, ModBuiltinRegistry::new);
 
     public TFMain() {
         CommonAPI.HOLDER.set(this);
+        RegistrySetup.INSTANCE.run();
+        DataSetup.INSTANCE.run();
 
         MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onInit);
@@ -81,11 +82,11 @@ public class TFMain extends TerraForged implements CommonAPI {
 
     @Override
     public BiomeMatcher getOverworldMatcher() {
-        return new BiomeTagMatcher.Overworld(BiomeTags.IS_OVERWORLD, ModTags.OVERWORLD.get());
+        return new BiomeTagMatcher.Overworld(BiomeTags.IS_OVERWORLD);
     }
 
     void onInit(FMLCommonSetupEvent event) {
-        event.enqueueWork(CommonSetup.INSTANCE::init);
+        event.enqueueWork(CommonSetup.INSTANCE::run);
     }
 
     void onRegisterCommands(RegisterCommandsEvent event) {
@@ -94,13 +95,12 @@ public class TFMain extends TerraForged implements CommonAPI {
 
     void onGenerateData(GatherDataEvent event) {
         // Init everything necessary to data-gen
-        RegistrySetup.INSTANCE.init();
-        CommonSetup.INSTANCE.init();
-        DataSetup.INSTANCE.init();
+        RegistrySetup.INSTANCE.run();
+        CommonSetup.INSTANCE.run();
 
         var path = event.getGenerator().getOutputFolder().resolve("resources/default");
 
-        event.getGenerator().addProvider(true, new BuiltinProvider(path));
+        event.getGenerator().addProvider(true, new TerraForgedDataProvider(path));
     }
 
     private static Path getRootPath() {

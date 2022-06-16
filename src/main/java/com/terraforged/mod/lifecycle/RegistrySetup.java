@@ -33,13 +33,17 @@ public class RegistrySetup extends Init {
 
     @Override
     protected void doInit() {
-        TerraForged.LOG.info("Initializing registries");
-        var registryManager = CommonAPI.get().getRegistryManager();
-        registryManager.create(TerraForged.BIOMES);
-        registryManager.create(TerraForged.CAVES, NoiseCave.CODEC);
-        registryManager.create(TerraForged.CLIMATES, ClimateType.CODEC);
-        registryManager.create(TerraForged.TERRAIN_TYPES, TerrainType.DIRECT);
-        registryManager.create(TerraForged.TERRAINS, TerrainNoise.CODEC);
-        registryManager.create(TerraForged.VEGETATIONS, VegetationConfig.CODEC);
+        try {
+            TerraForged.LOG.info("Initializing registries");
+            var registryManager = CommonAPI.get().getRegistryManager();
+            registryManager.create(TerraForged.BIOMES);
+            registryManager.create(TerraForged.CAVES, NoiseCave.CODEC);
+            registryManager.create(TerraForged.CLIMATES, ClimateType.CODEC);
+            registryManager.create(TerraForged.TERRAINS, TerrainNoise.CODEC);
+            registryManager.create(TerraForged.TERRAIN_TYPES, TerrainType.DIRECT);
+            registryManager.create(TerraForged.VEGETATIONS, VegetationConfig.CODEC);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 }

@@ -24,7 +24,6 @@
 
 package com.terraforged.mod;
 
-import com.terraforged.mod.lifecycle.RegistrySetup;
 import com.terraforged.mod.registry.key.RegistryKey;
 import com.terraforged.mod.worldgen.asset.*;
 import net.minecraft.core.Registry;
@@ -39,16 +38,21 @@ public abstract class TerraForged {
 	public static final String DATAPACK_VERSION = "v0.1";
 	public static final Logger LOG = LogManager.getLogger(TITLE);
 
+	public static final ResourceLocation WORLD_PRESET = location("normal");
+	public static final ResourceLocation DIMENSION_EFFECTS = location("overworld");
+
 	public static final RegistryKey<Biome> BIOMES = RegistryKey.builtin(() -> Registry.BIOME_REGISTRY);
-	public static final RegistryKey<ClimateType> CLIMATES = registry("worldgen/climate");
-	public static final RegistryKey<NoiseCave> CAVES = registry("worldgen/cave");
-	public static final RegistryKey<TerrainNoise> TERRAINS = registry("worldgen/terrain/noise");
-	public static final RegistryKey<TerrainType> TERRAIN_TYPES = registry("worldgen/terrain/type");
-	public static final RegistryKey<VegetationConfig> VEGETATIONS = registry("worldgen/vegetation");
+
+	// Note: Forge fucks around with mod datapack registry paths in a way that would make these
+	// keys break on other platforms, so we must register them under the minecraft namespace :/
+	public static final RegistryKey<ClimateType> CLIMATES = registry("minecraft:worldgen/climate");
+	public static final RegistryKey<NoiseCave> CAVES = registry("minecraft:worldgen/cave");
+	public static final RegistryKey<TerrainNoise> TERRAINS = registry("minecraft:worldgen/terrain/noise");
+	public static final RegistryKey<TerrainType> TERRAIN_TYPES = registry("minecraft:worldgen/terrain/type");
+	public static final RegistryKey<VegetationConfig> VEGETATIONS = registry("minecraft:worldgen/vegetation");
 
 	protected TerraForged() {
 		Environment.log();
-		RegistrySetup.INSTANCE.init();
 	}
 
 	public static ResourceLocation location(String name) {

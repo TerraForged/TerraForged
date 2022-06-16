@@ -28,6 +28,8 @@ import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.function.Predicate;
 
@@ -181,7 +183,15 @@ public class JsonFormatter {
         return json.keySet().stream().sorted().toArray(String[]::new);
     }
 
-    public static void apply(JsonElement jsonElement, Writer writer) throws IOException {
+    public static void format(JsonElement jsonElement, Writer writer) throws IOException {
         new JsonFormatter(writer).write(jsonElement);
+    }
+
+    public static void format(JsonElement jsonElement, OutputStream out) {
+        try (var writer = new OutputStreamWriter(out)) {
+            format(jsonElement, writer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

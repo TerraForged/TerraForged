@@ -34,19 +34,19 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
-import net.minecraft.world.level.levelgen.structure.StructurePiece;
-import net.minecraft.world.level.levelgen.structure.TerrainAdjustment;
+import net.minecraft.world.level.levelgen.structure.*;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 
 import java.util.Comparator;
+import java.util.function.Predicate;
 
 public class StructureTerrain {
     private static final int RADIUS = 20;
     private static final Comparator<StructurePiece> PIECE_SORTER = Comparator.comparing(o -> o.getBoundingBox().minY());
 
-    private final ObjectList<StructurePiece> rigids = new ObjectArrayList<>(10);
+    private static final Predicate<Structure> TERRAIN_MODIFIED = f -> f.terrainAdaptation() == TerrainAdjustment.BEARD_BOX || f.terrainAdaptation() == TerrainAdjustment.BEARD_THIN;
+
+    protected final ObjectList<StructurePiece> rigids = new ObjectArrayList<>(10);
     protected final ObjectListIterator<StructurePiece> pieceIterator;
 
     protected final BlockState air = Blocks.AIR.defaultBlockState();
@@ -56,11 +56,9 @@ public class StructureTerrain {
     public StructureTerrain(ChunkAccess chunk, StructureManager manager) {
         var chunkPos = chunk.getPos();
 
-        // TODO: Handle different TerrainAdjustment types
-        manager.startsForStructure(chunkPos, cf -> cf.terrainAdaptation() != TerrainAdjustment.BEARD_BOX).forEach(start -> {
+        manager.startsForStructure(chunkPos, TERRAIN_MODIFIED).forEach(start -> {
             for (var piece : start.getPieces()) {
                 if (!piece.isCloseToChunk(chunkPos, RADIUS)) continue;
-//                if (piece..getNoiseEffect() != NoiseEffect.BEARD) continue;
 
                 if (piece instanceof PoolElementStructurePiece element) {
                     var projection = element.getElement().getProjection();
@@ -104,7 +102,7 @@ public class StructureTerrain {
             }
         }
 
-        boolean raised = raiseTerrain(x, y, z, maxY, chunk, terrainData);
+        boolean raised = raiseTerrain(x, y, z, maxY, chunk);
         boolean carved = carveTerrain(x, maxPosY, z, chunk, highest);
 
         if (raised || carved) {
@@ -114,7 +112,7 @@ public class StructureTerrain {
         reset();
     }
 
-    protected boolean raiseTerrain(int x, int y, int z, float maxY, ChunkAccess chunk, TerrainData terrainData) {
+    protected boolean raiseTerrain(int x, int y, int z, float maxY, ChunkAccess chunk) {
         int max = (int) maxY;
         if (y + 1 >= max) return false;
 

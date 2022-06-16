@@ -27,19 +27,17 @@ package com.terraforged.mod.worldgen.datapack;
 import com.terraforged.mod.CommonAPI;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.util.FileUtil;
-import net.minecraft.world.level.DataPackConfig;
 import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DataPackExporter {
-    public static final String PACK = "file/" + TerraForged.TITLE + ".zip";
+    public static final String PACK_NAME = TerraForged.TITLE + "-" + TerraForged.DATAPACK_VERSION;
+    public static final String PACK_FILE_NAME = PACK_NAME + ".zip";
+
     public static final Path CONFIG_DIR = Paths.get("config", "terraforged").toAbsolutePath();
     public static final Path DEFAULT_PACK_DIR = CONFIG_DIR.resolve("pack-" + TerraForged.DATAPACK_VERSION);
 
@@ -66,25 +64,15 @@ public class DataPackExporter {
         return Pair.of(DEFAULT_PACK_DIR, ".");
     }
 
-    public static DataPackConfig setup(@Nullable Path dir, DataPackConfig config) {
-        if (dir == null) throw new NullPointerException("Dir is null!");
-
-        TerraForged.LOG.info("Generating TerraForged datapack");
+    public static void createWorldDatapack(Path dir) {
+        TerraForged.LOG.info("Copying world-instance datapack to {}", dir);
 
         try {
             var src = getDefaultsPath();
-            var dest = dir.resolve(TerraForged.TITLE + ".zip");
+            var dest = dir.resolve(PACK_FILE_NAME);
             FileUtil.createZipCopy(src.getLeft(), src.getRight(), dest);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        List<String> enabled = new ArrayList<>(config.getEnabled());
-        enabled.add(PACK);
-
-        List<String> disabled = new ArrayList<>(config.getDisabled());
-        disabled.remove(PACK);
-
-        return new DataPackConfig(enabled, disabled);
     }
 }

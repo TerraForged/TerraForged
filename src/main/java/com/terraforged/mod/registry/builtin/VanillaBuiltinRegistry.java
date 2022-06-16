@@ -38,7 +38,7 @@ public class VanillaBuiltinRegistry<T> extends LazyValue<Registry<T>> implements
     protected final RegistryKey<T> key;
 
     public VanillaBuiltinRegistry(RegistryKey<T> key) {
-        super(null);
+        super(UNDEFINED);
         this.key = key;
     }
 

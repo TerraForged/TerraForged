@@ -30,7 +30,7 @@ import com.terraforged.mod.worldgen.Seeds;
 import com.terraforged.mod.worldgen.terrain.TerrainData;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import net.minecraft.core.QuartPos;
-import net.minecraft.world.level.ChunkPos;
+import net.minecraft.server.level.ColumnPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.NoiseChunk;
 import net.minecraft.world.level.levelgen.RandomState;
@@ -75,12 +75,12 @@ public class NoiseChunkUtil {
 
         cache.clear();
 
-        for (int dz = 0; dz < 16; dz++) {
-            for (int dx = 0; dx < 16; dx++) {
+        for (int dz = 0; dz < 16; dz += 4) {
+            for (int dx = 0; dx < 16; dx += 4) {
                 int height = data.getHeight(dx, dz);
-                int qx = QuartPos.fromBlock(startX + dx);
-                int qz = QuartPos.fromBlock(startZ + dz);
-                long index = ChunkPos.asLong(qx, qz);
+                int qx = QuartPos.toBlock(QuartPos.fromBlock(startX + dx));
+                int qz = QuartPos.toBlock(QuartPos.fromBlock(startZ + dz));
+                long index = ColumnPos.asLong(qx, qz);
                 cache.put(index, height);
                 min = Math.min(min, height);
                 max = Math.max(max, height);
@@ -92,13 +92,13 @@ public class NoiseChunkUtil {
         // to fix an issue where some surfaces just get left as stone
         // for some reason. TODO: Figure out wtf
 
-        for (int dz = -16; dz < 32; dz++) {
-            for (int dx = -16; dx < 32; dx++) {
+        for (int dz = -16; dz < 32; dz += 4) {
+            for (int dx = -16; dx < 32; dx += 4) {
                 if ((dx & 15) == dx && (dz & 15) == dz) continue;
 
-                int qx = QuartPos.fromBlock(startX + dx);
-                int qz = QuartPos.fromBlock(startZ + dz);
-                long index = ChunkPos.asLong(qx, qz);
+                int qx = QuartPos.toBlock(QuartPos.fromBlock(startX + dx));
+                int qz = QuartPos.toBlock(QuartPos.fromBlock(startZ + dz));
+                long index = ColumnPos.asLong(qx, qz);
 
                 cache.put(index, min);
             }

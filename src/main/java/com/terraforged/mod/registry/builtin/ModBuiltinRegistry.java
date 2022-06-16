@@ -68,9 +68,11 @@ public class ModBuiltinRegistry<T> implements ModRegistry<T> {
     @Override
     public MappedRegistry<T> copy() {
         var copy = new MappedRegistry<>(registry.key(), registry.lifecycle(), null);
-        for (var e : registry.entrySet()) {
-            int id = registry.getId(e.getValue());
-            copy.registerMapping(id, e.getKey(), e.getValue(), registry.lifecycle(e.getValue()));
+        for (var value : registry) {
+            int id = registry.getId(value);
+            var key = registry.getResourceKey(value).orElseThrow();
+            var lifecycle = registry.lifecycle(value);
+            copy.registerMapping(id, key, value, lifecycle);
         }
         return copy;
     }

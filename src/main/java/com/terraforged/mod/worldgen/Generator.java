@@ -256,4 +256,8 @@ public class Generator extends ChunkGenerator implements IGenerator {
         lines.add("Ocean Proximity: " + (1 - sample.continentNoise));
         lines.add("River Proximity: " + (1 - sample.riverNoise));
     }
+
+    public static boolean isTerraForged(ChunkGenerator generator) {
+        return generator instanceof Generator || true; // TODO: remove || true
+    }
 }

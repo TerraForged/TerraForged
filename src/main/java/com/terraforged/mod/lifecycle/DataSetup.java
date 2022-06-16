@@ -24,6 +24,7 @@
 
 package com.terraforged.mod.lifecycle;
 
+import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.data.*;
 
@@ -32,12 +33,14 @@ public class DataSetup extends Init {
 
     @Override
     protected void doInit() {
-        TerraForged.LOG.info("Registering world-gen content");
-        ModTerrainTypes.register();
-        ModTerrains.register();
-        ModBiomes.register();
-        ModCaves.register();
-        ModVegetations.register();
-        ModClimates.register();
+        if (Environment.DATA_GEN) {
+            TerraForged.LOG.info("Registering world-gen content");
+            ModTerrainTypes.register();
+            ModTerrains.register();
+            ModBiomes.register();
+            ModCaves.register();
+            ModVegetations.register();
+            ModClimates.register();
+        }
     }
 }

@@ -28,6 +28,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 
@@ -40,7 +41,11 @@ public class Codecs {
     }
 
     public static <V> JsonElement encode(V v, Codec<V> codec) {
-        return codec.encodeStart(JsonOps.INSTANCE, v).result()
+        return encode(v, codec, JsonOps.INSTANCE);
+    }
+
+    public static <V> JsonElement encode(V v, Codec<V> codec, DynamicOps<JsonElement> ops) {
+        return codec.encodeStart(ops, v).result()
                 .filter(JsonElement::isJsonObject)
                 .map(JsonElement::getAsJsonObject)
                 .orElse(null);

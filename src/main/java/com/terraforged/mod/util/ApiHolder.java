@@ -38,7 +38,7 @@ public class ApiHolder<T> extends Init {
     protected void doInit() {}
 
     public void set(T value) {
-        if (init()) {
+        if (run()) {
             this.value = value;
             TerraForged.LOG.info("Set TerraForged API: {}", value.getClass().getSimpleName());
         }

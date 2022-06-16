@@ -31,19 +31,24 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.RegistryResourceAccess;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Desc;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(RegistryOps.class)
 public class MixinRegistryOps {
     @Inject(
-            method = "createAndLoad(Lcom/mojang/serialization/DynamicOps;Lnet/minecraft/core/RegistryAccess$Writable;Lnet/minecraft/resources/RegistryResourceAccess;)Lnet/minecraft/resources/RegistryOps;",
-            at = @At("RETURN")
+            at = @At("RETURN"),
+            target = @Desc(
+                    value = "createAndLoad",
+                    ret = RegistryOps.class,
+                    args= {DynamicOps.class, RegistryAccess.Writable.class, RegistryResourceAccess.class}
+            )
     )
     private static <T> void onCreateAndLoad(DynamicOps<T> ops,
-                                     RegistryAccess.Writable writable,
-                                     RegistryResourceAccess resource,
-                                     CallbackInfoReturnable<RegistryOps<T>> cir) {
+                                            RegistryAccess.Writable writable,
+                                            RegistryResourceAccess resource,
+                                            CallbackInfoReturnable<RegistryOps<T>> cir) {
         BuiltinHook.load(writable, cir.getReturnValue());
     }
 }

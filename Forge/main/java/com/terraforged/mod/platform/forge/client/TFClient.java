@@ -43,7 +43,7 @@ public class TFClient {
     }
 
     void onClientInit(FMLClientSetupEvent event) {
-        event.enqueueWork(ClientSetup.INSTANCE::init);
+        event.enqueueWork(ClientSetup.INSTANCE::run);
         event.enqueueWork(TFPreset::makeDefault);
     }
 

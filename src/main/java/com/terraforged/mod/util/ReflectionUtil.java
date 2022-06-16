@@ -42,6 +42,15 @@ public class ReflectionUtil {
         }
     }
 
+    public static MethodHandle setter(Class<?> owner, Class<?> type, String... names) {
+        try {
+            Field field = getField(owner, type, f -> contains(names, f.getName()));
+            return MethodHandles.lookup().in(owner).unreflectSetter(field);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static Field getField(Class<?> owner, Class<?> fieldType, Predicate<Field> predicate) {
         return accessMember(owner, fieldType, owner.getDeclaredFields(), Field::getType, predicate);
     }

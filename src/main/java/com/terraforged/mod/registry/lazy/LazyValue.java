@@ -24,11 +24,14 @@
 
 package com.terraforged.mod.registry.lazy;
 
+import com.terraforged.mod.TerraForged;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Supplier;
 
 public abstract class LazyValue<T> implements Supplier<T> {
+    protected static final ResourceLocation UNDEFINED = TerraForged.location("undefined");
+
     protected final ResourceLocation name;
     protected volatile T value;
 

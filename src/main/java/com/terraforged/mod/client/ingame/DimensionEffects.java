@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DimensionEffects extends DimensionSpecialEffects {
     public static final AtomicInteger CLOUD_HEIGHT = new AtomicInteger(300);
+
     private static final MethodHandle REGISTRY_GETTER = ReflectionUtil.field(DimensionSpecialEffects.class, Object2ObjectMap.class);
 
     protected final DimensionSpecialEffects source;

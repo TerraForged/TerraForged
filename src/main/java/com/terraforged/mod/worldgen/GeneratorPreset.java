@@ -25,8 +25,8 @@
 package com.terraforged.mod.worldgen;
 
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.data.ModTerrains;
 import com.terraforged.mod.util.TranslationUtil;
+import com.terraforged.mod.worldgen.asset.TerrainNoise;
 import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.noise.NoiseGenerator;
@@ -47,7 +47,7 @@ public class GeneratorPreset {
     public static final String TRANSLATION_KEY = TranslationUtil.key("generator", PRESET_NAME);
 
     public static Generator build(TerrainLevels levels, RegistryAccess registries) {
-        var terrain = ModTerrains.getTerrain(registries);
+        var terrain = TerraForged.TERRAINS.entries(registries, TerrainNoise[]::new);
 
         var biomeGenerator = new BiomeGenerator(registries);
         var noiseGenerator = new NoiseGenerator(levels, terrain).withErosion();

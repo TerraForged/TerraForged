@@ -28,10 +28,11 @@ import com.mojang.serialization.Codec;
 import com.terraforged.mod.registry.builtin.ModBuiltinRegistry;
 import com.terraforged.mod.registry.builtin.VanillaBuiltinRegistry;
 import com.terraforged.mod.registry.key.RegistryKey;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class RegistryManager {
     public static final RegistryManager DEFAULT = new RegistryManager(VanillaBuiltinRegistry::new, ModBuiltinRegistry::new);
@@ -63,23 +64,29 @@ public class RegistryManager {
     }
 
     public Iterable<ModRegistry<?>> getModRegistries() {
-        return modRegistries.registries.values();
+        return modRegistries.order;
     }
 
     public Iterable<VanillaRegistry<?>> getVanillaRegistries() {
-        return vanillaRegistries.registries.values();
+        return vanillaRegistries.order;
     }
 
     protected static class RegistryHolder<Registry extends VanillaRegistry<?>> {
-        private final Map<RegistryKey<?>, Registry> registries = new IdentityHashMap<>();
+        protected final List<Registry> order = new ObjectArrayList<>();
+        protected final Map<RegistryKey<?>, Registry> registries = new IdentityHashMap<>();
 
         public <T> void put(RegistryKey<T> key, Registry registry) {
+            order.add(registry);
             registries.put(key, registry);
         }
 
-        public <T, R extends VanillaRegistry<T>> R getRegistry(RegistryKey<T> registry) {
+        public <T, R extends VanillaRegistry<T>> R getRegistry(RegistryKey<T> key) {
+            var registry = registries.get(key);
+            if (registry == null) {
+                throw new NullPointerException("Registry is null: " + key);
+            }
             //noinspection unchecked
-            return (R) Objects.requireNonNull(registries.get(registry));
+            return (R) registry;
         }
     }
 }

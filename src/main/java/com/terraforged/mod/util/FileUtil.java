@@ -122,6 +122,7 @@ public class FileUtil {
         try (var output = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(to)))) {
             walk(from, path, (fs, root, file) -> {
                 var name = root.relativize(file).toString().replace('\\', '/');
+
                 if (Files.isDirectory(file)) {
                     if (!name.endsWith("/")) {
                         name += "'/";
@@ -130,16 +131,17 @@ public class FileUtil {
                     var entry = new ZipEntry(name);
                     entry.setTime(System.currentTimeMillis());
                     output.putNextEntry(entry);
-                    output.closeEntry();
                 } else {
                     var entry = new ZipEntry(name);
                     entry.setTime(System.currentTimeMillis());
                     output.putNextEntry(entry);
+
                     try (var input = new InputStreamReader(fs.provider().newInputStream(file))) {
                         IOUtils.copy(input, output, Charset.defaultCharset());
                     }
-                    output.closeEntry();
                 }
+
+                output.closeEntry();
             });
 
             output.finish();

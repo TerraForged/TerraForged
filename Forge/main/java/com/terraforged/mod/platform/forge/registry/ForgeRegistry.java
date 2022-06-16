@@ -24,11 +24,12 @@
 
 package com.terraforged.mod.platform.forge.registry;
 
-import com.google.common.base.Suppliers;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.registry.VanillaRegistry;
 import com.terraforged.mod.registry.key.RegistryKey;
 import net.minecraft.resources.ResourceKey;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.javafmlmod.FMLModContainer;
 import net.minecraftforge.registries.DeferredRegister;
 
 import java.util.AbstractMap;
@@ -41,7 +42,8 @@ public class ForgeRegistry<T> implements VanillaRegistry<T> {
 
     public ForgeRegistry(RegistryKey<T> key) {
         this.key = key;
-        this.register = DeferredRegister.create(key.get(), TerraForged.MODID);
+        this.register = DeferredRegister.createOptional(key.get(), TerraForged.MODID);
+        this.register.register(((FMLModContainer) ModLoadingContext.get().getActiveContainer()).getEventBus());
     }
 
     @Override
@@ -51,7 +53,7 @@ public class ForgeRegistry<T> implements VanillaRegistry<T> {
 
     @Override
     public void register(ResourceKey<T> key, T value) {
-        register.register(key.location().getPath(), Suppliers.ofInstance(value));
+        register.register(key.location().getPath(), () -> value);
     }
 
     @Override

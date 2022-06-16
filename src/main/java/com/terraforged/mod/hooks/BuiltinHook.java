@@ -25,37 +25,61 @@
 package com.terraforged.mod.hooks;
 
 import com.terraforged.mod.CommonAPI;
+import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.registry.ModRegistry;
 import com.terraforged.mod.util.ReflectionUtil;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.RegistryLoader;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.levelgen.presets.WorldPreset;
 
 import java.lang.invoke.MethodHandle;
 import java.util.Map;
 
 public class BuiltinHook {
     private static final MethodHandle REGISTRY_GETTER = ReflectionUtil.field(RegistryAccess.WritableRegistryAccess.class, Map.class);
+    private static final MethodHandle READ_CACHE_GETTER = ReflectionUtil.field(RegistryLoader.class, Map.class);
 
     public static <T> void load(RegistryAccess.Writable writable, RegistryOps<T> ops) {
         if (ops.registryLoader().isEmpty()) return;
 
+        var registries = CommonAPI.get().getRegistryManager().getModRegistries();
+
         var backing = getBacking(writable);
-        for (var registry : CommonAPI.get().getRegistryManager().getModRegistries()) {
+        for (var registry : registries) {
             backing.put(registry.key().get(), registry.copy());
         }
 
-        for (var registry : CommonAPI.get().getRegistryManager().getModRegistries()) {
+        for (var registry : registries) {
             loadRegistry(registry, ops);
         }
+
+        // Note: need to reload the preset registry after injecting datapack
+        // content so that generators have access to the additional data!
+        reloadPresetRegistry(writable, ops);
     }
+
     private static <T, E> void loadRegistry(ModRegistry<T> registry, RegistryOps<E> ops) {
         var key = registry.key().get();
         var codec = registry.codec();
         var loader = ops.registryLoader().orElseThrow();
         var result = loader.overrideRegistryFromResources(key, codec, ops.getAsJson());
         RegistryAccessUtil.printRegistryContents(result.result().orElseThrow());
+    }
+
+    private static <T> void reloadPresetRegistry(RegistryAccess.Writable writable, RegistryOps<T> ops) {
+        var loader = ops.registryLoader().orElseThrow().loader();
+
+        // Clear cached world-presets so that they're read fully from
+        // json, allowing access to the newly injected data.
+        clearReadCache(loader, Registry.WORLD_PRESET_REGISTRY);
+
+        var registry = writable.ownedWritableRegistryOrThrow(Registry.WORLD_PRESET_REGISTRY);
+        loader.overrideRegistryFromResources(registry, Registry.WORLD_PRESET_REGISTRY, WorldPreset.DIRECT_CODEC, ops.getAsJson());
+
+        TerraForged.LOG.info("Reloaded world-preset registry");
     }
 
     @SuppressWarnings("unchecked")
@@ -65,6 +89,15 @@ public class BuiltinHook {
         } catch (Throwable e) {
             e.printStackTrace();
             return Map.of();
+        }
+    }
+
+    private static void clearReadCache(RegistryLoader loader, ResourceKey<?> registry) {
+        try {
+            var map = (Map<?, ?>) READ_CACHE_GETTER.invokeExact(loader);
+            map.remove(registry);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
         }
     }
 }

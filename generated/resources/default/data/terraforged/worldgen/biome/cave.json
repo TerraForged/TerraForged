@@ -1,6 +1,4 @@
 {
-  "category": "underground",
-  "forge:registry_name": "terraforged:cave",
   "precipitation": "rain",
   "downfall": 0.4,
   "temperature": 0.8,

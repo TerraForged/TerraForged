@@ -4,16 +4,19 @@
   "package": "com.terraforged.mod.mixin",
   "refmap": "terraforged.mixins.refmap.json",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [],
-  "_mixins": [
-    "common.MixinBoat",
-    "common.MixinRegistryAccess",
-    "common.MixinRegistryOps",
-    "common.MixinWorldGenSettings"
-  ],
-  "_client": [
+  "client": [
     "client.MixinCreateWorldScreen",
-    "client.MixinPrimaryLevelData"
+    "client.MixinWorldGenSettingsComponent"
+  ],
+  "mixins": [
+    "common.MixinBoat",
+    "common.MixinPackRepository",
+    "common.MixinRegistryAccess",
+    "common.MixinRegistryOps"
+  ],
+  "disabled": [
+    "common.MixinRegistryAccess",
+    "common.MixinWorldGenSettings"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class Init {
     private final AtomicBoolean lock = new AtomicBoolean(false);
 
-    public final boolean init() {
+    public final boolean run() {
         if (lock.compareAndSet(false, true)) {
             doInit();
             return true;

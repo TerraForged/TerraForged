@@ -22,37 +22,33 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.platform.forge.registry;
+package com.terraforged.mod.data.gen;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.Lifecycle;
-import com.terraforged.mod.registry.ModRegistry;
-import com.terraforged.mod.registry.key.RegistryKey;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.resources.ResourceKey;
-import net.minecraftforge.registries.RegistryBuilder;
+import com.terraforged.mod.TerraForged;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataProvider;
 
-public class ForgeModRegistry<T> extends ForgeRegistry<T> implements ModRegistry<T> {
-    protected final Codec<T> codec;
+import java.nio.file.Path;
+import java.util.Timer;
+import java.util.TimerTask;
 
-    public ForgeModRegistry(RegistryKey<T> key, Codec<T> codec) {
-        super(key);
-        this.codec = codec;
-        this.register.makeRegistry(() -> new RegistryBuilder<T>().disableSaving().dataPackRegistry(this.codec));
+public record TerraForgedDataProvider(Path dir) implements DataProvider {
+    @Override
+    public void run(CachedOutput cachedOutput) {
+        DataGen.export(dir, cachedOutput).join();
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                // Process hangs so force exit after completion
+                TerraForged.LOG.warn("Forcibly shutting down datagen process");
+                System.exit(0);
+            }
+        }, 1_000L);
     }
 
     @Override
-    public Codec<T> codec() {
-        return codec;
-    }
-
-    @Override
-    public MappedRegistry<T> copy() {
-        var copy = new MappedRegistry<T>(key.get(), Lifecycle.stable(), null);
-        for (var entry : register.getEntries()) {
-            var key = ResourceKey.create(this.key.get(), entry.getId());
-            copy.register(key, entry.get(), Lifecycle.stable());
-        }
-        return copy;
+    public String getName() {
+        return "TerraForged Builtins";
     }
 }

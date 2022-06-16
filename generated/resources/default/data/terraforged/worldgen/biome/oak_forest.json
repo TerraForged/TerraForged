@@ -1,6 +1,4 @@
 {
-  "category": "forest",
-  "forge:registry_name": "terraforged:oak_forest",
   "precipitation": "rain",
   "downfall": 0.4,
   "temperature": 0.8,

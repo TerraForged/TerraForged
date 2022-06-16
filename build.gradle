@@ -76,6 +76,7 @@ minecraft {
             property "forge.logging.console.level", "debug"
             args "--mod", "terraforged", "--server", "--output", file("generated")
             arg "-mixin.config=terraforged.mixins.json"
+            jvmArgs "-Ddatagen"
             mods {
                 terraforged {
                     source sourceSets.main

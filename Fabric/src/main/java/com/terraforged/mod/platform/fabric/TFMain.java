@@ -30,6 +30,7 @@ import com.terraforged.mod.CommonAPI;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.command.TFCommands;
 import com.terraforged.mod.lifecycle.CommonSetup;
+import com.terraforged.mod.lifecycle.RegistrySetup;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
@@ -43,6 +44,11 @@ import java.util.function.Supplier;
 public class TFMain extends TerraForged implements CommonAPI, ModInitializer, CommandRegistrationCallback {
     private final Supplier<Path> container = Suppliers.memoize(TFMain::getRootPath);
 
+    public TFMain() {
+        CommonAPI.HOLDER.set(this);
+        RegistrySetup.INSTANCE.run();
+    }
+
     @Override
     public Path getContainer() {
         return container.get();
@@ -50,7 +56,7 @@ public class TFMain extends TerraForged implements CommonAPI, ModInitializer, Co
 
     @Override
     public void onInitialize() {
-        CommonSetup.INSTANCE.init();
+        CommonSetup.INSTANCE.run();
         CommandRegistrationCallback.EVENT.register(this);
     }
 

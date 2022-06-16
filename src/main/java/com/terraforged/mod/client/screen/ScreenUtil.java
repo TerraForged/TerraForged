@@ -57,6 +57,8 @@ public class ScreenUtil {
     }
 
     public static boolean isPresetEnabled(CreateWorldScreen screen) {
+        if (true) return true;
+
         var button = getPresetButton(screen);
         if (button == null) return false;
 

@@ -78,6 +78,11 @@ public class RegistryKey<T> extends LazyValue<ResourceKey<Registry<T>>> {
         return ResourceKey.createRegistryKey(name);
     }
 
+    @Override
+    public String toString() {
+        return "RegistryKey{" + name + "}";
+    }
+
     private static <T> T[] toSortedArray(Stream<Map.Entry<ResourceKey<T>, T>> stream, IntFunction<T[]> arrayFunc) {
         return stream.sorted(Comparator.comparing(e -> e.getKey().location()))
                 .map(Map.Entry::getValue)
@@ -89,8 +94,6 @@ public class RegistryKey<T> extends LazyValue<ResourceKey<Registry<T>>> {
     }
 
     public static class Builtin<T> extends RegistryKey<T> {
-        protected static final ResourceLocation UNDEFINED = TerraForged.location("undefined");
-
         protected final Supplier<ResourceKey<Registry<T>>> supplier;
 
         public Builtin(Supplier<ResourceKey<Registry<T>>> supplier) {
@@ -100,7 +103,7 @@ public class RegistryKey<T> extends LazyValue<ResourceKey<Registry<T>>> {
 
         @Override
         public void register(ResourceKey<T> key, T value) {
-            CommonAPI.get().getRegistryManager().getModRegistry(this).register(key, value);
+            CommonAPI.get().getRegistryManager().getVanillaRegistry(this).register(key, value);
         }
 
         @Override

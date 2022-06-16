@@ -48,7 +48,11 @@ public class CaveBiomeSampler {
         this.scale = scale;
         this.frequency = 1F / scale;
 
-        Holder<Biome>[] global = new Holder[]{biomeMapManager.getBiomes().getHolderOrThrow(ModBiomes.CAVE.get())};
+        var biomes = biomeMapManager.getBiomes();
+        var cave = biomes.getHolder(ModBiomes.CAVE.get());
+
+        Holder<Biome>[] global = cave.isPresent() ? new Holder[]{cave.get()} : new Holder[0];
+
         Holder<Biome>[] special = biomeMapManager.getBiomes()
                 .holders()
 //                .filter(b -> Biome.getBiomeCategory(b) == Biome.BiomeCategory.UNDERGROUND) TODO

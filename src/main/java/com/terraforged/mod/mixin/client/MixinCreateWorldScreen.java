@@ -24,46 +24,30 @@
 
 package com.terraforged.mod.mixin.client;
 
-import com.mojang.datafixers.util.Pair;
-import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.client.screen.ScreenUtil;
-import com.terraforged.mod.worldgen.datapack.DataPackExporter;
+import com.terraforged.mod.hooks.DatapackHook;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.world.level.DataPackConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Desc;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.File;
 import java.nio.file.Path;
 
 @Mixin(CreateWorldScreen.class)
 public abstract class MixinCreateWorldScreen {
     @Shadow
-    protected DataPackConfig dataPacks;
-
-    @Shadow
     protected abstract Path getTempDataPackDir();
 
-    @Shadow
-    protected abstract Pair<File, PackRepository> getDataPackSelectionSettings();
+    @Inject(target = @Desc(value = "init"), at = @At("RETURN"))
+    private void onInit(CallbackInfo ci) {
+        DatapackHook.selectPreset(this);
+    }
 
-    @Shadow
-    protected abstract void tryApplyNewDataPacks(PackRepository packRepository);
-
-    @Inject(method = "onCreate()V", at = @At("HEAD"))
-    private void onCreate(CallbackInfo ci) {
-        if (ScreenUtil.isPresetEnabled(((CreateWorldScreen) (Object) this))) {
-            dataPacks = DataPackExporter.setup(getTempDataPackDir(), dataPacks);
-
-            var selection = getDataPackSelectionSettings().getSecond();
-            selection.setSelected(dataPacks.getEnabled());
-            tryApplyNewDataPacks(selection);
-
-            TerraForged.LOG.info("Applied datapacks: {}", selection.getSelectedIds());
-        }
+    @Inject(target = @Desc(value = "tryApplyNewDataPacks", args = PackRepository.class), at = @At("HEAD"))
+    private void onTryApplyNewDataPacks(PackRepository repository, CallbackInfo ci) {
+        DatapackHook.injectDatapack(repository, getTempDataPackDir());
     }
 }

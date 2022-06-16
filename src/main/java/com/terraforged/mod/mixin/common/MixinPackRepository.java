@@ -22,34 +22,28 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.data.gen;
+package com.terraforged.mod.mixin.common;
 
-import com.terraforged.mod.TerraForged;
-import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataProvider;
+import com.terraforged.mod.hooks.DatapackHook;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.RepositorySource;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Desc;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Timer;
-import java.util.TimerTask;
-
-public record BuiltinProvider(Path dir) implements DataProvider {
-    @Override
-    public void run(CachedOutput cachedOutput) throws IOException {
-        DataGen.export(dir);
-
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                // Process hangs so force exit after completion
-                TerraForged.LOG.warn("Forcibly shutting down datagen process");
-                System.exit(0);
-            }
-        }, 1_000L);
-    }
-
-    @Override
-    public String getName() {
-        return "TerraForged Builtins";
+@Mixin(PackRepository.class)
+public class MixinPackRepository {
+    @ModifyVariable(
+            at = @At("HEAD"),
+            index = 2,
+            target = @Desc(
+                    value = "<init>",
+                    args = {Pack.PackConstructor.class, RepositorySource[].class}
+            )
+    )
+    private static RepositorySource[] modifySources(RepositorySource[] sources) {
+        return DatapackHook.injectRepositorySource(sources);
     }
 }

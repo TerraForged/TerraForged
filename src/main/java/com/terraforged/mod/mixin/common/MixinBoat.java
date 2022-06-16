@@ -35,9 +35,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinBoat {
     @Inject(method = "isUnderwater", at = @At("RETURN"), cancellable = true)
     private void onIsUnderwater(CallbackInfoReturnable<Boat.Status> cir) {
-        var status = cir.getReturnValue();
-
-        if (status != null && BoatHook.floatTheBoat((Boat) (Object) this)) {
+        if (cir.getReturnValue() != null && BoatHook.floatTheBoat((Boat) (Object) this)) {
             // Clear the status so the boat doesn't sink
             cir.setReturnValue(null);
         }
