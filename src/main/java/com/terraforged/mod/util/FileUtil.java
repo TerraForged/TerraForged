@@ -74,7 +74,7 @@ public class FileUtil {
 
     public static void walkDir(Path root, String path, FileSystemVisitor visitor) throws IOException {
         root = root.resolve(path);
-        walk(FileSystems.getDefault(), root, root, visitor);
+        walk(root.getFileSystem(), root, root, visitor);
     }
 
     public static void walkSystem(Path root, String path, FileSystemVisitor visitor) throws IOException {
