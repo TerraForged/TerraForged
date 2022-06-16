@@ -104,19 +104,22 @@ public class DatapackHook {
     }
 
     private static boolean selectPreset(CycleButton<?> button, Predicate<ResourceLocation> predicate) {
-        var key = getKey(button);
+        final var key = getKey(button);
+        
+        // Return early if preset already selected
         if (predicate.test(key.location())) {
             return false;
         }
 
+        // Loop through options and test
         var next = nextKey(button);
         while (next != key) {
 
-            if (predicate.test(key.location())) {
+            if (predicate.test(next.location())) {
                 return true;
             }
 
-            key = nextKey(button);
+            next = nextKey(button);
         }
 
         return false;
