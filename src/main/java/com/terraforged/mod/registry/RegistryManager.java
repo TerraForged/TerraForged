@@ -25,68 +25,54 @@
 package com.terraforged.mod.registry;
 
 import com.mojang.serialization.Codec;
-import com.terraforged.mod.registry.builtin.ModBuiltinRegistry;
-import com.terraforged.mod.registry.builtin.VanillaBuiltinRegistry;
 import com.terraforged.mod.registry.key.RegistryKey;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.resources.ResourceKey;
 
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class RegistryManager {
-    public static final RegistryManager DEFAULT = new RegistryManager(VanillaBuiltinRegistry::new, ModBuiltinRegistry::new);
+    public static final RegistryManager DEFAULT = new RegistryManager();
 
-    private final RegistryFactory.Mod modFactory;
-    private final RegistryFactory.Vanilla vanillaFactory;
-    private final RegistryHolder<ModRegistry<?>> modRegistries = new RegistryHolder<>();
-    private final RegistryHolder<VanillaRegistry<?>> vanillaRegistries = new RegistryHolder<>();
+    protected final List<DataRegistry<?>> injected = new ObjectArrayList<>();
+    protected final Map<RegistryKey<?>, DataRegistry<?>> registries = new IdentityHashMap<>();
 
-    public RegistryManager(RegistryFactory.Vanilla vanillaFactory, RegistryFactory.Mod modFactory) {
-        this.modFactory = modFactory;
-        this.vanillaFactory = vanillaFactory;
+    public <T> void register(RegistryKey<T> registry, ResourceKey<T> key, T value) {
+        getRegistry(registry).register(key, value);
     }
 
     public <T> void create(RegistryKey<T> registry) {
-        vanillaRegistries.put(registry, vanillaFactory.create(registry));
+        create(registry, null, false);
     }
 
     public <T> void create(RegistryKey<T> registry, Codec<T> codec) {
-        modRegistries.put(registry, modFactory.create(registry, codec));
+        create(registry, codec, true);
     }
 
-    public <T> ModRegistry<T> getModRegistry(RegistryKey<T> registry) {
-        return modRegistries.getRegistry(registry);
-    }
+    public <T> void create(RegistryKey<T> key, Codec<T> codec, boolean injected) {
+        var registry = new DataRegistry<>(key, codec);
 
-    public <T> VanillaRegistry<T> getVanillaRegistry(RegistryKey<T> registry) {
-        return vanillaRegistries.getRegistry(registry);
-    }
+        registries.put(key, registry);
 
-    public Iterable<ModRegistry<?>> getModRegistries() {
-        return modRegistries.order;
-    }
-
-    public Iterable<VanillaRegistry<?>> getVanillaRegistries() {
-        return vanillaRegistries.order;
-    }
-
-    protected static class RegistryHolder<Registry extends VanillaRegistry<?>> {
-        protected final List<Registry> order = new ObjectArrayList<>();
-        protected final Map<RegistryKey<?>, Registry> registries = new IdentityHashMap<>();
-
-        public <T> void put(RegistryKey<T> key, Registry registry) {
-            order.add(registry);
-            registries.put(key, registry);
+        if (injected) {
+            this.injected.add(registry);
         }
+    }
 
-        public <T, R extends VanillaRegistry<T>> R getRegistry(RegistryKey<T> key) {
-            var registry = registries.get(key);
-            if (registry == null) {
-                throw new NullPointerException("Registry is null: " + key);
-            }
-            //noinspection unchecked
-            return (R) registry;
-        }
+    public Iterable<DataRegistry<?>> getRegistries() {
+        return registries.values();
+    }
+
+    public Iterable<DataRegistry<?>> getInjectedRegistries() {
+        return injected;
+    }
+
+    public <T> DataRegistry<T> getRegistry(RegistryKey<T> key) {
+        var registry = registries.get(key);
+        //noinspection unchecked
+        return (DataRegistry<T>) Objects.requireNonNull(registry);
     }
 }

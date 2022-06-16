@@ -24,14 +24,15 @@
 
 package com.terraforged.mod.lifecycle;
 
+import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.worldgen.Generator;
 import com.terraforged.mod.worldgen.biome.Source;
 import com.terraforged.mod.worldgen.datapack.DataPackExporter;
 import net.minecraft.core.Registry;
 
-public class CommonSetup extends Init {
-    public static final CommonSetup INSTANCE = new CommonSetup();
+public class CommonSetup extends Stage {
+    public static final CommonSetup STAGE = new CommonSetup();
 
     CommonSetup() {}
 
@@ -43,6 +44,8 @@ public class CommonSetup extends Init {
 
 //        Registry.register(Registry.CHUNK_GENERATOR, TerraForged.location("profiler"), GeneratorProfiler.CODEC);
 
-        DataPackExporter.extractDefaultPack();
+        if (!Environment.DATA_GEN) {
+            DataPackExporter.extractDefaultPack();
+        }
     }
 }

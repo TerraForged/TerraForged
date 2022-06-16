@@ -24,26 +24,20 @@
 
 package com.terraforged.mod.lifecycle;
 
-import com.terraforged.mod.CommonAPI;
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.worldgen.asset.*;
+import com.terraforged.mod.data.*;
 
-public class RegistrySetup extends Init {
-    public static final RegistrySetup INSTANCE = new RegistrySetup();
+public class DataGenSetup extends Stage {
+    public static final Stage STAGE = new DataGenSetup();
 
     @Override
     protected void doInit() {
-        try {
-            TerraForged.LOG.info("Initializing registries");
-            var registryManager = CommonAPI.get().getRegistryManager();
-            registryManager.create(TerraForged.BIOMES);
-            registryManager.create(TerraForged.CAVES, NoiseCave.CODEC);
-            registryManager.create(TerraForged.CLIMATES, ClimateType.CODEC);
-            registryManager.create(TerraForged.TERRAINS, TerrainNoise.CODEC);
-            registryManager.create(TerraForged.TERRAIN_TYPES, TerrainType.DIRECT);
-            registryManager.create(TerraForged.VEGETATIONS, VegetationConfig.CODEC);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+        TerraForged.LOG.info("Registering data-gen content");
+        ModTerrainTypes.register();
+        ModTerrains.register();
+        ModCaves.register();
+        ModVegetations.register();
+        ModClimates.register();
+        ModBiomes.register();
     }
 }

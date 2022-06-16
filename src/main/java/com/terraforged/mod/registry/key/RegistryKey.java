@@ -45,15 +45,6 @@ public class RegistryKey<T> extends LazyValue<ResourceKey<Registry<T>>> {
         super(name);
     }
 
-    public void register(String name, T value) {
-        var key = ResourceKey.create(get(), TerraForged.location(name));
-        register(key, value);
-    }
-
-    public void register(ResourceKey<T> key, T value) {
-        CommonAPI.get().getRegistryManager().getModRegistry(this).register(key, value);
-    }
-
     public EntryKey<T> entryKey(String name) {
         return new EntryKey<>(this, TerraForged.location(name));
     }
@@ -68,7 +59,7 @@ public class RegistryKey<T> extends LazyValue<ResourceKey<Registry<T>>> {
 
     public T[] entries(RegistryAccess access, IntFunction<T[]> arrayFunc) {
         if (access == null) {
-            return toSortedArray(CommonAPI.get().getRegistryManager().getModRegistry(this).stream(), arrayFunc);
+            return toSortedArray(CommonAPI.get().getRegistryManager().getRegistry(this).stream(), arrayFunc);
         }
         return toSortedArray(access.ownedRegistryOrThrow(get()).entrySet().stream(), arrayFunc);
     }
@@ -87,28 +78,5 @@ public class RegistryKey<T> extends LazyValue<ResourceKey<Registry<T>>> {
         return stream.sorted(Comparator.comparing(e -> e.getKey().location()))
                 .map(Map.Entry::getValue)
                 .toArray(arrayFunc);
-    }
-
-    public static <T> RegistryKey<T> builtin(Supplier<ResourceKey<Registry<T>>> supplier) {
-        return new Builtin<>(supplier);
-    }
-
-    public static class Builtin<T> extends RegistryKey<T> {
-        protected final Supplier<ResourceKey<Registry<T>>> supplier;
-
-        public Builtin(Supplier<ResourceKey<Registry<T>>> supplier) {
-            super(UNDEFINED);
-            this.supplier = supplier;
-        }
-
-        @Override
-        public void register(ResourceKey<T> key, T value) {
-            CommonAPI.get().getRegistryManager().getVanillaRegistry(this).register(key, value);
-        }
-
-        @Override
-        protected ResourceKey<Registry<T>> compute() {
-            return supplier.get();
-        }
     }
 }

@@ -25,7 +25,6 @@
 package com.terraforged.mod.data;
 
 import com.terraforged.engine.Seed;
-import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.registry.lazy.LazyTag;
 import com.terraforged.mod.util.seed.RandSeed;
@@ -35,29 +34,19 @@ import com.terraforged.noise.Source;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.biome.Biome;
 
+import static com.terraforged.mod.TerraForged.VEGETATIONS;
+
 public interface ModVegetations {
     static void register() {
         var seed = Factory.createSeed();
-        TerraForged.VEGETATIONS.register("trees_copse", Factory.copse(seed, null));
-        TerraForged.VEGETATIONS.register("trees_sparse", Factory.sparse(seed, null));
-        TerraForged.VEGETATIONS.register("trees_patchy", Factory.patchy(seed, null));
-        TerraForged.VEGETATIONS.register("trees_temperate", Factory.temperate(seed, null));
-        TerraForged.VEGETATIONS.register("trees_hardy", Factory.hardy(seed, null));
-        TerraForged.VEGETATIONS.register("trees_hardy_slopes", Factory.hardySlopes(seed, null));
-        TerraForged.VEGETATIONS.register("trees_rainforest", Factory.rainforest(seed, null));
-        TerraForged.VEGETATIONS.register("trees_sparse_rainforest", Factory.sparseRainforest(seed, null));
-    }
-
-    static VegetationConfig[] getVegetation(RegistryAccess access) {
-        if (access == null) {
-            return Factory.getDefaults(null);
-        }
-
-        if (Environment.DEV_ENV) {
-            return Factory.getDefaults(access);
-        }
-
-        return TerraForged.VEGETATIONS.entries(access, VegetationConfig[]::new);
+        TerraForged.register(VEGETATIONS, "trees_copse", Factory.copse(seed, null));
+        TerraForged.register(VEGETATIONS, "trees_sparse", Factory.sparse(seed, null));
+        TerraForged.register(VEGETATIONS, "trees_patchy", Factory.patchy(seed, null));
+        TerraForged.register(VEGETATIONS, "trees_temperate", Factory.temperate(seed, null));
+        TerraForged.register(VEGETATIONS, "trees_hardy", Factory.hardy(seed, null));
+        TerraForged.register(VEGETATIONS, "trees_hardy_slopes", Factory.hardySlopes(seed, null));
+        TerraForged.register(VEGETATIONS, "trees_rainforest", Factory.rainforest(seed, null));
+        TerraForged.register(VEGETATIONS, "trees_sparse_rainforest", Factory.sparseRainforest(seed, null));
     }
 
     class Factory {

@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
+import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.data.ModTerrains;
-import com.terraforged.mod.data.ModVegetations;
 import com.terraforged.mod.util.MathUtil;
 import com.terraforged.mod.worldgen.asset.VegetationConfig;
 import com.terraforged.mod.worldgen.biome.IBiomeSampler;
@@ -84,7 +84,7 @@ public class ViabilityTest {
         context.biomeSampler = new IBiomeSampler.Sampler(noise);
         context.terrainData = CompletableFuture.completedFuture(new TerrainData(levels));
 
-        var vegetations = ModVegetations.getVegetation(null);
+        var vegetations = TerraForged.VEGETATIONS.entries(null, VegetationConfig[]::new);
         var vegetation = vegetations[Type.TEMPERATE.ordinal()];
 
         var image = N2DUtil.render(width, height, (x, z, img) -> {

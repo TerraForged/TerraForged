@@ -41,23 +41,25 @@ import net.minecraft.core.RegistryAccess;
 
 import java.util.function.BiFunction;
 
+import static com.terraforged.mod.TerraForged.TERRAINS;
+
 public interface ModTerrains {
     static void register() {
         var seed = Factory.createSeed();
-        TerraForged.TERRAINS.register("steppe", Factory.create(null, seed, TerrainType.FLATS, Weights.STEPPE, LandForms::steppe));
-        TerraForged.TERRAINS.register("plains", Factory.create(null, seed, TerrainType.FLATS, Weights.PLAINS, LandForms::plains));
-        TerraForged.TERRAINS.register("hills_1", Factory.create(null, seed, TerrainType.HILLS, Weights.HILLS, LandForms::hills1));
-        TerraForged.TERRAINS.register("hills_2", Factory.create(null, seed, TerrainType.HILLS, Weights.HILLS, LandForms::hills2));
-        TerraForged.TERRAINS.register("dales", Factory.create(null, seed, TerrainType.HILLS, Weights.DALES, LandForms::dales));
-        TerraForged.TERRAINS.register("plateau", Factory.create(null, seed, TerrainType.PLATEAU, Weights.PLATEAU, LandForms::plateau));
-        TerraForged.TERRAINS.register("badlands", Factory.create(null, seed, TerrainType.BADLANDS, Weights.BADLANDS, LandForms::badlands));
-        TerraForged.TERRAINS.register("torridonian", Factory.create(null, seed, ModTerrainTypes.TORRIDONIAN, Weights.TORRIDONIAN, LandForms::torridonian));
-        TerraForged.TERRAINS.register("mountains_1", Factory.create(null, seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains));
-        TerraForged.TERRAINS.register("mountains_2", Factory.create(null, seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains2));
-        TerraForged.TERRAINS.register("mountains_3", Factory.create(null, seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains3));
-        TerraForged.TERRAINS.register("dolomites", Factory.createDolomite(null, seed, ModTerrainTypes.DOLOMITES, Weights.MOUNTAINS));
-        TerraForged.TERRAINS.register("mountains_ridge_1", Factory.createNF(null, seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains2));
-        TerraForged.TERRAINS.register("mountains_ridge_2", Factory.createNF(null, seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains3));
+        TerraForged.register(TERRAINS, "steppe", Factory.create(null, seed, TerrainType.FLATS, Weights.STEPPE, LandForms::steppe));
+        TerraForged.register(TERRAINS, "plains", Factory.create(null, seed, TerrainType.FLATS, Weights.PLAINS, LandForms::plains));
+        TerraForged.register(TERRAINS, "hills_1", Factory.create(null, seed, TerrainType.HILLS, Weights.HILLS, LandForms::hills1));
+        TerraForged.register(TERRAINS, "hills_2", Factory.create(null, seed, TerrainType.HILLS, Weights.HILLS, LandForms::hills2));
+        TerraForged.register(TERRAINS, "dales", Factory.create(null, seed, TerrainType.HILLS, Weights.DALES, LandForms::dales));
+        TerraForged.register(TERRAINS, "plateau", Factory.create(null, seed, TerrainType.PLATEAU, Weights.PLATEAU, LandForms::plateau));
+        TerraForged.register(TERRAINS, "badlands", Factory.create(null, seed, TerrainType.BADLANDS, Weights.BADLANDS, LandForms::badlands));
+        TerraForged.register(TERRAINS, "torridonian", Factory.create(null, seed, ModTerrainTypes.TORRIDONIAN, Weights.TORRIDONIAN, LandForms::torridonian));
+        TerraForged.register(TERRAINS, "mountains_1", Factory.create(null, seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains));
+        TerraForged.register(TERRAINS, "mountains_2", Factory.create(null, seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains2));
+        TerraForged.register(TERRAINS, "mountains_3", Factory.create(null, seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains3));
+        TerraForged.register(TERRAINS, "dolomites", Factory.createDolomite(null, seed, ModTerrainTypes.DOLOMITES, Weights.MOUNTAINS));
+        TerraForged.register(TERRAINS, "mountains_ridge_1", Factory.createNF(null, seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains2));
+        TerraForged.register(TERRAINS, "mountains_ridge_2", Factory.createNF(null, seed, TerrainType.MOUNTAINS, Weights.MOUNTAINS, LandForms::mountains3));
     }
 
     interface Weights {
@@ -69,10 +71,6 @@ public interface ModTerrains {
         float BADLANDS = 1.75F;
         float TORRIDONIAN = 2.5F;
         float MOUNTAINS = 1.25F;
-    }
-
-    static TerrainNoise[] getTerrain(RegistryAccess access) {
-        return TerraForged.TERRAINS.entries(access, TerrainNoise[]::new);
     }
 
     class Factory {

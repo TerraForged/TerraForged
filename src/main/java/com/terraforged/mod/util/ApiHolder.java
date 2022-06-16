@@ -25,9 +25,9 @@
 package com.terraforged.mod.util;
 
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.lifecycle.Init;
+import com.terraforged.mod.lifecycle.Stage;
 
-public class ApiHolder<T> extends Init {
+public class ApiHolder<T> extends Stage {
     private volatile T value;
 
     public ApiHolder(T defaultValue) {

@@ -1,0 +1,40 @@
+{
+  "dimensions": {
+    "minecraft:overworld": {
+      "type": "minecraft:overworld",
+      "generator": {
+        "type": "terraforged:generator",
+        "levels": {
+          "auto_scale": true,
+          "base_height": 128,
+          "horizontal_scale": 1,
+          "max_y": 480,
+          "min_y": -64,
+          "sea_floor": 22,
+          "sea_level": 62
+        }
+      }
+    },
+    "minecraft:the_end": {
+      "type": "minecraft:the_end",
+      "generator": {
+        "settings": "minecraft:end",
+        "type": "minecraft:noise",
+        "biome_source": {
+          "type": "minecraft:the_end"
+        }
+      }
+    },
+    "minecraft:the_nether": {
+      "type": "minecraft:the_nether",
+      "generator": {
+        "settings": "minecraft:nether",
+        "type": "minecraft:noise",
+        "biome_source": {
+          "preset": "minecraft:nether",
+          "type": "minecraft:multi_noise"
+        }
+      }
+    }
+  }
+}

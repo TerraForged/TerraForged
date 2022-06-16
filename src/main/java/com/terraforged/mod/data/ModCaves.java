@@ -24,30 +24,23 @@
 
 package com.terraforged.mod.data;
 
-import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.util.seed.RandSeed;
 import com.terraforged.mod.worldgen.asset.NoiseCave;
 import com.terraforged.mod.worldgen.cave.CaveType;
 import com.terraforged.noise.Source;
 import com.terraforged.noise.util.NoiseUtil;
-import net.minecraft.core.RegistryAccess;
+
+import static com.terraforged.mod.TerraForged.CAVES;
 
 public interface ModCaves {
     static void register() {
         var seed = new RandSeed(901246, 500_000);
-        TerraForged.CAVES.register("synapse_high", Factory.synapse(seed.next(), 0.75F, 96, 384));
-        TerraForged.CAVES.register("synapse_mid", Factory.synapse(seed.next(), 1.0F, 0, 256));
-        TerraForged.CAVES.register("synapse_low", Factory.synapse(seed.next(), 1.2F, -32, 128));
-        TerraForged.CAVES.register("mega", Factory.mega(seed.next(), 1.0F, -16, 64));
-        TerraForged.CAVES.register("mega_deep", Factory.mega(seed.next(), 1.2F, -32, 48));
-    }
-
-    static NoiseCave[] getCaves(RegistryAccess access) {
-        if (access == null || Environment.DEV_ENV) {
-            return Factory.getDefaults();
-        }
-        return TerraForged.CAVES.entries(access, NoiseCave[]::new);
+        TerraForged.register(CAVES, "synapse_high", Factory.synapse(seed.next(), 0.75F, 96, 384));
+        TerraForged.register(CAVES, "synapse_mid", Factory.synapse(seed.next(), 1.0F, 0, 256));
+        TerraForged.register(CAVES, "synapse_low", Factory.synapse(seed.next(), 1.2F, -32, 128));
+        TerraForged.register(CAVES, "mega", Factory.mega(seed.next(), 1.0F, -16, 64));
+        TerraForged.register(CAVES, "mega_deep", Factory.mega(seed.next(), 1.2F, -32, 48));
     }
 
     class Factory {

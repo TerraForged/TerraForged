@@ -26,7 +26,7 @@ package com.terraforged.mod.hooks;
 
 import com.terraforged.mod.CommonAPI;
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.registry.ModRegistry;
+import com.terraforged.mod.registry.DataRegistry;
 import com.terraforged.mod.util.ReflectionUtil;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -45,14 +45,12 @@ public class BuiltinHook {
     public static <T> void load(RegistryAccess.Writable writable, RegistryOps<T> ops) {
         if (ops.registryLoader().isEmpty()) return;
 
-        var registries = CommonAPI.get().getRegistryManager().getModRegistries();
-
         var backing = getBacking(writable);
-        for (var registry : registries) {
-            backing.put(registry.key().get(), registry.copy());
+        for (var registry : CommonAPI.get().getRegistryManager().getInjectedRegistries()) {
+            backing.putIfAbsent(registry.key().get(), registry.copy());
         }
 
-        for (var registry : registries) {
+        for (var registry : CommonAPI.get().getRegistryManager().getInjectedRegistries()) {
             loadRegistry(registry, ops);
         }
 
@@ -61,7 +59,7 @@ public class BuiltinHook {
         reloadPresetRegistry(writable, ops);
     }
 
-    private static <T, E> void loadRegistry(ModRegistry<T> registry, RegistryOps<E> ops) {
+    private static <T, E> void loadRegistry(DataRegistry<T> registry, RegistryOps<E> ops) {
         var key = registry.key().get();
         var codec = registry.codec();
         var loader = ops.registryLoader().orElseThrow();
@@ -87,8 +85,7 @@ public class BuiltinHook {
         try {
             return (Map<ResourceKey<?>, Registry<?>>) REGISTRY_GETTER.invokeExact((RegistryAccess.WritableRegistryAccess) writable);
         } catch (Throwable e) {
-            e.printStackTrace();
-            return Map.of();
+            throw new RuntimeException(e);
         }
     }
 

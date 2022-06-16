@@ -25,13 +25,14 @@
 package com.terraforged.mod.worldgen.biome.util;
 
 import com.terraforged.engine.world.biome.type.BiomeType;
-import com.terraforged.mod.CommonAPI;
 import com.terraforged.mod.TerraForged;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 
@@ -66,35 +67,31 @@ public class BiomeUtil {
     }
 
     public static List<Holder<Biome>> getOverworldBiomes(Registry<Biome> biomes) {
-        var overworld = getVanillaOverworldBiomes(biomes);
-        var matcher = CommonAPI.get().getOverworldMatcher();
+        var holders = new ObjectArrayList<Holder<Biome>>();
 
-        for (var holder : biomes.asHolderIdMap()) {
-            if (!overworld.contains(holder) && matcher.test(holder)) {
-                overworld.add(holder);
+        for (var biome : biomes.asHolderIdMap()) {
+            if (biome.is(BiomeTags.IS_OVERWORLD)) {
+                holders.add(biome);
             }
         }
 
-        var result = new ArrayList<>(overworld);
-        result.sort(BIOME_SORTER);
+        holders.sort(BIOME_SORTER);
 
-        return result;
+        return holders;
     }
 
     public static BiomeType getType(Holder<Biome> biome) {
-//        return switch (Biome.getBiomeCategory(biome)) {
-//            case MESA, DESERT -> BiomeType.DESERT;
-//            case PLAINS -> getByTemp(biome.value(), BiomeType.COLD_STEPPE, BiomeType.GRASSLAND, BiomeType.STEPPE);
-//            case TAIGA -> getByTemp(biome.value(), BiomeType.TUNDRA, BiomeType.TAIGA);
-//            case ICY -> BiomeType.TUNDRA;
-//            case SAVANNA -> BiomeType.SAVANNA;
-//            case JUNGLE -> BiomeType.TROPICAL_RAINFOREST;
-//            case FOREST ->
-//                    getByRain(biome.value(), BiomeType.TUNDRA, BiomeType.TEMPERATE_RAINFOREST, BiomeType.TEMPERATE_FOREST);
-//            case MOUNTAIN -> BiomeType.ALPINE;
-//            default -> null;
-//        };
-        return BiomeType.TAIGA;
+        if (biome.is(BiomeTags.IS_BADLANDS) || biome.is(BiomeTags.HAS_VILLAGE_DESERT))
+            return BiomeType.DESERT;
+        if (biome.is(BiomeTags.IS_SAVANNA))
+            return BiomeType.SAVANNA;
+        if (biome.is(BiomeTags.IS_JUNGLE))
+            return BiomeType.TROPICAL_RAINFOREST;
+        if (biome.is(BiomeTags.IS_TAIGA))
+            return getByTemp(biome.value(), BiomeType.TUNDRA, BiomeType.TAIGA);
+        if (biome.is(BiomeTags.IS_FOREST))
+            return getByRain(biome.value(), BiomeType.TUNDRA, BiomeType.TEMPERATE_RAINFOREST, BiomeType.TEMPERATE_FOREST);
+        return BiomeType.GRASSLAND;
     }
 
     public static BiomeType getByRain(Biome biome, BiomeType frozen, BiomeType wetter, BiomeType dryer) {

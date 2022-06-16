@@ -24,35 +24,53 @@
 
 package com.terraforged.mod;
 
+import com.google.common.base.Suppliers;
+import com.terraforged.mod.lifecycle.ModSetup;
 import com.terraforged.mod.registry.key.RegistryKey;
 import com.terraforged.mod.worldgen.asset.*;
-import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public abstract class TerraForged {
+import java.nio.file.Path;
+import java.util.function.Supplier;
+
+public abstract class TerraForged implements CommonAPI {
 	public static final String MODID = "terraforged";
 	public static final String TITLE = "TerraForged";
-	public static final String DATAPACK_VERSION = "v0.1";
+	public static final String DATAPACK_VERSION = "v0.2";
 	public static final Logger LOG = LogManager.getLogger(TITLE);
 
 	public static final ResourceLocation WORLD_PRESET = location("normal");
 	public static final ResourceLocation DIMENSION_EFFECTS = location("overworld");
 
-	public static final RegistryKey<Biome> BIOMES = RegistryKey.builtin(() -> Registry.BIOME_REGISTRY);
+	public static final RegistryKey<Biome> BIOMES = registry("minecraft:worldgen/biome");
 
 	// Note: Forge fucks around with mod datapack registry paths in a way that would make these
 	// keys break on other platforms, so we must register them under the minecraft namespace :/
 	public static final RegistryKey<ClimateType> CLIMATES = registry("minecraft:worldgen/climate");
 	public static final RegistryKey<NoiseCave> CAVES = registry("minecraft:worldgen/cave");
-	public static final RegistryKey<TerrainNoise> TERRAINS = registry("minecraft:worldgen/terrain/noise");
-	public static final RegistryKey<TerrainType> TERRAIN_TYPES = registry("minecraft:worldgen/terrain/type");
+	public static final RegistryKey<TerrainNoise> TERRAINS = registry("minecraft:worldgen/terrain_noise");
+	public static final RegistryKey<TerrainType> TERRAIN_TYPES = registry("minecraft:worldgen/terrain_type");
 	public static final RegistryKey<VegetationConfig> VEGETATIONS = registry("minecraft:worldgen/vegetation");
 
-	protected TerraForged() {
+	private final Supplier<Path> path;
+
+	protected TerraForged(Supplier<Path> path) {
+		this.path = Suppliers.memoize(path::get);
+
 		Environment.log();
+
+		CommonAPI.HOLDER.set(this);
+
+		ModSetup.STAGE.run();
+	}
+
+	@Override
+	public final Path getContainer() {
+		return path.get();
 	}
 
 	public static ResourceLocation location(String name) {
@@ -63,5 +81,10 @@ public abstract class TerraForged {
 
 	public static <T> RegistryKey<T> registry(String name) {
 		return new RegistryKey<>(location(name));
+	}
+
+	public static <T> void register(RegistryKey<T> key, String name, T t) {
+		var entryKey = ResourceKey.create(key.get(), TerraForged.location(name));
+		CommonAPI.get().getRegistryManager().register(key, entryKey, t);
 	}
 }

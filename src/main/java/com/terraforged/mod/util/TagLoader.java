@@ -25,16 +25,41 @@
 package com.terraforged.mod.util;
 
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.VanillaPackResources;
+import net.minecraft.server.packs.repository.ServerPacksSource;
+import net.minecraft.server.packs.resources.MultiPackResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.tags.TagKey;
 import net.minecraft.tags.TagManager;
 import net.minecraft.util.profiling.InactiveProfiler;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.resource.ResourcePackLoader;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 public class TagLoader {
     private static final Executor DIRECT_EXECUTOR = Runnable::run;
+    public static void bindTags(RegistryAccess access) {
+        var sources = new ArrayList<PackResources>();
+        sources.add(new VanillaPackResources(ServerPacksSource.BUILT_IN_METADATA, "minecraft"));
+
+        for (var mod : ModList.get().getMods()) {
+            if (mod.getOwningFile() == null) continue;
+
+            sources.add(ResourcePackLoader.createPackForMod(mod.getOwningFile()));
+        }
+
+        try (var resourceManager = new MultiPackResourceManager(PackType.SERVER_DATA, sources)) {
+            bindTags(access, resourceManager);
+        }
+    }
     
     public static void bindTags(RegistryAccess access, ResourceManager resources) {
         var tagManager = new TagManager(access);
@@ -59,10 +84,12 @@ public class TagLoader {
 
         if (registry.isEmpty()) return;
 
-//        registry.get().bindTags(result.tags().entrySet().stream().collect(Collectors.toMap(
-//                e -> TagKey.create(result.key(), e.getKey()),
-//                e -> e.getValue().getValues()
-//        )));
+        var tags = result.tags().entrySet().stream().collect(Collectors.toMap(
+                e -> TagKey.create(result.key(), e.getKey()),
+                e -> List.copyOf(e.getValue())
+        ));
+
+        registry.get().bindTags(tags);
     }
 
     @Nonnull

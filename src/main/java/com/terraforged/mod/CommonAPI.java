@@ -24,11 +24,11 @@
 
 package com.terraforged.mod;
 
-import com.terraforged.mod.data.ModTags;
 import com.terraforged.mod.registry.RegistryManager;
 import com.terraforged.mod.util.ApiHolder;
 import com.terraforged.mod.worldgen.biome.util.matcher.BiomeMatcher;
 import com.terraforged.mod.worldgen.biome.util.matcher.BiomeTagMatcher;
+import net.minecraft.tags.BiomeTags;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,7 +45,7 @@ public interface CommonAPI {
     }
 
     default BiomeMatcher getOverworldMatcher() {
-        return new BiomeTagMatcher.Overworld(ModTags.OVERWORLD.get());
+        return new BiomeTagMatcher.Overworld(BiomeTags.IS_OVERWORLD);
     }
 
     static CommonAPI get() {

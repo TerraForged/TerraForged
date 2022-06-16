@@ -24,16 +24,12 @@
 
 package com.terraforged.mod.platform.fabric.client;
 
-import com.terraforged.mod.client.ClientAPI;
 import com.terraforged.mod.lifecycle.ClientSetup;
 import net.fabricmc.api.ClientModInitializer;
 
 public class TFClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        ClientAPI.HOLDER.set(new FabricClientAPI());
         ClientSetup.INSTANCE.run();
     }
-
-    private static class FabricClientAPI implements ClientAPI {}
 }

@@ -48,7 +48,7 @@ public class Codecs {
         return codec.encodeStart(ops, v).result()
                 .filter(JsonElement::isJsonObject)
                 .map(JsonElement::getAsJsonObject)
-                .orElse(null);
+                .orElseThrow();
     }
 
     public static <V> V modify(V v, Codec<V> codec, UnaryOperator<JsonObject> modifier) {

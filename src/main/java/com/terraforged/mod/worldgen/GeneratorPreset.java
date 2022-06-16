@@ -25,7 +25,6 @@
 package com.terraforged.mod.worldgen;
 
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.util.TranslationUtil;
 import com.terraforged.mod.worldgen.asset.TerrainNoise;
 import com.terraforged.mod.worldgen.biome.BiomeGenerator;
 import com.terraforged.mod.worldgen.biome.Source;
@@ -33,7 +32,6 @@ import com.terraforged.mod.worldgen.noise.NoiseGenerator;
 import com.terraforged.mod.worldgen.terrain.TerrainLevels;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -43,9 +41,6 @@ import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 
 public class GeneratorPreset {
-    public static final ResourceLocation PRESET_NAME = TerraForged.location("preset");
-    public static final String TRANSLATION_KEY = TranslationUtil.key("generator", PRESET_NAME);
-
     public static Generator build(TerrainLevels levels, RegistryAccess registries) {
         var terrain = TerraForged.TERRAINS.entries(registries, TerrainNoise[]::new);
 

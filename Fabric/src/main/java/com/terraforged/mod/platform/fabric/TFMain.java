@@ -24,13 +24,10 @@
 
 package com.terraforged.mod.platform.fabric;
 
-import com.google.common.base.Suppliers;
 import com.mojang.brigadier.CommandDispatcher;
-import com.terraforged.mod.CommonAPI;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.command.TFCommands;
 import com.terraforged.mod.lifecycle.CommonSetup;
-import com.terraforged.mod.lifecycle.RegistrySetup;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
@@ -39,24 +36,15 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
 import java.nio.file.Path;
-import java.util.function.Supplier;
 
-public class TFMain extends TerraForged implements CommonAPI, ModInitializer, CommandRegistrationCallback {
-    private final Supplier<Path> container = Suppliers.memoize(TFMain::getRootPath);
-
+public class TFMain extends TerraForged implements ModInitializer, CommandRegistrationCallback {
     public TFMain() {
-        CommonAPI.HOLDER.set(this);
-        RegistrySetup.INSTANCE.run();
-    }
-
-    @Override
-    public Path getContainer() {
-        return container.get();
+        super(TFMain::getRootPath);
     }
 
     @Override
     public void onInitialize() {
-        CommonSetup.INSTANCE.run();
+        CommonSetup.STAGE.run();
         CommandRegistrationCallback.EVENT.register(this);
     }
 

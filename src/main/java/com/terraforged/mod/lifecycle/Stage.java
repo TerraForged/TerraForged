@@ -22,18 +22,20 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.client;
+package com.terraforged.mod.lifecycle;
 
-import com.terraforged.mod.util.ApiHolder;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public interface ClientAPI {
-    ApiHolder<ClientAPI> HOLDER = new ApiHolder<>(new ClientAPI() {});
+public abstract class Stage {
+    private final AtomicBoolean lock = new AtomicBoolean(false);
 
-    default boolean hasPreset() {
+    public final boolean run() {
+        if (lock.compareAndSet(false, true)) {
+            doInit();
+            return true;
+        }
         return false;
     }
 
-    static ClientAPI get() {
-        return HOLDER.get();
-    }
+    protected abstract void doInit();
 }

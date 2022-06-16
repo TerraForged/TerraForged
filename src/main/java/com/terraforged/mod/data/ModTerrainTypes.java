@@ -28,6 +28,8 @@ import com.terraforged.engine.world.terrain.Terrain;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.worldgen.asset.TerrainType;
 
+import static com.terraforged.mod.TerraForged.TERRAIN_TYPES;
+
 public interface ModTerrainTypes {
     Terrain TORRIDONIAN = com.terraforged.engine.world.terrain.TerrainType.getOrCreate("torridonian", com.terraforged.engine.world.terrain.TerrainType.HILLS);
     Terrain DOLOMITES = com.terraforged.engine.world.terrain.TerrainType.getOrCreate("dolomites", com.terraforged.engine.world.terrain.TerrainType.MOUNTAINS);
@@ -35,7 +37,7 @@ public interface ModTerrainTypes {
     static void register() {
         com.terraforged.engine.world.terrain.TerrainType.forEach(terrain -> {
             var type = TerrainType.of(terrain);
-            TerraForged.TERRAIN_TYPES.register(terrain.getName(), type);
+            TerraForged.register(TERRAIN_TYPES, terrain.getName(), type);
         });
     }
 }

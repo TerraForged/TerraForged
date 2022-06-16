@@ -64,8 +64,10 @@ public class RegistryAccessUtil {
 
     public static <T> MappedRegistry<T> copy(Registry<T> input) {
         var copy = new MappedRegistry<>(input.key(), input.lifecycle(), null);
-        for (var e : input.entrySet()) {
-            copy.register(e.getKey(), e.getValue(), input.lifecycle(e.getValue()));
+        for (var value : input) {
+            var key = input.getResourceKey(value).orElseThrow();
+            var lifecycle = input.lifecycle(value);
+            copy.register(key, value, lifecycle);
         }
         return copy;
     }

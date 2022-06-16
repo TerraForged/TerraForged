@@ -40,6 +40,8 @@ import net.minecraft.world.level.biome.Biomes;
 import java.util.List;
 import java.util.Locale;
 
+import static com.terraforged.mod.TerraForged.CLIMATES;
+
 public interface ModClimates {
     float RARE = 1F;
     float NORMAL = 5F;
@@ -48,7 +50,7 @@ public interface ModClimates {
         var registry = BuiltinRegistries.BIOME;
         var biomes = BiomeUtil.getOverworldBiomes(registry);
         for (var type : BiomeType.values()) {
-            TerraForged.CLIMATES.register(type.name().toLowerCase(Locale.ROOT), Factory.create(type, biomes, registry));
+            TerraForged.register(CLIMATES, type.name().toLowerCase(Locale.ROOT), Factory.create(type, biomes, registry));
         }
     }
 

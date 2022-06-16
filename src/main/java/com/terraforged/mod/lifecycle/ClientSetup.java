@@ -27,8 +27,8 @@ package com.terraforged.mod.lifecycle;
 import com.terraforged.mod.TerraForged;
 import com.terraforged.mod.client.ingame.DimensionEffects;
 
-public class ClientSetup extends Init {
-    public static final ClientSetup INSTANCE = new ClientSetup();
+public class ClientSetup extends Stage {
+    public static final ClientSetup STAGE = new ClientSetup();
 
     ClientSetup() {}
 

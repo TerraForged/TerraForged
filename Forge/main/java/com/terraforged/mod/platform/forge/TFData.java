@@ -25,47 +25,39 @@
 package com.terraforged.mod.platform.forge;
 
 import com.terraforged.mod.CommonAPI;
-import com.terraforged.mod.Environment;
 import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.command.TFCommands;
+import com.terraforged.mod.data.gen.TerraForgedDataProvider;
 import com.terraforged.mod.lifecycle.CommonSetup;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import com.terraforged.mod.lifecycle.DataGenSetup;
+import com.terraforged.mod.lifecycle.Stage;
+import net.minecraft.core.Registry;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.registries.DeferredRegister;
 
-import java.nio.file.Path;
+public class TFData extends Stage {
+    public static final TFData STAGE = new TFData();
 
-@Mod(TerraForged.MODID)
-public class TFMain extends TerraForged implements CommonAPI {
-    public TFMain() {
-        super(TFMain::getRootPath);
+    @Override
+    protected void doInit() {
+        var eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        eventBus.addListener(this::onGenerateData);
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onInit);
+        var register = DeferredRegister.create(Registry.BIOME_REGISTRY, TerraForged.MODID);
+        register.register(eventBus);
 
-        MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
+        DataGenSetup.STAGE.run();
 
-        if (Environment.DATA_GEN) {
-            TFData.STAGE.run();
+        for (var entry : CommonAPI.get().getRegistryManager().getRegistry(TerraForged.BIOMES)) {
+            register.register(entry.getKey().location().getPath(), entry::getValue);
         }
-
-        if (FMLLoader.getDist().isClient()) {
-            TFClient.STAGE.run();
-        }
     }
 
-    void onInit(FMLCommonSetupEvent event) {
-        event.enqueueWork(CommonSetup.STAGE::run);
-    }
+    void onGenerateData(GatherDataEvent event) {
+        CommonSetup.STAGE.run();
 
-    void onRegisterCommands(RegisterCommandsEvent event) {
-        TFCommands.register(event.getDispatcher());
-    }
+        var path = event.getGenerator().getOutputFolder().resolve("resources/default");
 
-    private static Path getRootPath() {
-        return ModList.get().getModContainerById(MODID).orElseThrow().getModInfo().getOwningFile().getFile().getFilePath();
+        event.getGenerator().addProvider(true, new TerraForgedDataProvider(path));
     }
 }

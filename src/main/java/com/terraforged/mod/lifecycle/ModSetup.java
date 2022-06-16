@@ -22,22 +22,26 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.registry;
+package com.terraforged.mod.lifecycle;
 
-import com.terraforged.mod.registry.key.RegistryKey;
-import net.minecraft.resources.ResourceKey;
+import com.terraforged.mod.CommonAPI;
+import com.terraforged.mod.TerraForged;
+import com.terraforged.mod.worldgen.asset.*;
+import net.minecraft.world.level.biome.Biome;
 
-import java.util.Map;
-import java.util.stream.Stream;
+public class ModSetup extends Stage {
+    public static final ModSetup STAGE = new ModSetup();
 
-public interface VanillaRegistry<T> {
-    RegistryKey<T> key();
+    @Override
+    protected void doInit() {
+        TerraForged.LOG.info("Setting up registries");
+        var registryManager = CommonAPI.get().getRegistryManager();
+        registryManager.create(TerraForged.CAVES, NoiseCave.CODEC);
+        registryManager.create(TerraForged.CLIMATES, ClimateType.CODEC);
+        registryManager.create(TerraForged.TERRAINS, TerrainNoise.CODEC);
+        registryManager.create(TerraForged.TERRAIN_TYPES, TerrainType.DIRECT);
+        registryManager.create(TerraForged.VEGETATIONS, VegetationConfig.CODEC);
 
-    void register(ResourceKey<T> key, T value);
-
-    Stream<Map.Entry<ResourceKey<T>, T>> stream();
-
-    interface Factory {
-        <T, R extends VanillaRegistry<T>> R create(RegistryKey<T> registry);
+        registryManager.create(TerraForged.BIOMES, Biome.DIRECT_CODEC, false);
     }
 }

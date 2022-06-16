@@ -33,12 +33,14 @@ import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
+import static com.terraforged.mod.TerraForged.BIOMES;
+
 public interface ModBiomes {
     EntryKey<Biome> CAVE = TerraForged.BIOMES.entryKey("cave");
     EntryKey<Biome> OAK_FOREST = TerraForged.BIOMES.entryKey("oak_forest");
 
     static void register() {
-        TerraForged.BIOMES.register(CAVE.get(), ModBiome.create(Biomes.DRIPSTONE_CAVES, builder -> {
+        TerraForged.register(BIOMES, "cave", ModBiome.create(Biomes.DRIPSTONE_CAVES, builder -> {
             var genSettings = new BiomeGenerationSettings.Builder();
             genSettings.addFeature(GenerationStep.Decoration.LOCAL_MODIFICATIONS, CavePlacements.LARGE_DRIPSTONE);
             genSettings.addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, CavePlacements.POINTED_DRIPSTONE);
@@ -46,7 +48,7 @@ public interface ModBiomes {
             builder.generationSettings(genSettings.build());
         }));
 
-        TerraForged.BIOMES.register(OAK_FOREST.get(), ModBiome.create(Biomes.PLAINS, builder -> {
+        TerraForged.register(BIOMES, "oak_forest", ModBiome.create(Biomes.PLAINS, builder -> {
 //        builder.biomeCategory(Biome.BiomeCategory.FOREST);
         }));
     }

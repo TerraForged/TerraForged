@@ -22,42 +22,55 @@
  * SOFTWARE.
  */
 
-package com.terraforged.mod.platform.forge.registry;
+package com.terraforged.mod.registry;
 
-import com.terraforged.mod.TerraForged;
-import com.terraforged.mod.registry.VanillaRegistry;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.Lifecycle;
+import com.terraforged.mod.hooks.RegistryAccessUtil;
 import com.terraforged.mod.registry.key.RegistryKey;
+import net.minecraft.core.MappedRegistry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.javafmlmod.FMLModContainer;
-import net.minecraftforge.registries.DeferredRegister;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.AbstractMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
-public class ForgeRegistry<T> implements VanillaRegistry<T> {
+public class DataRegistry<T> implements Iterable<Map.Entry<ResourceKey<T>, T>> {
+    protected final MappedRegistry<T> registry;
     protected final RegistryKey<T> key;
-    protected final DeferredRegister<T> register;
+    protected final Codec<T> codec;
 
-    public ForgeRegistry(RegistryKey<T> key) {
+    public DataRegistry(RegistryKey<T> key, Codec<T> codec) {
         this.key = key;
-        this.register = DeferredRegister.createOptional(key.get(), TerraForged.MODID);
-        this.register.register(((FMLModContainer) ModLoadingContext.get().getActiveContainer()).getEventBus());
+        this.codec = codec;
+        this.registry = new MappedRegistry<>(key.get(), Lifecycle.stable(), null);
     }
 
-    @Override
+    public Codec<T> codec() {
+        return codec;
+    }
+
     public RegistryKey<T> key() {
         return key;
     }
 
-    @Override
     public void register(ResourceKey<T> key, T value) {
-        register.register(key.location().getPath(), () -> value);
+        registry.register(key, value, Lifecycle.stable());
     }
 
+    @NotNull
     @Override
+    public Iterator<Map.Entry<ResourceKey<T>, T>> iterator() {
+        return registry.entrySet().iterator();
+    }
+
     public Stream<Map.Entry<ResourceKey<T>, T>> stream() {
-        return register.getEntries().stream().map(o -> new AbstractMap.SimpleEntry<>(o.getKey(), o.get()));
+        return StreamSupport.stream(spliterator(), false);
+    }
+
+    public MappedRegistry<T> copy() {
+        return RegistryAccessUtil.copy(registry);
     }
 }
