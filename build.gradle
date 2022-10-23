@@ -6,8 +6,8 @@ buildscript {
         maven { url "https://files.minecraftforge.net/maven" }
     }
     dependencies {
-        classpath group: "org.spongepowered", name: "mixingradle", version: "0.7-SNAPSHOT", changing: true
-        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "4.1.+", changing: true
+        classpath group: "org.spongepowered", name: "mixingradle", version: "0.7.32", changing: true
+        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "5.1.+", changing: true
     }
 }
 
@@ -26,7 +26,7 @@ allprojects {
 
 configurations {
     lib
-    compile.extendsFrom lib
+    implementation.extendsFrom lib
 }
 
 repositories {
@@ -35,12 +35,12 @@ repositories {
     jcenter()
 }
 
-// If building from source
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    annotationProcessor "org.spongepowered:mixin:0.8.2:processor"
+    annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
 //    lib "com.terraforged:Engine:0.2.3"
     lib project(":Engine")
+    compileOnly "com.terraforged:Noise2D:0.9.0-SNAPSHOT"
 }
 
 sourceSets {
@@ -145,7 +145,7 @@ jar {
     }
 }
 
-import net.minecraftforge.gradle.common.task.SignJar
+import net.minecraftforge.gradle.common.tasks.SignJar
 task signJar(type: SignJar, dependsOn: "reobfJar") {
     onlyIf { project.hasProperty("signing.keystore.path") }
     keyStore = project.findProperty("signing.keystore.path")

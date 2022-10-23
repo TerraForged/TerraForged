@@ -279,7 +279,7 @@ public class TFChunkGenerator extends ChunkGenerator {
 
             final int level = getContext().levels.scale(cell.value) + 1;
             if (type == Heightmap.Type.OCEAN_FLOOR || type == Heightmap.Type.OCEAN_FLOOR_WG) {
-                return level;
+                return Math.max(0, level);
             }
 
             return Math.max(getSeaLevel(), level);

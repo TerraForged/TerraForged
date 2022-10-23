@@ -96,7 +96,7 @@ public class BryceSurface implements MaskedSurface, Stratum.Visitor<BlockState, 
     @Override
     public void buildSurface(int x, int z, int height, float mask, SurfaceContext ctx) {
         float strength = 1 - ctx.cell.gradient;
-        float value = module.getValue(x, z) * mask * strength;
+        float value = module.getValue(0, x, z) * mask * strength;
 
         int top = (int) (value * 30);
         if (top <= 0) {

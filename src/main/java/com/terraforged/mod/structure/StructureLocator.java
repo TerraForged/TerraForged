@@ -49,7 +49,7 @@ public class StructureLocator {
     public static final String ASYNC_KEY = "async_structure_search";
     public static final String TIMEOUT_KEY = "structure_search_timeout";
 
-    public static final boolean DEFAULT_ASYNC = true;
+    public static final boolean DEFAULT_ASYNC = false;
     public static final long DEFAULT_TIMEOUT_MS = 5_000L;
 
     // @Magic Value:

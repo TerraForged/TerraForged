@@ -74,7 +74,7 @@ public class SwampSurface implements Surface {
     }
 
     private BlockState getMaterial(int x, int y, int z, SurfaceContext ctx) {
-        float value = noise.getValue(x, z);
+        float value = noise.getValue(0, x, z);
         if (value > 0.6) {
             if (value < 0.75 && y < ctx.levels.waterY) {
                 return States.CLAY.get();

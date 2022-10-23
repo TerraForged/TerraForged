@@ -69,8 +69,8 @@ public class SnowEroder extends ErosionDecorator {
 
         if (context.biome.getTemperature(context.pos.set(x, y, z)) <= 0.25) {
             float var = -ColumnDecorator.getNoise(x, z, seed1, 16, 0);
-            float hNoise = rand.getValue(x, z, seed2) * HEIGHT_MODIFIER;
-            float sNoise = rand.getValue(x, z, seed3) * SLOPE_MODIFIER;
+            float hNoise = rand.getValue(seed2, (float) x, (float) z) * HEIGHT_MODIFIER;
+            float sNoise = rand.getValue(seed3, (float) x, (float) z) * SLOPE_MODIFIER;
             float vModifier = context.cell.terrain == TerrainType.VOLCANO ? 0.15F : 0F;
             float height = context.cell.value + var + hNoise + vModifier;
             float steepness = context.cell.gradient + var + sNoise + vModifier;

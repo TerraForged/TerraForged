@@ -67,7 +67,7 @@ public interface ColumnDecorator {
     }
 
     static float getNoise(float x, float z, int seed, float scale, float bias) {
-        return (variance.getValue(x, z, seed) * scale) + bias;
+        return (variance.getValue(seed, x, z) * scale) + bias;
     }
 
     static float getNoise(float x, float z, int seed, int scale, int bias) {

@@ -39,13 +39,13 @@ public class DensityNoise implements SafeCloseable, Module {
     }
 
     @Override
-    public float getValue(float x, float y) {
-        float value1 = biome.getValue(x, y);
+    public float getValue(int seed, float x, float y) {
+        float value1 = biome.getValue(seed, x, y);
         if (value1 > 2F) {
             return value1;
         }
 
-        float value2 = variance.getValue(x, y);
+        float value2 = variance.getValue(seed, x, y);
         if (value1 > 1F) {
             return NoiseUtil.lerp(value2, value1, (value1 - 0.25F) / 0.25F);
         }

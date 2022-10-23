@@ -67,7 +67,7 @@ public class DunesSurface implements MaskedSurface {
 
     @Override
     public void buildSurface(int x, int z, int surface, float mask, SurfaceContext ctx) {
-        float value = module.getValue(x, z) * mask;
+        float value = module.getValue(0, x, z) * mask;
         float baseHeight = ctx.chunk.getHeight(Heightmap.Type.WORLD_SURFACE_WG, x & 15, z & 15);
         float duneHeight = baseHeight + value * maxHeight;
         int duneBase = (int) baseHeight;

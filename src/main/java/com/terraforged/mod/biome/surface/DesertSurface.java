@@ -62,7 +62,7 @@ public class DesertSurface implements Surface {
             return;
         }
 
-        float value = ctx.cell.value + noise.getValue(x, z);
+        float value = ctx.cell.value + noise.getValue(0, x, z);
         if (ctx.cell.gradient > 0.3 || value > level) {
             BlockState state = sandstone;
 

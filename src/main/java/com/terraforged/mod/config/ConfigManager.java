@@ -43,7 +43,7 @@ import java.util.function.Consumer;
 
 public class ConfigManager {
 
-    private static final String GENERAL_VERSION = "1.1";
+    private static final String GENERAL_VERSION = "1.2";
     private static final Path COMMON_DIR = Paths.get("config", "terraforged").toAbsolutePath();
 
     public static final ConfigRef BIOME_WEIGHTS = new ConfigRef(() -> create("biome_weights", cfg -> set(

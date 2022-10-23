@@ -104,9 +104,9 @@ public class IcebergsSurface implements MaskedSurface {
     @Override
     public void buildSurface(int x, int z, int height, float mask, SurfaceContext ctx) {
         int center = levels.waterLevel - 5;
-        int top = center + (int) (up.getValue(x, z) * levels.worldHeight * mask);
-        int topDepth = (int) (bergTop.getValue(x, z) * levels.worldHeight * mask);
-        int bottom = center - (int) (down.getValue(x, z) * levels.worldHeight * mask);
+        int top = center + (int) (up.getValue(0, x, z) * levels.worldHeight * mask);
+        int topDepth = (int) (bergTop.getValue(0, x, z) * levels.worldHeight * mask);
+        int bottom = center - (int) (down.getValue(0, x, z) * levels.worldHeight * mask);
 
         // set iceberg materials
         BlockPos.Mutable pos = new BlockPos.Mutable(x, height, z);
@@ -118,7 +118,7 @@ public class IcebergsSurface implements MaskedSurface {
 
         // set ocean floor to gravel
         int floorBed = ctx.levels.scale(ctx.cell.value);
-        int floorDepth = (int) (seaFloor.getValue(x, z) * levels.worldHeight);
+        int floorDepth = (int) (seaFloor.getValue(0, x, z) * levels.worldHeight);
         for (int dy = 0; dy < floorDepth; dy++) {
             pos.setY(floorBed - dy);
             ctx.chunk.setBlockState(pos, gravel, false);
@@ -126,7 +126,7 @@ public class IcebergsSurface implements MaskedSurface {
     }
 
     private BlockState getMaterial(int x, int y, int z, int top, int topDepth) {
-        if (y >= top - topDepth && fadeUp.getValue(x, z) == 1) {
+        if (y >= top - topDepth && fadeUp.getValue(0, x, z) == 1) {
             return States.SNOW_BLOCK.get();
         }
         return States.PACKED_ICE.get();

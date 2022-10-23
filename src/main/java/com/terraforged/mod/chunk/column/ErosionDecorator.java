@@ -134,13 +134,13 @@ public class ErosionDecorator implements ColumnDecorator {
     }
 
     protected void placeScree(IChunk chunk, DecoratorContext context, int x, int y, int z) {
-        float steepness = context.cell.gradient + context.climate.getRand().getValue(x, z, seed2) * SLOPE_MODIFIER;
+        float steepness = context.cell.gradient + context.climate.getRand().getValue(seed2, (float) x, (float) z) * SLOPE_MODIFIER;
         if (steepness < SCREE_STEEPNESS) {
             return;
         }
 
         float sediment = context.cell.sediment * SEDIMENT_MODIFIER;
-        float noise = context.climate.getRand().getValue(x, z, seed3) * SEDIMENT_NOISE;
+        float noise = context.climate.getRand().getValue(seed3, (float) x, (float) z) * SEDIMENT_NOISE;
         if (sediment + noise > SCREE_VALUE) {
             fillDownSolid(context, chunk, x, z, y, y - 2, States.GRAVEL.get());
         }

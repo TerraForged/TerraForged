@@ -50,7 +50,7 @@ public class ForestSurface implements Surface {
     }
 
     private BlockState getMaterial(int x, int z) {
-        float value = noise.getValue(x, z);
+        float value = noise.getValue(0, x, z);
         if (value > 0.65) {
             if (value < 0.725) {
                 return States.PODZOL.get();

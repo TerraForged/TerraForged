@@ -36,7 +36,7 @@ public class BiomeVariance implements Module, SafeCloseable {
 
     public static final BiomeVariance NONE = new BiomeVariance(null, 0F) {
         @Override
-        public float getValue(float x, float y) {
+        public float getValue(int seed, float x, float y) {
             return NO_SPREAD;
         }
 
@@ -62,7 +62,7 @@ public class BiomeVariance implements Module, SafeCloseable {
     }
 
     @Override
-    public float getValue(float x, float y) {
+    public float getValue(int seed, float x, float y) {
         Cell cell = chunk.getCell((int) x, (int) y);
         float edge = 0.02F + cell.biomeRegionEdge;
 

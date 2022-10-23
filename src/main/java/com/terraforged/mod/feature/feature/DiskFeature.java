@@ -65,7 +65,7 @@ public class DiskFeature extends Feature<SphereReplaceConfig> {
                 for(int z = pos.getZ() - radius; z <= pos.getZ() + radius; ++z) {
                     int dx = x - pos.getX();
                     int dz = z - pos.getZ();
-                    float rad2 = domain.getValue(x, z) * radius2;
+                    float rad2 = domain.getValue(0, x, z) * radius2;
                     if (dx * dx + dz * dz <= rad2) {
                         for(int y = pos.getY() - ySize; y <= pos.getY() + ySize && y + 1 < generator.getGenDepth(); ++y) {
                             blockPos.set(x, y, z);

@@ -64,6 +64,6 @@ public class VolcanoPredicate implements FeaturePredicate {
     private boolean testHeight(ChunkReader chunk, Cell cell) {
         int x = chunk.getBlockX() + 8;
         int z = chunk.getBlockZ() + 8;
-        return cell.value < threshold.getValue(x, z);
+        return cell.value < threshold.getValue(0, x, z);
     }
 }

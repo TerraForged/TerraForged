@@ -37,7 +37,7 @@ public class SteppeSurface implements Surface {
     @Override
     public void buildSurface(int x, int z, int height, SurfaceContext ctx) {
         Module module = Source.cell(123, 4, CellFunc.DISTANCE).warp(214, 80, 1, 40);
-        float value = module.getValue(x, z);
+        float value = module.getValue(0, x, z);
 
         BlockState state = States.SAND.get();
 

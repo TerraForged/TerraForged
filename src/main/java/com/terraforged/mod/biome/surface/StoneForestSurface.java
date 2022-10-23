@@ -62,7 +62,7 @@ public class StoneForestSurface implements MaskedSurface {
     public void buildSurface(int x, int z, int height, float mask, SurfaceContext ctx) {
         // reduce height on steeper terrain
         float strength = 1 - ctx.cell.gradient;
-        float value = module.getValue(x, z) * mask * strength;
+        float value = module.getValue(0, x, z) * mask * strength;
 
         int top = height + (int) (value * 50);
         if (top > height) {

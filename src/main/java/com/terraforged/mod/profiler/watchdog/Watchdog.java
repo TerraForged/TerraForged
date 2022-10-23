@@ -36,7 +36,7 @@ public class Watchdog implements Runnable {
 
     public static final String FEATURE_WARN_KEY = "feature_warn_time";
     public static final String CHUNK_TIMEOUT_KEY = "chunkgen_timeout";
-    public static final long DEFAULT_WARN_TIME_MS = 100;
+    public static final long DEFAULT_WARN_TIME_MS = 500;
     public static final long DEFAULT_TIMEOUT_MS = 60_000L;
 
     private static final long MIN_CRASH_TIME = 5_000L;

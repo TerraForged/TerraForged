@@ -28,6 +28,7 @@ import com.terraforged.engine.tile.chunk.ChunkReader;
 import com.terraforged.mod.biome.TFBiomeContainer;
 import com.terraforged.mod.chunk.TFChunkGenerator;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunk;
 
 public class BiomeGenerator implements Generator.Biomes {
@@ -42,7 +43,10 @@ public class BiomeGenerator implements Generator.Biomes {
     public void generateBiomes(IChunk chunk) {
         ChunkPos pos = chunk.getPos();
         try (ChunkReader reader = generator.getChunkReader(pos.x, pos.z)) {
-            TFBiomeContainer.create(reader, generator.getBiomeSource());
+            TFBiomeContainer biomes = TFBiomeContainer.create(reader, generator.getBiomeSource());
+            if (chunk instanceof ChunkPrimer) {
+                ((ChunkPrimer) chunk).setBiomes(biomes);
+            }
         }
     }
 }
